@@ -1,7 +1,7 @@
 {
   "version": "0.0.2",
   "name": "tailwindcss-react-native",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
   "sideEffects": false,
   "scripts": {
     "test": "jest",
