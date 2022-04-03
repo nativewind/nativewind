@@ -11,12 +11,6 @@ Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native
 * :sparkles: compatible with RN style objects
 * :sparkles: Server Side Rendering (SSR) on Web (including responsive styles)
 
-## Why?
-
-* Readable: All classes follow the same convention
-* Themeable: Use a consistent them across your applications
-* Reusable: Share components between applications
-
 Already using another RN library for Tailwind? [Find out why you should switch.](./docs/library-comparision.md)
 
 ## Install
