@@ -2,14 +2,14 @@
 
 Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native](https://reactnative.dev/) applications.
 
-* :sparkes: full support for all native RN styles with tailwind counterparts: (view, layout, image, shadow, and text).
-* :sparkes: native support for multiple platforms 
-* :sparkes: respects tailwind.config.js
-* :sparkes: fast hot-reload
-* :sparkes: supports dark mode / media queries / arbitrary classes
-* :sparkes: platform prefixes: android:mt-4 ios:mt-2 web:mt-3
-* :sparkes: compatible with RN style objects
-* :sparkes: Server Side Rendering (SSR) on Web (including responsive styles)
+* :sparkles: full support for all native RN styles with tailwind counterparts: (view, layout, image, shadow, and text).
+* :sparkles: native support for multiple platforms 
+* :sparkles: respects tailwind.config.js
+* :sparkles: fast hot-reload
+* :sparkles: supports dark mode / media queries / arbitrary classes
+* :sparkles: platform prefixes: android:mt-4 ios:mt-2 web:mt-3
+* :sparkles: compatible with RN style objects
+* :sparkles: Server Side Rendering (SSR) on Web (including responsive styles)
 
 ## Why?
 
@@ -33,14 +33,14 @@ module.exports = {
   ],
 }
 ```
-Add the `TailwindCssProvider` to your application
+Add the `TailwindProvider` to your application
 
 ```jsx
-import { TailwindCssProvider } from 'tailwindcss-react-native`
+import { TailwindProvider } from 'tailwindcss-react-native`
 
 function MyAppsProviders ({ children }) {
     return (
-        <TailwindCssProvider>{children}</TailwindCssProvider>
+        <TailwindProvider>{children}</TailwindProvider>
     )
 }
 ```
@@ -70,11 +70,7 @@ You can combine it with existing styles
 
 ```jsx
 <Text className="font-bold" style={styles.text}>
-
-const styles = StyleSheet.create({ text: { color: 'blue' }})
 ```
-
-
 
 ## Options
 
@@ -92,7 +88,7 @@ module.exports = {
 Pro      | Values               | Default  | Description         
 ---------|----------------------|----------|----------------------
 platform | `native`, `web`, `native-inline`, `native-context` | `native` | Specifies how the className is transformed (see [platforms](#platforms) 
-tailwindConfig | Path relative to `cwd` | `tailwind.config.js` | Provide a custom `tailwind.config.js`. Useful for setting different breakpoints per platform.
+tailwindConfig | Path relative to `cwd` | `tailwind.config.js` | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform.
 
 
 ## How it works
@@ -125,7 +121,7 @@ Requires external tooling | :x:
 - import { Text } from "react-native"
 + import { Text, StyleSheet } from "react-native"
 - import { TailwindProvider } from "tailwindcss-react-native"
-+ import { TailwindProvider, __tailwindMedia } from "tailwindcss-react-native"
++ import { TailwindProvider, __useParseTailwind } from "tailwindcss-react-native"
 
 export function Test() {
   return (
@@ -154,7 +150,7 @@ Requires external tooling | :x:
 ```diff
 - import { Text } from "react-native"
 + import { Text, StyleSheet } from "react-native"
-+ import {  __tailwindMedia } from "tailwindcss-react-native"
++ import {  __useParseTailwind } from "tailwindcss-react-native"
 
 export function Test() {
   return (
@@ -169,7 +165,7 @@ export function Test() {
 
 ### web
 
-| `web` requires `react-native-web@0.18+` (currently in preview). Please see this [PR](https://github.com/necolas/react-native-web/pull/2248) for more info. If your are currently using `<=0.17` you can still use `native` for rendering within a browser.
+> `web` requires `react-native-web@0.18+` (currently in preview). Please see this [PR](https://github.com/necolas/react-native-web/pull/2248) for more info. If your are currently using `<=0.17` you can still use `native` for rendering within a browser.
 
 The platform to use when using `react-native-web`. It leaves the className attribute as-is, allowing you to use CSS files for your styling. Because of this, you will need to follow the [TailwindCSS installation steps](https://tailwindcss.com/docs/installation) to include the nessessary `.css` files in your HTML.
 
@@ -187,11 +183,9 @@ import { Text } from "react-native"
 export function Test() {
   return (
 -   <Text className="font-bold">Test</Text>
-+   <Text style={__tailwindStyles}>Test</Text>
++   <Text style={{ $$css: true, tailwind: 'font-bold' }}>Test</Text>
   )
 }
-
-+ const __tailwindStyles = { 'font-bold': { $$css: true, tailwind: 'font-bold' }}
 ```
 
 ##
