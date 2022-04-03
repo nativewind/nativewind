@@ -1,5 +1,5 @@
 const cssToReactNative = require("css-to-react-native").default;
-const normaliseSelector = require("../../../src/shared/selector");
+const normaliseSelector = require("../../../dist/shared/selector");
 
 /** @typedef {import('react-native').ViewStyle | import('react-native').TextStyle | import('react-native').ImageStyle} Style */
 /** @typedef {{ selector: string, media: string[], rules: Style, rulesAst: any }} CssRule */

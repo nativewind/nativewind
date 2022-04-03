@@ -6,7 +6,7 @@ const postcssColorRBG = require("postcss-color-rgb");
 const postcssRemToPixel = require("postcss-rem-to-pixel");
 const serialize = require("babel-literal-to-ast");
 const flattenRules = require("./flatten-rules");
-const normaliseSelector = require("../../../src/shared/selector");
+const normaliseSelector = require("../../../dist/shared/selector");
 
 /** @typedef {import('react-native').ViewStyle | import('react-native').TextStyle | import('react-native').ImageStyle} Style */
 
