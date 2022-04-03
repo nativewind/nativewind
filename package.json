@@ -1,11 +1,11 @@
 {
-  "version": "0.0.7",
+  "version": "0.0.8",
   "name": "tailwindcss-react-native",
   "main": "dist/index.js",
   "sideEffects": false,
   "scripts": {
     "test": "jest",
-    "build": "tsc --jsx react-jsx --module commonjs"
+    "build": "tsc"
   },
   "files": [
     "dist/",
