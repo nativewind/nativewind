@@ -1,6 +1,8 @@
+## Overview
+
 Ultimately all these libraries achieve mostly the same result. The difference is either philosophical or implementation details. 
 
-These are my notes that I created before creating `tailwindcss-react-native`. I was unhappy with the developer UX they provided and that they didn't completely follow the implementation details of Tailwind.
+These are my notes I made before I created `tailwindcss-react-native` but they also help explain some of the differences.
 
 ## tailwind-rn 
 
@@ -11,7 +13,6 @@ https://github.com/vadimdemedes/tailwind-rn
 * The processes may run slower than your web application causing warnings/delays https://github.com/vadimdemedes/tailwind-rn/issues/154
 * Requires custom setup of editor/IDE plugins
 * Rerenders all components when a style has changed
-* Does not respect Tailwind's or its plugins selector order (eg `dark:text-black text-white` will always produce white text, even in dark mode)
 * Does not support responsive SSR for web (cannot apply varients until hydration)
 
 ## react-native-tailwindcss
