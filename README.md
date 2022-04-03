@@ -2,14 +2,14 @@
 
 Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native](https://reactnative.dev/) applications.
 
-* :sparkes: full support for all native RN styles with tailwind counterparts: (view, layout, image, shadow, and text).
-* :sparkes: native support for multiple platforms 
-* :sparkes: respects tailwind.config.js
-* :sparkes: fast hot-reload
-* :sparkes: supports dark mode / media queries / arbitrary classes
-* :sparkes: platform prefixes: android:mt-4 ios:mt-2 web:mt-3
-* :sparkes: compatible with RN style objects
-* :sparkes: Server Side Rendering (SSR) on Web (including responsive styles)
+* :sparkles: full support for all native RN styles with tailwind counterparts: (view, layout, image, shadow, and text).
+* :sparkles: native support for multiple platforms 
+* :sparkles: respects tailwind.config.js
+* :sparkles: fast hot-reload
+* :sparkles: supports dark mode / media queries / arbitrary classes
+* :sparkles: platform prefixes: android:mt-4 ios:mt-2 web:mt-3
+* :sparkles: compatible with RN style objects
+* :sparkles: Server Side Rendering (SSR) on Web (including responsive styles)
 
 ## Why?
 
