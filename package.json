@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.4",
   "name": "tailwindcss-react-native",
   "main": "dist/index.js",
   "sideEffects": false,
@@ -16,6 +16,7 @@
     "@react-native-community/hooks": "^2.8.1",
     "babel-literal-to-ast": "^2.1.0",
     "css": "^3.0.0",
+    "css-mediaquery": "^0.1.2",
     "css-to-react-native": "^3.0.0",
     "postcss-color-rgb": "^2.0.0",
     "postcss-css-variables": "^0.18.0",
