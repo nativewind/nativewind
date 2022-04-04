@@ -21,7 +21,6 @@
     "css-to-react-native": "^3.0.0",
     "postcss-color-rgb": "^2.0.0",
     "postcss-css-variables": "^0.18.0",
-    "postcss-raw-append": "^1.0.0",
     "postcss-rem-to-pixel": "^4.1.2",
     "ts-jest": "^27.1.4"
   },
