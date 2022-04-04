@@ -28,46 +28,52 @@ const convertClassNameIntoTailwindStyles = (
 
   const tailwindConfig = getTailwindConfig(cwd, tailwindConfigPath);
 
-  let classNames = false;
-  let hasStyleSheetImport = false;
-  let hasUseParseTailwind = false;
+  const hasClassNames = new Set();
+  const hasUseParseTailwind = new Set();
+  const hasStyleSheetImport = new Set();
 
   return {
     visitor: {
-      ImportDeclaration(path) {
+      ImportDeclaration(path, state) {
+        const { filename } = state.file.opts;
+
         if (hasImport(path, "__useParseTailwind", "tailwindcss-react-native")) {
-          hasUseParseTailwind = true;
+          hasUseParseTailwind.add(filename);
         }
 
         if (hasImport(path, "StyleSheet", "react-native")) {
-          hasStyleSheetImport = true;
+          hasStyleSheetImport.add(filename);
         }
       },
-      JSXOpeningElement(path) {
-        classNames = transformClassNames(babelConfig, path, {
+      JSXOpeningElement(path, state) {
+        const { filename } = state.file.opts;
+
+        const classNames = transformClassNames(babelConfig, path, {
           inlineStyles: true,
         });
+
+        if (classNames) {
+          hasClassNames.add(filename);
+        }
       },
       Program: {
-        enter() {
-          classNames = false;
-          hasStyleSheetImport = false;
-          hasUseParseTailwind = false;
-        },
         exit(path, state) {
           const {
             node: { body },
           } = path;
 
-          if (!classNames) {
+          const { filename, root } = state.file.opts;
+
+          // There are no classNames so skip this file
+          if (!hasClassNames.has(filename)) {
             return;
           }
 
-          if (!hasStyleSheetImport) {
+          if (!hasStyleSheetImport.has(filename)) {
             appendImport(t, body, "StyleSheet", "react-native");
           }
 
-          if (!hasUseParseTailwind) {
+          if (!hasUseParseTailwind.has(filename)) {
             appendImport(
               t,
               body,
@@ -75,8 +81,6 @@ const convertClassNameIntoTailwindStyles = (
               "tailwindcss-react-native"
             );
           }
-
-          const { filename, root } = state.file.opts;
 
           /**
            * Override tailwind to only process the classnames in this file

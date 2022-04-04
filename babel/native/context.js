@@ -13,24 +13,37 @@ const convertClassNameIntoTailwindStyles = (
   const tailwindConfig = getTailwindConfig(cwd, tailwindConfigPath);
   const { styles, media } = processStyles(babelConfig, tailwindConfig);
 
+  const hasClassNames = new Set();
+  const hasUseParseTailwind = new Set();
+  const hasStyleSheetImport = new Set();
+  const hasProvider = new Set();
+
   return {
     visitor: {
-      ImportDeclaration(path) {
+      ImportDeclaration(path, state) {
+        const { filename } = state.file.opts;
+
         if (hasImport(path, "__useParseTailwind", "tailwindcss-react-native")) {
-          hasUseParseTailwind = true;
+          hasUseParseTailwind.add(filename);
         }
 
         if (hasImport(path, "StyleSheet", "react-native")) {
-          hasStyleSheetImport = true;
+          hasStyleSheetImport.add(filename);
         }
       },
-      JSXOpeningElement(path) {
+      JSXOpeningElement(path, state) {
+        const { filename } = state.file.opts;
+
         classNames = transformClassNames(babelConfig, path, {
           inlineStyles: false,
         });
 
+        if (classNames) {
+          hasClassNames.add(filename);
+        }
+
         if (path.node.name.name === "TailwindProvider") {
-          hasProvider = true;
+          hasProvider.add(filename);
 
           path.node.attributes.push(
             t.JSXAttribute(
@@ -48,18 +61,18 @@ const convertClassNameIntoTailwindStyles = (
         }
       },
       Program: {
-        enter() {
-          classNames = false;
-          hasProvider = false;
-          hasStyleSheetImport = false;
-          hasUseParseTailwind = false;
-        },
-        exit(path) {
+        exit(path, state) {
           const {
             node: { body },
           } = path;
 
-          if (classNames) {
+          const { filename } = state.file.opts;
+
+          // If there are classNames, but there is no import - add the import
+          if (
+            hasClassNames.has(filename) &&
+            !hasUseParseTailwind.has(filename)
+          ) {
             appendImport(
               t,
               body,
@@ -68,11 +81,12 @@ const convertClassNameIntoTailwindStyles = (
             );
           }
 
-          if (!hasProvider) {
+          // If there is no provider - then our work here is done
+          if (!hasProvider.has(filename)) {
             return;
           }
 
-          if (!hasStyleSheetImport) {
+          if (!hasStyleSheetImport.has(filename)) {
             appendImport(t, body, "StyleSheet", "react-native");
           }
 
