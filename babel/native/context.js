@@ -52,6 +52,7 @@ const convertClassNameIntoTailwindStyles = (
           classNames = false;
           hasProvider = false;
           hasStyleSheetImport = false;
+          hasUseParseTailwind = false;
         },
         exit(path) {
           const {
