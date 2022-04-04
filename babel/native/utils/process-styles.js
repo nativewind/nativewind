@@ -42,7 +42,10 @@ function processStyles({ types: t }, tailwindConfig) {
   /** @type {Record<string, Array<{ media: string, suffix: number>} */
   const mediaRules = {};
 
-  for (const [suffix, { selector, media, rules }] of parsedRules.entries()) {
+  for (const [
+    suffix,
+    { selector, media, rules } = {},
+  ] of parsedRules.entries()) {
     const normalisedSelector = normaliseSelector(selector, tailwindConfig);
 
     if (media.length > 0) {

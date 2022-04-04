@@ -1,5 +1,6 @@
 const cssToReactNative = require("css-to-react-native").default;
 const normaliseSelector = require("../../../dist/shared/selector");
+const isValidStyle = require("./is-valid-style");
 
 /** @typedef {import('react-native').ViewStyle | import('react-native').TextStyle | import('react-native').ImageStyle} Style */
 /** @typedef {{ selector: string, media: string[], rules: Style, rulesAst: any }} CssRule */
@@ -22,19 +23,50 @@ function flattenRules(t, cssRules, options, media = []) {
       ]);
     } else if (cssRule.type === "rule") {
       const declarationRuleTuples = [];
+      const invalidStyleProps = [];
 
       for (const { type, property, value } of cssRule.declarations || []) {
         if (type !== "declaration") {
           continue;
         }
+
         declarationRuleTuples.push([property, value]);
       }
 
       if (declarationRuleTuples.length === 0) {
-        return;
+        return [];
       }
 
-      const rules = cssToReactNative(declarationRuleTuples);
+      const rules = Object.fromEntries(
+        Object.entries(cssToReactNative(declarationRuleTuples)).filter(
+          ([prop, value]) => {
+            if (isValidStyle(prop, value)) {
+              return true;
+            } else {
+              invalidStyleProps.push(prop);
+              return false;
+            }
+          }
+        )
+      );
+
+      if (
+        process.env.NODE_ENV !== "development" &&
+        process.env.NODE_ENV !== "test"
+      ) {
+        if (invalidStyleProps.length > 0) {
+          console.warn(
+            `Selectors ${cssRule.selectors} use invalid styles ${invalidStyleProps}`
+          );
+          console.warn(
+            `Either remove these selectors or change to file to be platform specific (eg compoent.web.js)`
+          );
+        }
+      }
+
+      if (Object.keys(rules).length === 0) {
+        return [];
+      }
 
       /** @type {Array<CssRule>} */
       const selectors = (cssRule.selectors || []).map((selectorDirty) => {
