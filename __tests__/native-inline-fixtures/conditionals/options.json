@@ -1,0 +1,4 @@
+{
+  "tailwindConfigPath": "./__tests__/native-inline-fixtures/conditionals/tailwind.config.js",
+  "platform": "native-inline"
+}
