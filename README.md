@@ -28,7 +28,7 @@ module.exports = {
 ```
 Add the `TailwindProvider` to your application
 
-```jsx
+```JSX
 import { TailwindProvider } from 'tailwindcss-react-native'
 
 function MyAppsProviders ({ children }) {
@@ -42,7 +42,7 @@ function MyAppsProviders ({ children }) {
 
 Create a file (eg. `src/tailwindcss-react-native.d.ts`) and paste this line
 
-```
+```js
 import "tailwindcss-react-native/types.d"
 ```
 
@@ -50,13 +50,13 @@ import "tailwindcss-react-native/types.d"
 
 Simply add a `className` attribute to your existing `react-native` components
 
-```jsx
+```JSX
 <Text className="font-bold">
 ```
 
 You can combine it with existing styles
 
-```jsx
+```JSX
 <Text className="font-bold" style={styles.text}>
 ```
 
@@ -73,8 +73,8 @@ module.exports = {
 }
 ```
 
-Pro      | Values               | Default  | Description         
----------|----------------------|----------|----------------------
+Prop      | Values               | Default  | Description         
+----------|----------------------|----------|----------------------
 platform | `native`, `web`, `native-inline`, `native-context` | `native` | Specifies how the className is transformed (see [platforms](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/platforms.md) 
 tailwindConfig | Path relative to `cwd` | `tailwind.config.js` | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform.
 
