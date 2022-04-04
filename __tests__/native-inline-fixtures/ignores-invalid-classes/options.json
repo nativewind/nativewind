@@ -1,3 +1,4 @@
 {
-  "tailwindConfigPath": "./__tests__/native-inline-fixtures/ignores-invalid-classes/tailwind.config.js"
+  "tailwindConfigPath": "./__tests__/native-inline-fixtures/ignores-invalid-classes/tailwind.config.js",
+  "platform": "native-inline"
 }
