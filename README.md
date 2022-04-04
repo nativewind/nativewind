@@ -60,6 +60,22 @@ You can combine it with existing styles
 <Text className="font-bold" style={styles.text}>
 ```
 
+Or perform computed logic
+
+```JSX
+export function Test({ isBold, isUnderline }) {
+  const classNames = [];
+
+  if (isBold) classNames.push("font-bold");
+  if (isUnderline) classNames.push("underline");
+
+  return (
+    <Text className={classNames.join(" ")}>Hello world!</Text>
+  );
+}
+```
+
+
 ## Options
 
 Options can be provided via the babel config
