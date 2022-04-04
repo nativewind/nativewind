@@ -29,7 +29,7 @@ module.exports = {
 Add the `TailwindProvider` to your application
 
 ```jsx
-import { TailwindProvider } from 'tailwindcss-react-native`
+import { TailwindProvider } from 'tailwindcss-react-native'
 
 function MyAppsProviders ({ children }) {
     return (
