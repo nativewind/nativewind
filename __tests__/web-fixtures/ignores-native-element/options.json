@@ -1,0 +1,4 @@
+{
+  "tailwindConfigPath": "./__tests__/web-fixtures/ignores-native-element/tailwind.config.js",
+  "platform": "web"
+}

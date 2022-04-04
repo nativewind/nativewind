@@ -6,6 +6,16 @@ const convertClassNameIntoTailwindStyles = ({ types: t }) => {
           let classNames;
           let existingStyles;
 
+          const firstCharOfName = path.node.name.name[0];
+
+          // Ignore elements that start in lower case
+          if (
+            firstCharOfName &&
+            firstCharOfName === firstCharOfName.toLowerCase()
+          ) {
+            return;
+          }
+
           /**
            * Find the className attribute
            *  - Save its value
