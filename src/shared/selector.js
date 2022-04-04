@@ -13,10 +13,11 @@ function normaliseSelector(selector, options = {}) {
     ? selector.replace(new RegExp(`^${important}`), "")
     : selector;
 
+  // prettier-ignore
   return s
-    .replaceAll(" ", "")
-    .replaceAll("\\", "")
-    .replaceAll(":", "_")
+    .split(" ").join("")
+    .split("\\").join("")
+    .split(":").join("_")
     .replace(/^\./, "");
 }
 
