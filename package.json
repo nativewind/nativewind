@@ -1,5 +1,5 @@
 {
-  "version": "0.0.8",
+  "version": "0.0.9",
   "name": "tailwindcss-react-native",
   "main": "dist/index.js",
   "sideEffects": false,
@@ -9,7 +9,8 @@
   },
   "files": [
     "dist/",
-    "babel/"
+    "babel/",
+    "types.d.ts"
   ],
   "dependencies": {
     "@babel/template": "^7.16.7",

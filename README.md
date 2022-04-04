@@ -39,17 +39,12 @@ function MyAppsProviders ({ children }) {
 }
 ```
 
-### Additional steps if targeting `web`
+### Additional steps if using typescript
 
-When targetting the web platform, you will need to include the `tailwindcss-react-native/plugin` tailwind plugin.
+Create a file (eg. `src/tailwindcss-react-native.d.ts`) and paste this line
 
-```js
-// tailwind.config.js
-module.exports = {
-  plugins: [
-    ['tailwindcss-react-native/plugin']
-  ],
-}
+```
+import "tailwindcss-react-native/types.d"
 ```
 
 ## Usage
