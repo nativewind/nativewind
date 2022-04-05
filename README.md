@@ -42,11 +42,11 @@ function MyAppsProviders ({ children }) {
 }
 ```
 
-#### tailwindcss
+#### tailwindcss peerDependency
 
 This package has a peerDependency of `tailwindcss@3.x.x`. You can install it with `npm install tailwindcss` or `yarn add tailwindcss`
 
-#### typescript
+#### Typescript support
 
 Create a file (eg. `src/tailwindcss-react-native.d.ts`) and paste this line
 
