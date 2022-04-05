@@ -19,18 +19,6 @@ Install the library
 
 `npm install tailwindcss-react-native` or `yarn add tailwindcss-react-native`
 
-#### tailwindcss
-
-This package has a peerDependency of `tailwindcss@3.x.x`. You can install it with `npm install tailwindcss` or `yarn add tailwindcss`
-
-#### Web only
-
-> `web` requires `react-native-web@0.18+` (currently in preview). Please see this [PR](https://github.com/necolas/react-native-web/pull/2248) for more info. If your are currently using `<=0.17` you can still use `native` for rendering within a browser.
-
-If using `{ platform: 'web' }` you will need to follow the follow the [TailwindCSS installation steps](https://tailwindcss.com/docs/installation) to include it's styles in the application.
-
-## Add to babel
-
 Add `tailwindcss-react-native/babel` to your babel plugins 
 
 ```js
@@ -41,6 +29,7 @@ module.exports = {
   ],
 }
 ```
+
 Add the `TailwindProvider` to your application
 
 ```JSX
@@ -53,13 +42,25 @@ function MyAppsProviders ({ children }) {
 }
 ```
 
-### Additional steps if using typescript
+#### tailwindcss
+
+This package has a peerDependency of `tailwindcss@3.x.x`. You can install it with `npm install tailwindcss` or `yarn add tailwindcss`
+
+#### typescript
 
 Create a file (eg. `src/tailwindcss-react-native.d.ts`) and paste this line
 
 ```js
 import "tailwindcss-react-native/types.d"
 ```
+
+#### Web only
+
+> `web` requires `react-native-web@0.18+` (currently in preview). Please see this [PR](https://github.com/necolas/react-native-web/pull/2248) for more info. If your are currently using `<=0.17` you can still use `native` for rendering within a browser.
+
+If using `{ platform: 'web' }` you will need to follow the follow the [TailwindCSS installation steps](https://tailwindcss.com/docs/installation) to include it's styles in the application.
+
+
 
 ## Usage
 
