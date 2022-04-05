@@ -2,19 +2,34 @@
 
 Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native](https://reactnative.dev/) applications.
 
-* :sparkles: full support for all native RN styles with tailwind counterparts: (view, layout, image, shadow, and text).
+> This library is currently under active development.
+
 * :sparkles: native support for multiple platforms 
 * :sparkles: respects tailwind.config.js
 * :sparkles: fast refresh compatible
 * :sparkles: supports dark mode / media queries / arbitrary classes
-* :sparkles: compatible with RN style objects
+* :sparkles: compatible with existing styles
 * :sparkles: Server Side Rendering (SSR) on Web (including responsive styles)
 
 Already using another RN library for Tailwind? [Find out why you should switch.](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/library-comparision.md)
 
-## Install
+## Getting started
+
+Install the library
 
 `npm install tailwindcss-react-native` or `yarn add tailwindcss-react-native`
+
+### tailwindcss
+
+This package has a peerDependency of `tailwindcss@3.x.x`. You can install it with `npm install tailwindcss` or `yarn add tailwindcss`
+
+#### Web only
+
+> `web` requires `react-native-web@0.18+` (currently in preview). Please see this [PR](https://github.com/necolas/react-native-web/pull/2248) for more info. If your are currently using `<=0.17` you can still use `native` for rendering within a browser.
+
+If using `{ platform: 'web' }` you will need to follow the follow the [TailwindCSS installation steps](https://tailwindcss.com/docs/installation) to include it's styles in the application.
+
+## Add to babel
 
 Add `tailwindcss-react-native/babel` to your babel plugins 
 
