@@ -100,7 +100,7 @@ Options can be provided via the babel config
 // babel.config.js
 module.exports = {
   plugins: [
-    ['tailwindcss-react-native', { platform: 'native' }]
+    ['tailwindcss-react-native/babel', { platform: 'native' }]
   ],
 }
 ```
