@@ -39,7 +39,7 @@ export function __useParseTailwind(
     ...additionalStyles,
   };
 
-  return classNames.split(" ").flatMap((className) => {
+  return (classNames ?? "").split(" ").flatMap((className) => {
     const selector = normaliseSelector(className);
     const styleIds: unknown[] = [];
 
