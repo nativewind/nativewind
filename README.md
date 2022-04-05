@@ -19,7 +19,7 @@ Install the library
 
 `npm install tailwindcss-react-native` or `yarn add tailwindcss-react-native`
 
-### tailwindcss
+#### tailwindcss
 
 This package has a peerDependency of `tailwindcss@3.x.x`. You can install it with `npm install tailwindcss` or `yarn add tailwindcss`
 
