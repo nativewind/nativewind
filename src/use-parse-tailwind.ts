@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import normaliseSelector from "./shared/selector";
+import { normaliseSelector } from "./shared/selector";
 import {
   MediaRules,
   StyleRecord,

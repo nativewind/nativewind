@@ -8,12 +8,11 @@ The `native` platform switches platform based upon the `NODE_ENV` environment va
 
 The platform best suited for production environments. It compiles the entire applications styles and produces the smallest possible output. It shares these styles to components via a React context.
 
-Feature | Included
------- | -------------
-Small output | :heavy_check_mark: 
-Hot module reload | :x: 
-Requires external tooling | :x: 
-
+| Feature                   | Included           |
+| ------------------------- | ------------------ |
+| Small output              | :heavy_check_mark: |
+| Hot module reload         | :x:                |
+| Requires external tooling | :x:                |
 
 ```diff
 - import { Text } from "react-native"
@@ -39,11 +38,11 @@ export function Test() {
 
 The platform best suited for development environments. Produces larger output but works with hot-reload. Each file will generate it's own styles and provide them inline.
 
-Feature | Included
------- | -------------
-Small output | :x: 
-Hot module reload | :heavy_check_mark: 
-Requires external tooling | :x: 
+| Feature                   | Included           |
+| ------------------------- | ------------------ |
+| Small output              | :x:                |
+| Hot module reload         | :heavy_check_mark: |
+| Requires external tooling | :x:                |
 
 ```diff
 - import { Text } from "react-native"
@@ -69,11 +68,11 @@ The platform to use when using `react-native-web`. It leaves the className attri
 
 Relies on external tooling for production minification.
 
-Feature | Included
------- | -------------
-Small output | :heavy_check_mark: 
-Hot module reload | :heavy_check_mark: 
-Requires external tooling | :heavy_check_mark: 
+| Feature                   | Included           |
+| ------------------------- | ------------------ |
+| Small output              | :heavy_check_mark: |
+| Hot module reload         | :heavy_check_mark: |
+| Requires external tooling | :heavy_check_mark: |
 
 ```diff
 import { Text } from "react-native"

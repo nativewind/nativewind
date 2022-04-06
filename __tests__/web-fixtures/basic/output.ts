@@ -11,7 +11,6 @@ export function Test() {
       >
         Hello world!
       </Text>
-      <div className="text-white">Should be untransformed</div>
     </TailwindProvider>
   );
 }
