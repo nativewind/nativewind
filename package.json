@@ -1,10 +1,11 @@
 {
-  "version": "0.0.17",
+  "version": "0.0.18-0",
   "name": "tailwindcss-react-native",
   "main": "dist/index.js",
   "sideEffects": false,
   "scripts": {
     "test": "jest",
+    "prepublishOnly": "npm run build",
     "build": "rm -rf dist && tsc"
   },
   "files": [
