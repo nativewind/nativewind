@@ -1,16 +1,26 @@
-import cssToReactNative, { StyleTuple } from "css-to-react-native";
+import cssToReactNative from "css-to-react-native";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { AtRule, Comment, Media, Rule, StyleRules } from "css";
 
 import { normaliseSelector } from "../../shared/selector";
 import { Style } from "../types";
-import { isValidStyle } from "./is-valid-style";
+
+import { isInvalidSelector, isValidStyle } from "./is-valid-style";
+import { preAspectRatio, postAspectRatio } from "./css-transform";
 
 interface CssRule {
   selector: string;
   media: string[];
   rules: Style;
 }
+
+const preTransforms = {
+  "aspect-ratio": preAspectRatio,
+};
+
+const postTransforms = {
+  aspectRatio: postAspectRatio,
+};
 
 /**
  * Flattens StyleRules from the 'css' package
@@ -29,7 +39,7 @@ export function flattenRules(
         ...new Set(cssRule.media ? [...media, cssRule.media] : media),
       ]);
     } else if (isRule(cssRule)) {
-      const declarationRuleTuples: StyleTuple[] = [];
+      const declarationRuleTuples: [string, string | number | undefined][] = [];
       const invalidStyleProps: string[] = [];
 
       for (const declaration of cssRule.declarations || []) {
@@ -37,10 +47,20 @@ export function flattenRules(
           continue;
         }
 
-        const { property, value } = declaration;
+        let { property, value } = declaration;
 
         if (property === undefined || value === undefined) {
           continue;
+        }
+
+        if (isInvalidSelector(property)) {
+          continue;
+        }
+
+        if (property in preTransforms) {
+          value = preTransforms[property as keyof typeof preTransforms](
+            value
+          ) as any;
         }
 
         declarationRuleTuples.push([property, value]);
@@ -51,16 +71,26 @@ export function flattenRules(
       }
 
       const rules = Object.fromEntries(
-        Object.entries(cssToReactNative(declarationRuleTuples)).filter(
-          ([prop, value]) => {
-            if (isValidStyle(prop, value)) {
-              return true;
-            } else {
-              invalidStyleProps.push(prop);
-              return false;
+        Object.entries(cssToReactNative(declarationRuleTuples as any)).flatMap<
+          [string, string | number | Style | undefined]
+        >(([prop, value]) => {
+          if (isValidStyle(prop, value)) {
+            if (prop in postTransforms) {
+              return [
+                [
+                  prop,
+                  postTransforms[prop as keyof typeof postTransforms](
+                    value as any
+                  ),
+                ],
+              ];
             }
+            return [[prop, value]];
+          } else {
+            invalidStyleProps.push(prop);
+            return [];
           }
-        )
+        })
       );
 
       if (

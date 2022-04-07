@@ -6,6 +6,12 @@ export function isValidStyle(prop: string, _value: unknown) {
   return true;
 }
 
+export function isInvalidSelector(selector: string) {
+  return invalidSelectors.has(selector);
+}
+
+const invalidSelectors = new Set(["columns"]);
+
 const validProps = new Set([
   "alignContent",
   "alignItems",
