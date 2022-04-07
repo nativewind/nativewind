@@ -60,7 +60,7 @@ export function transformClassName(
     : [existingClassName];
 
   const hookExpression = t.callExpression(
-    t.identifier("__useParseTailwind"),
+    t.identifier("useTailwind"),
     callExpressionArguments
   );
 

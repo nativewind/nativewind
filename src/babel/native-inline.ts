@@ -59,7 +59,7 @@ export default function (
             appendImport(
               babel,
               bodyNode,
-              "__useParseTailwind",
+              "useTailwind",
               "tailwindcss-react-native"
             );
           }

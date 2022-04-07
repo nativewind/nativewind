@@ -18,7 +18,7 @@ export interface UseParseTailwindOptions {
   media?: MediaRules;
 }
 
-export function __useParseTailwind(
+export function useTailwind(
   classNames: string,
   {
     styles: additionalStyles = {},
