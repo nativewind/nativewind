@@ -43,6 +43,7 @@ export default function (
             hasProvider: false,
             transformClassNameOptions: { inlineStyles: false },
             visitor: nativeContextVisitor,
+            hookCount: 0,
           };
 
           // Traverse the file

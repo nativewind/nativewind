@@ -35,6 +35,7 @@ export default function (
             hasClassNames: false,
             hasProvider: false,
             transformClassNameOptions: { inlineStyles: true },
+            hookCount: 0,
           };
 
           // Traverse the file
