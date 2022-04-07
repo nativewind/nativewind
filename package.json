@@ -10,7 +10,7 @@
   },
   "files": [
     "dist/",
-    "babel/",
+    "babel.js",
     "types.d.ts"
   ],
   "dependencies": {
