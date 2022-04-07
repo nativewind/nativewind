@@ -1,5 +1,6 @@
 import { MediaRecord, StyleRecord } from "../../src/babel/types";
 import { processStyles } from "../../src/babel/utils/process-styles";
+import { getNativeTailwindConfig } from "../../src/babel/tailwind/native-config";
 
 export type Case = [string, Array<Test>];
 export type Test = [string, Expected];
@@ -16,6 +17,7 @@ export function tailwindRunner(cases: Case[]) {
       (css, { styles: expectedStyles, media: expectedMedia }) => {
         const { styles, media } = processStyles({
           theme: {},
+          ...getNativeTailwindConfig(),
           content: [{ raw: `<div class="${css}">`, extension: "html" } as any],
         });
 

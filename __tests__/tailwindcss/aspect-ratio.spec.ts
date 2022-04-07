@@ -13,7 +13,6 @@ const cases: Array<Case> = [
           media: {},
         },
       ],
-
       [
         "aspect-square",
         {
@@ -27,7 +26,7 @@ const cases: Array<Case> = [
         "aspect-video",
         {
           styles: {
-            "aspect-video": { aspectRatio: 1.7777777777777777 },
+            "aspect-video": { aspectRatio: 1.777777778 },
           },
           media: {},
         },

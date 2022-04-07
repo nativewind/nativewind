@@ -5,22 +5,14 @@ import { AtRule, Comment, Media, Rule, StyleRules } from "css";
 import { normaliseSelector } from "../../shared/selector";
 import { Style } from "../types";
 
-import { isInvalidSelector, isValidStyle } from "./is-valid-style";
-import { preAspectRatio, postAspectRatio } from "./css-transform";
+import { isValidStyle } from "./is-valid-style";
+import { postProcessingCssFn } from "./postprocessing-css";
 
 interface CssRule {
   selector: string;
   media: string[];
   rules: Style;
 }
-
-const preTransforms = {
-  "aspect-ratio": preAspectRatio,
-};
-
-const postTransforms = {
-  aspectRatio: postAspectRatio,
-};
 
 /**
  * Flattens StyleRules from the 'css' package
@@ -53,16 +45,6 @@ export function flattenRules(
           continue;
         }
 
-        if (isInvalidSelector(property)) {
-          continue;
-        }
-
-        if (property in preTransforms) {
-          value = preTransforms[property as keyof typeof preTransforms](
-            value
-          ) as any;
-        }
-
         declarationRuleTuples.push([property, value]);
       }
 
@@ -75,17 +57,11 @@ export function flattenRules(
           [string, string | number | Style | undefined]
         >(([prop, value]) => {
           if (isValidStyle(prop, value)) {
-            if (prop in postTransforms) {
-              return [
-                [
-                  prop,
-                  postTransforms[prop as keyof typeof postTransforms](
-                    value as any
-                  ),
-                ],
-              ];
+            if (postProcessingCssFn[prop]) {
+              return [[prop, postProcessingCssFn[prop](value)]];
+            } else {
+              return [[prop, value]];
             }
-            return [[prop, value]];
           } else {
             invalidStyleProps.push(prop);
             return [];

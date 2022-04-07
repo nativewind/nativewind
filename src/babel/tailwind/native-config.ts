@@ -1,15 +1,18 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { TailwindReactNativeOptions } from "../types";
+import { nativePlugin } from "./native-plugin";
 
 export function getNativeTailwindConfig({
   rem = 16,
-}: TailwindReactNativeOptions) {
+}: TailwindReactNativeOptions = {}) {
   const config: Partial<TailwindConfig> = {
+    plugins: [nativePlugin],
     corePlugins: {
       accentColor: false,
       accessibility: false,
       animation: false,
       appearance: false,
+      aspectRatio: false,
       backdropBlur: false,
       backdropBrightness: false,
       backdropContrast: false,
@@ -40,7 +43,6 @@ export function getNativeTailwindConfig({
       caretColor: false,
       clear: false,
       columns: false,
-      container: false,
       content: false,
       contrast: false,
       cursor: false,

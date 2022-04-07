@@ -1,10 +1,11 @@
 import { join } from "path";
 import { existsSync } from "fs";
-import plugin from "tailwindcss/plugin";
+
 import resolveTailwindConfig from "tailwindcss/resolveConfig";
-import { TailwindReactNativeOptions } from "../types";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
+
 import { getNativeTailwindConfig } from "./native-config";
+import { TailwindReactNativeOptions } from "../types";
 
 export function getTailwindConfig(
   cwd: string,
@@ -37,17 +38,8 @@ export function getTailwindConfig(
       ...nativeConfig.theme,
       ...userConfig.theme,
     },
+    plugins: [...(nativeConfig.plugins ?? []), ...(userConfig.plugins ?? [])],
   };
 
-  return resolveTailwindConfig({
-    ...mergedConfig,
-    plugins: [
-      ...(userConfig.plugins || []),
-      plugin(function ({ addVariant }) {
-        addVariant("native", "@media native");
-        addVariant("ios", "");
-        addVariant("android", "");
-      }),
-    ],
-  });
+  return resolveTailwindConfig(mergedConfig);
 }

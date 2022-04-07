@@ -1,16 +1,6 @@
 export function isValidStyle(prop: string, _value: unknown) {
-  if (!validProps.has(prop)) {
-    return false;
-  }
-
-  return true;
+  return validProps.has(prop);
 }
-
-export function isInvalidSelector(selector: string) {
-  return invalidSelectors.has(selector);
-}
-
-const invalidSelectors = new Set(["columns"]);
 
 const validProps = new Set([
   "alignContent",
