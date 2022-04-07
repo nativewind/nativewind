@@ -23,7 +23,7 @@ export function __useParseTailwind(
   {
     styles: additionalStyles = {},
     media: additionalMediaRules = {},
-  }: UseParseTailwindOptions
+  }: UseParseTailwindOptions = {}
 ) {
   const { styles, media: mediaRules } = useContext(TailwindStyleContext);
   const colorScheme = useContext(TailwindColorSchemeContext);
