@@ -17,10 +17,15 @@ export default function (
 ) {
   let { platform = "native" } = options ?? {};
 
-  if (platform === "native" && process.env.NODE_ENV === "production") {
-    platform = "native-inline";
-  } else if (platform === "native") {
+  const isProduction =
+    typeof __DEV__ !== "undefined"
+      ? __DEV__ === true
+      : process.env.NODE_ENV === "production";
+
+  if (platform === "native" && isProduction) {
     platform = "native-context";
+  } else if (platform === "native") {
+    platform = "native-inline";
   } else if (!(platform in platformPlugins)) {
     throw new Error(`Unknown platform ${platform}`);
   }
