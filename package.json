@@ -1,19 +1,19 @@
 {
-  "version": "0.0.17",
+  "version": "0.0.19-7",
   "name": "tailwindcss-react-native",
   "main": "dist/index.js",
   "sideEffects": false,
   "scripts": {
     "test": "jest",
-    "build": "tsc"
+    "prepublishOnly": "npm run build",
+    "build": "rm -rf dist && tsc"
   },
   "files": [
     "dist/",
-    "babel/",
+    "babel.js",
     "types.d.ts"
   ],
   "dependencies": {
-    "@babel/template": "^7.16.7",
     "@react-native-community/hooks": "^2.8.1",
     "babel-literal-to-ast": "^2.1.0",
     "css": "^3.0.0",
@@ -25,7 +25,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
-    "@babel/preset-typescript": "^7.16.7",
+    "@babel/plugin-syntax-jsx": "^7.16.7",
+    "@babel/types": "^7.17.0",
     "@types/css": "^0.0.33",
     "@types/css-mediaquery": "^0.1.1",
     "@types/css-to-react-native": "^3.0.0",
@@ -35,12 +36,11 @@
     "@types/tailwindcss": "^3.0.10",
     "babel-plugin-tester": "^10.1.0",
     "jest": "^27.5.1",
-    "metro-react-native-babel-preset": "^0.70.0",
     "postcss": "^8.4.12",
     "prettier": "^2.6.1",
     "react-native": "^0.68.0",
-    "react-native-web": "^0.17.7",
     "tailwindcss": "^3.0.23",
+    "ts-jest": "^27.1.4",
     "typescript": "^4.6.3"
   },
   "peerDependencies": {

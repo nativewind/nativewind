@@ -1,6 +1,7 @@
+/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  preset: "react-native",
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+  preset: "ts-jest",
+  testEnvironment: "node",
   testPathIgnorePatterns: [
     "/node_modules/",
     "/__tests__/native-context-fixtures/",

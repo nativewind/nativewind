@@ -1,17 +1,17 @@
 import { Text } from "react-native";
 import { TailwindProvider } from "../../../src";
+
 export function Test() {
   return (
     <TailwindProvider>
-      <Text
-        style={{
-          $$css: true,
-          tailwindcssReactNative: "font-bold",
-        }}
-      >
+      <Text className="font-bold" style={[styles.test, styles.test2]}>
         Hello world!
       </Text>
-      <div className="text-white">Should be untransformed</div>
     </TailwindProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  test: { color: "blue" },
+  test2: { color: "red" },
+});
