@@ -40,6 +40,22 @@ function MyAppsProviders ({ children }) {
 }
 ```
 
+Create a `tailwind.config.js` and set `content`
+
+> During development your application may work without a `tailwind.config.js` or the `content` option, but it will error when running in production.
+
+```
+// tailwind.config.js
+module.exports = {
+  content: [
+    './screens/**/*.{js,ts,jsx,tsx}',
+    './pages/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+  ],
+  // ...
+}
+```
+
 #### tailwindcss peerDependency
 
 This package has a peerDependency of `tailwindcss@3.x.x`. You can install it with `npm install tailwindcss` or `yarn add tailwindcss`
