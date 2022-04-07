@@ -1,4 +1,4 @@
-import { Babel, Style } from "../types";
+import { MediaRecord, Style, StyleRecord } from "../types";
 
 import css from "css";
 import postcss from "postcss";
@@ -6,15 +6,15 @@ import tailwind from "tailwindcss";
 import postcssCssvariables from "postcss-css-variables";
 import postcssColorRBG from "postcss-color-rgb";
 import postcssRemToPixel from "postcss-rem-to-pixel";
-import serialize from "babel-literal-to-ast";
 
 import { flattenRules } from "./flatten-rules";
 import { normaliseSelector } from "../../shared/selector";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
-export function processStyles(babel: Babel, tailwindConfig: TailwindConfig) {
-  const cssInput = "@tailwind utilities";
-
+export function processStyles(
+  tailwindConfig: TailwindConfig,
+  cssInput: string = "@tailwind components;@tailwind utilities;"
+) {
   const processedCss = postcss([
     tailwind(tailwindConfig),
     postcssCssvariables(),
@@ -36,13 +36,10 @@ export function processStyles(babel: Babel, tailwindConfig: TailwindConfig) {
 
   const cssRules = css.parse(processedCss).stylesheet?.rules ?? [];
 
-  const parsedRules = flattenRules(babel, cssRules, tailwindConfig);
+  const parsedRules = flattenRules(cssRules, tailwindConfig);
 
-  const styles: Record<string, Style> = {};
-  const mediaRules: Record<
-    string,
-    Array<{ media: string[]; suffix: number }>
-  > = {};
+  const styles: StyleRecord = {};
+  const mediaRules: MediaRecord = {};
 
   for (const [suffix, parsedRule] of parsedRules.entries()) {
     const { selector, media, rules } = parsedRule;
@@ -66,7 +63,7 @@ export function processStyles(babel: Babel, tailwindConfig: TailwindConfig) {
   }
 
   return {
-    styles: serialize(styles),
-    media: serialize(mediaRules),
+    styles,
+    media: mediaRules,
   };
 }

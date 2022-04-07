@@ -15,7 +15,7 @@ export default function (
   cwd: string
 ) {
   const tailwindConfig = getTailwindConfig(cwd, options);
-  const { styles, media } = processStyles(babel, tailwindConfig);
+  const { styles, media } = processStyles(tailwindConfig);
 
   return {
     visitor: {

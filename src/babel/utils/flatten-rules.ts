@@ -3,7 +3,7 @@ import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { AtRule, Comment, Media, Rule, StyleRules } from "css";
 
 import { normaliseSelector } from "../../shared/selector";
-import { Babel, Style } from "../types";
+import { Style } from "../types";
 import { isValidStyle } from "./is-valid-style";
 
 interface CssRule {
@@ -19,14 +19,13 @@ interface CssRule {
  *  - flattens styles to be react-native style objects
  */
 export function flattenRules(
-  babel: Babel,
   cssRules: StyleRules["rules"],
   tailwindConfig: TailwindConfig,
   media: string[] = []
 ): CssRule[] {
   return cssRules.flatMap((cssRule) => {
     if (isMedia(cssRule)) {
-      return flattenRules(babel, cssRule.rules ?? [], tailwindConfig, [
+      return flattenRules(cssRule.rules ?? [], tailwindConfig, [
         ...new Set(cssRule.media ? [...media, cssRule.media] : media),
       ]);
     } else if (isRule(cssRule)) {

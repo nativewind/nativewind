@@ -1,11 +1,12 @@
-import { Expression, Statement } from "@babel/types";
-import { Babel } from "../types";
+import { Statement } from "@babel/types";
+import serialize from "babel-literal-to-ast";
+import { Babel, MediaRecord, StyleRecord } from "../types";
 
 export function appendVariables(
   babel: Babel,
   body: Statement[],
-  styles: Expression,
-  media: Expression
+  styles: StyleRecord,
+  media: MediaRecord
 ) {
   const { types: t } = babel;
 
@@ -18,7 +19,7 @@ export function appendVariables(
             t.identifier("StyleSheet"),
             t.identifier("create")
           ),
-          [styles]
+          [serialize(styles)]
         )
       ),
     ])
@@ -26,7 +27,7 @@ export function appendVariables(
 
   body.push(
     t.variableDeclaration("const", [
-      t.variableDeclarator(t.identifier("__tailwindMedia"), media),
+      t.variableDeclarator(t.identifier("__tailwindMedia"), serialize(media)),
     ])
   );
 }

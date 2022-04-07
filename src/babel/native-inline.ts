@@ -71,7 +71,7 @@ export default function (
           /**
            * Override tailwind to only process the classnames in this file
            */
-          const { styles, media } = processStyles(babel, {
+          const { styles, media } = processStyles({
             ...tailwindConfig,
             // Make sure its relative to the tailwind.config.js
             content: [relative(rootDir, filename)],

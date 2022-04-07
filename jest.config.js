@@ -7,5 +7,6 @@ module.exports = {
     "/__tests__/native-context-fixtures/",
     "/__tests__/native-inline-fixtures/",
     "/__tests__/web-fixtures/",
+    "/__tests__/tailwindcss/runner.ts",
   ],
 };
