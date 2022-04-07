@@ -70,7 +70,7 @@ import "tailwindcss-react-native/types.d";
 
 #### Web only
 
-> `web` requires `react-native-web@0.18+` (currently in preview). Please see this [PR](https://github.com/necolas/react-native-web/pull/2248) for more info. If your are currently using `<=0.17` you can still use `native` for rendering within a browser.
+> The platform `web` requires `react-native-web@0.18+` (currently in preview). Please see this [PR](https://github.com/necolas/react-native-web/pull/2248) for more info. If your are currently using `<=0.17` you can still use `native` for rendering within a browser.
 
 If using `{ platform: 'web' }` you will need to follow the follow the [TailwindCSS installation steps](https://tailwindcss.com/docs/installation) to include it's styles in the application.
 
@@ -114,10 +114,10 @@ module.exports = {
 };
 ```
 
-| Prop           | Values                                             | Default              | Description                                                                                                                                     |
-| -------------- | -------------------------------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| platform       | `native`, `web`, `native-inline`, `native-context` | `native`             | Specifies how the className is transformed (see [platforms](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/platforms.md) |
-| tailwindConfig | Path relative to `cwd`                             | `tailwind.config.js` | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform.                                                      |
+| Option         | Values                 | Default              | Description                                                                                                                                                                                                                    |
+| -------------- | ---------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| platform       | `native`, `web`        | `native`             | Specifies how the className is transformed (see [platforms](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/platforms.md)<br/><br />You can also use `native-inline`, `native-context` to debug `native` |
+| tailwindConfig | Path relative to `cwd` | `tailwind.config.js` | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform.                                                                                                                                     |
 
 ## How it works
 
@@ -128,4 +128,4 @@ Under the hood, `tailwindcss-react-native` performs these general steps
 1. Remove the `className` attribute and replace/merge it with the `style` attribute
 1. Utilises a `react` hook for matching media queries.
 
-See [the platforms documentation](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/platforms.md) for a more detailed explaination)
+For detailed explaination see [the platforms documentation](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/platforms.md) for a more detailed explaination)
