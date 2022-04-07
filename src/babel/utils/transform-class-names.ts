@@ -1,6 +1,5 @@
 import { NodePath } from "@babel/core";
 import { Expression, JSXOpeningElement } from "@babel/types";
-import { NativeVisitorState } from "../native-visitor";
 import { Babel } from "../types";
 
 import {
@@ -15,7 +14,7 @@ export interface TransformClassNameOptions {
 export function transformClassName(
   babel: Babel,
   path: NodePath<JSXOpeningElement>,
-  state: NativeVisitorState
+  { inlineStyles }: TransformClassNameOptions
 ): boolean {
   const {
     className: existingClassName,
@@ -44,10 +43,6 @@ export function transformClassName(
    * so they should always be first
    */
   const { types: t } = babel;
-  const {
-    transformClassNameOptions: { inlineStyles },
-  } = state;
-
   const callExpressionArguments: Array<Expression> = inlineStyles
     ? [
         existingClassName,
@@ -64,18 +59,10 @@ export function transformClassName(
       ]
     : [existingClassName];
 
-  const hookCallExpression = t.callExpression(
+  const hookExpression = t.callExpression(
     t.identifier("__useParseTailwind"),
     callExpressionArguments
   );
-
-  const hookExpression = inlineStyles
-    ? t.assignmentExpression(
-        "=",
-        t.identifier(`__trn${state.hookCount++}`),
-        hookCallExpression
-      )
-    : hookCallExpression;
 
   const newStyleExpression = createMergedStylesExpressionContainer(
     babel,

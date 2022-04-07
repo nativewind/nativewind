@@ -19,7 +19,6 @@ export interface NativeVisitorState extends State {
   hasProvider: boolean;
   visitor?: Visitor<NativeVisitorState>;
   transformClassNameOptions: TransformClassNameOptions;
-  hookCount: number;
 }
 
 /**
@@ -66,7 +65,11 @@ export const nativeVisitor: Visitor<NativeVisitorState> = {
       return;
     }
 
-    const hasClassNames = transformClassName(state.babel, path, state);
+    const hasClassNames = transformClassName(
+      state.babel,
+      path,
+      state.transformClassNameOptions
+    );
 
     state.hasClassNames ||= hasClassNames;
 
