@@ -7,11 +7,11 @@ import {
   TailwindStyleContext,
 } from "./context";
 import { match as matchMediaQuery } from "css-mediaquery";
-// import {
-//   // useAccessibilityInfo,
-//   useDeviceOrientation,
-// } from "@react-native-community/hooks";
-// import { useWindowDimensions } from "react-native";
+import {
+  // useAccessibilityInfo,
+  useDeviceOrientation,
+} from "@react-native-community/hooks";
+import { useWindowDimensions } from "react-native";
 
 export interface UseParseTailwindOptions {
   styles?: StyleRecord;
@@ -28,14 +28,11 @@ export function __useParseTailwind(
   const { styles, media: mediaRules } = useContext(TailwindStyleContext);
   const colorScheme = useContext(TailwindColorSchemeContext);
 
-  // const { width, height } = useWindowDimensions();
-  // // const { reduceMotionEnabled: reduceMotion } = useAccessibilityInfo()
-  // const orientation = useDeviceOrientation().portrait
-  //   ? "portrait"
-  //   : "landscape";
-  const width = 0;
-  const height = 0;
-  const orientation = "landscape";
+  const { width, height } = useWindowDimensions();
+  // const { reduceMotionEnabled: reduceMotion } = useAccessibilityInfo()
+  const orientation = useDeviceOrientation().portrait
+    ? "portrait"
+    : "landscape";
 
   const allStyles = {
     ...styles,
