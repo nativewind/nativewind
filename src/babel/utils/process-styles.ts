@@ -1,11 +1,10 @@
-import { MediaRecord, Style, StyleRecord } from "../types";
+import { MediaRecord, StyleRecord } from "../types";
 
 import css from "css";
 import postcss from "postcss";
 import tailwind from "tailwindcss";
 import postcssCssvariables from "postcss-css-variables";
 import postcssColorRBG from "postcss-color-rgb";
-import postcssRemToPixel from "postcss-rem-to-pixel";
 
 import { flattenRules } from "./flatten-rules";
 import { normaliseSelector } from "../../shared/selector";
@@ -19,19 +18,6 @@ export function processStyles(
     tailwind(tailwindConfig),
     postcssCssvariables(),
     postcssColorRBG(),
-    postcssRemToPixel({
-      rootValue: 16,
-      propList: [
-        "font",
-        "font-size",
-        "line-height",
-        "letter-spacing",
-        "margin",
-      ],
-      replace: true,
-      mediaQuery: true,
-      minRemValue: 0,
-    }),
   ]).process(cssInput).css;
 
   const cssRules = css.parse(processedCss).stylesheet?.rules ?? [];

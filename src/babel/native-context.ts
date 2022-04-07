@@ -3,7 +3,7 @@ import { Program } from "@babel/types";
 import { Babel, State, TailwindReactNativeOptions } from "./types";
 import { nativeVisitor, NativeVisitorState } from "./native-visitor";
 
-import { getTailwindConfig } from "./utils/get-tailwind-config";
+import { getTailwindConfig } from "./tailwind/get-tailwind-config";
 import { processStyles } from "./utils/process-styles";
 import { appendVariables } from "./utils/native-variables";
 import { appendImport } from "./utils/imports";

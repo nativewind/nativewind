@@ -15,6 +15,7 @@ export interface TailwindReactNativeOptions {
   platform?: "web" | "native" | "native-context" | "native-inline";
   allowedImports?: "*" | Array<string | RegExp>;
   deniedImports?: Array<string | RegExp>;
+  rem?: number;
 }
 
 export type State = {

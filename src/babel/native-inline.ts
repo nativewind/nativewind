@@ -3,7 +3,7 @@ import { Program } from "@babel/types";
 import { NodePath } from "@babel/traverse";
 
 import { processStyles } from "./utils/process-styles";
-import { getTailwindConfig } from "./utils/get-tailwind-config";
+import { getTailwindConfig } from "./tailwind/get-tailwind-config";
 import { appendVariables } from "./utils/native-variables";
 import { appendImport } from "./utils/imports";
 import { NativeVisitorState, nativeVisitor } from "./native-visitor";
