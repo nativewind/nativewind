@@ -1,5 +1,5 @@
 {
-  "version": "0.0.19",
+  "version": "0.0.20",
   "name": "tailwindcss-react-native",
   "main": "dist/index.js",
   "sideEffects": false,
