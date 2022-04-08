@@ -1,6 +1,6 @@
 # React Native Compatibility
 
-This library is still in development. This document helps track what classes are currently supported
+This library is still in development. This document helps track what classes are currently supported, but is not a complete list
 
 | Icon               | Legend                |
 | ------------------ | --------------------- |
