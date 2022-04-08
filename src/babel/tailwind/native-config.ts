@@ -131,6 +131,14 @@ export function getNativeTailwindConfig({
         square: "1",
         video: "1.777777778",
       },
+      letterSpacing: {
+        tighter: "-0.5",
+        tight: "-0.25",
+        normal: "0",
+        wide: "0.25",
+        wider: "0.5",
+        widest: "1",
+      },
       spacing: {
         px: "1px",
         0: "0px",
