@@ -17,7 +17,7 @@ Already using another RN library for Tailwind? [Find out why you should switch.]
 
 Install the library
 
-`npm install tailwindcss-react-native` or `yarn add tailwindcss-react-native`
+`npm install tailwindcss-react-native tailwindcss` or `yarn add tailwindcss-react-native tailwindcss`
 
 Add `tailwindcss-react-native/babel` to your babel plugins
 
