@@ -1,7 +1,10 @@
+import { dirname } from "path";
 import { NodePath } from "@babel/core";
 import * as t from "@babel/types";
 import { Statement } from "@babel/types";
-import { Babel, State } from "../types";
+import { Babel } from "../types";
+import { NativeVisitorState } from "../native-visitor";
+import { isAllowedPath } from "../tailwind/allowed-paths";
 
 export function appendImport(
   { types: t }: Babel,
@@ -17,6 +20,9 @@ export function appendImport(
   );
 }
 
+/*
+ * Finds if an import declaration has an imported value
+ */
 export function hasNamedImport(
   path: NodePath<t.ImportDeclaration>,
   variable: string,
@@ -39,49 +45,72 @@ export function hasNamedImport(
   return false;
 }
 
-export function getBlackedListedComponents(
+export function getImportBlockList(
   path: NodePath<t.ImportDeclaration>,
-  state: State
+  state: NativeVisitorState
 ) {
-  const { allowedImports = "*", deniedImports = [] } = state.opts;
+  const { allowModules = "*", blockModules = [] } = state.opts;
+  const { allowedContentPaths, filename } = state;
 
-  if (allowedImports === "*" && deniedImports.length === 0) {
+  if (
+    allowedContentPaths === "*" &&
+    allowModules === "*" &&
+    blockModules.length === 0
+  ) {
     return [];
   }
 
   const module = path.node.source.value;
 
-  if (allowedImports !== "*") {
-    const isAllowed = allowedImports.every((allowed) => {
-      if (allowed instanceof RegExp) {
-        return allowed.test(module);
-      } else {
-        return module.startsWith(allowed);
-      }
-    });
+  function getComponentNames() {
+    return path.node.specifiers.flatMap((specifier) => {
+      const name = specifier.local.name;
 
-    if (isAllowed) {
+      if (name[0] === name[0].toUpperCase()) {
+        return [name];
+      }
+
       return [];
+    });
+  }
+
+  if (module.startsWith(".")) {
+    // This is a relative path, so make sure its within the content globs
+    if (!isAllowedPath(module, allowedContentPaths, dirname(filename))) {
+      return getComponentNames();
+    }
+  } else {
+    // If the module is blocked, return the imported components
+    if (blockModules.length > 0) {
+      const isBlocked = blockModules.every((deny) => {
+        if (deny instanceof RegExp) {
+          return deny.test(module);
+        } else {
+          return module.startsWith(deny);
+        }
+      });
+
+      if (isBlocked) {
+        return getComponentNames();
+      }
+    }
+
+    // If the module is not allowed, return the imported components
+    if (allowModules !== "*") {
+      const isAllowed = allowModules.every((allowed) => {
+        if (allowed instanceof RegExp) {
+          return allowed.test(module);
+        } else {
+          return module.startsWith(allowed);
+        }
+      });
+
+      if (!isAllowed) {
+        return getComponentNames();
+      }
     }
   }
 
-  if (deniedImports.length > 0) {
-    const isDenied = deniedImports.every((deny) => {
-      if (deny instanceof RegExp) {
-        return deny.test(module);
-      } else {
-        return module.startsWith(deny);
-      }
-    });
-
-    if (!isDenied) {
-      return [];
-    }
-  }
-
-  // If we have made it to here, either the module was
-  // not allowed or was denied.
-  return path.node.specifiers.map((specifier) => {
-    return specifier.local.name;
-  });
+  // If we got here, then isAllowed = true & isBlock = false
+  return [];
 }

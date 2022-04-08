@@ -1,0 +1,4 @@
+{
+  "platform": "native-inline",
+  "tailwindConfigPath": "./__tests__/native-inline-fixtures/content-ignore-unmatched-relative-import/tailwind.config.js"
+}

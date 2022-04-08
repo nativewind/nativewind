@@ -1,0 +1,4 @@
+{
+  "platform": "native-inline",
+  "tailwindConfigPath": "./__tests__/native-inline-fixtures/content-negative-match/tailwind.config.js"
+}

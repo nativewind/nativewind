@@ -3,7 +3,7 @@ import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 import { Babel, State } from "./types";
 import { getJSXElementName } from "./utils/jsx";
-import { getBlackedListedComponents, hasNamedImport } from "./utils/imports";
+import { getImportBlockList, hasNamedImport } from "./utils/imports";
 import {
   transformClassName,
   TransformClassNameOptions,
@@ -12,13 +12,14 @@ import {
 export interface NativeVisitorState extends State {
   babel: Babel;
   tailwindConfig: TailwindConfig;
-  blackedListedComponents: Set<string>;
+  blockList: Set<string>;
   hasUseParseTailwind: boolean;
   hasStyleSheetImport: boolean;
   hasClassNames: boolean;
   hasProvider: boolean;
   visitor?: Visitor<NativeVisitorState>;
   transformClassNameOptions: TransformClassNameOptions;
+  allowedContentPaths: string[] | "*";
 }
 
 /**
@@ -41,27 +42,24 @@ export interface NativeVisitorState extends State {
  */
 export const nativeVisitor: Visitor<NativeVisitorState> = {
   ImportDeclaration(path, state) {
-    state.blackedListedComponents = new Set(
-      getBlackedListedComponents(path, state)
-    );
+    for (const component of getImportBlockList(path, state)) {
+      state.blockList.add(component);
+    }
 
     // We only need to check named imports.
     // THe code will still work if they are using a Namespace Specifier
-    state.hasStyleSheetImport = hasNamedImport(
-      path,
-      "StyleSheet",
-      "react-native"
-    );
-    state.hasUseParseTailwind = hasNamedImport(
-      path,
-      "__useParseTailwind",
-      "tailwindcss-react-native"
-    );
+    state.hasStyleSheetImport =
+      state.hasStyleSheetImport ||
+      hasNamedImport(path, "StyleSheet", "react-native");
+
+    state.hasUseParseTailwind =
+      state.hasUseParseTailwind ||
+      hasNamedImport(path, "__useParseTailwind", "tailwindcss-react-native");
   },
   JSXOpeningElement(path, state) {
     const name = getJSXElementName(path.node);
 
-    if (state.blackedListedComponents.has(name)) {
+    if (state.blockList.has(name)) {
       return;
     }
 

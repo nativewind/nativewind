@@ -13,8 +13,8 @@ export type MediaRecord = Record<
 export interface TailwindReactNativeOptions {
   tailwindConfigPath?: string;
   platform?: "web" | "native" | "native-context" | "native-inline";
-  allowedImports?: "*" | Array<string | RegExp>;
-  deniedImports?: Array<string | RegExp>;
+  allowModules?: "*" | Array<string | RegExp>;
+  blockModules?: Array<string | RegExp>;
   rem?: number;
 }
 

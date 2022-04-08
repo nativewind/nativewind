@@ -8,6 +8,7 @@ import { processStyles } from "./utils/process-styles";
 import { appendVariables } from "./utils/native-variables";
 import { appendImport } from "./utils/imports";
 import { getJSXElementName } from "./utils/jsx";
+import { getAllowedPaths } from "./tailwind/allowed-paths";
 
 export default function (
   babel: Babel,
@@ -15,6 +16,7 @@ export default function (
   cwd: string
 ) {
   const tailwindConfig = getTailwindConfig(cwd, options);
+  const allowedContentPaths = getAllowedPaths(tailwindConfig);
   const { styles, media } = processStyles(tailwindConfig);
 
   return {
@@ -36,13 +38,14 @@ export default function (
             ...state,
             babel,
             tailwindConfig,
-            blackedListedComponents: new Set(),
+            blockList: new Set(),
             hasUseParseTailwind: false,
             hasStyleSheetImport: false,
             hasClassNames: false,
             hasProvider: false,
             transformClassNameOptions: { inlineStyles: false },
             visitor: nativeContextVisitor,
+            allowedContentPaths,
           };
 
           // Traverse the file

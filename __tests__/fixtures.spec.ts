@@ -13,16 +13,16 @@ pluginTester({
   babelOptions,
 });
 
-pluginTester({
-  pluginName: "native-context",
-  plugin: testPlugin,
-  fixtures: path.join(__dirname, "native-context-fixtures"),
-  babelOptions,
-});
+// pluginTester({
+//   pluginName: "native-context",
+//   plugin: testPlugin,
+//   fixtures: path.join(__dirname, "native-context-fixtures"),
+//   babelOptions,
+// });
 
-pluginTester({
-  pluginName: "web",
-  plugin: testPlugin,
-  fixtures: path.join(__dirname, "web-fixtures"),
-  babelOptions,
-});
+// pluginTester({
+//   pluginName: "web",
+//   plugin: testPlugin,
+//   fixtures: path.join(__dirname, "web-fixtures"),
+//   babelOptions,
+// });

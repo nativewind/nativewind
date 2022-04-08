@@ -8,6 +8,7 @@ import { appendVariables } from "./utils/native-variables";
 import { appendImport } from "./utils/imports";
 import { NativeVisitorState, nativeVisitor } from "./native-visitor";
 import { TailwindReactNativeOptions, State, Babel } from "./types";
+import { getAllowedPaths, isAllowedPath } from "./tailwind/allowed-paths";
 
 export default function (
   babel: Babel,
@@ -15,11 +16,16 @@ export default function (
   cwd: string
 ) {
   const tailwindConfig = getTailwindConfig(cwd, options);
+  const allowedContentPaths = getAllowedPaths(tailwindConfig);
 
   return {
     visitor: {
       Program: {
         enter(path: NodePath<Program>, state: State) {
+          if (!isAllowedPath(state.filename, allowedContentPaths)) {
+            return;
+          }
+
           // Dirty check the file for the className attribute
           if (!state.file.code.includes("className=")) {
             return;
@@ -29,12 +35,13 @@ export default function (
             ...state,
             babel,
             tailwindConfig,
-            blackedListedComponents: new Set(),
+            blockList: new Set(),
             hasUseParseTailwind: false,
             hasStyleSheetImport: false,
             hasClassNames: false,
             hasProvider: false,
             transformClassNameOptions: { inlineStyles: true },
+            allowedContentPaths,
           };
 
           // Traverse the file
