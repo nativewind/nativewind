@@ -11,7 +11,8 @@
     "outDir": "dist",
     "strict": true,
     "target": "esnext",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true,
   },
   "include": ["src/**/*"],
   "exclude": [
