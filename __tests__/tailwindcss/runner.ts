@@ -2,7 +2,6 @@ import { MediaRecord, StyleRecord } from "../../src/babel/types";
 import { getNativeTailwindConfig } from "../../src/babel/tailwind/native-config";
 import { extractStyles } from "../../src/babel/native-style-extraction";
 
-export type Case = [string, Array<Test>];
 export type Test = [string, Expected];
 
 export interface Expected {
@@ -10,8 +9,12 @@ export interface Expected {
   media?: MediaRecord;
 }
 
-export function tailwindRunner(cases: Case[]) {
-  describe.each(cases)("%s", (_, testCases) => {
+export function emptyResults(names: string[]): Test[] {
+  return names.map((name) => [name, { styles: {}, media: {} }]);
+}
+
+export function tailwindRunner(name: string, testCases: Test[]) {
+  describe(name, () => {
     test.each(testCases)(
       "%s",
       (css, { styles: expectedStyles, media: expectedMedia }) => {

@@ -1,20 +1,13 @@
-import { tailwindRunner, Case } from "./runner";
+import { tailwindRunner } from "./runner";
 
-const cases: Array<Case> = [
+tailwindRunner("Typography - Letter Spacing", [
   [
-    "Typography - Letter Spacing",
-    [
-      [
-        "tracking-wide",
-        {
-          styles: {
-            "tracking-wide": { letterSpacing: 0.25 },
-          },
-          media: {},
-        },
-      ],
-    ],
+    "tracking-wide",
+    {
+      styles: {
+        "tracking-wide": { letterSpacing: 0.25 },
+      },
+      media: {},
+    },
   ],
-];
-
-tailwindRunner(cases);
+]);

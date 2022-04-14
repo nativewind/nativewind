@@ -1,4 +1,4 @@
-import { tailwindRunner, Case } from "./runner";
+import { tailwindRunner, emptyResults } from "./runner";
 
 const breakAfter = [
   "break-after-auto",
@@ -11,17 +11,4 @@ const breakAfter = [
   "break-after-column",
 ];
 
-const cases: Array<Case> = [
-  [
-    "Layout - Break After",
-    breakAfter.map((n) => [
-      n,
-      {
-        styles: {},
-        media: {},
-      },
-    ]),
-  ],
-];
-
-tailwindRunner(cases);
+tailwindRunner("Layout - Break After", emptyResults(breakAfter));

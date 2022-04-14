@@ -1,20 +1,13 @@
-import { tailwindRunner, Case } from "./runner";
+import { tailwindRunner } from "./runner";
 
-const cases: Array<Case> = [
+tailwindRunner("Layout - Margin", [
   [
-    "Layout - Margin",
-    [
-      [
-        "my-8",
-        {
-          styles: {
-            "my-8": { marginBottom: 32, marginTop: 32 },
-          },
-          media: {},
-        },
-      ],
-    ],
+    "my-8",
+    {
+      styles: {
+        "my-8": { marginBottom: 32, marginTop: 32 },
+      },
+      media: {},
+    },
   ],
-];
-
-tailwindRunner(cases);
+]);

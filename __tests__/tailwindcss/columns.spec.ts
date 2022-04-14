@@ -1,4 +1,4 @@
-import { tailwindRunner, Case } from "./runner";
+import { tailwindRunner, emptyResults } from "./runner";
 
 const columns = [
   "columns-1",
@@ -12,17 +12,4 @@ const columns = [
   "columns-[10rem]",
 ];
 
-const cases: Array<Case> = [
-  [
-    "Layout - Columns",
-    columns.map((n) => [
-      n,
-      {
-        styles: {},
-        media: {},
-      },
-    ]),
-  ],
-];
-
-tailwindRunner(cases);
+tailwindRunner("Layout - Columns", emptyResults(columns));

@@ -1,4 +1,4 @@
-import { tailwindRunner, Case } from "./runner";
+import { tailwindRunner, emptyResults } from "./runner";
 
 const breakInside = [
   "break-inside-auto",
@@ -7,17 +7,4 @@ const breakInside = [
   "break-inside-avoid-column",
 ];
 
-const cases: Array<Case> = [
-  [
-    "Layout - Break Inside",
-    breakInside.map((n) => [
-      n,
-      {
-        styles: {},
-        media: {},
-      },
-    ]),
-  ],
-];
-
-tailwindRunner(cases);
+tailwindRunner("Layout - Break Inside", emptyResults(breakInside));

@@ -1,25 +1,6 @@
-import { tailwindRunner, Case } from "./runner";
+import { tailwindRunner, emptyResults } from "./runner";
 
-const cases: Array<Case> = [
-  [
-    "Layout - Box Sizing",
-    [
-      [
-        "box-border",
-        {
-          styles: {},
-          media: {},
-        },
-      ],
-      [
-        "box-content",
-        {
-          styles: {},
-          media: {},
-        },
-      ],
-    ],
-  ],
-];
-
-tailwindRunner(cases);
+tailwindRunner(
+  "Layout - Box Sizing",
+  emptyResults(["box-border", "box-content"])
+);
