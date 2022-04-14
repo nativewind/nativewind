@@ -5,16 +5,16 @@ import { Babel } from "../types";
 import {
   createMergedStylesExpressionContainer,
   getStyleAttributesAndValues,
-} from "./jsx";
+} from "../utils/jsx";
 
-export interface TransformClassNameOptions {
+export interface ClassNameToStyleOptions {
   inlineStyles: boolean;
 }
 
-export function transformClassName(
+export function classNameToStyle(
   babel: Babel,
   path: NodePath<JSXOpeningElement>,
-  { inlineStyles }: TransformClassNameOptions
+  { inlineStyles }: ClassNameToStyleOptions
 ): boolean {
   const {
     className: existingClassName,

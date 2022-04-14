@@ -8,11 +8,12 @@ import {
   TailwindReactNativeOptions,
 } from "./types";
 import { getJSXElementName } from "./utils/jsx";
-import { getImportBlockList, hasNamedImport } from "./utils/imports";
+import { hasNamedImport } from "./utils/imports";
 import {
-  transformClassName,
-  TransformClassNameOptions,
-} from "./utils/transform-class-names";
+  classNameToStyle,
+  ClassNameToStyleOptions,
+} from "./transforms/class-name-to-style";
+import { getImportBlockedComponents } from "./utils/get-import-blocked-components";
 
 export interface NativeVisitorState
   extends State,
@@ -25,7 +26,7 @@ export interface NativeVisitorState
   hasStyleSheetImport: boolean;
   hasUseParseTailwind: boolean;
   tailwindConfig: TailwindConfig;
-  transformClassNameOptions: TransformClassNameOptions;
+  classNameToStyleOptions: ClassNameToStyleOptions;
   visitor?: Visitor<NativeVisitorState>;
 }
 
@@ -49,7 +50,7 @@ export interface NativeVisitorState
  */
 export const nativeVisitor: Visitor<NativeVisitorState> = {
   ImportDeclaration(path, state) {
-    for (const component of getImportBlockList(path, state)) {
+    for (const component of getImportBlockedComponents(path, state)) {
       state.blockList.add(component);
     }
 
@@ -76,10 +77,10 @@ export const nativeVisitor: Visitor<NativeVisitorState> = {
       return;
     }
 
-    const hasClassNames = transformClassName(
+    const hasClassNames = classNameToStyle(
       state.babel,
       path,
-      state.transformClassNameOptions
+      state.classNameToStyleOptions
     );
 
     state.hasClassNames ||= hasClassNames;

@@ -3,8 +3,8 @@ import { NodePath } from "@babel/traverse";
 
 import { extractStyles } from "./native-style-extraction";
 import { getTailwindConfig } from "./tailwind/get-tailwind-config";
-import { appendVariables } from "./utils/native-variables";
-import { appendImport } from "./utils/imports";
+import { appendVariables } from "./transforms/append-variables";
+import { appendImport } from "./transforms/append-import";
 import { NativeVisitorState, nativeVisitor } from "./native-visitor";
 import { TailwindReactNativeOptions, State, Babel } from "./types";
 import {
@@ -58,7 +58,7 @@ export default function (
             hasStyleSheetImport: false,
             hasUseParseTailwind: false,
             tailwindConfig,
-            transformClassNameOptions: { inlineStyles: true },
+            classNameToStyleOptions: { inlineStyles: true },
           };
 
           // Traverse the file

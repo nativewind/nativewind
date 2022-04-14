@@ -2,40 +2,13 @@ import { createRequire } from "module";
 import { join, dirname, basename } from "path";
 import { readdirSync, lstatSync } from "fs";
 import micromatch from "micromatch";
+
 import { NodePath } from "@babel/core";
-import {
-  ImportDeclaration,
-  isImportSpecifier,
-  isStringLiteral,
-} from "@babel/types";
+import { ImportDeclaration } from "@babel/types";
+
 import { NativeVisitorState } from "../native-visitor";
 
-/*
- * Finds if an import declaration has an imported value
- */
-export function hasNamedImport(
-  path: NodePath<ImportDeclaration>,
-  variable: string,
-  source: string
-) {
-  if (path.node.source.value === source) {
-    return path.node.specifiers.some((specifier) => {
-      if (!isImportSpecifier(specifier)) {
-        return;
-      }
-
-      if (isStringLiteral(specifier.imported)) {
-        return specifier.imported.value === variable;
-      } else {
-        return specifier.imported.name === variable;
-      }
-    });
-  }
-
-  return false;
-}
-
-export function getImportBlockList(
+export function getImportBlockedComponents(
   path: NodePath<ImportDeclaration>,
   state: NativeVisitorState
 ) {

@@ -5,9 +5,9 @@ import { nativeVisitor, NativeVisitorState } from "./native-visitor";
 
 import { getTailwindConfig } from "./tailwind/get-tailwind-config";
 import { extractStyles } from "./native-style-extraction";
-import { appendVariables } from "./utils/native-variables";
-import { appendImport } from "./utils/imports";
+import { appendVariables } from "./transforms/append-variables";
 import { getJSXElementName } from "./utils/jsx";
+import { appendImport } from "./transforms/append-import";
 import {
   getAllowedPaths,
   isAllowedProgramPath,
@@ -66,7 +66,7 @@ export default function (
             hasStyleSheetImport: false,
             hasUseParseTailwind: false,
             tailwindConfig,
-            transformClassNameOptions: { inlineStyles: false },
+            classNameToStyleOptions: { inlineStyles: false },
             visitor: nativeContextVisitor,
           };
 
