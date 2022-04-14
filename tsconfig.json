@@ -5,7 +5,7 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "lib": ["es2017"],
+    "lib": ["esnext"],
     "moduleResolution": "node",
     "module": "commonjs",
     "outDir": "dist",

@@ -1,15 +1,14 @@
 import { MediaRecord, StyleRecord } from "../types";
 
-import css from "css";
 import postcss from "postcss";
 import tailwind from "tailwindcss";
 import postcssCssvariables from "postcss-css-variables";
 import postcssColorRBG from "postcss-color-rgb";
 
-import { flattenRules } from "./flatten-rules";
+import { ruleIterator } from "./rule-iterator";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
-export function processStyles(
+export function extractStyles(
   tailwindConfig: TailwindConfig,
   cssInput: string = "@tailwind components;@tailwind utilities;"
 ) {
@@ -19,19 +18,16 @@ export function processStyles(
     postcssColorRBG(),
   ]).process(cssInput).css;
 
-  const cssRules = css.parse(processedCss).stylesheet?.rules ?? [];
-
-  const parsedRules = flattenRules(cssRules, tailwindConfig);
-
   const styles: StyleRecord = {};
   const mediaRules: MediaRecord = {};
 
+  const parsedRules = [...ruleIterator(processedCss, tailwindConfig)];
   for (const [suffix, parsedRule] of parsedRules.entries()) {
-    const { selector, media, rules } = parsedRule;
+    const { selector, media, style } = parsedRule;
 
     if (media.length > 0) {
       // If there are media conditions, add the rules with an uffix
-      styles[`${selector}_${suffix}`] = rules;
+      styles[`${selector}_${suffix}`] = style;
       // Store the conditions, along with the suffix
       mediaRules[selector] = mediaRules[selector] ?? [];
       mediaRules[selector].push({ media, suffix });
@@ -40,7 +36,7 @@ export function processStyles(
       // Lower rules should overwrite
       styles[selector] = {
         ...(styles[selector] ?? {}),
-        ...rules,
+        ...style,
       };
     }
   }

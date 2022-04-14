@@ -1,11 +1,10 @@
-import { dirname } from "path";
 import { NodePath, Visitor } from "@babel/core";
 import { Program } from "@babel/types";
 import { Babel, State, TailwindReactNativeOptions } from "./types";
 import { nativeVisitor, NativeVisitorState } from "./native-visitor";
 
 import { getTailwindConfig } from "./tailwind/get-tailwind-config";
-import { processStyles } from "./utils/process-styles";
+import { extractStyles } from "./native-style-extraction";
 import { appendVariables } from "./utils/native-variables";
 import { appendImport } from "./utils/imports";
 import { getJSXElementName } from "./utils/jsx";
@@ -20,7 +19,7 @@ export default function (
   cwd: string
 ) {
   const tailwindConfig = getTailwindConfig(cwd, options);
-  const { styles, media } = processStyles(tailwindConfig);
+  const { styles, media } = extractStyles(tailwindConfig);
   const { allowModules, allowRelativeModules } = getAllowedPaths(
     tailwindConfig,
     options

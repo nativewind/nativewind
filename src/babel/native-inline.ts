@@ -1,7 +1,7 @@
 import { Program } from "@babel/types";
 import { NodePath } from "@babel/traverse";
 
-import { processStyles } from "./utils/process-styles";
+import { extractStyles } from "./native-style-extraction";
 import { getTailwindConfig } from "./tailwind/get-tailwind-config";
 import { appendVariables } from "./utils/native-variables";
 import { appendImport } from "./utils/imports";
@@ -94,7 +94,7 @@ export default function (
           /**
            * Override tailwind to only process the classnames in this file
            */
-          const { styles, media } = processStyles({
+          const { styles, media } = extractStyles({
             ...tailwindConfig,
             content: [filename],
           });
