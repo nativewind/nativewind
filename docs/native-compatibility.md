@@ -7,7 +7,7 @@ This library is still in development. This document helps track what classes are
 | :heavy_check_mark: | Supported             |
 | :white_check_mark: | Partial support       |
 | :x:                | Not supported         |
-| :construction:     | Under development     |
+| :construction:     | Needs development     |
 | :boom:             | Not handled correctly |
 
 ## Table of contents
