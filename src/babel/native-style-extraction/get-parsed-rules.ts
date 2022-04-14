@@ -21,12 +21,12 @@ interface CssRule {
  * It will flatten selectors there are no grouped selectors
  * It will flattern media queries so they are not nested
  */
-export function* ruleIterator(
+export function getParsedRules(
   css: string,
   tailwindConfig: TailwindConfig
-): Generator<CssRule> {
+): CssRule[] {
   const cssRules = parse(css).stylesheet?.rules ?? [];
-  yield* cssRuleIterator(cssRules, tailwindConfig);
+  return [...cssRuleIterator(cssRules, tailwindConfig)];
 }
 
 function* cssRuleIterator(
@@ -50,10 +50,11 @@ function* cssRuleIterator(
         continue;
       }
 
-      if (
-        process.env.NODE_ENV !== "development" &&
-        process.env.NODE_ENV !== "test"
-      ) {
+      if (process.env.NODE_ENV === "production") {
+        throw new Error(
+          `Selectors ${cssRule.selectors} are invalid for React Native`
+        );
+      } else {
         if (invalidStyleProps.length > 0) {
           console.warn(`
 Selectors ${cssRule.selectors} use invalid styles ${invalidStyleProps}.

@@ -32,7 +32,7 @@ tailwindRunner("Layout - Aspect Ratio", [
     "aspect-[4/3]",
     {
       styles: {
-        "aspect-\\[4\\/3\\]": { aspectRatio: 1.3333333333333333 },
+        "aspect-_4_3_": { aspectRatio: 1.3333333333333333 },
       },
       media: {},
     },

@@ -14,5 +14,9 @@ export function normaliseSelector(
       ? new RegExp(`^${important}|${leadingDots}`)
       : new RegExp(leadingDots);
 
-  return selector.replace(regex, "").replace(/\s/g, "_");
+  return selector
+    .replace(regex, "")
+    .replace(/\s/g, "_")
+    .replace(/(\\.|\.)/g, "_")
+    .replace(/\//g, "_")
 }

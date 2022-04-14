@@ -384,3 +384,16 @@ React Native does not support clearning floats. Use Flexbox instead
 | static   | :x:                |
 | fixed    | :x:                |
 | stick    | :x:                |
+
+
+### Top Right Bottom Left
+
+| Class    | Supported          |
+| -------- | ------------------ |
+| inset-{n} | :heavy_check_mark: |
+| inset-x-{n} | :heavy_check_mark: |
+| inset-y-{n} | :heavy_check_mark: |
+| top-{n} | :heavy_check_mark: |
+| right-{n} | :heavy_check_mark: |
+| bottom-{n} | :heavy_check_mark: |
+| left-{n} | :heavy_check_mark: |

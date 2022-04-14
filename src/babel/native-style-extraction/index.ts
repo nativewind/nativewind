@@ -5,7 +5,7 @@ import tailwind from "tailwindcss";
 import postcssCssvariables from "postcss-css-variables";
 import postcssColorRBG from "postcss-color-rgb";
 
-import { ruleIterator } from "./rule-iterator";
+import { getParsedRules } from "./get-parsed-rules";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 export function extractStyles(
@@ -21,7 +21,8 @@ export function extractStyles(
   const styles: StyleRecord = {};
   const mediaRules: MediaRecord = {};
 
-  const parsedRules = [...ruleIterator(processedCss, tailwindConfig)];
+  const parsedRules = getParsedRules(processedCss, tailwindConfig);
+
   for (const [suffix, parsedRule] of parsedRules.entries()) {
     const { selector, media, style } = parsedRule;
 

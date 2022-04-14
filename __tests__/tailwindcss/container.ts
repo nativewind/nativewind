@@ -27,15 +27,15 @@ tailwindRunner("Layout - Container", [
     "sm:container",
     {
       styles: {
-        "sm\\:container_0": { width: "100%" },
-        "sm\\:container_1": { maxWidth: 640 },
-        "sm\\:container_2": { maxWidth: 768 },
-        "sm\\:container_3": { maxWidth: 1024 },
-        "sm\\:container_4": { maxWidth: 1280 },
-        "sm\\:container_5": { maxWidth: 1536 },
+        "sm_container_0": { width: "100%" },
+        "sm_container_1": { maxWidth: 640 },
+        "sm_container_2": { maxWidth: 768 },
+        "sm_container_3": { maxWidth: 1024 },
+        "sm_container_4": { maxWidth: 1280 },
+        "sm_container_5": { maxWidth: 1536 },
       },
       media: {
-        "sm\\:container": [
+        "sm_container": [
           { media: ["(min-width: 640px)"], suffix: 0 },
           { media: ["(min-width: 640px)"], suffix: 1 },
           {
