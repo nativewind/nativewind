@@ -252,23 +252,18 @@ Use a `FlatList` with `numColumns` set instead.
 | box-decoration-clone | :x:       |
 | box-decoration-slice | :x:       |
 
-### Box Decoration Break
+### Box Sizing
 
-React Native only supports `border-box`.
+React Native does not support changing the box sizing
 
-| Class       | Supported          |
-| ----------- | ------------------ |
-| box-border  | :heavy_check_mark: |
-| box-content | :x:                |
+| Class       | Supported |
+| ----------- | --------- |
+| box-border  | :x:       |
+| box-content | :x:       |
 
 ### Display
 
 React Native only supports `flex` or `none`
-
-| Class       | Supported          |
-| ----------- | ------------------ |
-| box-border  | :heavy_check_mark: |
-| box-content | :x:                |
 
 | Class              | Supported          |
 | ------------------ | ------------------ |
@@ -293,3 +288,55 @@ React Native only supports `flex` or `none`
 | inline-grid        | :x:                |
 | contents           | :x:                |
 | list-item          | :x:                |
+
+### Floats
+
+React Native does not support floats. Use Flexbox instead
+
+| Class       | Supported |
+| ----------- | --------- |
+| float-right | :x:       |
+| float-left  | :x:       |
+| float-none  | :x:       |
+
+### Clear
+
+React Native does not support clearning floats. Use Flexbox instead
+
+| Class       | Supported |
+| ----------- | --------- |
+| clear-right | :x:       |
+| clear-left  | :x:       |
+| clear-both  | :x:       |
+| clear-none  | :x:       |
+
+### Isolation
+
+| Class        | Supported |
+| ------------ | --------- |
+| isolate      | :x:       |
+| isolate-auto | :x:       |
+
+### Object Fit
+
+| Class             | Supported |
+| ----------------- | --------- |
+| object-contain    | :x:       |
+| object-cover      | :x:       |
+| object-fill       | :x:       |
+| object-none       | :x:       |
+| object-scale-down | :x:       |
+
+### Object Position
+
+| Class               | Supported |
+| ------------------- | --------- |
+| object-bottom       | :x:       |
+| object-center       | :x:       |
+| object-left         | :x:       |
+| object-left-bottom  | :x:       |
+| object-left-top     | :x:       |
+| object-right        | :x:       |
+| object-right-bottom | :x:       |
+| object-right-top    | :x:       |
+| object-top          | :x:       |
