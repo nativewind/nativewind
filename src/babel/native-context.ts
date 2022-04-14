@@ -1,3 +1,4 @@
+import { dirname } from "path";
 import { NodePath, Visitor } from "@babel/core";
 import { Program } from "@babel/types";
 import { Babel, State, TailwindReactNativeOptions } from "./types";
@@ -8,7 +9,10 @@ import { processStyles } from "./utils/process-styles";
 import { appendVariables } from "./utils/native-variables";
 import { appendImport } from "./utils/imports";
 import { getJSXElementName } from "./utils/jsx";
-import { getAllowedPaths } from "./tailwind/allowed-paths";
+import {
+  getAllowedPaths,
+  isAllowedProgramPath,
+} from "./tailwind/allowed-paths";
 
 export default function (
   babel: Babel,
@@ -16,13 +20,26 @@ export default function (
   cwd: string
 ) {
   const tailwindConfig = getTailwindConfig(cwd, options);
-  const allowedContentPaths = getAllowedPaths(tailwindConfig);
   const { styles, media } = processStyles(tailwindConfig);
+  const { allowModules, allowRelativeModules } = getAllowedPaths(
+    tailwindConfig,
+    options
+  );
 
   return {
     visitor: {
       Program: {
         enter(path: NodePath<Program>, state: State) {
+          if (
+            !isAllowedProgramPath({
+              path: state.filename,
+              allowRelativeModules,
+              cwd,
+            })
+          ) {
+            return;
+          }
+
           /* Dirty check the file for
            *  - className attribute
            *  - TailwindProvider
@@ -35,17 +52,23 @@ export default function (
           }
 
           const nativeVisitorState: NativeVisitorState = {
+            rem: 16,
+            tailwindConfigPath: "tailwind.config.js",
+            platform: "native-context",
+            blockModules: [],
             ...state,
+            ...state.opts,
+            allowModules,
+            allowRelativeModules,
             babel,
-            tailwindConfig,
             blockList: new Set(),
-            hasUseParseTailwind: false,
-            hasStyleSheetImport: false,
             hasClassNames: false,
             hasProvider: false,
+            hasStyleSheetImport: false,
+            hasUseParseTailwind: false,
+            tailwindConfig,
             transformClassNameOptions: { inlineStyles: false },
             visitor: nativeContextVisitor,
-            allowedContentPaths,
           };
 
           // Traverse the file

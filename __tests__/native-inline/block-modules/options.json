@@ -1,0 +1,4 @@
+{
+  "platform": "native-inline",
+  "blockModules": ["moti"]
+}

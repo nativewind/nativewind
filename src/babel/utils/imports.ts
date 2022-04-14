@@ -1,10 +1,16 @@
-import { dirname } from "path";
+import { createRequire } from "module";
+import { join, dirname, basename } from "path";
+import { readdirSync, lstatSync } from "fs";
+import micromatch from "micromatch";
 import { NodePath } from "@babel/core";
-import * as t from "@babel/types";
-import { Statement } from "@babel/types";
+import {
+  ImportDeclaration,
+  isImportSpecifier,
+  isStringLiteral,
+  Statement,
+} from "@babel/types";
 import { Babel } from "../types";
 import { NativeVisitorState } from "../native-visitor";
-import { isAllowedPath } from "../tailwind/allowed-paths";
 
 export function appendImport(
   { types: t }: Babel,
@@ -24,17 +30,17 @@ export function appendImport(
  * Finds if an import declaration has an imported value
  */
 export function hasNamedImport(
-  path: NodePath<t.ImportDeclaration>,
+  path: NodePath<ImportDeclaration>,
   variable: string,
   source: string
 ) {
   if (path.node.source.value === source) {
     return path.node.specifiers.some((specifier) => {
-      if (!t.isImportSpecifier(specifier)) {
+      if (!isImportSpecifier(specifier)) {
         return;
       }
 
-      if (t.isStringLiteral(specifier.imported)) {
+      if (isStringLiteral(specifier.imported)) {
         return specifier.imported.value === variable;
       } else {
         return specifier.imported.name === variable;
@@ -46,71 +52,98 @@ export function hasNamedImport(
 }
 
 export function getImportBlockList(
-  path: NodePath<t.ImportDeclaration>,
+  path: NodePath<ImportDeclaration>,
   state: NativeVisitorState
 ) {
-  const { allowModules = "*", blockModules = [] } = state.opts;
-  const { allowedContentPaths, filename } = state;
+  const { allowModules, allowRelativeModules, blockModules, filename } = state;
 
-  if (
-    allowedContentPaths === "*" &&
-    allowModules === "*" &&
-    blockModules.length === 0
-  ) {
+  const require = createRequire(filename);
+
+  const moduleName = path.node.source.value;
+  let modulePaths: string[] = [];
+  let returnComponentsAsBlocked = false;
+
+  let isNodeModule: boolean;
+  let isBlocked: boolean | null = null;
+  let isAllowed: boolean | null = null;
+
+  try {
+    modulePaths = [require.resolve(moduleName)];
+    isNodeModule =
+      modulePaths[0].includes("node_modules") ||
+      moduleName === "tailwindcss-react-native"; // Need this, coz the tests get confused
+  } catch {
+    /**
+     * Hello user! If your are reading this then your probably why your exotic import isn't working.
+     *
+     * You might be using module-alias or importing a folder without an index.{js,jsx,ts,tsx} file
+     * either way your doing something that isn't vanilla node or typescript.
+     *
+     * Because there's many scenarios, we simply try
+     *  - Scan the allow/block lists and try and work out if this is a module alias
+     *  - Check if its a file
+     *  - Check if its a directory that has an platform specific index files
+     */
+    const guessAtPath = join(dirname(state.filename), moduleName);
+
+    isBlocked = micromatch.isMatch(moduleName, blockModules);
+    isAllowed = micromatch.isMatch(moduleName, allowModules);
+
+    if (isBlocked || isAllowed) {
+      isNodeModule = true;
+    } else if (lstatSync(guessAtPath).isFile()) {
+      isNodeModule = false;
+      modulePaths.push(guessAtPath);
+    } else {
+      const allowedIndexFiles: string[] = [];
+
+      for (const platform of ["android", "ios", "native", "web", "windows"]) {
+        for (const ext of ["js", "jsx", "ts", "tsx"]) {
+          allowedIndexFiles.push(`index.${platform}.${ext}`);
+        }
+      }
+
+      isNodeModule = false;
+      modulePaths = readdirSync(guessAtPath).flatMap((file) => {
+        if (allowedIndexFiles.includes(basename(file))) {
+          return [join(guessAtPath, file)];
+        }
+
+        return [];
+      });
+    }
+  }
+
+  if (isNodeModule) {
+    isBlocked ??=
+      blockModules.length > 0 && micromatch.isMatch(moduleName, blockModules);
+
+    isAllowed ??= micromatch.isMatch(moduleName, allowModules);
+
+    returnComponentsAsBlocked = isBlocked || !isAllowed;
+  } else {
+    const isNotAllowedRelative =
+      Array.isArray(allowRelativeModules) &&
+      allowRelativeModules.length > 0 &&
+      !modulePaths.some((modulePath) =>
+        micromatch.isMatch(modulePath, allowRelativeModules)
+      );
+
+    returnComponentsAsBlocked = isNotAllowedRelative;
+  }
+
+  if (!returnComponentsAsBlocked) {
     return [];
   }
 
-  const module = path.node.source.value;
+  // Only return component names
+  return path.node.specifiers.flatMap((specifier) => {
+    const name = specifier.local.name;
 
-  function getComponentNames() {
-    return path.node.specifiers.flatMap((specifier) => {
-      const name = specifier.local.name;
-
-      if (name[0] === name[0].toUpperCase()) {
-        return [name];
-      }
-
-      return [];
-    });
-  }
-
-  if (module.startsWith(".")) {
-    // This is a relative path, so make sure its within the content globs
-    if (!isAllowedPath(module, allowedContentPaths, dirname(filename))) {
-      return getComponentNames();
-    }
-  } else {
-    // If the module is blocked, return the imported components
-    if (blockModules.length > 0) {
-      const isBlocked = blockModules.every((deny) => {
-        if (deny instanceof RegExp) {
-          return deny.test(module);
-        } else {
-          return module.startsWith(deny);
-        }
-      });
-
-      if (isBlocked) {
-        return getComponentNames();
-      }
+    if (name[0] === name[0].toUpperCase()) {
+      return [name];
     }
 
-    // If the module is not allowed, return the imported components
-    if (allowModules !== "*") {
-      const isAllowed = allowModules.every((allowed) => {
-        if (allowed instanceof RegExp) {
-          return allowed.test(module);
-        } else {
-          return module.startsWith(allowed);
-        }
-      });
-
-      if (!isAllowed) {
-        return getComponentNames();
-      }
-    }
-  }
-
-  // If we got here, then isAllowed = true & isBlock = false
-  return [];
+    return [];
+  });
 }

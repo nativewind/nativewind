@@ -1,7 +1,12 @@
 import type { Visitor } from "@babel/traverse";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
-import { Babel, State } from "./types";
+import {
+  AllowPathOptions,
+  Babel,
+  State,
+  TailwindReactNativeOptions,
+} from "./types";
 import { getJSXElementName } from "./utils/jsx";
 import { getImportBlockList, hasNamedImport } from "./utils/imports";
 import {
@@ -9,17 +14,19 @@ import {
   TransformClassNameOptions,
 } from "./utils/transform-class-names";
 
-export interface NativeVisitorState extends State {
+export interface NativeVisitorState
+  extends State,
+    Required<TailwindReactNativeOptions> {
+  allowRelativeModules: AllowPathOptions;
   babel: Babel;
-  tailwindConfig: TailwindConfig;
   blockList: Set<string>;
-  hasUseParseTailwind: boolean;
-  hasStyleSheetImport: boolean;
   hasClassNames: boolean;
   hasProvider: boolean;
-  visitor?: Visitor<NativeVisitorState>;
+  hasStyleSheetImport: boolean;
+  hasUseParseTailwind: boolean;
+  tailwindConfig: TailwindConfig;
   transformClassNameOptions: TransformClassNameOptions;
-  allowedContentPaths: string[] | "*";
+  visitor?: Visitor<NativeVisitorState>;
 }
 
 /**
@@ -48,16 +55,22 @@ export const nativeVisitor: Visitor<NativeVisitorState> = {
 
     // We only need to check named imports.
     // THe code will still work if they are using a Namespace Specifier
-    state.hasStyleSheetImport =
-      state.hasStyleSheetImport ||
-      hasNamedImport(path, "StyleSheet", "react-native");
+    state.hasStyleSheetImport ||= hasNamedImport(
+      path,
+      "StyleSheet",
+      "react-native"
+    );
 
-    state.hasUseParseTailwind =
-      state.hasUseParseTailwind ||
-      hasNamedImport(path, "__useParseTailwind", "tailwindcss-react-native");
+    state.hasUseParseTailwind ||= hasNamedImport(
+      path,
+      "__useParseTailwind",
+      "tailwindcss-react-native"
+    );
   },
   JSXOpeningElement(path, state) {
     const name = getJSXElementName(path.node);
+
+    state.hasProvider ||= name === "TailwindProvider";
 
     if (state.blockList.has(name)) {
       return;

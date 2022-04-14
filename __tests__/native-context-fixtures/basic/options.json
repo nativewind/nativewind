@@ -1,4 +1,0 @@
-{
-  "tailwindConfigPath": "./__tests__/native-context-fixtures/basic/tailwind.config.js",
-  "platform": "native-context"
-}

@@ -1,62 +1,54 @@
-import { existsSync, lstatSync } from "fs";
-import { join } from "path";
-import { TailwindConfig } from "tailwindcss/tailwind-config";
 import micromatch from "micromatch";
+import { join, isAbsolute } from "path";
+import { TailwindConfig } from "tailwindcss/tailwind-config";
+import { TailwindReactNativeOptions, AllowPathOptions } from "../types";
 
-const indexVariations: string[] = [];
-for (const file in [
-  "index",
-  "index.native",
-  "index.ios",
-  "index.android",
-  "index.web",
-]) {
-  for (const extension in ["js", "jsx", "ts", "tsx"]) {
-    indexVariations.push(`${file}.${extension}`);
-  }
+const defaultContent: NonNullable<TailwindConfig["content"]> = {
+  files: ["*"],
+  extract: undefined,
+  transform: undefined,
+};
+
+export function getAllowedPaths(
+  { content = defaultContent }: TailwindConfig,
+  { allowModules = "*" }: TailwindReactNativeOptions
+): {
+  allowModules: AllowPathOptions;
+  allowRelativeModules: AllowPathOptions;
+} {
+  const contentPaths = Array.isArray(content) ? content : content.files;
+
+  /*
+   * Tailwindcss resolves content relative to the cwd (https://github.com/tailwindlabs/tailwindcss/issues/6516)
+   *
+   * We join the contentPath with the cwd to make globbing of relative files easier
+   */
+  return {
+    allowModules,
+    allowRelativeModules: contentPaths.length === 0 ? "*" : contentPaths,
+  };
 }
 
-export function getAllowedPaths({ content }: TailwindConfig) {
-  if (Array.isArray(content)) {
-    return content.length > 0 ? content : "*";
-  } else if (content?.files) {
-    return content.files.length > 0 ? content.files : "*";
-  } else {
-    return "*";
-  }
+export interface IsAllowedProgramPathOptions {
+  path: string;
+  allowRelativeModules: AllowPathOptions;
+  cwd: string;
 }
 
-export function isAllowedPath(
-  path: string,
-  allowList: string[] | "*",
-  dirname: string = ".",
-  root: string = `${process.cwd()}/`
-) {
-  if (allowList === "*") {
+export function isAllowedProgramPath({
+  path,
+  allowRelativeModules,
+  cwd,
+}: IsAllowedProgramPathOptions) {
+  if (allowRelativeModules === "*") {
     return true;
   }
 
-  /*
-   * Tailwindcss resolves content relative to the cwd, not the path
-   * of the config file
-   *
-   * https://github.com/tailwindlabs/tailwindcss/issues/6516
-   */
-
-  const pathWithoutRoot = path.replace(root, "");
-
-  const pathVariations =
-    existsSync(path) && lstatSync(path).isDirectory()
-      ? indexVariations.map((variation) =>
-          join(dirname, pathWithoutRoot, `./${variation}`)
-        )
-      : [pathWithoutRoot];
-
-  for (const variation of pathVariations) {
-    for (const glob of allowList) {
-      if (micromatch.isMatch(variation, glob)) {
-        return true;
-      }
+  return allowRelativeModules.some((modulePath) => {
+    if (isAbsolute(modulePath)) {
+      return micromatch.isMatch(path, modulePath);
+    } else {
+      return micromatch.isMatch(path, join(cwd, modulePath));
     }
-  }
+  });
 }

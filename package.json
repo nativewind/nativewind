@@ -41,6 +41,7 @@
     "@types/tailwindcss": "^3.0.10",
     "babel-plugin-tester": "^10.1.0",
     "jest": "^27.5.1",
+    "moti": "^0.17.1",
     "postcss": "^8.4.12",
     "prettier": "^2.6.1",
     "react-native": "^0.68.0",

@@ -1,4 +1,0 @@
-{
-  "platform": "native-inline",
-  "blockModules": ["module-in-block-modules"]
-}

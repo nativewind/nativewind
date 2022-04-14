@@ -167,3 +167,5 @@ module.exports = {
 | -------------- | ---------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | platform       | `native`, `web`        | `native`             | Specifies how the className is transformed (see [platforms](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/platforms.md)<br/><br />You can also use `native-inline`, `native-context` to debug `native` |
 | tailwindConfig | Path relative to `cwd` | `tailwind.config.js` | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform.                                                                                                                                     |
+| allowModules | `*`, String[] | `*` | Only transform components from these imported modules. `*` will transform all modules |
+| blockModules | `*`, String[] | [] | Do not transform components from these imported modules. |

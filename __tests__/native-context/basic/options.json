@@ -1,0 +1,4 @@
+{
+  "platform": "native-context",
+  "tailwindConfigPath": "./basic/tailwind.config.js"
+}

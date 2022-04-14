@@ -12,7 +12,7 @@
     "strict": true,
     "target": "esnext",
     "skipLibCheck": true,
-    "declaration": true,
+    "declaration": true
   },
   "include": ["src/**/*"],
   "exclude": [

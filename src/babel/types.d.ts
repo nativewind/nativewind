@@ -10,12 +10,15 @@ export type MediaRecord = Record<
   Array<{ media: string[]; suffix: number }>
 >;
 
+export type PathOption = string;
+export type AllowPathOptions = "*" | PathOption[];
+
 export interface TailwindReactNativeOptions {
-  tailwindConfigPath?: string;
+  allowModules?: AllowPathOptions;
+  blockModules?: PathOption[];
   platform?: "web" | "native" | "native-context" | "native-inline";
-  allowModules?: "*" | Array<string | RegExp>;
-  blockModules?: Array<string | RegExp>;
   rem?: number;
+  tailwindConfigPath?: string;
 }
 
 export type State = {

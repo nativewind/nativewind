@@ -1,4 +1,3 @@
-import { relative } from "path";
 import { Program } from "@babel/types";
 import { NodePath } from "@babel/traverse";
 
@@ -8,7 +7,10 @@ import { appendVariables } from "./utils/native-variables";
 import { appendImport } from "./utils/imports";
 import { NativeVisitorState, nativeVisitor } from "./native-visitor";
 import { TailwindReactNativeOptions, State, Babel } from "./types";
-import { getAllowedPaths, isAllowedPath } from "./tailwind/allowed-paths";
+import {
+  getAllowedPaths,
+  isAllowedProgramPath,
+} from "./tailwind/allowed-paths";
 
 export default function (
   babel: Babel,
@@ -16,13 +18,22 @@ export default function (
   cwd: string
 ) {
   const tailwindConfig = getTailwindConfig(cwd, options);
-  const allowedContentPaths = getAllowedPaths(tailwindConfig);
+  const { allowModules, allowRelativeModules } = getAllowedPaths(
+    tailwindConfig,
+    options
+  );
 
   return {
     visitor: {
       Program: {
         enter(path: NodePath<Program>, state: State) {
-          if (!isAllowedPath(state.filename, allowedContentPaths)) {
+          if (
+            !isAllowedProgramPath({
+              path: state.filename,
+              allowRelativeModules,
+              cwd,
+            })
+          ) {
             return;
           }
 
@@ -32,16 +43,22 @@ export default function (
           }
 
           const nativeVisitorState: NativeVisitorState = {
+            rem: 16,
+            tailwindConfigPath: "tailwind.config.js",
+            platform: "native-inline",
+            blockModules: [],
             ...state,
+            ...state.opts,
+            allowModules,
+            allowRelativeModules,
             babel,
-            tailwindConfig,
             blockList: new Set(),
-            hasUseParseTailwind: false,
-            hasStyleSheetImport: false,
             hasClassNames: false,
             hasProvider: false,
+            hasStyleSheetImport: false,
+            hasUseParseTailwind: false,
+            tailwindConfig,
             transformClassNameOptions: { inlineStyles: true },
-            allowedContentPaths,
           };
 
           // Traverse the file
@@ -59,7 +76,6 @@ export default function (
             return;
           }
 
-          const rootDir = state.file.opts.root ?? ".";
           const bodyNode = path.node.body;
 
           if (!hasUseParseTailwind) {
@@ -80,8 +96,7 @@ export default function (
            */
           const { styles, media } = processStyles({
             ...tailwindConfig,
-            // Make sure its relative to the tailwind.config.js
-            content: [relative(rootDir, filename)],
+            content: [filename],
           });
 
           appendVariables(babel, bodyNode, styles, media);

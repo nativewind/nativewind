@@ -4,9 +4,15 @@ module.exports = {
   testEnvironment: "node",
   testPathIgnorePatterns: [
     "/node_modules/",
-    "/__tests__/native-context-fixtures/",
-    "/__tests__/native-inline-fixtures/",
-    "/__tests__/web-fixtures/",
+    "/__tests__/native-inline/",
+    "/__tests__/native-context/",
+    "/__tests__/web/",
     "/__tests__/tailwindcss/runner.ts",
+    "/__tests__/types.d.ts",
   ],
+  globals: {
+    "ts-jest": {
+      tsconfig: "tsconfig.test.json",
+    },
+  },
 };

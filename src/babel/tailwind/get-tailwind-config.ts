@@ -13,14 +13,13 @@ export function getTailwindConfig(
 ): TailwindConfig {
   const { tailwindConfigPath } = options;
 
+  let userConfig;
   const fullConfigPath = join(
     cwd,
     tailwindConfigPath || "./tailwind.config.js"
   );
 
-  // Get the config.
   // Throw an error if configPath was set but we were unable to find it
-  let userConfig;
   if (existsSync(fullConfigPath)) {
     userConfig = require(fullConfigPath);
   } else if (tailwindConfigPath) {
