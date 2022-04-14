@@ -9,11 +9,11 @@ const cases: Array<Case> = [
         {
           styles: {
             container: { width: "100%" },
-            container1: { maxWidth: 640 },
-            container2: { maxWidth: 768 },
-            container3: { maxWidth: 1024 },
-            container4: { maxWidth: 1280 },
-            container5: { maxWidth: 1536 },
+            container_1: { maxWidth: 640 },
+            container_2: { maxWidth: 768 },
+            container_3: { maxWidth: 1024 },
+            container_4: { maxWidth: 1280 },
+            container_5: { maxWidth: 1536 },
           },
           media: {
             container: [
@@ -30,12 +30,12 @@ const cases: Array<Case> = [
         "sm:container",
         {
           styles: {
-            "sm\\:container0": { width: "100%" },
-            "sm\\:container1": { maxWidth: 640 },
-            "sm\\:container2": { maxWidth: 768 },
-            "sm\\:container3": { maxWidth: 1024 },
-            "sm\\:container4": { maxWidth: 1280 },
-            "sm\\:container5": { maxWidth: 1536 },
+            "sm\\:container_0": { width: "100%" },
+            "sm\\:container_1": { maxWidth: 640 },
+            "sm\\:container_2": { maxWidth: 768 },
+            "sm\\:container_3": { maxWidth: 1024 },
+            "sm\\:container_4": { maxWidth: 1280 },
+            "sm\\:container_5": { maxWidth: 1536 },
           },
           media: {
             "sm\\:container": [

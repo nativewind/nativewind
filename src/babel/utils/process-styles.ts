@@ -7,7 +7,6 @@ import postcssCssvariables from "postcss-css-variables";
 import postcssColorRBG from "postcss-color-rgb";
 
 import { flattenRules } from "./flatten-rules";
-import { normaliseSelector } from "../../shared/selector";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 export function processStyles(
@@ -30,19 +29,17 @@ export function processStyles(
   for (const [suffix, parsedRule] of parsedRules.entries()) {
     const { selector, media, rules } = parsedRule;
 
-    const normalisedSelector = normaliseSelector(selector, tailwindConfig);
-
     if (media.length > 0) {
       // If there are media conditions, add the rules with an uffix
-      styles[`${normalisedSelector}${suffix}`] = rules;
+      styles[`${selector}_${suffix}`] = rules;
       // Store the conditions, along with the suffix
-      mediaRules[normalisedSelector] = mediaRules[normalisedSelector] ?? [];
-      mediaRules[normalisedSelector].push({ media, suffix });
+      mediaRules[selector] = mediaRules[selector] ?? [];
+      mediaRules[selector].push({ media, suffix });
     } else {
       // If there are no conditions, we merge the rules
       // Lower rules should overwrite
-      styles[normalisedSelector] = {
-        ...(styles[normalisedSelector] ?? {}),
+      styles[selector] = {
+        ...(styles[selector] ?? {}),
         ...rules,
       };
     }

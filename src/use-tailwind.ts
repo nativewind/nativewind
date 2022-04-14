@@ -54,7 +54,7 @@ export function useTailwind(
 
     for (const { media, suffix } of rules) {
       if (!media) {
-        styleIds.push(styles[`${className}${suffix}`]);
+        styleIds.push(styles[`${className}_${suffix}`]);
         continue;
       }
 
