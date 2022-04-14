@@ -1,9 +1,9 @@
-import { ViewStyle, TextStyle, ImageStyle } from "react-native";
+import { ViewStyle, TextStyle, ImageStyle, LayoutStyle } from "react-native";
 import * as BabelCore from "@babel/core";
 
 export type Babel = typeof BabelCore;
 
-export type Style = ViewStyle | TextStyle | ImageStyle;
+export type Style = ViewStyle | TextStyle | ImageStyle | LayoutStyle;
 export type StyleRecord = Record<string, Style>;
 export type MediaRecord = Record<
   string,

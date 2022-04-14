@@ -6,7 +6,14 @@ import { normaliseSelector } from "../../shared/selector";
 import { Style } from "../types";
 
 import { isValidStyle } from "./is-valid-style";
-import { postProcessingCssFn } from "./postprocessing-css";
+
+import { aspectRatio } from "./postprocessing/aspect-ratio";
+import { display } from "./postprocessing/display";
+
+const postProcessingCssFn: Record<string, (value: any) => any> = {
+  aspectRatio,
+  display,
+};
 
 interface CssRule {
   selector: string;
@@ -92,7 +99,14 @@ function getStyles({ declarations }: Rule | Page): {
   const styleEntries = Object.entries(style).flatMap(([prop, value]) => {
     if (isValidStyle(prop, value)) {
       if (postProcessingCssFn[prop]) {
-        return [[prop, postProcessingCssFn[prop](value)]];
+        const postprocessedValue = postProcessingCssFn[prop](value);
+
+        if (postprocessedValue === null) {
+          invalidStyleProps.push(prop);
+          return [];
+        } else {
+          return [[prop, postprocessedValue]];
+        }
       } else {
         return [[prop, value]];
       }
