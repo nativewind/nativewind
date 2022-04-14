@@ -4,16 +4,8 @@ import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 import { normaliseSelector } from "../../shared/selector";
 import { Style } from "../types";
-
 import { isValidStyle } from "./is-valid-style";
-
-import { aspectRatio } from "./postprocessing/aspect-ratio";
-import { display } from "./postprocessing/display";
-
-const postProcessingCssFn: Record<string, (value: any) => any> = {
-  aspectRatio,
-  display,
-};
+import { postProcessingCssFn } from "./postprocessing";
 
 interface CssRule {
   selector: string;

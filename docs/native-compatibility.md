@@ -340,3 +340,47 @@ React Native does not support clearning floats. Use Flexbox instead
 | object-right-bottom | :x:       |
 | object-right-top    | :x:       |
 | object-top          | :x:       |
+
+### Overflow
+
+| Class              | Supported          |
+| ------------------ | ------------------ |
+| overflow-visible   | :heavy_check_mark: |
+| overflow-hidden    | :heavy_check_mark: |
+| overflow-scroll    | :heavy_check_mark: |
+| overflow-auto      | :x:                |
+| overflow-clip      | :x:                |
+| overflow-x-auto    | :x:                |
+| overflow-y-auto    | :x:                |
+| overflow-x-hidden  | :x:                |
+| overflow-y-hidden  | :x:                |
+| overflow-x-clip    | :x:                |
+| overflow-y-clip    | :x:                |
+| overflow-x-visible | :x:                |
+| overflow-y-visible | :x:                |
+| overflow-x-scroll  | :x:                |
+| overflow-y-scroll  | :x:                |
+
+### Overscroll Behavior
+
+| Class                | Supported |
+| -------------------- | --------- |
+| overscroll-auto      | :x:       |
+| overscroll-contain   | :x:       |
+| overscroll-none      | :x:       |
+| overscroll-y-auto    | :x:       |
+| overscroll-y-contain | :x:       |
+| overscroll-y-none    | :x:       |
+| overscroll-x-auto    | :x:       |
+| overscroll-x-contain | :x:       |
+| overscroll-x-none    | :x:       |
+
+### Position
+
+| Class    | Supported          |
+| -------- | ------------------ |
+| absolute | :heavy_check_mark: |
+| relative | :heavy_check_mark: |
+| static   | :x:                |
+| fixed    | :x:                |
+| stick    | :x:                |
