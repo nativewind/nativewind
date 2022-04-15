@@ -2,8 +2,21 @@
   "version": "0.0.25",
   "name": "tailwindcss-react-native",
   "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "sideEffects": false,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marklawlor/tailwindcss-react-native.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marklawlor/tailwindcss-react-native/issues"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "homepage": "https://github.com/marklawlor/tailwindcss-react-native",
+  "keywords": "react native react-native tailwind tailwindcss",
   "scripts": {
     "test": "jest",
     "prepublishOnly": "npm run build",
