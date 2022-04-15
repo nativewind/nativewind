@@ -10,6 +10,12 @@ This library is still in development. This document helps track what classes are
 | :construction:     | Needs development     |
 | :boom:             | Not handled correctly |
 
+Classes that support scaling will be document as `class-{n}`
+
+### Arbitrary values
+
+Classes that support arbitrary values will be documented as `class-[n]` and are widely supported. However use of invalid value and/or units will result in an error.
+
 ## Table of contents
 
 ### Layout
@@ -214,13 +220,13 @@ This library is still in development. This document helps track what classes are
 
 ### Aspect Ratio
 
-| Class          | Supported          |
-| -------------- | ------------------ |
-| aspect-auto    | :heavy_check_mark: |
-| aspect-square  | :heavy_check_mark: |
-| aspect-video   | :heavy_check_mark: |
-| aspect-{ratio} | :heavy_check_mark: |
-| aspect-[ratio] | :heavy_check_mark: |
+| Class         | Supported          |
+| ------------- | ------------------ |
+| aspect-auto   | :heavy_check_mark: |
+| aspect-square | :heavy_check_mark: |
+| aspect-video  | :heavy_check_mark: |
+| aspect-{n}    | :heavy_check_mark: |
+| aspect-[n]    | :heavy_check_mark: |
 
 ### Container
 
@@ -383,17 +389,30 @@ React Native does not support clearning floats. Use Flexbox instead
 | relative | :heavy_check_mark: |
 | static   | :x:                |
 | fixed    | :x:                |
-| stick    | :x:                |
-
+| sticky   | :x:                |
 
 ### Top Right Bottom Left
 
-| Class    | Supported          |
-| -------- | ------------------ |
-| inset-{n} | :heavy_check_mark: |
-| inset-x-{n} | :heavy_check_mark: |
-| inset-y-{n} | :heavy_check_mark: |
-| top-{n} | :heavy_check_mark: |
-| right-{n} | :heavy_check_mark: |
-| bottom-{n} | :heavy_check_mark: |
-| left-{n} | :heavy_check_mark: |
+| Class        | Supported          |
+| ------------ | ------------------ |
+| inset-{n}    | :heavy_check_mark: |
+| inset-x-{n}  | :heavy_check_mark: |
+| inset-y-{n}  | :heavy_check_mark: |
+| top-{n}      | :heavy_check_mark: |
+| right-{n}    | :heavy_check_mark: |
+| bottom-{n}   | :heavy_check_mark: |
+| left-{n}     | :heavy_check_mark: |
+| inset-[n]    | :heavy_check_mark: |
+| inset-x-[n]  | :heavy_check_mark: |
+| inset-y-{n}  | :heavy_check_mark: |
+| top-[n]      | :heavy_check_mark: |
+| right-[n]    | :heavy_check_mark: |
+| bottom-[n]   | :heavy_check_mark: |
+| left-[n]     | :heavy_check_mark: |
+| inset-auto   | :x:                |
+| inset-x-auto | :x:                |
+| inset-y-auto | :x:                |
+| top-auto     | :x:                |
+| right-auto   | :x:                |
+| bottom-auto  | :x:                |
+| left-auto    | :x:                |
