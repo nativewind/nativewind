@@ -4,13 +4,15 @@ This library is still in development. This document helps track what classes are
 
 | Icon               | Legend                |
 | ------------------ | --------------------- |
-| :heavy_check_mark: | Supported             |
+| :heavy_check_mark: | Full support          |
 | :white_check_mark: | Partial support       |
 | :x:                | Not supported         |
 | :construction:     | Needs development     |
 | :boom:             | Not handled correctly |
 
-Classes that support scaling will be document as `class-{n}`
+### Scaling values
+
+Classes that support scaling will be document as `class-{n}`. You can provide custom scaling values via your TailwindCSS theme.
 
 ### Arbitrary values
 
