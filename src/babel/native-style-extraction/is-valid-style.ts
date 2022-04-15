@@ -1,5 +1,5 @@
-export function isValidStyle(prop: string, _value: unknown) {
-  return validProps.has(prop);
+export function isInvalidStyle(prop: string, _value: unknown) {
+  return !validProps.has(prop);
 }
 
 const validProps = new Set([

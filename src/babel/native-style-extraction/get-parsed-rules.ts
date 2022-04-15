@@ -1,11 +1,9 @@
-import { parse, AtRule, Comment, Declaration, Media, Page, Rule } from "css";
-import cssToReactNative from "css-to-react-native";
+import { parse, AtRule, Comment, Media, Rule } from "css";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 import { normaliseSelector } from "../../shared/selector";
 import { Style } from "../types";
-import { isValidStyle } from "./is-valid-style";
-import { postProcessingCssFn } from "./postprocessing";
+import { ruleToReactNative } from "./rule-to-react-native";
 
 interface CssRule {
   selector: string;
@@ -44,24 +42,10 @@ function* cssRuleIterator(
 
       yield* cssRuleIterator(cssRule.rules ?? [], tailwindConfig, childMedia);
     } else if (isRule(cssRule)) {
-      const { style, invalidStyleProps } = getStyles(cssRule);
+      const style = ruleToReactNative(cssRule);
 
-      if (!style) {
+      if (Object.keys(style).length === 0) {
         continue;
-      }
-
-      if (process.env.NODE_ENV === "production") {
-        throw new Error(
-          `Selectors ${cssRule.selectors} are invalid for React Native`
-        );
-      } else {
-        if (invalidStyleProps.length > 0) {
-          console.warn(`
-Selectors ${cssRule.selectors} use invalid styles ${invalidStyleProps}.
-
-Either remove these selectors or change to file to be platform specific (eg compoent.web.js)
-            `);
-        }
       }
 
       for (const selector of cssRule.selectors ?? []) {
@@ -75,74 +59,8 @@ Either remove these selectors or change to file to be platform specific (eg comp
   }
 }
 
-function getStyles({ declarations }: Rule | Page): {
-  style: Style | null;
-  invalidStyleProps: string[];
-} {
-  const invalidStyleProps: string[] = [];
-
-  const ruleTuples = [...declarationRuleTupleIterator(declarations)];
-
-  if (ruleTuples.length === 0) {
-    return { style: null, invalidStyleProps };
-  }
-
-  const style = cssToReactNative(ruleTuples);
-
-  const styleEntries = Object.entries(style).flatMap(([prop, value]) => {
-    if (isValidStyle(prop, value)) {
-      if (postProcessingCssFn[prop]) {
-        const postprocessedValue = postProcessingCssFn[prop](value);
-
-        if (postprocessedValue === null) {
-          invalidStyleProps.push(prop);
-          return [];
-        } else {
-          return [[prop, postprocessedValue]];
-        }
-      } else {
-        return [[prop, value]];
-      }
-    } else {
-      invalidStyleProps.push(prop);
-      return [];
-    }
-  });
-
-  if (styleEntries.length === 0) {
-    return { style: null, invalidStyleProps };
-  }
-
-  return {
-    style: Object.fromEntries(styleEntries),
-    invalidStyleProps,
-  };
-}
-
-function* declarationRuleTupleIterator(
-  declarations: (Comment | Declaration)[] = []
-): Generator<[string, string]> {
-  for (const declaration of declarations) {
-    if (isComment(declaration)) {
-      continue;
-    }
-
-    let { property, value } = declaration;
-
-    if (property === undefined || value === undefined) {
-      continue;
-    }
-
-    yield [property, value];
-  }
-}
-
 function isRule(rule: Rule | Comment | AtRule): rule is Rule {
   return rule.type === "rule";
-}
-
-function isComment(rule: Rule | Comment | AtRule): rule is Comment {
-  return rule.type === "comment";
 }
 
 function isMedia(rule: Rule | Comment | AtRule): rule is Media {

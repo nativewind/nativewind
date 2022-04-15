@@ -1,4 +1,4 @@
-import { generateTestsForScales, tailwindRunner } from "./runner";
+import { emptyResults, generateTestsForScales, tailwindRunner } from "./runner";
 
 const expectedValues: Record<string | number, any> = {
   0: 0,
@@ -43,6 +43,7 @@ const expectedValues: Record<string | number, any> = {
   "2/4": "50%",
   "3/4": "75%",
   full: "100%",
+  "[18px]": 18,
 };
 
 const sizes = Object.keys(expectedValues);
@@ -57,12 +58,20 @@ const tests = [
   generateTopRightBottomLeftTest("inset", ["top", "right", "bottom", "left"]),
   generateTopRightBottomLeftTest("inset-x", ["right", "left"]),
   generateTopRightBottomLeftTest("inset-y", ["top", "bottom"]),
-  generateTopRightBottomLeftTest("inset-x", ["right", "left"]),
-  generateTopRightBottomLeftTest("inset-y", ["top", "bottom"]),
   generateTopRightBottomLeftTest("top", ["top"]),
   generateTopRightBottomLeftTest("right", ["right"]),
   generateTopRightBottomLeftTest("bottom", ["bottom"]),
   generateTopRightBottomLeftTest("left", ["left"]),
+
+  emptyResults([
+    "insert-auto",
+    "insert-x-auto",
+    "insert-y-auto",
+    "top-auto",
+    "right-auto",
+    "bottom-auto",
+    "left-auto",
+  ]),
 ].flat();
 
 tailwindRunner("Layout - Top Right Bottom Left", tests);

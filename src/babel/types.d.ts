@@ -3,7 +3,7 @@ import * as BabelCore from "@babel/core";
 
 export type Babel = typeof BabelCore;
 
-export type Style = ViewStyle | TextStyle | ImageStyle | LayoutStyle;
+export type Style = ViewStyle | TextStyle | ImageStyle;
 export type StyleRecord = Record<string, Style>;
 export type MediaRecord = Record<
   string,

@@ -1,22 +1,23 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 /**
- * Normalise a selector so it can be used as an object key
+ * Normalise a selector to be object key friendly
+ *
+ * We also remove non-word characters for readability/testing purposes
  */
 export function normaliseSelector(
   selector: string,
   { important }: Partial<TailwindConfig> = {}
 ) {
   const leadingDots = "^\\.";
+  const nonWordCharactersExceptDash = new RegExp("[^a-zA-Z0-9-]+", "g");
 
-  const regex =
+  const importantOrLeadingDots =
     typeof important === "string"
       ? new RegExp(`^${important}|${leadingDots}`)
       : new RegExp(leadingDots);
 
   return selector
-    .replace(regex, "")
-    .replace(/\s/g, "_")
-    .replace(/(\\.|\.)/g, "_")
-    .replace(/\//g, "_")
+    .replace(importantOrLeadingDots, "")
+    .replace(nonWordCharactersExceptDash, "_");
 }
