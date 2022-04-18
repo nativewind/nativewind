@@ -471,3 +471,75 @@ To maintain compatibility between platforms, `flex` mimics the CSS functionality
 | flex-auto    | :heavy_check_mark: | `{ flexGrow: 1, flexShrink: 1 }` |
 | flex-initial | :heavy_check_mark: | `{ flexGrow: 0, flexShrink: 1 }` |
 | flex-none    | :heavy_check_mark: | `{ flexGrow: 0, flexShrink: 0 }` |
+
+### Flex Grow
+
+| Class    | Supported          |
+| -------- | ------------------ |
+| grow     | :heavy_check_mark: |
+| grow-{n} | :heavy_check_mark: |
+| grow-[n] | :heavy_check_mark: |
+
+### Flex Shrink
+
+| Class      | Supported          |
+| ---------- | ------------------ |
+| shrink     | :heavy_check_mark: |
+| shrink-{n} | :heavy_check_mark: |
+| shrink-[n] | :heavy_check_mark: |
+
+### Order
+
+| Class       | Supported |
+| ----------- | --------- |
+| order-{n}   | :x:       |
+| order-[n]   | :x:       |
+| order-first | :x:       |
+| order-last  | :x:       |
+| order-none  | :x:       |
+
+### Grid Template Columns
+
+| Class          | Supported |
+| -------------- | --------- |
+| grid-cols-{n}  | :x:       |
+| grid-cols-none | :x:       |
+| grid-cols-[n]  | :x:       |
+
+### Grid Column Start / End
+
+| Class          | Supported |
+| -------------- | --------- |
+| cols-auto      | :x:       |
+| col-span-{n}   | :x:       |
+| col-span-none  | :x:       |
+| col-span-[n]   | :x:       |
+| col-start-{n}  | :x:       |
+| col-start-auto | :x:       |
+| col-start-[n]  | :x:       |
+| col-end-{n}    | :x:       |
+| col-end-auto   | :x:       |
+| col-end-[n]    | :x:       |
+
+### Grid Template Rows
+
+| Class          | Supported |
+| -------------- | --------- |
+| grid-rows-{n}  | :x:       |
+| grid-rows-none | :x:       |
+| grid-rows-[n]  | :x:       |
+
+### Grid Row Start / End
+
+| Class          | Supported |
+| -------------- | --------- |
+| rows-auto      | :x:       |
+| row-span-{n}   | :x:       |
+| row-span-none  | :x:       |
+| row-span-[n]   | :x:       |
+| row-start-{n}  | :x:       |
+| row-start-auto | :x:       |
+| row-start-[n]  | :x:       |
+| row-end-{n}    | :x:       |
+| row-end-auto   | :x:       |
+| row-end-[n]    | :x:       |

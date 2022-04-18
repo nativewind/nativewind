@@ -23,4 +23,15 @@ tailwindRunner("Layout - Flex Grow", [
       media: {},
     },
   ],
+  [
+    "grow-[1]",
+    {
+      styles: {
+        "grow-_1_": {
+          flexGrow: 1,
+        },
+      },
+      media: {},
+    },
+  ],
 ]);
