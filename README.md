@@ -2,14 +2,31 @@
 
 Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native](https://reactnative.dev/) applications.
 
-> This library is currently under active development.
+> This library is currently stabilising for a v1 release.
+>
+> Follow the [v1 milestone](https://github.com/marklawlor/tailwindcss-react-native/milestone/1) to track the progress.
 
-- :sparkles: native support for multiple platforms
-- :sparkles: respects tailwind.config.js
-- :sparkles: fast refresh compatible
-- :sparkles: supports dark mode / media queries / arbitrary classes
-- :sparkles: compatible with existing styles
-- :sparkles: Server Side Rendering (SSR) on Web (including responsive styles)
+```JSX
+import { Text } from "react-native"
+import { TailwindProvider } from "tailwindcss-react-native"
+
+export function Test({ isBold }) {
+  return (
+    <TailwindProvider>
+     <Text className="font-bold">Basic usuage</Text>
+     <Text className={isBold ? "font-bold" : ""}>You can use compueted styles</Text>
+     <Text className="font-bold" style={{ color: 'green' }}>Works with existing styles</Text>
+    </TailwindProvider>
+  )
+}
+```
+
+- **native support** for multiple platforms (RN Stylesheets, CSS Stylesheets)
+- fast refresh compatible
+- respects **all** tailwind.config.js, including themes, custom values, plugins
+- supports **dark mode** / **media queries** / **arbitrary classes**
+- compatible with existing styles
+- supports Server Side Rendering (SSR) on Web (including responsive styles)
 
 Already using another RN library for Tailwind? [Find out why you should switch.](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/library-comparision.md)
 
@@ -114,44 +131,6 @@ export function Test({ isBold, isUnderline }) {
 }
 ```
 
-### Rules of Hooks
-
-As specified in [How it works](#how-it-works), `tailwindcss-react-native` is using a hook to load the styles and match media queries. For this reason, all components with a `className` attribute must follow the rules of hooks.
-
-#### Don’t use `className` inside loops
-
-```diff
-- export function Test() {
--  return [1,2,3].map((i) => <Text key={i} className="font-bold">Test</Text>
--}
-
-+ export function Test() {
-+  return [1,2,3].map((i) => <StyledText key={i}>Test</Text>
-+ }
-
-+ function StyledText(props) {
-+   return <Text className="font-bold" {...props} />
-+ }
-```
-
-#### Don’t use `className` conditionally
-
-The value of `className` can be conditional, but not the attribute itself!
-
-```diff
-- export function Test({ isBold }) {
--   if (isBold) {
--     return <Text className="font-bold">Test</Text>
--   } else {
--     return <Text>Test</Text>
--   }
-- }
-
-+ export function Test({ isBold }) {
-+   return <Text className={isBold ? "font-bold" : ""}>Test</Text>
-+ }
-```
-
 ## Options
 
 Options can be provided via the babel config
@@ -169,3 +148,78 @@ module.exports = {
 | tailwindConfig | Path relative to `cwd` | `tailwind.config.js` | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform.                                                                                                                                     |
 | allowModules   | `*`, string[]          | `*`                  | Only transform components from these imported modules. `*` will transform all modules                                                                                                                                          |
 | blockModules   | string[]               | []                   | Do not transform components from these imported modules.                                                                                                                                                                       |
+
+## Troubleshooting
+
+### Components are not being transformed
+
+Make sure your `tailwind.config.js` content configuration is correct and matches all of the right source files.
+
+A common mistake is missing a file extension, for example if you’re using jsx instead of js for your React components:
+
+````diff
+module.exports = {
+  content: [
+-   './src/**/*.{html,js}',
++   './src/**/*.{html,js,jsx}'
+  ],
+  // ...
+}
+
+Or creating a new folder mid-project that wasn’t covered originally and forgetting to add it to your configuration:
+
+```diff
+module.exports = {
+  content: [
+    './pages/**/*.{html,js}',
+    './components/**/*.{html,js}',
++    './util/**/*.{html,js}'
+  ],
+  // ...
+}
+````
+
+### Don't construct class names dynamically
+
+The TailwindCSS compiler [does not allow for dynamic class names](https://tailwindcss.com/docs/content-configuration#dynamic-class-names). Use this pattern instead
+
+```diff
+- <div class="text-{{ error ? 'red' : 'green' }}-600"></div>
++ <div class="{{ error ? 'text-red-600' : 'text-green-600' }}"></div>
+```
+
+### Don’t use `className` inside loops
+
+`tailwindcss-react-native` is using a hook to load the styles and match media queries. For this reason, all components with a `className` attribute must follow the rules of hooks.
+
+```diff
+- export function Test() {
+-  return [1,2,3].map((i) => <Text key={i} className="font-bold">Test</Text>
+-}
+
++ export function Test() {
++  return [1,2,3].map((i) => <StyledText key={i}>Test</Text>
++ }
+
++ function StyledText(props) {
++   return <Text className="font-bold" {...props} />
++ }
+```
+
+### Don’t use `className` conditionally
+
+The value of `className` can be conditional, but not the attribute itself!
+
+```diff
+- export function Test({ isBold }) {
+-   if (isBold) {
+-     return <Text className="font-bold">Test</Text>
+-   } else {
+-     return <Text>Test</Text>
+-   }
+- }
+
++ export function Test({ isBold }) {
++   return <Text className={isBold ? "font-bold" : ""}>Test</Text>
++ }
+```
