@@ -165,6 +165,7 @@ module.exports = {
   ],
   // ...
 }
+```
 
 Or creating a new folder mid-project that wasn’t covered originally and forgetting to add it to your configuration:
 
