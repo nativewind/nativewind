@@ -21,5 +21,8 @@ export const postProcessingCssFn: Record<string, (value: any) => any> = {
   bottom: noAuto,
   left: noAuto,
   right: noAuto,
+};
+
+export const preProcessingCssFn: Record<string, (value: any) => any> = {
   zIndex: noAuto,
 };

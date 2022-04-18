@@ -6,8 +6,23 @@ import {
 } from "css-to-react-native";
 
 import { isInvalidStyle } from "./is-valid-style";
-import { postProcessingCssFn } from "./postprocessing";
+import { postProcessingCssFn, preProcessingCssFn } from "./patches";
 
+/**
+ * Convert a css rule to react-native.
+ *
+ * The heavy lifting is performed by 'css-to-react-native', but this comes with some quirks
+ *
+ * CTRN only accepts __valid__ css that can be mapped 1-1 to RN. Invalid CSS will
+ * produce warnings in the console.
+ *
+ * This library is more friendly and fixes what it can / produces better warnings.
+ *
+ * Hence why we have pre/post processing.
+ *
+ * - Pre fixes so CTRN can process it (or it skips processing altogether)
+ * - Post fixes the result of CTRN (or it skips the value)
+ */
 export function ruleToReactNative({ declarations = [] }: Rule | Page): Style {
   const style: Style = {};
 
@@ -22,10 +37,18 @@ export function ruleToReactNative({ declarations = [] }: Rule | Page): Style {
       continue;
     }
 
-    const nativeStyles = getStylesForProperty(
-      getPropertyName(cssAttribute),
-      cssValue
-    );
+    const name = getPropertyName(cssAttribute);
+
+    const value = preProcessingCssFn[name]
+      ? preProcessingCssFn[name](cssValue)
+      : cssValue;
+
+    if (value === null) {
+      warnInvalidStyle(cssAttribute, name, value);
+      continue;
+    }
+
+    const nativeStyles = getStylesForProperty(name, value);
 
     for (const [nativeAttribute, nativeValue] of Object.entries(nativeStyles)) {
       if (isInvalidStyle(nativeAttribute, nativeValue)) {
