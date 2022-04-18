@@ -81,7 +81,6 @@ export function getNativeTailwindConfig({
       objectPosition: false,
       order: false,
       overscrollBehavior: false,
-      placeContent: false,
       placeItems: false,
       placeSelf: false,
       placeholderColor: false,

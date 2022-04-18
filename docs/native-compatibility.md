@@ -543,3 +543,71 @@ To maintain compatibility between platforms, `flex` mimics the CSS functionality
 | row-end-{n}    | :x:       |
 | row-end-auto   | :x:       |
 | row-end-[n]    | :x:       |
+
+### Grid Auto Flow
+
+| Class               | Supported |
+| ------------------- | --------- |
+| grid-flow-row       | :x:       |
+| grid-flow-col       | :x:       |
+| grid-flow-row-dense | :x:       |
+| grid-flow-col-dense | :x:       |
+
+### Grid Auto Columns
+
+| Class          | Supported |
+| -------------- | --------- |
+| grid-cols-auto | :x:       |
+| grid-cols-min  | :x:       |
+| grid-cols-max  | :x:       |
+| grid-cols-fr   | :x:       |
+
+### Grid Auto Rows
+
+| Class          | Supported |
+| -------------- | --------- |
+| grid-rows-auto | :x:       |
+| grid-rows-min  | :x:       |
+| grid-rows-max  | :x:       |
+| grid-rows-fr   | :x:       |
+
+### Gap
+
+| Class     | Supported |
+| --------- | --------- |
+| gap-{n}   | :x:       |
+| gap-x-{n} | :x:       |
+| gap-y-{n} | :x:       |
+| gap-px    | :x:       |
+| gap-x-px  | :x:       |
+| gap-y-px  | :x:       |
+
+### Justify Content
+
+| Class           | Supported          |
+| --------------- | ------------------ |
+| justify-start   | :heavy_check_mark: |
+| justify-end     | :heavy_check_mark: |
+| justify-center  | :heavy_check_mark: |
+| justify-between | :heavy_check_mark: |
+| justify-around  | :heavy_check_mark: |
+| justify-evenly  | :heavy_check_mark: |
+
+### Justify Items
+
+| Class                 | Supported |
+| --------------------- | --------- |
+| justify-items-start   | :x:       |
+| justify-items-end     | :x:       |
+| justify-items-center  | :x:       |
+| justify-items-stretch | :x:       |
+
+### Justify Self
+
+| Class                 | Supported |
+| --------------------- | --------- |
+| justify-self-auto   | :x:       |
+| justify-self-start   | :x:       |
+| justify-self-end     | :x:       |
+| justify-self-center  | :x:       |
+| justify-self-stretch | :x:       |

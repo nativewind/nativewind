@@ -21,6 +21,10 @@ export const postProcessingCssFn: Record<string, (value: any) => any> = {
   bottom: noAuto,
   left: noAuto,
   right: noAuto,
+  marginTop: noAuto,
+  marginRight: noAuto,
+  marginBottom: noAuto,
+  marginLeft: noAuto,
 };
 
 export const preProcessingCssFn: Record<string, (value: any) => any> = {

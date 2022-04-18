@@ -48,7 +48,8 @@ export function ruleToReactNative({ declarations = [] }: Rule | Page): Style {
       continue;
     }
 
-    const nativeStyles = getStylesForProperty(name, value);
+    const nativeStyles: Style =
+      typeof value === "object" ? value : getStylesForProperty(name, value);
 
     for (const [nativeAttribute, nativeValue] of Object.entries(nativeStyles)) {
       if (isInvalidStyle(nativeAttribute, nativeValue)) {
