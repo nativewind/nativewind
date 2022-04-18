@@ -32,8 +32,8 @@ export function getImportBlockedComponents(
     /**
      * Hello user! If your are reading this then your probably wondering why your exotic import isn't working.
      *
-     * You might be using module-alias or importing a folder without an index.{js,jsx,ts,tsx} file
-     * either way your doing something that isn't vanilla node or typescript.
+     * You might be using module-alias, ts-config paths, or importing a folder without an index.{js,jsx,ts,tsx} file
+     * either way your doing something that doesn't follow the rules of a normal require statement.
      *
      * Because there's many scenarios, we simply try
      *  - Scan the allow/block lists and try and work out if this is a module alias
@@ -47,33 +47,43 @@ export function getImportBlockedComponents(
 
     if (isBlocked || isAllowed) {
       isNodeModule = true;
-    } else if (lstatSync(guessAtPath).isFile()) {
-      isNodeModule = false;
-      modulePaths.push(guessAtPath);
     } else {
-      const allowedIndexFiles: string[] = [];
+      let isFile = false;
 
-      for (const platform of ["android", "ios", "native", "web", "windows"]) {
-        for (const ext of ["js", "jsx", "ts", "tsx"]) {
-          allowedIndexFiles.push(`index.${platform}.${ext}`);
-        }
+      try {
+        isFile = lstatSync(guessAtPath).isFile();
+      } catch (error) {
+        throw new Error(
+          `No such file or directory: ${guessAtPath}.\n\nIf you are using a tool to rewrite imports (eg Typescript paths, module-alias, etc) you will need to add these paths to allowModules. For example { allowModules: ['components/*'] }`
+        );
       }
 
-      isNodeModule = false;
-      modulePaths = readdirSync(guessAtPath).flatMap((file) => {
-        if (allowedIndexFiles.includes(basename(file))) {
-          return [join(guessAtPath, file)];
+      if (isFile) {
+        isNodeModule = false;
+        modulePaths.push(guessAtPath);
+      } else {
+        const allowedIndexFiles: string[] = [];
+
+        for (const platform of ["android", "ios", "native", "web", "windows"]) {
+          for (const ext of ["js", "jsx", "ts", "tsx"]) {
+            allowedIndexFiles.push(`index.${platform}.${ext}`);
+          }
         }
 
-        return [];
-      });
+        isNodeModule = false;
+        modulePaths = readdirSync(guessAtPath).flatMap((file) => {
+          if (allowedIndexFiles.includes(basename(file))) {
+            return [join(guessAtPath, file)];
+          }
+
+          return [];
+        });
+      }
     }
   }
 
   if (isNodeModule) {
-    isBlocked ??=
-      blockModules.length > 0 && micromatch.isMatch(moduleName, blockModules);
-
+    isBlocked ??= micromatch.isMatch(moduleName, blockModules);
     isAllowed ??= micromatch.isMatch(moduleName, allowModules);
 
     returnComponentsAsBlocked = isBlocked || !isAllowed;
