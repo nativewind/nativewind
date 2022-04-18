@@ -31,14 +31,6 @@ export default function (
               cwd,
             })
           ) {
-            console.log({
-              path: state.filename,
-              dirname: dirname(state.filename),
-              allowModules,
-              allowRelativeModules,
-              cwd,
-            });
-
             return;
           }
 
@@ -48,8 +40,16 @@ export default function (
           }
 
           const webVisitorState: WebVisitorState = {
+            rem: 16,
+            tailwindConfigPath: "tailwind.config.js",
+            platform: "web",
+            blockModules: [],
             ...state,
+            ...state.opts,
+            allowModules,
+            allowRelativeModules,
             babel,
+            blockList: new Set(),
           };
 
           // Traverse the file

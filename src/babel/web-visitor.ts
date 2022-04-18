@@ -1,24 +1,32 @@
 import type { Visitor } from "@babel/traverse";
-import { Babel, State } from "./types";
+import { SharedVisitorState } from "./types";
+import { getImportBlockedComponents } from "./utils/get-import-blocked-components";
 import {
   createMergedStylesExpressionContainer,
   getJSXElementName,
   getStyleAttributesAndValues,
 } from "./utils/jsx";
 
-export interface WebVisitorState extends State {
-  babel: Babel;
-}
+export type WebVisitorState = SharedVisitorState;
 
 export const webVisitor: Visitor<WebVisitorState> = {
+  ImportDeclaration(path, state) {
+    for (const component of getImportBlockedComponents(path, state)) {
+      state.blockList.add(component);
+    }
+  },
   JSXOpeningElement(path, state) {
     try {
       const { types: t } = state.babel;
 
       const name = getJSXElementName(path.node);
-      const firstCharOfName = name[0];
+
+      if (state.blockList.has(name)) {
+        return;
+      }
 
       // Ignore elements that start in lower case
+      const firstCharOfName = name[0];
       if (
         firstCharOfName &&
         firstCharOfName === firstCharOfName.toLowerCase()

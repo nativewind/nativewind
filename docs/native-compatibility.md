@@ -40,15 +40,15 @@ Classes that support arbitrary values will be documented as `class-[n]` and are 
 - [Overscroll Behavior :x:](#overscroll-behavior)
 - [Position :white_check_mark:](#position)
 - [Top / Right / Bottom / Left :white_check_mark:](#top-right-bottom-left)
-- [Visibility](#visibility)
-- [Z-Index](#z-index)
+- [Visibility :x:](#visibility)
+- [Z-Index :white_check_mark:](#z-index)
 
 ### Flexbox & Grid
 
-- [Flex Basis](#flex-basis)
-- [Flex Direction](#flex-direction)
-- [Flex Wrap](#flex-wrap)
-- [Flex](#flex)
+- [Flex Basis :white_check_mark:](#flex-basis)
+- [Flex Direction :heavy_check_mark:](#flex-direction)
+- [Flex Wrap :heavy_check_mark:](#flex-wrap)
+- [Flex :heavy_check_mark:](#flex)
 - [Flex Grow](#flex-grow)
 - [Flex Shrink](#flex-shrink)
 - [Order](#order)
@@ -418,3 +418,56 @@ React Native does not support clearning floats. Use Flexbox instead
 | right-auto   | :x:                |
 | bottom-auto  | :x:                |
 | left-auto    | :x:                |
+
+### Visibility
+
+| Class     | Supported |
+| --------- | --------- |
+| visibile  | :x:       |
+| invisible | :x:       |
+
+### Z-Index
+
+| Class  | Supported          |
+| ------ | ------------------ |
+| z-{n}  | :heavy_check_mark: |
+| z-[n]  | :heavy_check_mark: |
+| z-auto | :x:                |
+
+### Flex Basis
+
+| Class      | Supported          |
+| ---------- | ------------------ |
+| basis-{n}  | :heavy_check_mark: |
+| basis-[n]  | :heavy_check_mark: |
+| basis-auto | :x:                |
+
+### Flex Direction
+
+| Class            | Supported          |
+| ---------------- | ------------------ |
+| flex-row         | :heavy_check_mark: |
+| flex-row-reverse | :heavy_check_mark: |
+| flex-col         | :heavy_check_mark: |
+| flex-col-reverse | :heavy_check_mark: |
+
+### Flex Wrap
+
+| Class             | Supported          |
+| ----------------- | ------------------ |
+| flex-wrap         | :heavy_check_mark: |
+| flex-wrap-reverse | :heavy_check_mark: |
+| flex-nowrap       | :heavy_check_mark: |
+
+### Flex
+
+In React Native flex does not work the same way that it does in CSS. flex is a number rather than a string, and it works according to the Yoga layout engine.
+
+To maintain compatibility between platforms, `flex` mimics the CSS functionality.
+
+| Class        | Supported          | Output                           |
+| ------------ | ------------------ | -------------------------------- |
+| flex         | :heavy_check_mark: | `{ display: flex }`              |
+| flex-auto    | :heavy_check_mark: | `{ flexGrow: 1, flexShrink: 1 }` |
+| flex-initial | :heavy_check_mark: | `{ flexGrow: 0, flexShrink: 1 }` |
+| flex-none    | :heavy_check_mark: | `{ flexGrow: 0, flexShrink: 0 }` |

@@ -1,4 +1,3 @@
 {
-  "platform": "native-inline",
   "allowModules": ["react-native"]
 }

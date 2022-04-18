@@ -1,4 +1,4 @@
-import { ViewStyle, TextStyle, ImageStyle, LayoutStyle } from "react-native";
+import { ViewStyle, TextStyle, ImageStyle } from "react-native";
 import * as BabelCore from "@babel/core";
 
 export type Babel = typeof BabelCore;
@@ -28,3 +28,11 @@ export type State = {
   file: BabelCore.BabelFile;
   filename: string;
 };
+
+export interface SharedVisitorState
+  extends State,
+    Required<TailwindReactNativeOptions> {
+  allowRelativeModules: AllowPathOptions;
+  babel: Babel;
+  blockList: Set<string>;
+}

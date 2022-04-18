@@ -1,4 +1,0 @@
-{
-  "tailwindConfigPath": "./ignores-native-element/tailwind.config.js",
-  "platform": "web"
-}

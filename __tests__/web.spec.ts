@@ -12,4 +12,7 @@ pluginTester({
     plugins: ["@babel/plugin-syntax-jsx"],
     cwd: fixtures,
   },
+  pluginOptions: {
+    platform: "web",
+  },
 });

@@ -5,12 +5,11 @@ import micromatch from "micromatch";
 
 import { NodePath } from "@babel/core";
 import { ImportDeclaration } from "@babel/types";
-
-import { NativeVisitorState } from "../native-visitor";
+import { SharedVisitorState } from "../types";
 
 export function getImportBlockedComponents(
   path: NodePath<ImportDeclaration>,
-  state: NativeVisitorState
+  state: SharedVisitorState
 ) {
   const { allowModules, allowRelativeModules, blockModules, filename } = state;
 
@@ -31,7 +30,7 @@ export function getImportBlockedComponents(
       moduleName === "tailwindcss-react-native"; // Need this, coz the tests get confused
   } catch {
     /**
-     * Hello user! If your are reading this then your probably why your exotic import isn't working.
+     * Hello user! If your are reading this then your probably wondering why your exotic import isn't working.
      *
      * You might be using module-alias or importing a folder without an index.{js,jsx,ts,tsx} file
      * either way your doing something that isn't vanilla node or typescript.

@@ -1,12 +1,7 @@
 import type { Visitor } from "@babel/traverse";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
-import {
-  AllowPathOptions,
-  Babel,
-  State,
-  TailwindReactNativeOptions,
-} from "./types";
+import { SharedVisitorState } from "./types";
 import { getJSXElementName } from "./utils/jsx";
 import { hasNamedImport } from "./utils/imports";
 import {
@@ -15,12 +10,7 @@ import {
 } from "./transforms/class-name-to-style";
 import { getImportBlockedComponents } from "./utils/get-import-blocked-components";
 
-export interface NativeVisitorState
-  extends State,
-    Required<TailwindReactNativeOptions> {
-  allowRelativeModules: AllowPathOptions;
-  babel: Babel;
-  blockList: Set<string>;
+export interface NativeVisitorState extends SharedVisitorState {
   hasClassNames: boolean;
   hasProvider: boolean;
   hasStyleSheetImport: boolean;

@@ -1,19 +1,25 @@
 import { aspectRatio } from "./aspect-ratio";
-import { bottom } from "./bottom";
 import { display } from "./display";
-import { left } from "./left";
 import { overflow } from "./overflow";
 import { position } from "./position";
-import { right } from "./right";
-import { top } from "./top";
+
+function noAuto(value: number | string) {
+  if (value === "auto") {
+    return null;
+  }
+
+  return value;
+}
 
 export const postProcessingCssFn: Record<string, (value: any) => any> = {
   aspectRatio,
   display,
   overflow,
   position,
-  top,
-  bottom,
-  left,
-  right,
+  top: noAuto,
+  flexBasis: noAuto,
+  bottom: noAuto,
+  left: noAuto,
+  right: noAuto,
+  zIndex: noAuto,
 };
