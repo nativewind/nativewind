@@ -3,7 +3,7 @@ import { MediaRecord, StyleRecord } from "../types";
 import postcss from "postcss";
 import tailwind from "tailwindcss";
 import postcssCssvariables from "postcss-css-variables";
-import postcssColorRBG from "postcss-color-rgb";
+import postcssColorFunctionalNotation from "postcss-color-functional-notation";
 
 import { getParsedRules } from "./get-parsed-rules";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
@@ -15,7 +15,7 @@ export function extractStyles(
   const processedCss = postcss([
     tailwind(tailwindConfig),
     postcssCssvariables(),
-    postcssColorRBG(),
+    postcssColorFunctionalNotation(),
   ]).process(cssInput).css;
 
   const styles: StyleRecord = {};
