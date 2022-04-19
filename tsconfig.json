@@ -1,16 +1,19 @@
 {
   "compilerOptions": {
+    // Recommended settings for Node 14
+    // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
+    "lib": ["ES2020"],
+    "module": "commonjs",
+    "target": "ES2020",
+
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "lib": ["esnext"],
     "moduleResolution": "node",
-    "module": "commonjs",
     "outDir": "dist",
     "strict": true,
-    "target": "esnext",
     "skipLibCheck": true,
     "declaration": true
   },
