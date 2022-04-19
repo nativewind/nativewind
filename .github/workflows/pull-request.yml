@@ -10,7 +10,7 @@ jobs:
   CI:
     strategy:
       matrix:
-        node-version: [14.x, 16.x]
+        node-version: [14, 16]
 
     runs-on: ubuntu-latest
 
@@ -20,6 +20,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
+          cache: 'npm'
+      - run: npm install
       - run: npm run build
       - run: npm test
