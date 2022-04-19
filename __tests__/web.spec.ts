@@ -1,4 +1,4 @@
-import { join } from "path";
+import { join } from "node:path";
 import pluginTester from "babel-plugin-tester";
 import testPlugin from "../src/babel";
 

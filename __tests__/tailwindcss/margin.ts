@@ -1,6 +1,6 @@
 import { emptyResults, generateTestsForScales, tailwindRunner } from "./runner";
 
-const sizes: Record<string | number, any> = {
+const sizes: Record<string, number> = {
   0: 0,
   px: 1,
   0.5: 2,
@@ -39,37 +39,37 @@ const sizes: Record<string | number, any> = {
 };
 
 const tests = [
-  generateTestsForScales("m", Object.keys(sizes), (i) => ({
-    marginBottom: sizes[i],
-    marginLeft: sizes[i],
-    marginRight: sizes[i],
-    marginTop: sizes[i],
+  generateTestsForScales("m", Object.keys(sizes), (index) => ({
+    marginBottom: sizes[index],
+    marginLeft: sizes[index],
+    marginRight: sizes[index],
+    marginTop: sizes[index],
   })),
 
-  generateTestsForScales("mx", Object.keys(sizes), (i) => ({
-    marginLeft: sizes[i],
-    marginRight: sizes[i],
+  generateTestsForScales("mx", Object.keys(sizes), (index) => ({
+    marginLeft: sizes[index],
+    marginRight: sizes[index],
   })),
 
-  generateTestsForScales("my", Object.keys(sizes), (i) => ({
-    marginTop: sizes[i],
-    marginBottom: sizes[i],
+  generateTestsForScales("my", Object.keys(sizes), (index) => ({
+    marginTop: sizes[index],
+    marginBottom: sizes[index],
   })),
 
-  generateTestsForScales("mt", Object.keys(sizes), (i) => ({
-    marginTop: sizes[i],
+  generateTestsForScales("mt", Object.keys(sizes), (index) => ({
+    marginTop: sizes[index],
   })),
 
-  generateTestsForScales("mr", Object.keys(sizes), (i) => ({
-    marginRight: sizes[i],
+  generateTestsForScales("mr", Object.keys(sizes), (index) => ({
+    marginRight: sizes[index],
   })),
 
-  generateTestsForScales("mb", Object.keys(sizes), (i) => ({
-    marginBottom: sizes[i],
+  generateTestsForScales("mb", Object.keys(sizes), (index) => ({
+    marginBottom: sizes[index],
   })),
 
-  generateTestsForScales("ml", Object.keys(sizes), (i) => ({
-    marginLeft: sizes[i],
+  generateTestsForScales("ml", Object.keys(sizes), (index) => ({
+    marginLeft: sizes[index],
   })),
 
   emptyResults([

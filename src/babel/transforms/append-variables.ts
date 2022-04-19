@@ -22,10 +22,7 @@ export function appendVariables(
           [serialize(styles)]
         )
       ),
-    ])
-  );
-
-  body.push(
+    ]),
     t.variableDeclaration("const", [
       t.variableDeclarator(t.identifier("__tailwindMedia"), serialize(media)),
     ])

@@ -29,4 +29,6 @@ export const TailwindColorSchemeContext = createContext<ColorSchemeName>(
 );
 export const TailwindSetColorSchemeContext = createContext<
   (colorScheme: ColorSchemeName) => void
->(() => {});
+>(() => {
+  return;
+});

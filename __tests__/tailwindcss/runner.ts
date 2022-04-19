@@ -29,6 +29,7 @@ export function assetStyles(
   const { styles, media } = extractStyles({
     theme: {},
     ...nativeConfig,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     content: [{ raw: "", extension: "html" } as any],
     safelist: [css],
   });
@@ -46,7 +47,8 @@ export function assetStyles(
 export function generateTestsForScales<T extends string | number>(
   prefix: string,
   scales: Array<T>,
-  valueFn: (n: T) => any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  valueFunction: (n: T) => any
 ): Test[] {
   return scales.map((scale) => {
     const scalesGeneratedByTailwind: T[] = [scale];
@@ -65,9 +67,9 @@ export function generateTestsForScales<T extends string | number>(
       {
         media: {},
         styles: Object.fromEntries(
-          scalesGeneratedByTailwind.map((i) => [
-            normaliseSelector(`${prefix}-${i}`),
-            valueFn(i),
+          scalesGeneratedByTailwind.map((index) => [
+            normaliseSelector(`${prefix}-${index}`),
+            valueFunction(index),
           ])
         ),
       },

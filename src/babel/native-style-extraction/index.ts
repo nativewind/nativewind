@@ -10,7 +10,7 @@ import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 export function extractStyles(
   tailwindConfig: TailwindConfig,
-  cssInput: string = "@tailwind components;@tailwind utilities;"
+  cssInput = "@tailwind components;@tailwind utilities;"
 ) {
   const processedCss = postcss([
     tailwind(tailwindConfig),
@@ -36,7 +36,7 @@ export function extractStyles(
       // If there are no conditions, we merge the rules
       // Lower rules should overwrite
       styles[selector] = {
-        ...(styles[selector] ?? {}),
+        ...styles[selector],
         ...style,
       };
     }

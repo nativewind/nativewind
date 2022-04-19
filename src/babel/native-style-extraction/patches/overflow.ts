@@ -1,7 +1,7 @@
-const supportedValues = ["visible", "hidden", "scroll"];
+const supportedValues = new Set(["visible", "hidden", "scroll"]);
 
 export function overflow(value: string) {
-  if (supportedValues.includes(value)) {
+  if (supportedValues.has(value)) {
     return value;
   }
 

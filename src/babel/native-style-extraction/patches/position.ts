@@ -1,6 +1,7 @@
-const supportedValues = ["absolute", "relative"];
+const supportedValues = new Set(["absolute", "relative"]);
+
 export function position(value: string) {
-  if (supportedValues.includes(value)) {
+  if (supportedValues.has(value)) {
     return value;
   }
 

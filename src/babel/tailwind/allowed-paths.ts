@@ -1,5 +1,5 @@
 import micromatch from "micromatch";
-import { join, isAbsolute } from "path";
+import { join, isAbsolute } from "node:path";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { TailwindReactNativeOptions, AllowPathOptions } from "../types";
 
@@ -45,10 +45,8 @@ export function isAllowedProgramPath({
   }
 
   return allowRelativeModules.some((modulePath) => {
-    if (isAbsolute(modulePath)) {
-      return micromatch.isMatch(path, modulePath);
-    } else {
-      return micromatch.isMatch(path, join(cwd, modulePath));
-    }
+    return isAbsolute(modulePath)
+      ? micromatch.isMatch(path, modulePath)
+      : micromatch.isMatch(path, join(cwd, modulePath));
   });
 }

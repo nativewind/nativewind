@@ -1,6 +1,6 @@
-import { createRequire } from "module";
-import { join, dirname, basename } from "path";
-import { readdirSync, lstatSync } from "fs";
+import { createRequire } from "node:module";
+import { join, dirname, basename } from "node:path";
+import { readdirSync, lstatSync } from "node:fs";
 import micromatch from "micromatch";
 import { NodePath } from "@babel/core";
 import {
@@ -24,11 +24,9 @@ export function hasNamedImport(
         return;
       }
 
-      if (isStringLiteral(specifier.imported)) {
-        return specifier.imported.value === variable;
-      } else {
-        return specifier.imported.name === variable;
-      }
+      return isStringLiteral(specifier.imported)
+        ? specifier.imported.value === variable
+        : specifier.imported.name === variable;
     });
   }
 
@@ -48,8 +46,8 @@ export function getImportBlockList(
   let returnComponentsAsBlocked = false;
 
   let isNodeModule: boolean;
-  let isBlocked: boolean | null = null;
-  let isAllowed: boolean | null = null;
+  let isBlocked: boolean | undefined;
+  let isAllowed: boolean | undefined;
 
   try {
     modulePaths = [require.resolve(moduleName)];
@@ -68,7 +66,7 @@ export function getImportBlockList(
      *  - Check if its a file
      *  - Check if its a directory that has an platform specific index files
      */
-    const guessAtPath = join(dirname(state.filename), moduleName);
+    const guessAtPath = join(dirname(filename), moduleName);
 
     isBlocked = micromatch.isMatch(moduleName, blockModules);
     isAllowed = micromatch.isMatch(moduleName, allowModules);
@@ -82,8 +80,8 @@ export function getImportBlockList(
       const allowedIndexFiles: string[] = [];
 
       for (const platform of ["android", "ios", "native", "web", "windows"]) {
-        for (const ext of ["js", "jsx", "ts", "tsx"]) {
-          allowedIndexFiles.push(`index.${platform}.${ext}`);
+        for (const extension of ["js", "jsx", "ts", "tsx"]) {
+          allowedIndexFiles.push(`index.${platform}.${extension}`);
         }
       }
 

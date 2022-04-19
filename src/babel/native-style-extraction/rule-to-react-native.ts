@@ -6,7 +6,7 @@ import {
 } from "css-to-react-native";
 
 import { isInvalidStyle } from "./is-valid-style";
-import { postProcessingCssFn, preProcessingCssFn } from "./patches";
+import { postProcessingCss, preProcessingCss } from "./patches";
 
 /**
  * Convert a css rule to react-native.
@@ -31,7 +31,7 @@ export function ruleToReactNative({ declarations = [] }: Rule | Page): Style {
       continue;
     }
 
-    let { property: cssAttribute, value: cssValue } = declaration;
+    const { property: cssAttribute, value: cssValue } = declaration;
 
     if (cssAttribute === undefined || cssValue === undefined) {
       continue;
@@ -39,8 +39,8 @@ export function ruleToReactNative({ declarations = [] }: Rule | Page): Style {
 
     const name = getPropertyName(cssAttribute);
 
-    const value = preProcessingCssFn[name]
-      ? preProcessingCssFn[name](cssValue)
+    const value = preProcessingCss[name]
+      ? preProcessingCss[name](cssValue)
       : cssValue;
 
     if (value === null) {
@@ -52,14 +52,14 @@ export function ruleToReactNative({ declarations = [] }: Rule | Page): Style {
       typeof value === "object" ? value : getStylesForProperty(name, value);
 
     for (const [nativeAttribute, nativeValue] of Object.entries(nativeStyles)) {
-      if (isInvalidStyle(nativeAttribute, nativeValue)) {
+      if (isInvalidStyle(nativeAttribute)) {
         warnInvalidStyle(cssAttribute, nativeAttribute, nativeValue);
         continue;
       }
 
-      if (postProcessingCssFn[nativeAttribute]) {
+      if (postProcessingCss[nativeAttribute]) {
         const postprocessedValue =
-          postProcessingCssFn[nativeAttribute](nativeValue);
+          postProcessingCss[nativeAttribute](nativeValue);
 
         if (postprocessedValue === null) {
           warnInvalidStyle(cssAttribute, nativeAttribute, nativeValue);

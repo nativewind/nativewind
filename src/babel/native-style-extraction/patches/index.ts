@@ -11,7 +11,8 @@ function noAuto(value: number | string) {
   return value;
 }
 
-export const postProcessingCssFn: Record<string, (value: any) => any> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const postProcessingCss: Record<string, (value: any) => any> = {
   aspectRatio,
   display,
   overflow,
@@ -27,6 +28,7 @@ export const postProcessingCssFn: Record<string, (value: any) => any> = {
   marginLeft: noAuto,
 };
 
-export const preProcessingCssFn: Record<string, (value: any) => any> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const preProcessingCss: Record<string, (value: any) => any> = {
   zIndex: noAuto,
 };

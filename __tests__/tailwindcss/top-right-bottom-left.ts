@@ -1,6 +1,6 @@
 import { emptyResults, generateTestsForScales, tailwindRunner } from "./runner";
 
-const expectedValues: Record<string | number, any> = {
+const expectedValues: Record<string, number | string> = {
   0: 0,
   px: 1,
   0.5: 2,
@@ -49,8 +49,8 @@ const expectedValues: Record<string | number, any> = {
 const sizes = Object.keys(expectedValues);
 
 const generateTopRightBottomLeftTest = (prefix: string, keys: string[]) => {
-  return generateTestsForScales(prefix, sizes, (i: string | number) => {
-    return Object.fromEntries(keys.map((key) => [key, expectedValues[i]]));
+  return generateTestsForScales(prefix, sizes, (index) => {
+    return Object.fromEntries(keys.map((key) => [key, expectedValues[index]]));
   });
 };
 

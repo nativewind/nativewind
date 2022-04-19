@@ -47,7 +47,7 @@ export function useTailwind(
       styleIds.push(allStyles[selector]);
     }
 
-    let rules = [
+    const rules = [
       ...(mediaRules[selector] ?? []),
       ...(additionalMediaRules[selector] ?? []),
     ];
@@ -65,7 +65,7 @@ export function useTailwind(
         height,
         orientation,
         "prefers-color-scheme": colorScheme,
-      } as any);
+      });
 
       if (isMatch) {
         styleIds.push(allStyles[`${selector}${suffix}`]);

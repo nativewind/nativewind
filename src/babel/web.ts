@@ -1,4 +1,3 @@
-import { dirname } from "path";
 import { NodePath } from "@babel/core";
 import { Program } from "@babel/types";
 import { getTailwindConfig } from "./tailwind/get-tailwind-config";

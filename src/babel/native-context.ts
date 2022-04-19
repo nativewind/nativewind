@@ -64,7 +64,7 @@ export default function (
             hasClassNames: false,
             hasProvider: false,
             hasStyleSheetImport: false,
-            hasUseParseTailwind: false,
+            hasUseTailwindImport: false,
             tailwindConfig,
             classNameToStyleOptions: { inlineStyles: false },
             visitor: nativeContextVisitor,
@@ -76,14 +76,14 @@ export default function (
           const {
             hasClassNames,
             hasStyleSheetImport,
-            hasUseParseTailwind,
+            hasUseTailwindImport,
             hasProvider,
           } = nativeVisitorState;
 
           const bodyNode = path.node.body;
 
           // Add the __useParseTailwind import if it is missing
-          if (hasClassNames && !hasUseParseTailwind) {
+          if (hasClassNames && !hasUseTailwindImport) {
             appendImport(
               babel,
               bodyNode,
@@ -123,10 +123,7 @@ const nativeContextVisitor: Visitor<NativeVisitorState> = {
         t.jSXAttribute(
           t.jSXIdentifier("styles"),
           t.jSXExpressionContainer(t.identifier("__tailwindStyles"))
-        )
-      );
-
-      path.node.attributes.push(
+        ),
         t.jSXAttribute(
           t.jSXIdentifier("media"),
           t.jSXExpressionContainer(t.identifier("__tailwindMedia"))

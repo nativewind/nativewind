@@ -1,6 +1,6 @@
 import { generateTestsForScales, tailwindRunner } from "./runner";
 
-const sizes: Record<string | number, any> = {
+const sizes: Record<string | number, number> = {
   0: 0,
   px: 1,
   0.5: 2,
@@ -39,37 +39,37 @@ const sizes: Record<string | number, any> = {
 };
 
 const tests = [
-  generateTestsForScales("p", Object.keys(sizes), (i) => ({
-    paddingBottom: sizes[i],
-    paddingLeft: sizes[i],
-    paddingRight: sizes[i],
-    paddingTop: sizes[i],
+  generateTestsForScales("p", Object.keys(sizes), (index) => ({
+    paddingBottom: sizes[index],
+    paddingLeft: sizes[index],
+    paddingRight: sizes[index],
+    paddingTop: sizes[index],
   })),
 
-  generateTestsForScales("px", Object.keys(sizes), (i) => ({
-    paddingLeft: sizes[i],
-    paddingRight: sizes[i],
+  generateTestsForScales("px", Object.keys(sizes), (index) => ({
+    paddingLeft: sizes[index],
+    paddingRight: sizes[index],
   })),
 
-  generateTestsForScales("py", Object.keys(sizes), (i) => ({
-    paddingTop: sizes[i],
-    paddingBottom: sizes[i],
+  generateTestsForScales("py", Object.keys(sizes), (index) => ({
+    paddingTop: sizes[index],
+    paddingBottom: sizes[index],
   })),
 
-  generateTestsForScales("pt", Object.keys(sizes), (i) => ({
-    paddingTop: sizes[i],
+  generateTestsForScales("pt", Object.keys(sizes), (index) => ({
+    paddingTop: sizes[index],
   })),
 
-  generateTestsForScales("pr", Object.keys(sizes), (i) => ({
-    paddingRight: sizes[i],
+  generateTestsForScales("pr", Object.keys(sizes), (index) => ({
+    paddingRight: sizes[index],
   })),
 
-  generateTestsForScales("pb", Object.keys(sizes), (i) => ({
-    paddingBottom: sizes[i],
+  generateTestsForScales("pb", Object.keys(sizes), (index) => ({
+    paddingBottom: sizes[index],
   })),
 
-  generateTestsForScales("pl", Object.keys(sizes), (i) => ({
-    paddingLeft: sizes[i],
+  generateTestsForScales("pl", Object.keys(sizes), (index) => ({
+    paddingLeft: sizes[index],
   })),
 ].flat();
 

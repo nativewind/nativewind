@@ -14,7 +14,7 @@ export interface NativeVisitorState extends SharedVisitorState {
   hasClassNames: boolean;
   hasProvider: boolean;
   hasStyleSheetImport: boolean;
-  hasUseParseTailwind: boolean;
+  hasUseTailwindImport: boolean;
   tailwindConfig: TailwindConfig;
   classNameToStyleOptions: ClassNameToStyleOptions;
   visitor?: Visitor<NativeVisitorState>;
@@ -52,7 +52,7 @@ export const nativeVisitor: Visitor<NativeVisitorState> = {
       "react-native"
     );
 
-    state.hasUseParseTailwind ||= hasNamedImport(
+    state.hasUseTailwindImport ||= hasNamedImport(
       path,
       "__useParseTailwind",
       "tailwindcss-react-native"

@@ -23,7 +23,7 @@ tailwindRunner("Layout - Aspect Ratio", [
     "aspect-video",
     {
       styles: {
-        "aspect-video": { aspectRatio: 1.777777778 },
+        "aspect-video": { aspectRatio: 1.777_777_778 },
       },
       media: {},
     },
@@ -32,7 +32,7 @@ tailwindRunner("Layout - Aspect Ratio", [
     "aspect-[4/3]",
     {
       styles: {
-        "aspect-_4_3_": { aspectRatio: 1.3333333333333333 },
+        "aspect-_4_3_": { aspectRatio: 1.333_333_333_333_333_3 },
       },
       media: {},
     },

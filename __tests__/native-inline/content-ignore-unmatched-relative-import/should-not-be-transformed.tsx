@@ -4,6 +4,9 @@ interface ShouldNotBeTransformedProps {
   className: string;
 }
 
-export function ShouldNotBeTransformed(_props: ShouldNotBeTransformedProps) {
-  return <Text>Hello world!</Text>;
+export function ShouldNotBeTransformed({
+  className,
+  ...props
+}: ShouldNotBeTransformedProps) {
+  return <Text {...props}>Hello world!</Text>;
 }

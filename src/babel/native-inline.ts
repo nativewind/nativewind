@@ -56,7 +56,7 @@ export default function (
             hasClassNames: false,
             hasProvider: false,
             hasStyleSheetImport: false,
-            hasUseParseTailwind: false,
+            hasUseTailwindImport: false,
             tailwindConfig,
             classNameToStyleOptions: { inlineStyles: true },
           };
@@ -68,7 +68,7 @@ export default function (
             filename,
             hasClassNames,
             hasStyleSheetImport,
-            hasUseParseTailwind,
+            hasUseTailwindImport,
           } = nativeVisitorState;
 
           // There are no classNames so skip this file
@@ -78,7 +78,7 @@ export default function (
 
           const bodyNode = path.node.body;
 
-          if (!hasUseParseTailwind) {
+          if (!hasUseTailwindImport) {
             appendImport(
               babel,
               bodyNode,
