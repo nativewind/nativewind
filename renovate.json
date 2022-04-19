@@ -1,0 +1,6 @@
+{
+  "extends": ["config:base"],
+  "prCreation": "not-pending",
+  "automerge": true,
+  "automergeType": "branch"
+}
