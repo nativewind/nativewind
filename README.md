@@ -157,7 +157,7 @@ Make sure your `tailwind.config.js` content configuration is correct and matches
 
 A common mistake is missing a file extension, for example if you’re using jsx instead of js for your React components:
 
-````diff
+```diff
 module.exports = {
   content: [
 -   './src/**/*.{html,js}',
@@ -178,7 +178,7 @@ module.exports = {
   ],
   // ...
 }
-````
+```
 
 ### Don't construct class names dynamically
 
