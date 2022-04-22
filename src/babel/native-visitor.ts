@@ -3,7 +3,7 @@ import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 import { SharedVisitorState } from "./types";
 import { getJSXElementName } from "./utils/jsx";
-import { hasNamedImport } from "./utils/imports";
+import { hasNamedImport } from "./utils/has-named-import";
 import {
   classNameToStyle,
   ClassNameToStyleOptions,
