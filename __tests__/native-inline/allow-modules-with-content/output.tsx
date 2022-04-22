@@ -15,10 +15,8 @@ export function Test() {
       >
         Hello world!
       </Text>
-      <MotiText className="font-bold">Should be the untransformed</MotiText>
-      <TestComponent className="font-bold">
-        Should be the untransformed
-      </TestComponent>
+      <MotiText className="font-bold">Do not transform</MotiText>
+      <TestComponent className="font-bold">Do not transform</TestComponent>
     </TailwindProvider>
   );
 }
