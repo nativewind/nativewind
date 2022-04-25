@@ -20,14 +20,14 @@ The platform best suited for production environments. It compiles the entire app
 - import { Text } from "react-native"
 + import { Text, StyleSheet } from "react-native"
 - import { TailwindProvider } from "tailwindcss-react-native"
-+ import { TailwindProvider, useTailwind } from "tailwindcss-react-native"
++ import { TailwindProvider, StyledComponentProxy } from "tailwindcss-react-native"
 
 export function Test() {
   return (
 -   <TailwindProvider>
 +   <TailwindProvider styles={__tailwindStyles} media={__tailwindMedia}>
 -     <Text className="font-bold">Test</Text>
-+     <Text style={useTailwind("font-bold")}>Test</Text>
++     <StyledComponentProxy __component={Text} className="font-bold">Test</Text>
     </TailwindProvider>
   )
 }
@@ -54,7 +54,7 @@ The platform best suited for development environments. Produces larger output bu
 export function Test() {
   return (
 -   <Text className="font-bold">Test</Text>
-+   <Text style={useTailwind("font-bold", { styles: __tailwindStyles, media: __tailwindMedia})}>Test</Text>
++   <StyledComponentProxy __component={Text} className="font-bold" styles={__tailwindStyles} media={__tailwindMedia}>Test</Text>
   )
 }
 
@@ -82,7 +82,10 @@ import { Text } from "react-native"
 export function Test() {
   return (
 -   <Text className="font-bold">Test</Text>
-+   <Text style={{ $$css: true, tailwindcssReactNative: 'font-bold' }}>Test</Text>
++   <StyledComponentProxy __component={Text} className="font-bold" styles={__tailwindStyles} media={__tailwindMedia}>Test</Text>
   )
 }
+
++ const __tailwindStyles = StyleSheet.create({ 'font-bold': { $$css: true, tailwindcssReactNative: 'font-bold' }})
++ const __tailwindMedia = {}
 ```

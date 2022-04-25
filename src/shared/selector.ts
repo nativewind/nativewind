@@ -12,12 +12,14 @@ export function normaliseSelector(
   const leadingDots = "^\\.";
   const nonWordCharactersExceptDash = new RegExp("[^a-zA-Z0-9-]+", "g");
 
-  const importantOrLeadingDots =
-    typeof important === "string"
-      ? new RegExp(`^${important}|${leadingDots}`)
-      : new RegExp(leadingDots);
+  let newSelector = selector;
 
-  return selector
-    .replace(importantOrLeadingDots, "")
+  if (important) {
+    newSelector = newSelector.replace(new RegExp(`^${important}`), "");
+  }
+
+  return newSelector
+    .trim()
+    .replace(new RegExp(leadingDots), "")
     .replace(nonWordCharactersExceptDash, "_");
 }

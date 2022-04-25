@@ -4,9 +4,7 @@ module.exports = {
   testEnvironment: "node",
   testPathIgnorePatterns: [
     "/node_modules/",
-    "/__tests__/native-inline/",
-    "/__tests__/native-context/",
-    "/__tests__/web/",
+    "/__tests__/visitor/",
     "/__tests__/tailwindcss/runner.ts",
     "/__tests__/types.d.ts",
   ],

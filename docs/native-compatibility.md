@@ -604,9 +604,9 @@ To maintain compatibility between platforms, `flex` mimics the CSS functionality
 
 ### Justify Self
 
-| Class                 | Supported |
-| --------------------- | --------- |
-| justify-self-auto   | :x:       |
+| Class                | Supported |
+| -------------------- | --------- |
+| justify-self-auto    | :x:       |
 | justify-self-start   | :x:       |
 | justify-self-end     | :x:       |
 | justify-self-center  | :x:       |

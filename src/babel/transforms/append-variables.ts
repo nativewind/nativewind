@@ -1,30 +1,40 @@
-import { Statement } from "@babel/types";
+import {
+  callExpression,
+  expressionStatement,
+  identifier,
+  memberExpression,
+  Statement,
+} from "@babel/types";
 import serialize from "babel-literal-to-ast";
-import { Babel, MediaRecord, StyleRecord } from "../types";
+import { MediaRecord, StyleRecord } from "../types";
+import { globalMedia, globalStyle } from "./constants";
 
 export function appendVariables(
-  babel: Babel,
   body: Statement[],
   styles: StyleRecord,
   media: MediaRecord
 ) {
-  const { types: t } = babel;
-
   body.push(
-    t.variableDeclaration("const", [
-      t.variableDeclarator(
-        t.identifier("__tailwindStyles"),
-        t.callExpression(
-          t.memberExpression(
-            t.identifier("StyleSheet"),
-            t.identifier("create")
+    expressionStatement(
+      callExpression(
+        memberExpression(identifier("Object"), identifier("assign")),
+        [
+          memberExpression(identifier("globalThis"), identifier(globalStyle)),
+          callExpression(
+            memberExpression(identifier("StyleSheet"), identifier("create")),
+            [serialize(styles)]
           ),
-          [serialize(styles)]
-        )
-      ),
-    ]),
-    t.variableDeclaration("const", [
-      t.variableDeclarator(t.identifier("__tailwindMedia"), serialize(media)),
-    ])
+        ]
+      )
+    ),
+    expressionStatement(
+      callExpression(
+        memberExpression(identifier("Object"), identifier("assign")),
+        [
+          memberExpression(identifier("globalThis"), identifier(globalMedia)),
+          serialize(media),
+        ]
+      )
+    )
   );
 }

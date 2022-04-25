@@ -2,11 +2,13 @@ import { PropsWithChildren, useState } from "react";
 import { ColorSchemeName, Appearance } from "react-native";
 
 import {
-  TailwindStyleContext,
-  TailwindColorSchemeContext,
-  TailwindSetColorSchemeContext,
-  StyleRecord,
   MediaRules,
+  StyleRecord,
+  TailwindColorSchemeContext,
+  TailwindMediaContext,
+  TailwindPlatformContext,
+  TailwindSetColorSchemeContext,
+  TailwindStyleContext,
 } from "./context";
 
 export interface TailwindProviderProps {
@@ -16,26 +18,28 @@ export interface TailwindProviderProps {
 }
 
 export function TailwindProvider({
-  styles = {},
-  media = {},
+  styles = globalThis.tailwindcss_react_native_style,
+  media = globalThis.tailwindcss_react_native_media,
   colorScheme: overrideColorScheme,
   children,
 }: PropsWithChildren<TailwindProviderProps>) {
-  // Save into state, as this will never change
-  const [styleValue] = useState<TailwindStyleContext>({ media, styles });
   const [colorScheme, setColorScheme] = useState<ColorSchemeName>(
-    Appearance.getColorScheme() ?? "light"
+    overrideColorScheme ?? Appearance.getColorScheme() ?? "light"
   );
 
   return (
-    <TailwindStyleContext.Provider value={styleValue}>
-      <TailwindColorSchemeContext.Provider
-        value={overrideColorScheme || colorScheme}
-      >
-        <TailwindSetColorSchemeContext.Provider value={setColorScheme}>
-          {children}
-        </TailwindSetColorSchemeContext.Provider>
-      </TailwindColorSchemeContext.Provider>
+    <TailwindStyleContext.Provider value={styles}>
+      <TailwindMediaContext.Provider value={media}>
+        <TailwindPlatformContext.Provider value="native">
+          <TailwindColorSchemeContext.Provider
+            value={overrideColorScheme || colorScheme}
+          >
+            <TailwindSetColorSchemeContext.Provider value={setColorScheme}>
+              {children}
+            </TailwindSetColorSchemeContext.Provider>
+          </TailwindColorSchemeContext.Provider>
+        </TailwindPlatformContext.Provider>
+      </TailwindMediaContext.Provider>
     </TailwindStyleContext.Provider>
   );
 }

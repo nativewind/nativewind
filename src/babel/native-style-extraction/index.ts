@@ -27,14 +27,13 @@ export function extractStyles(
     const { selector, media, style } = parsedRule;
 
     if (media.length > 0) {
-      // If there are media conditions, add the rules with an uffix
+      // If there are media conditions, add the rules with a suffix
       styles[`${selector}_${suffix}`] = style;
       // Store the conditions, along with the suffix
       mediaRules[selector] = mediaRules[selector] ?? [];
       mediaRules[selector].push({ media, suffix });
     } else {
       // If there are no conditions, we merge the rules
-      // Lower rules should overwrite
       styles[selector] = {
         ...styles[selector],
         ...style,
