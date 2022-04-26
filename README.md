@@ -63,6 +63,9 @@ This library can be used with or without babel. The babel plugin provide DexUX f
 - Automatically wrap components in `StyledComponent`
 - Automatically inject Tailwindcss styles
 
+You can see examples of the plugin in action via the [unit tests](https://github.com/marklawlor/tailwindcss-react-native/tree/main/__tests__/visitor). E.g. [before](https://github.com/marklawlor/tailwindcss-react-native/blob/main/__tests__/visitor/basic/code.tsx) and [after](https://github.com/marklawlor/tailwindcss-react-native/blob/main/__tests__/visitor/basic/output.tsx).
+
+
 If you do not wish to use babel, or are using using a non-babel web framework (such as [Next.js](https://nextjs.org/docs/advanced-features/compiler)), you will need to manually wrap native components via the [Component Api](#component-api).
 
 <details>
