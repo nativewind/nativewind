@@ -85,9 +85,9 @@ This library can be used with or without babel. The babel plugin provides a bett
   <hr />
   Without babel, the tailwindcss styles will need to be compiled via the `tailwindcss-react-native` command-line tool. This tool wraps the `tailwindcss` CLI and writes a `tailwindcss-react-native-output.js` which will need to be imported into your application.
 
-  How your run `tailwindcss-react-native` is up to you, but we recommend using [`concurrently`](https://www.npmjs.com/package/concurrently) to run the process in parallel (eg. `"start": "concurrently \"tailwindcss-react-native native --platform native --watch\" \"expo start\""`)
+  How your run `tailwindcss-react-native` is up to you, but we recommend using [`concurrently`](https://www.npmjs.com/package/concurrently) to run the process in parallel (eg. `"start": "concurrently \"tailwindcss-react-native native --platform native --watch\" \"expo start\""`).
 
-  The babel plugin will covert components with a `className` attribute into a `StyledComponent`. Please see [Babel Options](#babel-options) to configure the transform.
+  Please see [CLI Options](#cli-options) for usuage of the CLI.
 
   Once you have the generated file, you will need to update your `TailwindProvider`
 
