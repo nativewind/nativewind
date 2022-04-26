@@ -5,11 +5,15 @@ import resolveTailwindConfig from "tailwindcss/resolveConfig";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 import { getNativeTailwindConfig } from "./native-config";
-import { TailwindReactNativeOptions } from "../types";
+
+export interface GetTailwindConfigOptions {
+  rem?: number;
+  tailwindConfigPath?: string;
+}
 
 export function getTailwindConfig(
   cwd: string,
-  options: TailwindReactNativeOptions
+  options: GetTailwindConfigOptions
 ): TailwindConfig {
   const { tailwindConfigPath } = options;
 

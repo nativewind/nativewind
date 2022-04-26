@@ -12,12 +12,17 @@ export function extractStyles(
   tailwindConfig: TailwindConfig,
   cssInput = "@tailwind components;@tailwind utilities;"
 ) {
+  // If you edit this, make sure you update the CLI postcss.config.js
   const processedCss = postcss([
     tailwind(tailwindConfig),
     postcssCssvariables(),
     postcssColorFunctionalNotation(),
   ]).process(cssInput).css;
 
+  return cssToRn(processedCss, tailwindConfig);
+}
+
+export function cssToRn(processedCss: string, tailwindConfig: TailwindConfig) {
   const styles: StyleRecord = {};
   const mediaRules: MediaRecord = {};
 
