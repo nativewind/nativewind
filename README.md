@@ -8,12 +8,11 @@ Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native
 
 <img src="https://raw.github.com/marklawlor/tailwindcss-react-native/master/docs/example.svg">
 
-- **native support** for multiple platforms (RN Stylesheets, CSS Stylesheets)
-- fast refresh compatible
+- **native support** for multiple platforms (uses RN Stylesheets for native, CSS Stylesheets for web)
+- **fast refresh** compatible
 - respects **all** tailwind.config.js, including themes, custom values, plugins
-- supports **dark mode** / **media queries** / **arbitrary classes**
-- compatible with existing styles
-- supports Server Side Rendering (SSR) on Web (including responsive styles)
+- supports **dark mode** / **arbitrary classes** / **media queries**
+- supports **responsive** Server Side Rendering (SSR) on Web 
 
 Already using another RN library for Tailwind? [Find out why you should switch.](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/library-comparision.md)
 
@@ -62,12 +61,12 @@ Create a file (eg. `src/tailwindcss-react-native.d.ts`) and paste this line
 import "tailwindcss-react-native/types.d";
 ````
 
-### Additional setup
+## Additional setup
 
 This library can be used with or without babel. The babel plugin provides a better developer experience, improved fast-refresh and quicker setup, but is unsuitable for using within a published library or for frameworks not using babel.
 
 <details>
-  <summary>With babel (recommended)</summary>
+  <summary>With babel</summary>
   <hr />
   Add `tailwindcss-react-native/babel` to your babel plugins
 
@@ -77,18 +76,20 @@ This library can be used with or without babel. The babel plugin provides a bett
     plugins: ["tailwindcss-react-native/babel"],
   };
   ```
+
+  The babel plugin will covert components with a `className` attribute into a `StyledComponent`. Please see [Babel Options](#babel-options) to configure the transform.
+
   <hr />
 </details>
 
 <details>
   <summary>Without babel</summary>
   <hr />
-  Without babel, the tailwindcss styles will need to be compiled via the `tailwindcss-react-native` command-line tool. This watches your codebase and produces an `tailwindcss-react-native-output.js` which needs to be imported into your application.
+  Without babel, the tailwindcss styles will need to be compiled via the `tailwindcss-react-native` command-line tool. This tool wraps the `tailwindcss` CLI and writes a `tailwindcss-react-native-output.js` which will need to be imported into your application.
 
+  How your run `tailwindcss-react-native` is up to you, but we recommend using [`concurrently`](https://www.npmjs.com/package/concurrently) to run the process in parallel (eg. `"start": "concurrently \"tailwindcss-react-native native --platform native --watch\" \"expo start\""`)
 
-  How your run `tailwindcss-react-native` is up to you, but we recommend using [`concurrently`](https://www.npmjs.com/package/concurrently) to run the process in parallel (eg. `"start": "concurrently \"tailwindcss-react-native native\" \"expo start\""`)
-
-  You can read the [CLI docs](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/cli.md) for all available options.
+  The babel plugin will covert components with a `className` attribute into a `StyledComponent`. Please see [Babel Options](#babel-options) to configure the transform.
 
   Once you have the generated file, you will need to update your `TailwindProvider`
 
@@ -117,8 +118,6 @@ This library can be used with or without babel. The babel plugin provides a bett
     return <StyledText className="font-bold">Hello world</StyledText>
   }
   ```
-
-
   <hr />
 </details>
 
@@ -212,6 +211,20 @@ module.exports = {
 | tailwindConfig | Path relative to `cwd` | `tailwind.config.js`                          | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform.                                                                 |
 | allow          | `*`, string[]          | `*`                                           | Only transform components from these imported modules. `*` will transform all modules                                                                      |
 | block          | string[]               | []                                            | Do not transform components from these imported modules.                                                                                                   |
+
+### CLI Options
+
+Usage `tailwindcss-react-native [...options]`
+
+```
+Options:
+      --help      Show help                                             [boolean]
+      --version   Show version number                                   [boolean]
+  -p, --platform  tailwindcss-react-native platform                    [required]
+  -c, --config    Path to tailwindcss config file [default: "tailwind.config.js"]
+  -o, --output    Output file     [default: "tailwindcss-react-native-output.js"]
+  -w, --watch     Watch for changes and rebuild as needed        [default: false]
+```
 
 ## Troubleshooting
 

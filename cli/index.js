@@ -12,35 +12,31 @@ const {
 } = require("../dist/babel/tailwind/get-tailwind-config");
 
 const argv = yargs(hideBin(process.argv))
-  .option("config", {
-    alias: "c",
-    type: "string",
-    default: "tailwind.config.js",
-  })
   .option("platform", {
     alias: "p",
-    type: "string",
-    default: "native",
+    description: "tailwindcss-react-native platform",
+    required: true,
+  })
+  .option("config", {
+    alias: "c",
+    description: "Path to tailwindcss config file",
+    default: "tailwind.config.js",
   })
   .option("output", {
     alias: "o",
-    type: "string",
+    description: "Output file",
     default: "tailwindcss-react-native-output.js",
-  })
-  .option("rem", {
-    type: "number",
   })
   .option("watch", {
     alias: "w",
-    type: "boolean",
+    description: "Watch for changes and rebuild as needed",
     default: false,
   }).argv;
 
-const { platform, output, watch, rem, config } = argv;
+const { platform, output, watch, config } = argv;
 
 const tailwindOutput = file();
 const tailwindConfig = getTailwindConfig(process.cwd(), {
-  rem,
   tailwindConfigPath: config,
 });
 
