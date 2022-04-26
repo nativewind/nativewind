@@ -234,10 +234,10 @@ module.exports = {
 | Option         | Values                 | Default                                       | Description                                                                                |
 | -------------- | ---------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | platform       | `native`, `web`        | `native`                                      | Specifies how the className is transformed                                                 |
-| hmr            | boolean                | Development: `true` <br />Production: `false` | Allow fast-refresh of styles                                                               |
+| hmr            | `boolean`              | Development: `true` <br />Production: `false` | Allow fast-refresh of styles                                                               |
 | tailwindConfig | Path relative to `cwd` | `tailwind.config.js`                          | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform. |
-| allowModules   | `*`, string[]          | `*`                                           | Only transform components from these imported modules. `*` will transform all modules      |
-| blockModules   | string[]               | []                                            | Do not transform components from these imported modules.                                   |
+| allowModules   | `*`, `string[]`        | `*`                                           | Only transform components from these imported modules. `*` will transform all modules      |
+| blockModules   | `string[]`             | `[]`                                          | Do not transform components from these imported modules.                                   |
 
 ### CLI Options
 
