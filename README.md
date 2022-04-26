@@ -24,7 +24,7 @@ Install the library
 
 Create a `tailwind.config.js` and set `content`
 
-```
+```js
 // tailwind.config.js
 module.exports = {
   content: [
