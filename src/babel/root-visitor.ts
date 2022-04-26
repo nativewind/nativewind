@@ -42,6 +42,7 @@ export default function rootVisitor(
             tailwindConfigPath: "tailwind.config.js",
             platform: "native",
             hmr: true,
+            skipTransform: false,
             blockModules: [],
             hasStyledComponentImport: false,
             hasClassNames: false,
@@ -64,6 +65,7 @@ export default function rootVisitor(
             hasProvider,
             hasStyledComponentImport,
             hasClassNames,
+            skipTransform,
             hmr,
           } = visitorState;
 
@@ -83,7 +85,7 @@ export default function rootVisitor(
 
             const bodyNode = path.node.body;
 
-            if (!hasStyledComponentImport) {
+            if (!hasStyledComponentImport && !skipTransform) {
               prependImport(bodyNode, componentProxy, packageName);
             }
 

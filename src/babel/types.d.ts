@@ -14,6 +14,7 @@ export interface TailwindReactNativeOptions {
   allowModules?: AllowPathOptions;
   blockModules?: PathOption[];
   platform?: "web" | "native";
+  skipTransform?: false;
   rem?: number;
   tailwindConfigPath?: string;
   hmr?: boolean;

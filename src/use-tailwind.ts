@@ -19,7 +19,7 @@ export function useTailwind(className = "") {
 
   if (!platform) {
     throw new Error(
-      "No TailwindProvider found. Make sure all components are within a TailwindProvider"
+      "No platform details found. Make sure all components are within a TailwindProvider with the platform attribute set."
     );
   }
 

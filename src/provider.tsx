@@ -1,5 +1,5 @@
 import { PropsWithChildren, useState } from "react";
-import { ColorSchemeName, Appearance } from "react-native";
+import { ColorSchemeName, Appearance, Platform } from "react-native";
 
 import {
   MediaRules,
@@ -12,27 +12,38 @@ import {
 } from "./context";
 
 export interface TailwindProviderProps {
-  platform?: "web" | "native";
   styles?: StyleRecord;
   media?: MediaRules;
   colorScheme?: ColorSchemeName;
+  platform: typeof Platform.OS | "native";
 }
+
+const nativePlatforms = new Set([
+  "ios",
+  "android",
+  "windows",
+  "macos",
+  "web",
+  "native",
+]);
 
 export function TailwindProvider({
   styles = globalThis.tailwindcss_react_native_style,
   media = globalThis.tailwindcss_react_native_media,
   colorScheme: overrideColorScheme,
-  platform = "native",
+  platform = Platform.OS,
   children,
 }: PropsWithChildren<TailwindProviderProps>) {
   const [colorScheme, setColorScheme] = useState<ColorSchemeName>(
     overrideColorScheme ?? Appearance.getColorScheme() ?? "light"
   );
 
+  const platformValue = nativePlatforms.has(platform) ? "native" : platform;
+
   return (
     <TailwindStyleContext.Provider value={styles}>
       <TailwindMediaContext.Provider value={media}>
-        <TailwindPlatformContext.Provider value={platform}>
+        <TailwindPlatformContext.Provider value={platformValue}>
           <TailwindColorSchemeContext.Provider
             value={overrideColorScheme || colorScheme}
           >

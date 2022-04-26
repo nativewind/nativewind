@@ -52,20 +52,21 @@ export const visitor: Visitor<VisitorState> = {
     );
   },
   JSXElement(path, state) {
+    const { skipTransform, platform, blockList } = state;
     const name = getJSXElementName(path.node.openingElement);
 
     state.hasProvider ||= name === "TailwindProvider";
 
-    if (name === "TailwindProvider") {
-      appendPlatformAttribute(path, state.platform);
+    if (name === "TailwindProvider" && !skipTransform) {
+      appendPlatformAttribute(path, platform);
     }
 
-    if (state.blockList.has(name) || name[0] !== name[0].toUpperCase()) {
+    if (blockList.has(name) || name[0] !== name[0].toUpperCase()) {
       return;
     }
 
     if (hasAttribute(path, "className")) {
-      toStyledComponent(path);
+      if (!skipTransform) toStyledComponent(path);
       state.hasClassNames = true;
     }
   },

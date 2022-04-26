@@ -3,6 +3,7 @@ import {
   Appearance,
   ColorSchemeName,
   ImageStyle,
+  Platform,
   TextStyle,
   ViewStyle,
 } from "react-native";
@@ -39,4 +40,6 @@ export const TailwindSetColorSchemeContext = createContext<
 >(() => {
   return;
 });
-export const TailwindPlatformContext = createContext<string>("");
+export const TailwindPlatformContext = createContext<
+  typeof Platform.OS | "native" | undefined
+>(undefined);

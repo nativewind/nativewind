@@ -65,7 +65,6 @@ This library can be used with or without babel. The babel plugin provide DexUX f
 
 You can see examples of the plugin in action via the [unit tests](https://github.com/marklawlor/tailwindcss-react-native/tree/main/__tests__/visitor). E.g. [before](https://github.com/marklawlor/tailwindcss-react-native/blob/main/__tests__/visitor/basic/code.tsx) and [after](https://github.com/marklawlor/tailwindcss-react-native/blob/main/__tests__/visitor/basic/output.tsx).
 
-
 If you do not wish to use babel, or are using using a non-babel web framework (such as [Next.js](https://nextjs.org/docs/advanced-features/compiler)), you will need to manually wrap native components via the [Component Api](#component-api).
 
 <details>
@@ -185,6 +184,28 @@ export function MyComponent() {
 
 ```
 
+### TailwindProvider
+
+All components need to be within the context of the TailwindProvider.
+
+```JSX
+import { TailwindProvider } from 'tailwindcss-react-native'
+
+function MyAppsProviders ({ children }) {
+   return (
+     <TailwindProvider platform="native">{children}</TailwindProvider>
+   )
+ }
+```
+
+You don't need to provide these props if you are using Babel or spreading the CLI output.
+
+| Prop     | Values                                                | Default     | Description                                                                                               |
+| -------- | ----------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
+| platform | `native`, `web`, `ios`, `android`, `windows`, `macos` | Platform.OS | Specifies how the className is transformed. `ios`, `android`, `windows`, `macos` are aliases for `native` |
+| style    | Compiled style object                                 |             |                                                                                                           |
+| media    | Compiled media object                                 |             |                                                                                                           |
+
 ## Component API
 
 If you are not using the babel plugin you will need to use the Component API.
@@ -234,13 +255,13 @@ module.exports = {
 };
 ```
 
-| Option         | Values                 | Default                                       | Description                                                                                |
-| -------------- | ---------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| platform       | `native`, `web`        | `native`                                      | Specifies how the className is transformed                                                 |
-| hmr            | `boolean`              | Development: `true` <br />Production: `false` | Allow fast-refresh of styles                                                               |
-| tailwindConfig | Path relative to `cwd` | `tailwind.config.js`                          | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform. |
-| allowModules   | `*`, `string[]`        | `*`                                           | Only transform components from these imported modules. `*` will transform all modules      |
-| blockModules   | `string[]`             | `[]`                                          | Do not transform components from these imported modules.                                   |
+| Option         | Values                                                | Default                                       | Description                                                                                               |
+| -------------- | ----------------------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| platform       | `native`, `web`, `ios`, `android`, `windows`, `macos` | `native`                                      | Specifies how the className is transformed. `ios`, `android`, `windows`, `macos` are aliases for `native` |
+| hmr            | `boolean`                                             | Development: `true` <br />Production: `false` | Allow fast-refresh of styles                                                                              |
+| tailwindConfig | Path relative to `cwd`                                | `tailwind.config.js`                          | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform.                |
+| allowModules   | `*`, `string[]`                                       | `*`                                           | Only transform components from these imported modules. `*` will transform all modules                     |
+| blockModules   | `string[]`                                            | `[]`                                          | Do not transform components from these imported modules.                                                  |
 
 ### CLI Options
 
