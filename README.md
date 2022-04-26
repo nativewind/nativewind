@@ -1,12 +1,8 @@
 # tailwindcss-react-native
 
-Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native](https://reactnative.dev/) applications.
-
-> This library is currently stabilising for a v1 release.
->
-> Follow the [v1 milestone](https://github.com/marklawlor/tailwindcss-react-native/milestone/1) to track the progress.
-
 <img src="https://raw.github.com/marklawlor/tailwindcss-react-native/next/docs/example.svg">
+
+Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native](https://reactnative.dev/) applications.
 
 - **native support** for multiple platforms (uses RN Stylesheets for native, CSS Stylesheets for web)
 - **fast refresh** compatible
