@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "tailwindcss-react-native",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "main": "dist/index.js",
