@@ -4,7 +4,7 @@ export function Test() {
   return (
     <>
       <Text className="font-bold">Hello world!</Text>
-      <TestComponent className="text-green-500" />
+      <TestComponent className="text-blue-500" />
     </>
   );
 }
