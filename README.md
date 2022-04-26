@@ -24,8 +24,6 @@ Install the library
 
 Create a `tailwind.config.js` and set `content`
 
-> During development your application may work without a `tailwind.config.js` or the `content` option, but it will error when running in production.
-
 ```
 // tailwind.config.js
 module.exports = {
@@ -44,9 +42,9 @@ Add the `TailwindProvider` to your application
 import { TailwindProvider } from 'tailwindcss-react-native'
 
 function MyAppsProviders ({ children }) {
-    return (
-        <TailwindProvider>{children}</TailwindProvider>
-    )
+  return (
+    <TailwindProvider>{children}</TailwindProvider>
+  )
 }
 ```
 #### tailwindcss peerDependency
