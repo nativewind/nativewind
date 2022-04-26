@@ -127,17 +127,19 @@ If using `{ platform: 'web' }` you will need to follow the follow the [TailwindC
 
 ## Usage
 
+### With Babel
+
 Simply add a `className` attribute to your existing `react-native` components
 
 ```JSX
 <Text className="font-bold">
 ```
 
-## useTailwind
+### useTailwind
 
 Sometimes components have multiple style props, or you need programmatic access to the generated styles. In these instances you can use the `useTailwind` hook.
 
-```
+```JSX
 import { MotiView } from "moti";
 import { useTailwind } from "tailwindcss-react-native";
 
