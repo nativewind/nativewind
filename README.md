@@ -50,49 +50,6 @@ function MyAppsProviders ({ children }) {
     )
 }
 ```
-
-### Additional setup
-
-This library can be used with or without babel. The babel plugin provides a better developer experience, improved fast-refresh and quicker setup, but is unsuitable for using within a published library or for frameworks not using babel.
-
-<details>
-  <summary>With babel (recommended)</summary>
-Add `tailwindcss-react-native/babel` to your babel plugins
-
-```js
-// babel.config.js
-module.exports = {
-  plugins: ["tailwindcss-react-native/babel"],
-};
-```
-
-</details>
-
-<details>
-  <summary>Without babel</summary>
-Without babel, the tailwindcss styles will need to be compiled via `tailwindcss-react-native` command-line tool. This watches your codebase and produces an `tailwindcss-react-native-output.js` which needs to be imported into your application.
-
-You will not be able to use the `className` attribute on RN components, and will need to use the [Component API](#component-api)
-
-How your run `tailwindcss-react-native` is up to you, but we recommend using [`concurrently`](https://www.npmjs.com/package/concurrently) to run the process in parallel (eg. `"start": "concurrently \"tailwindcss-react-native native\" \"expo start\""`)
-
-You can read the [CLI docs](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/cli.md) for all available options.
-
-Once you have the generated file, you will need to update your `TailwindProvider`
-
-```diff
-import { TailwindProvider } from 'tailwindcss-react-native'
-+ import * as tailwindProviderProps from "./tailwindcss-react-native-output"
-
-function MyAppsProviders ({ children }) {
-    return (
--       <TailwindProvider>{children}</TailwindProvider>
-+       <TailwindProvider {...tailwindProviderProps}>{children}</TailwindProvider>
-    )
-}
-```
-</details>
-
 #### tailwindcss peerDependency
 
 This package has a peerDependency of `tailwindcss@3.x.x`. You can install it with `npm install tailwindcss` or `yarn add tailwindcss`
@@ -104,6 +61,51 @@ Create a file (eg. `src/tailwindcss-react-native.d.ts`) and paste this line
 ```js
 import "tailwindcss-react-native/types.d";
 ````
+
+### Additional setup
+
+This library can be used with or without babel. The babel plugin provides a better developer experience, improved fast-refresh and quicker setup, but is unsuitable for using within a published library or for frameworks not using babel.
+
+<details>
+  <summary>With babel (recommended)</summary>
+  <hr />
+  Add `tailwindcss-react-native/babel` to your babel plugins
+
+  ```js
+  // babel.config.js
+  module.exports = {
+    plugins: ["tailwindcss-react-native/babel"],
+  };
+  ```
+  <hr />
+</details>
+
+<details>
+  <summary>Without babel</summary>
+  <hr />
+  Without babel, the tailwindcss styles will need to be compiled via the `tailwindcss-react-native` command-line tool. This watches your codebase and produces an `tailwindcss-react-native-output.js` which needs to be imported into your application.
+
+  You will not be able to use the `className` attribute on RN components, and will need to use the [Component API](#component-api)
+
+  How your run `tailwindcss-react-native` is up to you, but we recommend using [`concurrently`](https://www.npmjs.com/package/concurrently) to run the process in parallel (eg. `"start": "concurrently \"tailwindcss-react-native native\" \"expo start\""`)
+
+  You can read the [CLI docs](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/cli.md) for all available options.
+
+  Once you have the generated file, you will need to update your `TailwindProvider`
+
+  ```diff
+  import { TailwindProvider } from 'tailwindcss-react-native'
+  + import * as tailwindProviderProps from "./tailwindcss-react-native-output"
+
+  function MyAppsProviders ({ children }) {
+      return (
+  -       <TailwindProvider>{children}</TailwindProvider>
+  +       <TailwindProvider {...tailwindProviderProps}>{children}</TailwindProvider>
+      )
+  }
+  ```
+  <hr />
+</details>
 
 #### Web only
 
