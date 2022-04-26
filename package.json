@@ -46,7 +46,7 @@
     "postcss": "^8.4.12",
     "postcss-color-functional-notation": "^4.2.2",
     "postcss-css-variables": "^0.18.0",
-    "tempy": "^3.0.0",
+    "tempy": "^1.0.1",
     "yargs": "^17.4.1"
   },
   "devDependencies": {
