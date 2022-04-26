@@ -15,7 +15,7 @@ export interface TailwindProviderProps {
   styles?: StyleRecord;
   media?: MediaRules;
   colorScheme?: ColorSchemeName;
-  platform: typeof Platform.OS | "native";
+  platform?: typeof Platform.OS | "native";
 }
 
 const nativePlatforms = new Set([
