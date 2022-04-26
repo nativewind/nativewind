@@ -1,16 +1,20 @@
-import { Statement } from "@babel/types";
-import { Babel } from "../types";
+import {
+  identifier,
+  importDeclaration,
+  importSpecifier,
+  Statement,
+  stringLiteral,
+} from "@babel/types";
 
-export function appendImport(
-  { types: t }: Babel,
+export function prependImport(
   body: Statement[],
   variable: string,
   source: string
 ) {
   body.unshift(
-    t.importDeclaration(
-      [t.importSpecifier(t.identifier(variable), t.identifier(variable))],
-      t.stringLiteral(source)
+    importDeclaration(
+      [importSpecifier(identifier(variable), identifier(variable))],
+      stringLiteral(source)
     )
   );
 }

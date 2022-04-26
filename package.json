@@ -1,13 +1,23 @@
 {
   "version": "0.1.0",
   "name": "tailwindcss-react-native",
+  "description": "Use Tailwindcss in your cross-platform React Native applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
+  "bin": {
+    "tailwindcss-react-native": "cli/index.js"
+  },
+  "homepage": "https://github.com/marklawlor/tailwindcss-react-native#readme",
+  "keywords": "react native react-native tailwind tailwindcss",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/marklawlor/tailwindcss-react-native.git"
+  },
+  "author": {
+    "name": "Mark Lawlor",
+    "url": "https://github.com/marklawlor"
   },
   "bugs": {
     "url": "https://github.com/marklawlor/tailwindcss-react-native/issues"
@@ -15,8 +25,6 @@
   "engines": {
     "node": ">=12"
   },
-  "homepage": "https://github.com/marklawlor/tailwindcss-react-native",
-  "keywords": "react native react-native tailwind tailwindcss",
   "scripts": {
     "test": "jest",
     "lint": "eslint .",
@@ -25,19 +33,21 @@
   },
   "files": [
     "dist/",
+    "cli/",
     "babel.js",
     "types.d.ts"
   ],
   "dependencies": {
     "@react-native-community/hooks": "^2.8.1",
-    "babel-literal-to-ast": "^2.1.0",
     "css": "^3.0.0",
     "css-mediaquery": "^0.1.2",
     "css-to-react-native": "^3.0.0",
     "micromatch": "^4.0.5",
     "postcss": "^8.4.12",
     "postcss-color-functional-notation": "^4.2.2",
-    "postcss-css-variables": "^0.18.0"
+    "postcss-css-variables": "^0.18.0",
+    "tempy": "^1.0.1",
+    "yargs": "^17.4.1"
   },
   "devDependencies": {
     "@babel/core": "7.17.9",

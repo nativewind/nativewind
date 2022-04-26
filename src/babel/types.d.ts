@@ -1,7 +1,4 @@
 import { ViewStyle, TextStyle, ImageStyle } from "react-native";
-import * as BabelCore from "@babel/core";
-
-export type Babel = typeof BabelCore;
 
 export type Style = ViewStyle | TextStyle | ImageStyle;
 export type StyleRecord = Record<string, Style>;
@@ -16,9 +13,10 @@ export type AllowPathOptions = "*" | PathOption[];
 export interface TailwindReactNativeOptions {
   allowModules?: AllowPathOptions;
   blockModules?: PathOption[];
-  platform?: "web" | "native" | "native-context" | "native-inline";
+  platform?: "web" | "native";
   rem?: number;
   tailwindConfigPath?: string;
+  hmr?: boolean;
 }
 
 export type State = {
@@ -28,11 +26,3 @@ export type State = {
   file: BabelCore.BabelFile;
   filename: string;
 };
-
-export interface SharedVisitorState
-  extends State,
-    Required<TailwindReactNativeOptions> {
-  allowRelativeModules: AllowPathOptions;
-  babel: Babel;
-  blockList: Set<string>;
-}

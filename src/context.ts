@@ -7,11 +7,6 @@ import {
   ViewStyle,
 } from "react-native";
 
-export interface TailwindStyleContext {
-  styles: StyleRecord;
-  media: MediaRules;
-}
-
 export type StyleRecord = Record<string, ViewStyle | TextStyle | ImageStyle>;
 
 export type MediaRules = Record<
@@ -19,10 +14,22 @@ export type MediaRules = Record<
   Array<{ media: string[]; suffix: number }>
 >;
 
-export const TailwindStyleContext = createContext<TailwindStyleContext>({
-  styles: {},
-  media: {},
-});
+declare global {
+  // eslint-disable-next-line no-var
+  var tailwindcss_react_native_style: StyleRecord;
+  // eslint-disable-next-line no-var
+  var tailwindcss_react_native_media: MediaRules;
+}
+
+globalThis.tailwindcss_react_native_style ??= {};
+globalThis.tailwindcss_react_native_media ??= {};
+
+export const TailwindStyleContext = createContext<StyleRecord>(
+  globalThis.tailwindcss_react_native_style
+);
+export const TailwindMediaContext = createContext<MediaRules>(
+  globalThis.tailwindcss_react_native_media
+);
 
 export const TailwindColorSchemeContext = createContext<ColorSchemeName>(
   Appearance.getColorScheme()
@@ -32,3 +39,4 @@ export const TailwindSetColorSchemeContext = createContext<
 >(() => {
   return;
 });
+export const TailwindPlatformContext = createContext<string>("");

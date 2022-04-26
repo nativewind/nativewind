@@ -1,58 +1,50 @@
 import { useContext } from "react";
+import { useWindowDimensions } from "react-native";
 import { normaliseSelector } from "./shared/selector";
+import { match as matchMediaQuery } from "css-mediaquery";
+
 import {
-  MediaRules,
-  StyleRecord,
   TailwindColorSchemeContext,
+  TailwindMediaContext,
+  TailwindPlatformContext,
   TailwindStyleContext,
 } from "./context";
-import { match as matchMediaQuery } from "css-mediaquery";
 import {
   // useAccessibilityInfo,
   useDeviceOrientation,
 } from "@react-native-community/hooks";
-import { useWindowDimensions } from "react-native";
 
-export interface UseParseTailwindOptions {
-  styles?: StyleRecord;
-  media?: MediaRules;
-}
+export function useTailwind(className = "") {
+  const platform = useContext(TailwindPlatformContext);
 
-export function useTailwind(
-  classNames: string,
-  {
-    styles: additionalStyles = {},
-    media: additionalMediaRules = {},
-  }: UseParseTailwindOptions = {}
-) {
-  const { styles, media: mediaRules } = useContext(TailwindStyleContext);
+  if (!platform) {
+    throw new Error(
+      "No TailwindProvider found. Make sure all components are within a TailwindProvider"
+    );
+  }
+
+  if (platform === "web") {
+    return { $$css: true, tailwindClassName: className };
+  }
+
+  const styles = useContext(TailwindStyleContext);
+  const mediaRules = useContext(TailwindMediaContext);
   const colorScheme = useContext(TailwindColorSchemeContext);
-
   const { width, height } = useWindowDimensions();
   // const { reduceMotionEnabled: reduceMotion } = useAccessibilityInfo()
   const orientation = useDeviceOrientation().portrait
     ? "portrait"
     : "landscape";
 
-  const allStyles = {
-    ...styles,
-    ...additionalStyles,
-  };
-
-  return (classNames ?? "").split(" ").flatMap((className) => {
+  const tailwindStyleIds = className.split(" ").flatMap((className) => {
     const selector = normaliseSelector(className);
     const styleIds: unknown[] = [];
 
-    if (allStyles[selector]) {
-      styleIds.push(allStyles[selector]);
+    if (styles[selector]) {
+      styleIds.push(styles[selector]);
     }
 
-    const rules = [
-      ...(mediaRules[selector] ?? []),
-      ...(additionalMediaRules[selector] ?? []),
-    ];
-
-    for (const { media, suffix } of rules) {
+    for (const { media, suffix } of mediaRules[selector] ?? []) {
       if (!media) {
         styleIds.push(styles[`${className}_${suffix}`]);
         continue;
@@ -68,10 +60,11 @@ export function useTailwind(
       });
 
       if (isMatch) {
-        styleIds.push(allStyles[`${selector}${suffix}`]);
+        styleIds.push(styles[`${selector}${suffix}`]);
       }
     }
-
     return styleIds;
   });
+
+  return tailwindStyleIds;
 }
