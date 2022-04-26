@@ -6,7 +6,7 @@ Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native
 >
 > Follow the [v1 milestone](https://github.com/marklawlor/tailwindcss-react-native/milestone/1) to track the progress.
 
-<img src="https://raw.github.com/marklawlor/tailwindcss-react-native/master/docs/example.svg">
+<img src="https://raw.github.com/marklawlor/tailwindcss-react-native/next/docs/example.svg">
 
 - **native support** for multiple platforms (uses RN Stylesheets for native, CSS Stylesheets for web)
 - **fast refresh** compatible
