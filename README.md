@@ -1,6 +1,6 @@
 # tailwindcss-react-native
 
-<img src="https://raw.github.com/marklawlor/tailwindcss-react-native/next/docs/example.svg">
+<img src="https://raw.github.com/marklawlor/tailwindcss-react-native/main/docs/example.svg">
 
 Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native](https://reactnative.dev/) applications.
 
