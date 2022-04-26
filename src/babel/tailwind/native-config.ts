@@ -1,10 +1,13 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
-import { TailwindReactNativeOptions } from "../types";
 import { nativePlugin } from "./native-plugin";
+
+export interface GetNativeTailwindConfigOptions {
+  rem?: number;
+}
 
 export function getNativeTailwindConfig({
   rem = 16,
-}: TailwindReactNativeOptions = {}) {
+}: GetNativeTailwindConfigOptions = {}) {
   const config: Partial<TailwindConfig> = {
     plugins: [nativePlugin],
     corePlugins: {

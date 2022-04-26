@@ -1,38 +1,18 @@
-import { Babel, TailwindReactNativeOptions } from "./types";
+import { TailwindReactNativeOptions } from "./types";
 
-import web from "./web";
-import nativeInline from "./native-inline";
-import nativeContext from "./native-context";
-
-const platformPlugins = {
-  web,
-  "native-context": nativeContext,
-  "native-inline": nativeInline,
-};
+import visitor from "./root-visitor";
 
 export default function (
-  babel: Babel,
+  _: unknown,
   options: TailwindReactNativeOptions,
   cwd: string
 ) {
-  let { platform = "native" } = options ?? {};
-
   const isProduction =
     typeof __DEV__ !== "undefined"
       ? __DEV__ === true
       : process.env.NODE_ENV === "production";
 
-  if (platform === "native" && isProduction) {
-    platform = "native-context";
-  } else if (platform === "native") {
-    platform = "native-inline";
-  } else if (!(platform in platformPlugins)) {
-    throw new Error(`Unknown platform ${platform}`);
-  }
+  const hmr = !isProduction && options.hmr;
 
-  return platformPlugins[platform as keyof typeof platformPlugins](
-    babel,
-    options,
-    cwd
-  );
+  return visitor({ platform: "native", ...options, hmr }, cwd);
 }

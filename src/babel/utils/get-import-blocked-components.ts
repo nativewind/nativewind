@@ -5,7 +5,7 @@ import micromatch from "micromatch";
 
 import { NodePath } from "@babel/core";
 import { ImportDeclaration } from "@babel/types";
-import { SharedVisitorState } from "../types";
+import { VisitorState } from "../visitor";
 
 const allowedIndexFiles: string[] = [];
 for (const platform of ["android", "ios", "native", "web", "windows"]) {
@@ -16,7 +16,7 @@ for (const platform of ["android", "ios", "native", "web", "windows"]) {
 
 export function getImportBlockedComponents(
   path: NodePath<ImportDeclaration>,
-  state: SharedVisitorState
+  state: VisitorState
 ): string[] {
   const { allowModules, allowRelativeModules, blockModules, filename } = state;
 

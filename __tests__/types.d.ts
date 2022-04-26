@@ -4,4 +4,5 @@
 declare module "tailwindcss-react-native" {
   export const TailwindProvider: any;
   export const useTailwind: (...arg: any[]) => any;
+  export const StyledComponent: FunctionComponent<any>;
 }

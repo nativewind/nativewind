@@ -9,22 +9,21 @@ const defaultContent: NonNullable<TailwindConfig["content"]> = {
   transform: undefined,
 };
 
-export function getAllowedPaths(
-  { content = defaultContent }: TailwindConfig,
-  { allowModules = "*" }: TailwindReactNativeOptions
-): {
+interface GetAllowedOptionsOptions {
   allowModules: AllowPathOptions;
   allowRelativeModules: AllowPathOptions;
-} {
+}
+
+export function getAllowedOptions(
+  { content = defaultContent }: TailwindConfig,
+  { allowModules = "*" }: TailwindReactNativeOptions
+): GetAllowedOptionsOptions {
   const contentPaths = Array.isArray(content) ? content : content.files;
 
-  /*
-   * Tailwindcss resolves content relative to the cwd (https://github.com/tailwindlabs/tailwindcss/issues/6516)
-   *
-   * We join the contentPath with the cwd to make globbing of relative files easier
-   */
   return {
-    allowModules,
+    allowModules: Array.isArray(allowModules)
+      ? ["react-native", "react-native-web", ...allowModules]
+      : allowModules,
     allowRelativeModules: contentPaths.length === 0 ? "*" : contentPaths,
   };
 }

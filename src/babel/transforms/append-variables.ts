@@ -1,30 +1,77 @@
-import { Statement } from "@babel/types";
-import serialize from "babel-literal-to-ast";
-import { Babel, MediaRecord, StyleRecord } from "../types";
+import {
+  arrayExpression,
+  booleanLiteral,
+  callExpression,
+  expressionStatement,
+  identifier,
+  memberExpression,
+  nullLiteral,
+  numericLiteral,
+  objectExpression,
+  objectProperty,
+  Statement,
+  stringLiteral,
+  unaryExpression,
+} from "@babel/types";
+import { MediaRecord, StyleRecord } from "../types";
+import { globalMedia, globalStyle } from "./constants";
 
 export function appendVariables(
-  babel: Babel,
   body: Statement[],
   styles: StyleRecord,
   media: MediaRecord
 ) {
-  const { types: t } = babel;
-
   body.push(
-    t.variableDeclaration("const", [
-      t.variableDeclarator(
-        t.identifier("__tailwindStyles"),
-        t.callExpression(
-          t.memberExpression(
-            t.identifier("StyleSheet"),
-            t.identifier("create")
+    expressionStatement(
+      callExpression(
+        memberExpression(identifier("Object"), identifier("assign")),
+        [
+          memberExpression(identifier("globalThis"), identifier(globalStyle)),
+          callExpression(
+            memberExpression(identifier("StyleSheet"), identifier("create")),
+            [serialize(styles)]
           ),
-          [serialize(styles)]
-        )
-      ),
-    ]),
-    t.variableDeclaration("const", [
-      t.variableDeclarator(t.identifier("__tailwindMedia"), serialize(media)),
-    ])
+        ]
+      )
+    ),
+    expressionStatement(
+      callExpression(
+        memberExpression(identifier("Object"), identifier("assign")),
+        [
+          memberExpression(identifier("globalThis"), identifier(globalMedia)),
+          serialize(media),
+        ]
+      )
+    )
   );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function serialize(literal: any): any {
+  if (literal === null) {
+    return nullLiteral();
+  }
+  switch (typeof literal) {
+    case "number":
+      return numericLiteral(literal);
+    case "string":
+      return stringLiteral(literal);
+    case "boolean":
+      return booleanLiteral(literal);
+    case "undefined":
+      return unaryExpression("void", numericLiteral(0), true);
+    default:
+      if (Array.isArray(literal)) {
+        return arrayExpression(literal.map((n) => serialize(n)));
+      }
+      return objectExpression(
+        Object.keys(literal)
+          .filter((k) => {
+            return typeof literal[k] !== "undefined";
+          })
+          .map((k) => {
+            return objectProperty(stringLiteral(k), serialize(literal[k]));
+          })
+      );
+  }
 }

@@ -12,12 +12,17 @@ export function extractStyles(
   tailwindConfig: TailwindConfig,
   cssInput = "@tailwind components;@tailwind utilities;"
 ) {
+  // If you edit this, make sure you update the CLI postcss.config.js
   const processedCss = postcss([
     tailwind(tailwindConfig),
     postcssCssvariables(),
     postcssColorFunctionalNotation(),
   ]).process(cssInput).css;
 
+  return cssToRn(processedCss, tailwindConfig);
+}
+
+export function cssToRn(processedCss: string, tailwindConfig: TailwindConfig) {
   const styles: StyleRecord = {};
   const mediaRules: MediaRecord = {};
 
@@ -27,14 +32,13 @@ export function extractStyles(
     const { selector, media, style } = parsedRule;
 
     if (media.length > 0) {
-      // If there are media conditions, add the rules with an uffix
+      // If there are media conditions, add the rules with a suffix
       styles[`${selector}_${suffix}`] = style;
       // Store the conditions, along with the suffix
       mediaRules[selector] = mediaRules[selector] ?? [];
       mediaRules[selector].push({ media, suffix });
     } else {
       // If there are no conditions, we merge the rules
-      // Lower rules should overwrite
       styles[selector] = {
         ...styles[selector],
         ...style,

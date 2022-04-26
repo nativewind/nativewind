@@ -18,11 +18,11 @@ export function emptyResults(names: string[]): Test[] {
 
 export function tailwindRunner(name: string, testCases: Test[]) {
   describe(name, () => {
-    test.each(testCases)("%s", assetStyles);
+    test.each(testCases)("%s", assertStyles);
   });
 }
 
-export function assetStyles(
+export function assertStyles(
   css: string,
   { styles: expectedStyles, media: expectedMedia }: Expected
 ) {
