@@ -1,4 +1,4 @@
-import { createElement } from "react";
+import { createElement, FunctionComponent, ComponentClass } from "react";
 import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 import { useTailwind } from "./use-tailwind";
 
@@ -9,17 +9,23 @@ type StyledProps<P> = P & {
 
 type Component<P> =
   | string
-  | React.FunctionComponent<P>
+  | FunctionComponent<P>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | React.ComponentClass<P, any>;
+  | ComponentClass<P, any>;
 
 const isStyled = Symbol("styled");
 
-export function styled<P>(Component: Component<P>) {
-  function Styled({ className, style: styleProp, ...props }: StyledProps<P>) {
+export function styled<P>(Component: Component<P>): FunctionComponent<P> {
+  function Styled({
+    className,
+    style: styleProperty,
+    ...props
+  }: StyledProps<P>) {
     const tailwindStyleIds = useTailwind(className);
 
-    const style = styleProp ? [tailwindStyleIds, styleProp] : tailwindStyleIds;
+    const style = styleProperty
+      ? [tailwindStyleIds, styleProperty]
+      : tailwindStyleIds;
 
     return createElement(Component, { ...props, style } as unknown as P);
   }

@@ -17,6 +17,12 @@ import {
 export function useTailwind(className = "") {
   const platform = useContext(TailwindPlatformContext);
 
+  if (!platform) {
+    throw new Error(
+      "No TailwindProvider found. Make sure all components are within a TailwindProvider"
+    );
+  }
+
   if (platform === "web") {
     return { $$css: true, tailwindClassName: className };
   }

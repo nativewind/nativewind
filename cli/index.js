@@ -1,9 +1,12 @@
 #!/usr/bin/env node
+/* eslint-disable unicorn/import-style */
+/* eslint-disable unicorn/prefer-module */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
 const { spawn } = require("node:child_process");
 const { writeFile, readFile } = require("node:fs/promises");
-const { existsSync } = require("node:fs");
+const { existsSync, writeFileSync } = require("node:fs");
 const { file } = require("tempy");
 const { join } = require("path");
 const { cssToRn } = require("../dist/babel/native-style-extraction");
@@ -35,12 +38,26 @@ const argv = yargs(hideBin(process.argv))
 
 const { platform, output, watch, config } = argv;
 
+/**
+ * Web does not need to compile any styles, as it will simply do a pass through
+ */
+if (platform === "web") {
+  writeFileSync(
+    output,
+    `module.exports = {
+  platform: '${platform}',
+}`
+  );
+
+  process.exit(0);
+}
+
 const tailwindOutput = file();
 const tailwindConfig = getTailwindConfig(process.cwd(), {
   tailwindConfigPath: config,
 });
 
-const spawnArgs = [
+const spawnArguments = [
   "tailwindcss",
   "-c",
   config,
@@ -52,9 +69,9 @@ const spawnArgs = [
   join(__dirname, "./postcss.config.js"),
 ];
 
-if (watch) spawnArgs.push("--watch");
+if (watch) spawnArguments.push("--watch");
 
-const child = spawn("npx", spawnArgs);
+const child = spawn("npx", spawnArguments);
 
 let chain = Promise.resolve();
 

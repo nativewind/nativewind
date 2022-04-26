@@ -61,7 +61,12 @@ import "tailwindcss-react-native/types.d";
 
 ## Additional setup
 
-This library can be used with or without babel. The babel plugin provides a better developer experience, improved fast-refresh and quicker setup, but is unsuitable for using within a published library or for frameworks not using babel.
+This library can be used with or without babel. The babel plugin provide DexUX features such as:
+
+- Automatically wrap components in `StyledComponent`
+- Automatically inject Tailwindcss styles
+
+If you do not wish to use babel, or are using using a non-babel web framework (such as [Next.js](https://nextjs.org/docs/advanced-features/compiler)), you will need to manually wrap native components via the [Component Api](#component-api).
 
 <details>
   <summary>With babel</summary>
@@ -83,9 +88,44 @@ This library can be used with or without babel. The babel plugin provides a bett
 <details>
   <summary>Without babel</summary>
   <hr />
-  Without babel, the tailwindcss styles will need to be compiled via the `tailwindcss-react-native` command-line tool. This tool wraps the `tailwindcss` CLI and writes a `tailwindcss-react-native-output.js` which will need to be imported into your application.
 
-  How your run `tailwindcss-react-native` is up to you, but we recommend using [`concurrently`](https://www.npmjs.com/package/concurrently) to run the process in parallel (eg. `"start": "concurrently \"tailwindcss-react-native native --platform native --watch\" \"expo start\""`).
+  ### Component API
+
+  Without babel, you will need to manually wrap your native components via the [Component API](#component-api)
+
+  ```JSX
+  // Example usage of the Component API
+  import { Text } from "react-native"
+  import { styled } from "tailwindcss-react-native"
+
+  const StyledText = styled(Text)
+
+  export function MyComponent() {
+    return <StyledText className="font-bold">Hello world</StyledText>
+  }
+  ```
+
+  ### Web frameworks with Tailwindcss Support
+
+  > The platform `web` requires `react-native-web@0.18+` (currently in preview). Please see this [PR](https://github.com/necolas/react-native-web/pull/2248) for more info. If your are currently using `<=0.17` you can still use `native` for rendering within a browser.
+
+  If you are using a web framework with [first-class Tailwindcss support](https://tailwindcss.com/docs/installation/framework-guides) you can follow the framework setup guide and simply add the `TailwindProvider` with the `platform="web"` attribute. 
+
+  ```JSX
+  import { TailwindProvider } from 'tailwindcss-react-native'
+
+  function MyAppsProviders ({ children }) {
+      return (
+         <TailwindProvider platform="web">{children}</TailwindProvider>
+      )
+  }
+  ```
+
+  ### Native
+
+  The tailwindcss styles will need to be compiled via the `tailwindcss-react-native` command-line tool. This tool wraps the `tailwindcss` CLI and outputs a file which will need to be manually imported into your application.
+
+  There are many ways to run `tailwindcss-react-native`, but we recommend using [`concurrently`](https://www.npmjs.com/package/concurrently) to run the process in parallel with your normal startup command (eg. `"start": "concurrently \"tailwindcss-react-native --platform native --watch\" \"expo start\""`).
 
   Please see [CLI Options](#cli-options) for usuage of the CLI.
 
@@ -103,19 +143,6 @@ This library can be used with or without babel. The babel plugin provides a bett
   }
   ```
 
-  You will not be able to use the `className` attribute on RN components, and will need to use the [Component API](#component-api)
-
-  ```JSX
-  // Example usage of the Component API
-  import { Text } from "react-native"
-  import { styled } from "tailwindcss-react-native"
-
-  const StyledText = styled(Text)
-
-  export function MyComponent() {
-    return <StyledText className="font-bold">Hello world</StyledText>
-  }
-  ```
   <hr />
 </details>
 

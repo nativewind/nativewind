@@ -39,4 +39,4 @@ export const TailwindSetColorSchemeContext = createContext<
 >(() => {
   return;
 });
-export const TailwindPlatformContext = createContext<string>("native");
+export const TailwindPlatformContext = createContext<string>("");
