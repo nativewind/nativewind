@@ -1,5 +1,11 @@
 import { useContext } from "react";
-import { useWindowDimensions } from "react-native";
+import {
+  useWindowDimensions,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+  ImageStyle,
+} from "react-native";
 import { normaliseSelector } from "./shared/selector";
 import { match as matchMediaQuery } from "css-mediaquery";
 
@@ -14,7 +20,10 @@ import {
   useDeviceOrientation,
 } from "@react-native-community/hooks";
 
-export function useTailwind(className = "") {
+export function useTailwind<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  P extends ViewStyle | TextStyle | ImageStyle = any
+>(className = ""): StyleProp<P> {
   const platform = useContext(TailwindPlatformContext);
 
   if (!platform) {
@@ -24,7 +33,10 @@ export function useTailwind(className = "") {
   }
 
   if (platform === "web") {
-    return { $$css: true, tailwindClassName: className };
+    return {
+      $$css: true,
+      tailwindClassName: className,
+    } as unknown as StyleProp<P>;
   }
 
   const styles = useContext(TailwindStyleContext);
@@ -66,5 +78,5 @@ export function useTailwind(className = "") {
     return styleIds;
   });
 
-  return tailwindStyleIds;
+  return tailwindStyleIds as StyleProp<P>;
 }

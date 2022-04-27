@@ -10,6 +10,7 @@ import type {
 declare module "react-native" {
   interface ViewProps {
     className?: string;
+    rw?: string;
   }
 
   interface ViewStyle {
@@ -19,6 +20,7 @@ declare module "react-native" {
 
   interface TextProps {
     className?: string;
+    tw?: string;
   }
 
   interface TextStyle {
@@ -28,6 +30,7 @@ declare module "react-native" {
 
   interface ImageProps {
     className?: string;
+    tw?: string;
   }
 
   interface ImageStyle {

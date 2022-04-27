@@ -4,7 +4,7 @@ import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { getJSXElementName } from "./utils/get-jsx-element-name";
 import { hasNamedImport } from "./utils/has-named-import";
 import { getImportBlockedComponents } from "./utils/get-import-blocked-components";
-import { hasAttribute } from "./utils/has-attribute";
+import { someAttributes } from "./utils/has-attribute";
 
 import { componentProxy, packageName } from "./transforms/constants";
 import { toStyledComponent } from "./transforms/to-component";
@@ -65,7 +65,7 @@ export const visitor: Visitor<VisitorState> = {
       return;
     }
 
-    if (hasAttribute(path, "className")) {
+    if (someAttributes(path, ["className", "tw"])) {
       if (!skipTransform) toStyledComponent(path);
       state.hasClassNames = true;
     }
