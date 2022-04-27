@@ -18,14 +18,6 @@ export interface TailwindProviderProps {
   platform?: typeof Platform.OS | "native";
 }
 
-const nativePlatforms = new Set([
-  "ios",
-  "android",
-  "windows",
-  "macos",
-  "native",
-]);
-
 export function TailwindProvider({
   styles = globalThis.tailwindcss_react_native_style,
   media = globalThis.tailwindcss_react_native_media,
@@ -37,12 +29,10 @@ export function TailwindProvider({
     overrideColorScheme ?? Appearance.getColorScheme() ?? "light"
   );
 
-  const platformValue = nativePlatforms.has(platform) ? "native" : platform;
-
   return (
     <TailwindStyleContext.Provider value={styles}>
       <TailwindMediaContext.Provider value={media}>
-        <TailwindPlatformContext.Provider value={platformValue}>
+        <TailwindPlatformContext.Provider value={platform}>
           <TailwindColorSchemeContext.Provider
             value={overrideColorScheme || colorScheme}
           >

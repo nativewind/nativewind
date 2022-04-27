@@ -11,7 +11,7 @@ module.exports = {
   env: {
     node: true,
   },
-  ignorePatterns: ["dist/*", "types.d.ts"],
+  ignorePatterns: ["dist/*", "types.d.ts", "coverage/*"],
   rules: {
     "@typescript-eslint/no-unused-vars": [
       "error",

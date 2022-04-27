@@ -1,13 +1,9 @@
 import { useContext } from "react";
-import {
-  useWindowDimensions,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
-  ImageStyle,
-} from "react-native";
+import { useWindowDimensions, StyleProp } from "react-native";
+import { useDeviceOrientation } from "@react-native-community/hooks";
+import { match } from "css-mediaquery";
 import { normaliseSelector } from "./shared/selector";
-import { match as matchMediaQuery } from "css-mediaquery";
+import { Style } from "./types/common";
 
 import {
   TailwindColorSchemeContext,
@@ -15,11 +11,10 @@ import {
   TailwindPlatformContext,
   TailwindStyleContext,
 } from "./context";
-import { useDeviceOrientation } from "@react-native-community/hooks";
 
 export function useTailwind<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  P extends ViewStyle | TextStyle | ImageStyle = any
+  P extends Style = any
 >(className = ""): StyleProp<P> {
   const platform = useContext(TailwindPlatformContext);
 
@@ -55,15 +50,16 @@ export function useTailwind<
     }
 
     for (const [media, suffix] of mediaRules[selector] ?? []) {
-      const isMatch = matchMediaQuery(media, {
+      const isMatch = match(media, {
+        type: platform,
         width,
+        height,
         "device-width": width,
         "device-height": width,
-        height,
         orientation,
-
         "prefers-color-scheme": colorScheme,
-      });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       if (isMatch) {
         tailwindStyleIds.push(styles[`${selector}_${suffix}`] as P);
