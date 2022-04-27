@@ -214,7 +214,9 @@ If you are not using the babel plugin you will need to use the Component API.
 
 `styled` is a [Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) which transforms the component into a `tailwindcss-react-native` compatible component.
 
-A component created via `styled` will now accept the `className` prop. It will recieve the compiled styles via the `style` prop.
+A component created via `styled` will now accept the `tw` or `className` prop. It will recieve the compiled styles via the `style` prop.
+
+There is no difference between `tw` and `className`, but `tw` has priority.
 
 ```JSX
 import { Text } from "react-native"
@@ -223,7 +225,12 @@ import { styled } from "tailwindcss-react-native"
 const StyledText = styled(Text)
 
 export function MyComponent() {
-  return <StyledText className="font-bold">Hello world</StyledText>
+  return (
+    <>
+      <StyledText tw="font-bold">Hello world</StyledText>
+      <StyledText className="font-bold">Hello world</StyledText>
+    </>
+  )
 }
 ```
 
@@ -231,14 +238,21 @@ export function MyComponent() {
 
 `StyledComponent` is the component version of `styled`. It is a normal component that accepts your component as a prop.
 
-`StyledComponent` will pass all props to your component, except for `className` which it will convert into the `style` prop.
+`StyledComponent` will pass all props to your component, except for `tw` and `className` which it will convert into the `style` prop.
+
+There is no difference between `tw` and `className`, but `tw` has priority.
 
 ```JSX
 import { Text } from "react-native"
 import { StyledComponent } from "tailwindcss-react-native"
 
 export function MyComponent() {
-  return <StyledComponent component={Text} className="font-bold">Hello world</StyledComponent>
+  return (
+    <>
+      <StyledComponent component={Text} tw="font-bold">Hello world</StyledComponent>
+      <StyledComponent component={Text} className="font-bold">Hello world</StyledComponent>
+    </>
+  )
 }
 ```
 

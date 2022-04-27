@@ -4,6 +4,7 @@ import { useTailwind } from "./use-tailwind";
 
 type StyledProps<P> = P & {
   className?: string;
+  tw?: string;
   style?: StyleProp<ViewStyle | TextStyle | ImageStyle>;
 };
 
@@ -20,10 +21,11 @@ export function styled<P>(
 ): FunctionComponent<StyledProps<P>> {
   function Styled({
     className,
+    tw,
     style: styleProperty,
     ...props
   }: StyledProps<P>) {
-    const tailwindStyleIds = useTailwind(className);
+    const tailwindStyleIds = useTailwind(tw ?? className);
 
     const style = styleProperty
       ? [tailwindStyleIds, styleProperty]
