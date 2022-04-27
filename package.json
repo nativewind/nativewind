@@ -58,7 +58,7 @@
     "@types/css-to-react-native": "3.0.0",
     "@types/jest": "27.4.1",
     "@types/micromatch": "4.0.2",
-    "@types/react": "18.0.7",
+    "@types/react": "18.0.8",
     "@types/react-native": "0.67.6",
     "@types/tailwindcss": "3.0.10",
     "@typescript-eslint/eslint-plugin": "5.21.0",
