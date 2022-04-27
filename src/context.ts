@@ -1,25 +1,12 @@
 import { createContext } from "react";
-import {
-  Appearance,
-  ColorSchemeName,
-  ImageStyle,
-  Platform,
-  TextStyle,
-  ViewStyle,
-} from "react-native";
-
-export type StyleRecord = Record<string, ViewStyle | TextStyle | ImageStyle>;
-
-export type MediaRules = Record<
-  string,
-  Array<{ media: string[]; suffix: number }>
->;
+import { Appearance, ColorSchemeName, Platform } from "react-native";
+import { MediaRecord, StyleRecord } from "./types/common";
 
 declare global {
   // eslint-disable-next-line no-var
   var tailwindcss_react_native_style: StyleRecord;
   // eslint-disable-next-line no-var
-  var tailwindcss_react_native_media: MediaRules;
+  var tailwindcss_react_native_media: MediaRecord;
 }
 
 globalThis.tailwindcss_react_native_style ??= {};
@@ -28,7 +15,7 @@ globalThis.tailwindcss_react_native_media ??= {};
 export const TailwindStyleContext = createContext<StyleRecord>(
   globalThis.tailwindcss_react_native_style
 );
-export const TailwindMediaContext = createContext<MediaRules>(
+export const TailwindMediaContext = createContext<MediaRecord>(
   globalThis.tailwindcss_react_native_media
 );
 

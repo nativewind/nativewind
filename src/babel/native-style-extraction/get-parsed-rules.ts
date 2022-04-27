@@ -2,12 +2,12 @@ import { parse, AtRule, Comment, Media, Rule } from "css";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 import { normaliseSelector } from "../../shared/selector";
-import { Style } from "../types";
+import { Style } from "../../types/common";
 import { ruleToReactNative } from "./rule-to-react-native";
 
 interface CssRule {
   selector: string;
-  media: string[];
+  media: string;
   style: Style;
 }
 
@@ -51,7 +51,7 @@ function* cssRuleIterator(
       for (const selector of cssRule.selectors ?? []) {
         yield {
           selector: normaliseSelector(selector, tailwindConfig),
-          media,
+          media: media.join(" and "),
           style,
         };
       }

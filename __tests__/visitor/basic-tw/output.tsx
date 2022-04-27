@@ -41,25 +41,10 @@ Object.assign(
 );
 Object.assign(globalThis.tailwindcss_react_native_media, {
   container: [
-    {
-      media: ["(min-width: 640px)"],
-      suffix: 1,
-    },
-    {
-      media: ["(min-width: 768px)"],
-      suffix: 2,
-    },
-    {
-      media: ["(min-width: 1024px)"],
-      suffix: 3,
-    },
-    {
-      media: ["(min-width: 1280px)"],
-      suffix: 4,
-    },
-    {
-      media: ["(min-width: 1536px)"],
-      suffix: 5,
-    },
+    ["(min-width: 640px)", 1],
+    ["(min-width: 768px)", 2],
+    ["(min-width: 1024px)", 3],
+    ["(min-width: 1280px)", 4],
+    ["(min-width: 1536px)", 5],
   ],
 });

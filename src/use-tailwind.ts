@@ -15,10 +15,7 @@ import {
   TailwindPlatformContext,
   TailwindStyleContext,
 } from "./context";
-import {
-  // useAccessibilityInfo,
-  useDeviceOrientation,
-} from "@react-native-community/hooks";
+import { useDeviceOrientation } from "@react-native-community/hooks";
 
 export function useTailwind<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,7 +40,7 @@ export function useTailwind<
   const mediaRules = useContext(TailwindMediaContext);
   const colorScheme = useContext(TailwindColorSchemeContext);
   const { width, height } = useWindowDimensions();
-  // const { reduceMotionEnabled: reduceMotion } = useAccessibilityInfo()
+  // const { reduceMotionEnabled: reduceMotion } = useAccessibilityInfo() // We should support this
   const orientation = useDeviceOrientation().portrait
     ? "portrait"
     : "landscape";
@@ -57,21 +54,19 @@ export function useTailwind<
       tailwindStyleIds.push(styles[selector] as P);
     }
 
-    for (const { media, suffix } of mediaRules[selector] ?? []) {
-      if (!media) {
-        tailwindStyleIds.push(styles[`${className}_${suffix}`] as P);
-        continue;
-      }
-
-      const isMatch = matchMediaQuery(media.join(" and "), {
+    for (const [media, suffix] of mediaRules[selector] ?? []) {
+      const isMatch = matchMediaQuery(media, {
         width,
+        "device-width": width,
+        "device-height": width,
         height,
         orientation,
+
         "prefers-color-scheme": colorScheme,
       });
 
       if (isMatch) {
-        tailwindStyleIds.push(styles[`${selector}${suffix}`] as P);
+        tailwindStyleIds.push(styles[`${selector}_${suffix}`] as P);
       }
     }
   }

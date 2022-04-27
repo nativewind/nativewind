@@ -13,7 +13,7 @@ import {
   stringLiteral,
   unaryExpression,
 } from "@babel/types";
-import { MediaRecord, StyleRecord } from "../types";
+import { MediaRecord, StyleRecord } from "../../types/common";
 import { globalMedia, globalStyle } from "./constants";
 
 export function appendVariables(

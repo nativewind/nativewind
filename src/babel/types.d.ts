@@ -1,12 +1,5 @@
 import { ViewStyle, TextStyle, ImageStyle } from "react-native";
 
-export type Style = ViewStyle | TextStyle | ImageStyle;
-export type StyleRecord = Record<string, Style>;
-export type MediaRecord = Record<
-  string,
-  Array<{ media: string[]; suffix: number }>
->;
-
 export type PathOption = string;
 export type AllowPathOptions = "*" | PathOption[];
 

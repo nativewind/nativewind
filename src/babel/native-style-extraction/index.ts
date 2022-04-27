@@ -1,12 +1,11 @@
-import { MediaRecord, StyleRecord } from "../types";
-
+import { TailwindConfig } from "tailwindcss/tailwind-config";
 import postcss from "postcss";
 import tailwind from "tailwindcss";
 import postcssCssvariables from "postcss-css-variables";
 import postcssColorFunctionalNotation from "postcss-color-functional-notation";
 
 import { getParsedRules } from "./get-parsed-rules";
-import { TailwindConfig } from "tailwindcss/tailwind-config";
+import { MediaRecord, StyleRecord } from "../../types/common";
 
 export function extractStyles(
   tailwindConfig: TailwindConfig,
@@ -36,7 +35,7 @@ export function cssToRn(processedCss: string, tailwindConfig: TailwindConfig) {
       styles[`${selector}_${suffix}`] = style;
       // Store the conditions, along with the suffix
       mediaRules[selector] = mediaRules[selector] ?? [];
-      mediaRules[selector].push({ media, suffix });
+      mediaRules[selector].push([media, suffix]);
     } else {
       // If there are no conditions, we merge the rules
       styles[selector] = {

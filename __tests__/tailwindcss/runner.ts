@@ -1,7 +1,7 @@
-import { MediaRecord, StyleRecord } from "../../src/babel/types";
 import { getNativeTailwindConfig } from "../../src/babel/tailwind/native-config";
 import { extractStyles } from "../../src/babel/native-style-extraction";
 import { normaliseSelector } from "../../src/shared/selector";
+import { MediaRecord, StyleRecord } from "../../src/types/common";
 
 const nativeConfig = getNativeTailwindConfig();
 

@@ -1,9 +1,9 @@
 import { PropsWithChildren, useState } from "react";
 import { ColorSchemeName, Appearance, Platform } from "react-native";
 
+import type { MediaRecord, StyleRecord } from "./types/common";
+
 import {
-  MediaRules,
-  StyleRecord,
   TailwindColorSchemeContext,
   TailwindMediaContext,
   TailwindPlatformContext,
@@ -13,7 +13,7 @@ import {
 
 export interface TailwindProviderProps {
   styles?: StyleRecord;
-  media?: MediaRules;
+  media?: MediaRecord;
   colorScheme?: ColorSchemeName;
   platform?: typeof Platform.OS | "native";
 }

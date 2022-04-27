@@ -14,11 +14,11 @@ tailwindRunner("Layout - Container", [
       },
       media: {
         container: [
-          { media: ["(min-width: 640px)"], suffix: 1 },
-          { media: ["(min-width: 768px)"], suffix: 2 },
-          { media: ["(min-width: 1024px)"], suffix: 3 },
-          { media: ["(min-width: 1280px)"], suffix: 4 },
-          { media: ["(min-width: 1536px)"], suffix: 5 },
+          ["(min-width: 640px)", 1],
+          ["(min-width: 768px)", 2],
+          ["(min-width: 1024px)", 3],
+          ["(min-width: 1280px)", 4],
+          ["(min-width: 1536px)", 5],
         ],
       },
     },
@@ -27,33 +27,21 @@ tailwindRunner("Layout - Container", [
     "sm:container",
     {
       styles: {
-        "sm_container_0": { width: "100%" },
-        "sm_container_1": { maxWidth: 640 },
-        "sm_container_2": { maxWidth: 768 },
-        "sm_container_3": { maxWidth: 1024 },
-        "sm_container_4": { maxWidth: 1280 },
-        "sm_container_5": { maxWidth: 1536 },
+        sm_container_0: { width: "100%" },
+        sm_container_1: { maxWidth: 640 },
+        sm_container_2: { maxWidth: 768 },
+        sm_container_3: { maxWidth: 1024 },
+        sm_container_4: { maxWidth: 1280 },
+        sm_container_5: { maxWidth: 1536 },
       },
       media: {
-        "sm_container": [
-          { media: ["(min-width: 640px)"], suffix: 0 },
-          { media: ["(min-width: 640px)"], suffix: 1 },
-          {
-            media: ["(min-width: 640px)", "(min-width: 768px)"],
-            suffix: 2,
-          },
-          {
-            media: ["(min-width: 640px)", "(min-width: 1024px)"],
-            suffix: 3,
-          },
-          {
-            media: ["(min-width: 640px)", "(min-width: 1280px)"],
-            suffix: 4,
-          },
-          {
-            media: ["(min-width: 640px)", "(min-width: 1536px)"],
-            suffix: 5,
-          },
+        sm_container: [
+          ["(min-width: 640px)", 0],
+          ["(min-width: 640px)", 1],
+          ["(min-width: 640px) and (min-width: 768px)", 2],
+          ["(min-width: 640px) and (min-width: 1024px)", 3],
+          ["(min-width: 640px) and (min-width: 1280px)", 4],
+          ["(min-width: 640px) and (min-width: 1536px)", 5],
         ],
       },
     },
