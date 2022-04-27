@@ -48,23 +48,22 @@ export function useTailwind<
     ? "portrait"
     : "landscape";
 
-  const tailwindStyleIds = className.split(" ").flatMap((className) => {
-    const selector = normaliseSelector(className);
-    const styleIds: unknown[] = [];
+  const tailwindStyleIds: StyleProp<P> = [];
+
+  for (const name of className.split(" ")) {
+    const selector = normaliseSelector(name);
 
     if (styles[selector]) {
-      styleIds.push(styles[selector]);
+      tailwindStyleIds.push(styles[selector] as P);
     }
 
     for (const { media, suffix } of mediaRules[selector] ?? []) {
       if (!media) {
-        styleIds.push(styles[`${className}_${suffix}`]);
+        tailwindStyleIds.push(styles[`${className}_${suffix}`] as P);
         continue;
       }
 
-      const query = media.join(" and ");
-
-      const isMatch = matchMediaQuery(query, {
+      const isMatch = matchMediaQuery(media.join(" and "), {
         width,
         height,
         orientation,
@@ -72,11 +71,10 @@ export function useTailwind<
       });
 
       if (isMatch) {
-        styleIds.push(styles[`${selector}${suffix}`]);
+        tailwindStyleIds.push(styles[`${selector}${suffix}`] as P);
       }
     }
-    return styleIds;
-  });
+  }
 
-  return tailwindStyleIds as StyleProp<P>;
+  return tailwindStyleIds;
 }
