@@ -23,7 +23,6 @@ const nativePlatforms = new Set([
   "android",
   "windows",
   "macos",
-  "web",
   "native",
 ]);
 

@@ -15,7 +15,9 @@ type Component<P> =
 
 const isStyled = Symbol("styled");
 
-export function styled<P>(Component: Component<P>): FunctionComponent<P> {
+export function styled<P>(
+  Component: Component<P>
+): FunctionComponent<StyledProps<P>> {
   function Styled({
     className,
     style: styleProperty,
