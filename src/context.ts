@@ -1,6 +1,7 @@
 import { createContext } from "react";
-import { Appearance, ColorSchemeName, Platform } from "react-native";
+import { Appearance, ColorSchemeName } from "react-native";
 import { MediaRecord, StyleRecord } from "./types/common";
+import { Platform } from "./shared/platforms";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -27,6 +28,6 @@ export const TailwindSetColorSchemeContext = createContext<
 >(() => {
   return;
 });
-export const TailwindPlatformContext = createContext<
-  typeof Platform.OS | "native" | undefined
->(undefined);
+export const TailwindPlatformContext = createContext<Platform | undefined>(
+  undefined
+);

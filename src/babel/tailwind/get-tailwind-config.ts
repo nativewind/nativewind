@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import resolveTailwindConfig from "tailwindcss/resolveConfig";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
-import { getNativeTailwindConfig } from "./native-config";
+import { nativePlugin } from "../../plugin/native";
 
 export interface GetTailwindConfigOptions {
   rem?: number;
@@ -33,16 +33,9 @@ export function getTailwindConfig(
     userConfig = {};
   }
 
-  const nativeConfig = getNativeTailwindConfig(options);
-
   const mergedConfig = {
-    ...nativeConfig,
     ...userConfig,
-    theme: {
-      ...nativeConfig.theme,
-      ...userConfig.theme,
-    },
-    plugins: [...(nativeConfig.plugins ?? []), ...(userConfig.plugins ?? [])],
+    plugins: [nativePlugin(options), ...(userConfig.plugins ?? [])],
   };
 
   return resolveTailwindConfig(mergedConfig);

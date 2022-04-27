@@ -6,9 +6,10 @@ import micromatch from "micromatch";
 import { NodePath } from "@babel/core";
 import { ImportDeclaration } from "@babel/types";
 import { VisitorState } from "../visitor";
+import { platforms } from "../../shared/platforms";
 
 const allowedIndexFiles: string[] = [];
-for (const platform of ["android", "ios", "native", "web", "windows"]) {
+for (const platform of platforms) {
   for (const extension of ["js", "jsx", "ts", "tsx"]) {
     allowedIndexFiles.push(`index.${platform}.${extension}`);
   }

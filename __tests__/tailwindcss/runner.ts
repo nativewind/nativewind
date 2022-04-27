@@ -1,9 +1,9 @@
-import { getNativeTailwindConfig } from "../../src/babel/tailwind/native-config";
 import { extractStyles } from "../../src/babel/native-style-extraction";
 import { normaliseSelector } from "../../src/shared/selector";
 import { MediaRecord, StyleRecord } from "../../src/types/common";
 
-const nativeConfig = getNativeTailwindConfig();
+import plugin from "../../src/plugin";
+import { nativePlugin } from "../../src/plugin/native";
 
 export type Test = [string, Expected];
 
@@ -22,23 +22,16 @@ export function tailwindRunner(name: string, testCases: Test[]) {
   });
 }
 
-export function assertStyles(
-  css: string,
-  { styles: expectedStyles, media: expectedMedia }: Expected
-) {
-  const { styles, media } = extractStyles({
+export function assertStyles(css: string, { styles, media = {} }: Expected) {
+  const output = extractStyles({
     theme: {},
-    ...nativeConfig,
+    plugins: [plugin, nativePlugin()],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     content: [{ raw: "", extension: "html" } as any],
     safelist: [css],
   });
 
-  expect(styles).toEqual(expectedStyles);
-
-  if (expectedMedia) {
-    expect(media).toEqual(expectedMedia);
-  }
+  expect(output).toEqual({ styles, media });
 }
 
 /**

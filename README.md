@@ -18,11 +18,12 @@ Install the library
 
 `npm install tailwindcss-react-native tailwindcss` or `yarn add tailwindcss-react-native tailwindcss`
 
-Create a `tailwind.config.js` and set `content`
+Create a `tailwind.config.js` and set `content` and added the `tailwindcss-react-native/plugin`
 
 ```js
 // tailwind.config.js
 module.exports = {
+  plugins: [require("tailwindcss-react-native/plugin")],
   content: [
     "./screens/**/*.{js,ts,jsx,tsx}",
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -200,11 +201,11 @@ function MyAppsProviders ({ children }) {
 
 You don't need to provide these props if you are using Babel or spreading the CLI output.
 
-| Prop     | Values                                                | Default     | Description                                                                                               |
-| -------- | ----------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
-| platform | `native`, `web`, `ios`, `android`, `windows`, `macos` | Platform.OS | Specifies how the className is transformed. `ios`, `android`, `windows`, `macos` are aliases for `native` |
-| style    | Compiled style object                                 |             |                                                                                                           |
-| media    | Compiled media object                                 |             |                                                                                                           |
+| Prop     | Values                                                              | Default     | Description                               |
+| -------- | ------------------------------------------------------------------- | ----------- | ----------------------------------------- |
+| platform | `web`, `native`, `ios`, `android`, `windows`, `macos`, `web-inline` | Platform.OS | Specifies how the styles are transformed. |
+| style    | Compiled style object                                               |             |                                           |
+| media    | Compiled media object                                               |             |                                           |
 
 ## Component API
 
@@ -265,17 +266,22 @@ Options can be provided via the babel config
 ```js
 // babel.config.js
 module.exports = {
-  plugins: [["tailwindcss-react-native/babel", { platform: "native" }]],
+  plugins: [
+    [
+      "tailwindcss-react-native/babel",
+      { tailwindConfig: "./tailwind.native.config.js" },
+    ],
+  ],
 };
 ```
 
-| Option         | Values                                                | Default                                       | Description                                                                                               |
-| -------------- | ----------------------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| platform       | `native`, `web`, `ios`, `android`, `windows`, `macos` | `native`                                      | Specifies how the className is transformed. `ios`, `android`, `windows`, `macos` are aliases for `native` |
-| hmr            | `boolean`                                             | Development: `true` <br />Production: `false` | Allow fast-refresh of styles                                                                              |
-| tailwindConfig | Path relative to `cwd`                                | `tailwind.config.js`                          | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform.                |
-| allowModules   | `*`, `string[]`                                       | `*`                                           | Only transform components from these imported modules. `*` will transform all modules                     |
-| blockModules   | `string[]`                                            | `[]`                                          | Do not transform components from these imported modules.                                                  |
+| Option         | Values                                                | Default                                       | Description                                                                                |
+| -------------- | ----------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| platform       | `native`, `web`, `ios`, `android`, `windows`, `macos` | `native`                                      | Specifies how the className is transformed.                                                |
+| hmr            | `boolean`                                             | Development: `true` <br />Production: `false` | Allow fast-refresh of styles                                                               |
+| tailwindConfig | Path relative to `cwd`                                | `tailwind.config.js`                          | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform. |
+| allowModules   | `*`, `string[]`                                       | `*`                                           | Only transform components from these imported modules. `*` will transform all modules      |
+| blockModules   | `string[]`                                            | `[]`                                          | Do not transform components from these imported modules.                                   |
 
 ### CLI Options
 
