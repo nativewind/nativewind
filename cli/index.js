@@ -33,7 +33,6 @@ const argv = yargs(hideBin(process.argv))
   .option("watch", {
     alias: "w",
     description: "Watch for changes and rebuild as needed",
-    default: false,
   }).argv;
 
 const { platform, output, watch, config } = argv;
