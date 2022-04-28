@@ -82,7 +82,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
           } else {
             // The parent is the root, so we are not in a media query
             for (const s of node.selectors) {
-              const selector = normaliseSelector(s);
+              const selector = normaliseSelector(s, { important });
               styles[selector] = { ...styles[selector], ...declarations };
             }
           }
