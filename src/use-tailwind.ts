@@ -1,9 +1,15 @@
+import {
+  useWindowDimensions,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+  ImageStyle,
+} from "react-native";
 import { useContext } from "react";
-import { useWindowDimensions, StyleProp } from "react-native";
+
 import { useDeviceOrientation } from "@react-native-community/hooks";
 import { match } from "css-mediaquery";
 import { normaliseSelector } from "./shared/selector";
-import { Style } from "./types/common";
 
 import {
   TailwindColorSchemeContext,
@@ -12,10 +18,16 @@ import {
   TailwindStyleContext,
 } from "./context";
 
-export function useTailwind<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  P extends Style = any
->(className = ""): StyleProp<P> {
+export type RWNCssStyle = {
+  $$css: true;
+  tailwindClassName: string;
+};
+
+export function useTailwind<P extends ViewStyle>(className?: string): P;
+export function useTailwind<P extends TextStyle>(className?: string): P;
+export function useTailwind<P extends ImageStyle>(className?: string): P;
+export function useTailwind<P extends RWNCssStyle>(className?: string): P;
+export function useTailwind<P>(className = "") {
   const platform = useContext(TailwindPlatformContext);
 
   if (!platform) {
@@ -64,8 +76,7 @@ export function useTailwind<
         "device-height": width,
         orientation,
         "prefers-color-scheme": colorScheme,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
+      });
 
       if (isMatch) {
         tailwindStyleIds.push(styles[`${selector}_${index}`] as P);

@@ -1,6 +1,7 @@
+import { TextStyle } from "react-native";
 import { generateTestsForScales, tailwindRunner } from "./runner";
 
-const options: Record<string, string> = {
+const options: Record<string, TextStyle["alignContent"]> = {
   center: "center",
   start: "flex-start",
   end: "flex-end",

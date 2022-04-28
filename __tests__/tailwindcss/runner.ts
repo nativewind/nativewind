@@ -1,9 +1,10 @@
 import { extractStyles } from "../../src/babel/native-style-extraction";
 import { normaliseSelector } from "../../src/shared/selector";
-import { MediaRecord, StyleRecord } from "../../src/types/common";
+import { MediaRecord, Style, StyleRecord } from "../../src/types/common";
 
 import plugin from "../../src/plugin";
 import { nativePlugin } from "../../src/plugin/native";
+import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 export type Test = [string, Expected];
 
@@ -26,8 +27,9 @@ export function assertStyles(css: string, { styles, media = {} }: Expected) {
   const output = extractStyles({
     theme: {},
     plugins: [plugin, nativePlugin()],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    content: [{ raw: "", extension: "html" } as any],
+    content: [
+      { raw: "", extension: "html" },
+    ] as unknown as TailwindConfig["content"],
     safelist: [css],
   });
 
@@ -40,8 +42,7 @@ export function assertStyles(css: string, { styles, media = {} }: Expected) {
 export function generateTestsForScales<T extends string | number>(
   prefix: string,
   scales: Array<T>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  valueFunction: (n: T) => any
+  valueFunction: (n: T) => Style
 ): Test[] {
   return scales.map((scale) => {
     const scalesGeneratedByTailwind: T[] = [scale];

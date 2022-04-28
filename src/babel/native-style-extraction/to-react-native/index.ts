@@ -39,10 +39,10 @@ export function toReactNative(
     styles = transform
       ? transform(value, name)
       : getStylesForProperty(name, value);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    onError({ declaration, error, result: styles });
+  } catch (error) {
+    if (error instanceof Error) {
+      onError({ declaration, error, result: styles });
+    }
     return;
   }
 

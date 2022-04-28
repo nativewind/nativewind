@@ -2,6 +2,7 @@ import {
   arrayExpression,
   booleanLiteral,
   callExpression,
+  Expression,
   expressionStatement,
   identifier,
   memberExpression,
@@ -51,8 +52,7 @@ export function appendVariables(
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function serialize(literal: any): any {
+function serialize(literal: unknown): Expression {
   if (literal === null) {
     return nullLiteral();
   }
@@ -69,14 +69,23 @@ function serialize(literal: any): any {
       if (Array.isArray(literal)) {
         return arrayExpression(literal.map((n) => serialize(n)));
       }
-      return objectExpression(
-        Object.keys(literal)
-          .filter((k) => {
-            return typeof literal[k] !== "undefined";
-          })
-          .map((k) => {
-            return objectProperty(stringLiteral(k), serialize(literal[k]));
-          })
-      );
+
+      if (isObject(literal)) {
+        return objectExpression(
+          Object.keys(literal)
+            .filter((k) => {
+              return typeof literal[k] !== "undefined";
+            })
+            .map((k) => {
+              return objectProperty(stringLiteral(k), serialize(literal[k]));
+            })
+        );
+      }
+
+      throw new Error("unserializable literal");
   }
+}
+
+function isObject(literal: unknown): literal is Record<string, unknown> {
+  return typeof literal === "object";
 }

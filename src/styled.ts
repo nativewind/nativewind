@@ -2,19 +2,15 @@ import { createElement, FunctionComponent, ComponentClass } from "react";
 import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 import { useTailwind } from "./use-tailwind";
 
+const isStyled = Symbol("styled");
+
 type StyledProps<P> = P & {
   className?: string;
   tw?: string;
   style?: StyleProp<ViewStyle | TextStyle | ImageStyle>;
 };
 
-type Component<P> =
-  | string
-  | FunctionComponent<P>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | ComponentClass<P, any>;
-
-const isStyled = Symbol("styled");
+type Component<P> = string | FunctionComponent<P> | ComponentClass<P>;
 
 export function styled<P>(
   Component: Component<P>
@@ -45,16 +41,20 @@ export function styled<P>(
   return Styled;
 }
 
+type StyledComponentProps<P> = StyledProps<P> & {
+  component: Component<P> & {
+    [isStyled]?: boolean;
+  };
+};
+
 export function StyledComponent<P>({
   component,
   ...options
-}: StyledProps<P> & { component: Component<P> }) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((component as any)[isStyled]) {
+}: StyledComponentProps<P>) {
+  if (component[isStyled]) {
     return component;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return styled<P>(component)(options as any);
+  return styled<P>(component)(options as P);
 }
 StyledComponent[isStyled] = true;
