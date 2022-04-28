@@ -37,7 +37,7 @@ const wrapper = ({
 
 describe("web", () => {
   test("can accept no arguments", () => {
-    const { result } = renderHook(() => useTailwind<RWNCssStyle>(), {
+    const { result } = renderHook(() => useTailwind<RWNCssStyle>()(), {
       wrapper,
       initialProps: { platform: "web" },
     });
@@ -48,7 +48,7 @@ describe("web", () => {
 
   test("will pass-through any arguments", () => {
     const { result } = renderHook(
-      () => useTailwind<RWNCssStyle>("hello-world"),
+      () => useTailwind<RWNCssStyle>()("hello-world"),
       {
         wrapper,
         initialProps: { platform: "web" },
@@ -62,7 +62,7 @@ describe("web", () => {
 
 describe("native", () => {
   test("can accept no arguments", () => {
-    const { result } = renderHook(() => useTailwind(), {
+    const { result } = renderHook(() => useTailwind()(), {
       wrapper,
       initialProps: { platform: "native" },
     });
@@ -71,7 +71,7 @@ describe("native", () => {
   });
 
   test("will return nothing is no styles match", () => {
-    const { result } = renderHook(() => useTailwind("hello-world"), {
+    const { result } = renderHook(() => useTailwind()("hello-world"), {
       wrapper,
       initialProps: { platform: "native" },
     });
@@ -80,7 +80,7 @@ describe("native", () => {
   });
 
   test("will return matched styles", () => {
-    const { result } = renderHook(() => useTailwind("font-bold"), {
+    const { result } = renderHook(() => useTailwind()("font-bold"), {
       wrapper,
       initialProps: {
         platform: "native",
@@ -103,7 +103,7 @@ describe("native", () => {
       width: 1000,
     });
 
-    const { result } = renderHook(() => useTailwind("container"), {
+    const { result } = renderHook(() => useTailwind()("container"), {
       wrapper,
       initialProps: {
         platform: "native",
@@ -147,7 +147,7 @@ describe("native", () => {
   });
 
   test("media - platform prefix", () => {
-    const { result } = renderHook(() => useTailwind("w-px"), {
+    const { result } = renderHook(() => useTailwind()("w-px"), {
       wrapper,
       initialProps: {
         platform: "ios",

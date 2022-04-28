@@ -171,8 +171,10 @@ import { MotiView } from "moti";
 import { useTailwind } from "tailwindcss-react-native";
 
 export function MyComponent() {
-  const opacity0 = useTailwind('opacity-0')
-  const opacity1 = useTailwind('opacity-1')
+  const tw = useTailwind()
+
+  const opacity0 = tw('opacity-0')
+  const opacity1 = tw('opacity-1')
 
   return (
     <MotiView

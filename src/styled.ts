@@ -21,7 +21,7 @@ export function styled<P>(
     style: styleProperty,
     ...props
   }: StyledProps<P>) {
-    const tailwindStyleIds = useTailwind(tw ?? className);
+    const tailwindStyleIds = useTailwind()(tw ?? className);
 
     const style = styleProperty
       ? [tailwindStyleIds, styleProperty]
