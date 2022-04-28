@@ -4,10 +4,7 @@ tailwindRunner("Layout - Aspect Ratio", [
   [
     "aspect-auto",
     {
-      styles: {
-        "aspect-auto": { aspectRatio: undefined },
-      },
-      media: {},
+      styles: {},
     },
   ],
   [
@@ -16,7 +13,6 @@ tailwindRunner("Layout - Aspect Ratio", [
       styles: {
         "aspect-square": { aspectRatio: 1 },
       },
-      media: {},
     },
   ],
   [

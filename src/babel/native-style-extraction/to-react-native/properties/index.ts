@@ -1,34 +1,36 @@
+import { getStylesForProperty, Style } from "css-to-react-native";
+import { StyleProperty } from "../is-invalid-property";
 import { aspectRatio } from "./aspect-ratio";
 import { display } from "./display";
+import { flex } from "./flex";
 import { overflow } from "./overflow";
 import { position } from "./position";
 
-function noAuto(value: number | string) {
+function noAuto(value: string, name: string): Style {
   if (value === "auto") {
-    return null;
+    throw new Error("no auto");
   }
 
-  return value;
+  return getStylesForProperty(name, value);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const postProcessingCss: Record<string, (value: any) => any> = {
+export const properties: Partial<
+  Record<StyleProperty, (value: string, name: string) => Style>
+> = {
   aspectRatio,
   display,
+  flex,
   overflow,
   position,
-  top: noAuto,
   flexBasis: noAuto,
+  top: noAuto,
   bottom: noAuto,
   left: noAuto,
   right: noAuto,
+  margin: noAuto,
   marginTop: noAuto,
   marginRight: noAuto,
   marginBottom: noAuto,
   marginLeft: noAuto,
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const preProcessingCss: Record<string, (value: any) => any> = {
   zIndex: noAuto,
 };

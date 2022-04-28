@@ -9,7 +9,7 @@ const { writeFile, readFile } = require("node:fs/promises");
 const { existsSync, writeFileSync } = require("node:fs");
 const { file } = require("tempy");
 const { join } = require("path");
-const { cssToRn } = require("../dist/babel/native-style-extraction");
+const { extractStyles } = require("../dist/babel/native-style-extraction");
 const {
   getTailwindConfig,
 } = require("../dist/babel/tailwind/get-tailwind-config");
@@ -65,8 +65,6 @@ const spawnArguments = [
   join(__dirname, "./cli.css"),
   "-o",
   tailwindOutput,
-  "--postcss",
-  join(__dirname, "./postcss.config.js"),
 ];
 
 if (watch) spawnArguments.push("--watch");
@@ -85,7 +83,7 @@ child.stderr.on("data", (data) => {
     if (!existsSync(tailwindOutput)) return;
 
     const css = await readFile(tailwindOutput, "utf8");
-    const { styles, media } = cssToRn(css, tailwindConfig);
+    const { styles, media } = extractStyles(tailwindConfig, css, false);
 
     return writeFile(
       output,

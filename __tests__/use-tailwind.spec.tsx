@@ -96,7 +96,7 @@ describe("native", () => {
     expect(result.current).toEqual([{ fontWeight: "700" }]);
   });
 
-  test("media - width", () => {
+  test.only("media - width", () => {
     useWindowDimensions.mockReturnValue({
       width: 1000,
     });
@@ -109,29 +109,29 @@ describe("native", () => {
           container: {
             width: "100%",
           },
-          container_1: {
+          container_0: {
             maxWidth: 640,
           },
-          container_2: {
+          container_1: {
             maxWidth: 768,
           },
-          container_3: {
+          container_2: {
             maxWidth: 1024,
           },
-          container_4: {
+          container_3: {
             maxWidth: 1280,
           },
-          container_5: {
+          container_4: {
             maxWidth: 1536,
           },
         },
         media: {
           container: [
-            ["(min-width: 640px)", 1],
-            ["(min-width: 768px)", 2],
-            ["(min-width: 1024px)", 3],
-            ["(min-width: 1280px)", 4],
-            ["(min-width: 1536px)", 5],
+            "(min-width: 640px)",
+            "(min-width: 768px)",
+            "(min-width: 1024px)",
+            "(min-width: 1280px)",
+            "(min-width: 1536px)",
           ],
         },
       },
@@ -150,18 +150,15 @@ describe("native", () => {
       initialProps: {
         platform: "ios",
         styles: {
-          "w-px_1": {
+          "w-px_0": {
             width: 1,
           },
-          "w-px_2": {
+          "w-px_1": {
             width: 1,
           },
         },
         media: {
-          "w-px": [
-            ["ios", 1],
-            ["android", 2],
-          ],
+          "w-px": ["ios", "android"],
         },
       },
     });

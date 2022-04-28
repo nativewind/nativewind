@@ -49,8 +49,14 @@ export function useTailwind<
       tailwindStyleIds.push(styles[selector] as P);
     }
 
-    for (const [media, suffix] of mediaRules[selector] ?? []) {
-      const isMatch = match(media, {
+    const rules = mediaRules[selector];
+
+    if (!rules) {
+      continue;
+    }
+
+    for (let index = 0, length = rules.length; index < length; index++) {
+      const isMatch = match(rules[index], {
         type: platform,
         width,
         height,
@@ -62,7 +68,7 @@ export function useTailwind<
       } as any);
 
       if (isMatch) {
-        tailwindStyleIds.push(styles[`${selector}_${suffix}`] as P);
+        tailwindStyleIds.push(styles[`${selector}_${index}`] as P);
       }
     }
   }

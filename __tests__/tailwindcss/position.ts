@@ -1,14 +1,13 @@
 import { tailwindRunner, emptyResults } from "./runner";
 
 tailwindRunner("Layout - Object Position", [
-  ...emptyResults(["fixed", "sticky"]),
+  ...emptyResults(["fixed", "sticky", "static"]),
   [
     "absolute",
     {
       styles: {
         absolute: { position: "absolute" },
       },
-      media: {},
     },
   ],
   [
@@ -17,16 +16,6 @@ tailwindRunner("Layout - Object Position", [
       styles: {
         relative: { position: "relative" },
       },
-      media: {},
-    },
-  ],
-  [
-    "static",
-    {
-      styles: {
-        static: { position: undefined },
-      },
-      media: {},
     },
   ],
 ]);

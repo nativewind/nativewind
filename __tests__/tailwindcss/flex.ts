@@ -9,7 +9,6 @@ tailwindRunner("Layout - Flex", [
           display: "flex",
         },
       },
-      media: {},
     },
   ],
   [
@@ -21,7 +20,6 @@ tailwindRunner("Layout - Flex", [
           flexShrink: 1,
         },
       },
-      media: {},
     },
   ],
   [
@@ -33,7 +31,6 @@ tailwindRunner("Layout - Flex", [
           flexShrink: 1,
         },
       },
-      media: {},
     },
   ],
   [
@@ -45,7 +42,6 @@ tailwindRunner("Layout - Flex", [
           flexShrink: 0,
         },
       },
-      media: {},
     },
   ],
 ]);

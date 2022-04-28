@@ -21,7 +21,6 @@ tailwindRunner("Layout - Object Position", [
       styles: {
         "overflow-hidden": { overflow: "hidden" },
       },
-      media: {},
     },
   ],
   [
@@ -30,7 +29,6 @@ tailwindRunner("Layout - Object Position", [
       styles: {
         "overflow-visible": { overflow: "visible" },
       },
-      media: {},
     },
   ],
   [
@@ -39,7 +37,6 @@ tailwindRunner("Layout - Object Position", [
       styles: {
         "overflow-scroll": { overflow: "scroll" },
       },
-      media: {},
     },
   ],
 ]);

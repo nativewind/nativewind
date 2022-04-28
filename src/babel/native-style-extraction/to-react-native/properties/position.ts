@@ -1,17 +1,18 @@
+import { Style } from "css-to-react-native";
+
 const supportedValues = new Set(["absolute", "relative"]);
 
-export function position(value: string) {
+export function position(value: string): Style {
   if (supportedValues.has(value)) {
-    return value;
+    return { position: value };
   }
 
   // This is a special edge case
   // The tailwindcss keeps picking up `static` as its a javascript keyword
-  // We cannot return `null` (and show the warning) as the user isn't
-  // actualy using the className
+  // So instead of throwing an error we just ignore it
   if (value === "static") {
-    return;
+    return {};
   }
 
-  return null;
+  throw new Error("position");
 }

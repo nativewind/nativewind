@@ -1,8 +1,15 @@
-export function isInvalidStyle(property: string) {
-  return !validProps.has(property);
+import { ImageStyle, TextStyle, ViewStyle } from "react-native";
+
+export type StyleProperty =
+  | keyof TextStyle
+  | keyof ViewStyle
+  | keyof ImageStyle;
+
+export function isInvalidProperty(property: string) {
+  return !validProps.has(property as StyleProperty);
 }
 
-const validProps = new Set([
+const validProps = new Set<StyleProperty>([
   "alignContent",
   "alignItems",
   "alignSelf",
@@ -35,7 +42,6 @@ const validProps = new Set([
   "borderWidth",
   "bottom",
   "color",
-  "decomposedMatrix",
   "direction",
   "display",
   "elevation",

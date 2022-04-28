@@ -4,49 +4,45 @@ import tailwind from "tailwindcss";
 import postcssCssvariables from "postcss-css-variables";
 import postcssColorFunctionalNotation from "postcss-color-functional-notation";
 
-import { getParsedRules } from "./get-parsed-rules";
+import { plugin } from "./postcss-plugin";
 import { MediaRecord, StyleRecord } from "../../types/common";
 
+/**
+ * This is used by both Babel and the CLI to extract the files
+ *
+ * The CLI watches the TailwindCLI output, so you don't need
+ * to use the tailwind plugin
+ */
 export function extractStyles(
   tailwindConfig: TailwindConfig,
-  cssInput = "@tailwind components;@tailwind utilities;"
+  cssInput = "@tailwind components;@tailwind utilities;",
+  includeTailwind = true
 ) {
-  // If you edit this, make sure you update the CLI postcss.config.js
-  const processedCss = postcss([
-    tailwind(tailwindConfig),
+  let styles: StyleRecord = {};
+  let media: MediaRecord = {};
+
+  const plugins = [
     postcssCssvariables(),
     postcssColorFunctionalNotation(),
-  ]).process(cssInput).css;
+    plugin({
+      ...tailwindConfig,
+      done: (output) => {
+        styles = output.styles;
+        media = output.media;
+      },
+    }),
+  ];
 
-  return cssToRn(processedCss, tailwindConfig);
-}
-
-export function cssToRn(processedCss: string, tailwindConfig: TailwindConfig) {
-  const styles: StyleRecord = {};
-  const mediaRules: MediaRecord = {};
-
-  const parsedRules = getParsedRules(processedCss, tailwindConfig);
-
-  for (const [suffix, parsedRule] of parsedRules.entries()) {
-    const { selector, media, style } = parsedRule;
-
-    if (media.length > 0) {
-      // If there are media conditions, add the rules with a suffix
-      styles[`${selector}_${suffix}`] = style;
-      // Store the conditions, along with the suffix
-      mediaRules[selector] = mediaRules[selector] ?? [];
-      mediaRules[selector].push([media, suffix]);
-    } else {
-      // If there are no conditions, we merge the rules
-      styles[selector] = {
-        ...styles[selector],
-        ...style,
-      };
-    }
+  if (includeTailwind) {
+    plugins.unshift(tailwind(tailwindConfig));
   }
+
+  // If you edit this, make sure you update the CLI postcss.config.js
+  // to include the extra plugins
+  postcss(plugins).process(cssInput).css;
 
   return {
     styles,
-    media: mediaRules,
+    media,
   };
 }

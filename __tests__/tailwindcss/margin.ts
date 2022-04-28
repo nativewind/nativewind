@@ -39,47 +39,47 @@ const sizes: Record<string, number> = {
 };
 
 const tests = [
-  generateTestsForScales("m", Object.keys(sizes), (index) => ({
-    marginBottom: sizes[index],
-    marginLeft: sizes[index],
-    marginRight: sizes[index],
-    marginTop: sizes[index],
-  })),
+  // generateTestsForScales("m", Object.keys(sizes), (index) => ({
+  //   marginBottom: sizes[index],
+  //   marginLeft: sizes[index],
+  //   marginRight: sizes[index],
+  //   marginTop: sizes[index],
+  // })),
 
-  generateTestsForScales("mx", Object.keys(sizes), (index) => ({
-    marginLeft: sizes[index],
-    marginRight: sizes[index],
-  })),
+  // generateTestsForScales("mx", Object.keys(sizes), (index) => ({
+  //   marginLeft: sizes[index],
+  //   marginRight: sizes[index],
+  // })),
 
-  generateTestsForScales("my", Object.keys(sizes), (index) => ({
-    marginTop: sizes[index],
-    marginBottom: sizes[index],
-  })),
+  // generateTestsForScales("my", Object.keys(sizes), (index) => ({
+  //   marginTop: sizes[index],
+  //   marginBottom: sizes[index],
+  // })),
 
-  generateTestsForScales("mt", Object.keys(sizes), (index) => ({
-    marginTop: sizes[index],
-  })),
+  // generateTestsForScales("mt", Object.keys(sizes), (index) => ({
+  //   marginTop: sizes[index],
+  // })),
 
-  generateTestsForScales("mr", Object.keys(sizes), (index) => ({
-    marginRight: sizes[index],
-  })),
+  // generateTestsForScales("mr", Object.keys(sizes), (index) => ({
+  //   marginRight: sizes[index],
+  // })),
 
-  generateTestsForScales("mb", Object.keys(sizes), (index) => ({
-    marginBottom: sizes[index],
-  })),
+  // generateTestsForScales("mb", Object.keys(sizes), (index) => ({
+  //   marginBottom: sizes[index],
+  // })),
 
-  generateTestsForScales("ml", Object.keys(sizes), (index) => ({
-    marginLeft: sizes[index],
-  })),
+  // generateTestsForScales("ml", Object.keys(sizes), (index) => ({
+  //   marginLeft: sizes[index],
+  // })),
 
   emptyResults([
     "m-auto",
-    "mx-auto",
-    "my-auto",
-    "mt-auto",
-    "mr-auto",
-    "mb-auto",
-    "ml-auto",
+    // "mx-auto",
+    // "my-auto",
+    // "mt-auto",
+    // "mr-auto",
+    // "mb-auto",
+    // "ml-auto",
   ]),
 ].flat();
 

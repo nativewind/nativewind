@@ -8,7 +8,7 @@ tailwindRunner("Platform Prefixes", [
         "ios_w-px_0": { width: 1 },
       },
       media: {
-        "ios_w-px": [["ios", 0]],
+        "ios_w-px": ["ios"],
       },
     },
   ],
@@ -19,7 +19,7 @@ tailwindRunner("Platform Prefixes", [
         "android_w-px_0": { width: 1 },
       },
       media: {
-        "android_w-px": [["android", 0]],
+        "android_w-px": ["android"],
       },
     },
   ],
@@ -30,7 +30,7 @@ tailwindRunner("Platform Prefixes", [
         "windows_w-px_0": { width: 1 },
       },
       media: {
-        "windows_w-px": [["windows", 0]],
+        "windows_w-px": ["windows"],
       },
     },
   ],
@@ -41,7 +41,7 @@ tailwindRunner("Platform Prefixes", [
         "macos_w-px_0": { width: 1 },
       },
       media: {
-        "macos_w-px": [["macos", 0]],
+        "macos_w-px": ["macos"],
       },
     },
   ],
@@ -52,7 +52,7 @@ tailwindRunner("Platform Prefixes", [
         "web_w-px_0": { width: 1 },
       },
       media: {
-        "web_w-px": [["web-inline", 0]],
+        "web_w-px": ["web-inline"],
       },
     },
   ],
@@ -67,13 +67,7 @@ tailwindRunner("Platform Prefixes", [
         "native_w-px_4": { width: 1 },
       },
       media: {
-        "native_w-px": [
-          ["native", 0],
-          ["android", 1],
-          ["ios", 2],
-          ["windows", 3],
-          ["macos", 4],
-        ],
+        "native_w-px": ["native", "android", "ios", "windows", "macos"],
       },
     },
   ],
