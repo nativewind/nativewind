@@ -96,7 +96,7 @@ describe("native", () => {
     expect(result.current).toEqual([{ fontWeight: "700" }]);
   });
 
-  test.only("media - width", () => {
+  test("media - width", () => {
     useWindowDimensions.mockReturnValue({
       width: 1000,
     });

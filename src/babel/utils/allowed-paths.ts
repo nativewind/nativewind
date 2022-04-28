@@ -1,7 +1,7 @@
 import micromatch from "micromatch";
 import { join, isAbsolute } from "node:path";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
-import { TailwindReactNativeOptions, AllowPathOptions } from "../types";
+import { TailwindcssReactNativeBabelOptions, AllowPathOptions } from "../types";
 
 const defaultContent: NonNullable<TailwindConfig["content"]> = {
   files: ["*"],
@@ -16,7 +16,7 @@ interface GetAllowedOptionsOptions {
 
 export function getAllowedOptions(
   { content = defaultContent }: TailwindConfig,
-  { allowModules = "*" }: TailwindReactNativeOptions
+  { allowModules = "*" }: TailwindcssReactNativeBabelOptions
 ): GetAllowedOptionsOptions {
   const contentPaths = Array.isArray(content) ? content : content.files;
 

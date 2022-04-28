@@ -2,19 +2,15 @@ import { Program } from "@babel/types";
 import { NodePath } from "@babel/traverse";
 
 import { extractStyles } from "./native-style-extraction";
-import { getTailwindConfig } from "./tailwind/get-tailwind-config";
 import { appendVariables } from "./transforms/append-variables";
 import { prependImport } from "./transforms/append-import";
-import { TailwindReactNativeOptions, State } from "./types";
+import { TailwindcssReactNativeBabelOptions, State } from "./types";
 import { visitor, VisitorState } from "./visitor";
-import { componentProxy, packageName } from "./transforms/constants";
-import {
-  getAllowedOptions,
-  isAllowedProgramPath,
-} from "./tailwind/allowed-paths";
+import { getAllowedOptions, isAllowedProgramPath } from "./utils/allowed-paths";
+import { getTailwindConfig } from "./utils/get-tailwind-config";
 
 export default function rootVisitor(
-  options: TailwindReactNativeOptions,
+  options: TailwindcssReactNativeBabelOptions,
   cwd: string
 ) {
   const tailwindConfig = getTailwindConfig(cwd, options);
@@ -86,7 +82,11 @@ export default function rootVisitor(
             const bodyNode = path.node.body;
 
             if (!hasStyledComponentImport && !skipTransform) {
-              prependImport(bodyNode, componentProxy, packageName);
+              prependImport(
+                bodyNode,
+                "StyledComponent",
+                "tailwindcss-react-native"
+              );
             }
 
             appendVariables(bodyNode, styles, media);

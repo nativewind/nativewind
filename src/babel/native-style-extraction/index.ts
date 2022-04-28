@@ -37,8 +37,6 @@ export function extractStyles(
     plugins.unshift(tailwind(tailwindConfig));
   }
 
-  // If you edit this, make sure you update the CLI postcss.config.js
-  // to include the extra plugins
   postcss(plugins).process(cssInput).css;
 
   return {

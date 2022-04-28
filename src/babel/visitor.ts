@@ -6,15 +6,18 @@ import { hasNamedImport } from "./utils/has-named-import";
 import { getImportBlockedComponents } from "./utils/get-import-blocked-components";
 import { someAttributes } from "./utils/has-attribute";
 
-import { componentProxy, packageName } from "./transforms/constants";
 import { toStyledComponent } from "./transforms/to-component";
 import { appendPlatformAttribute } from "./transforms/append-platform-attribute";
 
-import { AllowPathOptions, State, TailwindReactNativeOptions } from "./types";
+import {
+  AllowPathOptions,
+  State,
+  TailwindcssReactNativeBabelOptions,
+} from "./types";
 
 export interface VisitorState
   extends State,
-    Required<TailwindReactNativeOptions> {
+    Required<TailwindcssReactNativeBabelOptions> {
   allowRelativeModules: AllowPathOptions;
   blockList: Set<string>;
   hasClassNames: boolean;
@@ -47,8 +50,8 @@ export const visitor: Visitor<VisitorState> = {
 
     state.hasStyledComponentImport ||= hasNamedImport(
       path,
-      componentProxy,
-      packageName
+      "StyledComponent",
+      "tailwindcss-react-native"
     );
   },
   JSXElement(path, state) {

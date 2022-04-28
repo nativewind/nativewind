@@ -14,7 +14,6 @@ import {
   unaryExpression,
 } from "@babel/types";
 import { MediaRecord, StyleRecord } from "../../types/common";
-import { globalMedia, globalStyle } from "./constants";
 
 export function appendVariables(
   body: Statement[],
@@ -26,7 +25,10 @@ export function appendVariables(
       callExpression(
         memberExpression(identifier("Object"), identifier("assign")),
         [
-          memberExpression(identifier("globalThis"), identifier(globalStyle)),
+          memberExpression(
+            identifier("globalThis"),
+            identifier("tailwindcss_react_native_style")
+          ),
           callExpression(
             memberExpression(identifier("StyleSheet"), identifier("create")),
             [serialize(styles)]
@@ -38,7 +40,10 @@ export function appendVariables(
       callExpression(
         memberExpression(identifier("Object"), identifier("assign")),
         [
-          memberExpression(identifier("globalThis"), identifier(globalMedia)),
+          memberExpression(
+            identifier("globalThis"),
+            identifier("tailwindcss_react_native_media")
+          ),
           serialize(media),
         ]
       )

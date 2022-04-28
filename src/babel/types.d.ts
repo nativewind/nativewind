@@ -1,11 +1,10 @@
 import { ViewStyle, TextStyle, ImageStyle } from "react-native";
 
-export type PathOption = string;
-export type AllowPathOptions = "*" | PathOption[];
+export type AllowPathOptions = "*" | string[];
 
-export interface TailwindReactNativeOptions {
+export interface TailwindcssReactNativeBabelOptions {
   allowModules?: AllowPathOptions;
-  blockModules?: PathOption[];
+  blockModules?: string[];
   platform?: "web" | "native";
   skipTransform?: false;
   rem?: number;
@@ -16,7 +15,7 @@ export interface TailwindReactNativeOptions {
 export type State = {
   get: (name: string) => any;
   set: (name: string, value: any) => any;
-  opts: TailwindReactNativeOptions;
+  opts: TailwindcssReactNativeBabelOptions;
   file: BabelCore.BabelFile;
   filename: string;
 };

@@ -12,7 +12,7 @@ const { join } = require("path");
 const { extractStyles } = require("../dist/babel/native-style-extraction");
 const {
   getTailwindConfig,
-} = require("../dist/babel/tailwind/get-tailwind-config");
+} = require("../dist/babel/utils/get-tailwind-config");
 
 const argv = yargs(hideBin(process.argv))
   .option("platform", {

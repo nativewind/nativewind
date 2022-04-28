@@ -7,16 +7,9 @@ import {
 
 import { properties } from "./properties";
 import { isInvalidProperty, StyleProperty } from "./is-invalid-property";
+import { StyleError } from "../../../types/common";
 
-export interface ToReactNativeErrorRecord {
-  declaration: Declaration;
-  error: Error;
-  result?: Style;
-}
-
-export type ToReactNativeErrorCallback = (
-  options: ToReactNativeErrorRecord
-) => void;
+export type ToReactNativeErrorCallback = (options: StyleError) => void;
 
 export interface ToReactNativeOptions {
   onError: ToReactNativeErrorCallback;

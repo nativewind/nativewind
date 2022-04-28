@@ -1,10 +1,10 @@
-import { TailwindReactNativeOptions } from "./types";
+import { TailwindcssReactNativeBabelOptions } from "./types";
 
 import visitor from "./root-visitor";
 
 export default function (
   _: unknown,
-  options: TailwindReactNativeOptions,
+  options: TailwindcssReactNativeBabelOptions,
   cwd: string
 ) {
   const isProduction =
