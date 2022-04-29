@@ -1,15 +1,20 @@
-import { tailwindRunner } from "./runner";
+import { ViewStyle } from "react-native";
+import { createTests, expectError, tailwindRunner } from "./runner";
+
+const scenarios: Record<string, ViewStyle["width"]> = {
+  0: 0,
+  px: 1,
+  0.5: 2,
+  1: 4,
+  1.5: 6,
+  96: 384,
+  "1/2": "50%",
+  "1/3": "33.333333%",
+  full: "100%",
+  "[18px]": 18,
+};
 
 tailwindRunner("Sizing - Width", [
-  ["w-0", { styles: { "w-0": { width: 0 } } }],
-  ["w-px", { styles: { "w-px": { width: 1 } } }],
-  ["w-1", { styles: { "w-1": { width: 4 } } }],
-  ["w-1/2", { styles: { "w-1_2": { width: "50%" } } }],
-  // ["w-1/2", { styles: { w_px: { width: "50%" } } }],
-  // ["w-auto", { styles: {} }],
-  // ["w-full", { styles: { w_px: { width: "100%" } } }],
-  // ["w-screen", { styles: {} }],
-  // ["w-min", { styles: {} }],
-  // ["w-max", { styles: {} }],
-  // ["w-fit", { styles: {} }],
+  // ...createTests("w", scenarios, (n) => ({ width: n })),
+  ...expectError(["w-auto", "w-screen", "w-min", "w-max", "w-fit"]),
 ]);

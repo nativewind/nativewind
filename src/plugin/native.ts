@@ -15,9 +15,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
   } = {}) {
     function notSupported(property: string) {
       return () => {
-        onError({
-          error: `${property} is not available on native`,
-        });
+        onError({ error: `${property} is not available on native` });
         return {};
       };
     }

@@ -1,27 +1,9 @@
-import { getStylesForProperty, Style } from "css-to-react-native";
+import { Style } from "css-to-react-native";
 import { StyleProperty } from "../is-invalid-property";
 import { aspectRatio } from "./aspect-ratio";
 import { flex } from "./flex";
+import { only } from "./only";
 import { position } from "./position";
-
-function only(name: string, values: string[]) {
-  const supportedValues = new Set(values);
-  return (value: string): Style => {
-    if (!supportedValues.has(value)) {
-      throw new Error(name);
-    }
-
-    return getStylesForProperty(name, value);
-  };
-}
-
-function noAuto(value: string, name: string): Style {
-  if (value === "auto") {
-    throw new Error("no auto");
-  }
-
-  return getStylesForProperty(name, value);
-}
 
 export const properties: Partial<
   Record<StyleProperty, (value: string, name: string) => Style>
@@ -39,15 +21,18 @@ export const properties: Partial<
   flex,
   overflow: only("overflow", ["visible", "hidden", "scroll"]),
   position,
-  flexBasis: noAuto,
-  top: noAuto,
-  bottom: noAuto,
-  left: noAuto,
-  right: noAuto,
-  margin: noAuto,
-  marginTop: noAuto,
-  marginRight: noAuto,
-  marginBottom: noAuto,
-  marginLeft: noAuto,
-  zIndex: noAuto,
+  flexBasis: only("flexBasis", { units: ["%"] }),
+  top: only("top", { units: ["px", "%"] }),
+  bottom: only("bottom", { units: ["px", "%"] }),
+  left: only("left", { units: ["px", "%"] }),
+  right: only("right", { units: ["px", "%"] }),
+  margin: only("margin", { units: ["px", "%"] }),
+  marginBottom: only("marginBottom", { units: ["px", "%"] }),
+  marginLeft: only("marginLeft", { units: ["px", "%"] }),
+  marginRight: only("marginRight", { units: ["px", "%"] }),
+  marginTop: only("marginTop", { units: ["px", "%"] }),
+  width: only("width", {
+    units: ["px", "%"],
+  }),
+  zIndex: only("zIndex", { number: true }),
 };
