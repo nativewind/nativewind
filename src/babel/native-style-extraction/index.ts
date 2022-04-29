@@ -1,11 +1,12 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
-import postcss from "postcss";
+import postcss, { PluginCreator } from "postcss";
 import tailwind from "tailwindcss";
 import postcssCssvariables from "postcss-css-variables";
 import postcssColorFunctionalNotation from "postcss-color-functional-notation";
+import calc from "postcss-calc";
 
 import { plugin } from "./postcss-plugin";
-import { MediaRecord, StyleRecord } from "../../types/common";
+import { MediaRecord, StyleError, StyleRecord } from "../../types/common";
 
 /**
  * This is used by both Babel and the CLI to extract the files
@@ -20,15 +21,20 @@ export function extractStyles(
 ) {
   let styles: StyleRecord = {};
   let media: MediaRecord = {};
+  let errors: StyleError[] = [];
 
   const plugins = [
     postcssCssvariables(),
     postcssColorFunctionalNotation(),
+    calc({
+      warnWhenCannotResolve: true,
+    }),
     plugin({
       ...tailwindConfig,
       done: (output) => {
         styles = output.styles;
         media = output.media;
+        errors = output.errors;
       },
     }),
   ];
@@ -42,5 +48,6 @@ export function extractStyles(
   return {
     styles,
     media,
+    errors,
   };
 }

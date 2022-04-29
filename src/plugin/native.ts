@@ -1,14 +1,38 @@
 import plugin from "tailwindcss/plugin";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
+import { StyleError } from "../types/common";
 
 export interface NativePluginOptions {
   rem?: number;
+  onError?: (error: StyleError) => void;
 }
 
 export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
-  function () {
-    return () => {
-      /*Nothing here yet */
+  function ({
+    onError = () => {
+      return;
+    },
+  } = {}) {
+    function notSupported(property: string) {
+      const error = new Error(`${property} is not available on native`);
+      return () => {
+        onError({
+          error,
+        });
+        return {};
+      };
+    }
+
+    return ({ matchUtilities, theme }) => {
+      matchUtilities(
+        {
+          "space-x": notSupported("space-x"),
+          "space-y": notSupported("space-y"),
+          "space-y-reverse": notSupported("space-y-reverse"),
+          "space-x-reverse": notSupported("space-x-reverse"),
+        },
+        { values: theme("space"), supportsNegativeValues: true }
+      );
     };
   },
   function ({ rem = 16 } = {}) {
@@ -127,6 +151,9 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
           prose: "65ch",
           ...breakpoints(theme("screens")),
         }),
+      },
+      corePlugins: {
+        space: false,
       },
     };
 

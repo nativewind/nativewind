@@ -1,12 +1,14 @@
-import { extractStyles } from "../../src/babel/native-style-extraction";
-import { normaliseSelector } from "../../src/shared/selector";
-import { MediaRecord, Style, StyleRecord } from "../../src/types/common";
+import { extractStyles } from "../../../src/babel/native-style-extraction";
+import { normaliseSelector } from "../../../src/shared/selector";
+import { MediaRecord, Style, StyleRecord } from "../../../src/types/common";
 
-import plugin from "../../src/plugin";
-import { nativePlugin } from "../../src/plugin/native";
+import plugin from "../../../src/plugin";
+import { nativePlugin } from "../../../src/plugin/native";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 export type Test = [string, Expected];
+
+export { spacing } from "./spacing";
 
 export interface Expected {
   styles: StyleRecord;
@@ -24,7 +26,7 @@ export function tailwindRunner(name: string, testCases: Test[]) {
 }
 
 export function assertStyles(css: string, { styles, media = {} }: Expected) {
-  const output = extractStyles({
+  const { errors, ...output } = extractStyles({
     theme: {},
     plugins: [plugin, nativePlugin()],
     content: [

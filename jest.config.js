@@ -14,7 +14,7 @@ module.exports = {
   testPathIgnorePatterns: [
     "/node_modules/",
     "/__tests__/visitor/",
-    "/__tests__/tailwindcss/runner.ts",
+    "/__tests__/tailwindcss/runner/",
     "/__tests__/types.d.ts",
   ],
 };

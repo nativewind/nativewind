@@ -8,12 +8,21 @@ import { TailwindcssReactNativeBabelOptions, State } from "./types";
 import { visitor, VisitorState } from "./visitor";
 import { getAllowedOptions, isAllowedProgramPath } from "./utils/allowed-paths";
 import { getTailwindConfig } from "./utils/get-tailwind-config";
+import { StyleError } from "../types/common";
 
 export default function rootVisitor(
   options: TailwindcssReactNativeBabelOptions,
   cwd: string
 ) {
-  const tailwindConfig = getTailwindConfig(cwd, options);
+  const errors: StyleError[] = [];
+
+  const tailwindConfig = getTailwindConfig(cwd, {
+    ...options,
+    onError(error) {
+      errors.push(error);
+    },
+  });
+
   const { allowModules, allowRelativeModules } = getAllowedOptions(
     tailwindConfig,
     options

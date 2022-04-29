@@ -49,6 +49,7 @@
     "css-to-react-native": "^3.0.0",
     "micromatch": "^4.0.5",
     "postcss": "^8.4.12",
+    "postcss-calc": "^8.2.4",
     "postcss-color-functional-notation": "^4.2.2",
     "postcss-css-variables": "^0.18.0",
     "tempy": "^1.0.1",

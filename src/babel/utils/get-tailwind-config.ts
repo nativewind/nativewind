@@ -4,10 +4,9 @@ import { existsSync } from "node:fs";
 import resolveTailwindConfig from "tailwindcss/resolveConfig";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
-import { nativePlugin } from "../../plugin/native";
+import { nativePlugin, NativePluginOptions } from "../../plugin/native";
 
-export interface GetTailwindConfigOptions {
-  rem?: number;
+export interface GetTailwindConfigOptions extends NativePluginOptions {
   tailwindConfigPath?: string;
 }
 

@@ -39,7 +39,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
 
   return {
     postcssPlugin: "react-native-css-hook",
-    Root: (root) => {
+    OnceExit: (root) => {
       root.walk((node) => {
         if (node.type === "atrule" && node.name === "media") {
           // For each media AtRule, calculate the full media query based upon its parent
