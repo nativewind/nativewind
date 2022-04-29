@@ -102,10 +102,7 @@ export default function rootVisitor(
             /**
              * Override tailwind to only process the classnames in this file
              */
-            const { styles, media } = extractStyles({
-              ...tailwindConfig,
-              content: [filename],
-            });
+            const { styles, media } = extractStyles(tailwindConfig);
 
             const bodyNode = path.node.body;
             appendVariables(bodyNode, styles, media);
