@@ -1,13 +1,13 @@
 import { Plugin, PluginCreator } from "postcss";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { normaliseSelector } from "../../shared/selector";
+import { toReactNative } from "./to-react-native";
 import {
   MediaRecord,
   StyleRecord,
   Style,
   StyleError,
 } from "../../types/common";
-import { toReactNative } from "./to-react-native";
 
 const mediaStringSymbol = Symbol("media_string");
 
@@ -17,14 +17,12 @@ declare module "postcss" {
   }
 }
 
-export type PostcssPluginDone = (options: {
-  styles: StyleRecord;
-  media: MediaRecord;
-  errors: StyleError[];
-}) => void;
-
 export interface PostcssPluginOptions extends Partial<TailwindConfig> {
-  done?: PostcssPluginDone;
+  done?: (options: {
+    styles: StyleRecord;
+    media: MediaRecord;
+    errors: StyleError[];
+  }) => void;
 }
 
 export const plugin: PluginCreator<PostcssPluginOptions> = ({

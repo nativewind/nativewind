@@ -9,10 +9,8 @@ import { properties } from "./properties";
 import { isInvalidProperty, StyleProperty } from "./is-invalid-property";
 import { StyleError } from "../../../types/common";
 
-export type ToReactNativeErrorCallback = (options: StyleError) => void;
-
 export interface ToReactNativeOptions {
-  onError: ToReactNativeErrorCallback;
+  onError: (options: StyleError) => void;
 }
 
 export function toReactNative(
