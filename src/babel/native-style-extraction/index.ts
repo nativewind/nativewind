@@ -1,5 +1,5 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
-import postcss, { PluginCreator } from "postcss";
+import postcss from "postcss";
 import tailwind from "tailwindcss";
 import postcssCssvariables from "postcss-css-variables";
 import postcssColorFunctionalNotation from "postcss-color-functional-notation";

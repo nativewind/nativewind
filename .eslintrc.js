@@ -38,7 +38,13 @@ module.exports = {
       },
     },
     {
-      files: ["*rc.js", "*.config.js", "babel.js", "./__tests__/*.spec.ts"],
+      files: ["__tests__/**"],
+      rules: {
+        "unicorn/prefer-module": "off",
+      },
+    },
+    {
+      files: ["*rc.js", "*.config.js", "plugin.js", "babel.js"],
       rules: {
         "unicorn/prefer-module": "off",
         "@typescript-eslint/no-var-requires": "off",

@@ -41,6 +41,7 @@
     "dist/",
     "cli/",
     "babel.js",
+    "plugin.js",
     "types.d.ts"
   ],
   "dependencies": {
