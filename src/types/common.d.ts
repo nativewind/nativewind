@@ -6,6 +6,6 @@ export type StyleRecord = Record<string, Style>;
 export type MediaRecord = Record<string, string[]>;
 export interface StyleError {
   declaration?: Declaration;
-  error: Error;
+  error: string;
   result?: Style;
 }

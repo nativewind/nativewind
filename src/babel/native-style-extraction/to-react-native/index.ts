@@ -26,7 +26,7 @@ export function toReactNative(
   if (isInvalidProperty(name)) {
     onError({
       declaration,
-      error: new Error("invalid property"),
+      error: "invalid property",
       result: styles,
     });
     return;
@@ -39,7 +39,7 @@ export function toReactNative(
       : getStylesForProperty(name, value);
   } catch (error) {
     if (error instanceof Error) {
-      onError({ declaration, error, result: styles });
+      onError({ declaration, error: error.message, result: styles });
     }
     return;
   }
