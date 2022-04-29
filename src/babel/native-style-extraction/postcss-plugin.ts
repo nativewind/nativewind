@@ -38,7 +38,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
   const errors: StyleError[] = [];
 
   return {
-    postcssPlugin: "react-native-css-hook",
+    postcssPlugin: "tailwindcss-react-native-style-extractor",
     OnceExit: (root) => {
       root.walk((node) => {
         if (node.type === "atrule" && node.name === "media") {
