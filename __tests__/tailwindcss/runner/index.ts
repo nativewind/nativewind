@@ -1,10 +1,11 @@
+import { TailwindConfig, TailwindTheme } from "tailwindcss/tailwind-config";
+import resolveTailwindConfig from "tailwindcss/resolveConfig";
 import { extractStyles } from "../../../src/babel/native-style-extraction";
 import { normaliseSelector } from "../../../src/shared/selector";
 import { MediaRecord, Style, StyleRecord } from "../../../src/types/common";
 
 import plugin from "../../../src/plugin";
 import { nativePlugin } from "../../../src/plugin/native";
-import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 export type Test = [string, Expected];
 
@@ -61,7 +62,6 @@ export function generateTestsForScales<T extends string | number>(
     return [
       `${prefix}-${scale}`,
       {
-        media: {},
         styles: Object.fromEntries(
           scalesGeneratedByTailwind.map((index) => [
             normaliseSelector(`${prefix}-${index}`),
