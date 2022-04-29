@@ -1,6 +1,6 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
-const columns = [
+tailwindRunner("Layout - Columns", expectError([
   "columns-1",
   "columns-2",
   "columns-3",
@@ -10,6 +10,4 @@ const columns = [
   "columns-7",
   "columns-8",
   "columns-[10rem]",
-];
-
-tailwindRunner("Layout - Columns", emptyResults(columns));
+]));

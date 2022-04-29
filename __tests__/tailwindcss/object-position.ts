@@ -1,8 +1,8 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 tailwindRunner(
   "Layout - Object Position",
-  emptyResults([
+  expectError([
     "object-bottom",
     "object-center",
     "object-left",

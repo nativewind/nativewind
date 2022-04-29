@@ -1,38 +1,36 @@
-import { generateTestsForScales, tailwindRunner, spacing } from "./runner";
+import { createTests, tailwindRunner, spacing } from "./runner";
 
-const tests = [
-  generateTestsForScales("p", Object.keys(spacing), (index) => ({
-    paddingBottom: spacing[index],
-    paddingLeft: spacing[index],
-    paddingRight: spacing[index],
-    paddingTop: spacing[index],
+tailwindRunner("Layout - Top Right Bottom Left", [
+  ...createTests("p", spacing, (n) => ({
+    paddingBottom: n,
+    paddingLeft: n,
+    paddingRight: n,
+    paddingTop: n,
   })),
 
-  generateTestsForScales("px", Object.keys(spacing), (index) => ({
-    paddingLeft: spacing[index],
-    paddingRight: spacing[index],
+  ...createTests("px", spacing, (n) => ({
+    paddingLeft: n,
+    paddingRight: n,
   })),
 
-  generateTestsForScales("py", Object.keys(spacing), (index) => ({
-    paddingTop: spacing[index],
-    paddingBottom: spacing[index],
+  ...createTests("py", spacing, (n) => ({
+    paddingTop: n,
+    paddingBottom: n,
   })),
 
-  generateTestsForScales("pt", Object.keys(spacing), (index) => ({
-    paddingTop: spacing[index],
+  ...createTests("pt", spacing, (n) => ({
+    paddingTop: n,
   })),
 
-  generateTestsForScales("pr", Object.keys(spacing), (index) => ({
-    paddingRight: spacing[index],
+  ...createTests("pr", spacing, (n) => ({
+    paddingRight: n,
   })),
 
-  generateTestsForScales("pb", Object.keys(spacing), (index) => ({
-    paddingBottom: spacing[index],
+  ...createTests("pb", spacing, (n) => ({
+    paddingBottom: n,
   })),
 
-  generateTestsForScales("pl", Object.keys(spacing), (index) => ({
-    paddingLeft: spacing[index],
+  ...createTests("pl", spacing, (n) => ({
+    paddingLeft: n,
   })),
-].flat();
-
-tailwindRunner("Layout - Top Right Bottom Left", tests);
+]);

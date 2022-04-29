@@ -1,8 +1,8 @@
-import { emptyResults, tailwindRunner } from "./runner";
+import { expectError, tailwindRunner } from "./runner";
 
 tailwindRunner(
   "Layout - Justify Items",
-  emptyResults([
+  expectError([
     "justify-self-auto",
     "justify-self-start",
     "justify-self-end",

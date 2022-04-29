@@ -1,5 +1,3 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
-const breakInside = ["visible", "invisible"];
-
-tailwindRunner("Layout - Visibility", emptyResults(breakInside));
+tailwindRunner("Layout - Visibility", expectError(["visible", "invisible"]));

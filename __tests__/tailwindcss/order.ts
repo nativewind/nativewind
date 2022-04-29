@@ -1,8 +1,8 @@
-import { emptyResults, tailwindRunner } from "./runner";
+import { expectError, tailwindRunner } from "./runner";
 
 tailwindRunner(
   "Layout - Order",
-  emptyResults([
+  expectError([
     "order-1",
     "order-2",
     "order-3",

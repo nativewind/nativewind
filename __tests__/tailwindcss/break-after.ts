@@ -1,6 +1,6 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
-const breakAfter = [
+tailwindRunner("Layout - Break After", expectError([
   "break-after-auto",
   "break-after-avoid",
   "break-after-all",
@@ -9,6 +9,4 @@ const breakAfter = [
   "break-after-left",
   "break-after-right",
   "break-after-column",
-];
-
-tailwindRunner("Layout - Break After", emptyResults(breakAfter));
+]));

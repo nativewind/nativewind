@@ -1,8 +1,8 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 tailwindRunner(
   "Layout - Grid Auto Columns",
-  emptyResults([
+  expectError([
     "auto-cols-auto",
     "auto-cols-min",
     "auto-cols-max",

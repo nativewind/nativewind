@@ -1,10 +1,8 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
-const breakInside = [
+tailwindRunner("Layout - Break Inside", expectError([
   "break-inside-auto",
   "break-inside-avoid",
   "break-inside-avoid-page",
   "break-inside-avoid-column",
-];
-
-tailwindRunner("Layout - Break Inside", emptyResults(breakInside));
+]));

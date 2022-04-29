@@ -1,4 +1,4 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 const displayEmptyResults = [
   "block",
@@ -23,27 +23,7 @@ const displayEmptyResults = [
 ];
 
 tailwindRunner("Layout - Display", [
-  ...emptyResults(displayEmptyResults),
-  [
-    "flex",
-    {
-      styles: {
-        flex: {
-          display: "flex",
-        },
-      },
-      media: {},
-    },
-  ],
-  [
-    "hidden",
-    {
-      styles: {
-        hidden: {
-          display: "none",
-        },
-      },
-      media: {},
-    },
-  ],
+  ...expectError(displayEmptyResults),
+  ["flex", { styles: { flex: { display: "flex" } } }],
+  ["hidden", { styles: { hidden: { display: "none" } } }],
 ]);

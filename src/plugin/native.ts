@@ -27,10 +27,11 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
         {
           "space-x": notSupported("space-x"),
           "space-y": notSupported("space-y"),
-          "space-y-reverse": notSupported("space-y-reverse"),
-          "space-x-reverse": notSupported("space-x-reverse"),
         },
-        { values: theme("space"), supportsNegativeValues: true }
+        {
+          values: { ...theme("space"), reverse: 0 },
+          supportsNegativeValues: true,
+        }
       );
     };
   },

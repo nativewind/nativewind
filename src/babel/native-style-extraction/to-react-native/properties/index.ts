@@ -1,10 +1,19 @@
 import { getStylesForProperty, Style } from "css-to-react-native";
 import { StyleProperty } from "../is-invalid-property";
 import { aspectRatio } from "./aspect-ratio";
-import { display } from "./display";
 import { flex } from "./flex";
-import { overflow } from "./overflow";
 import { position } from "./position";
+
+function only(name: string, values: string[]) {
+  const supportedValues = new Set(values);
+  return (value: string): Style => {
+    if (!supportedValues.has(value)) {
+      throw new Error(name);
+    }
+
+    return getStylesForProperty(name, value);
+  };
+}
 
 function noAuto(value: string, name: string): Style {
   if (value === "auto") {
@@ -18,9 +27,17 @@ export const properties: Partial<
   Record<StyleProperty, (value: string, name: string) => Style>
 > = {
   aspectRatio,
-  display,
+  alignContent: only("alignContent", [
+    "flex-start",
+    "flex-end",
+    "stretch",
+    "center",
+    "space-between",
+    "space-around",
+  ]),
+  display: only("display", ["none", "flex"]),
   flex,
-  overflow,
+  overflow: only("overflow", ["visible", "hidden", "scroll"]),
   position,
   flexBasis: noAuto,
   top: noAuto,

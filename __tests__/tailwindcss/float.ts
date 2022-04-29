@@ -1,6 +1,6 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 tailwindRunner(
   "Layout - Float",
-  emptyResults(["float-right", "float-left", "float-none"])
+  expectError(["float-right", "float-left", "float-none"])
 );

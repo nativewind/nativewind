@@ -1,8 +1,8 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 tailwindRunner(
   "Layout - Overscroll Behavior",
-  emptyResults([
+  expectError([
     "overscroll-auto",
     "overscroll-contain",
     "overscroll-none",

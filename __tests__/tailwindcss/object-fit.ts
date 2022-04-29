@@ -1,8 +1,8 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 tailwindRunner(
   "Layout - Object Fit",
-  emptyResults([
+  expectError([
     "object-contain",
     "object-cover",
     "object-fill",

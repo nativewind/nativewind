@@ -1,7 +1,7 @@
 import { TextStyle } from "react-native";
-import { generateTestsForScales, tailwindRunner } from "./runner";
+import { createTests, tailwindRunner } from "./runner";
 
-const options: Record<string, TextStyle["alignSelf"]> = {
+const scenarios: Record<string, TextStyle["alignSelf"]> = {
   auto: "auto",
   start: "flex-start",
   end: "flex-end",
@@ -12,7 +12,5 @@ const options: Record<string, TextStyle["alignSelf"]> = {
 
 tailwindRunner(
   "Layout - Align Self",
-  generateTestsForScales("self", Object.keys(options), (n) => ({
-    alignSelf: options[n],
-  }))
+  createTests("self", scenarios, (n) => ({ alignSelf: n }))
 );

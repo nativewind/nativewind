@@ -1,6 +1,6 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 tailwindRunner(
   "Layout - Clear",
-  emptyResults(["clear-right", "clear-left", "clear-both", "clear-none"])
+  expectError(["clear-right", "clear-left", "clear-both", "clear-none"])
 );

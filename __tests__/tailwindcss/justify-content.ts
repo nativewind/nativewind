@@ -1,5 +1,5 @@
 import { TextStyle } from "react-native";
-import { generateTestsForScales, tailwindRunner } from "./runner";
+import { createTests, tailwindRunner } from "./runner";
 
 const options: Record<string, TextStyle["justifyContent"]> = {
   start: "flex-start",
@@ -12,7 +12,5 @@ const options: Record<string, TextStyle["justifyContent"]> = {
 
 tailwindRunner(
   "Layout - Justify Content",
-  generateTestsForScales("justify", Object.keys(options), (n) => ({
-    justifyContent: options[n],
-  }))
+  createTests("justify", options, (n) => ({ justifyContent: n }))
 );

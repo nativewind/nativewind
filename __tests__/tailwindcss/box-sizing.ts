@@ -1,6 +1,6 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 tailwindRunner(
   "Layout - Box Sizing",
-  emptyResults(["box-border", "box-content"])
+  expectError(["box-border", "box-content"])
 );

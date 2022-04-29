@@ -1,6 +1,6 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
-const breakBefore = [
+tailwindRunner("Layout - Break Before", expectError([
   "break-before-auto",
   "break-before-avoid",
   "break-before-all",
@@ -9,6 +9,4 @@ const breakBefore = [
   "break-before-left",
   "break-before-right",
   "break-before-column",
-];
-
-tailwindRunner("Layout - Break Before", emptyResults(breakBefore));
+]));

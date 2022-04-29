@@ -1,45 +1,40 @@
-import {
-  emptyResults,
-  generateTestsForScales,
-  tailwindRunner,
-  spacing,
-} from "./runner";
+import { expectError, createTests, tailwindRunner, spacing } from "./runner";
 
 const tests = [
-  generateTestsForScales("m", Object.keys(spacing), (index) => ({
-    marginBottom: spacing[index],
-    marginLeft: spacing[index],
-    marginRight: spacing[index],
-    marginTop: spacing[index],
+  // createTests("m", spacing, (n) => ({
+  //   marginBottom: n,
+  //   marginLeft: n,
+  //   marginRight: n,
+  //   marginTop: n,
+  // })),
+
+  // createTests("mx", spacing, (n) => ({
+  //   marginLeft: n,
+  //   marginRight: n,
+  // })),
+
+  // createTests("my", spacing, (n) => ({
+  //   marginTop: n,
+  //   marginBottom: n,
+  // })),
+
+  // createTests("mt", spacing, (n) => ({
+  //   marginTop: n,
+  // })),
+
+  // createTests("mr", spacing, (n) => ({
+  //   marginRight: n,
+  // })),
+
+  // createTests("mb", spacing, (n) => ({
+  //   marginBottom: n,
+  // })),
+
+  createTests("ml", spacing, (n) => ({
+    marginLeft: n,
   })),
 
-  generateTestsForScales("mx", Object.keys(spacing), (index) => ({
-    marginLeft: spacing[index],
-    marginRight: spacing[index],
-  })),
-
-  generateTestsForScales("my", Object.keys(spacing), (index) => ({
-    marginTop: spacing[index],
-    marginBottom: spacing[index],
-  })),
-
-  generateTestsForScales("mt", Object.keys(spacing), (index) => ({
-    marginTop: spacing[index],
-  })),
-
-  generateTestsForScales("mr", Object.keys(spacing), (index) => ({
-    marginRight: spacing[index],
-  })),
-
-  generateTestsForScales("mb", Object.keys(spacing), (index) => ({
-    marginBottom: spacing[index],
-  })),
-
-  generateTestsForScales("ml", Object.keys(spacing), (index) => ({
-    marginLeft: spacing[index],
-  })),
-
-  emptyResults([
+  expectError([
     "m-auto",
     "mx-auto",
     "my-auto",

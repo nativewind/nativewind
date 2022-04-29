@@ -1,8 +1,10 @@
-import { TailwindConfig, TailwindTheme } from "tailwindcss/tailwind-config";
-import resolveTailwindConfig from "tailwindcss/resolveConfig";
+import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { extractStyles } from "../../../src/babel/native-style-extraction";
-import { normaliseSelector } from "../../../src/shared/selector";
-import { MediaRecord, Style, StyleRecord } from "../../../src/types/common";
+import {
+  MediaRecord,
+  StyleError,
+  StyleRecord,
+} from "../../../src/types/common";
 
 import plugin from "../../../src/plugin";
 import { nativePlugin } from "../../../src/plugin/native";
@@ -10,14 +12,12 @@ import { nativePlugin } from "../../../src/plugin/native";
 export type Test = [string, Expected];
 
 export { spacing } from "./spacing";
+export { createTests, expectError } from "./tests";
 
 export interface Expected {
   styles: StyleRecord;
   media?: MediaRecord;
-}
-
-export function emptyResults(names: string[]): Test[] {
-  return names.map((name) => [name, { styles: {}, media: {} }]);
+  shouldError?: boolean;
 }
 
 export function tailwindRunner(name: string, testCases: Test[]) {
@@ -26,10 +26,22 @@ export function tailwindRunner(name: string, testCases: Test[]) {
   });
 }
 
-export function assertStyles(css: string, { styles, media = {} }: Expected) {
-  const { errors, ...output } = extractStyles({
+export function assertStyles(
+  css: string,
+  { styles, media = {}, shouldError = false }: Expected
+) {
+  const errors: StyleError[] = [];
+
+  const { errors: outputErrors, ...output } = extractStyles({
     theme: {},
-    plugins: [plugin, nativePlugin()],
+    plugins: [
+      plugin,
+      nativePlugin({
+        onError(error) {
+          errors.push(error);
+        },
+      }),
+    ],
     content: [
       { raw: "", extension: "html" },
     ] as unknown as TailwindConfig["content"],
@@ -37,38 +49,8 @@ export function assertStyles(css: string, { styles, media = {} }: Expected) {
   });
 
   expect(output).toEqual({ styles, media });
-}
-
-/**
- * Given an array of scales (eg 0,px,1,2,1/3) generates a set of tests
- */
-export function generateTestsForScales<T extends string | number>(
-  prefix: string,
-  scales: Array<T>,
-  valueFunction: (n: T) => Style
-): Test[] {
-  return scales.map((scale) => {
-    const scalesGeneratedByTailwind: T[] = [scale];
-
-    // If the scale is 0.5, the tailwind compiler will generate styles for
-    // both 0.5 and 0
-    //
-    // This is true for all decimal numbers
-    const scaleParsed = Number(scale.toString());
-    if (Number.isFinite(scaleParsed) && Math.floor(scaleParsed) !== scale) {
-      scalesGeneratedByTailwind.push(Math.floor(scaleParsed) as T);
-    }
-
-    return [
-      `${prefix}-${scale}`,
-      {
-        styles: Object.fromEntries(
-          scalesGeneratedByTailwind.map((index) => [
-            normaliseSelector(`${prefix}-${index}`),
-            valueFunction(index),
-          ])
-        ),
-      },
-    ];
-  });
+  if (shouldError) {
+    errors.push(...outputErrors);
+    expect(errors.length).toBeGreaterThan(0);
+  }
 }

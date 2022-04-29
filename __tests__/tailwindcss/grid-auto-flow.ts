@@ -1,8 +1,8 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 tailwindRunner(
   "Layout - Grid Auto Flow",
-  emptyResults([
+  expectError([
     "grid-flow-row",
     "grid-flow-col",
     "grid-flow-row-dense",

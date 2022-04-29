@@ -1,3 +1,6 @@
-import { tailwindRunner, emptyResults } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
-tailwindRunner("Layout - Isolation", emptyResults(["isolate", "isolate-auto"]));
+tailwindRunner(
+  "Layout - Isolation",
+  expectError(["isolate", "isolation-auto"])
+);
