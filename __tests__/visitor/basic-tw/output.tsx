@@ -19,19 +19,19 @@ Object.assign(
     container: {
       width: "100%",
     },
-    container_0: {
+    "container.0": {
       maxWidth: 640,
     },
-    container_1: {
+    "container.1": {
       maxWidth: 768,
     },
-    container_2: {
+    "container.2": {
       maxWidth: 1024,
     },
-    container_3: {
+    "container.3": {
       maxWidth: 1280,
     },
-    container_4: {
+    "container.4": {
       maxWidth: 1536,
     },
     "font-bold": {

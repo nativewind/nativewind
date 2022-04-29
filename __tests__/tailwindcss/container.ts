@@ -6,11 +6,11 @@ tailwindRunner("Layout - Container", [
     {
       styles: {
         container: { width: "100%" },
-        container_0: { maxWidth: 640 },
-        container_1: { maxWidth: 768 },
-        container_2: { maxWidth: 1024 },
-        container_3: { maxWidth: 1280 },
-        container_4: { maxWidth: 1536 },
+        "container.0": { maxWidth: 640 },
+        "container.1": { maxWidth: 768 },
+        "container.2": { maxWidth: 1024 },
+        "container.3": { maxWidth: 1280 },
+        "container.4": { maxWidth: 1536 },
       },
       media: {
         container: [
@@ -27,12 +27,12 @@ tailwindRunner("Layout - Container", [
     "sm:container",
     {
       styles: {
-        sm_container_0: { width: "100%" },
-        sm_container_1: { maxWidth: 640 },
-        sm_container_2: { maxWidth: 768 },
-        sm_container_3: { maxWidth: 1024 },
-        sm_container_4: { maxWidth: 1280 },
-        sm_container_5: { maxWidth: 1536 },
+        "sm_container.0": { width: "100%" },
+        "sm_container.1": { maxWidth: 640 },
+        "sm_container.2": { maxWidth: 768 },
+        "sm_container.3": { maxWidth: 1024 },
+        "sm_container.4": { maxWidth: 1280 },
+        "sm_container.5": { maxWidth: 1536 },
       },
       media: {
         sm_container: [

@@ -74,7 +74,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
               const selector = normaliseSelector(s, { important });
 
               media[selector] ??= [];
-              styles[`${selector}_${media[selector].length}`] = declarations;
+              styles[`${selector}.${media[selector].length}`] = declarations;
               media[selector].push(node.parent[mediaStringSymbol]);
             }
           } else {

@@ -79,7 +79,7 @@ export function useTailwind<P>() {
         });
 
         if (isMatch) {
-          tailwindStyleIds.push(styles[`${selector}_${index}`] as P);
+          tailwindStyleIds.push(styles[`${selector}.${index}`] as P);
         }
       }
     }
