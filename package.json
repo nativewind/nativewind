@@ -57,9 +57,9 @@
     "yargs": "^17.4.1"
   },
   "devDependencies": {
-    "@babel/core": "7.17.9",
+    "@babel/core": "7.17.10",
     "@babel/plugin-syntax-jsx": "7.16.7",
-    "@babel/types": "7.17.0",
+    "@babel/types": "7.17.10",
     "@testing-library/react-hooks": "8.0.0",
     "@types/css": "0.0.33",
     "@types/css-mediaquery": "0.1.1",
