@@ -16,8 +16,8 @@ jest.mock("react-native", () => {
     Appearance,
     Dimensions,
     useWindowDimensions: jest.fn(() => ({
-      width: 750,
-      height: 1334,
+      width: 0,
+      height: 0,
       scale: 1,
       fontScale: 1,
     })),
@@ -152,10 +152,10 @@ describe("native", () => {
       initialProps: {
         platform: "ios",
         styles: {
-          "w-px_0": {
+          "w-px.0": {
             width: 1,
           },
-          "w-px_1": {
+          "w-px.1": {
             width: 1,
           },
         },
