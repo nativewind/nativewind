@@ -7,7 +7,7 @@ export function Test() {
     <TailwindProvider>
       <View className="container">
         <Text className="font-bold">Hello world!</Text>
-        <MotiText className="font-bold">Do not transform</MotiText>
+        <MotiText className="font-bold">Not in allowModules</MotiText>
       </View>
     </TailwindProvider>
   );

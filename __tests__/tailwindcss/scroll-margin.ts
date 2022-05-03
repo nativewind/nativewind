@@ -1,0 +1,35 @@
+import { expectError, tailwindRunner } from "./runner";
+
+tailwindRunner(
+  "Interactivity - Scroll Margin",
+  expectError([
+    "scroll-m-0",
+    "scroll-mx-0",
+    "scroll-my-0",
+    "scroll-mt-0",
+    "scroll-mr-0",
+    "scroll-mb-0",
+    "scroll-ml-0",
+    "scroll-m-px",
+    "scroll-mx-px",
+    "scroll-my-px",
+    "scroll-mt-px",
+    "scroll-mr-px",
+    "scroll-mb-px",
+    "scroll-ml-px",
+    "scroll-m-0.5",
+    "scroll-mx-0.5",
+    "scroll-my-0.5",
+    "scroll-mt-0.5",
+    "scroll-mr-0.5",
+    "scroll-mb-0.5",
+    "scroll-ml-0.5",
+    "scroll-m-1",
+    "scroll-mx-1",
+    "scroll-my-1",
+    "scroll-mt-1",
+    "scroll-mr-1",
+    "scroll-mb-1",
+    "scroll-ml-1",
+  ])
+);

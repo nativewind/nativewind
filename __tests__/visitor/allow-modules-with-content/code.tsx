@@ -7,8 +7,8 @@ export function Test() {
   return (
     <TailwindProvider>
       <Text className="font-bold">Hello world!</Text>
-      <MotiText className="font-bold">Do not transform</MotiText>
-      <TestComponent className="font-bold">Do not transform</TestComponent>
+      <MotiText className="font-bold">Not in allowModules</MotiText>
+      <TestComponent className="font-bold">Not in allowModules</TestComponent>
     </TailwindProvider>
   );
 }

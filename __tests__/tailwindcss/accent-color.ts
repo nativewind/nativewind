@@ -1,0 +1,35 @@
+import { expectError, tailwindRunner } from "./runner";
+
+tailwindRunner(
+  "Interactivity - Accent Color",
+  expectError([
+    "accent-inherit",
+    "accent-current",
+    "accent-transparent",
+    "accent-black",
+    "accent-white",
+    "accent-slate-50",
+    "accent-gray-50",
+    "accent-zinc-50",
+    "accent-neutral-50",
+    "accent-stone-50",
+    "accent-red-50",
+    "accent-orange-50",
+    "accent-amber-50",
+    "accent-yellow-50",
+    "accent-lime-50",
+    "accent-green-50",
+    "accent-emerald-50",
+    "accent-teal-50",
+    "accent-cyan-50",
+    "accent-sky-50",
+    "accent-blue-50",
+    "accent-indigo-50",
+    "accent-violet-50",
+    "accent-purple-50",
+    "accent-fuchsia-50",
+    "accent-pink-50",
+    "accent-rose-50",
+    "accent-auto",
+  ])
+);

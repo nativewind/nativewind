@@ -1,0 +1,35 @@
+import { expectError, tailwindRunner } from "./runner";
+
+tailwindRunner(
+  "Interactivity - Scroll Padding",
+  expectError([
+    "scroll-p-0",
+    "scroll-px-0",
+    "scroll-py-0",
+    "scroll-pt-0",
+    "scroll-pr-0",
+    "scroll-pb-0",
+    "scroll-pl-0",
+    "scroll-p-px",
+    "scroll-px-px",
+    "scroll-py-px",
+    "scroll-pt-px",
+    "scroll-pr-px",
+    "scroll-pb-px",
+    "scroll-pl-px",
+    "scroll-p-0.5",
+    "scroll-px-0.5",
+    "scroll-py-0.5",
+    "scroll-pt-0.5",
+    "scroll-pr-0.5",
+    "scroll-pb-0.5",
+    "scroll-pl-0.5",
+    "scroll-p-1",
+    "scroll-px-1",
+    "scroll-py-1",
+    "scroll-pt-1",
+    "scroll-pr-1",
+    "scroll-pb-1",
+    "scroll-pl-1",
+  ])
+);

@@ -36,6 +36,7 @@ export const properties = {
   gridRowEnd: only([]),
   gridColumnStart: only([]),
   gridColumnEnd: only([]),
+  strokeWidth: only([]),
   backgroundColor: only({ color: true }),
   borderBottomWidth: only<"borderBottomWidth">({ number: true }),
   borderEndWidth: only<"borderEndWidth">({ number: true }),

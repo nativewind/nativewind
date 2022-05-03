@@ -1,0 +1,35 @@
+import { expectError, tailwindRunner } from "./runner";
+
+tailwindRunner(
+  "Interactivity - Caret Color",
+  expectError([
+    "caret-inherit",
+    "caret-current",
+    "caret-transparent",
+    "caret-black",
+    "caret-white",
+    "caret-slate-50",
+    "caret-gray-50",
+    "caret-zinc-50",
+    "caret-neutral-50",
+    "caret-neutral-100",
+    "caret-stone-100",
+    "caret-red-100",
+    "caret-orange-100",
+    "caret-amber-100",
+    "caret-yellow-100",
+    "caret-lime-100",
+    "caret-green-100",
+    "caret-emerald-100",
+    "caret-teal-100",
+    "caret-cyan-100",
+    "caret-sky-100",
+    "caret-blue-100",
+    "caret-indigo-100",
+    "caret-violet-100",
+    "caret-purple-100",
+    "caret-fuchsia-100",
+    "caret-pink-100",
+    "caret-rose-100",
+  ])
+);
