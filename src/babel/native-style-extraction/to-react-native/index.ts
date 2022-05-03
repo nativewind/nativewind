@@ -6,7 +6,7 @@ import {
 } from "css-to-react-native";
 
 import { properties } from "./properties";
-import { isInvalidProperty, StyleProperty } from "./is-invalid-property";
+import { isInvalidProperty } from "./is-invalid-property";
 import { StyleError } from "../../../types/common";
 
 export interface ToReactNativeOptions {
@@ -19,18 +19,9 @@ export function toReactNative(
 ) {
   const { prop, value } = declaration;
 
-  const name = getPropertyName(prop) as StyleProperty;
+  const name = getPropertyName(prop) as keyof typeof properties;
 
   let styles: Style | undefined;
-
-  if (isInvalidProperty(name)) {
-    onError({
-      declaration,
-      error: "invalid property",
-      result: styles,
-    });
-    return;
-  }
 
   try {
     const transform = properties[name];
@@ -41,6 +32,19 @@ export function toReactNative(
     if (error instanceof Error) {
       onError({ declaration, error: error.message, result: styles });
     }
+    return;
+  }
+
+  const hasInvalidStyle = Object.keys(styles).some((property) => {
+    return isInvalidProperty(property);
+  });
+
+  if (hasInvalidStyle) {
+    onError({
+      declaration,
+      error: "invalid property",
+      result: styles,
+    });
     return;
   }
 

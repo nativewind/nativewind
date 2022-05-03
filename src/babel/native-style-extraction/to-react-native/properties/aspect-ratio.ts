@@ -1,6 +1,7 @@
-import { getStylesForProperty, Style } from "css-to-react-native";
+import { getStylesForProperty } from "css-to-react-native";
+import { PropertyFunction } from "./only";
 
-export function aspectRatio(value: string): Style {
+export const aspectRatio: PropertyFunction<"aspectRatio"> = (value) => {
   if (value === "0") {
     return {};
   } else if (typeof value === "string" && value.includes("/")) {
@@ -8,8 +9,9 @@ export function aspectRatio(value: string): Style {
       return Number.parseInt(n, 10);
     });
 
-    return { aspectRatio: left / right };
+    return getStylesForProperty("aspectRatio", `${left / right}`);
   }
 
   return getStylesForProperty("aspectRatio", value);
-}
+};
+aspectRatio.prop = "aspectRatio";

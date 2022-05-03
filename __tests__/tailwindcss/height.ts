@@ -1,7 +1,7 @@
 import { ViewStyle } from "react-native";
 import { createTests, expectError, tailwindRunner } from "./runner";
 
-const scenarios: Record<string, ViewStyle["width"]> = {
+const scenarios: Record<string, ViewStyle["height"]> = {
   0: 0,
   px: 1,
   0.5: 2,
@@ -14,7 +14,7 @@ const scenarios: Record<string, ViewStyle["width"]> = {
   "[18px]": 18,
 };
 
-tailwindRunner("Sizing - Width", [
-  ...createTests("w", scenarios, (n) => ({ width: n })),
-  ...expectError(["w-auto", "w-screen", "w-min", "w-max", "w-fit"]),
+tailwindRunner("Sizing - Height", [
+  ...createTests("h", scenarios, (n) => ({ height: n })),
+  ...expectError(["h-auto", "h-screen", "h-min", "h-max", "h-fit"]),
 ]);

@@ -1,6 +1,9 @@
 import plugin from "tailwindcss/plugin";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
-import { StyleError } from "../types/common";
+import { StyleError } from "../../types/common";
+import { fontSize } from "./font-size";
+import { lineHeight } from "./line-height";
+import { space } from "./space";
 
 export interface NativePluginOptions {
   rem?: number;
@@ -20,17 +23,10 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
       };
     }
 
-    return ({ matchUtilities, theme }) => {
-      matchUtilities(
-        {
-          "space-x": notSupported("space-x"),
-          "space-y": notSupported("space-y"),
-        },
-        {
-          values: { ...theme("space"), reverse: 0 },
-          supportsNegativeValues: true,
-        }
-      );
+    return (helpers) => {
+      space(helpers, notSupported);
+      fontSize(helpers);
+      lineHeight(helpers, notSupported);
     };
   },
   function ({ rem = 16 } = {}) {
@@ -152,6 +148,8 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
       },
       corePlugins: {
         space: false,
+        fontSize: false,
+        lineHeight: false,
       },
     };
 

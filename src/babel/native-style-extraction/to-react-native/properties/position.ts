@@ -1,8 +1,9 @@
 import { Style } from "css-to-react-native";
+import { PropertyFunction } from "./only";
 
 const supportedValues = new Set(["absolute", "relative"]);
 
-export function position(value: string): Style {
+export const position: PropertyFunction<"position"> = (value) => {
   if (supportedValues.has(value)) {
     return { position: value };
   }
@@ -11,8 +12,9 @@ export function position(value: string): Style {
   // The tailwindcss keeps picking up `static` as its a javascript keyword
   // So instead of throwing an error we just ignore it
   if (value === "static") {
-    return {};
+    return {} as Style;
   }
 
   throw new Error("position");
-}
+};
+position.prop = "position";

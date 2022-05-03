@@ -1,6 +1,8 @@
-import { getStylesForProperty, Style } from "css-to-react-native";
+import { getStylesForProperty } from "css-to-react-native";
+import { PropertyFunction } from "./only";
 
-export function flex(value: string, name: string): Style {
+export const flex: PropertyFunction<"flex"> = (value, name) => {
   const { flexGrow, flexShrink } = getStylesForProperty(name, value);
   return { flexGrow, flexShrink };
-}
+};
+flex.prop = "flex";

@@ -1,45 +1,84 @@
 import { getStylesForProperty, Style } from "css-to-react-native";
-import { StyleProperty } from "../is-invalid-property";
+import { ImageStyle, TextStyle, ViewStyle } from "react-native";
 
-type StyleCallback = (value: string) => Style;
-interface OnlyOptions {
-  values?: string[];
-  units?: string[];
-  number?: boolean;
+export type PropertyGuard<T extends string> = (
+  value: string,
+  name: string
+) => PropertyFunction<T>;
+
+export interface PropertyFunction<T extends string> {
+  prop?: T;
+  (value: string, name: string): Style;
 }
 
-export function only(name: StyleProperty, options: OnlyOptions): StyleCallback;
-export function only(name: StyleProperty, values: string[]): StyleCallback;
-export function only(name: StyleProperty, options: string[] | OnlyOptions) {
-  const { values, units, number }: OnlyOptions = Array.isArray(options)
-    ? { values: options }
-    : options;
+interface OnlyOptions<
+  T extends keyof S,
+  S extends TextStyle | ViewStyle | ImageStyle =
+    | TextStyle
+    | ViewStyle
+    | ImageStyle
+> {
+  values?: Array<S[T]>;
+  units?: string[];
+  number?: boolean;
+  color?: boolean;
+}
 
-  const supportedValues = new Set(values);
+// eslint-disable-next-line unicorn/consistent-function-scoping
+export function noop<T extends string>(): PropertyFunction<T> {
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const callback = (value: string, name: string) => {
+    return getStylesForProperty(name, value);
+  };
+  callback.prop = "" as T;
+  return callback;
+}
 
-  return (unparsedValue: string) => {
-    if (number && Number.isNaN(Number.parseInt(unparsedValue))) {
-      throw new Error(name);
-    }
+export function only<
+  T extends keyof S & string,
+  S extends TextStyle | ViewStyle | ImageStyle =
+    | TextStyle
+    | ViewStyle
+    | ImageStyle
+>(options: Array<S[T]> | OnlyOptions<T, S>): PropertyFunction<T> {
+  const {
+    values = [],
+    units,
+    number,
+    color,
+  }: OnlyOptions<T, S> = Array.isArray(options) ? { values: options } : options;
 
-    const value = getStylesForProperty(name, unparsedValue)[name];
+  const callback = (value: string, name: string) => {
+    const isNaN = Number.isNaN(Number.parseInt(value));
 
-    if (typeof value === "number") {
-      return { [name]: value };
+    if (number) {
+      if (isNaN) {
+        throw new Error(name);
+      }
+      return getStylesForProperty(name, value);
     }
 
     if (
-      typeof value === "string" &&
-      units &&
-      !Number.isNaN(Number.parseInt(value)) &&
-      units.some((unit) => value.endsWith(unit))
+      (color &&
+        (value.startsWith("#") ||
+          value.startsWith("rgb(") ||
+          value.startsWith("rgba(") ||
+          value.startsWith("hsl("))) ||
+      value === "transparent"
     ) {
-      return { [name]: value };
+      return getStylesForProperty(name, value);
     }
 
-    if (typeof value === "string" && values && supportedValues.has(value)) {
-      return { [name]: value };
+    if (!isNaN && units?.some((unit) => value.endsWith(unit))) {
+      return getStylesForProperty(name, value);
     }
+
+    if (values.includes(value as unknown as S[T])) {
+      return getStylesForProperty(name, value);
+    }
+
     throw new Error(name);
   };
+
+  return callback;
 }
