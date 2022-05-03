@@ -1,6 +1,7 @@
 import plugin from "tailwindcss/plugin";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { StyleError } from "../../types/common";
+import { divide } from "./divide";
 import { fontSize } from "./font-size";
 import { lineHeight } from "./line-height";
 import { space } from "./space";
@@ -25,6 +26,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
 
     return (helpers) => {
       space(helpers, notSupported);
+      divide(helpers, notSupported);
       fontSize(helpers);
       lineHeight(helpers, notSupported);
     };
@@ -150,6 +152,10 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
         space: false,
         fontSize: false,
         lineHeight: false,
+        divideWidth: false,
+        divideColor: false,
+        divideStyle: false,
+        divideOpacity: false,
       },
     };
 

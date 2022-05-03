@@ -28,7 +28,47 @@ const scenarios: Record<string, string> = {
   "rose-50": "rgba(255, 241, 242, 1)",
 };
 
-tailwindRunner("Typography - Text Color", [
-  ...createTests("text", scenarios, (n) => ({ color: n })),
-  ...expectError(["text-current", "text-inherit"]),
+tailwindRunner("Border - Border Color", [
+  ...createTests("border", scenarios, (n) => ({
+    borderBottomColor: n,
+    borderRightColor: n,
+    borderTopColor: n,
+    borderLeftColor: n,
+  })),
+  ...createTests("border-x", scenarios, (n) => ({
+    borderRightColor: n,
+    borderLeftColor: n,
+  })),
+  ...createTests("border-y", scenarios, (n) => ({
+    borderBottomColor: n,
+    borderTopColor: n,
+  })),
+  ...createTests("border-t", scenarios, (n) => ({
+    borderTopColor: n,
+  })),
+  ...createTests("border-b", scenarios, (n) => ({
+    borderBottomColor: n,
+  })),
+  ...createTests("border-l", scenarios, (n) => ({
+    borderLeftColor: n,
+  })),
+  ...createTests("border-r", scenarios, (n) => ({
+    borderRightColor: n,
+  })),
+  ...expectError([
+    "border-current",
+    "border-inherit",
+    "border-x-current",
+    "border-x-inherit",
+    "border-y-current",
+    "border-y-inherit",
+    "border-t-current",
+    "border-t-inherit",
+    "border-b-current",
+    "border-b-inherit",
+    "border-l-current",
+    "border-l-inherit",
+    "border-r-current",
+    "border-r-inherit",
+  ]),
 ]);

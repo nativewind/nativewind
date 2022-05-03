@@ -1,5 +1,5 @@
 import { TailwindPluginFn } from "tailwindcss/plugin";
-import isPlainObject from "./utils";
+import { isPlainObject } from "./utils";
 
 /**
  * This "fixes" the fontSize plugin to calculate relative lineHeight's
