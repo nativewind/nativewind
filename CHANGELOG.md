@@ -1,3 +1,15 @@
+# [1.0.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v0.2.0-next.1...v1.0.0-next.1) (2022-05-03)
+
+
+### Features
+
+* v1 ([67ec4e0](https://github.com/marklawlor/tailwindcss-react-native/commit/67ec4e04e186c31a24f4a438f10ed0fc27b1a566))
+
+
+### BREAKING CHANGES
+
+* useTailwind is now a factory function
+
 # [0.2.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v0.1.7...v0.2.0-next.1) (2022-05-03)
 
 
