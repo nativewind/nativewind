@@ -7,8 +7,6 @@ on:
 jobs:
   CI:
     runs-on: ubuntu-latest
-    env:
-      NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -19,5 +17,6 @@ jobs:
       - run: npm run build
       - run: npx semantic-release
         env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HUSKY: 0
