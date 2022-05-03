@@ -1,3 +1,10 @@
+# [1.0.0-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.1...v1.0.0-next.2) (2022-05-03)
+
+
+### Bug Fixes
+
+* auto publish ([e964d64](https://github.com/marklawlor/tailwindcss-react-native/commit/e964d64110ebc6f4fbc6844e9bc3c3b722379d9b))
+
 # [1.0.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v0.2.0-next.1...v1.0.0-next.1) (2022-05-03)
 
 
