@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# spell-checker: ignore chdir loglevel
+
+. "$(dirname "$0")/_/husky.sh"
+
+# Get all staged files, by name only, that have not been deleted
+ALL_FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
+
+if [ -z "$ALL_FILES" ]; then
+  exit 0
+fi
+
+TS_FILES=$(git diff --cached --name-only --diff-filter=ACMR "*.ts" "*.tsx" | sed 's| |\\ |g')
+
+npx prettier \
+  --loglevel=error \
+  --ignore-unknown \
+  --no-error-on-unmatched-pattern \
+  --write \
+  $ALL_FILES
+
+# Don't fix these, as they could cause errors
+npx eslint $TS_FILES
