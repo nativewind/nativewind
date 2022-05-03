@@ -64,7 +64,7 @@
     "@types/css": "0.0.33",
     "@types/css-mediaquery": "0.1.1",
     "@types/css-to-react-native": "3.0.0",
-    "@types/jest": "27.4.1",
+    "@types/jest": "27.5.0",
     "@types/micromatch": "4.0.2",
     "@types/react": "18.0.8",
     "@types/react-native": "0.67.6",
