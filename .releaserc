@@ -8,5 +8,5 @@
       "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
     }],
   ],
-  "branches": ["main", {"name": "next", "prerelease": true}]
+  "branches": ["+([0-9])?(.{+([0-9]),x}).x", "main", {"name": "next", "prerelease": true}]
 }
