@@ -1,3 +1,10 @@
+# [1.0.0-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.2...v1.0.0-next.3) (2022-05-03)
+
+
+### Bug Fixes
+
+* **deps:** pin dependencies ([f51b499](https://github.com/marklawlor/tailwindcss-react-native/commit/f51b4994f95cddb96c6db67d9969ec363ed761a5))
+
 # [1.0.0-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.1...v1.0.0-next.2) (2022-05-03)
 
 
