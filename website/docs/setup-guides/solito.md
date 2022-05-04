@@ -8,9 +8,9 @@ Solito apps are a combination of `react-native` (either vanilla or Expo) and `Ne
 
 ## Using the `swc` compiler
 
-- **Native**: [Native w/ compile only](/setup-guides/native-compile-only)
-- **Next.JS**: [NextJS w/ swc](/setup-guides/nextjs)
+- **Native**: [Native w/ compile only](/setup-guides/babel-compile-only)
+- **Next.JS**: [NextJS w/ swc](/setup-guides/nextjs-swc)
 
 ## Using the `babel` compiler
 
-You will need to follow the [Full Babel](/setup-guides/full-babel) instuctions for both your `react-native` and `Next.js` applications.
+You will need to follow the [Babel](/setup-guides/babel) instuctions for both your `react-native` and `Next.js` applications.
