@@ -1,3 +1,10 @@
+# [1.0.0-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.3...v1.0.0-next.4) (2022-05-04)
+
+
+### Bug Fixes
+
+* **deps:** update docusaurus monorepo to v2.0.0-beta.19 ([a381ad2](https://github.com/marklawlor/tailwindcss-react-native/commit/a381ad25a9ee9b9dcb63a1d06b3ee02e76e1725e))
+
 # [1.0.0-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.2...v1.0.0-next.3) (2022-05-03)
 
 
