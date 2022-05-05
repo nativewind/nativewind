@@ -1,3 +1,10 @@
+# [1.0.0-next.7](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.6...v1.0.0-next.7) (2022-05-05)
+
+
+### Bug Fixes
+
+* add output option to postcss plugin ([e11a066](https://github.com/marklawlor/tailwindcss-react-native/commit/e11a066c22a3f78955b6a2267fb27d2801b2d0b2))
+
 # [1.0.0-next.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.5...v1.0.0-next.6) (2022-05-05)
 
 
