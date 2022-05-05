@@ -31,3 +31,5 @@ export const TailwindSetColorSchemeContext = createContext<
 export const TailwindPlatformContext = createContext<Platform | undefined>(
   undefined
 );
+
+export const TailwindPreviewContext = createContext<boolean>(false);

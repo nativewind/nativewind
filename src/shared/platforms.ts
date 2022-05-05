@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 
-export type Platform = typeof Platform.OS | "native" | "web-inline";
+export type Platform = typeof Platform.OS | "native";
 
 export const platforms: Platform[] = [
   "android",
@@ -9,7 +9,6 @@ export const platforms: Platform[] = [
   "native",
   "windows",
   "macos",
-  "web-inline",
 ];
 
 export const nativePlatforms: Platform[] = [

@@ -203,11 +203,11 @@ function MyAppsProviders ({ children }) {
 
 You don't need to provide these props if you are using Babel or spreading the CLI output.
 
-| Prop     | Values                                                              | Default     | Description                               |
-| -------- | ------------------------------------------------------------------- | ----------- | ----------------------------------------- |
-| platform | `web`, `native`, `ios`, `android`, `windows`, `macos`, `web-inline` | Platform.OS | Specifies how the styles are transformed. |
-| style    | Compiled style object                                               |             |                                           |
-| media    | Compiled media object                                               |             |                                           |
+| Prop     | Values                                                | Default     | Description                               |
+| -------- | ----------------------------------------------------- | ----------- | ----------------------------------------- |
+| platform | `web`, `native`, `ios`, `android`, `windows`, `macos` | Platform.OS | Specifies how the styles are transformed. |
+| style    | Compiled style object                                 |             |                                           |
+| media    | Compiled media object                                 |             |                                           |
 
 ## Component API
 

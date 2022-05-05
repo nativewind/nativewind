@@ -52,7 +52,7 @@ tailwindRunner("Platform Prefixes", [
         "web_w-px.0": { width: 1 },
       },
       media: {
-        "web_w-px": ["web-inline"],
+        "web_w-px": ["web"],
       },
     },
   ],
