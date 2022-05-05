@@ -1,7 +1,7 @@
 import { Program } from "@babel/types";
 import { NodePath } from "@babel/traverse";
 
-import { extractStyles } from "./native-style-extraction";
+import { extractStyles } from "./extract-styles";
 import { appendVariables } from "./transforms/append-variables";
 import { prependImport } from "./transforms/append-import";
 import { TailwindcssReactNativeBabelOptions, State } from "./types";
