@@ -19,7 +19,12 @@ export function getImportBlockedComponents(
   path: NodePath<ImportDeclaration>,
   state: VisitorState
 ): string[] {
-  const { allowModules, allowRelativeModules, blockModules, filename } = state;
+  const {
+    allowModuleTransform,
+    allowRelativeModules,
+    blockModuleTransform,
+    filename,
+  } = state;
 
   const require = createRequire(filename);
   const moduleName = path.node.source.value;
@@ -67,17 +72,17 @@ export function getImportBlockedComponents(
       }
     } else {
       isNodeModule = true;
-      isBlocked = micromatch.isMatch(moduleName, blockModules);
+      isBlocked = micromatch.isMatch(moduleName, blockModuleTransform);
       isAllowed =
-        allowModules === "*"
+        allowModuleTransform === "*"
           ? true
-          : micromatch.isMatch(moduleName, allowModules);
+          : micromatch.isMatch(moduleName, allowModuleTransform);
     }
   }
 
   if (isNodeModule) {
-    isBlocked ??= micromatch.isMatch(moduleName, blockModules);
-    isAllowed ??= micromatch.isMatch(moduleName, allowModules);
+    isBlocked ??= micromatch.isMatch(moduleName, blockModuleTransform);
+    isAllowed ??= micromatch.isMatch(moduleName, allowModuleTransform);
     returnComponentsAsBlocked = isBlocked || !isAllowed;
   } else {
     const isNotAllowedRelative =

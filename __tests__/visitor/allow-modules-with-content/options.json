@@ -1,4 +1,4 @@
 {
-  "allowModules": ["react-native"],
+  "allowModuleTransform": ["react-native"],
   "tailwindConfigPath": "./allow-modules-with-content/tailwind.config.js"
 }

@@ -23,7 +23,7 @@ export default function rootVisitor(
     },
   });
 
-  const { allowModules, allowRelativeModules } = getAllowedOptions(
+  const { allowModuleTransform, allowRelativeModules } = getAllowedOptions(
     tailwindConfig,
     options
   );
@@ -48,12 +48,12 @@ export default function rootVisitor(
             platform: "native",
             hmr: true,
             skipTransform: false,
-            blockModules: [],
+            blockModuleTransform: [],
             hasStyledComponentImport: false,
             hasClassNames: false,
             ...state,
             ...state.opts,
-            allowModules,
+            allowModuleTransform,
             allowRelativeModules,
             blockList: new Set(),
             hasProvider: false,

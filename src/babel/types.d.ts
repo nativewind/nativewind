@@ -3,8 +3,8 @@ import { ViewStyle, TextStyle, ImageStyle } from "react-native";
 export type AllowPathOptions = "*" | string[];
 
 export interface TailwindcssReactNativeBabelOptions {
-  allowModules?: AllowPathOptions;
-  blockModules?: string[];
+  allowModuleTransform?: AllowPathOptions;
+  blockModuleTransform?: string[];
   platform?: "web" | "native";
   skipTransform?: false;
   rem?: number;
