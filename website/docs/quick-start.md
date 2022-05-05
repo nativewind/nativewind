@@ -4,7 +4,7 @@ sidebar_position: 200
 
 # Quick start guide
 
-## 1. Create a new React Native Application
+## 1. Create a new React Native application
 
 ```
 npx create-react-native-app my-tailwind-native-app
@@ -12,7 +12,13 @@ npx create-react-native-app my-tailwind-native-app
 
 Choose "Default new app"
 
+```bash
+cd my-tailwind-native-app
+```
+
 ## 2. Install the dependancies
+
+You will need to install `tailwindcss-react-native` and it's peer dependancy `tailwindcss`.
 
 ```bash
 cd my-tailwind-native-app

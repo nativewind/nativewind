@@ -83,18 +83,26 @@ export function MyActivityIndicator(props) {
 
 > There are more setup configurations and in-depth guides [on our website](https://tailwindcss-react-native.vercel.app/installation)
 
-## 1. Create a new React Native Application
+## 1. Create a new React Native application
 
 ```
-npx create-react-native-app my-tailwind-native-app
+npx create-react-native-app my-tailwind-native-app;
+
 ```
 
 Choose "Default new app"
 
-## 2. Install the dependancies
+Then change your `cwd` to the folder containing the project
 
 ```bash
 cd my-tailwind-native-app
+```
+
+## 2. Install the dependancies
+
+You will need to install `tailwindcss-react-native` and it's peer dependancy `tailwindcss`.
+
+```bash
 npm install tailwindcss-react-native
 npm install --save-dev tailwindcss
 ```
