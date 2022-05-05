@@ -1,3 +1,10 @@
+# [1.0.0-next.10](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.9...v1.0.0-next.10) (2022-05-05)
+
+
+### Features
+
+* add feature preview flag ([06d3f46](https://github.com/marklawlor/tailwindcss-react-native/commit/06d3f46106fa91be08d3f87400cd87d21bc5bb98))
+
 # [1.0.0-next.9](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.8...v1.0.0-next.9) (2022-05-05)
 
 
