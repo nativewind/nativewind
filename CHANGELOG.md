@@ -1,3 +1,10 @@
+# [1.0.0-next.9](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.8...v1.0.0-next.9) (2022-05-05)
+
+
+### Bug Fixes
+
+* production dependancies ([675d00f](https://github.com/marklawlor/tailwindcss-react-native/commit/675d00f9174a701aed5a131daaff98df592d2389))
+
 # [1.0.0-next.8](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.7...v1.0.0-next.8) (2022-05-05)
 
 
