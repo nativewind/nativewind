@@ -18,17 +18,18 @@ Follow the [setup guide for Tailwind CLI](https://tailwindcss.com/docs/installat
 
 Follow the [general setup instructions](../installation.md) to setup tailwindcss-react-native.
 
-## 3. Update the TailwindProvider
+## 3. Enable preview features
+
+You will need to enable preview features on your `TailwindProvider`
 
 ```diff
 import { TailwindProvider } from 'tailwindcss-react-native'
-+ import * as tailwindProviderProps from "./tailwindcss-react-native-output"
 
 function MyAppsProviders ({ children }) {
-    return (
--       <TailwindProvider>{children}</TailwindProvider>
-+       <TailwindProvider {...tailwindProviderProps}>{children}</TailwindProvider>
-    )
+  return (
+-   <TailwindProvider>{children}</TailwindProvider>
++   <TailwindProvider preview={true}>{children}</TailwindProvider>
+  )
 }
 ```
 
