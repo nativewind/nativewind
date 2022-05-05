@@ -14,7 +14,10 @@ First, you will need to install both `tailwindcss-react-native` and `tailwindcss
 <Tabs>
   <TabItem value="npm" label="NPM" default>
 
-`npm install --save-dev tailwindcss-react-native tailwindcss`
+```
+npm install tailwindcss-react-native
+npm install --save-dev tailwindcss
+```
 
   </TabItem>
   <TabItem value="yarn" label="Yarn">

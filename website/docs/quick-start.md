@@ -4,7 +4,7 @@ sidebar_position: 200
 
 # Quick start guide
 
-## 1. Create a new React Native Application
+## 1. Create a new React Native application
 
 ```
 npx create-react-native-app my-tailwind-native-app
@@ -12,16 +12,23 @@ npx create-react-native-app my-tailwind-native-app
 
 Choose "Default new app"
 
+```bash
+cd my-tailwind-native-app
+```
+
 ## 2. Install the dependancies
+
+You will need to install `tailwindcss-react-native` and it's peer dependancy `tailwindcss`.
 
 ```bash
 cd my-tailwind-native-app
-yarn add --dev tailwindcss-react-native tailwindcss
+npm install tailwindcss-react-native
+npm install --save-dev tailwindcss
 ```
 
 ## 3. Setup Tailwind CSS
 
-Run `yarn tailwindcss init`
+Run `npx tailwindcss init` to create a `tailwind.config.ts` file
 
 Add the paths to all of your component files in your tailwind.config.js file.
 
@@ -58,7 +65,7 @@ Modify your `App.js` to add the `TailwindProvider`
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { TailwindProvider } from 'tailwindcss-react-native';
++ import { TailwindProvider } from 'tailwindcss-react-native';
 
 export default function App() {
   return (

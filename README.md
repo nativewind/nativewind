@@ -1,344 +1,194 @@
 # tailwindcss-react-native
 
-<img src="https://raw.github.com/marklawlor/tailwindcss-react-native/main/docs/example.svg">
+`tailwindcss-react-native` uses [Tailwind CSS](https://tailwindcss.com) as **universal design system** for all React Native platforms. It lets you share code between all React Native platforms and improves DX, performance and code maintainability.
 
-Use [Tailwindcss](https://tailwindcss.com/) in your cross platform [React Native](https://reactnative.dev/) applications.
+It is powered by the Tailwind CSS compiler to process the styles, themes, responsive and conditional logic. The styles can than be used as React Native Stylesheets or as CSS - whatever suits your platform best!
 
-- **native support** for multiple platforms (uses RN Stylesheets for native, CSS Stylesheets for web)
-- **fast refresh** compatible
-- respects **all** tailwind.config.js, including themes, custom values, plugins
-- supports **dark mode** / **arbitrary classes** / **media queries**
-- supports **responsive** Server Side Rendering (SSR) on Web
+## Features
 
-Already using another RN library for Tailwind? [Find out why you should switch.](https://github.com/marklawlor/tailwindcss-react-native/blob/main/docs/library-comparision.md)
+- Works on all RN platforms (including Web, Macos & Windows)
+- Uses the Tailwind compiler
+- Can be used with either React Native or CSS StyleSheets!
+- Babel plugin for simple setup, or can integrate with your tooling
+- Fast refresh compatible
+- Respects all tailwind.config.js settings, including themes, custom values, plugins
+- Supports dark mode / arbitrary classes / media queries
+- Styles processed at build time - not runtime
 
-## Getting started
+## Documentation
 
-Install the library
+All documenation is on our website https://tailwindcss-react-native.vercel.app
 
-`npm install tailwindcss-react-native tailwindcss` or `yarn add tailwindcss-react-native tailwindcss`
+- [Introduction](https://tailwindcss-react-native.vercel.app/)
+- [Installation](https://tailwindcss-react-native.vercel.app/installation)
 
-Create a `tailwind.config.js` and set `content` and added the `tailwindcss-react-native/plugin`
+## In action
 
-```js
-// tailwind.config.js
-module.exports = {
-  plugins: [require("tailwindcss-react-native/plugin")],
-  content: [
-    "./screens/**/*.{js,ts,jsx,tsx}",
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-  ],
-  // ...
-};
-```
+You can use the Babel plugin to instantly start writing code! This will also enable your editor's language support and provide features such as autocomplete with no extra setup!
 
-Add the `TailwindProvider` to your application
+```tsx
+import { Text } from "react-native";
 
-```JSX
-import { TailwindProvider } from 'tailwindcss-react-native'
-
-function MyAppsProviders ({ children }) {
-  return (
-    <TailwindProvider>{children}</TailwindProvider>
-  )
+export function BoldText(props) {
+  // Thanks to Babel, I just work :)
+  return <Text className="text-bold" {...props} />;
 }
 ```
 
-#### tailwindcss peerDependency
+Or use the Component API to be more explicit about what gets the styles.
 
-This package has a peerDependency of `tailwindcss@3.x.x`. You can install it with `npm install tailwindcss` or `yarn add tailwindcss`
+```tsx
+import { Text } from "react-native";
+import { styles } from "tailwindcss-react-native";
 
-#### Typescript support
+const StyledText = styled(Text);
 
-Create a file (eg. `src/tailwindcss-react-native.d.ts`) and paste this line
-
-```js
-import "tailwindcss-react-native/types.d";
-```
-
-## Additional setup
-
-This library can be used with or without babel. The babel plugin provide DexUX features such as:
-
-- Automatically wrap components in `StyledComponent`
-- Automatically inject Tailwindcss styles
-
-You can see examples of the plugin in action via the [unit tests](https://github.com/marklawlor/tailwindcss-react-native/tree/main/__tests__/visitor). E.g. [before](https://github.com/marklawlor/tailwindcss-react-native/blob/main/__tests__/visitor/basic/code.tsx) and [after](https://github.com/marklawlor/tailwindcss-react-native/blob/main/__tests__/visitor/basic/output.tsx).
-
-If you do not wish to use babel, or are using using a non-babel web framework (such as [Next.js](https://nextjs.org/docs/advanced-features/compiler)), you will need to manually wrap native components via the [Component Api](#component-api).
-
-<details>
-  <summary>With babel</summary>
-  <hr />
-  Add `tailwindcss-react-native/babel` to your babel plugins
-
-```js
-// babel.config.js
-module.exports = {
-  plugins: ["tailwindcss-react-native/babel"],
-};
-```
-
-The babel plugin will covert components with a `className` attribute into a `StyledComponent`. Please see [Babel Options](#babel-options) to configure the transform.
-
-  <hr />
-</details>
-
-<details>
-  <summary>Without babel</summary>
-  <hr />
-
-### Component API
-
-Without babel, you will need to manually wrap your native components via the [Component API](#component-api)
-
-```JSX
-// Example usage of the Component API
-import { Text } from "react-native"
-import { styled } from "tailwindcss-react-native"
-
-const StyledText = styled(Text)
-
-export function MyComponent() {
-  return <StyledText className="font-bold">Hello world</StyledText>
+export function BoldText(props) {
+  return <StyledText className="text-bold" {...props} />;
 }
 ```
 
-### Web frameworks with Tailwindcss Support
+You still have the ability to perform conditional logic and built up complex style objects.
 
-> The platform `web` requires `react-native-web@0.18+` (currently in preview). Please see this [PR](https://github.com/necolas/react-native-web/pull/2248) for more info. If your are currently using `<=0.17` you can still use `native` for rendering within a browser.
+```tsx
+import { Text } from "react-native";
 
-If you are using a web framework with [first-class Tailwindcss support](https://tailwindcss.com/docs/installation/framework-guides) you can follow the framework setup guide and simply add the `TailwindProvider` with the `platform="web"` attribute.
+export function MyText({ bold, italic, lineThrough, ...props }) {
+  const classNames = [];
 
-```JSX
-import { TailwindProvider } from 'tailwindcss-react-native'
+  if (bold) classNames.push("font-bold");
+  if (italic) classNames.push("italic");
+  if (lineThrough) classNames.push("line-through");
 
-function MyAppsProviders ({ children }) {
-    return (
-       <TailwindProvider platform="web">{children}</TailwindProvider>
-    )
+  return <Text className={classNames.join(" ")} {...props} />;
 }
 ```
 
-### Native
+And access the styles directly
 
-The tailwindcss styles will need to be compiled via the `tailwindcss-react-native` command-line tool. This tool wraps the `tailwindcss` CLI and outputs a file which will need to be manually imported into your application.
-
-There are many ways to run `tailwindcss-react-native`, but we recommend using [`concurrently`](https://www.npmjs.com/package/concurrently) to run the process in parallel with your normal startup command (eg. `"start": "concurrently \"tailwindcss-react-native --platform native --watch\" \"expo start\""`).
-
-Please see [CLI Options](#cli-options) for usuage of the CLI.
-
-Once you have the generated file, you will need to update your `TailwindProvider`
-
-```diff
-import { TailwindProvider } from 'tailwindcss-react-native'
-+ import * as tailwindProviderProps from "./tailwindcss-react-native-output"
-
-function MyAppsProviders ({ children }) {
-    return (
--       <TailwindProvider>{children}</TailwindProvider>
-+       <TailwindProvider {...tailwindProviderProps}>{children}</TailwindProvider>
-    )
-}
-```
-
-  <hr />
-</details>
-
-#### Web only
-
-> The platform `web` requires `react-native-web@0.18+` (currently in preview). Please see this [PR](https://github.com/necolas/react-native-web/pull/2248) for more info. If your are currently using `<=0.17` you can still use `native` for rendering within a browser.
-
-If using `{ platform: 'web' }` you will need to follow the follow the [TailwindCSS installation steps](https://tailwindcss.com/docs/installation) to include it's styles in your application.
-
-## Usage
-
-### With Babel
-
-Simply add a `className` attribute to your components
-
-```JSX
-<Text className="font-bold">
-```
-
-### useTailwind
-
-Sometimes components have multiple style props, or you need programmatic access to the generated styles. In these instances you can use the `useTailwind` hook.
-
-```JSX
-import { MotiView } from "moti";
+```tsx
+import { Text } from "react-native";
 import { useTailwind } from "tailwindcss-react-native";
 
-export function MyComponent() {
-  const tw = useTailwind()
+export function MyActivityIndicator(props) {
+  const tw = useTailwind();
 
-  const opacity0 = tw('opacity-0')
-  const opacity1 = tw('opacity-1')
+  const { color } = tx("text-blue-500");
 
+  return <ActivityIndicator size="small" color={color} {...props} />;
+}
+```
+
+# Quick start guide
+
+> There are more setup configurations and in-depth guides [on our website](https://tailwindcss-react-native.vercel.app/installation)
+
+## 1. Create a new React Native application
+
+```
+npx create-react-native-app my-tailwind-native-app;
+
+```
+
+Choose "Default new app"
+
+Then change your `cwd` to the folder containing the project
+
+```bash
+cd my-tailwind-native-app
+```
+
+## 2. Install the dependancies
+
+You will need to install `tailwindcss-react-native` and it's peer dependancy `tailwindcss`.
+
+```bash
+npm install tailwindcss-react-native
+npm install --save-dev tailwindcss
+```
+
+## 3. Setup Tailwind CSS
+
+Run `npx tailwindcss init` to create a `tailwind.config.ts` file
+
+Add the paths to all of your component files in your tailwind.config.js file.
+
+```diff
+// tailwind.config.js
+module.exports = {
+- content: [],
++ content: ["./**/*.{js,jsx,ts,tsx}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+## 4. Add the Babel plugin
+
+Modify your `babel.config.js`
+
+```diff
+// babel.config.js
+module.exports = {
+- plugins: [],
++ plugins: ["tailwindcss-react-native/babel"],
+};
+```
+
+## 5. Add the TailwindProvider
+
+Modify your `App.js` to add the `TailwindProvider`
+
+```diff
+// App.js
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
++ import { TailwindProvider } from 'tailwindcss-react-native';
+
+export default function App() {
   return (
-    <MotiView
-      from={opacity0}
-      animate={opacity1}
-      exit={opacity0}
-    />
++   <TailwindProvider>
+      <View style={styles.container}>
+        <Text>Open up App.js to start working on your app!</Text>
+        <StatusBar style="auto" />
+      </View>
++   </TailwindProvider>
+  );
+}
+```
+
+## Thats it 🎉
+
+Start writing code!
+
+```diff
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+- import { StyleSheet, Text, View } from 'react-native';
++ import { Text, View } from 'react-native';
+import { TailwindProvider } from 'tailwindcss-react-native';
+
+export default function App() {
+  return (
+    <TailwindProvider>
+-     <View style={styles.container}>
++     <View className="flex-1 items-center justify-center bg-white">
+        <Text>Open up App.js to start working on your app!</Text>
+        <StatusBar style="auto" />
+      </View>
+    </TailwindProvider>
   );
 }
 
+- const styles = StyleSheet.create({
+-   container: {
+-     flex: 1,
+-     backgroundColor: '#fff',
+-     alignItems: 'center',
+-     justifyContent: 'center',
+-   },
+- });
 ```
-
-### TailwindProvider
-
-All components need to be within the context of the TailwindProvider.
-
-```JSX
-import { TailwindProvider } from 'tailwindcss-react-native'
-
-function MyAppsProviders ({ children }) {
-   return (
-     <TailwindProvider platform="native">{children}</TailwindProvider>
-   )
- }
-```
-
-You don't need to provide these props if you are using Babel or spreading the CLI output.
-
-| Prop     | Values                                                | Default     | Description                               |
-| -------- | ----------------------------------------------------- | ----------- | ----------------------------------------- |
-| platform | `web`, `native`, `ios`, `android`, `windows`, `macos` | Platform.OS | Specifies how the styles are transformed. |
-| style    | Compiled style object                                 |             |                                           |
-| media    | Compiled media object                                 |             |                                           |
-
-## Component API
-
-If you are not using the babel plugin you will need to use the Component API.
-
-### styled
-
-`styled` is a [Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) which transforms the component into a `tailwindcss-react-native` compatible component.
-
-A component created via `styled` will now accept the `tw` or `className` prop. It will recieve the compiled styles via the `style` prop.
-
-There is no difference between `tw` and `className`, but `tw` has priority.
-
-```JSX
-import { Text } from "react-native"
-import { styled } from "tailwindcss-react-native"
-
-const StyledText = styled(Text)
-
-export function MyComponent() {
-  return (
-    <>
-      <StyledText tw="font-bold">Hello world</StyledText>
-      <StyledText className="font-bold">Hello world</StyledText>
-    </>
-  )
-}
-```
-
-### StyledComponent
-
-`StyledComponent` is the component version of `styled`. It is a normal component that accepts your component as a prop.
-
-`StyledComponent` will pass all props to your component, except for `tw` and `className` which it will convert into the `style` prop.
-
-There is no difference between `tw` and `className`, but `tw` has priority.
-
-```JSX
-import { Text } from "react-native"
-import { StyledComponent } from "tailwindcss-react-native"
-
-export function MyComponent() {
-  return (
-    <>
-      <StyledComponent component={Text} tw="font-bold">Hello world</StyledComponent>
-      <StyledComponent component={Text} className="font-bold">Hello world</StyledComponent>
-    </>
-  )
-}
-```
-
-## Options
-
-### Babel Options
-
-Options can be provided via the babel config
-
-```js
-// babel.config.js
-module.exports = {
-  plugins: [
-    [
-      "tailwindcss-react-native/babel",
-      { tailwindConfig: "./tailwind.native.config.js" },
-    ],
-  ],
-};
-```
-
-| Option               | Values                                                | Default                                       | Description                                                                                |
-| -------------------- | ----------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| platform             | `native`, `web`, `ios`, `android`, `windows`, `macos` | `native`                                      | Specifies how the className is transformed.                                                |
-| hmr                  | `boolean`                                             | Development: `true` <br />Production: `false` | Allow fast-refresh of styles                                                               |
-| tailwindConfig       | Path relative to `cwd`                                | `tailwind.config.js`                          | Provide a custom `tailwind.config.js`. Useful for setting different settings per platform. |
-| allowModuleTransform | `*`, `string[]`                                       | `*`                                           | Only transform components from these imported modules. `*` will transform all modules      |
-| blockModuleTransform | `string[]`                                            | `[]`                                          | Do not transform components from these imported modules.                                   |
-
-### CLI Options
-
-Usage `tailwindcss-react-native [...options]`
-
-```
-Options:
-      --help      Show help                                             [boolean]
-      --version   Show version number                                   [boolean]
-  -p, --platform  tailwindcss-react-native platform                    [required]
-  -c, --config    Path to tailwindcss config file [default: "tailwind.config.js"]
-  -o, --output    Output file     [default: "tailwindcss-react-native-output.js"]
-  -w, --watch     Watch for changes and rebuild as needed        [default: false]
-```
-
-## Troubleshooting
-
-### Components are not being transformed
-
-Make sure your `tailwind.config.js` content configuration is correct and matches all of the right source files.
-
-A common mistake is missing a file extension, for example if you’re using jsx instead of js for your React components:
-
-```diff
-module.exports = {
-  content: [
--   './src/**/*.{html,js}',
-+   './src/**/*.{html,js,jsx}'
-  ],
-  // ...
-}
-```
-
-Or creating a new folder mid-project that wasn’t covered originally and forgetting to add it to your configuration:
-
-```diff
-module.exports = {
-  content: [
-    './pages/**/*.{html,js}',
-    './components/**/*.{html,js}',
-+    './util/**/*.{html,js}'
-  ],
-  // ...
-}
-```
-
-### Don't construct class names dynamically
-
-The TailwindCSS compiler [does not allow for dynamic class names](https://tailwindcss.com/docs/content-configuration#dynamic-class-names). Use this pattern instead
-
-```diff
-- <div class="text-{{ error ? 'red' : 'green' }}-600"></div>
-+ <div class="{{ error ? 'text-red-600' : 'text-green-600' }}"></div>
-```
-
-### className is not passed to child components
-
-The `className` prop is not passed to the wrapped components, it is transformed into a style object and passed via the `style` prop.
