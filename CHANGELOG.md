@@ -1,3 +1,10 @@
+## [1.0.1-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0...v1.0.1-next.1) (2022-05-05)
+
+
+### Bug Fixes
+
+* ci versioning ([f2374e3](https://github.com/marklawlor/tailwindcss-react-native/commit/f2374e3e30b51d2e9844ce0cec9eed0e2b37c18e))
+
 # [1.0.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v0.1.7...v1.0.0) (2022-05-05)
 
 
