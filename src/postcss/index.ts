@@ -1,13 +1,8 @@
 import { Plugin, PluginCreator } from "postcss";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
-import { normaliseSelector } from "../../shared/selector";
+import { normaliseSelector } from "../shared/selector";
 import { toReactNative } from "./to-react-native";
-import {
-  MediaRecord,
-  StyleRecord,
-  Style,
-  StyleError,
-} from "../../types/common";
+import { MediaRecord, StyleRecord, Style, StyleError } from "../types/common";
 
 const mediaStringSymbol = Symbol("media_string");
 

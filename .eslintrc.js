@@ -44,7 +44,7 @@ module.exports = {
       },
     },
     {
-      files: ["*rc.js", "*.config.js", "plugin.js", "babel.js"],
+      files: ["*rc.js", "*.config.js", "plugin.js", "babel.js", "postcss.js"],
       rules: {
         "unicorn/prefer-module": "off",
         "@typescript-eslint/no-var-requires": "off",

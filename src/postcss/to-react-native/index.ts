@@ -7,7 +7,7 @@ import {
 
 import { properties } from "./properties";
 import { isInvalidProperty } from "./is-invalid-property";
-import { StyleError } from "../../../types/common";
+import { StyleError } from "../../types/common";
 
 export interface ToReactNativeOptions {
   onError: (options: StyleError) => void;
