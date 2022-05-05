@@ -1,3 +1,10 @@
+# [1.0.0-next.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.4...v1.0.0-next.5) (2022-05-05)
+
+
+### Features
+
+* rename allowModules and blockmodules ([46d52bc](https://github.com/marklawlor/tailwindcss-react-native/commit/46d52bc160b700c65c691d08f7f5ef3af508cf5d))
+
 # [1.0.0-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.3...v1.0.0-next.4) (2022-05-04)
 
 
