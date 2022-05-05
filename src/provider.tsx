@@ -7,6 +7,7 @@ import {
   TailwindColorSchemeContext,
   TailwindMediaContext,
   TailwindPlatformContext,
+  TailwindPreviewContext,
   TailwindSetColorSchemeContext,
   TailwindStyleContext,
 } from "./context";
@@ -16,6 +17,7 @@ export interface TailwindProviderProps {
   media?: MediaRecord;
   colorScheme?: ColorSchemeName;
   platform?: typeof Platform.OS | "native";
+  preview?: boolean;
 }
 
 export function TailwindProvider({
@@ -23,6 +25,7 @@ export function TailwindProvider({
   media = globalThis.tailwindcss_react_native_media,
   colorScheme: overrideColorScheme,
   platform = Platform.OS,
+  preview = false,
   children,
 }: PropsWithChildren<TailwindProviderProps>) {
   const [colorScheme, setColorScheme] = useState<ColorSchemeName>(
@@ -33,13 +36,15 @@ export function TailwindProvider({
     <TailwindStyleContext.Provider value={styles}>
       <TailwindMediaContext.Provider value={media}>
         <TailwindPlatformContext.Provider value={platform}>
-          <TailwindColorSchemeContext.Provider
-            value={overrideColorScheme || colorScheme}
-          >
-            <TailwindSetColorSchemeContext.Provider value={setColorScheme}>
-              {children}
-            </TailwindSetColorSchemeContext.Provider>
-          </TailwindColorSchemeContext.Provider>
+          <TailwindPreviewContext.Provider value={preview}>
+            <TailwindColorSchemeContext.Provider
+              value={overrideColorScheme || colorScheme}
+            >
+              <TailwindSetColorSchemeContext.Provider value={setColorScheme}>
+                {children}
+              </TailwindSetColorSchemeContext.Provider>
+            </TailwindColorSchemeContext.Provider>
+          </TailwindPreviewContext.Provider>
         </TailwindPlatformContext.Provider>
       </TailwindMediaContext.Provider>
     </TailwindStyleContext.Provider>
