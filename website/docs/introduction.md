@@ -6,12 +6,23 @@ sidebar_position: 1
 # Introduction
 
 :::tip
-[Looking to get started? Read our quick-start guide!](/quick-start)
+[Want to jump straight in? Read our quick-start guide!](/quick-start)
 :::
 
 `tailwindcss-react-native` uses [Tailwind CSS](https://tailwindcss.com) as **universal design system** for all React Native platforms. It lets you share code between all React Native platforms and improves DX, performance and code maintainability.
 
 It is powered by the Tailwind CSS compiler to process the styles, themes, responsive and conditional logic. The styles can than be used as React Native Stylesheets or as CSS - whatever suits your platform best!
+
+## Features
+
+- Works on all RN platforms (including Web, Macos & Windows)
+- Uses the Tailwind compiler
+- Can be used with either React Native or CSS StyleSheets!
+- Babel plugin for simple setup, or can integrate with your tooling
+- Fast refresh compatible
+- Respects all tailwind.config.js settings, including themes, custom values, plugins
+- Supports dark mode / arbitrary classes / media queries
+- Styles processed at build time - not runtime
 
 ## In action
 
