@@ -19,7 +19,7 @@ module.exports = {
   plugins: [
     require("tailwindcss"),
     [
-      require("tailwindcss-react-native/postcss/native"),
+      require("tailwindcss-react-native/postcss"),
       {
         /* options */
       },

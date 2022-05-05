@@ -5,7 +5,7 @@ import postcssCssvariables from "postcss-css-variables";
 import postcssColorFunctionalNotation from "postcss-color-functional-notation";
 import calc from "postcss-calc";
 
-import { plugin } from "./postcss-plugin";
+import { plugin } from "../../postcss";
 import { MediaRecord, StyleError, StyleRecord } from "../../types/common";
 
 /**

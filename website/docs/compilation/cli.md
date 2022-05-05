@@ -15,7 +15,7 @@ Follow the [general setup instructions](//installation) to setup tailwindcss-rea
 module.exports = {
   plugins: [
     [
-      require("tailwindcss-react-native/postcss/native"),
+      require("tailwindcss-react-native/postcss"),
       {
         /* options */
       },
