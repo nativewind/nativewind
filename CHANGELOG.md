@@ -1,3 +1,20 @@
+# [1.0.0-next.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.5...v1.0.0-next.6) (2022-05-05)
+
+
+### Bug Fixes
+
+* expose postcss plugin ([e0a1c3c](https://github.com/marklawlor/tailwindcss-react-native/commit/e0a1c3cb8f933f34029fb678f672ae0b0dca71a9))
+
+
+### Features
+
+* new babel modes ([461f476](https://github.com/marklawlor/tailwindcss-react-native/commit/461f47697dfd27458c2da80230b3eca848f68040))
+
+
+### BREAKING CHANGES
+
+* skipTransform: true has been changed to mode: "compileOnly"
+
 # [1.0.0-next.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.4...v1.0.0-next.5) (2022-05-05)
 
 
