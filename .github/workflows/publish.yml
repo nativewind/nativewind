@@ -15,7 +15,10 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run build
-      - run: npm test
+      - name: Get number of CPU cores
+        id: cpu-cores
+        uses: SimenB/github-actions-cpu-cores@v1
+      - run: npm test -- --max-workers ${{ steps.cpu-cores.outputs.count }}
       - run: npx semantic-release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
