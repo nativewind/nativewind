@@ -10,20 +10,20 @@ const defaultContent: NonNullable<TailwindConfig["content"]> = {
 };
 
 interface GetAllowedOptionsOptions {
-  allowModules: AllowPathOptions;
+  allowModuleTransform: AllowPathOptions;
   allowRelativeModules: AllowPathOptions;
 }
 
 export function getAllowedOptions(
   { content = defaultContent }: TailwindConfig,
-  { allowModules = "*" }: TailwindcssReactNativeBabelOptions
+  { allowModuleTransform = "*" }: TailwindcssReactNativeBabelOptions
 ): GetAllowedOptionsOptions {
   const contentPaths = Array.isArray(content) ? content : content.files;
 
   return {
-    allowModules: Array.isArray(allowModules)
-      ? ["react-native", "react-native-web", ...allowModules]
-      : allowModules,
+    allowModuleTransform: Array.isArray(allowModuleTransform)
+      ? ["react-native", "react-native-web", ...allowModuleTransform]
+      : allowModuleTransform,
     allowRelativeModules: contentPaths.length === 0 ? "*" : contentPaths,
   };
 }

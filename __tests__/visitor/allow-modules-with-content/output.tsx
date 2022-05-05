@@ -10,8 +10,10 @@ export function Test() {
       <StyledComponent className="font-bold" component={Text}>
         Hello world!
       </StyledComponent>
-      <MotiText className="font-bold">Not in allowModules</MotiText>
-      <TestComponent className="font-bold">Not in allowModules</TestComponent>
+      <MotiText className="font-bold">Not in allowModuleTransform</MotiText>
+      <TestComponent className="font-bold">
+        Not in allowModuleTransform
+      </TestComponent>
     </TailwindProvider>
   );
 }
