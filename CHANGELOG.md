@@ -1,3 +1,11 @@
+# [1.0.0-next.8](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.7...v1.0.0-next.8) (2022-05-05)
+
+
+### Bug Fixes
+
+* postcss plugin not compiling variables ([fdd14fe](https://github.com/marklawlor/tailwindcss-react-native/commit/fdd14fe4628a504342377ce7cd3e77555e5d41a9))
+* updated dependancies ([06ee26b](https://github.com/marklawlor/tailwindcss-react-native/commit/06ee26b092793e11a40ebe62d90153823b60a3a2))
+
 # [1.0.0-next.7](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.6...v1.0.0-next.7) (2022-05-05)
 
 
