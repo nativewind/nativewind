@@ -8,7 +8,7 @@ Not everyone wants their components transformed via Babel, so a compile only ver
 
 ## 1. Setup tailwindcss-react-native
 
-Follow the [general setup instructions](/installation) to setup tailwindcss-react-native.
+Follow the [general setup instructions](../installation.md) to setup tailwindcss-react-native.
 
 ## 2. Configure your babel.config.js
 

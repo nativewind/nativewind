@@ -7,7 +7,7 @@ sidebar_label: PostCSS (RN StyleSheet)
 
 ## 1. Setup tailwindcss-react-native
 
-Follow the [general setup instructions](//installation) to setup tailwindcss-react-native.
+Follow the [general setup instructions](../installation.md) to setup tailwindcss-react-native.
 
 ## 2. Create a PostCSS config file
 
