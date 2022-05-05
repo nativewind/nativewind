@@ -14,9 +14,9 @@ function MyAppsProviders({ children }) {
 }
 ```
 
-| Prop     | Values                                                | Default     | Description                                           |
-| -------- | ----------------------------------------------------- | ----------- | ----------------------------------------------------- |
-| platform | `web`, `native`, `ios`, `android`, `windows`, `macos` | Platform.OS | Used to match platform media queries                  |
-| preview  | `boolean`                                             | `false`     | Enable preview features                               |
-| style    | Compiled style object                                 | `undefined` | For manual injection via the [CLI](/setup-guides/cli) |
-| media    | Compiled media object                                 | `undefined` | For manual injection via the [CLI](/setup-guides/cli) |
+| Prop     | Values                                                | Default     | Description                                          |
+| -------- | ----------------------------------------------------- | ----------- | ---------------------------------------------------- |
+| platform | `web`, `native`, `ios`, `android`, `windows`, `macos` | Platform.OS | Used to match platform media queries                 |
+| preview  | `boolean`                                             | `false`     | Enable preview features                              |
+| style    | Compiled style object                                 | `undefined` | For manual injection via the [CLI](/compilation/cli) |
+| media    | Compiled media object                                 | `undefined` | For manual injection via the [CLI](/compilation/cli) |
