@@ -30,7 +30,6 @@ You can use the Babel plugin to instantly start writing code! This will also ena
 import { Text } from "react-native";
 
 export function BoldText(props) {
-  // Thanks to Babel, I just work :)
   return <Text className="text-bold" {...props} />;
 }
 ```
