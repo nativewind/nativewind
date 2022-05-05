@@ -2,7 +2,9 @@
 sidebar_position: 5
 ---
 
-# Tailwind CLI
+# Tailwind CLI (RN StyleSheets)
+
+The Tailwind CLI can be used to output precompiled RN StyleSheet objects.
 
 ## 1. Setup tailwindcss-react-native
 

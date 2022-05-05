@@ -19,7 +19,7 @@ You can still use React Native StyleSheets by following one of these guides:
 - [Babel](../compilation/babel.md)
 - [Babel (Compile Only)](../compilation/babel-compile-only.md)
 - [PostCSS (RN StyleSheet)](../compilation/postcss-native.md)
-- [Tailwind CLI](../compilation/cli.md)
+- [Tailwind CLI (RN StyleSheet)](../compilation/cli-native.md)
 
 ## 2. Setup transpilation
 

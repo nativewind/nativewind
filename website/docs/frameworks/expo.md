@@ -10,4 +10,4 @@ Otherwise you can setup Expo by using Babel or the Tailwind CLI
 
 - [Babel](../compilation/babel.md)
 - [Babel (Compile Only)](../compilation/babel-compile-only.md)
-- [Tailwind CLI](../compilation/cli.md)
+- [Tailwind CLI (RN StyleSheet)](../compilation/cli-native.md)
