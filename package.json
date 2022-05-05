@@ -77,7 +77,7 @@
     "eslint-plugin-unicorn": "42.0.0",
     "husky": "7.0.4",
     "jest": "28.0.3",
-    "metro-react-native-babel-preset": "0.70.2",
+    "metro-react-native-babel-preset": "0.70.3",
     "moti": "0.17.1",
     "prettier": "2.6.2",
     "react": "18.1.0",
