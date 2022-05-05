@@ -42,15 +42,31 @@ export default function rootVisitor(
             return;
           }
 
+          let canCompile = true;
+          let canTransform = true;
+
+          switch (state.opts.mode) {
+            case "compileOnly": {
+              canTransform = false;
+              break;
+            }
+            case "transformOnly": {
+              canCompile = false;
+              break;
+            }
+          }
+
           const visitorState: VisitorState = {
             rem: 16,
             tailwindConfigPath: "tailwind.config.js",
             platform: "native",
             hmr: true,
-            skipTransform: false,
+            mode: "compileAndTransform",
             blockModuleTransform: [],
             hasStyledComponentImport: false,
             hasClassNames: false,
+            canCompile,
+            canTransform,
             ...state,
             ...state.opts,
             allowModuleTransform,
@@ -70,7 +86,6 @@ export default function rootVisitor(
             hasProvider,
             hasStyledComponentImport,
             hasClassNames,
-            skipTransform,
             hmr,
           } = visitorState;
 
@@ -90,7 +105,7 @@ export default function rootVisitor(
 
             const bodyNode = path.node.body;
 
-            if (!hasStyledComponentImport && !skipTransform) {
+            if (!hasStyledComponentImport && canTransform) {
               prependImport(
                 bodyNode,
                 "StyledComponent",

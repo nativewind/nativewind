@@ -25,6 +25,8 @@ export interface VisitorState
   hasProvider: boolean;
   hasStyleSheetImport: boolean;
   tailwindConfig: TailwindConfig;
+  canCompile: boolean;
+  canTransform: boolean;
 }
 
 /**
@@ -55,12 +57,12 @@ export const visitor: Visitor<VisitorState> = {
     );
   },
   JSXElement(path, state) {
-    const { skipTransform, platform, blockList } = state;
+    const { platform, blockList, canTransform } = state;
     const name = getJSXElementName(path.node.openingElement);
 
     state.hasProvider ||= name === "TailwindProvider";
 
-    if (name === "TailwindProvider" && !skipTransform) {
+    if (name === "TailwindProvider" && canTransform) {
       appendPlatformAttribute(path, platform);
     }
 
@@ -69,7 +71,7 @@ export const visitor: Visitor<VisitorState> = {
     }
 
     if (someAttributes(path, ["className", "tw"])) {
-      if (!skipTransform) toStyledComponent(path);
+      if (canTransform) toStyledComponent(path);
       state.hasClassNames = true;
     }
   },
