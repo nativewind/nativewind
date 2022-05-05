@@ -3,5 +3,11 @@
   "prCreation": "not-pending",
   "automerge": true,
   "automergeType": "branch",
-  "dependencyDashboard": false
+  "dependencyDashboard": false,
+  "packageRules": [
+    {
+      "paths": ["website/package.json"],
+      "commitBody": "[skip release]"
+    }
+  ]
 }
