@@ -1,4 +1,17 @@
-# tailwindcss-react-native
+<div align="center">
+<p align="center">
+  <a href="https://tailwindcss-react-native.vercel.app" target="_blank">
+    <img src="https://tailwindcss-react-native.vercel.app/img/logo.svg" alt="Tailwind CSS" width="70" height="70">
+    <h1 align="center" style="color:red;">tailwindcss-react-native</h1>
+  </a>
+  
+</p>
+<img alt="GitHub branch checks state" src="https://img.shields.io/github/checks-status/marklawlor/tailwindcss-react-native/next">
+<img alt="npm" src="https://img.shields.io/npm/v/tailwindcss-react-native">
+<img alt="npm" src="https://img.shields.io/npm/dt/tailwindcss-react-native">
+</div>
+<br />
+
 
 `tailwindcss-react-native` uses [Tailwind CSS](https://tailwindcss.com) as **universal design system** for all React Native platforms. It lets you share code between all React Native platforms and improves DX, performance and code maintainability.
 
