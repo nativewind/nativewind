@@ -27,6 +27,7 @@ const config = {
         },
         blog: false,
         theme: {
+          defaultMode: "dark",
           customCss: require.resolve("./src/css/custom.css"),
         },
       }),
@@ -53,15 +54,6 @@ const config = {
       footer: {
         style: "dark",
         links: [
-          // {
-          //   title: "Docs",
-          //   items: [
-          //     {
-          //       label: "Tutorial",
-          //       to: "/docs/intro",
-          //     },
-          //   ],
-          // },
           {
             title: "More",
             items: [
@@ -75,9 +67,8 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} Mark Lawlor. Built with Docusaurus.`,
       },
       prism: {
-        // theme: lightCodeTheme,
-        // darkTheme: darkCodeTheme,
-        theme: darkCodeTheme,
+        theme: lightCodeTheme,
+        darkTheme: darkCodeTheme,
       },
     }),
 };

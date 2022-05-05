@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 2
 ---
 
 # Babel (compile only)
@@ -16,11 +16,13 @@ Follow the [general setup instructions](/installation) to setup tailwindcss-reac
 // babel.config.js
 module.exports = {
 - plugins: ["tailwindcss-react-native/babel"],
-+ plugins: [["tailwindcss-react-native/babel", { compileOnly: true }],
++ plugins: [["tailwindcss-react-native/babel", { mode: "compileOnly" }],
 };
 ```
 
-## 3. Write components using the Component API
+## 3. Start Coding 🎉
+
+Write components using the Component API
 
 ```tsx
 import { Text } from "react-native";
