@@ -1,11 +1,9 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import postcss from "postcss";
 import tailwind from "tailwindcss";
-import postcssCssvariables from "postcss-css-variables";
-import postcssColorFunctionalNotation from "postcss-color-functional-notation";
-import calc from "postcss-calc";
 
-import { plugin } from "../../postcss";
+import plugin from "../../postcss";
+
 import { MediaRecord, StyleError, StyleRecord } from "../../types/common";
 
 /**
@@ -24,21 +22,6 @@ export function extractStyles(
   let errors: StyleError[] = [];
 
   const plugins = [
-    postcssCssvariables({
-      variables: {
-        "tw-translate-x": 0,
-        "tw-translate-y": 0,
-        "tw-rotate": "0deg",
-        "tw-skew-x": "0deg",
-        "tw-skew-y": "0deg",
-        "tw-scale-x": 0,
-        "tw-scale-y": 0,
-      },
-    }),
-    postcssColorFunctionalNotation(),
-    calc({
-      warnWhenCannotResolve: true,
-    }),
     plugin({
       ...tailwindConfig,
       done: (output) => {
