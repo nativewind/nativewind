@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: "16"
           cache: "npm"
-      - run: npm ci
+      - run: npm install
       - run: npm run build
       - name: Get number of CPU cores
         id: cpu-cores
