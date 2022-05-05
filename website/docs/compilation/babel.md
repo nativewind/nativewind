@@ -8,7 +8,7 @@ The default babel configuration will both compile/inject the Tailwind CSS styles
 
 ## 1. Setup tailwindcss-react-native
 
-Follow the [general setup instructions](/installation) to setup tailwindcss-react-native.
+Follow the [general setup instructions](../installation.md) to setup tailwindcss-react-native.
 
 ## 2. Configure your babel.config.js
 

@@ -15,7 +15,7 @@ Follow the [Using PostCSS](https://tailwindcss.com/docs/installation/using-postc
 
 ## 2. Setup tailwindcss-react-native
 
-Follow the [general setup instructions](/installation) to setup tailwindcss-react-native.
+Follow the [general setup instructions](../installation.md) to setup tailwindcss-react-native.
 
 ## 3. Enable preview features
 
