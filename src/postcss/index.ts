@@ -1,5 +1,5 @@
+import { writeFileSync } from "node:fs";
 import { Plugin, PluginCreator } from "postcss";
-import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { normaliseSelector } from "../shared/selector";
 import { toReactNative } from "./to-react-native";
 import { MediaRecord, StyleRecord, Style, StyleError } from "../types/common";
@@ -12,7 +12,9 @@ declare module "postcss" {
   }
 }
 
-export interface PostcssPluginOptions extends Partial<TailwindConfig> {
+export interface PostcssPluginOptions {
+  important?: boolean | string;
+  output?: string;
   done?: (options: {
     styles: StyleRecord;
     media: MediaRecord;
@@ -21,9 +23,8 @@ export interface PostcssPluginOptions extends Partial<TailwindConfig> {
 }
 
 export const plugin: PluginCreator<PostcssPluginOptions> = ({
-  done = () => {
-    return;
-  },
+  done,
+  output,
   important,
 } = {}): Plugin => {
   const styles: StyleRecord = {};
@@ -82,7 +83,17 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
         }
       });
 
-      done({ styles, media, errors });
+      if (done) done({ styles, media, errors });
+      if (output) {
+        writeFileSync(
+          output,
+          `module.exports = {
+  platform: 'native',
+  styles: ${JSON.stringify(styles)},
+  media: ${JSON.stringify(media)}
+}`
+        );
+      }
     },
   };
 };
