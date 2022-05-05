@@ -1,5 +1,5 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
-import { extractStyles } from "../../../src/babel/native-style-extraction";
+import { extractStyles } from "../../../src/babel/extract-styles";
 import {
   MediaRecord,
   StyleError,
