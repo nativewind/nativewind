@@ -6,7 +6,7 @@ export interface TailwindcssReactNativeBabelOptions {
   allowModuleTransform?: AllowPathOptions;
   blockModuleTransform?: string[];
   platform?: "web" | "native";
-  skipTransform?: false;
+  mode?: "compileAndTransform" | "compileOnly" | "transformOnly";
   rem?: number;
   tailwindConfigPath?: string;
   hmr?: boolean;
