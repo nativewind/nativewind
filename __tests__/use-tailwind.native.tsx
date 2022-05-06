@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { useWindowDimensions as RNuseWindowDimensions } from "react-native";
 import { renderHook } from "@testing-library/react-hooks";
-import { useTailwind, RWNCssStyle } from "../src/use-tailwind";
+import { useTailwind } from "../src/use-tailwind.native";
 import { TailwindProvider, TailwindProviderProps } from "../src/provider";
 
 const useWindowDimensions = RNuseWindowDimensions as jest.Mock<
@@ -34,31 +34,6 @@ const wrapper = ({
 }: PropsWithChildren<TailwindProviderProps>) => (
   <TailwindProvider {...props}>{children}</TailwindProvider>
 );
-
-describe("web", () => {
-  test("can accept no arguments", () => {
-    const { result } = renderHook(() => useTailwind<RWNCssStyle>()(), {
-      wrapper,
-      initialProps: { platform: "web", preview: true },
-    });
-
-    expect(result.current.$$css).toBe(true);
-    expect(result.current.tailwindClassName).toBe("");
-  });
-
-  test("will pass-through any arguments", () => {
-    const { result } = renderHook(
-      () => useTailwind<RWNCssStyle>()("hello-world"),
-      {
-        wrapper,
-        initialProps: { platform: "web", preview: true },
-      }
-    );
-
-    expect(result.current.$$css).toBe(true);
-    expect(result.current.tailwindClassName).toBe("hello-world");
-  });
-});
 
 describe("native", () => {
   test("can accept no arguments", () => {
