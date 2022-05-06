@@ -39,7 +39,7 @@ describe("web", () => {
   test("can accept no arguments", () => {
     const { result } = renderHook(() => useTailwind<RWNCssStyle>()(), {
       wrapper,
-      initialProps: { platform: "web" },
+      initialProps: { platform: "web", preview: true },
     });
 
     expect(result.current.$$css).toBe(true);
