@@ -10,7 +10,6 @@ import {
   TailwindColorSchemeContext,
   TailwindMediaContext,
   TailwindPlatformContext,
-  TailwindPreviewContext,
   TailwindStyleContext,
 } from "./context";
 
@@ -19,7 +18,6 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
   const styles = useContext(TailwindStyleContext);
   const mediaRules = useContext(TailwindMediaContext);
   const colorScheme = useContext(TailwindColorSchemeContext);
-  const preview = useContext(TailwindPreviewContext);
   const { width, height } = useWindowDimensions();
   // const { reduceMotionEnabled: reduceMotion } = useAccessibilityInfo() // We should support this
   const orientation = useDeviceOrientation().portrait
@@ -33,13 +31,6 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
   }
 
   return (className = "") => {
-    if (platform === "web" && preview) {
-      return {
-        $$css: true,
-        tailwindClassName: className,
-      } as unknown as StyleProp<P>;
-    }
-
     const tailwindStyleIds: StyleProp<P> = [];
 
     for (const name of `${siblingClassName} ${className}`.trim().split(" ")) {
