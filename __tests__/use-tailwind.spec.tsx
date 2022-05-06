@@ -51,7 +51,7 @@ describe("web", () => {
       () => useTailwind<RWNCssStyle>()("hello-world"),
       {
         wrapper,
-        initialProps: { platform: "web" },
+        initialProps: { platform: "web", preview: true },
       }
     );
 
