@@ -1,91 +1,14 @@
-import {
-  useWindowDimensions,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
-  ImageStyle,
-} from "react-native";
-import { useContext } from "react";
+import { StyleProp } from "react-native";
 
-import { useDeviceOrientation } from "@react-native-community/hooks";
-import { match } from "css-mediaquery";
-import { normaliseSelector } from "./shared/selector";
-
-import {
-  TailwindColorSchemeContext,
-  TailwindMediaContext,
-  TailwindPlatformContext,
-  TailwindPreviewContext,
-  TailwindStyleContext,
-} from "./context";
+export { useTailwind } from "./use-tailwind.web";
 
 export type RWNCssStyle = {
   $$css: true;
   tailwindClassName: string;
 };
 
-export function useTailwind<P extends ViewStyle>(): (className?: string) => P;
-export function useTailwind<P extends TextStyle>(): (className?: string) => P;
-export function useTailwind<P extends ImageStyle>(): (className?: string) => P;
-export function useTailwind<P extends RWNCssStyle>(): (className?: string) => P;
-export function useTailwind<P>() {
-  const platform = useContext(TailwindPlatformContext);
-  const styles = useContext(TailwindStyleContext);
-  const mediaRules = useContext(TailwindMediaContext);
-  const colorScheme = useContext(TailwindColorSchemeContext);
-  const preview = useContext(TailwindPreviewContext);
-  const { width, height } = useWindowDimensions();
-  // const { reduceMotionEnabled: reduceMotion } = useAccessibilityInfo() // We should support this
-  const orientation = useDeviceOrientation().portrait
-    ? "portrait"
-    : "landscape";
+export type UseTailwindCallback<P> = (className?: string) => StyleProp<P>;
 
-  if (!platform) {
-    throw new Error(
-      "No platform details found. Make sure all components are within a TailwindProvider with the platform attribute set."
-    );
-  }
-
-  return (className = "") => {
-    if (platform === "web" && preview) {
-      return {
-        $$css: true,
-        tailwindClassName: className,
-      } as unknown as StyleProp<P>;
-    }
-
-    const tailwindStyleIds: StyleProp<P> = [];
-
-    for (const name of className.split(" ")) {
-      const selector = normaliseSelector(name);
-
-      if (styles[selector]) {
-        tailwindStyleIds.push(styles[selector] as P);
-      }
-
-      const rules = mediaRules[selector];
-
-      if (!rules) {
-        continue;
-      }
-
-      for (let index = 0, length = rules.length; index < length; index++) {
-        const isMatch = match(rules[index], {
-          type: platform,
-          width,
-          height,
-          "device-width": width,
-          "device-height": width,
-          orientation,
-          "prefers-color-scheme": colorScheme,
-        });
-
-        if (isMatch) {
-          tailwindStyleIds.push(styles[`${selector}.${index}`] as P);
-        }
-      }
-    }
-
-    return tailwindStyleIds;
-  };
+export interface UseTailwindOptions {
+  siblingClassName?: string;
 }
