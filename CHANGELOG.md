@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.1...v1.0.2) (2022-05-06)
+
+
+### Bug Fixes
+
+* useTailwind should correctly respect preview for css styles ([6632160](https://github.com/marklawlor/tailwindcss-react-native/commit/6632160d07291657662fd224d73c8b87ee339ed1))
+
 ## [1.0.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0...v1.0.1) (2022-05-05)
 
 
