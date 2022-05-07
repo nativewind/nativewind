@@ -43,6 +43,7 @@
     "types.d.ts"
   ],
   "dependencies": {
+    "@babel/types": "7.17.10",
     "@react-native-community/hooks": "^2.8.1",
     "css-mediaquery": "^0.1.2",
     "css-to-react-native": "^3.0.0",
@@ -55,7 +56,6 @@
   "devDependencies": {
     "@babel/core": "7.17.10",
     "@babel/plugin-syntax-jsx": "7.16.7",
-    "@babel/types": "7.17.10",
     "@commitlint/cli": "16.2.4",
     "@commitlint/config-conventional": "16.2.4",
     "@semantic-release/changelog": "6.0.1",
