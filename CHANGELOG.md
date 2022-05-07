@@ -1,3 +1,11 @@
+## [1.0.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.2...v1.0.3) (2022-05-07)
+
+
+### Bug Fixes
+
+* move @babel/types to dependancies ([883b5f3](https://github.com/marklawlor/tailwindcss-react-native/commit/883b5f3558b4c3579219ec2c930de254b0588c76))
+* move @babel/types to dependancies ([065f9a9](https://github.com/marklawlor/tailwindcss-react-native/commit/065f9a9cc17a47d68f3cf4395cd6fc9cca79d82a))
+
 ## [1.0.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.1...v1.0.2) (2022-05-06)
 
 
