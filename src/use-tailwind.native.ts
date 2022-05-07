@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import {
   TextStyle,
   ViewStyle,
@@ -6,7 +6,7 @@ import {
   ImageStyle,
   Platform,
 } from "react-native";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { match } from "css-mediaquery";
 import { normaliseSelector } from "./shared/selector";
 import { TailwindContext } from "./context";
@@ -15,6 +15,8 @@ import {
   UseTailwindCallback,
   UseTailwindOptions,
 } from "./use-tailwind";
+
+import { ChildClassNameSymbol } from "./utils/child-styles";
 
 export function useTailwind<P extends ViewStyle>(
   options?: UseTailwindOptions
@@ -28,7 +30,7 @@ export function useTailwind<P extends ImageStyle>(
 export function useTailwind<P extends RWNCssStyle>(
   options?: UseTailwindOptions
 ): UseTailwindCallback<P>;
-export function useTailwind<P>({ siblingClassName = "" } = {}) {
+export function useTailwind<P>(options: UseTailwindOptions = {}) {
   const {
     platform,
     styles,
@@ -38,6 +40,8 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
     orientation,
     colorScheme,
   } = useContext(TailwindContext);
+  let [nthChild] = useState(options.nthChild ?? 0);
+  const inheritedClassNames = options[ChildClassNameSymbol] ?? "";
 
   if (!platform) {
     throw new Error(
@@ -46,11 +50,27 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
   }
 
   return (className = "") => {
-    let tailwindStyles = {} as P;
+    let tailwindStyles = {} as P & {
+      [ChildClassNameSymbol]?: string;
+    };
     const transforms: ViewStyle["transform"] = [];
+    let childStyles = "";
+    nthChild++;
 
-    for (const name of `${siblingClassName} ${className}`.trim().split(" ")) {
-      const selector = normaliseSelector(name);
+    for (const name of `${inheritedClassNames} ${className}`
+      .trim()
+      .split(/\s+/)) {
+      let selector = normaliseSelector(name);
+
+      if (name.startsWith("--")) {
+        const [mediaQuery, ...selectorParts] = name.split(".");
+
+        if (mediaQuery === "--general-sibling-combinator" && nthChild === 1) {
+          continue;
+        }
+
+        selector = selectorParts.join(".");
+      }
 
       if (styles[selector]) {
         const { transform, ...rest } = styles[selector];
@@ -71,29 +91,34 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
       }
 
       for (let index = 0, length = rules.length; index < length; index++) {
-        const isMatch = match(rules[index], {
-          "aspect-ratio": width / height,
-          "device-aspect-ratio": width / height,
-          type: platform,
-          width,
-          height,
-          "device-width": width,
-          "device-height": width,
-          orientation,
-          "prefers-color-scheme": colorScheme,
-        });
+        const mediaQuery = rules[index];
+        if (mediaQuery.startsWith("--")) {
+          childStyles += ` ${mediaQuery}.${selector}.${index}`;
+        } else {
+          const isMatch = match(rules[index], {
+            "aspect-ratio": width / height,
+            "device-aspect-ratio": width / height,
+            type: platform,
+            width,
+            height,
+            "device-width": width,
+            "device-height": width,
+            orientation,
+            "prefers-color-scheme": colorScheme,
+          });
 
-        const { transform, ...rest } = styles[`${selector}.${index}`];
+          const { transform, ...rest } = styles[`${selector}.${index}`];
 
-        if (isMatch) {
-          tailwindStyles = {
-            ...tailwindStyles,
-            ...rest,
-          };
-        }
+          if (isMatch) {
+            tailwindStyles = {
+              ...tailwindStyles,
+              ...rest,
+            };
+          }
 
-        if (transform) {
-          transforms.push(...transform);
+          if (transform) {
+            transforms.push(...transform);
+          }
         }
       }
     }
@@ -102,6 +127,8 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (tailwindStyles as any).transform = transforms;
     }
+
+    tailwindStyles[ChildClassNameSymbol] = childStyles;
 
     return Platform.OS === "web"
       ? StyleSheet.flatten(tailwindStyles) // RNW <=0.17 still uses ReactNativePropRegistry

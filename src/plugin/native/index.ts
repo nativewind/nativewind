@@ -197,6 +197,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
         skew: false,
         translate: false,
         boxShadow: false,
+        gap: false,
       },
     };
 

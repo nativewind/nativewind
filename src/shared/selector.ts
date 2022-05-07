@@ -9,6 +9,8 @@ export function normaliseSelector(
   selector: string,
   { important }: Partial<TailwindConfig> = {}
 ) {
+  if (selector.startsWith("--")) return selector.slice(2);
+
   const leadingDots = "^\\.";
   const nonWordCharactersExceptDash = new RegExp("[^a-zA-Z0-9-]+", "g");
 
