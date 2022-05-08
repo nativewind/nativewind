@@ -2,8 +2,6 @@ import { createElement, FunctionComponent, ComponentClass } from "react";
 import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 import { useTailwind } from "./use-tailwind";
 
-const isStyled = Symbol("styled");
-
 type StyledProps<P> = P & {
   className?: string;
   tw?: string;
@@ -36,25 +34,17 @@ export function styled<P>(
     }`;
   }
 
-  Styled[isStyled] = true;
-
   return Styled;
 }
 
 type StyledComponentProps<P> = StyledProps<P> & {
-  component: Component<P> & {
-    [isStyled]?: boolean;
-  };
+  component: Component<P>;
 };
 
 export function StyledComponent<P>({
   component,
   ...options
 }: StyledComponentProps<P>) {
-  if (component[isStyled]) {
-    return component;
-  }
-
-  return styled<P>(component)(options as P);
+  const Component = styled<P>(component);
+  return <Component {...(options as P)} />;
 }
-StyledComponent[isStyled] = true;

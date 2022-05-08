@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.3...v1.0.4) (2022-05-08)
+
+
+### Bug Fixes
+
+* rendering nested child styled components ([a69f600](https://github.com/marklawlor/tailwindcss-react-native/commit/a69f600787dc7ff080f7539f4dfc4b8be3b770dc))
+
 ## [1.0.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.2...v1.0.3) (2022-05-07)
 
 
