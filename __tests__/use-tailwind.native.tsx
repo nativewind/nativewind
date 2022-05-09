@@ -12,7 +12,7 @@ const useWindowDimensions = RNuseWindowDimensions as jest.Mock<
 >;
 
 jest.mock("react-native", () => {
-  const { Appearance, Dimensions, StyleSheet } =
+  const { Appearance, Dimensions, StyleSheet, Platform } =
     jest.requireActual("react-native");
 
   return {
@@ -20,6 +20,7 @@ jest.mock("react-native", () => {
     Appearance,
     Dimensions,
     StyleSheet,
+    Platform,
     useWindowDimensions: jest.fn(() => ({
       width: 0,
       height: 0,
