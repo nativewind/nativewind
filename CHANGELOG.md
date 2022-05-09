@@ -1,3 +1,13 @@
+## [1.0.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.4...v1.0.5) (2022-05-09)
+
+
+### Bug Fixes
+
+* tw getComputedStyle ([b322373](https://github.com/marklawlor/tailwindcss-react-native/commit/b322373a348aeead5a4f49c275e5dd9607eaae8a))
+* tw getComputedStyle for web preview ([dbbc588](https://github.com/marklawlor/tailwindcss-react-native/commit/dbbc58811881993eaba1b4a3ec6bf3eb1195ea16))
+* useTailwind types ([df7db9c](https://github.com/marklawlor/tailwindcss-react-native/commit/df7db9cc8916f2ef4b23710d9ef1e4e9c40c16cf))
+* useTailwind types ([be362ec](https://github.com/marklawlor/tailwindcss-react-native/commit/be362ec33428c35512efcc809581c3c7a0a00457))
+
 ## [1.0.5-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.5-next.2...v1.0.5-next.3) (2022-05-09)
 
 
