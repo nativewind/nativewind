@@ -9,12 +9,14 @@ const useWindowDimensions = RNuseWindowDimensions as jest.Mock<
 >;
 
 jest.mock("react-native", () => {
-  const { Appearance, Dimensions } = jest.requireActual("react-native");
+  const { Appearance, Dimensions, StyleSheet } =
+    jest.requireActual("react-native");
 
   return {
     __esModule: true,
     Appearance,
     Dimensions,
+    StyleSheet,
     useWindowDimensions: jest.fn(() => ({
       width: 0,
       height: 0,
@@ -71,6 +73,25 @@ describe("native", () => {
     });
 
     expect(result.current).toEqual([{ fontWeight: "700" }]);
+  });
+
+  test("can flatten properties", () => {
+    const { result } = renderHook(() => useTailwind()("font-bold"), {
+      wrapper,
+      initialProps: {
+        platform: "native",
+        styles: {
+          "font-bold": {
+            fontWeight: "700",
+          },
+          "font-extrabold": {
+            fontWeight: "800",
+          },
+        },
+      },
+    });
+
+    expect(result.current.fontWeight).toEqual("700");
   });
 
   test("media - width", () => {
