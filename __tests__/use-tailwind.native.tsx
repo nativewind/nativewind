@@ -1,5 +1,8 @@
 import { PropsWithChildren } from "react";
-import { useWindowDimensions as RNuseWindowDimensions } from "react-native";
+import {
+  TextStyle,
+  useWindowDimensions as RNuseWindowDimensions,
+} from "react-native";
 import { renderHook } from "@testing-library/react-hooks";
 import { useTailwind } from "../src/use-tailwind.native";
 import { TailwindProvider, TailwindProviderProps } from "../src/provider";
@@ -76,7 +79,7 @@ describe("native", () => {
   });
 
   test("can flatten properties", () => {
-    const { result } = renderHook(() => useTailwind()("font-bold"), {
+    const { result } = renderHook(() => useTailwind<TextStyle>()("font-bold"), {
       wrapper,
       initialProps: {
         platform: "native",

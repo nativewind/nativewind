@@ -7,7 +7,7 @@ export type RWNCssStyle = {
   tailwindClassName: string;
 };
 
-export type UseTailwindCallback<P> = (className?: string) => StyleProp<P>;
+export type UseTailwindCallback<P> = (className?: string) => StyleProp<P> & P;
 
 export interface UseTailwindOptions {
   siblingClassName?: string;
