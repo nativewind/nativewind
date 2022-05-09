@@ -1,3 +1,11 @@
+## [1.0.5-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.5-next.1...v1.0.5-next.2) (2022-05-09)
+
+
+### Bug Fixes
+
+* useTailwind types ([df7db9c](https://github.com/marklawlor/tailwindcss-react-native/commit/df7db9cc8916f2ef4b23710d9ef1e4e9c40c16cf))
+* useTailwind types ([be362ec](https://github.com/marklawlor/tailwindcss-react-native/commit/be362ec33428c35512efcc809581c3c7a0a00457))
+
 ## [1.0.5-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.4...v1.0.5-next.1) (2022-05-09)
 
 
