@@ -1,7 +1,11 @@
 import plugin from "tailwindcss/plugin";
-import { TailwindConfig } from "tailwindcss/tailwind-config";
+import {
+  TailwindConfig,
+  TailwindThemeValue,
+} from "tailwindcss/tailwind-config";
 import { StyleError } from "../../types/common";
 import { divide } from "./divide";
+import { elevation } from "./elevation";
 import { fontSize } from "./font-size";
 import { lineHeight } from "./line-height";
 import { space } from "./space";
@@ -29,10 +33,13 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
       divide(helpers, notSupported);
       fontSize(helpers);
       lineHeight(helpers, notSupported);
+      elevation(helpers, notSupported);
     };
   },
   function ({ rem = 16 } = {}) {
-    const config: Partial<TailwindConfig> = {
+    const config: Partial<
+      TailwindConfig & { theme: { elevation: TailwindThemeValue } }
+    > = {
       theme: {
         aspectRatio: {
           auto: "0",
@@ -147,6 +154,14 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
           prose: "65ch",
           ...breakpoints(theme("screens")),
         }),
+        elevation: {
+          sm: "1.5",
+          DEFAULT: "3",
+          lg: "7.5",
+          xl: "12.5",
+          "2xl": "25",
+          none: "0",
+        },
       },
       corePlugins: {
         space: false,

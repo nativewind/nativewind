@@ -31,11 +31,10 @@ export function createTests<T extends string | number | undefined>(
       );
     }
 
-    styles[normaliseSelector(`${prefix}-${suffix}`)] = valueFunction(
-      value,
-      suffix
-    );
+    const key = suffix ? `${prefix}-${suffix}` : prefix;
 
-    return [`${prefix}-${suffix}`, { styles }];
+    styles[normaliseSelector(key)] = valueFunction(value, suffix);
+
+    return [key, { styles }];
   });
 }
