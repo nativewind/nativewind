@@ -47,7 +47,7 @@ describe("native", () => {
       initialProps: { platform: "native" },
     });
 
-    expect(result.current).toEqual([]);
+    expect(result.current).toEqual({});
   });
 
   test("will return nothing is no styles match", () => {
@@ -56,7 +56,7 @@ describe("native", () => {
       initialProps: { platform: "native" },
     });
 
-    expect(result.current).toEqual([]);
+    expect(result.current).toEqual({});
   });
 
   test("will return matched styles", () => {
@@ -75,7 +75,7 @@ describe("native", () => {
       },
     });
 
-    expect(result.current).toEqual([{ fontWeight: "700" }]);
+    expect(result.current).toEqual({ fontWeight: "700" });
   });
 
   test("can flatten properties", () => {
@@ -138,11 +138,10 @@ describe("native", () => {
       },
     });
 
-    expect(result.current).toEqual([
-      { width: "100%" },
-      { maxWidth: 640 },
-      { maxWidth: 768 },
-    ]);
+    expect(result.current).toEqual({
+      width: "100%",
+      maxWidth: 768,
+    });
   });
 
   test("media - platform prefix", () => {
@@ -164,6 +163,6 @@ describe("native", () => {
       },
     });
 
-    expect(result.current).toEqual([{ width: 1 }]);
+    expect(result.current).toEqual({ width: 1 });
   });
 });

@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   useWindowDimensions,
-  StyleProp,
-  StyleSheet,
   TextStyle,
   ViewStyle,
+  StyleSheet,
   ImageStyle,
+  Platform,
 } from "react-native";
 import { useContext } from "react";
 
@@ -56,13 +55,16 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
   }
 
   return (className = "") => {
-    const tailwindStyleIds: StyleProp<P> = [];
+    let tailwindStyles = {} as P;
 
     for (const name of `${siblingClassName} ${className}`.trim().split(" ")) {
       const selector = normaliseSelector(name);
 
       if (styles[selector]) {
-        tailwindStyleIds.push(styles[selector] as P);
+        tailwindStyles = {
+          ...tailwindStyles,
+          ...styles[selector],
+        };
       }
 
       const rules = mediaRules[selector];
@@ -83,24 +85,16 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
         });
 
         if (isMatch) {
-          tailwindStyleIds.push(styles[`${selector}.${index}`] as P);
+          tailwindStyles = {
+            ...tailwindStyles,
+            ...styles[`${selector}.${index}`],
+          };
         }
       }
     }
 
-    let computedStyles: P;
-
-    const proxy = new Proxy(tailwindStyleIds, {
-      get(_, property: string | number | symbol) {
-        if (property in tailwindStyleIds) {
-          return tailwindStyleIds[property as keyof typeof tailwindStyleIds];
-        }
-
-        computedStyles ??= StyleSheet.flatten(tailwindStyleIds) as P;
-        return computedStyles[property as keyof P];
-      },
-    });
-
-    return proxy as StyleProp<P> & TextStyle;
+    return Platform.OS === "web"
+      ? StyleSheet.flatten(tailwindStyles) // RNW <=0.17 still uses ReactNativePropRegistry
+      : tailwindStyles;
   };
 }

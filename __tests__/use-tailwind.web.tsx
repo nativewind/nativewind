@@ -51,7 +51,7 @@ describe("web", () => {
       initialProps: { platform: "native" },
     });
 
-    expect(result.current).toEqual([]);
+    expect(result.current).toEqual({});
   });
 
   test("will return nothing is no styles match", () => {
@@ -60,7 +60,7 @@ describe("web", () => {
       initialProps: { platform: "native" },
     });
 
-    expect(result.current).toEqual([]);
+    expect(result.current).toEqual({});
   });
 
   test("will return matched styles", () => {
@@ -79,7 +79,7 @@ describe("web", () => {
       },
     });
 
-    expect(result.current).toEqual([{ fontWeight: "700" }]);
+    expect(result.current).toEqual({ fontWeight: "700" });
   });
 
   test("can flatten properties", () => {
@@ -142,10 +142,9 @@ describe("web", () => {
       },
     });
 
-    expect(result.current).toEqual([
-      { width: "100%" },
-      { maxWidth: 640 },
-      { maxWidth: 768 },
-    ]);
+    expect(result.current).toEqual({
+      width: "100%",
+      maxWidth: 768,
+    });
   });
 });
