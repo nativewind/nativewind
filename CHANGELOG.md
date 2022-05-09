@@ -1,3 +1,10 @@
+## [1.0.5-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.4...v1.0.5-next.1) (2022-05-09)
+
+
+### Bug Fixes
+
+* tw getComputedStyle ([b322373](https://github.com/marklawlor/tailwindcss-react-native/commit/b322373a348aeead5a4f49c275e5dd9607eaae8a))
+
 ## [1.0.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.3...v1.0.4) (2022-05-08)
 
 
