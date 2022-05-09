@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.5...v1.0.6) (2022-05-09)
+
+
+### Bug Fixes
+
+* passing tw output to external libraries ([2bc1afb](https://github.com/marklawlor/tailwindcss-react-native/commit/2bc1afb95dd9dd54a07a7ccd5c99b5abd25bb153))
+
 ## [1.0.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.4...v1.0.5) (2022-05-09)
 
 
