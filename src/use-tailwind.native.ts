@@ -26,8 +26,6 @@ import {
   UseTailwindOptions,
 } from "./use-tailwind";
 
-const computedStyles = new WeakMap();
-
 export function useTailwind<P extends ViewStyle>(
   options?: UseTailwindOptions
 ): UseTailwindCallback<P>;
@@ -90,20 +88,16 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
       }
     }
 
+    let computedStyles: P;
+
     const proxy = new Proxy(tailwindStyleIds, {
-      get(target, property: string | number | symbol) {
+      get(_, property: string | number | symbol) {
         if (property in tailwindStyleIds) {
           return tailwindStyleIds[property as keyof typeof tailwindStyleIds];
         }
 
-        if (!computedStyles.has(tailwindStyleIds)) {
-          computedStyles.set(
-            tailwindStyleIds,
-            StyleSheet.flatten(tailwindStyleIds)
-          );
-        }
-
-        return computedStyles.get(target)[property];
+        computedStyles ??= StyleSheet.flatten(tailwindStyleIds) as P;
+        return computedStyles[property as keyof P];
       },
     });
 

@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
+import { ImageStyle, TextStyle, ViewStyle } from "react-native";
 import { TailwindPlatformContext, TailwindPreviewContext } from "./context";
 import {
   RWNCssStyle,
@@ -8,6 +8,8 @@ import {
 } from "./use-tailwind";
 
 import { useTailwind as useNativeTailwind } from "./use-tailwind.native";
+
+let element: HTMLElement;
 
 export function useTailwind<P extends ViewStyle>(
   options?: UseTailwindOptions
@@ -33,12 +35,51 @@ export function useTailwind<P>(options?: UseTailwindOptions) {
 
   if (platform === "web" && preview) {
     return (className = "") => {
-      return {
+      const style: RWNCssStyle = {
         $$css: true,
         tailwindClassName: className,
-      } as unknown as StyleProp<P>;
+      };
+
+      let computedStyles: CSSStyleDeclaration;
+
+      return new Proxy(style, {
+        get(_, property: string | number | symbol) {
+          if (property in style) {
+            return style[property as keyof RWNCssStyle];
+          }
+
+          computedStyles ??= getComputedStyle(className);
+
+          return computedStyles[property as keyof CSSStyleDeclaration];
+        },
+      });
     };
   }
 
   return useNativeTailwind<P>(options);
+}
+
+function getComputedStyle(className = ""): CSSStyleDeclaration {
+  if (typeof window !== "undefined") {
+    if (!element) {
+      element = document.createElement("tailwindcss-react-native"); // Use custom element to avoid styles
+      element.setAttribute("aria-hidden", "true");
+      element.style.position = "absolute";
+      element.style.width = "1px";
+      element.style.height = "1px";
+      element.style.padding = "0";
+      element.style.margin = "-1px";
+      element.style.overflow = "hidden";
+      element.style.whiteSpace = "nowrap";
+      element.style.borderWidth = "0";
+      document.body.append(element);
+    }
+
+    const newElement = document.createElement("tailwindcss-react-native"); // Use custom element to avoid styles
+    newElement.setAttribute("class", className);
+    element.append(newElement);
+    return { ...window.getComputedStyle(newElement) };
+  } else {
+    return {} as CSSStyleDeclaration;
+  }
 }
