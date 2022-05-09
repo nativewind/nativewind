@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useWindowDimensions, StyleProp } from "react-native";
+import {
+  useWindowDimensions,
+  StyleProp,
+  StyleSheet,
+  TextStyle,
+} from "react-native";
 import { useContext } from "react";
 
 import { useDeviceOrientation } from "@react-native-community/hooks";
@@ -12,6 +17,8 @@ import {
   TailwindPlatformContext,
   TailwindStyleContext,
 } from "./context";
+
+const computedStyles = new WeakMap();
 
 export function useTailwind<P>({ siblingClassName = "" } = {}) {
   const platform = useContext(TailwindPlatformContext);
@@ -63,6 +70,23 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
       }
     }
 
-    return tailwindStyleIds;
+    const proxy = new Proxy(tailwindStyleIds, {
+      get(target, property: string | number | symbol) {
+        if (property in tailwindStyleIds) {
+          return tailwindStyleIds[property as keyof typeof tailwindStyleIds];
+        }
+
+        if (!computedStyles.has(tailwindStyleIds)) {
+          computedStyles.set(
+            tailwindStyleIds,
+            StyleSheet.flatten(tailwindStyleIds)
+          );
+        }
+
+        return computedStyles.get(target)[property];
+      },
+    });
+
+    return proxy as StyleProp<P> & TextStyle;
   };
 }
