@@ -11,10 +11,10 @@ import { useTailwind as useNativeTailwind } from "./use-tailwind.native";
 
 export function useTailwind<P extends ViewStyle>(
   options?: UseTailwindOptions
-): (className?: string) => P;
+): UseTailwindCallback<P>;
 export function useTailwind<P extends TextStyle>(
   options?: UseTailwindOptions
-): (className?: string) => P;
+): UseTailwindCallback<P>;
 export function useTailwind<P extends ImageStyle>(
   options?: UseTailwindOptions
 ): UseTailwindCallback<P>;

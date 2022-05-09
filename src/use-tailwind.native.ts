@@ -4,6 +4,8 @@ import {
   StyleProp,
   StyleSheet,
   TextStyle,
+  ViewStyle,
+  ImageStyle,
 } from "react-native";
 import { useContext } from "react";
 
@@ -18,8 +20,26 @@ import {
   TailwindStyleContext,
 } from "./context";
 
+import {
+  RWNCssStyle,
+  UseTailwindCallback,
+  UseTailwindOptions,
+} from "./use-tailwind";
+
 const computedStyles = new WeakMap();
 
+export function useTailwind<P extends ViewStyle>(
+  options?: UseTailwindOptions
+): UseTailwindCallback<P>;
+export function useTailwind<P extends TextStyle>(
+  options?: UseTailwindOptions
+): UseTailwindCallback<P>;
+export function useTailwind<P extends ImageStyle>(
+  options?: UseTailwindOptions
+): UseTailwindCallback<P>;
+export function useTailwind<P extends RWNCssStyle>(
+  options?: UseTailwindOptions
+): UseTailwindCallback<P>;
 export function useTailwind<P>({ siblingClassName = "" } = {}) {
   const platform = useContext(TailwindPlatformContext);
   const styles = useContext(TailwindStyleContext);
