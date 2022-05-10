@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.1.0...v1.1.1) (2022-05-10)
+
+
+### Bug Fixes
+
+* transforms within invalid media queries are property ignored ([51e091f](https://github.com/marklawlor/tailwindcss-react-native/commit/51e091f0e19eb4b1e70bbdcaacbd1958ef07de9b))
+
 # [1.1.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.6...v1.1.0) (2022-05-10)
 
 
