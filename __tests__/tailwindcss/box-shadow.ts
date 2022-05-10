@@ -9,7 +9,7 @@ tailwindRunner("Effects - Box Shadow", [
           shadowColor: "rgba(0, 0, 0, 0.1)",
           shadowOffset: { height: 1, width: 0 },
           shadowOpacity: 1,
-          shadowRadius: 1,
+          shadowRadius: 2,
           elevation: 1.5,
         },
       },
@@ -21,7 +21,7 @@ tailwindRunner("Effects - Box Shadow", [
       styles: {
         shadow: {
           shadowColor: "rgba(0, 0, 0, 0.1)",
-          shadowOffset: { height: 4, width: 0 },
+          shadowOffset: { height: 2, width: 0 },
           shadowOpacity: 1,
           shadowRadius: 6,
           elevation: 3,
