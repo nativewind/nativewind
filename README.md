@@ -8,6 +8,7 @@
 <img alt="GitHub branch checks state" src="https://img.shields.io/github/checks-status/marklawlor/tailwindcss-react-native/next">
 <img alt="npm" src="https://img.shields.io/npm/v/tailwindcss-react-native">
 <img alt="npm" src="https://img.shields.io/npm/dt/tailwindcss-react-native">
+<img alt="GitHub" src="https://img.shields.io/github/license/marklawlor/tailwindcss-react-native">
 </div>
 <br />
 
