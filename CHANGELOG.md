@@ -1,3 +1,15 @@
+# [1.2.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.1.0...v1.2.0-next.1) (2022-05-10)
+
+
+### Bug Fixes
+
+* simplied sibling plugins ([d8a0383](https://github.com/marklawlor/tailwindcss-react-native/commit/d8a038313fb11af89f7090523dbd32a886de477e))
+
+
+### Features
+
+* support divide, space & gap ([3ce837e](https://github.com/marklawlor/tailwindcss-react-native/commit/3ce837eccec1c894783f8d230007169a5803267f))
+
 # [1.1.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.6...v1.1.0) (2022-05-10)
 
 
