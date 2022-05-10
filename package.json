@@ -5,7 +5,6 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
-  "homepage": "https://github.com/marklawlor/tailwindcss-react-native#readme",
   "keywords": [
     "react-native",
     "react",
@@ -24,6 +23,7 @@
     "name": "Mark Lawlor",
     "url": "https://github.com/marklawlor"
   },
+  "homepage": "https://tailwindcss-react-native.vercel.app",
   "bugs": {
     "url": "https://github.com/marklawlor/tailwindcss-react-native/issues"
   },
