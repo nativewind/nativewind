@@ -1,3 +1,10 @@
+# [1.1.0-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.1.0-next.2...v1.1.0-next.3) (2022-05-10)
+
+
+### Features
+
+* support 'shadow' ([0839f3e](https://github.com/marklawlor/tailwindcss-react-native/commit/0839f3e4c6f8a0858057f5ba1d5652a22e41510e))
+
 # [1.1.0-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.1.0-next.1...v1.1.0-next.2) (2022-05-10)
 
 
