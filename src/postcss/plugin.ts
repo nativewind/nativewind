@@ -66,20 +66,21 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
             return;
           }
 
-          if (node.parent?.[mediaStringSymbol]) {
-            // The parent has a media query, so this needs to be added a media style
-            for (const s of node.selectors) {
+          for (const s of node.selectors) {
+            if (node.parent?.[mediaStringSymbol]) {
+              // The parent has a media query, so this needs to be added a media style
               const selector = normaliseSelector(s, { important });
+              const mediaQuery = node.parent[mediaStringSymbol];
 
               media[selector] ??= [];
               styles[`${selector}.${media[selector].length}`] = declarations;
-              media[selector].push(node.parent[mediaStringSymbol]);
-            }
-          } else {
-            // The parent is the root, so we are not in a media query
-            for (const s of node.selectors) {
-              const selector = normaliseSelector(s, { important });
-              styles[selector] = { ...styles[selector], ...declarations };
+              media[selector].push(mediaQuery);
+            } else {
+              // The parent is the root, so we are not in a media query
+              for (const s of node.selectors) {
+                const selector = normaliseSelector(s, { important });
+                styles[selector] = { ...styles[selector], ...declarations };
+              }
             }
           }
         }

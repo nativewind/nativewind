@@ -1,4 +1,5 @@
 import { StyleProp } from "react-native";
+import { ChildClassNameSymbol } from "./utils/child-styles";
 
 export { useTailwind } from "./use-tailwind.web";
 
@@ -7,8 +8,12 @@ export type RWNCssStyle = {
   tailwindClassName: string;
 };
 
-export type UseTailwindCallback<P> = (className?: string) => StyleProp<P> & P;
+export type UseTailwindCallback<P> = (className?: string) => StyleProp<P> &
+  P & {
+    [ChildClassNameSymbol]?: string;
+  };
 
 export interface UseTailwindOptions {
-  siblingClassName?: string;
+  nthChild?: number;
+  [ChildClassNameSymbol]?: string;
 }

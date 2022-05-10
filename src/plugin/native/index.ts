@@ -8,6 +8,7 @@ import { boxShadow } from "./box-shadow";
 import { divide } from "./divide";
 import { elevation } from "./elevation";
 import { fontSize } from "./font-size";
+import { gap } from "./gap";
 import { lineHeight } from "./line-height";
 import { rotate } from "./rotate";
 import { scale } from "./scale";
@@ -36,6 +37,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
     return (helpers) => {
       space(helpers, notSupported);
       divide(helpers, notSupported);
+      gap(helpers, notSupported);
       fontSize(helpers);
       lineHeight(helpers, notSupported);
       elevation(helpers, notSupported);
@@ -197,6 +199,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
         skew: false,
         translate: false,
         boxShadow: false,
+        gap: false,
       },
     };
 
