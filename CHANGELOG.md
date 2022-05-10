@@ -1,3 +1,10 @@
+# [1.1.0-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.1.0-next.3...v1.1.0-next.4) (2022-05-10)
+
+
+### Features
+
+* support aspect ratio media queries ([94b9c48](https://github.com/marklawlor/tailwindcss-react-native/commit/94b9c487d8dfa342de5e818f58350a894d496f45))
+
 # [1.1.0-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.1.0-next.2...v1.1.0-next.3) (2022-05-10)
 
 
