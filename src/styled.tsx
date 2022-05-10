@@ -11,8 +11,6 @@ import { useTailwind } from "./use-tailwind";
 import { ChildClassNameSymbol } from "./utils/child-styles";
 import { isFragment } from "react-is";
 
-const isStyled = Symbol("styled");
-
 type StyledProps<P> = PropsWithChildren<
   P & {
     className?: string;
