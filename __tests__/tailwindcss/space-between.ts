@@ -1,11 +1,17 @@
-import { expectError, tailwindRunner, spacing } from "./runner";
+import { expectError, tailwindRunner, spacing, createTests } from "./runner";
 
-tailwindRunner(
-  "Layout - Space between",
-  expectError([
-    ...Object.keys(spacing).map((space) => `space-x-${space}`),
-    ...Object.keys(spacing).map((space) => `space-y-${space}`),
-    "space-x-reverse",
-    "space-y-reverse",
-  ])
-);
+tailwindRunner("Layout - Space between", [
+  ...createTests("space-x", spacing, (n) => ({
+    media: ["--general-sibling-combinator"],
+    style: {
+      marginLeft: n,
+    },
+  })),
+  ...createTests("space-y", spacing, (n) => ({
+    media: ["--general-sibling-combinator"],
+    style: {
+      marginTop: n,
+    },
+  })),
+  ...expectError(["space-x-reverse", "space-y-reverse"]),
+]);

@@ -1,7 +1,18 @@
-import { expectError, tailwindRunner } from "./runner";
+import { ViewStyle } from "react-native";
+import { createTests, expectError, tailwindRunner } from "./runner";
 
-const scenarios = ["solid", "dashed", "dotted", "double", "none"];
+const scenarios: Record<string, ViewStyle["borderStyle"]> = {
+  solid: "solid",
+  dashed: "dashed",
+  dotted: "dotted",
+};
 
 tailwindRunner("Border - Divide Style", [
-  ...expectError(scenarios.map((n) => `divide-${n}`)),
+  ...createTests("divide", scenarios, (n) => ({
+    media: ["--general-sibling-combinator"],
+    style: {
+      borderStyle: n,
+    },
+  })),
+  ...expectError(["divide-double", "divide-none"]),
 ]);

@@ -20,10 +20,8 @@ export const divide: CustomPluginFunction = ({
         return {
           "&": {
             "@media --general-sibling-combinator": {
-              // "@defaults border-width": {},
-              "--tw-divide-x-reverse": "0",
-              "border-right-width": `calc(${value} * var(--tw-divide-x-reverse))`,
-              "border-left-width": `calc(${value} * calc(1 - var(--tw-divide-x-reverse)))`,
+              "border-right-width": value,
+              "border-left-width": value,
             },
           },
         };
@@ -34,10 +32,8 @@ export const divide: CustomPluginFunction = ({
         return {
           "&": {
             "@media --general-sibling-combinator": {
-              // "@defaults border-width": {},
-              "--tw-divide-y-reverse": "0",
-              "border-top-width": `calc(${value} * var(--tw-divide-y-reverse))`,
-              "border-bottom-width": `calc(${value} * calc(1 - var(--tw-divide-y-reverse)))`,
+              "border-top-width": value,
+              "border-bottom-width": value,
             },
           },
         };

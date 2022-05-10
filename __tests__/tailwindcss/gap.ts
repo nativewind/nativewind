@@ -1,19 +1,36 @@
-import { tailwindRunner, expectError } from "./runner";
+import { ViewStyle } from "react-native";
+import { createTests, tailwindRunner } from "./runner";
 
-tailwindRunner(
-  "Layout - Gap",
-  expectError([
-    "gap-0",
-    "gap-x-0",
-    "gap-y-0",
-    "gap-px",
-    "gap-x-px",
-    "gap-y-px",
-    "gap-0.5",
-    "gap-x-0.5",
-    "gap-y-0.5",
-    "gap-1",
-    "gap-x-1",
-    "gap-y-1",
-  ])
-);
+// These are half the TailwindCSS gap values due the use of margins
+const scenarios: Record<string, ViewStyle["borderWidth"]> = {
+  0: 0,
+  px: 0.5,
+  "0.5": 1,
+  1: 2,
+};
+
+tailwindRunner("Flexbox & Grid - Gap", [
+  ...createTests("gap", scenarios, (n) => ({
+    media: ["--general-sibling-combinator"],
+    style: {
+      marginTop: n,
+      marginLeft: n,
+      marginRight: n,
+      marginBottom: n,
+    },
+  })),
+  ...createTests("gap-x", scenarios, (n) => ({
+    media: ["--general-sibling-combinator"],
+    style: {
+      marginLeft: n,
+      marginRight: n,
+    },
+  })),
+  ...createTests("gap-y", scenarios, (n) => ({
+    media: ["--general-sibling-combinator"],
+    style: {
+      marginTop: n,
+      marginBottom: n,
+    },
+  })),
+]);
