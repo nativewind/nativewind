@@ -81,6 +81,8 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
 
       for (let index = 0, length = rules.length; index < length; index++) {
         const isMatch = match(rules[index], {
+          "aspect-ratio": width / height,
+          "device-aspect-ratio": width / height,
           type: platform,
           width,
           height,
