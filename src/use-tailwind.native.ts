@@ -128,7 +128,9 @@ export function useTailwind<P>(options: UseTailwindOptions = {}) {
       (tailwindStyles as any).transform = transforms;
     }
 
-    tailwindStyles[ChildClassNameSymbol] = childStyles;
+    if (childStyles) {
+      tailwindStyles[ChildClassNameSymbol] = childStyles;
+    }
 
     return Platform.OS === "web"
       ? StyleSheet.flatten(tailwindStyles) // RNW <=0.17 still uses ReactNativePropRegistry
