@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { ImageStyle, TextStyle, ViewStyle } from "react-native";
-import { TailwindPlatformContext, TailwindPreviewContext } from "./context";
+import { TailwindContext } from "./context";
 import {
   RWNCssStyle,
   UseTailwindCallback,
@@ -22,8 +22,7 @@ export function useTailwind<P extends RWNCssStyle>(
   options?: UseTailwindOptions
 ): UseTailwindCallback<P>;
 export function useTailwind<P>(options?: UseTailwindOptions) {
-  const platform = useContext(TailwindPlatformContext);
-  const preview = useContext(TailwindPreviewContext);
+  const { platform, preview } = useContext(TailwindContext);
 
   if (!platform) {
     throw new Error(

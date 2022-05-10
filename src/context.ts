@@ -1,7 +1,6 @@
 import { createContext } from "react";
-import { Appearance, ColorSchemeName } from "react-native";
+import { ColorSchemeName } from "react-native";
 import { MediaRecord, StyleRecord } from "./types/common";
-import { Platform } from "./shared/platforms";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -13,23 +12,28 @@ declare global {
 globalThis.tailwindcss_react_native_style ??= {};
 globalThis.tailwindcss_react_native_media ??= {};
 
-export const TailwindStyleContext = createContext<StyleRecord>(
-  globalThis.tailwindcss_react_native_style
-);
-export const TailwindMediaContext = createContext<MediaRecord>(
-  globalThis.tailwindcss_react_native_media
-);
+export interface TailwindContext {
+  styles: StyleRecord;
+  media: MediaRecord;
+  colorScheme: ColorSchemeName;
+  setColorScheme: (colorScheme: ColorSchemeName) => void;
+  width: number;
+  height: number;
+  platform: string;
+  preview: boolean;
+  orientation: "portrait" | "landscape";
+}
 
-export const TailwindColorSchemeContext = createContext<ColorSchemeName>(
-  Appearance.getColorScheme()
-);
-export const TailwindSetColorSchemeContext = createContext<
-  (colorScheme: ColorSchemeName) => void
->(() => {
-  return;
+export const TailwindContext = createContext<TailwindContext>({
+  styles: {},
+  media: {},
+  colorScheme: "light",
+  setColorScheme: () => {
+    return;
+  },
+  width: 0,
+  height: 0,
+  platform: "",
+  orientation: "portrait",
+  preview: false,
 });
-export const TailwindPlatformContext = createContext<Platform | undefined>(
-  undefined
-);
-
-export const TailwindPreviewContext = createContext<boolean>(false);

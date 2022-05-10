@@ -1,24 +1,15 @@
+import { useContext } from "react";
 import {
-  useWindowDimensions,
   TextStyle,
   ViewStyle,
   StyleSheet,
   ImageStyle,
   Platform,
 } from "react-native";
-import { useContext } from "react";
 
-import { useDeviceOrientation } from "@react-native-community/hooks";
 import { match } from "css-mediaquery";
 import { normaliseSelector } from "./shared/selector";
-
-import {
-  TailwindColorSchemeContext,
-  TailwindMediaContext,
-  TailwindPlatformContext,
-  TailwindStyleContext,
-} from "./context";
-
+import { TailwindContext } from "./context";
 import {
   RWNCssStyle,
   UseTailwindCallback,
@@ -38,15 +29,15 @@ export function useTailwind<P extends RWNCssStyle>(
   options?: UseTailwindOptions
 ): UseTailwindCallback<P>;
 export function useTailwind<P>({ siblingClassName = "" } = {}) {
-  const platform = useContext(TailwindPlatformContext);
-  const styles = useContext(TailwindStyleContext);
-  const mediaRules = useContext(TailwindMediaContext);
-  const colorScheme = useContext(TailwindColorSchemeContext);
-  const { width, height } = useWindowDimensions();
-  // const { reduceMotionEnabled: reduceMotion } = useAccessibilityInfo() // We should support this
-  const orientation = useDeviceOrientation().portrait
-    ? "portrait"
-    : "landscape";
+  const {
+    platform,
+    styles,
+    media: mediaRules,
+    width,
+    height,
+    orientation,
+    colorScheme,
+  } = useContext(TailwindContext);
 
   if (!platform) {
     throw new Error(

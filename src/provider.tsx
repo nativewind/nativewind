@@ -1,16 +1,16 @@
 import { PropsWithChildren, useState } from "react";
-import { ColorSchemeName, Appearance, Platform } from "react-native";
+import {
+  useWindowDimensions,
+  ColorSchemeName,
+  Appearance,
+  Platform,
+} from "react-native";
+
+import { useDeviceOrientation } from "@react-native-community/hooks";
 
 import type { MediaRecord, StyleRecord } from "./types/common";
 
-import {
-  TailwindColorSchemeContext,
-  TailwindMediaContext,
-  TailwindPlatformContext,
-  TailwindPreviewContext,
-  TailwindSetColorSchemeContext,
-  TailwindStyleContext,
-} from "./context";
+import { TailwindContext } from "./context";
 
 export interface TailwindProviderProps {
   styles?: StyleRecord;
@@ -32,21 +32,28 @@ export function TailwindProvider({
     overrideColorScheme ?? Appearance.getColorScheme() ?? "light"
   );
 
+  // const { reduceMotionEnabled: reduceMotion } = useAccessibilityInfo() // We should support this
+  const { width, height } = useWindowDimensions();
+  const orientation: TailwindContext["orientation"] = useDeviceOrientation()
+    .portrait
+    ? "portrait"
+    : "landscape";
+
   return (
-    <TailwindStyleContext.Provider value={styles}>
-      <TailwindMediaContext.Provider value={media}>
-        <TailwindPlatformContext.Provider value={platform}>
-          <TailwindPreviewContext.Provider value={preview}>
-            <TailwindColorSchemeContext.Provider
-              value={overrideColorScheme || colorScheme}
-            >
-              <TailwindSetColorSchemeContext.Provider value={setColorScheme}>
-                {children}
-              </TailwindSetColorSchemeContext.Provider>
-            </TailwindColorSchemeContext.Provider>
-          </TailwindPreviewContext.Provider>
-        </TailwindPlatformContext.Provider>
-      </TailwindMediaContext.Provider>
-    </TailwindStyleContext.Provider>
+    <TailwindContext.Provider
+      value={{
+        styles,
+        media,
+        colorScheme: overrideColorScheme || colorScheme,
+        setColorScheme,
+        width,
+        height,
+        orientation,
+        platform,
+        preview,
+      }}
+    >
+      {children}
+    </TailwindContext.Provider>
   );
 }
