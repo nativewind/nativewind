@@ -1,3 +1,10 @@
+# [1.1.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.6...v1.1.0-next.1) (2022-05-09)
+
+
+### Features
+
+* elevation ([2c2a4ac](https://github.com/marklawlor/tailwindcss-react-native/commit/2c2a4ac91b7c63c18235a2a7d869c41190eac5db))
+
 ## [1.0.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.5...v1.0.6) (2022-05-09)
 
 
