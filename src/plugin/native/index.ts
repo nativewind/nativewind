@@ -174,8 +174,8 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
           none: "0",
         },
         boxShadow: {
-          sm: "0px 1px 1px rgba(0, 0, 0, 0.1)",
-          DEFAULT: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          sm: "0px 1px 2px rgba(0, 0, 0, 0.1)",
+          DEFAULT: "0px 2px 6px rgba(0, 0, 0, 0.1)",
           md: "0px 6px 10px rgba(0, 0, 0, 0.1)",
           lg: "0px 10px 15px rgba(0, 0, 0, 0.1)",
           xl: "0px 20px 25px rgba(0, 0, 0, 0.1)",
