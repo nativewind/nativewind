@@ -7,17 +7,7 @@ import plugin, { PostcssPluginOptions } from "./plugin";
 
 const pluginPack: PluginCreator<PostcssPluginOptions> = (options) => {
   return postcss([
-    postcssCssvariables({
-      variables: {
-        "tw-translate-x": 0,
-        "tw-translate-y": 0,
-        "tw-rotate": "0deg",
-        "tw-skew-x": "0deg",
-        "tw-skew-y": "0deg",
-        "tw-scale-x": 0,
-        "tw-scale-y": 0,
-      },
-    }),
+    postcssCssvariables(),
     postcssColorFunctionalNotation(),
     calc({
       warnWhenCannotResolve: true,
