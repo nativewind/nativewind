@@ -1,3 +1,10 @@
+# [1.1.0-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.1.0-next.1...v1.1.0-next.2) (2022-05-10)
+
+
+### Bug Fixes
+
+* transform merging ([9f41434](https://github.com/marklawlor/tailwindcss-react-native/commit/9f4143467e427bd18e37a7acdf8a74acd15498ca))
+
 # [1.1.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.6...v1.1.0-next.1) (2022-05-09)
 
 
