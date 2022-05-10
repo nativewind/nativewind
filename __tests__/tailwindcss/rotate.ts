@@ -6,15 +6,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "rotate-0": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ rotate: "0deg" }],
         },
       },
     },
@@ -24,15 +16,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "rotate-45": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "45deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ rotate: "45deg" }],
         },
       },
     },

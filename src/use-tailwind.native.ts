@@ -56,15 +56,21 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
 
   return (className = "") => {
     let tailwindStyles = {} as P;
+    const transforms: ViewStyle["transform"] = [];
 
     for (const name of `${siblingClassName} ${className}`.trim().split(" ")) {
       const selector = normaliseSelector(name);
 
       if (styles[selector]) {
+        const { transform, ...rest } = styles[selector];
         tailwindStyles = {
           ...tailwindStyles,
-          ...styles[selector],
+          ...rest,
         };
+
+        if (transform) {
+          transforms.push(...transform);
+        }
       }
 
       const rules = mediaRules[selector];
@@ -84,13 +90,24 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
           "prefers-color-scheme": colorScheme,
         });
 
+        const { transform, ...rest } = styles[`${selector}.${index}`];
+
         if (isMatch) {
           tailwindStyles = {
             ...tailwindStyles,
-            ...styles[`${selector}.${index}`],
+            ...rest,
           };
         }
+
+        if (transform) {
+          transforms.push(...transform);
+        }
       }
+    }
+
+    if (transforms.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (tailwindStyles as any).transform = transforms;
     }
 
     return Platform.OS === "web"

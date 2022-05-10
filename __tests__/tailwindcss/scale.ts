@@ -6,15 +6,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "scale-0": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ scaleY: 0 }, { scaleX: 0 }],
         },
       },
     },
@@ -24,15 +16,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "scale-50": {
-          transform: [
-            { scaleY: 0.5 },
-            { scaleX: 0.5 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ scaleY: 0.5 }, { scaleX: 0.5 }],
         },
       },
     },
@@ -42,15 +26,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "scale-x-50": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0.5 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ scaleX: 0.5 }],
         },
       },
     },
@@ -60,15 +36,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "scale-y-50": {
-          transform: [
-            { scaleY: 0.5 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ scaleY: 0.5 }],
         },
       },
     },

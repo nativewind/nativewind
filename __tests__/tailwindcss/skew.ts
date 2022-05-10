@@ -6,15 +6,7 @@ tailwindRunner("Layout - Skew", [
     {
       styles: {
         "skew-x-0": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ skewX: "0deg" }],
         },
       },
     },
@@ -24,15 +16,7 @@ tailwindRunner("Layout - Skew", [
     {
       styles: {
         "skew-y-0": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ skewY: "0deg" }],
         },
       },
     },
@@ -42,15 +26,7 @@ tailwindRunner("Layout - Skew", [
     {
       styles: {
         "skew-x-1": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "1deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ skewX: "1deg" }],
         },
       },
     },
@@ -60,15 +36,7 @@ tailwindRunner("Layout - Skew", [
     {
       styles: {
         "skew-y-1": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "1deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ skewY: "1deg" }],
         },
       },
     },

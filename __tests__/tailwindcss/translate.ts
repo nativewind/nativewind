@@ -6,15 +6,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "translate-x-0": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ translateY: 0 }, { translateX: 0 }],
         },
       },
     },
@@ -24,15 +16,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "translate-y-0": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 0 },
-          ],
+          transform: [{ translateY: 0 }, { translateX: 0 }],
         },
       },
     },
@@ -42,15 +26,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "translate-x-px": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 1 },
-          ],
+          transform: [{ translateY: 0 }, { translateX: 1 }],
         },
       },
     },
@@ -60,15 +36,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "translate-y-px": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 1 },
-            { translateX: 0 },
-          ],
+          transform: [{ translateY: 1 }, { translateX: 0 }],
         },
       },
     },
@@ -78,15 +46,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "translate-x-1": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 0 },
-            { translateX: 4 },
-          ],
+          transform: [{ translateY: 0 }, { translateX: 4 }],
         },
       },
     },
@@ -96,15 +56,7 @@ tailwindRunner("Layout - Scale", [
     {
       styles: {
         "translate-y-1": {
-          transform: [
-            { scaleY: 0 },
-            { scaleX: 0 },
-            { skewY: "0deg" },
-            { skewX: "0deg" },
-            { rotate: "0deg" },
-            { translateY: 4 },
-            { translateX: 0 },
-          ],
+          transform: [{ translateY: 4 }, { translateX: 0 }],
         },
       },
     },

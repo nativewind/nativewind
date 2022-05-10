@@ -145,6 +145,27 @@ describe("native", () => {
     });
   });
 
+  test("transform - merges transforms", () => {
+    const { result } = renderHook(() => useTailwind()("scale-50 rotate-45"), {
+      wrapper,
+      initialProps: {
+        platform: "ios",
+        styles: {
+          "rotate-45": {
+            transform: [{ rotate: "45deg" }],
+          },
+          "scale-50": {
+            transform: [{ scaleY: 0.5 }, { scaleX: 0.5 }],
+          },
+        },
+      },
+    });
+
+    expect(result.current).toEqual({
+      transform: [{ scaleY: 0.5 }, { scaleX: 0.5 }, { rotate: "45deg" }],
+    });
+  });
+
   test("media - platform prefix", () => {
     const { result } = renderHook(() => useTailwind()("w-px"), {
       wrapper,

@@ -8,7 +8,11 @@ import { divide } from "./divide";
 import { elevation } from "./elevation";
 import { fontSize } from "./font-size";
 import { lineHeight } from "./line-height";
+import { rotate } from "./rotate";
+import { scale } from "./scale";
+import { skew } from "./skew";
 import { space } from "./space";
+import { translate } from "./translate";
 
 export interface NativePluginOptions {
   rem?: number;
@@ -34,6 +38,10 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
       fontSize(helpers);
       lineHeight(helpers, notSupported);
       elevation(helpers, notSupported);
+      scale(helpers, notSupported);
+      rotate(helpers, notSupported);
+      translate(helpers, notSupported);
+      skew(helpers, notSupported);
     };
   },
   function ({ rem = 16 } = {}) {
@@ -171,6 +179,11 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
         divideColor: false,
         divideStyle: false,
         divideOpacity: false,
+        scale: false,
+        transform: false,
+        rotate: false,
+        skew: false,
+        translate: false,
       },
     };
 
