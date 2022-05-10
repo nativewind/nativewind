@@ -83,9 +83,13 @@ export function useTailwind<P>({ siblingClassName = "" } = {}) {
           "prefers-color-scheme": colorScheme,
         });
 
+        if (!isMatch) {
+          continue;
+        }
+
         const { transform, ...rest } = styles[`${selector}.${index}`];
 
-        if (isMatch) {
+        if (rest) {
           tailwindStyles = {
             ...tailwindStyles,
             ...rest,
