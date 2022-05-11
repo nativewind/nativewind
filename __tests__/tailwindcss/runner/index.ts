@@ -2,8 +2,8 @@ import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { extractStyles } from "../../../src/postcss/extract-styles";
 import { StyleError, StyleRecord } from "../../../src/types/common";
 
-import plugin from "../../../src/plugin";
-import { nativePlugin } from "../../../src/plugin/native";
+import plugin from "../../../src/tailwind";
+import { nativePlugin } from "../../../src/tailwind/native";
 
 export type Test = [string, StyleRecord] | [string, StyleRecord, true];
 

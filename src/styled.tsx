@@ -10,6 +10,7 @@ import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 import { useTailwind } from "./use-tailwind";
 import { ChildClassNameSymbol } from "./utils/child-styles";
 import { isFragment } from "react-is";
+import { useInteraction } from "./use-interaction";
 
 type StyledProps<P> = PropsWithChildren<
   P & {
@@ -35,8 +36,13 @@ export function styled<P>(
     children: componentChildren,
     ...props
   }: StyledProps<P>) {
+    const { hover, focus, active, ...handlers } = useInteraction(props);
+
     const tailwindStyles = useTailwind({
       nthChild,
+      hover,
+      focus,
+      active,
       [ChildClassNameSymbol]: inheritedClassName,
     })(tw ?? className);
 
@@ -60,6 +66,7 @@ export function styled<P>(
 
     return createElement(Component, {
       ...props,
+      ...handlers,
       style,
       children,
     } as unknown as P);

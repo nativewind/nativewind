@@ -15,5 +15,8 @@ export type UseTailwindCallback<P> = (className?: string) => StyleProp<P> &
 
 export interface UseTailwindOptions {
   nthChild?: number;
+  hover?: boolean;
+  focus?: boolean;
+  active?: boolean;
   [ChildClassNameSymbol]?: string;
 }

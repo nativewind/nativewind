@@ -10,6 +10,7 @@ import { elevation } from "./elevation";
 import { fontSize } from "./font-size";
 import { gap } from "./gap";
 import { lineHeight } from "./line-height";
+import { pseudoClasses } from "./pseudo-classes";
 import { rotate } from "./rotate";
 import { scale } from "./scale";
 import { skew } from "./skew";
@@ -46,6 +47,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
       translate(helpers, notSupported);
       skew(helpers, notSupported);
       boxShadow(helpers, notSupported);
+      pseudoClasses(helpers, notSupported);
     };
   },
   function ({ rem = 16 } = {}) {

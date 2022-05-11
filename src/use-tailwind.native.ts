@@ -39,6 +39,9 @@ export function useTailwind<P extends RWNCssStyle>(
  * White space for visual clarity :)
  */
 export function useTailwind<P>({
+  hover,
+  focus,
+  active,
   [ChildClassNameSymbol]: inheritedClassNames = "",
   nthChild: initialNthChild = 0,
 }: UseTailwindOptions = {}) {
@@ -90,9 +93,13 @@ export function useTailwind<P>({
             if (rule === "selector" && params === "(> * + *)") {
               isForChildren = !name.startsWith(">");
               return nthChild > 1;
-            }
-
-            if (rule === "media") {
+            } else if (rule === "pseudo-class" && params === "hover") {
+              return hover;
+            } else if (rule === "pseudo-class" && params === "focus") {
+              return focus;
+            } else if (rule === "pseudo-class" && params === "active") {
+              return active;
+            } else if (rule === "media") {
               return match(params, {
                 "aspect-ratio": width / height,
                 "device-aspect-ratio": width / height,
