@@ -5,6 +5,7 @@ import {
   PropsWithChildren,
   Children,
   cloneElement,
+  ComponentProps,
 } from "react";
 import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 import { useTailwind } from "./use-tailwind";
@@ -76,7 +77,7 @@ export function styled<P>(
 
     return !classes.includes("component")
       ? element
-      : createElement<PropsWithChildren<{ value: ComponentContext }>>(
+      : createElement<ComponentProps<typeof ComponentContext.Provider>>(
           ComponentContext.Provider,
           {
             children: element,
