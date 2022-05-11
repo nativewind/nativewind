@@ -1,3 +1,10 @@
+# [1.2.0-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0-next.3...v1.2.0-next.4) (2022-05-11)
+
+
+### Features
+
+* add component ([09c8698](https://github.com/marklawlor/tailwindcss-react-native/commit/09c86983ed0c73a99b01d69a6eaa207f43e2fb2b))
+
 # [1.2.0-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0-next.2...v1.2.0-next.3) (2022-05-11)
 
 
