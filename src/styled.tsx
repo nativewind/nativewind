@@ -74,7 +74,7 @@ export function styled<P>(
       children,
     } as unknown as P);
 
-    return !classes.includes("container")
+    return !classes.includes("component")
       ? element
       : createElement<PropsWithChildren<{ value: ComponentContext }>>(
           ComponentContext.Provider,
