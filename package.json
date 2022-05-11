@@ -84,7 +84,7 @@
     "jest": "28.1.0",
     "jest-environment-jsdom": "^28.1.0",
     "metro-react-native-babel-preset": "0.70.3",
-    "moti": "0.17.1",
+    "moti": "0.18.0",
     "prettier": "2.6.2",
     "react": "18.1.0",
     "react-dom": "^18.1.0",
