@@ -47,6 +47,7 @@ export function styled<P>(
       hover,
       focus,
       active,
+      flatten: false,
       [ChildClassNameSymbol]: inheritedClassName,
     })(classes);
 
@@ -75,7 +76,7 @@ export function styled<P>(
       children,
     } as unknown as P);
 
-    return !classes.includes("component")
+    return !classes.split(/\s+/).includes("component")
       ? element
       : createElement<ComponentProps<typeof ComponentContext.Provider>>(
           ComponentContext.Provider,

@@ -1,12 +1,5 @@
 import { useContext, useState } from "react";
-import {
-  TextStyle,
-  ViewStyle,
-  StyleSheet,
-  ImageStyle,
-  Platform,
-} from "react-native";
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { TextStyle, ViewStyle, StyleSheet, ImageStyle } from "react-native";
 import { match } from "css-mediaquery";
 import { normaliseSelector } from "./shared/selector";
 import { ComponentContext, TailwindContext } from "./context";
@@ -42,6 +35,7 @@ export function useTailwind<P>({
   hover,
   focus,
   active,
+  flatten = true,
   [ChildClassNameSymbol]: inheritedClassNames = "",
   nthChild: initialNthChild = 0,
 }: UseTailwindOptions = {}) {
@@ -56,7 +50,7 @@ export function useTailwind<P>({
   assertPlatform(platform);
 
   return (className = "") => {
-    const tailwindStyles = {} as WithChildClassNameSymbol<P>;
+    const tailwindStyles = [] as WithChildClassNameSymbol<P[]>;
     const transforms: ViewStyle["transform"] = [];
     const childClassNameSet = new Set<string>();
     nthChild++;
@@ -142,7 +136,7 @@ export function useTailwind<P>({
         const { transform, ...rest } = styleRecord;
 
         if (styles) {
-          Object.assign(tailwindStyles, rest);
+          tailwindStyles.push(rest as P);
         }
 
         if (transform) {
@@ -153,16 +147,14 @@ export function useTailwind<P>({
 
     if (transforms.length > 0) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (tailwindStyles as any).transform = transforms;
+      tailwindStyles.push({ transform: transforms } as any);
     }
 
     if (childClassNameSet.size > 0) {
       tailwindStyles[ChildClassNameSymbol] = [...childClassNameSet].join(" ");
     }
 
-    return Platform.OS === "web"
-      ? StyleSheet.flatten(tailwindStyles) // RNW <=0.17 still uses ReactNativePropRegistry
-      : tailwindStyles;
+    return flatten ? StyleSheet.flatten(tailwindStyles) : tailwindStyles;
   };
 }
 

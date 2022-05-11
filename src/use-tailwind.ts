@@ -14,6 +14,7 @@ export type UseTailwindCallback<P> = (className?: string) => StyleProp<P> &
   };
 
 export interface UseTailwindOptions {
+  flatten?: boolean;
   nthChild?: number;
   hover?: boolean;
   focus?: boolean;
