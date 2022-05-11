@@ -32,12 +32,10 @@ const scenarios: Record<string, ViewStyle["borderColor"]> = {
 tailwindRunner(
   "Border - Divide Color",
   createTests("divide", scenarios, (n) => ({
-    media: ["--general-sibling-combinator"],
-    style: {
-      borderBottomColor: n,
-      borderLeftColor: n,
-      borderRightColor: n,
-      borderTopColor: n,
-    },
+    atRules: [["selector", "(> * + *)"]],
+    borderBottomColor: n,
+    borderLeftColor: n,
+    borderRightColor: n,
+    borderTopColor: n,
   }))
 );

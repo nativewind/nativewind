@@ -7,7 +7,8 @@ const scenarios: Record<string, ViewStyle["zIndex"]> = {
   "[100]": 100,
 };
 
-tailwindRunner("Layout - Z-Index", [
-  ...expectError(["z-auto"]),
-  ...createTests("z", scenarios, (n) => ({ zIndex: n })),
-]);
+tailwindRunner(
+  "Layout - Z-Index",
+  expectError(["z-auto"]),
+  createTests("z", scenarios, (n) => ({ zIndex: n }))
+);

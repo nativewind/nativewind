@@ -15,7 +15,7 @@ export const space: CustomPluginFunction = (
 
         return {
           "&": {
-            "@media --general-sibling-combinator": {
+            "@selector (> * + *)": {
               "margin-left": value,
             },
           },
@@ -30,7 +30,7 @@ export const space: CustomPluginFunction = (
 
         return {
           "&": {
-            "@media --general-sibling-combinator": {
+            "@selector (> * + *)": {
               "margin-top": value,
             },
           },

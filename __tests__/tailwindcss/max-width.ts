@@ -7,7 +7,8 @@ const scenarios: Record<string, ViewStyle["maxWidth"]> = {
   "[18px]": 18,
 };
 
-tailwindRunner("Sizing - Max-Width", [
-  ...createTests("max-w", scenarios, (n) => ({ maxWidth: n })),
-  ...expectError(["max-w-max", "max-w-max", "max-w-fit"]),
-]);
+tailwindRunner(
+  "Sizing - Max-Width",
+  createTests("max-w", scenarios, (n) => ({ maxWidth: n })),
+  expectError(["max-w-max", "max-w-max", "max-w-fit"])
+);

@@ -28,34 +28,35 @@ const scenarios: Record<string, string> = {
   "rose-50": "rgba(255, 241, 242, 1)",
 };
 
-tailwindRunner("Border - Border Color", [
-  ...createTests("border", scenarios, (n) => ({
+tailwindRunner(
+  "Border - Border Color",
+  createTests("border", scenarios, (n) => ({
     borderBottomColor: n,
     borderRightColor: n,
     borderTopColor: n,
     borderLeftColor: n,
   })),
-  ...createTests("border-x", scenarios, (n) => ({
+  createTests("border-x", scenarios, (n) => ({
     borderRightColor: n,
     borderLeftColor: n,
   })),
-  ...createTests("border-y", scenarios, (n) => ({
+  createTests("border-y", scenarios, (n) => ({
     borderBottomColor: n,
     borderTopColor: n,
   })),
-  ...createTests("border-t", scenarios, (n) => ({
+  createTests("border-t", scenarios, (n) => ({
     borderTopColor: n,
   })),
-  ...createTests("border-b", scenarios, (n) => ({
+  createTests("border-b", scenarios, (n) => ({
     borderBottomColor: n,
   })),
-  ...createTests("border-l", scenarios, (n) => ({
+  createTests("border-l", scenarios, (n) => ({
     borderLeftColor: n,
   })),
-  ...createTests("border-r", scenarios, (n) => ({
+  createTests("border-r", scenarios, (n) => ({
     borderRightColor: n,
   })),
-  ...expectError([
+  expectError([
     "border-current",
     "border-inherit",
     "border-x-current",
@@ -70,5 +71,5 @@ tailwindRunner("Border - Border Color", [
     "border-l-inherit",
     "border-r-current",
     "border-r-inherit",
-  ]),
-]);
+  ])
+);

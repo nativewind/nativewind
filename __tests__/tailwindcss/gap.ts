@@ -9,28 +9,23 @@ const scenarios: Record<string, ViewStyle["borderWidth"]> = {
   1: 2,
 };
 
-tailwindRunner("Flexbox & Grid - Gap", [
-  ...createTests("gap", scenarios, (n) => ({
-    media: ["--general-sibling-combinator"],
-    style: {
-      marginTop: n,
-      marginLeft: n,
-      marginRight: n,
-      marginBottom: n,
-    },
+tailwindRunner(
+  "Flexbox & Grid - Gap",
+  createTests("gap", scenarios, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    marginTop: n,
+    marginLeft: n,
+    marginRight: n,
+    marginBottom: n,
   })),
-  ...createTests("gap-x", scenarios, (n) => ({
-    media: ["--general-sibling-combinator"],
-    style: {
-      marginLeft: n,
-      marginRight: n,
-    },
+  createTests("gap-x", scenarios, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    marginLeft: n,
+    marginRight: n,
   })),
-  ...createTests("gap-y", scenarios, (n) => ({
-    media: ["--general-sibling-combinator"],
-    style: {
-      marginTop: n,
-      marginBottom: n,
-    },
-  })),
-]);
+  createTests("gap-y", scenarios, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    marginTop: n,
+    marginBottom: n,
+  }))
+);

@@ -17,6 +17,11 @@ import {
 } from "./use-tailwind";
 
 import { ChildClassNameSymbol } from "./utils/child-styles";
+import { StyleArray } from "./types/common";
+
+type WithChildClassNameSymbol<T> = T & {
+  [ChildClassNameSymbol]?: string;
+};
 
 export function useTailwind<P extends ViewStyle>(
   options?: UseTailwindOptions
@@ -30,95 +35,103 @@ export function useTailwind<P extends ImageStyle>(
 export function useTailwind<P extends RWNCssStyle>(
   options?: UseTailwindOptions
 ): UseTailwindCallback<P>;
-export function useTailwind<P>(options: UseTailwindOptions = {}) {
-  const {
-    platform,
-    styles,
-    media: mediaRules,
-    width,
-    height,
-    orientation,
-    colorScheme,
-  } = useContext(TailwindContext);
-  let [nthChild] = useState(options.nthChild ?? 0);
-  const inheritedClassNames = options[ChildClassNameSymbol] ?? "";
+/*
+ * White space for visual clarity :)
+ */
+export function useTailwind<P>({
+  [ChildClassNameSymbol]: inheritedClassNames = "",
+  nthChild: initialNthChild = 0,
+}: UseTailwindOptions = {}) {
+  const { platform, styles, media, width, height, orientation, colorScheme } =
+    useContext(TailwindContext);
 
-  if (!platform) {
-    throw new Error(
-      "No platform details found. Make sure all components are within a TailwindProvider with the platform attribute set."
-    );
-  }
+  // useState ensure this 'resets' every render
+  let [nthChild] = useState(initialNthChild);
+
+  assertPlatform(platform);
 
   return (className = "") => {
-    let tailwindStyles = {} as P & {
-      [ChildClassNameSymbol]?: string;
-    };
+    const tailwindStyles = {} as WithChildClassNameSymbol<P>;
     const transforms: ViewStyle["transform"] = [];
-    let childStyles = "";
+    const childClassNameSet = new Set<string>();
     nthChild++;
 
-    for (const name of `${inheritedClassNames} ${className}`
+    for (const name of `${className} ${inheritedClassNames}`
       .trim()
       .split(/\s+/)) {
-      let selector = normaliseSelector(name);
+      const selector = normaliseSelector(name);
 
-      if (name.startsWith("--")) {
-        const [mediaQuery, ...selectorParts] = name.split(".");
-
-        if (mediaQuery === "--general-sibling-combinator" && nthChild === 1) {
-          continue;
-        }
-
-        selector = selectorParts.join(".");
-      }
+      const styleArray: StyleArray = [];
 
       if (styles[selector]) {
-        const { transform, ...rest } = styles[selector];
-        tailwindStyles = {
-          ...tailwindStyles,
-          ...rest,
-        };
-
-        if (transform) {
-          transforms.push(...transform);
-        }
+        styleArray.push(styles[selector]);
       }
 
-      const rules = mediaRules[selector];
+      if (media[selector]) {
+        styleArray.push(
+          ...media[selector].map((atRules, index) => ({
+            ...styles[`${selector}.${index}`],
+            atRules,
+          }))
+        );
+      }
 
-      if (!rules) {
+      if (styleArray.length === 0) {
         continue;
       }
 
-      for (let index = 0, length = rules.length; index < length; index++) {
-        const mediaQuery = rules[index];
-        if (mediaQuery.startsWith("--")) {
-          childStyles += ` ${mediaQuery}.${selector}.${index}`;
-        } else {
-          const isMatch = match(rules[index], {
-            "aspect-ratio": width / height,
-            "device-aspect-ratio": width / height,
-            type: platform,
-            width,
-            height,
-            "device-width": width,
-            "device-height": width,
-            orientation,
-            "prefers-color-scheme": colorScheme,
+      for (let styleRecord of styleArray) {
+        if ("atRules" in styleRecord) {
+          let isForChildren = false;
+
+          const { atRules, ...rest } = styleRecord;
+
+          const atRulesResult = atRules.every(([rule, params]) => {
+            if (rule === "selector" && params === "(> * + *)") {
+              isForChildren = !name.startsWith(">");
+              return nthChild > 1;
+            }
+
+            if (rule === "media") {
+              return match(params, {
+                "aspect-ratio": width / height,
+                "device-aspect-ratio": width / height,
+                type: platform,
+                width,
+                height,
+                "device-width": width,
+                "device-height": width,
+                orientation,
+                "prefers-color-scheme": colorScheme,
+              });
+            }
+
+            return false;
           });
 
-          const { transform, ...rest } = styles[`${selector}.${index}`];
-
-          if (isMatch) {
-            tailwindStyles = {
-              ...tailwindStyles,
-              ...rest,
-            };
+          if (!atRulesResult) {
+            // If one of the atRules don't match, skip this className
+            continue;
           }
 
-          if (transform) {
-            transforms.push(...transform);
+          if (isForChildren) {
+            // atRules can force the selector to be applied to the children
+            // So add it to childClassName and skip this className
+            childClassNameSet.add(`>${name}`);
+            continue;
+          } else {
+            styleRecord = rest;
           }
+        }
+
+        const { transform, ...rest } = styleRecord;
+
+        if (styles) {
+          Object.assign(tailwindStyles, rest);
+        }
+
+        if (transform) {
+          transforms.push(...transform);
         }
       }
     }
@@ -128,12 +141,20 @@ export function useTailwind<P>(options: UseTailwindOptions = {}) {
       (tailwindStyles as any).transform = transforms;
     }
 
-    if (childStyles) {
-      tailwindStyles[ChildClassNameSymbol] = childStyles;
+    if (childClassNameSet.size > 0) {
+      tailwindStyles[ChildClassNameSymbol] = [...childClassNameSet].join(" ");
     }
 
     return Platform.OS === "web"
       ? StyleSheet.flatten(tailwindStyles) // RNW <=0.17 still uses ReactNativePropRegistry
       : tailwindStyles;
   };
+}
+
+function assertPlatform(platform: string): asserts platform is string {
+  if (!platform) {
+    throw new Error(
+      "No platform details found. Make sure all components are within a TailwindProvider with the platform attribute set."
+    );
+  }
 }

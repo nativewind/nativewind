@@ -9,7 +9,7 @@ export const gap: CustomPluginFunction = ({ matchUtilities, theme }) => {
 
         return {
           "&": {
-            "@media --general-sibling-combinator": {
+            "@selector (> * + *)": {
               margin: `calc(${value} / 2)`,
             },
           },
@@ -21,7 +21,7 @@ export const gap: CustomPluginFunction = ({ matchUtilities, theme }) => {
 
         return {
           "&": {
-            "@media --general-sibling-combinator": {
+            "@selector (> * + *)": {
               "margin-left": `calc(${value} / 2)`,
               "margin-right": `calc(${value} / 2)`,
             },
@@ -34,7 +34,7 @@ export const gap: CustomPluginFunction = ({ matchUtilities, theme }) => {
 
         return {
           "&": {
-            "@media --general-sibling-combinator": {
+            "@selector (> * + *)": {
               "margin-top": `calc(${value} / 2)`,
               "margin-bottom": `calc(${value} / 2)`,
             },

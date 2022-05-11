@@ -7,12 +7,11 @@ const scenarios: Record<string, ViewStyle["borderStyle"]> = {
   dotted: "dotted",
 };
 
-tailwindRunner("Border - Divide Style", [
-  ...createTests("divide", scenarios, (n) => ({
-    media: ["--general-sibling-combinator"],
-    style: {
-      borderStyle: n,
-    },
+tailwindRunner(
+  "Border - Divide Style",
+  createTests("divide", scenarios, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    borderStyle: n,
   })),
-  ...expectError(["divide-double", "divide-none"]),
-]);
+  expectError(["divide-double", "divide-none"])
+);

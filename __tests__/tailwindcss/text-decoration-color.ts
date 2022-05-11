@@ -28,7 +28,8 @@ const scenarios: Record<string, string> = {
   "rose-50": "#fff1f2",
 };
 
-tailwindRunner("Typography - Text Decoration Color", [
-  ...createTests("decoration", scenarios, (n) => ({ textDecorationColor: n })),
-  ...expectError(["decoration-current", "decoration-inherit"]),
-]);
+tailwindRunner(
+  "Typography - Text Decoration Color",
+  createTests("decoration", scenarios, (n) => ({ textDecorationColor: n })),
+  expectError(["decoration-current", "decoration-inherit"])
+);

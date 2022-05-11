@@ -193,6 +193,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
         divideColor: false,
         divideStyle: false,
         divideOpacity: false,
+        textOpacity: false,
         scale: false,
         transform: false,
         rotate: false,

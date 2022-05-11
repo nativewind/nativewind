@@ -8,13 +8,11 @@ import {
 
 import { useDeviceOrientation } from "@react-native-community/hooks";
 
-import type { MediaRecord, StyleRecord } from "./types/common";
-
 import { TailwindContext } from "./context";
 
 export interface TailwindProviderProps {
-  styles?: StyleRecord;
-  media?: MediaRecord;
+  styles?: typeof globalThis["tailwindcss_react_native_style"];
+  media?: typeof globalThis["tailwindcss_react_native_media"];
   colorScheme?: ColorSchemeName;
   platform?: typeof Platform.OS | "native";
   preview?: boolean;
@@ -22,7 +20,7 @@ export interface TailwindProviderProps {
 
 export function TailwindProvider({
   styles = globalThis.tailwindcss_react_native_style,
-  media = globalThis.tailwindcss_react_native_media,
+  media = globalThis.tailwindcss_react_native_media ?? {},
   colorScheme: overrideColorScheme,
   platform = Platform.OS,
   preview = false,

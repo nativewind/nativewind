@@ -8,19 +8,16 @@ const scenarios: Record<string, ViewStyle["borderWidth"]> = {
   8: 8,
 };
 
-tailwindRunner("Border - Divide Width", [
-  ...createTests("divide-x", scenarios, (n) => ({
-    media: ["--general-sibling-combinator"],
-    style: {
-      borderLeftWidth: n,
-      borderRightWidth: n,
-    },
+tailwindRunner(
+  "Border - Divide Width",
+  createTests("divide-x", scenarios, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    borderLeftWidth: n,
+    borderRightWidth: n,
   })),
-  ...createTests("divide-y", scenarios, (n) => ({
-    media: ["--general-sibling-combinator"],
-    style: {
-      borderTopWidth: n,
-      borderBottomWidth: n,
-    },
-  })),
-]);
+  createTests("divide-y", scenarios, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    borderTopWidth: n,
+    borderBottomWidth: n,
+  }))
+);

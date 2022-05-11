@@ -1,17 +1,14 @@
 import { expectError, tailwindRunner, spacing, createTests } from "./runner";
 
-tailwindRunner("Layout - Space between", [
-  ...createTests("space-x", spacing, (n) => ({
-    media: ["--general-sibling-combinator"],
-    style: {
-      marginLeft: n,
-    },
+tailwindRunner(
+  "Layout - Space between",
+  createTests("space-x", spacing, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    marginLeft: n,
   })),
-  ...createTests("space-y", spacing, (n) => ({
-    media: ["--general-sibling-combinator"],
-    style: {
-      marginTop: n,
-    },
+  createTests("space-y", spacing, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    marginTop: n,
   })),
-  ...expectError(["space-x-reverse", "space-y-reverse"]),
-]);
+  expectError(["space-x-reverse", "space-y-reverse"])
+);

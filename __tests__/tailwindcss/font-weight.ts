@@ -13,6 +13,7 @@ const scenarios: Record<string, TextStyle["fontWeight"]> = {
   black: "900",
 };
 
-tailwindRunner("Typography - Font Weight", [
-  ...createTests("font", scenarios, (n) => ({ fontWeight: n })),
-]);
+tailwindRunner(
+  "Typography - Font Weight",
+  createTests("font", scenarios, (n) => ({ fontWeight: n }))
+);

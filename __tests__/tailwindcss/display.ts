@@ -22,8 +22,7 @@ const displayEmptyResults = [
   "list-item",
 ];
 
-tailwindRunner("Layout - Display", [
-  ...expectError(displayEmptyResults),
-  ["flex", { styles: { flex: { display: "flex" } } }],
-  ["hidden", { styles: { hidden: { display: "none" } } }],
+tailwindRunner("Layout - Display", expectError(displayEmptyResults), [
+  ["flex", { flex: [{ display: "flex" }] }],
+  ["hidden", { hidden: [{ display: "none" }] }],
 ]);

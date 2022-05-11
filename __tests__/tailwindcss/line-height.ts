@@ -6,14 +6,15 @@ const scenarios: Record<string, TextStyle["letterSpacing"]> = {
   4: 16,
 };
 
-tailwindRunner("Typography - Line Height", [
-  ...createTests("leading", scenarios, (n) => ({ lineHeight: n })),
-  ...expectError([
+tailwindRunner(
+  "Typography - Line Height",
+  createTests("leading", scenarios, (n) => ({ lineHeight: n })),
+  expectError([
     "leading-none",
     "leading-tight",
     "leading-snug",
     "leading-normal",
     "leading-relaxed",
     "leading-loose",
-  ]),
-]);
+  ])
+);

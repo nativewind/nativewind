@@ -1,36 +1,37 @@
 import { createTests, tailwindRunner, spacing } from "./runner";
 
-tailwindRunner("Layout - Top Right Bottom Left", [
-  ...createTests("p", spacing, (n) => ({
+tailwindRunner(
+  "Layout - Top Right Bottom Left",
+  createTests("p", spacing, (n) => ({
     paddingBottom: n,
     paddingLeft: n,
     paddingRight: n,
     paddingTop: n,
   })),
 
-  ...createTests("px", spacing, (n) => ({
+  createTests("px", spacing, (n) => ({
     paddingLeft: n,
     paddingRight: n,
   })),
 
-  ...createTests("py", spacing, (n) => ({
+  createTests("py", spacing, (n) => ({
     paddingTop: n,
     paddingBottom: n,
   })),
 
-  ...createTests("pt", spacing, (n) => ({
+  createTests("pt", spacing, (n) => ({
     paddingTop: n,
   })),
 
-  ...createTests("pr", spacing, (n) => ({
+  createTests("pr", spacing, (n) => ({
     paddingRight: n,
   })),
 
-  ...createTests("pb", spacing, (n) => ({
+  createTests("pb", spacing, (n) => ({
     paddingBottom: n,
   })),
 
-  ...createTests("pl", spacing, (n) => ({
+  createTests("pl", spacing, (n) => ({
     paddingLeft: n,
-  })),
-]);
+  }))
+);

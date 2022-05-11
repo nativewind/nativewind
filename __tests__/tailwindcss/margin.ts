@@ -1,6 +1,7 @@
 import { expectError, createTests, tailwindRunner, spacing } from "./runner";
 
-const tests = [
+tailwindRunner(
+  "Layout - Margin",
   createTests("m", spacing, (n) => ({
     marginBottom: n,
     marginLeft: n,
@@ -42,7 +43,5 @@ const tests = [
     "mr-auto",
     "mb-auto",
     "ml-auto",
-  ]),
-].flat();
-
-tailwindRunner("Layout - Margin", tests);
+  ])
+);

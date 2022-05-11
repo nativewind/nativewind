@@ -9,11 +9,8 @@ const scenarios: Record<string, ViewStyle["borderStyle"]> = {
 
 tailwindRunner(
   "Borders - Border Style",
-
-  [
-    ...createTests("border", scenarios, (n) => ({
-      borderStyle: n,
-    })),
-    ...expectError(["border-none", "border-double", "border-hidden"]),
-  ]
+  createTests("border", scenarios, (n) => ({
+    borderStyle: n,
+  })),
+  expectError(["border-none", "border-double", "border-hidden"])
 );

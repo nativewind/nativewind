@@ -12,52 +12,55 @@ const scenarios: Record<string, ViewStyle["borderRadius"]> = {
   full: 9999,
 };
 
-tailwindRunner("Border - Border Radius", [
+tailwindRunner(
+  "Border - Border Radius",
   [
-    "rounded",
-    {
-      styles: {
-        rounded: {
-          borderBottomLeftRadius: 4,
-          borderBottomRightRadius: 4,
-          borderTopLeftRadius: 4,
-          borderTopRightRadius: 4,
-        },
+    [
+      "rounded",
+      {
+        rounded: [
+          {
+            borderBottomLeftRadius: 4,
+            borderBottomRightRadius: 4,
+            borderTopLeftRadius: 4,
+            borderTopRightRadius: 4,
+          },
+        ],
       },
-    },
+    ],
   ],
-  ...createTests("rounded", scenarios, (n) => ({
+  createTests("rounded", scenarios, (n) => ({
     borderBottomLeftRadius: n,
     borderBottomRightRadius: n,
     borderTopLeftRadius: n,
     borderTopRightRadius: n,
   })),
-  ...createTests("rounded-t", scenarios, (n) => ({
+  createTests("rounded-t", scenarios, (n) => ({
     borderTopLeftRadius: n,
     borderTopRightRadius: n,
   })),
-  ...createTests("rounded-r", scenarios, (n) => ({
+  createTests("rounded-r", scenarios, (n) => ({
     borderBottomRightRadius: n,
     borderTopRightRadius: n,
   })),
-  ...createTests("rounded-b", scenarios, (n) => ({
+  createTests("rounded-b", scenarios, (n) => ({
     borderBottomLeftRadius: n,
     borderBottomRightRadius: n,
   })),
-  ...createTests("rounded-l", scenarios, (n) => ({
+  createTests("rounded-l", scenarios, (n) => ({
     borderBottomLeftRadius: n,
     borderTopLeftRadius: n,
   })),
-  ...createTests("rounded-tl", scenarios, (n) => ({
+  createTests("rounded-tl", scenarios, (n) => ({
     borderTopLeftRadius: n,
   })),
-  ...createTests("rounded-tr", scenarios, (n) => ({
+  createTests("rounded-tr", scenarios, (n) => ({
     borderTopRightRadius: n,
   })),
-  ...createTests("rounded-br", scenarios, (n) => ({
+  createTests("rounded-br", scenarios, (n) => ({
     borderBottomRightRadius: n,
   })),
-  ...createTests("rounded-bl", scenarios, (n) => ({
+  createTests("rounded-bl", scenarios, (n) => ({
     borderBottomLeftRadius: n,
-  })),
-]);
+  }))
+);
