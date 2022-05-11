@@ -4,71 +4,43 @@ tailwindRunner("Platform Prefixes", [
   [
     "ios:w-px",
     {
-      styles: {
-        "ios_w-px.0": { width: 1 },
-      },
-      media: {
-        "ios_w-px": ["ios"],
-      },
+      "ios_w-px": [{ atRules: [["media", "ios"]], width: 1 }],
     },
   ],
   [
     "android:w-px",
     {
-      styles: {
-        "android_w-px.0": { width: 1 },
-      },
-      media: {
-        "android_w-px": ["android"],
-      },
+      "android_w-px": [{ atRules: [["media", "android"]], width: 1 }],
     },
   ],
   [
     "windows:w-px",
     {
-      styles: {
-        "windows_w-px.0": { width: 1 },
-      },
-      media: {
-        "windows_w-px": ["windows"],
-      },
+      "windows_w-px": [{ atRules: [["media", "windows"]], width: 1 }],
     },
   ],
   [
     "macos:w-px",
     {
-      styles: {
-        "macos_w-px.0": { width: 1 },
-      },
-      media: {
-        "macos_w-px": ["macos"],
-      },
+      "macos_w-px": [{ atRules: [["media", "macos"]], width: 1 }],
     },
   ],
   [
     "web:w-px",
     {
-      styles: {
-        "web_w-px.0": { width: 1 },
-      },
-      media: {
-        "web_w-px": ["web"],
-      },
+      "web_w-px": [{ atRules: [["media", "web"]], width: 1 }],
     },
   ],
   [
     "native:w-px",
     {
-      styles: {
-        "native_w-px.0": { width: 1 },
-        "native_w-px.1": { width: 1 },
-        "native_w-px.2": { width: 1 },
-        "native_w-px.3": { width: 1 },
-        "native_w-px.4": { width: 1 },
-      },
-      media: {
-        "native_w-px": ["native", "android", "ios", "windows", "macos"],
-      },
+      "native_w-px": [
+        { atRules: [["media", "native"]], width: 1 },
+        { atRules: [["media", "android"]], width: 1 },
+        { atRules: [["media", "ios"]], width: 1 },
+        { atRules: [["media", "windows"]], width: 1 },
+        { atRules: [["media", "macos"]], width: 1 },
+      ],
     },
   ],
 ]);

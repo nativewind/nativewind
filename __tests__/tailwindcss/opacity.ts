@@ -19,6 +19,7 @@ const scenarios: Record<string, TextStyle["opacity"]> = {
   100: 1,
 };
 
-tailwindRunner("Effects - Opacity", [
-  ...createTests("opacity", scenarios, (n) => ({ opacity: n })),
-]);
+tailwindRunner(
+  "Effects - Opacity",
+  createTests("opacity", scenarios, (n) => ({ opacity: n }))
+);

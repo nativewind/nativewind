@@ -14,7 +14,8 @@ const scenarios: Record<string, ViewStyle["height"]> = {
   "[18px]": 18,
 };
 
-tailwindRunner("Sizing - Height", [
-  ...createTests("h", scenarios, (n) => ({ height: n })),
-  ...expectError(["h-auto", "h-screen", "h-min", "h-max", "h-fit"]),
-]);
+tailwindRunner(
+  "Sizing - Height",
+  createTests("h", scenarios, (n) => ({ height: n })),
+  expectError(["h-auto", "h-screen", "h-min", "h-max", "h-fit"])
+);

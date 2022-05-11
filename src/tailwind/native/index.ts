@@ -5,10 +5,13 @@ import {
 } from "tailwindcss/tailwind-config";
 import { StyleError } from "../../types/common";
 import { boxShadow } from "./box-shadow";
+import { component } from "./component";
 import { divide } from "./divide";
 import { elevation } from "./elevation";
 import { fontSize } from "./font-size";
+import { gap } from "./gap";
 import { lineHeight } from "./line-height";
+import { pseudoClasses } from "./pseudo-classes";
 import { rotate } from "./rotate";
 import { scale } from "./scale";
 import { skew } from "./skew";
@@ -36,6 +39,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
     return (helpers) => {
       space(helpers, notSupported);
       divide(helpers, notSupported);
+      gap(helpers, notSupported);
       fontSize(helpers);
       lineHeight(helpers, notSupported);
       elevation(helpers, notSupported);
@@ -44,6 +48,8 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
       translate(helpers, notSupported);
       skew(helpers, notSupported);
       boxShadow(helpers, notSupported);
+      pseudoClasses(helpers, notSupported);
+      component(helpers, notSupported);
     };
   },
   function ({ rem = 16 } = {}) {
@@ -191,12 +197,14 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
         divideColor: false,
         divideStyle: false,
         divideOpacity: false,
+        textOpacity: false,
         scale: false,
         transform: false,
         rotate: false,
         skew: false,
         translate: false,
         boxShadow: false,
+        gap: false,
       },
     };
 

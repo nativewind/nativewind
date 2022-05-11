@@ -4,14 +4,13 @@ import tailwind from "tailwindcss";
 
 import plugin from "../postcss";
 
-import { MediaRecord, StyleError, StyleRecord } from "../types/common";
+import { StyleError, StyleRecord } from "../types/common";
 
 export function extractStyles(
   tailwindConfig: TailwindConfig,
   cssInput = "@tailwind components;@tailwind utilities;"
 ) {
   let styles: StyleRecord = {};
-  let media: MediaRecord = {};
   let errors: StyleError[] = [];
 
   const plugins = [
@@ -20,7 +19,6 @@ export function extractStyles(
       ...tailwindConfig,
       done: (output) => {
         styles = output.styles;
-        media = output.media;
         errors = output.errors;
       },
     }),
@@ -30,7 +28,6 @@ export function extractStyles(
 
   return {
     styles,
-    media,
     errors,
   };
 }

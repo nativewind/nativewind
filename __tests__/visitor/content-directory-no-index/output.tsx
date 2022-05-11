@@ -19,7 +19,7 @@ Object.assign(
       fontWeight: "700",
     },
     "text-blue-500": {
-      color: "rgba(59, 130, 246, 1)",
+      color: "#3b82f6",
     },
   })
 );

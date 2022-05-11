@@ -1,14 +1,14 @@
 import { expectError, tailwindRunner } from "./runner";
 
-tailwindRunner("Typography - Text Decoration", [
-  ["underline", { styles: { underline: { textDecorationLine: "underline" } } }],
+tailwindRunner(
+  "Typography - Text Decoration",
   [
-    "line-through",
-    { styles: { "line-through": { textDecorationLine: "line-through" } } },
+    ["underline", { underline: [{ textDecorationLine: "underline" }] }],
+    [
+      "line-through",
+      { "line-through": [{ textDecorationLine: "line-through" }] },
+    ],
+    ["no-underline", { "no-underline": [{ textDecorationLine: "none" }] }],
   ],
-  [
-    "no-underline",
-    { styles: { "no-underline": { textDecorationLine: "none" } } },
-  ],
-  ...expectError(["overline"]),
-]);
+  expectError(["overline"])
+);

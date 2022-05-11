@@ -1,10 +1,14 @@
 import { tailwindRunner } from "./runner";
 
 tailwindRunner("Layout - Flex Direction", [
-  ["flex-row", { styles: { "flex-row": { flexDirection: "row" } } }],
-  // prettier-ignore
-  ["flex-row-reverse", { styles: { "flex-row-reverse": { flexDirection: "row-reverse" } } } ],
-  ["flex-col", { styles: { "flex-col": { flexDirection: "column" } } }],
-  // prettier-ignore
-  ["flex-col-reverse", { styles: { "flex-col-reverse": { flexDirection: "column-reverse" } } } ],
+  ["flex-row", { "flex-row": [{ flexDirection: "row" }] }],
+  ["flex-col", { "flex-col": [{ flexDirection: "column" }] }],
+  [
+    "flex-row-reverse",
+    { "flex-row-reverse": [{ flexDirection: "row-reverse" }] },
+  ],
+  [
+    "flex-col-reverse",
+    { "flex-col-reverse": [{ flexDirection: "column-reverse" }] },
+  ],
 ]);

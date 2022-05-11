@@ -1,11 +1,14 @@
-import { expectError, tailwindRunner, spacing } from "./runner";
+import { expectError, tailwindRunner, spacing, createTests } from "./runner";
 
 tailwindRunner(
   "Layout - Space between",
-  expectError([
-    ...Object.keys(spacing).map((space) => `space-x-${space}`),
-    ...Object.keys(spacing).map((space) => `space-y-${space}`),
-    "space-x-reverse",
-    "space-y-reverse",
-  ])
+  createTests("space-x", spacing, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    marginLeft: n,
+  })),
+  createTests("space-y", spacing, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    marginTop: n,
+  })),
+  expectError(["space-x-reverse", "space-y-reverse"])
 );

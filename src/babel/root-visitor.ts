@@ -98,7 +98,7 @@ export default function rootVisitor(
             /**
              * Override tailwind to only process the classnames in this file
              */
-            const { styles, media } = extractStyles({
+            const { styles } = extractStyles({
               ...tailwindConfig,
               content: [filename],
             });
@@ -113,7 +113,7 @@ export default function rootVisitor(
               );
             }
 
-            appendVariables(bodyNode, styles, media);
+            appendVariables(bodyNode, styles);
 
             if (!hasStyleSheetImport) {
               prependImport(bodyNode, "StyleSheet", "react-native");
@@ -126,10 +126,10 @@ export default function rootVisitor(
             /**
              * Override tailwind to only process the classnames in this file
              */
-            const { styles, media } = extractStyles(tailwindConfig);
+            const { styles } = extractStyles(tailwindConfig);
 
             const bodyNode = path.node.body;
-            appendVariables(bodyNode, styles, media);
+            appendVariables(bodyNode, styles);
 
             if (!hasStyleSheetImport) {
               prependImport(bodyNode, "StyleSheet", "react-native");

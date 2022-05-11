@@ -14,7 +14,8 @@ const scenarios: Record<string, ViewStyle["width"]> = {
   "[18px]": 18,
 };
 
-tailwindRunner("Sizing - Width", [
-  ...createTests("w", scenarios, (n) => ({ width: n })),
-  ...expectError(["w-auto", "w-screen", "w-min", "w-max", "w-fit"]),
-]);
+tailwindRunner(
+  "Sizing - Width",
+  createTests("w", scenarios, (n) => ({ width: n })),
+  expectError(["w-auto", "w-screen", "w-min", "w-max", "w-fit"])
+);

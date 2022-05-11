@@ -1,9 +1,23 @@
-import { expectError, tailwindRunner } from "./runner";
+import { ViewStyle } from "react-native";
+import { createTests, tailwindRunner } from "./runner";
 
-const scenarios = [0, 2, 4, 8];
+const scenarios: Record<string, ViewStyle["borderWidth"]> = {
+  0: 0,
+  2: 2,
+  4: 4,
+  8: 8,
+};
 
-tailwindRunner("Border - Divide Width", [
-  ...expectError(scenarios.map((n) => `divide-x-${n}`)),
-  ...expectError(scenarios.map((n) => `divide-y-${n}`)),
-  ...expectError(["divide-x-reverse", "divide-y-reverse"]),
-]);
+tailwindRunner(
+  "Border - Divide Width",
+  createTests("divide-x", scenarios, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    borderLeftWidth: n,
+    borderRightWidth: n,
+  })),
+  createTests("divide-y", scenarios, (n) => ({
+    atRules: [["selector", "(> * + *)"]],
+    borderTopWidth: n,
+    borderBottomWidth: n,
+  }))
+);

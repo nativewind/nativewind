@@ -1,7 +1,8 @@
 import { tailwindRunner, expectError } from "./runner";
 
-tailwindRunner("Layout - Object Position", [
-  ...expectError([
+tailwindRunner(
+  "Layout - Object Position",
+  expectError([
     "overflow-auto",
     "overflow-clip",
     "overflow-x-auto",
@@ -16,15 +17,8 @@ tailwindRunner("Layout - Object Position", [
     "overflow-y-scroll",
   ]),
   [
-    "overflow-hidden",
-    { styles: { "overflow-hidden": { overflow: "hidden" } } },
-  ],
-  [
-    "overflow-visible",
-    { styles: { "overflow-visible": { overflow: "visible" } } },
-  ],
-  [
-    "overflow-scroll",
-    { styles: { "overflow-scroll": { overflow: "scroll" } } },
-  ],
-]);
+    ["overflow-hidden", { "overflow-hidden": [{ overflow: "hidden" }] }],
+    ["overflow-visible", { "overflow-visible": [{ overflow: "visible" }] }],
+    ["overflow-scroll", { "overflow-scroll": [{ overflow: "scroll" }] }],
+  ]
+);

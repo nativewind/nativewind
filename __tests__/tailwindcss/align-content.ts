@@ -9,7 +9,8 @@ const scenarios: Record<string, TextStyle["alignContent"]> = {
   around: "space-around",
 };
 
-tailwindRunner("Layout - Align Content", [
-  ...createTests("content", scenarios, (n) => ({ alignContent: n })),
-  ...expectError(["content-evenly"]),
-]);
+tailwindRunner(
+  "Layout - Align Content",
+  createTests("content", scenarios, (n) => ({ alignContent: n })),
+  expectError(["content-evenly"])
+);

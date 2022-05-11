@@ -1,34 +1,25 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { extractStyles } from "../../../src/postcss/extract-styles";
-import {
-  MediaRecord,
-  StyleError,
-  StyleRecord,
-} from "../../../src/types/common";
+import { StyleError, StyleRecord } from "../../../src/types/common";
 
-import plugin from "../../../src/plugin";
-import { nativePlugin } from "../../../src/plugin/native";
+import plugin from "../../../src/tailwind";
+import { nativePlugin } from "../../../src/tailwind/native";
 
-export type Test = [string, Expected];
+export type Test = [string, StyleRecord] | [string, StyleRecord, true];
 
 export { spacing } from "./spacing";
 export { createTests, expectError } from "./tests";
 
-export interface Expected {
-  styles: StyleRecord;
-  media?: MediaRecord;
-  shouldError?: boolean;
-}
-
-export function tailwindRunner(name: string, testCases: Test[]) {
+export function tailwindRunner(name: string, ...testCases: Array<Test[]>) {
   describe(name, () => {
-    test.each(testCases)("%s", assertStyles);
+    test.each(testCases.flat())("%s", assertStyles);
   });
 }
 
 export function assertStyles(
   css: string,
-  { styles, media = {}, shouldError = false }: Expected
+  styles: StyleRecord,
+  shouldError = false
 ) {
   const errors: StyleError[] = [];
 
@@ -48,7 +39,7 @@ export function assertStyles(
     safelist: [css],
   });
 
-  expect(output).toEqual({ styles, media });
+  expect(output).toEqual({ styles });
   if (shouldError) {
     errors.push(...outputErrors);
     expect(errors.length).toBeGreaterThan(0);

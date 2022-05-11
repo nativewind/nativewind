@@ -14,13 +14,13 @@ import {
   stringLiteral,
   unaryExpression,
 } from "@babel/types";
-import { MediaRecord, StyleRecord } from "../../types/common";
 
-export function appendVariables(
-  body: Statement[],
-  styles: StyleRecord,
-  media: MediaRecord
-) {
+import { StyleRecord } from "../../types/common";
+import { serialiseStyles } from "../../utils/serialise-styles";
+
+export function appendVariables(body: Statement[], styleRecord: StyleRecord) {
+  const { styles, media } = serialiseStyles(styleRecord);
+
   body.push(
     expressionStatement(
       callExpression(

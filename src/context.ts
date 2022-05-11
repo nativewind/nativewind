@@ -1,10 +1,10 @@
 import { createContext } from "react";
 import { ColorSchemeName } from "react-native";
-import { MediaRecord, StyleRecord } from "./types/common";
+import { MediaRecord, Style } from "./types/common";
 
 declare global {
   // eslint-disable-next-line no-var
-  var tailwindcss_react_native_style: StyleRecord;
+  var tailwindcss_react_native_style: Record<string, Style>;
   // eslint-disable-next-line no-var
   var tailwindcss_react_native_media: MediaRecord;
 }
@@ -13,8 +13,8 @@ globalThis.tailwindcss_react_native_style ??= {};
 globalThis.tailwindcss_react_native_media ??= {};
 
 export interface TailwindContext {
-  styles: StyleRecord;
-  media: MediaRecord;
+  styles: typeof globalThis["tailwindcss_react_native_style"];
+  media: typeof globalThis["tailwindcss_react_native_media"];
   colorScheme: ColorSchemeName;
   setColorScheme: (colorScheme: ColorSchemeName) => void;
   width: number;
@@ -36,4 +36,16 @@ export const TailwindContext = createContext<TailwindContext>({
   platform: "",
   orientation: "portrait",
   preview: false,
+});
+
+export interface ComponentContext {
+  hover: boolean;
+  focus: boolean;
+  active: boolean;
+}
+
+export const ComponentContext = createContext<ComponentContext>({
+  hover: false,
+  focus: false,
+  active: false,
 });

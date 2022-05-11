@@ -53,7 +53,9 @@
     "postcss": "^8.4.12",
     "postcss-calc": "^8.2.4",
     "postcss-color-functional-notation": "^4.2.2",
-    "postcss-css-variables": "^0.18.0"
+    "postcss-css-variables": "^0.18.0",
+    "postcss-nested": "^5.0.6",
+    "react-is": "^18.1.0"
   },
   "devDependencies": {
     "@babel/core": "7.17.10",
@@ -69,6 +71,7 @@
     "@types/jest": "27.5.0",
     "@types/micromatch": "4.0.2",
     "@types/react": "18.0.9",
+    "@types/react-is": "^17.0.3",
     "@types/react-native": "0.67.6",
     "@types/tailwindcss": "3.0.10",
     "@typescript-eslint/eslint-plugin": "5.23.0",

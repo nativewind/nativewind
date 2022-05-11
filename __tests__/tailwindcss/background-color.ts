@@ -51,7 +51,8 @@ const scenarios: Record<string, string> = {
   "rose-100": "rgba(255, 228, 230, 1)",
 };
 
-tailwindRunner("Typography - Background Color", [
-  ...createTests("bg", scenarios, (n) => ({ backgroundColor: n })),
-  ...expectError(["bg-current", "bg-inherit"]),
-]);
+tailwindRunner(
+  "Typography - Background Color",
+  createTests("bg", scenarios, (n) => ({ backgroundColor: n })),
+  expectError(["bg-current", "bg-inherit"])
+);

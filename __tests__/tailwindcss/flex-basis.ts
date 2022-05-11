@@ -13,7 +13,8 @@ const scenarios: Record<string, ViewStyle["flexBasis"]> = {
   "[999%]": "999%",
 };
 
-tailwindRunner("Layout - Flex Basis", [
-  ...createTests("basis", scenarios, (n) => ({ flexBasis: n })),
-  ...expectError(["basis-auto"]),
-]);
+tailwindRunner(
+  "Layout - Flex Basis",
+  createTests("basis", scenarios, (n) => ({ flexBasis: n })),
+  expectError(["basis-auto"])
+);

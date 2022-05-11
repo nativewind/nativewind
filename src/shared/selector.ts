@@ -10,16 +10,16 @@ export function normaliseSelector(
   { important }: Partial<TailwindConfig> = {}
 ) {
   const leadingDots = "^\\.";
+  const leadingChild = "^>";
   const nonWordCharactersExceptDash = new RegExp("[^a-zA-Z0-9-]+", "g");
 
-  let newSelector = selector;
-
   if (important) {
-    newSelector = newSelector.replace(new RegExp(`^${important}`), "");
+    selector = selector.replace(new RegExp(`^${important}`), "");
   }
 
-  return newSelector
+  return selector
     .trim()
     .replace(new RegExp(leadingDots), "")
+    .replace(new RegExp(leadingChild), "")
     .replace(nonWordCharactersExceptDash, "_");
 }

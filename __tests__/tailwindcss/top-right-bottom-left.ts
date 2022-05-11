@@ -17,17 +17,22 @@ const expectedValues: Record<string, number | string> = {
   "[18px]": 18,
 };
 
-tailwindRunner("Layout - Top Right Bottom Left", [
-  // prettier-ignore
-  ...createTests("inset", expectedValues, (n) => ({ top: n, right: n, bottom: n, left: n })),
-  ...createTests("inset-x", expectedValues, (n) => ({ right: n, left: n })),
-  ...createTests("inset-y", expectedValues, (n) => ({ top: n, bottom: n })),
-  ...createTests("top", expectedValues, (n) => ({ top: n })),
-  ...createTests("right", expectedValues, (n) => ({ right: n })),
-  ...createTests("bottom", expectedValues, (n) => ({ bottom: n })),
-  ...createTests("left", expectedValues, (n) => ({ left: n })),
+tailwindRunner(
+  "Layout - Top Right Bottom Left",
+  createTests("inset-x", expectedValues, (n) => ({ right: n, left: n })),
+  createTests("inset-y", expectedValues, (n) => ({ top: n, bottom: n })),
+  createTests("top", expectedValues, (n) => ({ top: n })),
+  createTests("right", expectedValues, (n) => ({ right: n })),
+  createTests("bottom", expectedValues, (n) => ({ bottom: n })),
+  createTests("left", expectedValues, (n) => ({ left: n })),
+  createTests("inset", expectedValues, (n) => ({
+    top: n,
+    right: n,
+    bottom: n,
+    left: n,
+  })),
 
-  ...expectError([
+  expectError([
     "inset-auto",
     "inset-x-auto",
     "inset-y-auto",
@@ -35,5 +40,5 @@ tailwindRunner("Layout - Top Right Bottom Left", [
     "right-auto",
     "bottom-auto",
     "left-auto",
-  ]),
-]);
+  ])
+);

@@ -1,18 +1,19 @@
+import { ColorValue } from "react-native";
 import { Test } from ".";
 import { normaliseSelector } from "../../../src/shared/selector";
-import { Style, StyleRecord } from "../../../src/types/common";
+import { AtRuleRecord, Style, StyleRecord } from "../../../src/types/common";
 
 export function expectError(names: string[]): Test[] {
-  return names.map((name) => [
-    name,
-    { styles: {}, media: {}, shouldError: true },
-  ]);
+  return names.map((name) => [name, {}, true]);
 }
 
-export function createTests<T extends string | number | undefined>(
+export function createTests<T extends string | number | ColorValue | undefined>(
   prefix: string,
   suffixes: Record<string, T>,
-  valueFunction: (n: T, suffix: string) => Style
+  valueFunction: (
+    n: T,
+    suffix: string
+  ) => Style | AtRuleRecord | Array<Style | AtRuleRecord>
 ): Test[] {
   return Object.entries(suffixes).map(([suffix, value]) => {
     const styles: StyleRecord = {};
@@ -25,16 +26,21 @@ export function createTests<T extends string | number | undefined>(
     const flooredNumber = Math.floor(scaleParsed);
 
     if (Number.isFinite(flooredNumber) && flooredNumber !== scaleParsed) {
-      styles[normaliseSelector(`${prefix}-${flooredNumber}`)] = valueFunction(
+      const key = normaliseSelector(`${prefix}-${flooredNumber}`);
+      const result = valueFunction(
         suffixes[flooredNumber],
         flooredNumber.toString()
       );
+
+      styles[normaliseSelector(key)] = Array.isArray(result)
+        ? result
+        : [result];
     }
 
     const key = suffix ? `${prefix}-${suffix}` : prefix;
+    const result = valueFunction(value, suffix);
 
-    styles[normaliseSelector(key)] = valueFunction(value, suffix);
-
-    return [key, { styles }];
+    styles[normaliseSelector(key)] = Array.isArray(result) ? result : [result];
+    return [key, styles];
   });
 }
