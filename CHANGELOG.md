@@ -1,3 +1,20 @@
+# [1.2.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.1.1...v1.2.0) (2022-05-11)
+
+
+### Bug Fixes
+
+* component context not being created ([8709a9d](https://github.com/marklawlor/tailwindcss-react-native/commit/8709a9d825333bb374835df730b64049f1368f34))
+* missing initializer for tailwindcss_react_native_media ([e8493ac](https://github.com/marklawlor/tailwindcss-react-native/commit/e8493ac2655476d61f1ad3771d2a8236ebeff8c5))
+* simplied sibling plugins ([d8a0383](https://github.com/marklawlor/tailwindcss-react-native/commit/d8a038313fb11af89f7090523dbd32a886de477e))
+
+
+### Features
+
+* add component ([09c8698](https://github.com/marklawlor/tailwindcss-react-native/commit/09c86983ed0c73a99b01d69a6eaa207f43e2fb2b))
+* add flatten option of useTailwind ([9565c29](https://github.com/marklawlor/tailwindcss-react-native/commit/9565c29cbc13d436e5d0017612ee3142a6937fbe))
+* add hover, focus & active pseudo-classes ([da3c8f4](https://github.com/marklawlor/tailwindcss-react-native/commit/da3c8f4e2bc72b53f6c78ed286aba0a6aeef8f6f))
+* support divide, space & gap ([3ce837e](https://github.com/marklawlor/tailwindcss-react-native/commit/3ce837eccec1c894783f8d230007169a5803267f))
+
 # [1.2.0-next.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0-next.5...v1.2.0-next.6) (2022-05-11)
 
 
