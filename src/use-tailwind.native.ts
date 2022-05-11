@@ -9,7 +9,7 @@ import {
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { match } from "css-mediaquery";
 import { normaliseSelector } from "./shared/selector";
-import { TailwindContext } from "./context";
+import { ComponentContext, TailwindContext } from "./context";
 import {
   RWNCssStyle,
   UseTailwindCallback,
@@ -47,6 +47,8 @@ export function useTailwind<P>({
 }: UseTailwindOptions = {}) {
   const { platform, styles, media, width, height, orientation, colorScheme } =
     useContext(TailwindContext);
+
+  const componentInteraction = useContext(ComponentContext);
 
   // useState ensure this 'resets' every render
   let [nthChild] = useState(initialNthChild);
@@ -99,6 +101,12 @@ export function useTailwind<P>({
               return focus;
             } else if (rule === "pseudo-class" && params === "active") {
               return active;
+            } else if (rule === "component" && params === "hover") {
+              return componentInteraction.hover;
+            } else if (rule === "component" && params === "focus") {
+              return componentInteraction.focus;
+            } else if (rule === "component" && params === "active") {
+              return componentInteraction.active;
             } else if (rule === "media") {
               return match(params, {
                 "aspect-ratio": width / height,

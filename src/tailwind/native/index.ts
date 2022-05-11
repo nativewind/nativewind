@@ -5,6 +5,7 @@ import {
 } from "tailwindcss/tailwind-config";
 import { StyleError } from "../../types/common";
 import { boxShadow } from "./box-shadow";
+import { component } from "./component";
 import { divide } from "./divide";
 import { elevation } from "./elevation";
 import { fontSize } from "./font-size";
@@ -48,6 +49,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
       skew(helpers, notSupported);
       boxShadow(helpers, notSupported);
       pseudoClasses(helpers, notSupported);
+      component(helpers, notSupported);
     };
   },
   function ({ rem = 16 } = {}) {

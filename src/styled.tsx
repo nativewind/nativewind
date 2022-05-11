@@ -11,6 +11,7 @@ import { useTailwind } from "./use-tailwind";
 import { ChildClassNameSymbol } from "./utils/child-styles";
 import { isFragment } from "react-is";
 import { useInteraction } from "./use-interaction";
+import { ComponentContext } from "./context";
 
 type StyledProps<P> = PropsWithChildren<
   P & {
@@ -38,13 +39,15 @@ export function styled<P>(
   }: StyledProps<P>) {
     const { hover, focus, active, ...handlers } = useInteraction(props);
 
+    const classes = tw ?? className ?? "";
+
     const tailwindStyles = useTailwind({
       nthChild,
       hover,
       focus,
       active,
       [ChildClassNameSymbol]: inheritedClassName,
-    })(tw ?? className);
+    })(classes);
 
     const style = styleProperty
       ? [tailwindStyles, styleProperty]
@@ -64,12 +67,22 @@ export function styled<P>(
       });
     }
 
-    return createElement(Component, {
+    const element = createElement(Component, {
       ...props,
       ...handlers,
       style,
       children,
     } as unknown as P);
+
+    return !classes.includes("container")
+      ? element
+      : createElement<PropsWithChildren<{ value: ComponentContext }>>(
+          ComponentContext.Provider,
+          {
+            children: element,
+            value: { hover, focus, active },
+          }
+        );
   }
 
   if (typeof Component !== "string") {

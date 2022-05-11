@@ -37,3 +37,15 @@ export const TailwindContext = createContext<TailwindContext>({
   orientation: "portrait",
   preview: false,
 });
+
+export interface ComponentContext {
+  hover: boolean;
+  focus: boolean;
+  active: boolean;
+}
+
+export const ComponentContext = createContext<ComponentContext>({
+  hover: false,
+  focus: false,
+  active: false,
+});
