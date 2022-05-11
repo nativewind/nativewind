@@ -1,3 +1,10 @@
+# [1.2.0-next.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0-next.5...v1.2.0-next.6) (2022-05-11)
+
+
+### Features
+
+* add flatten option of useTailwind ([9565c29](https://github.com/marklawlor/tailwindcss-react-native/commit/9565c29cbc13d436e5d0017612ee3142a6937fbe))
+
 # [1.2.0-next.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0-next.4...v1.2.0-next.5) (2022-05-11)
 
 
