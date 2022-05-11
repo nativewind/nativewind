@@ -1,3 +1,10 @@
+# [1.2.0-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0-next.2...v1.2.0-next.3) (2022-05-11)
+
+
+### Bug Fixes
+
+* missing initializer for tailwindcss_react_native_media ([e8493ac](https://github.com/marklawlor/tailwindcss-react-native/commit/e8493ac2655476d61f1ad3771d2a8236ebeff8c5))
+
 # [1.2.0-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0-next.1...v1.2.0-next.2) (2022-05-11)
 
 
