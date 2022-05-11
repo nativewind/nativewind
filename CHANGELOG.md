@@ -1,3 +1,10 @@
+# [1.2.0-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0-next.1...v1.2.0-next.2) (2022-05-11)
+
+
+### Features
+
+* add hover, focus & active pseudo-classes ([da3c8f4](https://github.com/marklawlor/tailwindcss-react-native/commit/da3c8f4e2bc72b53f6c78ed286aba0a6aeef8f6f))
+
 # [1.2.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.1.0...v1.2.0-next.1) (2022-05-10)
 
 
