@@ -1,3 +1,10 @@
+# [1.2.0-next.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0-next.4...v1.2.0-next.5) (2022-05-11)
+
+
+### Bug Fixes
+
+* component context not being created ([8709a9d](https://github.com/marklawlor/tailwindcss-react-native/commit/8709a9d825333bb374835df730b64049f1368f34))
+
 # [1.2.0-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0-next.3...v1.2.0-next.4) (2022-05-11)
 
 
