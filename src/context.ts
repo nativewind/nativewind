@@ -10,6 +10,7 @@ declare global {
 }
 
 globalThis.tailwindcss_react_native_style ??= {};
+globalThis.tailwindcss_react_native_media ??= {};
 
 export interface TailwindContext {
   styles: typeof globalThis["tailwindcss_react_native_style"];
