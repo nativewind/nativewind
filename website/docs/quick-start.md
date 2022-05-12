@@ -1,6 +1,6 @@
 import StartCoding from "./\_start-coding.md"
 
-# Getting started
+# Quick Start
 
 :::info
 [Want a more details? View our detailed installation guide.](/installation)
