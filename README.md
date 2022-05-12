@@ -49,6 +49,7 @@ export function MyFancyButton(props) {
 All documenation is on our website https://tailwindcss-react-native.vercel.app
 
 - [Introduction](https://tailwindcss-react-native.vercel.app/)
+- [Quick Start](https://tailwindcss-react-native.vercel.app/quick-start)
 - [Installation](https://tailwindcss-react-native.vercel.app/installation)
 
 ## In action
