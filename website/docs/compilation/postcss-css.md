@@ -1,23 +1,19 @@
----
-sidebar_position: 4
-sidebar_label: PostCSS (CSS) 🔬
----
-
+import StartCoding from "../\_start-coding-components.md"
 import ReactNativeWebPreview from "./\_react-native-web-0-18-preview.md"
 
-# Using PostCSS (CSS) 🔬
+# PostCSS (CSS) 🔬
 
 <ReactNativeWebPreview />
 
-## 1. Setup Tailwind CSS
+This preview feature allows you to use the PostCSS to generate CSS stylesheets. You can then use className to style your React Native Web components using CSS.
 
-Follow the [Using PostCSS](https://tailwindcss.com/docs/installation/using-postcss) to setup Tailwind CSS
+## Setup
 
-## 2. Setup tailwindcss-react-native
+### 1. Setup Tailwind CSS
 
-Follow the [general setup instructions](../installation.md) to setup tailwindcss-react-native.
+Follow the [setup guide for Tailwind CLI](https://tailwindcss.com/docs/installation).
 
-## 3. Enable preview features
+### 2. Enable preview features
 
 You will need to enable preview features on your `TailwindProvider`
 
@@ -32,15 +28,4 @@ function MyAppsProviders ({ children }) {
 }
 ```
 
-## 4. Write components using the Component API
-
-```tsx
-import { Text } from "react-native";
-import { styled } from "tailwindcss-react-native";
-
-const StyledText = styled(Text);
-
-export function BoldText(props) {
-  return <StyledText className="font-bold" {...props} />;
-}
-```
+<StartCoding />

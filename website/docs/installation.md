@@ -1,15 +1,13 @@
----
-sidebar_position: 201
----
-
-# Installation
+# Detailed Installation
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-## 1. Install
+## 1. Install the dependancies
 
 First, you will need to install both `tailwindcss-react-native` and `tailwindcss`
+
+`tailwindcss` is not used during runtime so it can be added as a development dependancy.
 
 <Tabs>
   <TabItem value="npm" label="NPM" default>
@@ -22,9 +20,10 @@ npm install --save-dev tailwindcss
   </TabItem>
   <TabItem value="yarn" label="Yarn">
 
-## Test
-
-`yarn add --dev tailwindcss-react-native tailwindcss`
+```
+yarn add tailwindcss-react-native
+yarn add --dev tailwindcss
+```
 
   </TabItem>
 </Tabs>
@@ -32,6 +31,8 @@ npm install --save-dev tailwindcss
 ## 2. Setup Tailwindcss
 
 Tailwindcss requires a `tailwind.config.js` file with the content section configured to include the paths to all of your JavaScript components, and any other source files that contain Tailwind class names.
+
+If you are not already familiar with Tailwind CSS, we recommend reading its [configuration documentation](https://tailwindcss.com/docs/configuration)
 
 ```js
 // tailwind.config.js
@@ -46,11 +47,9 @@ module.exports = {
 };
 ```
 
-You can see additional customisation options on the [Tailwindcss website](https://tailwindcss.com/docs/configuration)
-
 ## 3. Add the TailwindProvider
 
-Add `TailwindProvider` at the top level of your application
+Add `TailwindProvider` at the top level of your application. The `TailwindProvider` creates the context for reactive styles and the atomic style objects.
 
 ```tsx
 import { TailwindProvider } from "tailwindcss-react-native";
@@ -66,6 +65,4 @@ As `tailwindcss-react-native` targets multiple platforms & frameworks, it suppor
 
 If you are using a framework, we recommending reading its specific framework guide, or follow a general compilation guide.
 
-:::info
 If you are unsure what guide to use, we recommend [Babel](./compilation/babel.md) which has the smallest setup and best out-of-the-box experience.
-:::

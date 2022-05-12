@@ -1,10 +1,11 @@
 ---
-sidebar_position: 2
-title: styled
+title: styled()
 sidebar_label: styled()
 ---
 
-`styled` is a [Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) which allows your component to accep the `tw` or `className` props. These props are compiled into StyleSheet objects and passed to your component via the `style` prop.
+## Usage
+
+`styled` is a [Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) which allows your component to accept either the `tw` or `className` props. These props are compiled into StyleSheet objects and passed to your component via the `style` prop.
 
 There is no difference between `tw` and `className`, but `tw` has priority.
 
@@ -23,3 +24,9 @@ export function MyComponent() {
   );
 }
 ```
+
+## Advanced usage
+
+### inheritedClassName
+
+    nthChild,

@@ -1,16 +1,12 @@
----
-sidebar_position: 5
----
+import StartCoding from "../\_start-coding-components.md"
 
-# Tailwind CLI (RN StyleSheets)
+# Tailwind CLI
 
 The Tailwind CLI can be used to output precompiled RN StyleSheet objects.
 
-## 1. Setup tailwindcss-react-native
+## Setup
 
-Follow the [general setup instructions](../installation.md) to setup tailwindcss-react-native.
-
-## 2. Create a PostCSS config file
+### 1. Create a PostCSS config file
 
 ```js
 // postcss.config.js
@@ -26,7 +22,7 @@ module.exports = {
 };
 ```
 
-## 3. Create a input file
+### 2. Create a input file
 
 ```css
 // input.css
@@ -34,15 +30,15 @@ module.exports = {
 @tailwind utilities;
 ```
 
-## 3. Run Tailwind CLI
+### 3. Run Tailwind CLI
+
+Running the Tailwind CLI will generate `tailwindcss-react-native-output.js`. This can be configured via the [PostCSS options](../configuration/postcss)
 
 ```bash
 npx tailwindcss -i input.css --postcss postcss.config.js
 ```
 
-This will create `tailwindcss-react-native-output.js`
-
-## 4. Update the TailwindProvider
+### 4. Update the TailwindProvider
 
 ```diff
 import { TailwindProvider } from 'tailwindcss-react-native'
@@ -56,20 +52,9 @@ function MyAppsProviders ({ children }) {
 }
 ```
 
-## 5. Write components using the Component API
+<StartCoding />
 
-```tsx
-import { Text } from "react-native";
-import { styled } from "tailwindcss-react-native";
-
-const StyledText = styled(Text);
-
-export function BoldText(props) {
-  return <StyledText className="font-bold" {...props} />;
-}
-```
-
-## 6. Update your scripts (optional)
+## Watching for changes
 
 You can use the Tailwind CLI with the `--watch` flag to automatically compile on save.
 
