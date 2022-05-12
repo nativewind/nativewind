@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0...v1.3.0) (2022-05-12)
+
+
+### Features
+
+* export pre-styled React Native components ([02527fc](https://github.com/marklawlor/tailwindcss-react-native/commit/02527fc870844529c507972382e9a5cc7f3a2c61))
+
 # [1.2.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.1.1...v1.2.0) (2022-05-11)
 
 
