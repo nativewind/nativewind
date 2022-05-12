@@ -16,6 +16,13 @@ const config = {
   organizationName: "marklawlor", // Usually your GitHub org/user name.
   projectName: "tailwindcss-react-native", // Usually your repo name.
 
+  scripts: [
+    {
+      src: "https://cdn.splitbee.io/sb.js",
+      async: true,
+    },
+  ],
+
   presets: [
     [
       "classic",
