@@ -34,10 +34,10 @@ export function MyFancyButton(props) {
 - Uses the Tailwind compiler - **styles computed at build time**
 - Babel plugin for **simple setup** and better **intellisense support**
 - Respects all tailwind.config.js settings, including **themes, custom values, plugins**
-- **dark mode / arbitrary classes / media queries** [(example)](/test)
-- pseudo classes - **hover / focus / active** on compatble components [(example)](/test)
-- styling based on **parent state** - automacialy style children based upon parent psuedo classes [(example)](/test)
-- **children styles** - create simple layouts based upon parent class [(example)](/test)
+- **dark mode / arbitrary classes / media queries**
+- pseudo classes - **hover / focus / active** on compatble components [(docs)](./tailwind/core-concepts/pseudo-classes)
+- styling based on **parent state** - automacialy style children based upon parent psuedo classes [(docs)](./tailwind/core-concepts/component)
+- **children styles** - create simple layouts based upon parent class
 
 ## In action
 
