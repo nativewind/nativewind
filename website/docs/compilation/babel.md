@@ -1,16 +1,27 @@
----
-sidebar_position: 1
----
+import StartCoding from "../\_start-coding.md"
 
 # Babel
 
 The default babel configuration will both compile/inject the Tailwind CSS styles and transform any component with the `className` attributed into a `styled` version.
 
-## 1. Setup tailwindcss-react-native
+This is the recommended configuration as it provides the fastest setup and best DX experience, with suport for Tailwind intellisense within your IDE.
 
-Follow the [general setup instructions](../installation.md) to setup tailwindcss-react-native.
+```tsx
+/* Example how your code will look */
+import { Text } from "react-native";
 
-## 2. Configure your babel.config.js
+export function MyFancyButton(props) {
+  return (
+    <Pressable className="component bg-violet-500 hover:bg-violet-600 active:bg-violet-700">
+      <Text className="font-bold component-active:font-extrabold" {...props} />;
+    </Pressable>
+  );
+}
+```
+
+## Setup
+
+### 1. Configure your babel.config.js
 
 ```js
 // babel.config.js
@@ -19,7 +30,7 @@ module.exports = {
 };
 ```
 
-## 3. Style components using the className prop
+### 2. Style components using the className prop
 
 ```tsx
 import { Text } from "react-native";
@@ -29,7 +40,9 @@ export function BoldText(props) {
 }
 ```
 
-## 4. Typescript support (optional)
+<StartCoding />
+
+## Typescript
 
 Create a file (eg. `src/tailwindcss-react-native.d.ts`) and paste this line
 
@@ -37,7 +50,7 @@ Create a file (eg. `src/tailwindcss-react-native.d.ts`) and paste this line
 import "tailwindcss-react-native/types.d";
 ```
 
-## 5. Configuring what is transformed (optional)
+## Configuring what is transformed
 
 When targetting `Web` you may be using components that youdo not want transformed.
 

@@ -1,24 +1,19 @@
----
-sidebar_position: 5
----
-
+import StartCoding from "../\_start-coding-components.md"
 import ReactNativeWebPreview from "./\_react-native-web-0-18-preview.md"
 
 # Tailwind CLI (CSS) 🔬
 
 <ReactNativeWebPreview />
 
-The Tailwind CLI can be used to generate CSS Stylesheets.
+This preview feature allows you to use the Tailwind CLI to generate CSS stylesheets. You can then use className to style your React Native Web components using CSS.
 
-## 1. Setup Tailwind CSS
+## Setup
+
+### 1. Setup Tailwind CSS
 
 Follow the [setup guide for Tailwind CLI](https://tailwindcss.com/docs/installation).
 
-## 2. Setup tailwindcss-react-native
-
-Follow the [general setup instructions](../installation.md) to setup tailwindcss-react-native.
-
-## 3. Enable preview features
+### 2. Enable preview features
 
 You will need to enable preview features on your `TailwindProvider`
 
@@ -33,20 +28,9 @@ function MyAppsProviders ({ children }) {
 }
 ```
 
-## 5. Write components using the Component API
+<StartCoding />
 
-```tsx
-import { Text } from "react-native";
-import { styled } from "tailwindcss-react-native";
-
-const StyledText = styled(Text);
-
-export function BoldText(props) {
-  return <StyledText className="font-bold" {...props} />;
-}
-```
-
-## 6. Update your scripts (optional)
+## Watching for changes
 
 You can use the Tailwind CLI with the `--watch` flag to automatically compile on save.
 

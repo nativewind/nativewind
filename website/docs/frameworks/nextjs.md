@@ -1,7 +1,3 @@
----
-sidebar_position: 2
----
-
 # Next.js
 
 :::note
@@ -10,18 +6,20 @@ This guide assumes you already have Next.js configued with [React Native Web](ht
 
 :::
 
-## 1. Setup compilation
+## Setup
 
-As Next.js applications run on the web, you will most likely want to output CSS by following [PostCSS (CSS) 🔬](../compilation/postcss-css.md). This will provide the best performance and features and allow you to use the [SWC compiler](https://nextjs.org/docs/advanced-features/compiler).
+### 1. Compilation
 
-You can still use React Native StyleSheets by following one of these guides:
+Next.js has built in support for both Babel and PostCSS, so either compilation guide is suitable. You can also manually setup the Tailwind CLI.
 
 - [Babel](../compilation/babel.md)
 - [Babel (Compile Only)](../compilation/babel-compile-only.md)
-- [PostCSS (RN StyleSheet)](../compilation/postcss-native.md)
-- [Tailwind CLI (RN StyleSheet)](../compilation/cli-native.md)
+- [PostCSS](../compilation/postcss-native.md)
+- [Tailwind CLI](../compilation/cli-native.md)
 
-## 2. Setup transpilation
+If you willing to try bleeding-edge features, you can also use Next.js to output CSS style sheets by following [PostCSS (CSS) 🔬](../compilation/postcss-css.md). This will provide the best performance and features and allow you to use the [SWC compiler](https://nextjs.org/docs/advanced-features/compiler).
+
+### 2. Transpilation
 
 Unlike Metro, Next.js does not transpile `node_modules`. You will need to add [next-transpile-modules](https://github.com/martpie/next-transpile-modules) to your `next.config.js`
 
@@ -35,7 +33,7 @@ Follow the [setup instructions](https://github.com/martpie/next-transpile-module
 // An example next.config.js
 const withTM = require("next-transpile-modules")([
   "tailwindcss-react-native",
-  "@react-native-community/hooks", // A dependancy used at runtime
+  "@react-native-community/hooks", // A dependancy used at runtime.
 ]);
 
 module.exports = withTM({});

@@ -1,15 +1,10 @@
----
-sidebar_position: 3
-sidebar_label: PostCSS (RN StyleSheet)
----
+import StartCoding from "../\_start-coding-components.md"
 
-# Using PostCSS (RN StyleSheet)
+# PostCSS
 
-## 1. Setup tailwindcss-react-native
+## Setup
 
-Follow the [general setup instructions](../installation.md) to setup tailwindcss-react-native.
-
-## 2. Create a PostCSS config file
+### 1. Create a PostCSS config file
 
 Add tailwindcss and to your postcss.config.js file, or wherever PostCSS is configured in your project.
 
@@ -28,7 +23,7 @@ module.exports = {
 };
 ```
 
-## 3. Add the `@tailwind` directives
+### 2. Add the `@tailwind` directives
 
 Add the @tailwind directives for each of Tailwind’s layers to your main CSS file.
 
@@ -38,13 +33,13 @@ Add the @tailwind directives for each of Tailwind’s layers to your main CSS fi
 @tailwind utilities;
 ```
 
-## 4. Start your build process
+### 3. Start your build process
 
 Run your build process with npm run dev or whatever command is configured in your package.json file.
 
 This will create `tailwindcss-react-native-output.js`
 
-## 5. Update the TailwindProvider
+### 4. Update the TailwindProvider
 
 ```diff
 import { TailwindProvider } from 'tailwindcss-react-native'
@@ -58,15 +53,4 @@ function MyAppsProviders ({ children }) {
 }
 ```
 
-## 6. Write components using the Component API
-
-```tsx
-import { Text } from "react-native";
-import { styled } from "tailwindcss-react-native";
-
-const StyledText = styled(Text);
-
-export function BoldText(props) {
-  return <StyledText className="font-bold" {...props} />;
-}
-```
+<StartCoding />

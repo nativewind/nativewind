@@ -1,0 +1,30 @@
+import Legend from "./_legend.md";
+
+### Compatability
+
+<Legend />
+
+<table>
+  <tr>
+    <th>Class</th>
+    <th>Supported</th>
+  </tr>
+  {(props.supported || []).map((value, index) => (
+    <tr key={`supported-${index}`}>
+      <td>{value}</td>
+      <td>✅</td>
+    </tr>
+  ))}
+  {(props.partial || []).map((value, index) => (
+    <tr key={`partial-${index}`}>
+      <td>{value}</td>
+      <td>✔️</td>
+    </tr>
+  ))}
+  {(props.none || []).map((value, index) => (
+    <tr key={`partial-${index}`}>
+      <td>{value}</td>
+      <td>❌</td>
+    </tr>
+  ))}
+</table>

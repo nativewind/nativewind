@@ -1,6 +1,5 @@
 ---
 slug: /
-sidebar_position: 1
 ---
 
 # Introduction
@@ -11,18 +10,34 @@ sidebar_position: 1
 
 `tailwindcss-react-native` uses [Tailwind CSS](https://tailwindcss.com) as **universal design system** for all React Native platforms. It lets you share code between all React Native platforms and improves DX, performance and code maintainability.
 
-It is powered by the Tailwind CSS compiler to process the styles, themes, responsive and conditional logic. The styles can than be used as React Native Stylesheets or as CSS - whatever suits your platform best!
+At during your applications build, it uses the Tailwind CSS compiler to process the styles, themes, and conditional logic. It uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation).
+
+```tsx
+import { Text } from "react-native";
+
+/**
+ * A button that changes color when hovered or pressed
+ * The text will change font weight when pressed
+ */
+export function MyFancyButton(props) {
+  return (
+    <Pressable className="component bg-violet-500 hover:bg-violet-600 active:bg-violet-700">
+      <Text className="font-bold component-active:font-extrabold" {...props} />;
+    </Pressable>
+  );
+}
+```
 
 ## Features
 
-- Works on all RN platforms (including Web, Macos & Windows)
-- Uses the Tailwind compiler
-- Can be used with either React Native or CSS StyleSheets!
-- Babel plugin for simple setup, or can integrate with your tooling
-- Fast refresh compatible
-- Respects all tailwind.config.js settings, including themes, custom values, plugins
-- Supports dark mode / arbitrary classes / media queries
-- Styles processed at build time - not runtime
+- Works on **all** RN platforms
+- Uses the Tailwind compiler - **styles computed at build time**
+- Babel plugin for **simple setup** and better **intellisense support**
+- Respects all tailwind.config.js settings, including **themes, custom values, plugins**
+- **dark mode / arbitrary classes / media queries** [(example)](/test)
+- pseudo classes - **hover / focus / active** on compatble components [(example)](/test)
+- styling based on **parent state** - automacialy style children based upon parent psuedo classes [(example)](/test)
+- **children styles** - create simple layouts based upon parent class [(example)](/test)
 
 ## In action
 
@@ -32,8 +47,7 @@ You can use the Babel plugin to instantly start writing code! This will also ena
 import { Text } from "react-native";
 
 export function BoldText(props) {
-  // Thanks to Babel, I just work :)
-  return <Text className="text-bold" {...props} />;
+  return <Text className="font-bold" {...props} />;
 }
 ```
 
@@ -80,3 +94,7 @@ export function MyActivityIndicator(props) {
   return <ActivityIndicator size="small" color={color} {...props} />;
 }
 ```
+
+## See the code on Github
+
+[![marklawlor/tailwindcss-react-native - GitHub](https://github-link-card.s3.ap-northeast-1.amazonaws.com/marklawlor/tailwindcss-react-native.png)](https://github.com/marklawlor/tailwindcss-react-native)

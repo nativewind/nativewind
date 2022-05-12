@@ -1,8 +1,10 @@
----
-sidebar_position: 200
----
+import StartCoding from "./\_start-coding.md"
 
-# Quick start guide
+# Getting started
+
+:::info
+[Want a more details? View our detailed installation guide.](/installation)
+:::
 
 ## 1. Create a new React Native application
 
@@ -79,35 +81,4 @@ export default function App() {
 }
 ```
 
-## Thats it 🎉
-
-Start writing code!
-
-```diff
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-- import { StyleSheet, Text, View } from 'react-native';
-+ import { Text, View } from 'react-native';
-import { TailwindProvider } from 'tailwindcss-react-native';
-
-export default function App() {
-  return (
-    <TailwindProvider>
--     <View style={styles.container}>
-+     <View className="flex-1 items-center justify-center bg-white">
-        <Text>Open up App.js to start working on your app!</Text>
-        <StatusBar style="auto" />
-      </View>
-    </TailwindProvider>
-  );
-}
-
-- const styles = StyleSheet.create({
--   container: {
--     flex: 1,
--     backgroundColor: '#fff',
--     alignItems: 'center',
--     justifyContent: 'center',
--   },
-- });
-```
+<StartCoding />
