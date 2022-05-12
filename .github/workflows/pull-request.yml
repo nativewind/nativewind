@@ -2,27 +2,23 @@ name: Tests
 
 on:
   push:
-    branches:    
-      - main
-      - 'renovate/**'
+    branches:
+      - "renovate/**"
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   CI:
-    strategy:
-      matrix:
-        node-version: [14, 16]
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }} 
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          node-version: "16"
+          cache: "npm"
       - run: npm install
       - run: npm run build
-      - run: npm test
+      - name: Get number of CPU cores
+        id: cpu-cores
+        uses: SimenB/github-actions-cpu-cores@v1
+      - run: npm test -- --max-workers ${{ steps.cpu-cores.outputs.count }}
