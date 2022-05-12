@@ -17,7 +17,7 @@ import { Text } from "react-native";
 
 /**
  * A button that changes color when hovered or pressed
- * The text will change font weight when pressed
+ * The text will change font weight when the Pressable is pressed
  */
 export function MyFancyButton(props) {
   return (
@@ -32,6 +32,7 @@ export function MyFancyButton(props) {
 
 - Works on **all** RN platforms
 - Uses the Tailwind compiler - **styles computed at build time**
+- Small runtime
 - Babel plugin for **simple setup** and better **intellisense support**
 - Respects all tailwind.config.js settings, including **themes, custom values, plugins**
 - **dark mode / arbitrary classes / media queries**
