@@ -1,1 +1,1 @@
-module.exports = require("./dist/plugin").default;
+module.exports = require("./dist/tailwind").default;
