@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.0...v1.3.1) (2022-05-12)
+
+
+### Bug Fixes
+
+* incorrect export for web tailwind plugin ([4d67abb](https://github.com/marklawlor/tailwindcss-react-native/commit/4d67abb82916ccb2232dc73ec6184d7758257161))
+
 # [1.3.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.2.0...v1.3.0) (2022-05-12)
 
 
