@@ -60,7 +60,7 @@
   "devDependencies": {
     "@babel/core": "7.17.10",
     "@babel/plugin-syntax-jsx": "7.16.7",
-    "@commitlint/cli": "16.2.4",
+    "@commitlint/cli": "16.3.0",
     "@commitlint/config-conventional": "16.2.4",
     "@semantic-release/changelog": "6.0.1",
     "@semantic-release/git": "10.0.1",
