@@ -3,17 +3,14 @@ import {
   FunctionComponent,
   ComponentClass,
   PropsWithChildren,
-  Children,
-  cloneElement,
   ComponentProps,
 } from "react";
 import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 import { useTailwind } from "./use-tailwind";
-import { ChildClassNameSymbol } from "./utils/child-styles";
-import { isFragment } from "react-is";
 import { useInteraction } from "./use-interaction";
 import { ComponentContext } from "./context";
-import { matchChildAtRule } from "./match-at-rule";
+import { useStyledProps } from "./use-styled-props";
+import { useStyledChildren } from "./use-styled-children";
 
 type StyledProps<P> = PropsWithChildren<
   P & {
@@ -25,68 +22,66 @@ type StyledProps<P> = PropsWithChildren<
 
 type Component<P> = string | FunctionComponent<P> | ComponentClass<P>;
 
+export interface StyledOptions<P> {
+  props?: boolean | Array<keyof P & string>;
+}
+
+// Transform no props
 export function styled<P>(
-  Component: Component<P>
-): FunctionComponent<StyledProps<P>> {
+  Component: Component<P>,
+  options?: { props: false }
+): FunctionComponent<StyledProps<P>>;
+// Transform extra props
+export function styled<P>(
+  Component: Component<P>,
+  options: { props: Array<keyof P & string> }
+): FunctionComponent<StyledProps<P & Record<keyof P, string>>>;
+// Transform all props
+export function styled<P>(
+  Component: Component<P>,
+  options: { props: true }
+): FunctionComponent<StyledProps<P & Record<keyof P, string>>>;
+// Implementation
+export function styled<P>(
+  Component: Component<P>,
+  { props: propsToTransform }: StyledOptions<P> = {}
+) {
   function Styled({
     className,
     tw,
-    style: styleProperty,
+    style: componentStyles,
     children: componentChildren,
-    ...props
+    ...componentProps
   }: StyledProps<P>) {
-    const { hover, focus, active, ...handlers } = useInteraction(props);
+    const { hover, focus, active, ...handlers } =
+      useInteraction(componentProps);
 
     const classes = tw ?? className ?? "";
 
-    const tailwindStyles = useTailwind({
+    const twCallback = useTailwind({
       hover,
       focus,
       active,
       flatten: false,
-    })(classes);
+    });
 
-    const style = styleProperty
-      ? [tailwindStyles, styleProperty]
-      : tailwindStyles;
+    const { childStyles, ...styledProps } = useStyledProps({
+      tw: twCallback,
+      classes,
+      componentStyles,
+      propsToTransform,
+      componentProps,
+    });
 
-    let children = isFragment(componentChildren)
-      ? // This probably needs to be recursive
-        componentChildren.props.children
-      : componentChildren;
-
-    if (tailwindStyles[ChildClassNameSymbol]) {
-      children = Children.map(children, (child, index) => {
-        const childStyles: P[] = [];
-        for (const { atRules, ...styles } of tailwindStyles[
-          ChildClassNameSymbol
-        ] ?? []) {
-          const matches = atRules.every(([rule, params]) => {
-            return matchChildAtRule({
-              nthChild: index + 1,
-              rule,
-              params,
-            });
-          });
-          if (matches) {
-            childStyles.push(styles as P);
-          }
-        }
-
-        return cloneElement(child, {
-          style: child.props.style
-            ? [child.props.style, childStyles]
-            : childStyles.length > 0
-            ? childStyles
-            : undefined,
-        });
-      });
-    }
+    const children = useStyledChildren({
+      componentChildren,
+      childStyles,
+    });
 
     const element = createElement(Component, {
-      ...props,
+      ...componentProps,
       ...handlers,
-      style,
+      ...styledProps,
       children,
     } as unknown as P);
 
