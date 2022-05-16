@@ -47,8 +47,8 @@ exports[`Border - Divide Width divide-x-2 1`] = `
     style={
       Array [
         Object {
-          "borderLeftWidth": 0,
-          "borderRightWidth": 2,
+          "borderLeftWidth": 2,
+          "borderRightWidth": 0,
         },
       ]
     }
@@ -76,8 +76,8 @@ exports[`Border - Divide Width divide-x-4 1`] = `
     style={
       Array [
         Object {
-          "borderLeftWidth": 0,
-          "borderRightWidth": 4,
+          "borderLeftWidth": 4,
+          "borderRightWidth": 0,
         },
       ]
     }
@@ -105,8 +105,8 @@ exports[`Border - Divide Width divide-x-8 1`] = `
     style={
       Array [
         Object {
-          "borderLeftWidth": 0,
-          "borderRightWidth": 8,
+          "borderLeftWidth": 8,
+          "borderRightWidth": 0,
         },
       ]
     }
@@ -163,8 +163,8 @@ exports[`Border - Divide Width divide-y-2 1`] = `
     style={
       Array [
         Object {
-          "borderBottomWidth": 2,
-          "borderTopWidth": 0,
+          "borderBottomWidth": 0,
+          "borderTopWidth": 2,
         },
       ]
     }
@@ -192,8 +192,8 @@ exports[`Border - Divide Width divide-y-4 1`] = `
     style={
       Array [
         Object {
-          "borderBottomWidth": 4,
-          "borderTopWidth": 0,
+          "borderBottomWidth": 0,
+          "borderTopWidth": 4,
         },
       ]
     }
@@ -221,8 +221,8 @@ exports[`Border - Divide Width divide-y-8 1`] = `
     style={
       Array [
         Object {
-          "borderBottomWidth": 8,
-          "borderTopWidth": 0,
+          "borderBottomWidth": 0,
+          "borderTopWidth": 8,
         },
       ]
     }
