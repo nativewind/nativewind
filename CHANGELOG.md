@@ -1,3 +1,10 @@
+## [1.3.2-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.1...v1.3.2-next.1) (2022-05-16)
+
+
+### Bug Fixes
+
+* child styles not working with non-styled components ([ac9ccb9](https://github.com/marklawlor/tailwindcss-react-native/commit/ac9ccb9b9353e9fa858f8f42868e23e983ba5dcf))
+
 ## [1.3.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.0...v1.3.1) (2022-05-12)
 
 
