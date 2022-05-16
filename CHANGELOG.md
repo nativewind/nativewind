@@ -1,3 +1,11 @@
+## [1.3.2-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.2-next.1...v1.3.2-next.2) (2022-05-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency prism-react-renderer to v1.3.3 ([6905b42](https://github.com/marklawlor/tailwindcss-react-native/commit/6905b42218ac5e14d2cbd62564c844932fb0d72f))
+* double borders when using divide ([b56b483](https://github.com/marklawlor/tailwindcss-react-native/commit/b56b483467bc0ee51876969b9d0b67ea26d3adfe))
+
 ## [1.3.2-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.1...v1.3.2-next.1) (2022-05-16)
 
 
