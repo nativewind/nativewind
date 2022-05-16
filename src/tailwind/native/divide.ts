@@ -15,8 +15,8 @@ export const divide: CustomPluginFunction = ({
         return {
           "&": {
             "@selector (> *:not(:first-child))": {
-              "border-right-width": value,
-              "border-left-width": 0,
+              "border-left-width": value,
+              "border-right-width": 0,
             },
           },
         };
@@ -27,8 +27,8 @@ export const divide: CustomPluginFunction = ({
         return {
           "&": {
             "@selector (> *:not(:first-child))": {
-              "border-top-width": 0,
-              "border-bottom-width": value,
+              "border-bottom-width": 0,
+              "border-top-width": value,
             },
           },
         };
