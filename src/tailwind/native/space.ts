@@ -15,7 +15,7 @@ export const space: CustomPluginFunction = (
 
         return {
           "&": {
-            "@selector (> * + *)": {
+            "@selector (> *:not(:first-child))": {
               "margin-left": value,
             },
           },
@@ -30,7 +30,7 @@ export const space: CustomPluginFunction = (
 
         return {
           "&": {
-            "@selector (> * + *)": {
+            "@selector (> *:not(:first-child))": {
               "margin-top": value,
             },
           },

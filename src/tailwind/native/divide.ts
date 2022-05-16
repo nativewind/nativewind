@@ -14,7 +14,7 @@ export const divide: CustomPluginFunction = ({
 
         return {
           "&": {
-            "@selector (> * + *)": {
+            "@selector (> *:not(:first-child))": {
               "border-right-width": value,
               "border-left-width": value,
             },
@@ -26,7 +26,7 @@ export const divide: CustomPluginFunction = ({
 
         return {
           "&": {
-            "@selector (> * + *)": {
+            "@selector (> *:not(:first-child))": {
               "border-top-width": value,
               "border-bottom-width": value,
             },
@@ -42,7 +42,7 @@ export const divide: CustomPluginFunction = ({
       divide: (value: string) => {
         return {
           "&": {
-            "@selector (> * + *)": {
+            "@selector (> *:not(:first-child))": {
               "border-color": toColorValue(value),
             },
           },
@@ -59,27 +59,27 @@ export const divide: CustomPluginFunction = ({
 
   addUtilities({
     ".divide-solid": {
-      "@selector (> * + *)": {
+      "@selector (> *:not(:first-child))": {
         "border-style": "solid",
       },
     },
     ".divide-dashed": {
-      "@selector (> * + *)": {
+      "@selector (> *:not(:first-child))": {
         "border-style": "dashed",
       },
     },
     ".divide-dotted": {
-      "@selector (> * + *)": {
+      "@selector (> *:not(:first-child))": {
         "border-style": "dotted",
       },
     },
     ".divide-double": {
-      "@selector (> * + *)": {
+      "@selector (> *:not(:first-child))": {
         "border-style": "double",
       },
     },
     ".divide-none": {
-      "@selector (> * + *)": {
+      "@selector (> *:not(:first-child))": {
         "border-style": "none",
       },
     },

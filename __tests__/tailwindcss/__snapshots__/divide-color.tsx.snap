@@ -1,0 +1,776 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Border - Divide Color divide-amber-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fffbeb",
+          "borderLeftColor": "#fffbeb",
+          "borderRightColor": "#fffbeb",
+          "borderTopColor": "#fffbeb",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-black 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#000",
+          "borderLeftColor": "#000",
+          "borderRightColor": "#000",
+          "borderTopColor": "#000",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-blue-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#eff6ff",
+          "borderLeftColor": "#eff6ff",
+          "borderRightColor": "#eff6ff",
+          "borderTopColor": "#eff6ff",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-cyan-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#ecfeff",
+          "borderLeftColor": "#ecfeff",
+          "borderRightColor": "#ecfeff",
+          "borderTopColor": "#ecfeff",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-emerald-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#ecfdf5",
+          "borderLeftColor": "#ecfdf5",
+          "borderRightColor": "#ecfdf5",
+          "borderTopColor": "#ecfdf5",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-fuchsia-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fdf4ff",
+          "borderLeftColor": "#fdf4ff",
+          "borderRightColor": "#fdf4ff",
+          "borderTopColor": "#fdf4ff",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-gray-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#f9fafb",
+          "borderLeftColor": "#f9fafb",
+          "borderRightColor": "#f9fafb",
+          "borderTopColor": "#f9fafb",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-green-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#f0fdf4",
+          "borderLeftColor": "#f0fdf4",
+          "borderRightColor": "#f0fdf4",
+          "borderTopColor": "#f0fdf4",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-indigo-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#eef2ff",
+          "borderLeftColor": "#eef2ff",
+          "borderRightColor": "#eef2ff",
+          "borderTopColor": "#eef2ff",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-lime-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#f7fee7",
+          "borderLeftColor": "#f7fee7",
+          "borderRightColor": "#f7fee7",
+          "borderTopColor": "#f7fee7",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-neutral-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fafafa",
+          "borderLeftColor": "#fafafa",
+          "borderRightColor": "#fafafa",
+          "borderTopColor": "#fafafa",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-orange-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fff7ed",
+          "borderLeftColor": "#fff7ed",
+          "borderRightColor": "#fff7ed",
+          "borderTopColor": "#fff7ed",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-pink-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fdf2f8",
+          "borderLeftColor": "#fdf2f8",
+          "borderRightColor": "#fdf2f8",
+          "borderTopColor": "#fdf2f8",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-purple-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#faf5ff",
+          "borderLeftColor": "#faf5ff",
+          "borderRightColor": "#faf5ff",
+          "borderTopColor": "#faf5ff",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-red-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fef2f2",
+          "borderLeftColor": "#fef2f2",
+          "borderRightColor": "#fef2f2",
+          "borderTopColor": "#fef2f2",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-rose-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fff1f2",
+          "borderLeftColor": "#fff1f2",
+          "borderRightColor": "#fff1f2",
+          "borderTopColor": "#fff1f2",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-sky-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#f0f9ff",
+          "borderLeftColor": "#f0f9ff",
+          "borderRightColor": "#f0f9ff",
+          "borderTopColor": "#f0f9ff",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-slate-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#f8fafc",
+          "borderLeftColor": "#f8fafc",
+          "borderRightColor": "#f8fafc",
+          "borderTopColor": "#f8fafc",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-stone-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fafaf9",
+          "borderLeftColor": "#fafaf9",
+          "borderRightColor": "#fafaf9",
+          "borderTopColor": "#fafaf9",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-teal-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#f0fdfa",
+          "borderLeftColor": "#f0fdfa",
+          "borderRightColor": "#f0fdfa",
+          "borderTopColor": "#f0fdfa",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-transparent 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "transparent",
+          "borderLeftColor": "transparent",
+          "borderRightColor": "transparent",
+          "borderTopColor": "transparent",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-violet-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#f5f3ff",
+          "borderLeftColor": "#f5f3ff",
+          "borderRightColor": "#f5f3ff",
+          "borderTopColor": "#f5f3ff",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-white 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fff",
+          "borderLeftColor": "#fff",
+          "borderRightColor": "#fff",
+          "borderTopColor": "#fff",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-yellow-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fefce8",
+          "borderLeftColor": "#fefce8",
+          "borderRightColor": "#fefce8",
+          "borderTopColor": "#fefce8",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Color divide-zinc-50 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomColor": "#fafafa",
+          "borderLeftColor": "#fafafa",
+          "borderRightColor": "#fafafa",
+          "borderTopColor": "#fafafa",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;

@@ -1,0 +1,233 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Border - Divide Width divide-x-0 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderLeftWidth": 0,
+          "borderRightWidth": 0,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Width divide-x-2 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderLeftWidth": 2,
+          "borderRightWidth": 2,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Width divide-x-4 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderLeftWidth": 4,
+          "borderRightWidth": 4,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Width divide-x-8 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderLeftWidth": 8,
+          "borderRightWidth": 8,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Width divide-y-0 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomWidth": 0,
+          "borderTopWidth": 0,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Width divide-y-2 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomWidth": 2,
+          "borderTopWidth": 2,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Width divide-y-4 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomWidth": 4,
+          "borderTopWidth": 4,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Width divide-y-8 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomWidth": 8,
+          "borderTopWidth": 8,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;

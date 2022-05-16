@@ -6,3 +6,5 @@ export const spacing: Record<string, number> = {
   1.5: 6,
   96: 384,
 };
+
+export const spacingCases = [["px"], ["0"], ["0.5"], ["1"], ["1.5"], ["96"]];

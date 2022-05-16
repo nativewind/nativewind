@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Border - Divide Style divide-dashed 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderStyle": "dashed",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Style divide-dotted 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderStyle": "dotted",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Style divide-solid 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderStyle": "solid",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;

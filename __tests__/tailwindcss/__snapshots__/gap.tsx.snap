@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Flexbox & Grid - Gap gap-0 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={
+    Array [
+      Object {
+        "marginLeft": 0,
+        "marginRight": 0,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
