@@ -1,3 +1,4 @@
+import { Style } from "css-to-react-native";
 import { ViewStyle } from "react-native";
 import { createTests, tailwindRunner } from "./runner";
 
@@ -16,20 +17,52 @@ tailwindRunner(
       {
         border: [
           {
-            borderBottomWidth: 1,
-            borderTopWidth: 1,
-            borderLeftWidth: 1,
-            borderRightWidth: 1,
-          },
+            borderBottomWidth: "hairlineWidth",
+            borderTopWidth: "hairlineWidth",
+            borderLeftWidth: "hairlineWidth",
+            borderRightWidth: "hairlineWidth",
+          } as Style,
         ],
       },
     ],
-    ["border-x", { "border-x": [{ borderLeftWidth: 1, borderRightWidth: 1 }] }],
-    ["border-y", { "border-y": [{ borderTopWidth: 1, borderBottomWidth: 1 }] }],
-    ["border-t", { "border-t": [{ borderTopWidth: 1 }] }],
-    ["border-b", { "border-b": [{ borderBottomWidth: 1 }] }],
-    ["border-l", { "border-l": [{ borderLeftWidth: 1 }] }],
-    ["border-r", { "border-r": [{ borderRightWidth: 1 }] }],
+    [
+      "border-x",
+      {
+        "border-x": [
+          {
+            borderLeftWidth: "hairlineWidth",
+            borderRightWidth: "hairlineWidth",
+          } as Style,
+        ],
+      },
+    ],
+    [
+      "border-y",
+      {
+        "border-y": [
+          {
+            borderTopWidth: "hairlineWidth",
+            borderBottomWidth: "hairlineWidth",
+          } as Style,
+        ],
+      },
+    ],
+    [
+      "border-t",
+      { "border-t": [{ borderTopWidth: "hairlineWidth" } as Style] },
+    ],
+    [
+      "border-b",
+      { "border-b": [{ borderBottomWidth: "hairlineWidth" } as Style] },
+    ],
+    [
+      "border-l",
+      { "border-l": [{ borderLeftWidth: "hairlineWidth" } as Style] },
+    ],
+    [
+      "border-r",
+      { "border-r": [{ borderRightWidth: "hairlineWidth" } as Style] },
+    ],
   ],
   createTests("border", scenarios, (n) => ({
     borderBottomWidth: n,
@@ -57,7 +90,4 @@ tailwindRunner(
   createTests("border-r", scenarios, (n) => ({
     borderRightWidth: n,
   }))
-  // ...createTests("border-bl", scenarios, (n) => ({
-  //   borderBottomWidth: n,
-  // })),
 );

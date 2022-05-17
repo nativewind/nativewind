@@ -1,5 +1,34 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Border - Divide Width divide-x 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderLeftWidth": 1,
+          "borderRightWidth": 0,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
 exports[`Border - Divide Width divide-x-0 1`] = `
 <View
   onBlur={[Function]}

@@ -1,6 +1,11 @@
 import { getStylesForProperty, Style } from "css-to-react-native";
 import { ImageStyle, TextStyle, ViewStyle } from "react-native";
 
+declare global {
+  // eslint-disable-next-line no-var
+  var hairlineWidthValue: number | undefined;
+}
+
 export type PropertyGuard<T extends string> = (
   value: string,
   name: string
@@ -52,6 +57,15 @@ export function only<
     const isNaN = Number.isNaN(Number.parseInt(value));
 
     if (number) {
+      if (value === "hairlineWidth") {
+        return JSON.parse(
+          JSON.stringify(getStylesForProperty(name, "1px")).replace(
+            new RegExp("1", "g"),
+            globalThis.hairlineWidthValue?.toString() ?? '"hairlineWidth"'
+          )
+        );
+      }
+
       if (isNaN) {
         throw new Error(name);
       }

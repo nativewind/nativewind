@@ -53,6 +53,8 @@ export function TestProvider({
   css,
   ...props
 }: PropsWithChildren<TailwindProviderProps & { css: string }>) {
+  globalThis.hairlineWidthValue = 1;
+
   const { styles } = extractStyles({
     theme: {},
     plugins: [plugin, nativePlugin()],

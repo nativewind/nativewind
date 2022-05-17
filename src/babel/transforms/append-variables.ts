@@ -60,6 +60,13 @@ function serialize(literal: unknown): Expression {
     case "number":
       return numericLiteral(literal);
     case "string":
+      if (literal === "hairlineWidth") {
+        return memberExpression(
+          identifier("StyleSheet"),
+          identifier("hairlineWidth")
+        );
+      }
+
       return stringLiteral(literal);
     case "boolean":
       return booleanLiteral(literal);

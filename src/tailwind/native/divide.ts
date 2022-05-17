@@ -11,7 +11,6 @@ export const divide: CustomPluginFunction = ({
     {
       "divide-x": (value: string) => {
         value = value === "0" ? "0px" : value;
-
         return {
           "&": {
             "@selector (> *:not(:first-child))": {

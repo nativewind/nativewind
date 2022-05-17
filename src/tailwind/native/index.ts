@@ -70,6 +70,13 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
           wider: "0.5px",
           widest: "1px",
         },
+        borderWidth: {
+          DEFAULT: "hairlineWidth",
+          0: "0px",
+          2: "2px",
+          4: "4px",
+          8: "8px",
+        },
         spacing: {
           px: "1px",
           0: "0px",
