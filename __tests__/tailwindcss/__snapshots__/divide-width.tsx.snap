@@ -145,6 +145,35 @@ exports[`Border - Divide Width divide-x-8 1`] = `
 </View>
 `;
 
+exports[`Border - Divide Width divide-y 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "borderBottomWidth": 0,
+          "borderTopWidth": 1,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
 exports[`Border - Divide Width divide-y-0 1`] = `
 <View
   onBlur={[Function]}
