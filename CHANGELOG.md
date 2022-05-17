@@ -1,3 +1,10 @@
+# [1.4.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.2...v1.4.0-next.1) (2022-05-17)
+
+
+### Features
+
+* allow hairlineWidth as a theme value ([5cf20d0](https://github.com/marklawlor/tailwindcss-react-native/commit/5cf20d00e21a804ba91650f7d60e66293a61dce0))
+
 ## [1.3.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.1...v1.3.2) (2022-05-17)
 
 
