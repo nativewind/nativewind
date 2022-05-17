@@ -11,14 +11,25 @@ The Tailwind CLI can be used to output precompiled RN StyleSheet objects.
 ```js
 // postcss.config.js
 module.exports = {
-  plugins: [
-    [
-      require("tailwindcss-react-native/postcss"),
-      {
-        /* options */
-      },
-    ],
+  plugins: {
+    "tailwindcss-react-native/postcss": {
+      output: "tailwindcss-react-native-output.js",
+    },
+  },
+};
+```
+
+### 2. Add the native tailwind plugin to your `tailwind.config.js`
+
+```diff
+// tailwind.config.js
++ const tailwindcssReactNative = require("tailwindcss-react-native/tailwind/native")
++
+module.exports = {
+  content: [
+    './App.{js,ts,jsx,tsx}',
   ],
++ plugins: [tailwindcssReactNative()],
 };
 ```
 

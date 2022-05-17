@@ -13,7 +13,21 @@ This preview feature allows you to use the Tailwind CLI to generate CSS styleshe
 
 Follow the [setup guide for Tailwind CLI](https://tailwindcss.com/docs/installation).
 
-### 2. Enable preview features
+### 2. Modify your `tailwind.config.js` to include the CSS plugin
+
+```diff
+// tailwind.config.js
++ const tailwindcssReactNative = require("tailwindcss-react-native/tailwind/css")
++
+module.exports = {
+  content: [
+    './App.{js,ts,jsx,tsx}',
+  ],
++ plugins: [tailwindcssReactNative()],
+};
+```
+
+### 3. Enable preview features
 
 You will need to enable preview features on your `TailwindProvider`
 

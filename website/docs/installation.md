@@ -5,7 +5,7 @@ import TabItem from '@theme/TabItem';
 
 ## 1. Install the dependancies
 
-First, you will need to install both `tailwindcss-react-native` and `tailwindcss`
+You will need to install both `tailwindcss-react-native` and `tailwindcss`
 
 `tailwindcss` is not used during runtime so it can be added as a development dependancy.
 
@@ -30,14 +30,13 @@ yarn add --dev tailwindcss
 
 ## 2. Setup Tailwindcss
 
-Tailwindcss requires a `tailwind.config.js` file with the content section configured to include the paths to all of your JavaScript components, and any other source files that contain Tailwind class names.
+Tailwindcss requires a `tailwind.config.js` file with the content section configured to include the paths to all of your components and any other source files that contain Tailwind class names.
 
 If you are not already familiar with Tailwind CSS, we recommend reading its [configuration documentation](https://tailwindcss.com/docs/configuration)
 
 ```js
 // tailwind.config.js
 module.exports = {
-  plugins: [require("tailwindcss-react-native/plugin")],
   content: [
     "./screens/**/*.{js,ts,jsx,tsx}",
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -61,8 +60,8 @@ function MyAppsProviders({ children }) {
 
 ## 4. Setup compilation
 
-As `tailwindcss-react-native` targets multiple platforms & frameworks, it supports multiple ways to setup compilation.
+As `tailwindcss-react-native` targets multiple platforms & frameworks, it supports multiple ways to setup compilation. The next step is to follow one of the compilation guides in the sidebar.
 
-If you are using a framework, we recommending reading its specific framework guide, or follow a general compilation guide.
+If you are using a framework there are specific framework guides under the framework section.
 
 If you are unsure what guide to use, we recommend [Babel](./compilation/babel.md) which has the smallest setup and best out-of-the-box experience.
