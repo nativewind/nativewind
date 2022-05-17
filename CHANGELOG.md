@@ -1,3 +1,10 @@
+## [1.3.2-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.2-next.3...v1.3.2-next.4) (2022-05-17)
+
+
+### Bug Fixes
+
+* vertical spacing for gap-[n] and gap-y-[n] ([8b27cae](https://github.com/marklawlor/tailwindcss-react-native/commit/8b27cae15284fc9928adfc01f6dda93734777b35))
+
 ## [1.3.2-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.2-next.2...v1.3.2-next.3) (2022-05-16)
 
 
