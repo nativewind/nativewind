@@ -39,6 +39,7 @@
   },
   "files": [
     "dist/",
+    "tailwind/",
     "postcss.js",
     "babel.js",
     "plugin.js",
