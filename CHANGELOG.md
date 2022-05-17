@@ -1,3 +1,10 @@
+## [1.3.2-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.2-next.2...v1.3.2-next.3) (2022-05-16)
+
+
+### Bug Fixes
+
+* divide borders on incorrect side ([df400cf](https://github.com/marklawlor/tailwindcss-react-native/commit/df400cf93d69329b234147fdd79216b779783425))
+
 ## [1.3.2-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.2-next.1...v1.3.2-next.2) (2022-05-16)
 
 
