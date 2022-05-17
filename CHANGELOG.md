@@ -1,3 +1,10 @@
+# [1.4.0-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.0-next.1...v1.4.0-next.2) (2022-05-17)
+
+
+### Bug Fixes
+
+* better clarification between the native and css tailwind plugins ([b484b54](https://github.com/marklawlor/tailwindcss-react-native/commit/b484b54ed7a60c0d05da65c9d29787286302de18))
+
 # [1.4.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.2...v1.4.0-next.1) (2022-05-17)
 
 
