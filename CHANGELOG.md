@@ -1,3 +1,14 @@
+## [1.3.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.1...v1.3.2) (2022-05-17)
+
+
+### Bug Fixes
+
+* child styles not working with non-styled components ([ac9ccb9](https://github.com/marklawlor/tailwindcss-react-native/commit/ac9ccb9b9353e9fa858f8f42868e23e983ba5dcf))
+* **deps:** update dependency prism-react-renderer to v1.3.3 ([6905b42](https://github.com/marklawlor/tailwindcss-react-native/commit/6905b42218ac5e14d2cbd62564c844932fb0d72f))
+* divide borders on incorrect side ([df400cf](https://github.com/marklawlor/tailwindcss-react-native/commit/df400cf93d69329b234147fdd79216b779783425))
+* double borders when using divide ([b56b483](https://github.com/marklawlor/tailwindcss-react-native/commit/b56b483467bc0ee51876969b9d0b67ea26d3adfe))
+* vertical spacing for gap-[n] and gap-y-[n] ([8b27cae](https://github.com/marklawlor/tailwindcss-react-native/commit/8b27cae15284fc9928adfc01f6dda93734777b35))
+
 ## [1.3.2-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.2-next.3...v1.3.2-next.4) (2022-05-17)
 
 
