@@ -1,9 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Custom - Parent Variant Snapshots parent:text-white 1`] = `
-<View
-  style={Array []}
->
+<View>
   <Text
     style={
       Array [

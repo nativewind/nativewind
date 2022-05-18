@@ -1,9 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Border - Divide Style divide-dashed 1`] = `
-<View
-  style={Array []}
->
+<View>
   <Text>
     A
   </Text>
@@ -22,9 +20,7 @@ exports[`Border - Divide Style divide-dashed 1`] = `
 `;
 
 exports[`Border - Divide Style divide-dotted 1`] = `
-<View
-  style={Array []}
->
+<View>
   <Text>
     A
   </Text>
@@ -43,9 +39,7 @@ exports[`Border - Divide Style divide-dotted 1`] = `
 `;
 
 exports[`Border - Divide Style divide-solid 1`] = `
-<View
-  style={Array []}
->
+<View>
   <Text>
     A
   </Text>

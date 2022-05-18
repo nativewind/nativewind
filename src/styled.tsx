@@ -35,7 +35,10 @@ export function styled<P>(
     children: componentChildren,
     ...props
   }: StyledProps<P>) {
-    const { hover, focus, active, ...handlers } = useInteraction(props);
+    const { hover, focus, active, ...handlers } = useInteraction({
+      className,
+      ...props,
+    });
 
     const classes = tw ?? className ?? "";
 
@@ -48,7 +51,9 @@ export function styled<P>(
 
     const style = styleProperty
       ? [tailwindStyles, styleProperty]
-      : tailwindStyles;
+      : Array.isArray(tailwindStyles) && tailwindStyles.length > 0
+      ? tailwindStyles
+      : undefined;
 
     let children = isFragment(componentChildren)
       ? // This probably needs to be recursive
