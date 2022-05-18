@@ -2,13 +2,6 @@
 
 exports[`Custom - Parent Variant Snapshots parent:text-white 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text

@@ -18,7 +18,8 @@ export function useInteraction({
   onPressIn,
   onPressOut,
   onPress,
-}: PressableProps = {}) {
+  className = "",
+}: PressableProps & { className?: string } = {}) {
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
   const [active, setActive] = useState(false);
@@ -132,12 +133,25 @@ export function useInteraction({
     active,
     hover,
     focus,
-    onBlur: handleBlur,
-    onFocus: handleFocus,
-    onHoverIn: handleHoverIn,
-    onHoverOut: handleHoverOut,
-    onPress: handlePress,
-    onPressIn: handlePressIn,
-    onPressOut: handlePressOut,
+    onBlur: shouldAddHandler(className, "focus", handleBlur),
+    onFocus: shouldAddHandler(className, "focus", handleFocus),
+    onHoverIn: shouldAddHandler(className, "hover", handleHoverIn),
+    onHoverOut: shouldAddHandler(className, "hover", handleHoverOut),
+    onPress: shouldAddHandler(className, "active", handlePress),
+    onPressIn: shouldAddHandler(className, "active", handlePressIn),
+    onPressOut: shouldAddHandler(className, "active", handlePressOut),
   };
+}
+
+function shouldAddHandler<T>(
+  className: string,
+  pseudoClass: string,
+  fn: T
+): T | undefined {
+  if (
+    className.includes("component") ||
+    className.includes(`${pseudoClass}_`)
+  ) {
+    return fn;
+  }
 }

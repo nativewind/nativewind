@@ -2,13 +2,6 @@
 
 exports[`Border - Divide Style divide-dashed 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -30,13 +23,6 @@ exports[`Border - Divide Style divide-dashed 1`] = `
 
 exports[`Border - Divide Style divide-dotted 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -58,13 +44,6 @@ exports[`Border - Divide Style divide-dotted 1`] = `
 
 exports[`Border - Divide Style divide-solid 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>

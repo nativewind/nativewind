@@ -2,13 +2,6 @@
 
 exports[`Border - Divide Width space-x-0 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -30,13 +23,6 @@ exports[`Border - Divide Width space-x-0 1`] = `
 
 exports[`Border - Divide Width space-x-0.5 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -58,13 +44,6 @@ exports[`Border - Divide Width space-x-0.5 1`] = `
 
 exports[`Border - Divide Width space-x-1 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -86,13 +65,6 @@ exports[`Border - Divide Width space-x-1 1`] = `
 
 exports[`Border - Divide Width space-x-1.5 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -114,13 +86,6 @@ exports[`Border - Divide Width space-x-1.5 1`] = `
 
 exports[`Border - Divide Width space-x-96 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -142,13 +107,6 @@ exports[`Border - Divide Width space-x-96 1`] = `
 
 exports[`Border - Divide Width space-x-px 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -170,13 +128,6 @@ exports[`Border - Divide Width space-x-px 1`] = `
 
 exports[`Border - Divide Width space-y-0 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -198,13 +149,6 @@ exports[`Border - Divide Width space-y-0 1`] = `
 
 exports[`Border - Divide Width space-y-0.5 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -226,13 +170,6 @@ exports[`Border - Divide Width space-y-0.5 1`] = `
 
 exports[`Border - Divide Width space-y-1 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -254,13 +191,6 @@ exports[`Border - Divide Width space-y-1 1`] = `
 
 exports[`Border - Divide Width space-y-1.5 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -282,13 +212,6 @@ exports[`Border - Divide Width space-y-1.5 1`] = `
 
 exports[`Border - Divide Width space-y-96 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
@@ -310,13 +233,6 @@ exports[`Border - Divide Width space-y-96 1`] = `
 
 exports[`Border - Divide Width space-y-px 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={Array []}
 >
   <Text>
