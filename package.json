@@ -46,7 +46,7 @@
     "types.d.ts"
   ],
   "dependencies": {
-    "@babel/types": "7.17.10",
+    "@babel/types": "7.17.12",
     "@react-native-community/hooks": "^2.8.1",
     "css-mediaquery": "^0.1.2",
     "css-to-react-native": "^3.0.0",
@@ -59,8 +59,8 @@
     "react-is": "^18.1.0"
   },
   "devDependencies": {
-    "@babel/core": "7.17.10",
-    "@babel/plugin-syntax-jsx": "7.16.7",
+    "@babel/core": "7.17.12",
+    "@babel/plugin-syntax-jsx": "7.17.12",
     "@commitlint/cli": "17.0.0",
     "@commitlint/config-conventional": "17.0.0",
     "@semantic-release/changelog": "6.0.1",
@@ -76,8 +76,8 @@
     "@types/react-is": "^17.0.3",
     "@types/react-native": "0.67.7",
     "@types/tailwindcss": "3.0.10",
-    "@typescript-eslint/eslint-plugin": "5.23.0",
-    "@typescript-eslint/parser": "5.23.0",
+    "@typescript-eslint/eslint-plugin": "5.25.0",
+    "@typescript-eslint/parser": "5.25.0",
     "babel-plugin-tester": "10.1.0",
     "eslint": "8.15.0",
     "eslint-config-prettier": "8.5.0",
