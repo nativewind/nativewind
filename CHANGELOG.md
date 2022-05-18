@@ -1,3 +1,10 @@
+# [1.5.0-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.2...v1.5.0-next.3) (2022-05-18)
+
+
+### Bug Fixes
+
+* prevent adding empty style arrays to parents ([61780d2](https://github.com/marklawlor/tailwindcss-react-native/commit/61780d2aff0a46e5c53abea2f0508af3d19a408a))
+
 # [1.5.0-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.1...v1.5.0-next.2) (2022-05-18)
 
 
