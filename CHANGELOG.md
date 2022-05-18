@@ -1,3 +1,10 @@
+# [1.5.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.0...v1.5.0-next.1) (2022-05-18)
+
+
+### Features
+
+* add parent variant ([a6d8023](https://github.com/marklawlor/tailwindcss-react-native/commit/a6d802314fa3452c554ae8b0656103dcf718f415))
+
 # [1.4.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.3...v1.4.0) (2022-05-18)
 
 
