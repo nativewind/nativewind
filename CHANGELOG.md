@@ -1,3 +1,10 @@
+# [1.5.0-next.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.1...v1.5.0-next.2) (2022-05-18)
+
+
+### Bug Fixes
+
+* prevent adding unnecessary event handlers to components ([04ce242](https://github.com/marklawlor/tailwindcss-react-native/commit/04ce24283fdf651dc5e910fdadfdc23bd9c39249))
+
 # [1.5.0-next.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.0...v1.5.0-next.1) (2022-05-18)
 
 
