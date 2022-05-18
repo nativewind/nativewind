@@ -43,6 +43,12 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "Guides",
+      collapsed: true,
+      items: ["guides/goals", "guides/use-tailwind"],
+    },
+    {
+      type: "category",
       label: "API",
       collapsed: true,
       items: [

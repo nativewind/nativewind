@@ -40,6 +40,10 @@ export function MyFancyButton(props) {
 - styling based on **parent state** - automacialy style children based upon parent psuedo classes [(docs)](./tailwind/core-concepts/component)
 - **children styles** - create simple layouts based upon parent class
 
+## Guides
+
+- [Goals & non-goals of the project](./guides/goals) - Get familiar with the core concepts
+
 ## In action
 
 You can use the Babel plugin to instantly start writing code! This will also enable your editor's language support and provide features such as autocomplete.
