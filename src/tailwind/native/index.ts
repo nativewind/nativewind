@@ -17,6 +17,7 @@ import { scale } from "./scale";
 import { skew } from "./skew";
 import { space } from "./space";
 import { translate } from "./translate";
+import { parent } from "./parent";
 
 export interface NativePluginOptions {
   rem?: number;
@@ -50,6 +51,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
       boxShadow(helpers, notSupported);
       pseudoClasses(helpers, notSupported);
       component(helpers, notSupported);
+      parent(helpers, notSupported);
     };
   },
   function ({ rem = 16 } = {}) {

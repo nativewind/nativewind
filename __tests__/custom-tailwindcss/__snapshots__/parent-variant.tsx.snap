@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Custom - Parent Variant Snapshots parent:text-white 1`] = `
+<View
+  onBlur={[Function]}
+  onFocus={[Function]}
+  onHoverIn={[Function]}
+  onHoverOut={[Function]}
+  onPress={[Function]}
+  onPressIn={[Function]}
+  onPressOut={[Function]}
+  style={Array []}
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#fff",
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#fff",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
