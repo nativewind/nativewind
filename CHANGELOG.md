@@ -1,3 +1,15 @@
+# [1.5.0-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.3...v1.5.0-next.4) (2022-05-19)
+
+
+### Bug Fixes
+
+* [#54](https://github.com/marklawlor/tailwindcss-react-native/issues/54) ([c639511](https://github.com/marklawlor/tailwindcss-react-native/commit/c63951127d9a1f242eeacf93011f0d2a5a089208))
+
+
+### Features
+
+* allow for styled to parse additional props ([1037027](https://github.com/marklawlor/tailwindcss-react-native/commit/1037027035187c2c67719e6880f3e5a4bd5ea778))
+
 # [1.5.0-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.2...v1.5.0-next.3) (2022-05-18)
 
 ### Bug Fixes
