@@ -4,7 +4,7 @@ import { UseTailwindCallback } from "./use-tailwind";
 
 export const ChildClassNameSymbol = Symbol("twrn-child");
 
-export interface UseStyledPropsOptions<P, T extends string> {
+export interface WithStyledPropsOptions<P, T extends string> {
   classes: string | undefined;
   componentStyles: StyleProp<P>;
   propsToTransform?: boolean | T[];
@@ -12,18 +12,18 @@ export interface UseStyledPropsOptions<P, T extends string> {
   tw: UseTailwindCallback<P>;
 }
 
-export type UseStyledProps<P, T extends string> = Record<T, StyleProp<P>> & {
+export type WithStyledProps<P, T extends string> = Record<T, StyleProp<P>> & {
   childStyles?: AtRuleRecord[];
   style: StyleProp<P>;
 };
 
-export function useStyledProps<P, T extends string>({
+export function withStyledProps<P, T extends string>({
   tw,
   classes,
   componentStyles,
   propsToTransform,
   componentProps,
-}: UseStyledPropsOptions<P, T>): UseStyledProps<P, T> {
+}: WithStyledPropsOptions<P, T>): WithStyledPropss<P, T> {
   const mainStyles = tw(classes);
 
   const style = componentStyles

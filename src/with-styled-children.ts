@@ -3,15 +3,15 @@ import { isFragment } from "react-is";
 import { matchChildAtRule } from "./match-at-rule";
 import { AtRuleRecord } from "./types/common";
 
-export interface UseStyledChildrenOptions {
+export interface WithStyledChildrenOptions {
   componentChildren: ReactNode;
   childStyles?: AtRuleRecord[];
 }
 
-export function useStyledChildren({
+export function withStyledChildren({
   componentChildren,
   childStyles,
-}: UseStyledChildrenOptions): ReactNode {
+}: WithStyledChildrenOptions): ReactNode {
   let children = isFragment(componentChildren)
     ? // This probably needs to be recursive
       componentChildren.props.children

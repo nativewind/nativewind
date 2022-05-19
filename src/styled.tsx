@@ -4,8 +4,8 @@ import { StyleProp } from "react-native";
 import { Component, StyledProps, StyledPropsWithKeys } from "./utils/styled";
 import { ComponentContext } from "./context";
 import { useInteraction } from "./use-interaction";
-import { useStyledChildren } from "./use-styled-children";
-import { useStyledProps } from "./use-styled-props";
+import { withStyledChildren } from "./with-styled-children";
+import { withStyledProps } from "./with-styled-props";
 import { useTailwind } from "./use-tailwind";
 
 export interface StyledOptions<P> {
@@ -57,7 +57,7 @@ export function styled<
 
     const classes = twClassName ?? className ?? "";
 
-    const { childStyles, ...styledProps } = useStyledProps<
+    const { childStyles, ...styledProps } = withStyledProps<
       StyleType,
       keyof Props & string
     >({
@@ -73,7 +73,7 @@ export function styled<
       componentProps,
     });
 
-    const children = useStyledChildren({
+    const children = withStyledChildren({
       componentChildren,
       childStyles,
     });
