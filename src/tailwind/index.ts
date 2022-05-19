@@ -10,4 +10,6 @@ export default plugin(function ({ addVariant }) {
     "native",
     nativePlatforms.map((platform) => `@media ${platform}`)
   );
+
+  addVariant("parent", "& > *");
 });

@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Custom - Parent Variant Snapshots parent:text-white 1`] = `
+<View>
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#fff",
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#fff",
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;

@@ -53,8 +53,10 @@ export function styled<P>(
     children: componentChildren,
     ...componentProps
   }: StyledProps<P>) {
-    const { hover, focus, active, ...handlers } =
-      useInteraction(componentProps);
+    const { hover, focus, active, ...handlers } = useInteraction({
+      className,
+      ...componentProps,
+    });
 
     const classes = tw ?? className ?? "";
 

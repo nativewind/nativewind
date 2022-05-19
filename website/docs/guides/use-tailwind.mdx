@@ -1,0 +1,74 @@
+# Don't overuse useTailwind()
+
+`useTailwind()` can seem like a powerful utility allowing you to style any component with Tailwind. This mindset can lead to some common anti-patterns that reduce performance and ability to create a universal component.
+
+## Retrieving theme values
+
+:::tip
+
+Please also read the [Tailwind CSS guide on referencing theme values in Javascript](https://tailwindcss.com/docs/configuration#referencing-in-java-script)
+
+:::
+
+It might be tempting to write code like this
+
+```tsx
+import { useTailwind } from "tailwindcss-react-native";
+
+export function MyActivityIndicator(props) {
+  const tw = useTailwind();
+
+  const { color } = tw("text-blue-500");
+
+  return <ActivityIndicator size="small" color={color} {...props} />;
+}
+```
+
+While this works, it forces you component to be reactive to the `<TailwindProvider>` and may cause unnecessary re-renders - along with the minor overhead of actually calling the `useTailwind()` hook.
+
+A better solution is to either access the color directly from `tailwindcss`
+
+```tsx
+import colors from "tailwindcss/colors";
+
+export function MyActivityIndicator(props) {
+  return <ActivityIndicator size="small" color={colors.blue.500} {...props} />;
+}
+```
+
+Or adding your custom colors into a shared file
+
+```tsx
+// colors.js
+module.exports = {
+  'tahiti': {
+    100: '#cffafe',
+    200: '#a5f3fc',
+    300: '#67e8f9',
+    400: '#22d3ee',
+    500: '#06b6d4',
+    600: '#0891b2',
+    700: '#0e7490',
+    800: '#155e75',
+    900: '#164e63',
+  },
+}
+
+// tailwind.config.js
+const colors = require("./colors")
+
+module.exports = {
+  theme: {
+    extend: {
+      colors
+    }
+  },
+}
+
+// MyActivityIndicator.js
+import colors from "./colors";
+
+export function MyActivityIndicator(props) {
+  return <ActivityIndicator size="small" color={colors.tahiti.500} {...props} />;
+}
+```

@@ -102,7 +102,7 @@ import { useTailwind } from "tailwindcss-react-native";
 export function MyActivityIndicator(props) {
   const tw = useTailwind();
 
-  const { color } = tx("text-blue-500");
+  const { color } = tw("text-blue-500");
 
   return <ActivityIndicator size="small" color={color} {...props} />;
 }

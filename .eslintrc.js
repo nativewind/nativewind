@@ -21,6 +21,7 @@ module.exports = {
       "error",
       {
         allowList: {
+          fn: true,
           prop: true,
           props: true,
           Props: true,

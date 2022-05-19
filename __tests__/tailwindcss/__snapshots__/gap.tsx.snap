@@ -2,13 +2,6 @@
 
 exports[`Flexbox & Grid - Gap gap-0 1`] = `
 <View
-  onBlur={[Function]}
-  onFocus={[Function]}
-  onHoverIn={[Function]}
-  onHoverOut={[Function]}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
   style={
     Array [
       Object {
