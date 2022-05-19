@@ -5,7 +5,7 @@ sidebar_label: styled()
 
 ## Usage
 
-`styled` is a [Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) which allows your component to accept either the `tw` or `className` props. These props are compiled into StyleSheet objects and passed to your component via the `style` prop.
+`styled()` is a [Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) which allows your component to accept either the `tw` or `className` props. These props are compiled into StyleSheet objects and passed to your component via the `style` prop.
 
 There is no difference between `tw` and `className`, but `tw` has priority.
 
@@ -25,8 +25,22 @@ export function MyComponent() {
 }
 ```
 
-## Advanced usage
+## Styling multiple properties
 
-### inheritedClassName
+`styled()` can optionally accept a list of additional props to parse into runtime styles.
 
-    nthChild,
+```
+function Wrapper({ innerStyle, children, ...props }) {
+  return (
+    <View {...props}>
+      <View style={innerStyle}>
+        { children }
+      </View>
+    </View>
+  )
+}
+
+const StyledWrapper = styled(Wrapper, { props: ["innerStyle"] })
+
+<StyledWrapper className="h-4" innerStyle="p-4"><Text>Hello, World!</Text></StyledWrapper>
+```
