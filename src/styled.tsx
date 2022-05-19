@@ -73,10 +73,12 @@ export function styled<
       componentProps,
     });
 
-    const children = withStyledChildren({
-      componentChildren,
-      childStyles,
-    });
+    const children = childStyles
+      ? withStyledChildren({
+          componentChildren,
+          childStyles,
+        })
+      : componentChildren;
 
     const element = createElement(Component, {
       ...componentProps,
