@@ -29,7 +29,7 @@ export function MyComponent() {
 
 `styled()` can optionally accept a list of additional props to parse into runtime styles.
 
-```
+```tsx
 function Wrapper({ innerStyle, children, ...props }) {
   return (
     <View {...props}>
