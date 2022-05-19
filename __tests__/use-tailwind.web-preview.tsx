@@ -18,8 +18,7 @@ describe("web", () => {
       initialProps: { platform: "web", preview: true },
     });
 
-    expect(result.current.$$css).toBe(true);
-    expect(result.current.tailwindClassName).toBe("");
+    expect(result.current).toEqual({ $$css: true, tailwindClassName: "" });
   });
 
   test("will pass-through any arguments", () => {
@@ -31,7 +30,9 @@ describe("web", () => {
       }
     );
 
-    expect(result.current.$$css).toBe(true);
-    expect(result.current.tailwindClassName).toBe("hello-world");
+    expect(result.current).toEqual({
+      $$css: true,
+      tailwindClassName: "hello-world",
+    });
   });
 });

@@ -4,23 +4,20 @@ import { TailwindContext } from "./context";
 import {
   RWNCssStyle,
   UseTailwindCallback,
+  UseTailwindCallbackFlattern,
   UseTailwindOptions,
 } from "./use-tailwind";
 
 import { useTailwind as useNativeTailwind } from "./use-tailwind.native";
 
-export function useTailwind<P extends ViewStyle>(
-  options?: UseTailwindOptions
-): UseTailwindCallback<P>;
-export function useTailwind<P extends TextStyle>(
-  options?: UseTailwindOptions
-): UseTailwindCallback<P>;
-export function useTailwind<P extends ImageStyle>(
-  options?: UseTailwindOptions
-): UseTailwindCallback<P>;
-export function useTailwind<P extends RWNCssStyle>(
-  options?: UseTailwindOptions
-): UseTailwindCallback<P>;
+export function useTailwind<
+  P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
+>(
+  options: UseTailwindOptions & { flatten: true }
+): UseTailwindCallbackFlattern<P>;
+export function useTailwind<
+  P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
+>(options?: UseTailwindOptions): UseTailwindCallback<P>;
 export function useTailwind<P>(options?: UseTailwindOptions) {
   const { platform, preview } = useContext(TailwindContext);
 

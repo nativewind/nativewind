@@ -1,49 +1,57 @@
 import {
   createElement,
-  FunctionComponent,
+  FC,
   ComponentClass,
   PropsWithChildren,
   ComponentProps,
 } from "react";
-import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
-import { useTailwind } from "./use-tailwind";
+import { StyleProp } from "react-native";
+import { RWNCssStyle, useTailwind } from "./use-tailwind";
 import { useInteraction } from "./use-interaction";
 import { ComponentContext } from "./context";
 import { useStyledProps } from "./use-styled-props";
 import { useStyledChildren } from "./use-styled-children";
 
-type StyledProps<P> = PropsWithChildren<
+type StyledProps<P, T> = PropsWithChildren<
   P & {
     className?: string;
     tw?: string;
-    style?: StyleProp<ViewStyle | TextStyle | ImageStyle>;
+    style?: StyleProp<T | RWNCssStyle>;
   }
 >;
 
-type Component<P> = string | FunctionComponent<P> | ComponentClass<P>;
+type Component<P extends { style?: StyleProp<T> | undefined }, T> =
+  | string
+  | FC<P & { style?: StyleProp<T> }>
+  | ComponentClass<P>;
 
 export interface StyledOptions<P> {
   props?: boolean | Array<keyof P & string>;
 }
 
-// Transform no props
-export function styled<P>(
-  Component: Component<P>,
+/*
+ * Transform no props
+ */
+export function styled<P extends { style?: StyleProp<T> }, T>(
+  Component: Component<P, T>,
   options?: { props: false }
-): FunctionComponent<StyledProps<P>>;
-// Transform extra props
-export function styled<P>(
-  Component: Component<P>,
-  options: { props: Array<keyof P & string> }
-): FunctionComponent<StyledProps<P & Record<keyof P, string>>>;
-// Transform all props
-export function styled<P>(
-  Component: Component<P>,
-  options: { props: true }
-): FunctionComponent<StyledProps<P & Record<keyof P, string>>>;
-// Implementation
-export function styled<P>(
-  Component: Component<P>,
+): FC<StyledProps<P, T>>;
+/**
+ * Transform extra props
+ */
+export function styled<
+  P extends { style?: StyleProp<T> },
+  T,
+  K extends keyof P & string
+>(
+  Component: Component<P, T>,
+  options: { props: Array<K> }
+): FC<StyledProps<P & { [key in K]: P[key] | string }, T>>;
+/**
+ * Implementation
+ */
+export function styled<P extends { style?: StyleProp<T> }, T>(
+  Component: Component<P, T>,
   { props: propsToTransform }: StyledOptions<P> = {}
 ) {
   function Styled({
@@ -52,7 +60,7 @@ export function styled<P>(
     style: componentStyles,
     children: componentChildren,
     ...componentProps
-  }: StyledProps<P>) {
+  }: StyledProps<P, T>) {
     const { hover, focus, active, ...handlers } = useInteraction({
       className,
       ...componentProps,
@@ -60,20 +68,22 @@ export function styled<P>(
 
     const classes = tw ?? className ?? "";
 
-    const twCallback = useTailwind({
+    const twCallback = useTailwind<T>({
       hover,
       focus,
       active,
       flatten: false,
     });
 
-    const { childStyles, ...styledProps } = useStyledProps({
-      tw: twCallback,
-      classes,
-      componentStyles,
-      propsToTransform,
-      componentProps,
-    });
+    const { childStyles, ...styledProps } = useStyledProps<T, keyof P & string>(
+      {
+        tw: twCallback,
+        classes,
+        componentStyles,
+        propsToTransform,
+        componentProps,
+      }
+    );
 
     const children = useStyledChildren({
       componentChildren,
@@ -107,14 +117,17 @@ export function styled<P>(
   return Styled;
 }
 
-type StyledComponentProps<P> = StyledProps<P> & {
-  component: Component<P>;
+type StyledComponentProps<P extends { style?: StyleProp<T> }, T> = StyledProps<
+  P,
+  T
+> & {
+  component: Component<P, T>;
 };
 
-export function StyledComponent<P>({
+export function StyledComponent<P extends { style?: StyleProp<T> }, T>({
   component,
   ...options
-}: StyledComponentProps<P>) {
-  const Component = styled<P>(component);
+}: StyledComponentProps<P, T>) {
+  const Component = styled<P, T>(component);
   return <Component {...(options as P)} />;
 }

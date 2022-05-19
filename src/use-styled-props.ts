@@ -1,31 +1,42 @@
 import { StyleProp } from "react-native";
+import { AtRuleRecord } from "./types/common";
 import { UseTailwindCallback } from "./use-tailwind";
-import { ChildClassNameSymbol } from "./utils/child-styles";
 
-export interface UseStyledPropsOptions {
-  tw: UseTailwindCallback<any>;
+export const ChildClassNameSymbol = Symbol("twrn-child");
+
+export interface UseStyledPropsOptions<P, T extends string> {
   classes: string | undefined;
-  componentStyles: StyleProp<any>;
-  propsToTransform?: boolean | string[];
+  componentStyles: StyleProp<P>;
+  propsToTransform?: boolean | T[];
   componentProps: Record<string, unknown>;
+  tw: UseTailwindCallback<P>;
 }
 
-export function useStyledProps({
+export type UseStyledProps<P, T extends string> = Record<T, StyleProp<P>> & {
+  childStyles?: AtRuleRecord[];
+  style: StyleProp<P>;
+};
+
+export function useStyledProps<P, T extends string>({
   tw,
   classes,
   componentStyles,
   propsToTransform,
   componentProps,
-}: UseStyledPropsOptions) {
+}: UseStyledPropsOptions<P, T>): UseStyledProps<P, T> {
   const mainStyles = tw(classes);
 
-  const style = componentStyles ? [mainStyles, componentStyles] : mainStyles;
+  const style = componentStyles
+    ? [mainStyles, componentStyles]
+    : Array.isArray(mainStyles) && mainStyles.length > 0
+    ? mainStyles
+    : undefined;
 
-  const styledProps: Record<string, unknown> = {};
+  const styledProps: Partial<Record<T, StyleProp<P>>> = {};
 
   if (propsToTransform) {
     if (propsToTransform === true) {
-      propsToTransform = Object.keys(componentProps);
+      propsToTransform = Object.keys(componentProps) as T[];
     }
 
     for (const prop of propsToTransform) {
@@ -37,11 +48,9 @@ export function useStyledProps({
     }
   }
 
-  console.log(styledProps);
-
   return {
     childStyles: mainStyles[ChildClassNameSymbol],
     style,
-    ...styledProps,
+    ...(styledProps as Record<T, StyleProp<P>>),
   };
 }

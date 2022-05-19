@@ -10,32 +10,26 @@ import { ComponentContext, TailwindContext } from "./context";
 import {
   RWNCssStyle,
   UseTailwindCallback,
+  UseTailwindCallbackFlattern,
   UseTailwindOptions,
 } from "./use-tailwind";
 
-import { ChildClassNameSymbol } from "./utils/child-styles";
 import { getRuntimeStyles } from "./runtime-styles";
 import { AtRuleRecord } from "./types/common";
+import { ChildClassNameSymbol } from "./use-styled-props";
 
 type WithChildClassNameSymbol<T> = T & {
   [ChildClassNameSymbol]?: AtRuleRecord[];
 };
 
-export function useTailwind<P extends ViewStyle>(
-  options?: UseTailwindOptions
-): UseTailwindCallback<P>;
-export function useTailwind<P extends TextStyle>(
-  options?: UseTailwindOptions
-): UseTailwindCallback<P>;
-export function useTailwind<P extends ImageStyle>(
-  options?: UseTailwindOptions
-): UseTailwindCallback<P>;
-export function useTailwind<P extends RWNCssStyle>(
-  options?: UseTailwindOptions
-): UseTailwindCallback<P>;
-/*
- * White space for visual clarity :)
- */
+export function useTailwind<
+  P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
+>(
+  options: UseTailwindOptions & { flatten: true }
+): UseTailwindCallbackFlattern<P>;
+export function useTailwind<
+  P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
+>(options?: UseTailwindOptions): UseTailwindCallback<P>;
 export function useTailwind<P>({
   hover = false,
   focus = false,

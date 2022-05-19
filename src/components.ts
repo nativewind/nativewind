@@ -1,7 +1,6 @@
 import { styled } from "./styled";
 import {
   ActivityIndicator as RNActivityIndicator,
-  Button as RNButton,
   FlatList as RNFlatList,
   Image as RNImage,
   ImageBackground as RNImageBackground,
@@ -11,7 +10,6 @@ import {
   RefreshControl as RNRefreshControl,
   ScrollView as RNScrollView,
   SectionList as RNSectionList,
-  StatusBar as RNStatusBar,
   Switch as RNSwitch,
   Text as RNText,
   TextInput as RNTextInput,
@@ -27,7 +25,6 @@ import {
 } from "react-native";
 
 export const ActivityIndicator = styled(RNActivityIndicator);
-export const Button = styled(RNButton);
 export const FlatList = styled(RNFlatList);
 export const Image = styled(RNImage);
 export const ImageBackground = styled(RNImageBackground);
@@ -37,7 +34,6 @@ export const Pressable = styled(RNPressable);
 export const RefreshControl = styled(RNRefreshControl);
 export const ScrollView = styled(RNScrollView);
 export const SectionList = styled(RNSectionList);
-export const StatusBar = styled(RNStatusBar);
 export const Switch = styled(RNSwitch);
 export const Text = styled(RNText);
 export const TextInput = styled(RNTextInput);

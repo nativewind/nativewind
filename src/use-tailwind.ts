@@ -1,6 +1,6 @@
 import { StyleProp } from "react-native";
 import { AtRuleRecord } from "./types/common";
-import { ChildClassNameSymbol } from "./utils/child-styles";
+import type { ChildClassNameSymbol } from "./use-styled-props";
 
 export { useTailwind } from "./use-tailwind.web";
 
@@ -9,10 +9,13 @@ export type RWNCssStyle = {
   tailwindClassName: string;
 };
 
-export type UseTailwindCallback<P> = (className?: string) => StyleProp<P> &
-  P & {
-    [ChildClassNameSymbol]?: AtRuleRecord[];
-  };
+export type UseTailwindCallback<P> = (className?: string) => StyleProp<P> & {
+  [ChildClassNameSymbol]?: AtRuleRecord[];
+};
+
+export type UseTailwindCallbackFlattern<P> = (className?: string) => P & {
+  [ChildClassNameSymbol]?: AtRuleRecord[];
+};
 
 export interface UseTailwindOptions {
   flatten?: boolean;

@@ -3,8 +3,12 @@ import { View, ViewProps, ViewStyle } from "react-native";
 import { styled } from "../../src";
 import { TestProvider } from "../tailwindcss/runner";
 
+export interface StyledTestComponentProps extends ViewProps {
+  style2: ViewStyle;
+}
+
 const StyledTestComponent = styled(
-  ({ style, style2 }: ViewProps & { style2: ViewStyle }) => {
+  ({ style, style2 }: StyledTestComponentProps) => {
     return (
       <>
         <View style={style} />
@@ -15,7 +19,7 @@ const StyledTestComponent = styled(
   {
     props: ["style2"],
   }
-) as any;
+);
 
 describe("Styled - Custom Props", () => {
   test("can style custom props", () => {

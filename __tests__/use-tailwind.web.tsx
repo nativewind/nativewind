@@ -83,20 +83,23 @@ describe("web", () => {
   });
 
   test("can flatten properties", () => {
-    const { result } = renderHook(() => useTailwind<TextStyle>()("font-bold"), {
-      wrapper,
-      initialProps: {
-        platform: "native",
-        styles: {
-          "font-bold": {
-            fontWeight: "700",
-          },
-          "font-extrabold": {
-            fontWeight: "800",
+    const { result } = renderHook(
+      () => useTailwind<TextStyle>({ flatten: true })("font-bold"),
+      {
+        wrapper,
+        initialProps: {
+          platform: "native",
+          styles: {
+            "font-bold": {
+              fontWeight: "700",
+            },
+            "font-extrabold": {
+              fontWeight: "800",
+            },
           },
         },
-      },
-    });
+      }
+    );
 
     expect(result.current.fontWeight).toEqual("700");
   });
