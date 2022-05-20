@@ -79,6 +79,11 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
           4: "4px",
           8: "8px",
         },
+        strokeWidth: {
+          0: "0px",
+          1: "1px",
+          2: "2px",
+        },
         spacing: {
           px: "1px",
           0: "0px",
