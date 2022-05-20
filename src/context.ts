@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import { ColorSchemeName } from "react-native";
 import { MediaRecord, Style } from "./types/common";
 
@@ -37,6 +37,18 @@ export const TailwindContext = createContext<TailwindContext>({
   orientation: "portrait",
   preview: false,
 });
+
+export function useTailwindContext() {
+  const context = useContext(TailwindContext);
+
+  if (!context.platform) {
+    throw new Error(
+      "No platform details found. Make sure all components are within a TailwindProvider with the platform attribute set."
+    );
+  }
+
+  return context;
+}
 
 export interface ComponentContext {
   hover: boolean;

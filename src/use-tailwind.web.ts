@@ -1,6 +1,5 @@
-import { useContext } from "react";
 import { ImageStyle, TextStyle, ViewStyle } from "react-native";
-import { TailwindContext } from "./context";
+import { useTailwindContext } from "./context";
 import {
   RWNCssStyle,
   UseTailwindCallback,
@@ -19,13 +18,7 @@ export function useTailwind<
   P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
 >(options?: UseTailwindOptions): UseTailwindCallback<P>;
 export function useTailwind<P>(options?: UseTailwindOptions) {
-  const { platform, preview } = useContext(TailwindContext);
-
-  if (!platform) {
-    throw new Error(
-      "No platform details found. Make sure all components are within a TailwindProvider with the platform attribute set."
-    );
-  }
+  const { platform, preview } = useTailwindContext();
 
   if (platform === "web" && preview) {
     return (className = "") => {

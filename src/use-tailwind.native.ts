@@ -6,7 +6,6 @@ import {
   ImageStyle,
   StyleProp,
 } from "react-native";
-import { ComponentContext, TailwindContext } from "./context";
 import {
   RWNCssStyle,
   UseTailwindCallback,
@@ -14,6 +13,7 @@ import {
   UseTailwindOptions,
 } from "./use-tailwind";
 
+import { ComponentContext, useTailwindContext } from "./context";
 import { getRuntimeStyles } from "./runtime-styles";
 import { AtRuleRecord } from "./types/common";
 import { ChildClassNameSymbol } from "./with-styled-props";
@@ -36,10 +36,8 @@ export function useTailwind<P>({
   active = false,
   flatten = true,
 }: UseTailwindOptions = {}) {
-  const tailwindContext = useContext(TailwindContext);
+  const tailwindContext = useTailwindContext();
   const componentInteraction = useContext(ComponentContext);
-
-  assertInContext(tailwindContext.platform);
 
   return (className = "") => {
     const [styles, childStyles] = getRuntimeStyles<P>({
@@ -61,12 +59,4 @@ export function useTailwind<P>({
 
     return result;
   };
-}
-
-function assertInContext(platform: string): asserts platform is string {
-  if (!platform) {
-    throw new Error(
-      "No platform details found. Make sure all components are within a TailwindProvider with the platform attribute set."
-    );
-  }
 }
