@@ -2,7 +2,7 @@ import { ViewStyle } from "react-native";
 import { ComponentContext, TailwindContext } from "./context";
 import { matchAtRule } from "./match-at-rule";
 import { normaliseSelector } from "./shared/selector";
-import { AtRuleRecord, StyleArray } from "./types/common";
+import { AtRuleRecord } from "./types/common";
 
 export interface GetStylesOptions {
   className: string;
@@ -31,30 +31,34 @@ export function getRuntimeStyles<T>({
 
     const selector = normaliseSelector(name);
 
-    const styleArray: StyleArray = [];
-
+    /**
+     * If we have static styles, add them
+     */
     if (styles[selector]) {
-      styleArray.push(styles[selector]);
+      const { transform, ...style } = styles[selector];
+
+      tailwindStyles.push(style as T);
+
+      if (transform) {
+        transforms.push(...transform);
+      }
     }
 
+    /**
+     * Media styles contain atRules and need to be validated
+     */
     if (media[selector]) {
-      styleArray.push(
-        ...media[selector].map((atRules, index) => ({
+      const atRuleStyles: AtRuleRecord[] = media[selector].map(
+        (atRules, index) => ({
           ...styles[`${selector}.${index}`],
           atRules,
-        }))
+        })
       );
-    }
 
-    if (styleArray.length === 0) {
-      continue;
-    }
-
-    for (let styleRecord of styleArray) {
-      if ("atRules" in styleRecord) {
+      for (const styleRecord of atRuleStyles) {
         let isForChildren = false;
 
-        const { atRules, ...style } = styleRecord;
+        const { atRules, transform, ...style } = styleRecord;
 
         const atRulesResult = atRules.every(([rule, params]) => {
           /**
@@ -82,20 +86,13 @@ export function getRuntimeStyles<T>({
 
         if (isForChildren) {
           childStyles.push(styleRecord);
-          continue;
         } else if (atRulesResult) {
-          styleRecord = style;
-        } else {
-          continue;
+          tailwindStyles.push(style as T);
+
+          if (transform) {
+            transforms.push(...transform);
+          }
         }
-      }
-
-      const { transform, ...style } = styleRecord;
-
-      tailwindStyles.push(style as T);
-
-      if (transform) {
-        transforms.push(...transform);
       }
     }
   }
