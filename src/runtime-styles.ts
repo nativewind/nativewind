@@ -27,7 +27,7 @@ export function getRuntimeStyles<T>({
   const transforms: ViewStyle["transform"] = [];
 
   for (const name of className.split(/\s+/)) {
-    if (!name) continue;
+    if (!name) continue; // Happens if there are leading or trailing whitespace
 
     const selector = normaliseSelector(name);
 
@@ -57,10 +57,14 @@ export function getRuntimeStyles<T>({
         const { atRules, ...style } = styleRecord;
 
         const atRulesResult = atRules.every(([rule, params]) => {
-          if (rule === "selector" && params === "(> *:not(:first-child))") {
-            isForChildren = true;
-            return true;
-          } else if (rule === "selector" && params === "(> *)") {
+          /**
+           * This is a match string, but it makes sense
+           * Child selectors look like this and will always start with (>
+           *
+           * @selector (> *:not(:first-child))
+           * @selector (> *)
+           */
+          if (rule === "selector" && params.startsWith("(>")) {
             isForChildren = true;
             return true;
           }
