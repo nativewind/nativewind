@@ -7,7 +7,7 @@ export const ChildClassNameSymbol = Symbol("twrn-child");
 export interface WithStyledPropsOptions<P, T extends string> {
   classes: string | undefined;
   componentStyles: StyleProp<P>;
-  propsToTransform?: boolean | T[];
+  propsToTransform?: false | T[];
   componentProps: Record<string, unknown>;
   tw: UseTailwindCallback<P>;
 }
@@ -35,10 +35,6 @@ export function withStyledProps<P, T extends string>({
   const styledProps: Partial<Record<T, StyleProp<P>>> = {};
 
   if (propsToTransform) {
-    if (propsToTransform === true) {
-      propsToTransform = Object.keys(componentProps) as T[];
-    }
-
     for (const prop of propsToTransform) {
       const value = componentProps[prop];
 
