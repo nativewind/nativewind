@@ -23,7 +23,7 @@ export function withStyledProps<P, T extends string>({
   componentStyles,
   propsToTransform,
   componentProps,
-}: WithStyledPropsOptions<P, T>): WithStyledPropss<P, T> {
+}: WithStyledPropsOptions<P, T>): WithStyledProps<P, T> {
   const mainStyles = tw(classes);
 
   const style = componentStyles

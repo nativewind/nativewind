@@ -1,6 +1,6 @@
 import { StyleProp } from "react-native";
 import { AtRuleRecord } from "./types/common";
-import type { ChildClassNameSymbol } from "./use-styled-props";
+import type { ChildClassNameSymbol } from "./with-styled-props";
 
 export { useTailwind } from "./use-tailwind.web";
 

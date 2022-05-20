@@ -16,7 +16,7 @@ import {
 
 import { getRuntimeStyles } from "./runtime-styles";
 import { AtRuleRecord } from "./types/common";
-import { ChildClassNameSymbol } from "./use-styled-props";
+import { ChildClassNameSymbol } from "./with-styled-props";
 
 type WithChildClassNameSymbol<T> = T & {
   [ChildClassNameSymbol]?: AtRuleRecord[];
