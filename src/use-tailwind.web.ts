@@ -3,30 +3,14 @@ import { useTailwindContext } from "./context";
 import {
   RWNCssStyle,
   UseTailwindCallback,
-  UseTailwindCallbackFlattern,
   UseTailwindOptions,
 } from "./use-tailwind";
 
 import { useTailwind as useNativeTailwind } from "./use-tailwind.native";
 
-/*
- * Flatten: true
- */
 export function useTailwind<
   P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
->(
-  options: UseTailwindOptions & { flatten: true }
-): UseTailwindCallbackFlattern<P>;
-/*
- * Normal usage
- */
-export function useTailwind<
-  P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
->(options?: UseTailwindOptions): UseTailwindCallback<P>;
-/**
- * Actual implementation
- */
-export function useTailwind<P>(options?: UseTailwindOptions) {
+>(options?: UseTailwindOptions): UseTailwindCallback<P> {
   const { platform, preview } = useTailwindContext();
 
   if (platform === "web" && preview) {
@@ -34,7 +18,8 @@ export function useTailwind<P>(options?: UseTailwindOptions) {
       return {
         $$css: true,
         tailwindClassName: className,
-      };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
     };
   }
 

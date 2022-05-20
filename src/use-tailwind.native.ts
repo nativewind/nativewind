@@ -1,54 +1,31 @@
 import { useContext } from "react";
-import {
-  TextStyle,
-  ViewStyle,
-  StyleSheet,
-  ImageStyle,
-  StyleProp,
-} from "react-native";
+import { TextStyle, ViewStyle, StyleSheet, ImageStyle } from "react-native";
 import {
   RWNCssStyle,
   UseTailwindCallback,
-  UseTailwindCallbackFlattern,
+  UseTailwindCallbackOptions,
+  UseTailwindCallbackResult,
   UseTailwindOptions,
 } from "./use-tailwind";
 
 import { ComponentContext, useTailwindContext } from "./context";
 import { getRuntimeStyles } from "./runtime-styles";
-import { AtRuleRecord } from "./types/common";
 import { ChildClassNameSymbol } from "./with-styled-props";
 
-type WithChildClassNameSymbol<T> = T & {
-  [ChildClassNameSymbol]?: AtRuleRecord[];
-};
-
-/*
- * Flatten: true
- */
 export function useTailwind<
   P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
->(
-  options: UseTailwindOptions & { flatten: true }
-): UseTailwindCallbackFlattern<P>;
-/*
- * Normal usage
- */
-export function useTailwind<
-  P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
->(options?: UseTailwindOptions): UseTailwindCallback<P>;
-/**
- * Actual implementation
- */
-export function useTailwind<P>({
+>({
   hover = false,
   focus = false,
   active = false,
-  flatten = true,
-}: UseTailwindOptions = {}) {
+}: UseTailwindOptions = {}): UseTailwindCallback<P> {
   const tailwindContext = useTailwindContext();
   const componentInteraction = useContext(ComponentContext);
 
-  return (className = "") => {
+  function callback<F extends boolean | undefined = true>(
+    className = "",
+    { flatten = true }: UseTailwindCallbackOptions<F> = {}
+  ) {
     const [styles, childStyles] = getRuntimeStyles<P>({
       className,
       hover,
@@ -60,12 +37,14 @@ export function useTailwind<P>({
 
     const result = (
       flatten ? StyleSheet.flatten<P>(styles) : styles
-    ) as WithChildClassNameSymbol<StyleProp<P>>;
+    ) as UseTailwindCallbackResult<P, F>;
 
     if (childStyles.length > 0) {
       result[ChildClassNameSymbol] = childStyles;
     }
 
     return result;
-  };
+  }
+
+  return callback;
 }

@@ -3,7 +3,13 @@ import { ImageStyle, TextStyle, ViewStyle } from "react-native";
 export type StyleProperty =
   | keyof TextStyle
   | keyof ViewStyle
-  | keyof ImageStyle;
+  | keyof ImageStyle
+  /**
+   * These are special SVG properties that we support
+   */
+  | "fill"
+  | "stroke"
+  | "strokeWidth";
 
 export function isInvalidProperty(property: string) {
   return !validProps.has(property as StyleProperty);
@@ -117,4 +123,9 @@ const validProps = new Set<StyleProperty>([
   "width",
   "writingDirection",
   "zIndex",
+
+  /* SVG Props */
+  "fill",
+  "stroke",
+  "strokeWidth",
 ]);

@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Svg - Stroke Width stroke-0 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "strokeWidth",
+        ]
+      }
+      r={0}
+      strokeWidth={0}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke Width stroke-1 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "strokeWidth",
+        ]
+      }
+      r={0}
+      strokeWidth={1}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke Width stroke-2 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "strokeWidth",
+        ]
+      }
+      r={0}
+      strokeWidth={2}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;

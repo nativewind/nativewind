@@ -1,52 +1,88 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StyleProp } from "react-native";
+import { useTailwindContext } from "./context";
 import { AtRuleRecord } from "./types/common";
 import { UseTailwindCallback } from "./use-tailwind";
 
 export const ChildClassNameSymbol = Symbol("twrn-child");
 
-export interface WithStyledPropsOptions<P, T extends string> {
+export interface WithStyledPropsOptions<S, T extends string> {
   classes: string | undefined;
-  componentStyles: StyleProp<P>;
+  styleProp: StyleProp<S>;
   propsToTransform?: false | T[];
   componentProps: Record<string, unknown>;
-  tw: UseTailwindCallback<P>;
+  tw: UseTailwindCallback<S>;
+  svg?: boolean;
 }
 
-export type WithStyledProps<P, T extends string> = Record<T, StyleProp<P>> & {
+export type WithStyledProps<S, T extends string> = Record<T, StyleProp<S>> & {
   childStyles?: AtRuleRecord[];
-  style: StyleProp<P>;
+  style: StyleProp<S>;
 };
 
-export function withStyledProps<P, T extends string>({
+export function withStyledProps<S, T extends string>({
   tw,
   classes,
-  componentStyles,
   propsToTransform,
+  styleProp,
   componentProps,
-}: WithStyledPropsOptions<P, T>): WithStyledProps<P, T> {
-  const mainStyles = tw(classes);
+  svg = true,
+}: WithStyledPropsOptions<S, T>): WithStyledProps<S, T> {
+  const { preview } = useTailwindContext();
+  const mainStyles = tw(classes, { flatten: false });
 
-  const style = componentStyles
-    ? [mainStyles, componentStyles]
-    : Array.isArray(mainStyles) && mainStyles.length > 0
-    ? mainStyles
-    : undefined;
+  const styledProps: Partial<Record<T, StyleProp<S>>> = {};
 
-  const styledProps: Partial<Record<T, StyleProp<P>>> = {};
+  /**
+   * There are 3 special SVG props: fill, stroke & strokeWidth
+   *
+   * Unlike other props, their value is extracted from the style object and passed to the prop
+   *
+   * Native: <SVG fill="fill-white" />  --->  <SVG fill="#fff" />
+   * CSS: <SVG fill="fill-white" />  --->  <SVG className="fill-white" />
+   */
+  if (svg) {
+    const fillProp = componentProps["fill"];
+    if (typeof fillProp === "string") {
+      if (preview) {
+        mainStyles.push({ $$css: true, fillProp } as any);
+      } else {
+        const { fill } = tw(fillProp) as any;
+        styledProps["fill" as T] = fill;
+      }
+    }
+
+    const strokeProp = componentProps["stroke"];
+    if (typeof strokeProp === "string") {
+      if (preview) {
+        mainStyles.push({ $$css: true, strokeProp } as any);
+      } else {
+        const { stroke, strokeWidth } = tw(strokeProp) as any;
+        styledProps["stroke" as T] = stroke;
+        styledProps["strokeWidth" as T] = strokeWidth;
+      }
+    }
+  }
 
   if (propsToTransform) {
     for (const prop of propsToTransform) {
       const value = componentProps[prop];
 
       if (typeof value === "string") {
-        styledProps[prop] = tw(value);
+        styledProps[prop] = tw(value, { flatten: false });
       }
     }
   }
 
+  const style = styleProp
+    ? [mainStyles, styleProp]
+    : mainStyles.length > 0
+    ? mainStyles
+    : undefined;
+
   return {
     childStyles: mainStyles[ChildClassNameSymbol],
     style,
-    ...(styledProps as Record<T, StyleProp<P>>),
+    ...styledProps,
   };
 }

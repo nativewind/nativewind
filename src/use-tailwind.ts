@@ -1,4 +1,3 @@
-import { StyleProp } from "react-native";
 import { AtRuleRecord } from "./types/common";
 import type { ChildClassNameSymbol } from "./with-styled-props";
 
@@ -9,17 +8,32 @@ export type RWNCssStyle = {
   tailwindClassName: string;
 };
 
-export type UseTailwindCallback<P> = (className?: string) => StyleProp<P> & {
-  [ChildClassNameSymbol]?: AtRuleRecord[];
-};
+export interface UseTailwindCallbackOptions<
+  Flatten extends boolean | undefined
+> {
+  flatten?: Flatten;
+}
 
-export type UseTailwindCallbackFlattern<P> = (className?: string) => P & {
+export type UseTailwindCallback<P> = <
+  Flatten extends boolean | undefined = true
+>(
+  className?: string,
+  options?: UseTailwindCallbackOptions<Flatten>
+) => UseTailwindCallbackResult<P, Flatten>;
+
+export type UseTailwindCallbackResult<
+  P,
+  Flatten extends boolean | undefined = true
+> = Flatten extends true
+  ? WithChildClassNameSymbol<P>
+  : WithChildClassNameSymbol<P[]>;
+
+export type WithChildClassNameSymbol<T> = T & {
   [ChildClassNameSymbol]?: AtRuleRecord[];
 };
 
 export interface UseTailwindOptions {
   flatten?: boolean;
-  nthChild?: number;
   hover?: boolean;
   focus?: boolean;
   active?: boolean;

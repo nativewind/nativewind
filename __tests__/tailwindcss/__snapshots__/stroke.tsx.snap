@@ -1,0 +1,913 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Svg - Stroke stroke-amber-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294966251}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-black 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4278190080}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-blue-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4293916415}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-cyan-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4293721855}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-emerald-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4293721589}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-fuchsia-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294833407}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-gray-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294572795}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-green-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4293983732}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-indigo-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4293849855}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-lime-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294442727}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-neutral-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294638330}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-orange-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294965229}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-pink-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294832888}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-purple-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294637055}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-red-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294898418}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-rose-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294963698}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-sky-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4293982719}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-slate-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294507260}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-stone-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294638329}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-teal-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4293983738}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-transparent 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={0}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-violet-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294308863}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-white 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294967295}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-yellow-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294900968}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke stroke-zinc-50 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+        ]
+      }
+      r={0}
+      stroke={4294638330}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;
+
+exports[`Svg - Stroke works with stroke width 1`] = `
+<RNSVGSvgView
+  bbHeight="100%"
+  bbWidth="100%"
+  focusable={false}
+  style={
+    Array [
+      Object {
+        "backgroundColor": "transparent",
+        "borderWidth": 0,
+      },
+      Object {
+        "flex": 0,
+        "height": "100%",
+        "width": "100%",
+      },
+    ]
+  }
+>
+  <RNSVGGroup>
+    <RNSVGCircle
+      cx={0}
+      cy={0}
+      propList={
+        Array [
+          "stroke",
+          "strokeWidth",
+        ]
+      }
+      r={0}
+      stroke={4294967295}
+      strokeWidth={1}
+    />
+  </RNSVGGroup>
+</RNSVGSvgView>
+`;

@@ -1,5 +1,4 @@
 import { createElement, FC, ComponentProps } from "react";
-import { StyleProp } from "react-native";
 
 import { Component, StyledProps, StyledPropsWithKeys } from "./utils/styled";
 import { ComponentContext } from "./context";
@@ -15,41 +14,31 @@ export interface StyledOptions<P> {
 /*
  * Normal usage
  */
-export function styled<
-  Props extends { style?: StyleProp<StyleType> },
-  StyleType
->(
-  Component: Component<Props, StyleType>,
+export function styled<T>(
+  Component: Component<T>,
   options?: { props?: false | undefined }
-): FC<StyledProps<Props, StyleType>>;
+): FC<StyledProps<T>>;
 /**
  * Transform extra props
  */
-export function styled<
-  Props extends { style?: StyleProp<StyleType> },
-  StyleType,
-  KeyOfProps extends keyof Props & string
->(
-  Component: Component<Props, StyleType>,
-  options: { props: Array<KeyOfProps> }
-): FC<StyledPropsWithKeys<Props, StyleType, KeyOfProps>>;
+export function styled<T, K extends keyof T & string>(
+  Component: Component<T>,
+  options: { props: Array<K> }
+): FC<StyledPropsWithKeys<T, K>>;
 /**
  * Actual implementation
  */
-export function styled<
-  Props extends { style?: StyleProp<StyleType> },
-  StyleType
->(
-  Component: Component<Props, StyleType>,
-  { props: propsToTransform }: StyledOptions<Props> = {}
+export function styled<T>(
+  Component: Component<T>,
+  { props: propsToTransform }: StyledOptions<T> = {}
 ) {
   function Styled({
     className,
     tw: twClassName,
-    style: componentStyles,
+    style: styleProp,
     children: componentChildren,
     ...componentProps
-  }: StyledProps<Props, StyleType>) {
+  }: StyledProps<T>) {
     const { hover, focus, active, ...handlers } = useInteraction({
       className,
       ...componentProps,
@@ -57,18 +46,14 @@ export function styled<
 
     const classes = twClassName ?? className ?? "";
 
-    const { childStyles, ...styledProps } = withStyledProps<
-      StyleType,
-      keyof Props & string
-    >({
-      tw: useTailwind<StyleType>({
+    const { childStyles, ...styledProps } = withStyledProps({
+      tw: useTailwind({
         hover,
         focus,
         active,
-        flatten: false,
       }),
       classes,
-      componentStyles,
+      styleProp,
       propsToTransform,
       componentProps,
     });
@@ -85,7 +70,7 @@ export function styled<
       ...handlers,
       ...styledProps,
       children,
-    } as unknown as Props);
+    } as unknown as T);
 
     return !classes.split(/\s+/).includes("component")
       ? element

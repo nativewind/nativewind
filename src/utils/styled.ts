@@ -1,12 +1,13 @@
 import { ComponentType, PropsWithChildren } from "react";
-import { StyleProp } from "react-native";
+import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 
-export type Component<
-  P extends { style?: StyleProp<T> | undefined },
-  T
-> = ComponentType<P & { style?: StyleProp<T> }>;
+export type Component<P> = ComponentType<P>;
 
-export type StyledProps<P, T> = PropsWithChildren<
+export type InferStyle<T> = T extends { style?: StyleProp<infer S> }
+  ? S & (ViewStyle | TextStyle | ImageStyle)
+  : never;
+
+export type StyledProps<P, T = InferStyle<P>> = PropsWithChildren<
   P & {
     className?: string;
     tw?: string;
@@ -14,11 +15,11 @@ export type StyledProps<P, T> = PropsWithChildren<
   }
 >;
 
-export type StyledPropsWithKeys<P, T, K extends keyof P> = PropsWithChildren<
+export type StyledPropsWithKeys<P, K extends keyof P> = PropsWithChildren<
   P & {
     className?: string;
     tw?: string;
-    style?: StyleProp<T | RWNCssStyle>;
+    style?: StyleProp<InferStyle<P> | RWNCssStyle>;
   } & { [key in K]: P[key] | string }
 >;
 
