@@ -1,3 +1,10 @@
+# [1.5.0-next.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.5...v1.5.0-next.6) (2022-05-20)
+
+
+### Features
+
+* add SVG support ([05897c3](https://github.com/marklawlor/tailwindcss-react-native/commit/05897c3ab7e3564c69e965bfd2c86d01f47eea1d)), closes [#56](https://github.com/marklawlor/tailwindcss-react-native/issues/56)
+
 # [1.5.0-next.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.4...v1.5.0-next.5) (2022-05-20)
 
 
