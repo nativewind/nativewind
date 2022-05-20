@@ -18,7 +18,24 @@ export function withStyledChildren({
     : componentChildren;
 
   children = Children.map(children, (child, index) => {
+    /**
+     * For every child:
+     *  For every style:
+     *    For every atRule:
+     *      Ensure all atRules match
+     *    If all atRules match, push the style
+     *  Add the styles to the child
+     * Return the children
+     *
+     * This is a inefficient and makes parent: selectors a bit slow
+     * as we repeat the logic for nearly every child. Sometimes that's required (eg. nthChild)
+     * but typically not.
+     *
+     * We should split the childStyles into static and dynamic and only loop the dynamic
+     * ones for each child.
+     */
     const matchingStyles = [];
+
     for (const { atRules, ...styles } of childStyles) {
       const matches = atRules.every(([rule, params]) => {
         return matchChildAtRule({
