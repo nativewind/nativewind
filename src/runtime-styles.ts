@@ -13,20 +13,22 @@ export interface GetStylesOptions {
   componentInteraction: ComponentContext;
 }
 
-export function getRuntimeStyles<P>({
+export function getRuntimeStyles<T>({
   className,
   hover,
   focus,
   active,
   componentInteraction,
   tailwindContext,
-}: GetStylesOptions): [P[], AtRuleRecord[]] {
+}: GetStylesOptions): [T[], AtRuleRecord[]] {
   const { styles, media } = tailwindContext;
-  const tailwindStyles: P[] = [];
-  const childStyles = [] as AtRuleRecord[];
+  const tailwindStyles: T[] = [];
+  const childStyles: AtRuleRecord[] = [];
   const transforms: ViewStyle["transform"] = [];
 
-  for (const name of className.trim().split(/\s+/)) {
+  for (const name of className.split(/\s+/)) {
+    if (!name) continue;
+
     const selector = normaliseSelector(name);
 
     const styleArray: StyleArray = [];
@@ -86,7 +88,7 @@ export function getRuntimeStyles<P>({
 
       const { transform, ...style } = styleRecord;
 
-      tailwindStyles.push(style as P);
+      tailwindStyles.push(style as T);
 
       if (transform) {
         transforms.push(...transform);
