@@ -1,5 +1,7 @@
 import { match } from "css-mediaquery";
-import { ComponentContext, TailwindContext } from "./context";
+import { ColorSchemeName } from "react-native";
+import { ComponentContext } from "./context/component";
+import { DeviceMediaContext } from "./context/device-media";
 
 interface MatchAtRuleOptions {
   rule: string;
@@ -7,8 +9,10 @@ interface MatchAtRuleOptions {
   hover: boolean;
   active: boolean;
   focus: boolean;
+  platform: string;
+  colorScheme: ColorSchemeName;
   componentInteraction: ComponentContext;
-  tailwindContext: TailwindContext;
+  deviceMediaContext: DeviceMediaContext;
 }
 
 export function matchAtRule({
@@ -18,7 +22,9 @@ export function matchAtRule({
   active,
   focus,
   componentInteraction,
-  tailwindContext: { width, height, platform, orientation, colorScheme },
+  platform,
+  colorScheme,
+  deviceMediaContext: { width, height, orientation },
 }: MatchAtRuleOptions) {
   if (rule === "pseudo-class" && params === "hover") {
     return hover;

@@ -1,5 +1,7 @@
-import { ViewStyle } from "react-native";
-import { ComponentContext, TailwindContext } from "./context";
+import { ColorSchemeName, ViewStyle } from "react-native";
+import { ComponentContext } from "./context/component";
+import { DeviceMediaContext } from "./context/device-media";
+import { StyleSheetContext } from "./context/style-sheet";
 import { matchAtRule } from "./match-at-rule";
 import { normaliseSelector } from "./shared/selector";
 import { AtRuleRecord } from "./types/common";
@@ -9,8 +11,11 @@ export interface GetStylesOptions {
   hover: boolean;
   focus: boolean;
   active: boolean;
-  tailwindContext: TailwindContext;
+  stylesheetContext: StyleSheetContext;
+  platform: string;
+  colorScheme: ColorSchemeName;
   componentInteraction: ComponentContext;
+  deviceMediaContext: DeviceMediaContext;
 }
 
 export function getRuntimeStyles<T>({
@@ -18,10 +23,13 @@ export function getRuntimeStyles<T>({
   hover,
   focus,
   active,
+  stylesheetContext,
+  platform,
+  colorScheme,
   componentInteraction,
-  tailwindContext,
+  deviceMediaContext,
 }: GetStylesOptions): [T[], AtRuleRecord[]] {
-  const { styles, media } = tailwindContext;
+  const { styles, media } = stylesheetContext;
   const tailwindStyles: T[] = [];
   const childStyles: AtRuleRecord[] = [];
   const transforms: ViewStyle["transform"] = [];
@@ -79,8 +87,10 @@ export function getRuntimeStyles<T>({
             hover,
             active,
             focus,
+            platform,
+            colorScheme,
             componentInteraction,
-            tailwindContext,
+            deviceMediaContext,
           });
         });
 

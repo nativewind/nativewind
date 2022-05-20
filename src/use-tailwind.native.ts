@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import { TextStyle, ViewStyle, StyleSheet, ImageStyle } from "react-native";
 import {
   RWNCssStyle,
@@ -8,9 +7,13 @@ import {
   UseTailwindOptions,
 } from "./use-tailwind";
 
-import { ComponentContext, useTailwindContext } from "./context";
 import { getRuntimeStyles } from "./runtime-styles";
 import { ChildClassNameSymbol } from "./with-styled-props";
+import { usePlatform } from "./context/platform";
+import { useStyleSheet } from "./context/style-sheet";
+import { useDeviceMedia } from "./context/device-media";
+import { useComponent } from "./context/component";
+import { useColorScheme } from "./context/color-scheme";
 
 export function useTailwind<
   P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
@@ -19,8 +22,11 @@ export function useTailwind<
   focus = false,
   active = false,
 }: UseTailwindOptions = {}): UseTailwindCallback<P> {
-  const tailwindContext = useTailwindContext();
-  const componentInteraction = useContext(ComponentContext);
+  const { platform } = usePlatform();
+  const { colorScheme } = useColorScheme();
+  const stylesheetContext = useStyleSheet();
+  const deviceMediaContext = useDeviceMedia();
+  const componentInteraction = useComponent();
 
   function callback<F extends boolean | undefined = true>(
     className = "",
@@ -31,8 +37,11 @@ export function useTailwind<
       hover,
       focus,
       active,
-      tailwindContext,
+      stylesheetContext,
+      platform,
+      colorScheme,
       componentInteraction,
+      deviceMediaContext,
     });
 
     const result = (

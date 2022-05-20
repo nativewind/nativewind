@@ -1,7 +1,7 @@
 import { createElement, FC, ComponentProps } from "react";
 
 import { Component, StyledProps, StyledPropsWithKeys } from "./utils/styled";
-import { ComponentContext } from "./context";
+import { ComponentContext } from "./context/component";
 import { useInteraction } from "./use-interaction";
 import { withStyledChildren } from "./with-styled-children";
 import { withStyledProps } from "./with-styled-props";

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { StyleProp } from "react-native";
-import { useTailwindContext } from "./context";
+import { usePlatform } from "./context/platform";
 import { AtRuleRecord } from "./types/common";
 import { UseTailwindCallback } from "./use-tailwind";
 
@@ -28,7 +28,7 @@ export function withStyledProps<S, T extends string>({
   componentProps,
   svg = true,
 }: WithStyledPropsOptions<S, T>): WithStyledProps<S, T> {
-  const { preview } = useTailwindContext();
+  const { preview } = usePlatform();
   const mainStyles = tw(classes, { flatten: false });
 
   const styledProps: Partial<Record<T, StyleProp<S>>> = {};

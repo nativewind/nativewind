@@ -1,14 +1,11 @@
-import { PropsWithChildren, useState } from "react";
-import {
-  useWindowDimensions,
-  ColorSchemeName,
-  Appearance,
-  Platform,
-} from "react-native";
+import { PropsWithChildren } from "react";
+import { ColorSchemeName, Platform } from "react-native";
 
-import { useDeviceOrientation } from "@react-native-community/hooks";
+import { PlatformProvider } from "./context/platform";
+import { ColorSchemeProvider } from "./context/color-scheme";
+import { DeviceMediaProvider } from "./context/device-media";
 
-import { TailwindContext } from "./context";
+import { StyleSheetContext } from "./context/style-sheet";
 
 export interface TailwindProviderProps {
   styles?: typeof globalThis["tailwindcss_react_native_style"];
@@ -21,37 +18,19 @@ export interface TailwindProviderProps {
 export function TailwindProvider({
   styles = globalThis.tailwindcss_react_native_style,
   media = globalThis.tailwindcss_react_native_media ?? {},
-  colorScheme: overrideColorScheme,
-  platform = Platform.OS,
-  preview = false,
+  colorScheme,
+  preview,
+  platform,
   children,
 }: PropsWithChildren<TailwindProviderProps>) {
-  const [colorScheme, setColorScheme] = useState<ColorSchemeName>(
-    overrideColorScheme ?? Appearance.getColorScheme() ?? "light"
-  );
-
-  // const { reduceMotionEnabled: reduceMotion } = useAccessibilityInfo() // We should support this
-  const { width, height } = useWindowDimensions();
-  const orientation: TailwindContext["orientation"] = useDeviceOrientation()
-    .portrait
-    ? "portrait"
-    : "landscape";
-
+  const stylesheet = { styles, media };
   return (
-    <TailwindContext.Provider
-      value={{
-        styles,
-        media,
-        colorScheme: overrideColorScheme || colorScheme,
-        setColorScheme,
-        width,
-        height,
-        orientation,
-        platform,
-        preview,
-      }}
-    >
-      {children}
-    </TailwindContext.Provider>
+    <PlatformProvider preview={preview} platform={platform}>
+      <ColorSchemeProvider initialColorScheme={colorScheme}>
+        <StyleSheetContext.Provider value={stylesheet}>
+          <DeviceMediaProvider>{children}</DeviceMediaProvider>
+        </StyleSheetContext.Provider>
+      </ColorSchemeProvider>
+    </PlatformProvider>
   );
 }
