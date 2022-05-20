@@ -1,3 +1,10 @@
+# [1.5.0-next.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.4...v1.5.0-next.5) (2022-05-20)
+
+
+### Bug Fixes
+
+* short circuit withStyledChildren when there are no child styles ([8de2e43](https://github.com/marklawlor/tailwindcss-react-native/commit/8de2e4351e13f9e3b681364a719b11e73a8fbb84))
+
 # [1.5.0-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.3...v1.5.0-next.4) (2022-05-19)
 
 
