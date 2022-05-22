@@ -85,21 +85,6 @@ export function MyText({ bold, italic, lineThrough, ...props }) {
 }
 ```
 
-And access the styles directly
-
-```tsx
-import { Text } from "react-native";
-import { useTailwind } from "tailwindcss-react-native";
-
-export function MyActivityIndicator(props) {
-  const tw = useTailwind();
-
-  const { color } = tx("text-blue-500");
-
-  return <ActivityIndicator size="small" color={color} {...props} />;
-}
-```
-
 ## See the code on Github
 
 [![marklawlor/tailwindcss-react-native - GitHub](https://github-link-card.s3.ap-northeast-1.amazonaws.com/marklawlor/tailwindcss-react-native.png)](https://github.com/marklawlor/tailwindcss-react-native)

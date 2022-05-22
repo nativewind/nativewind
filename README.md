@@ -93,21 +93,6 @@ export function MyText({ bold, italic, lineThrough, ...props }) {
 }
 ```
 
-And access the styles directly
-
-```tsx
-import { Text } from "react-native";
-import { useTailwind } from "tailwindcss-react-native";
-
-export function MyActivityIndicator(props) {
-  const tw = useTailwind();
-
-  const { color } = tw("text-blue-500");
-
-  return <ActivityIndicator size="small" color={color} {...props} />;
-}
-```
-
 # Quick start guide
 
 > There are more setup configurations and in-depth guides [on our website](https://tailwindcss-react-native.vercel.app/installation)
