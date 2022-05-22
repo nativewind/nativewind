@@ -1,3 +1,15 @@
+# [1.5.0-next.7](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.6...v1.5.0-next.7) (2022-05-20)
+
+
+### Bug Fixes
+
+* strokeWidth console warnings on native ([5ace7ff](https://github.com/marklawlor/tailwindcss-react-native/commit/5ace7ff9754e551f577faa067a393f006c21bbc0))
+
+
+### Features
+
+* export new context hooks ([1560afe](https://github.com/marklawlor/tailwindcss-react-native/commit/1560afe983b97c5c866a427dd1194a62ccb0adea))
+
 # [1.5.0-next.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.5...v1.5.0-next.6) (2022-05-20)
 
 
