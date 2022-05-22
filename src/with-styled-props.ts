@@ -43,7 +43,7 @@ export function withStyledProps<S, T extends string>({
    */
   if (svg) {
     const fillProp = componentProps["fill"];
-    if (typeof fillProp === "string") {
+    if (typeof fillProp === "string" && fillProp.includes("fill-")) {
       if (preview) {
         mainStyles.push({ $$css: true, fillProp } as any);
       } else {
@@ -53,7 +53,7 @@ export function withStyledProps<S, T extends string>({
     }
 
     const strokeProp = componentProps["stroke"];
-    if (typeof strokeProp === "string") {
+    if (typeof strokeProp === "string" && strokeProp.includes("stroke-")) {
       if (preview) {
         mainStyles.push({ $$css: true, strokeProp } as any);
       } else {

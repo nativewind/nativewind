@@ -1,0 +1,29 @@
+import Compatibility from "../_compatibility.mdx";
+import RNSVG from "./_rn-svg.mdx";
+
+# Fill
+
+## Basic usage
+
+<RNSVG />
+
+Styled components can use the `stroke` attribute to pass the stroke color to react-native-svg.
+
+```tsc
+import { styled } from "tailwindcss-react-native"
+
+const MyStyledSvg = styled({ stroke, ...props })
+  return (
+    <Svg height="100" width="100" {...props }>
+      <Rect x="0" y="0" width="100" height="100" stroke={stroke} />
+    </Svg>
+  )
+}
+
+<MyStyledSvg className="p-4" stroke="stroke-blue-500" />
+```
+
+<Compatibility
+  supported={["stroke-{n}", "stroke-[n]"]}
+  none={["stroke-inherit", "stroke-current"]}
+/>
