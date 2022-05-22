@@ -10,7 +10,7 @@ import { StyleSheetContext } from "./context/style-sheet";
 export interface TailwindProviderProps {
   styles?: typeof globalThis["tailwindcss_react_native_style"];
   media?: typeof globalThis["tailwindcss_react_native_media"];
-  colorScheme?: ColorSchemeName;
+  initialColorScheme?: ColorSchemeName;
   platform?: typeof Platform.OS | "native";
   preview?: boolean;
 }
@@ -18,7 +18,7 @@ export interface TailwindProviderProps {
 export function TailwindProvider({
   styles = globalThis.tailwindcss_react_native_style,
   media = globalThis.tailwindcss_react_native_media ?? {},
-  colorScheme,
+  initialColorScheme,
   preview,
   platform,
   children,
@@ -26,7 +26,7 @@ export function TailwindProvider({
   const stylesheet = { styles, media };
   return (
     <PlatformProvider preview={preview} platform={platform}>
-      <ColorSchemeProvider initialColorScheme={colorScheme}>
+      <ColorSchemeProvider initialColorScheme={initialColorScheme}>
         <StyleSheetContext.Provider value={stylesheet}>
           <DeviceMediaProvider>{children}</DeviceMediaProvider>
         </StyleSheetContext.Provider>
