@@ -1,2 +1,2 @@
-export const ChildClassNameSymbol = Symbol("twrn-child");
-export const AtRules = Symbol("twrn-at-rules");
+export const ChildClassNameSymbol = Symbol("tailwindcss-child");
+export const AtRules = Symbol("tailwindcss-at-rules");

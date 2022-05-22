@@ -4,7 +4,7 @@ import { usePlatform } from "./context/platform";
 import { AtRuleRecord } from "./types/common";
 import { UseTailwindCallback } from "./use-tailwind";
 
-export const ChildClassNameSymbol = Symbol("twrn-child");
+export const ChildClassNameSymbol = Symbol("tailwind-child");
 
 export interface WithStyledPropsOptions<S, T extends string> {
   classes: string | undefined;

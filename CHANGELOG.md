@@ -1,40 +1,34 @@
 # [1.5.0-next.7](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.6...v1.5.0-next.7) (2022-05-20)
 
-
 ### Bug Fixes
 
-* strokeWidth console warnings on native ([5ace7ff](https://github.com/marklawlor/tailwindcss-react-native/commit/5ace7ff9754e551f577faa067a393f006c21bbc0))
-
+- strokeWidth console warnings on native ([5ace7ff](https://github.com/marklawlor/tailwindcss-react-native/commit/5ace7ff9754e551f577faa067a393f006c21bbc0))
 
 ### Features
 
-* export new context hooks ([1560afe](https://github.com/marklawlor/tailwindcss-react-native/commit/1560afe983b97c5c866a427dd1194a62ccb0adea))
+- export new context hooks ([1560afe](https://github.com/marklawlor/tailwindcss-react-native/commit/1560afe983b97c5c866a427dd1194a62ccb0adea))
 
 # [1.5.0-next.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.5...v1.5.0-next.6) (2022-05-20)
 
-
 ### Features
 
-* add SVG support ([05897c3](https://github.com/marklawlor/tailwindcss-react-native/commit/05897c3ab7e3564c69e965bfd2c86d01f47eea1d)), closes [#56](https://github.com/marklawlor/tailwindcss-react-native/issues/56)
+- add SVG support ([05897c3](https://github.com/marklawlor/tailwindcss-react-native/commit/05897c3ab7e3564c69e965bfd2c86d01f47eea1d)), closes [#56](https://github.com/marklawlor/tailwindcss-react-native/issues/56)
 
 # [1.5.0-next.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.4...v1.5.0-next.5) (2022-05-20)
 
-
 ### Bug Fixes
 
-* short circuit withStyledChildren when there are no child styles ([8de2e43](https://github.com/marklawlor/tailwindcss-react-native/commit/8de2e4351e13f9e3b681364a719b11e73a8fbb84))
+- short circuit withStyledChildren when there are no child styles ([8de2e43](https://github.com/marklawlor/tailwindcss-react-native/commit/8de2e4351e13f9e3b681364a719b11e73a8fbb84))
 
 # [1.5.0-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.3...v1.5.0-next.4) (2022-05-19)
 
-
 ### Bug Fixes
 
-* [#54](https://github.com/marklawlor/tailwindcss-react-native/issues/54) ([c639511](https://github.com/marklawlor/tailwindcss-react-native/commit/c63951127d9a1f242eeacf93011f0d2a5a089208))
-
+- [#54](https://github.com/marklawlor/tailwindcss-react-native/issues/54) ([c639511](https://github.com/marklawlor/tailwindcss-react-native/commit/c63951127d9a1f242eeacf93011f0d2a5a089208))
 
 ### Features
 
-* allow for styled to parse additional props ([1037027](https://github.com/marklawlor/tailwindcss-react-native/commit/1037027035187c2c67719e6880f3e5a4bd5ea778))
+- allow for styled to parse additional props ([1037027](https://github.com/marklawlor/tailwindcss-react-native/commit/1037027035187c2c67719e6880f3e5a4bd5ea778))
 
 # [1.5.0-next.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.2...v1.5.0-next.3) (2022-05-18)
 
@@ -125,7 +119,7 @@
 
 - component context not being created ([8709a9d](https://github.com/marklawlor/tailwindcss-react-native/commit/8709a9d825333bb374835df730b64049f1368f34))
 - missing initializer for tailwindcss_react_native_media ([e8493ac](https://github.com/marklawlor/tailwindcss-react-native/commit/e8493ac2655476d61f1ad3771d2a8236ebeff8c5))
-- simplied sibling plugins ([d8a0383](https://github.com/marklawlor/tailwindcss-react-native/commit/d8a038313fb11af89f7090523dbd32a886de477e))
+- simplified sibling plugins ([d8a0383](https://github.com/marklawlor/tailwindcss-react-native/commit/d8a038313fb11af89f7090523dbd32a886de477e))
 
 ### Features
 
@@ -168,7 +162,7 @@
 
 ### Bug Fixes
 
-- simplied sibling plugins ([d8a0383](https://github.com/marklawlor/tailwindcss-react-native/commit/d8a038313fb11af89f7090523dbd32a886de477e))
+- simplified sibling plugins ([d8a0383](https://github.com/marklawlor/tailwindcss-react-native/commit/d8a038313fb11af89f7090523dbd32a886de477e))
 
 ### Features
 
@@ -254,8 +248,8 @@
 
 ### Bug Fixes
 
-- move @babel/types to dependancies ([883b5f3](https://github.com/marklawlor/tailwindcss-react-native/commit/883b5f3558b4c3579219ec2c930de254b0588c76))
-- move @babel/types to dependancies ([065f9a9](https://github.com/marklawlor/tailwindcss-react-native/commit/065f9a9cc17a47d68f3cf4395cd6fc9cca79d82a))
+- move @babel/types to dependencies ([883b5f3](https://github.com/marklawlor/tailwindcss-react-native/commit/883b5f3558b4c3579219ec2c930de254b0588c76))
+- move @babel/types to dependencies ([065f9a9](https://github.com/marklawlor/tailwindcss-react-native/commit/065f9a9cc17a47d68f3cf4395cd6fc9cca79d82a))
 
 ## [1.0.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.1...v1.0.2) (2022-05-06)
 
@@ -289,10 +283,10 @@
 - hmr=false was processes all files ([9fda8ea](https://github.com/marklawlor/tailwindcss-react-native/commit/9fda8eab87f728bb57e23501856b175033dd3766))
 - improvements to platform prefixes ([3496060](https://github.com/marklawlor/tailwindcss-react-native/commit/3496060bc0a2d7952ec2de3fb940a4e1a51cca56))
 - postcss plugin not compiling variables ([4742d58](https://github.com/marklawlor/tailwindcss-react-native/commit/4742d5828ed2ac9e07073c2263f51790a0f3ec79))
-- production dependancies ([683a7e9](https://github.com/marklawlor/tailwindcss-react-native/commit/683a7e96d115c3967e00e04fb5865118aa74d474))
+- production dependencies ([683a7e9](https://github.com/marklawlor/tailwindcss-react-native/commit/683a7e96d115c3967e00e04fb5865118aa74d474))
 - revert back to npm lockfile 1 for node 14 support ([f718884](https://github.com/marklawlor/tailwindcss-react-native/commit/f7188848a57779a051f1dd8bc31fca03eea23943))
 - selector generation when using important ([b39125d](https://github.com/marklawlor/tailwindcss-react-native/commit/b39125d9a84d1190ec6628db01ad750e3b45dc13))
-- updated dependancies ([e128db7](https://github.com/marklawlor/tailwindcss-react-native/commit/e128db763a5a6e9e79772d3940476c44b4f630b9))
+- updated dependencies ([e128db7](https://github.com/marklawlor/tailwindcss-react-native/commit/e128db763a5a6e9e79772d3940476c44b4f630b9))
 
 ### Features
 
@@ -300,7 +294,7 @@
 - basic platform variant matching ([22da605](https://github.com/marklawlor/tailwindcss-react-native/commit/22da605c245b8339b7a8b70424a3d7192a97fe92))
 - change useTailwind to a factory function ([56b4a29](https://github.com/marklawlor/tailwindcss-react-native/commit/56b4a29941d82fb415977fdfbebd852060659982))
 - new babel modes ([4c5741f](https://github.com/marklawlor/tailwindcss-react-native/commit/4c5741fff6321211339e1919a47ca414d0a1eaae))
-- rename allowModules and blockmodules ([cae86cf](https://github.com/marklawlor/tailwindcss-react-native/commit/cae86cf93edfb10133a0b89ee0c1dde907241001))
+- rename allowModules and blockModules ([cae86cf](https://github.com/marklawlor/tailwindcss-react-native/commit/cae86cf93edfb10133a0b89ee0c1dde907241001))
 - rewrite extract native styles logic ([30c5b76](https://github.com/marklawlor/tailwindcss-react-native/commit/30c5b76a4a7f7fcc234375d1b5035dee2a41ee22))
 
 ### BREAKING CHANGES
@@ -317,14 +311,14 @@
 
 ### Bug Fixes
 
-- production dependancies ([675d00f](https://github.com/marklawlor/tailwindcss-react-native/commit/675d00f9174a701aed5a131daaff98df592d2389))
+- production dependencies ([675d00f](https://github.com/marklawlor/tailwindcss-react-native/commit/675d00f9174a701aed5a131daaff98df592d2389))
 
 # [1.0.0-next.8](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.7...v1.0.0-next.8) (2022-05-05)
 
 ### Bug Fixes
 
 - postcss plugin not compiling variables ([fdd14fe](https://github.com/marklawlor/tailwindcss-react-native/commit/fdd14fe4628a504342377ce7cd3e77555e5d41a9))
-- updated dependancies ([06ee26b](https://github.com/marklawlor/tailwindcss-react-native/commit/06ee26b092793e11a40ebe62d90153823b60a3a2))
+- updated dependencies ([06ee26b](https://github.com/marklawlor/tailwindcss-react-native/commit/06ee26b092793e11a40ebe62d90153823b60a3a2))
 
 # [1.0.0-next.7](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.6...v1.0.0-next.7) (2022-05-05)
 
@@ -350,7 +344,7 @@
 
 ### Features
 
-- rename allowModules and blockmodules ([46d52bc](https://github.com/marklawlor/tailwindcss-react-native/commit/46d52bc160b700c65c691d08f7f5ef3af508cf5d))
+- rename allowModules and blockModules ([46d52bc](https://github.com/marklawlor/tailwindcss-react-native/commit/46d52bc160b700c65c691d08f7f5ef3af508cf5d))
 
 # [1.0.0-next.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.0.0-next.3...v1.0.0-next.4) (2022-05-04)
 

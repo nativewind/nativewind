@@ -1,8 +1,8 @@
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 # Z-Index
 
-<Compatability
+<Compatibility
 supported={[ "z-{n}", "z-[n]" ]}
 none={[
 "z-auto",

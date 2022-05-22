@@ -1,9 +1,9 @@
 import { writeFileSync } from "node:fs";
 import { Plugin, PluginCreator } from "postcss";
-import { normaliseSelector } from "../shared/selector";
+import { normalizeSelector } from "../shared/selector";
 import { toReactNative } from "./to-react-native";
 import { StyleRecord, Style, StyleError, AtRuleTuple } from "../types/common";
-import { serialiseStyles } from "../utils/serialise-styles";
+import { serializeStyles } from "../utils/serialize-styles";
 
 const atRuleSymbol = Symbol("media");
 
@@ -57,7 +57,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
           }
 
           for (const s of node.selectors) {
-            const selector = normaliseSelector(s, { important });
+            const selector = normalizeSelector(s, { important });
 
             styles[selector] ??= [];
 
@@ -74,17 +74,17 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
       });
 
       /*
-       * Why not serialise styles here?
-       * Because this is used by the tests and its clearner to write tests
-       * for the non-serialised version (the at rules are next to the declarations)
+       * Why not serialize styles here?
+       * Because this is used by the tests and its cleaner to write tests
+       * for the non-serialized version (the at rules are next to the declarations)
        *
        * If please create an issue if you want a done function
-       * that serialises the styles
+       * that serializes the styles
        */
       if (done) done({ styles, errors });
 
       if (output) {
-        const serialised = serialiseStyles(styles);
+        const serialized = serializeStyles(styles);
 
         writeFileSync(
           output,
@@ -92,11 +92,11 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
 const { StyleSheet } = require("react-native")
 module.exports = {
   ${platform ? `platform: '${platform},` : ""}
-  styles: ${JSON.stringify(serialised.styles).replace(
+  styles: ${JSON.stringify(serialized.styles).replace(
     new RegExp('"hairlineWidth"', "g"),
     "StyleSheet.hairlineWidth"
   )},
-  media: ${JSON.stringify(serialised.media)},
+  media: ${JSON.stringify(serialized.media)},
 }`
         );
       }

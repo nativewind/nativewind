@@ -1,8 +1,8 @@
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 # Text Color
 
-<Compatability
+<Compatibility
 supported={[
 "text-{n}",
 "text-[n]",

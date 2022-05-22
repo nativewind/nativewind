@@ -1,11 +1,11 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 /**
- * Normalise a selector to be object key friendly
+ * normalize a selector to be object key friendly
  *
  * We also remove non-word characters for readability/testing purposes
  */
-export function normaliseSelector(
+export function normalizeSelector(
   selector: string,
   { important }: Partial<TailwindConfig> = {}
 ) {

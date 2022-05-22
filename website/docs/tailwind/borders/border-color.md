@@ -1,8 +1,8 @@
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 # Border Color
 
-<Compatability
+<Compatibility
 supported={[
 "border-{n}",
 "border-[n]",

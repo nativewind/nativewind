@@ -1,6 +1,6 @@
 import { ColorValue } from "react-native";
 import { Test } from ".";
-import { normaliseSelector } from "../../../src/shared/selector";
+import { normalizeSelector } from "../../../src/shared/selector";
 import { AtRuleRecord, Style, StyleRecord } from "../../../src/types/common";
 
 export function expectError(names: string[]): Test[] {
@@ -26,13 +26,13 @@ export function createTests<T extends string | number | ColorValue | undefined>(
     const flooredNumber = Math.floor(scaleParsed);
 
     if (Number.isFinite(flooredNumber) && flooredNumber !== scaleParsed) {
-      const key = normaliseSelector(`${prefix}-${flooredNumber}`);
+      const key = normalizeSelector(`${prefix}-${flooredNumber}`);
       const result = valueFunction(
         suffixes[flooredNumber],
         flooredNumber.toString()
       );
 
-      styles[normaliseSelector(key)] = Array.isArray(result)
+      styles[normalizeSelector(key)] = Array.isArray(result)
         ? result
         : [result];
     }
@@ -40,7 +40,7 @@ export function createTests<T extends string | number | ColorValue | undefined>(
     const key = suffix ? `${prefix}-${suffix}` : prefix;
     const result = valueFunction(value, suffix);
 
-    styles[normaliseSelector(key)] = Array.isArray(result) ? result : [result];
+    styles[normalizeSelector(key)] = Array.isArray(result) ? result : [result];
     return [key, styles];
   });
 }

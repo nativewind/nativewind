@@ -1,6 +1,6 @@
 import { MediaRecord, StyleRecord } from "../types/common";
 
-export function serialiseStyles(styleRecord: StyleRecord) {
+export function serializeStyles(styleRecord: StyleRecord) {
   const media: MediaRecord = {};
 
   const styles = Object.fromEntries(

@@ -1,8 +1,8 @@
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 # Background Color
 
-<Compatability
+<Compatibility
 supported={[
 "bg-{n}",
 "bg-[n]",

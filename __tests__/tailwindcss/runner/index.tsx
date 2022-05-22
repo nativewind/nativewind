@@ -6,7 +6,7 @@ import plugin from "../../../src/tailwind";
 import { nativePlugin } from "../../../src/tailwind/native";
 import { TailwindProvider, TailwindProviderProps } from "../../../src";
 import { PropsWithChildren } from "react";
-import { serialiseStyles } from "../../../src/utils/serialise-styles";
+import { serializeStyles } from "../../../src/utils/serialize-styles";
 
 export type Test = [string, StyleRecord] | [string, StyleRecord, true];
 
@@ -65,5 +65,5 @@ export function TestProvider({
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <TailwindProvider {...serialiseStyles(styles)} {...props} />;
+  return <TailwindProvider {...serializeStyles(styles)} {...props} />;
 }

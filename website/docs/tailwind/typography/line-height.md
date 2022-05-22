@@ -1,8 +1,8 @@
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 # Line Height
 
-<Compatability
+<Compatibility
 supported={[
 "leading-{n}",
 "leading-[n]",

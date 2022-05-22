@@ -8,12 +8,12 @@ import {
 export function someAttributes(path: NodePath<JSXElement>, names: string[]) {
   const openingElement = path.node.openingElement;
 
-  return openingElement.attributes.some((attribue) => {
+  return openingElement.attributes.some((attribute) => {
     // Ignore spreads, we cannot process them
-    if (isJSXSpreadAttribute(attribue)) {
+    if (isJSXSpreadAttribute(attribute)) {
       return false;
     }
 
-    return names.some((name) => isJSXIdentifier(attribue.name, { name }));
+    return names.some((name) => isJSXIdentifier(attribute.name, { name }));
   });
 }

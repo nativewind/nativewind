@@ -2,7 +2,7 @@
 
 :::note
 
-This guide assumes you already have Next.js configued with [React Native Web](https://github.com/vercel/next.js/tree/canary/examples/with-react-native-web) or [Next.js with Expo for Web](https://docs.expo.dev/guides/using-nextjs/)
+This guide assumes you already have Next.js configured with [React Native Web](https://github.com/vercel/next.js/tree/canary/examples/with-react-native-web) or [Next.js with Expo for Web](https://docs.expo.dev/guides/using-nextjs/)
 
 :::
 
@@ -33,7 +33,7 @@ Follow the [setup instructions](https://github.com/martpie/next-transpile-module
 // An example next.config.js
 const withTM = require("next-transpile-modules")([
   "tailwindcss-react-native",
-  "@react-native-community/hooks", // A dependancy used at runtime.
+  "@react-native-community/hooks", // A dependency used at runtime.
 ]);
 
 module.exports = withTM({});

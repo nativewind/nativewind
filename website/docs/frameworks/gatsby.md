@@ -2,6 +2,6 @@
 sidebar_position: 999
 ---
 
-# Gatsy
+# Gatsby
 
 `Coming soon`

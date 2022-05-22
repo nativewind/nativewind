@@ -18,9 +18,9 @@ Choose "Default new app"
 cd my-tailwind-native-app
 ```
 
-## 2. Install the dependancies
+## 2. Install the dependencies
 
-You will need to install `tailwindcss-react-native` and it's peer dependancy `tailwindcss`.
+You will need to install `tailwindcss-react-native` and it's peer dependency `tailwindcss`.
 
 ```bash
 cd my-tailwind-native-app

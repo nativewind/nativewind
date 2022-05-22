@@ -1,7 +1,7 @@
 import { TextStyle } from "react-native";
 import { aspectRatio } from "./aspect-ratio";
 import { flex } from "./flex";
-import { fontFamily } from "./font-familiy";
+import { fontFamily } from "./font-family";
 import { only } from "./only";
 import { position } from "./position";
 

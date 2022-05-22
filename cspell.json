@@ -1,0 +1,36 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    "node_modules/*",
+    "website/node_modules/*",
+    "dist/*",
+    "types.d.ts",
+    "coverage/*",
+    "**.js",
+    "**.snap",
+    "**LICENSE",
+    "**/package.json",
+    "**/renovate.json",
+    "website/build/*",
+    "website/static/*",
+    "website/src/css/*"
+  ],
+  "dictionaries": ["tailwind-words"],
+  "dictionaryDefinitions": [
+    {
+      "name": "tailwind-words",
+      "path": "./.cspell/tailwind-words.txt"
+    }
+  ],
+  "words": [
+    "pressable",
+    "marklawlor",
+    "commitlint",
+    "lawlor",
+    "moti",
+    "solito",
+    "atrule",
+    "nextjs"
+  ]
+}

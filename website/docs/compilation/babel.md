@@ -4,7 +4,7 @@ import StartCoding from "../\_start-coding.md"
 
 The default babel configuration will both compile/inject the Tailwind CSS styles and transform any component with the `className` attributed into a `styled` version.
 
-This is the recommended configuration as it provides the fastest setup and best DX experience, with suport for Tailwind intellisense within your IDE.
+This is the recommended configuration as it provides the fastest setup and best DX experience, with support for Tailwind intellisense within your IDE.
 
 ```tsx
 /* Example how your code will look */
@@ -52,13 +52,13 @@ import "tailwindcss-react-native/types.d";
 
 ## Configuring what is transformed
 
-When targetting `Web` you may be using components that youdo not want transformed.
+When targeting `Web` you may be using components that should not be transformed.
 
 By default native components (e.g. `div`) are not transformed.
 
 However if you are using a `web` only library such as `react-select`, you can disabled the transform on components imported from this library.
 
-Either by explictly listing which modules can be transformed.
+Either by explicitly stating which modules can be transformed.
 
 ```diff
 // babel.config.js

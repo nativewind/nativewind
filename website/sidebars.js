@@ -100,7 +100,7 @@ const sidebars = {
       </tr>
       <tr>
         <td>⚠️ </td>
-        <td style="padding: 0px 12px; font-size: 0.8em;">Differnt functionality</td>
+        <td style="padding: 0px 12px; font-size: 0.8em;">Different functionality</td>
       </tr>
     </tbody>
   </table>

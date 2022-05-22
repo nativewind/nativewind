@@ -1,8 +1,8 @@
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 # Display
 
-<Compatability
+<Compatibility
 supported={[ "flex", "none" ]}
 none={[
 "block",

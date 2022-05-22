@@ -3,7 +3,7 @@ title: Divide Width
 sidebar_label: Divide Width ⭐
 ---
 
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 React Native does not have support child selectors, however `styled` components are context aware and can pass down information.
 
@@ -29,7 +29,7 @@ This class only works if both the parent and it's children are transformed or wr
 
 :::
 
-<Compatability
+<Compatibility
 supported={[
 "divide-x-{n}",
 "divide-x-[n]",

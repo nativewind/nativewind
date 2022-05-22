@@ -3,11 +3,11 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-## 1. Install the dependancies
+## 1. Install the dependencies
 
 You will need to install both `tailwindcss-react-native` and `tailwindcss`
 
-`tailwindcss` is not used during runtime so it can be added as a development dependancy.
+`tailwindcss` is not used during runtime so it can be added as a development dependency.
 
 <Tabs>
   <TabItem value="npm" label="NPM" default>

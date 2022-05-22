@@ -16,10 +16,10 @@ import {
 } from "@babel/types";
 
 import { StyleRecord } from "../../types/common";
-import { serialiseStyles } from "../../utils/serialise-styles";
+import { serializeStyles } from "../../utils/serialize-styles";
 
 export function appendVariables(body: Statement[], styleRecord: StyleRecord) {
-  const { styles, media } = serialiseStyles(styleRecord);
+  const { styles, media } = serializeStyles(styleRecord);
 
   body.push(
     expressionStatement(

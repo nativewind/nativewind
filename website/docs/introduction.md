@@ -36,8 +36,8 @@ export function MyFancyButton(props) {
 - Babel plugin for **simple setup** and better **intellisense support**
 - Respects all tailwind.config.js settings, including **themes, custom values, plugins**
 - **dark mode / arbitrary classes / media queries**
-- pseudo classes - **hover / focus / active** on compatble components [(docs)](./tailwind/core-concepts/pseudo-classes)
-- styling based on **parent state** - automacialy style children based upon parent psuedo classes [(docs)](./tailwind/core-concepts/component)
+- pseudo classes - **hover / focus / active** on compatible components [(docs)](./tailwind/core-concepts/pseudo-classes)
+- styling based on **parent state** - automatically style children based upon parent pseudo classes [(docs)](./tailwind/core-concepts/component)
 - **children styles** - create simple layouts based upon parent class
 
 ## Guides

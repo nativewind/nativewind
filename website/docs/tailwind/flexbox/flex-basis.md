@@ -1,8 +1,8 @@
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 # Flex Basis
 
-<Compatability
+<Compatibility
 supported={[ "basis-{n}", "basis-[n]" ]}
 none={[
 "basis-auto",

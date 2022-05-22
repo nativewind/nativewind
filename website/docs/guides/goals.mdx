@@ -16,11 +16,11 @@ Tailwind is not a complete styling solution and is not applicable everywhere you
 
 We want to support and promote universal applications, and as such all platform are equal. The library should always produce styles in the media that works best on that platform (eg StyleSheet.create on native, CSS StyleSheet on web).
 
-Components and styles should be copy/pastable between platforms and work with the same intentions.
+Components and styles should be portable between platforms and work with the same intentions.
 
 ### Align with Tailwind CSS
 
-Design choices and implementation details of Tailwind CSS are inheritied by this library. Something this goes against the React Native 'way' but allows us to better align with external tools and provide a universal experience.
+Design choices and implementation details of Tailwind CSS are inherited by this library. Something this goes against the React Native 'way' but allows us to better align with external tools and provide a universal experience.
 
 Some examples:
 
@@ -35,24 +35,24 @@ If a feature does require additional processing, it should be completely opt in.
 
 ## Non-Goals
 
-### Complete compatiblity with all libraries
+### Complete compatibility with all libraries
 
 A common question is: How does this work is animation libraries? (eg Reanimated 2, Moti, etc)
 
-Answer: This is a non-goal of the project and any compatiblity is a coincidence.
+Answer: This is a non-goal of the project and any compatibility is a coincidence.
 
 Tailwind CSS has minimal support for animations and zero support for libraries that do not accept CSS classes.
 
-If you were building a traditional web application with Tailwind CSS + Framer Motion, the two are seperate systems that do not overlap.
+If you were building a traditional web application with Tailwind CSS + Framer Motion, the two are separate systems that do not overlap.
 
 When using `tailwindcss-react-native` it's a good idea of adopt that philosophy and be adaptable to the tools available to you (either this library, StyleSheet.create, inline styles, etc)
 
 ### Polyfill the web
 
-This library provides some low level shims for web functionality, but it does not plan on 100% compatiblity.
+This library provides some low level shims for web functionality, but it does not plan on 100% compatibility.
 
 These shims are picked based upon: ease of implementation, maintenance burden, benefit to the community, small runtime.
 
-Features such as propery `gap` or `grid` support are best implemented upstream within React Native.
+Features such as property `gap` or `grid` support are best implemented upstream within React Native.
 
 If there is a shim you would like implemented please open an issue and we will consider it.

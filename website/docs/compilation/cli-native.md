@@ -2,7 +2,7 @@ import StartCoding from "../\_start-coding-components.md"
 
 # Tailwind CLI
 
-The Tailwind CLI can be used to output precompiled RN StyleSheet objects.
+The Tailwind CLI can be used to output pre-compiled RN StyleSheet objects.
 
 ## Setup
 

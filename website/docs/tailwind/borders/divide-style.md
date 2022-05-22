@@ -1,8 +1,8 @@
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 # Border Style
 
-<Compatability
+<Compatibility
 supported={[
 "divide-solid",
 "divide-dashed",

@@ -1,8 +1,8 @@
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 # Text Decoration style
 
-<Compatability
+<Compatibility
 supported={[
 "decoration-solid",
 "decoration-double",

@@ -40,13 +40,13 @@ export function MyFancyButton(props) {
 - Babel plugin for **simple setup** and better **intellisense support**
 - Respects all tailwind.config.js settings, including **themes, custom values, plugins**
 - **dark mode / arbitrary classes / media queries**
-- pseudo classes - **hover / focus / active** on compatble components [(docs)](https://tailwindcss-react-native.vercel.app/tailwind/core-concepts/pseudo-classes)
-- styling based on **parent state** - automacialy style children based upon parent psuedo classes [(docs)](https://tailwindcss-react-native.vercel.app/tailwind/core-concepts/component)
+- pseudo classes - **hover / focus / active** on compatible components [(docs)](https://tailwindcss-react-native.vercel.app/tailwind/core-concepts/pseudo-classes)
+- styling based on **parent state** - automatically style children based upon parent pseudo classes [(docs)](https://tailwindcss-react-native.vercel.app/tailwind/core-concepts/component)
 - **children styles** - create simple layouts based upon parent class
 
 ## Documentation
 
-All documenation is on our website https://tailwindcss-react-native.vercel.app
+All documentation is on our website https://tailwindcss-react-native.vercel.app
 
 - [Introduction](https://tailwindcss-react-native.vercel.app/)
 - [Quick Start](https://tailwindcss-react-native.vercel.app/quick-start)
@@ -112,9 +112,9 @@ Then change your `cwd` to the folder containing the project
 cd my-tailwind-native-app
 ```
 
-## 2. Install the dependancies
+## 2. Install the dependencies
 
-You will need to install `tailwindcss-react-native` and it's peer dependancy `tailwindcss`.
+You will need to install `tailwindcss-react-native` and it's peer dependency `tailwindcss`.
 
 ```bash
 npm install tailwindcss-react-native

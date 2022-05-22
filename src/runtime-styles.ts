@@ -3,7 +3,7 @@ import { ComponentContext } from "./context/component";
 import { DeviceMediaContext } from "./context/device-media";
 import { StyleSheetContext } from "./context/style-sheet";
 import { matchAtRule } from "./match-at-rule";
-import { normaliseSelector } from "./shared/selector";
+import { normalizeSelector } from "./shared/selector";
 import { AtRuleRecord } from "./types/common";
 
 export interface GetStylesOptions {
@@ -37,7 +37,7 @@ export function getRuntimeStyles<T>({
   for (const name of className.split(/\s+/)) {
     if (!name) continue; // Happens if there are leading or trailing whitespace
 
-    const selector = normaliseSelector(name);
+    const selector = normalizeSelector(name);
 
     /**
      * If we have static styles, add them

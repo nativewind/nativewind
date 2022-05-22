@@ -1,8 +1,8 @@
-import Compatability from "../\_compatability.mdx"
+import Compatibility from "../\_compatibility.mdx"
 
 # Overflow
 
-<Compatability
+<Compatibility
 supported={[ "visible", "hidden", "scroll" ]}
 none={[
 "overflow-auto",

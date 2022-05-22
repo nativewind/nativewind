@@ -1,17 +1,18 @@
 module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint"],
+  plugins: ["@typescript-eslint", "@cspell"],
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:unicorn/recommended",
     "prettier",
+    "plugin:@cspell/recommended",
   ],
   env: {
     node: true,
   },
-  ignorePatterns: ["dist/*", "types.d.ts", "coverage/*"],
+  ignorePatterns: ["dist/*", "types.d.ts", "coverage/*", "website/build/*"],
   rules: {
     "@typescript-eslint/no-unused-vars": [
       "error",
@@ -48,7 +49,24 @@ module.exports = {
       },
     },
     {
-      files: ["*rc.js", "*.config.js", "plugin.js", "babel.js", "postcss.js"],
+      files: [
+        "*rc.js",
+        "*.config.js",
+        "plugin.js",
+        "babel.js",
+        "postcss.js",
+        "plugin.js",
+        "commitlint.config.js",
+        "tailwind/css.js",
+        "tailwind/native.js",
+      ],
+      rules: {
+        "unicorn/prefer-module": "off",
+        "@typescript-eslint/no-var-requires": "off",
+      },
+    },
+    {
+      files: ["website/*.js"],
       rules: {
         "unicorn/prefer-module": "off",
         "@typescript-eslint/no-var-requires": "off",
