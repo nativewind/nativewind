@@ -70,7 +70,7 @@ export const visitor: Visitor<VisitorState> = {
       return;
     }
 
-    if (someAttributes(path, ["className", "tw"])) {
+    if (someAttributes(path, ["className", "tw", "fill", "stroke"])) {
       if (canTransform) toStyledComponent(path);
       state.hasClassNames = true;
     }
