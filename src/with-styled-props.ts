@@ -58,8 +58,8 @@ export function withStyledProps<S, T extends string>({
         mainStyles.push({ $$css: true, strokeProp } as any);
       } else {
         const { stroke, strokeWidth } = tw(strokeProp) as any;
-        styledProps["stroke" as T] = stroke;
-        styledProps["strokeWidth" as T] = strokeWidth;
+        if (stroke) styledProps["stroke" as T] = stroke;
+        if (strokeWidth) styledProps["strokeWidth" as T] = strokeWidth;
       }
     }
   }
