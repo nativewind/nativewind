@@ -1,3 +1,12 @@
+# [1.5.0-next.9](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.8...v1.5.0-next.9) (2022-05-23)
+
+
+### Bug Fixes
+
+* ensure stroke is set to a valid value ([8970f65](https://github.com/marklawlor/tailwindcss-react-native/commit/8970f655a38ef1b3a63b1a3712657af234d98dc0))
+* prevent passing undefined svg props ([244be39](https://github.com/marklawlor/tailwindcss-react-native/commit/244be3997ce55b7c089dc858ac8f1d9456a53e92))
+* remove empty line in generated styles ([20e6973](https://github.com/marklawlor/tailwindcss-react-native/commit/20e697321a4269efe095ca39a8da610717725ae5))
+
 # [1.5.0-next.8](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.7...v1.5.0-next.8) (2022-05-23)
 
 
