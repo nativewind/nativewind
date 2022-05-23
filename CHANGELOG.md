@@ -1,3 +1,12 @@
+# [1.5.0-next.8](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.7...v1.5.0-next.8) (2022-05-23)
+
+
+### Bug Fixes
+
+* stop babel appending platform to TailwindProvider ([fc8fdc8](https://github.com/marklawlor/tailwindcss-react-native/commit/fc8fdc8b9243439a3a75fc8966739b615c8dc5aa))
+* transform components using fill and stroke ([f4161ef](https://github.com/marklawlor/tailwindcss-react-native/commit/f4161ef3b2a20c984feab76e1dd300dbbaaa5678))
+* useInteraction not adding handlers ([f3c4127](https://github.com/marklawlor/tailwindcss-react-native/commit/f3c412789208430046834b4f6f294bb3bb49e8af))
+
 # [1.5.0-next.7](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.6...v1.5.0-next.7) (2022-05-20)
 
 ### Bug Fixes
