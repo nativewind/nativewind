@@ -8,7 +8,14 @@ declare module "react-native" {
   }
 }
 
+export interface Interaction extends PressableProps {
+  active: boolean;
+  hover: boolean;
+  focus: boolean;
+}
+
 export function useInteraction({
+  isComponent,
   disabled = false,
   focusable = true,
   onFocus,
@@ -19,7 +26,7 @@ export function useInteraction({
   onPressOut,
   onPress,
   className = "",
-}: PressableProps & { className?: string } = {}) {
+}: PressableProps & { className?: string; isComponent?: boolean } = {}) {
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
   const [active, setActive] = useState(false);
@@ -129,29 +136,38 @@ export function useInteraction({
     [disabled, onPress, setActive]
   );
 
-  return {
+  const interaction: Interaction = {
     active,
     hover,
     focus,
-    onBlur: shouldAddHandler(className, "focus", handleBlur),
-    onFocus: shouldAddHandler(className, "focus", handleFocus),
-    onHoverIn: shouldAddHandler(className, "hover", handleHoverIn),
-    onHoverOut: shouldAddHandler(className, "hover", handleHoverOut),
-    onPress: shouldAddHandler(className, "active", handlePress),
-    onPressIn: shouldAddHandler(className, "active", handlePressIn),
-    onPressOut: shouldAddHandler(className, "active", handlePressOut),
   };
-}
 
-function shouldAddHandler<T>(
-  className: string,
-  pseudoClass: string,
-  fn: T
-): T | undefined {
-  if (
-    className.includes("component") ||
-    className.includes(`${pseudoClass}_`)
-  ) {
-    return fn;
+  if (isComponent) {
+    Object.assign(interaction, {
+      onBlur: handleBlur,
+      onFocus: handleFocus,
+      onHoverIn: handleHoverIn,
+      onHoverOut: handleHoverOut,
+      onPress: handlePress,
+      onPressIn: handlePressIn,
+      onPressOut: handlePressOut,
+    });
+  } else {
+    if (className.includes("focus:")) {
+      interaction.onBlur = handleBlur;
+      interaction.onFocus = handleFocus;
+    }
+
+    if (className.includes("hover:")) {
+      interaction.onHoverIn = handleHoverIn;
+      interaction.onHoverOut = handleHoverOut;
+    }
+    if (className.includes("active:")) {
+      interaction.onPress = handlePress;
+      interaction.onPressIn = handlePressIn;
+      interaction.onPressOut = handlePressOut;
+    }
   }
+
+  return interaction;
 }

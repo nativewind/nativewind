@@ -39,12 +39,14 @@ export function styled<T>(
     children: componentChildren,
     ...componentProps
   }: StyledProps<T>) {
+    const classes = twClassName ?? className ?? "";
+    const isComponent = classes.split(/\s+/).includes("component");
+
     const { hover, focus, active, ...handlers } = useInteraction({
       className,
+      isComponent,
       ...componentProps,
     });
-
-    const classes = twClassName ?? className ?? "";
 
     const { childStyles, ...styledProps } = withStyledProps({
       tw: useTailwind({
@@ -72,7 +74,7 @@ export function styled<T>(
       children,
     } as unknown as T);
 
-    return !classes.split(/\s+/).includes("component")
+    return !isComponent
       ? element
       : createElement<ComponentProps<typeof ComponentContext.Provider>>(
           ComponentContext.Provider,
