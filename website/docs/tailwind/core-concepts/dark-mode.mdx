@@ -1,3 +1,22 @@
 # Dark Mode
 
 ## Basic usage
+
+:::tip
+
+This documention builds upon the features listed in the [Tailwind CSS documentation](https://tailwindcss.com/docs/dark-mode)
+
+:::
+
+The `dark:` variant is controlled by the [`useColorScheme()`](../../api/use-color-scheme) hook.
+
+```
+impo
+
+function MyComponent() {
+  const { colorScheme, setColorScheme } = useColorScheme()
+
+  return <Text style={{ color: colorScheme === "dark" ? "#FFF" : "#000" }} />
+}
+
+```
