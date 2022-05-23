@@ -30,13 +30,9 @@ export interface VisitorState
 }
 
 /**
- * Visitor that preforms common operations
- *
- * @privateRemarks
- *
- * This should only focus on common functionality, eg:
- *  - Detecting imports
- *  - Detecting if a JSXElement should be processed
+ * Visitor that detects what
+ * - components should be transformed
+ * - what imports exist
  */
 export const visitor: Visitor<VisitorState> = {
   ImportDeclaration(path, state) {
