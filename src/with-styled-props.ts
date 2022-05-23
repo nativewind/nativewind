@@ -58,7 +58,14 @@ export function withStyledProps<S, T extends string>({
         mainStyles.push({ $$css: true, strokeProp } as any);
       } else {
         const { stroke, strokeWidth } = tw(strokeProp) as any;
-        if (stroke) styledProps["stroke" as T] = stroke;
+        /**
+         * We always need to override the 'stroke' prop, even if its undefined
+         * If we only do it on defined values, strokeWidth will then pass
+         * { stroke: stroke-1, strokeWidth: 1 }.
+         *
+         * Hence it needs to be set to undefined
+         */
+        styledProps["stroke" as T] = stroke;
         if (strokeWidth) styledProps["strokeWidth" as T] = strokeWidth;
       }
     }

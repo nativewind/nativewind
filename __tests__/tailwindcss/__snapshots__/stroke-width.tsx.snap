@@ -23,13 +23,7 @@ exports[`Svg - Stroke Width stroke-0 1`] = `
     <RNSVGCircle
       cx={0}
       cy={0}
-      propList={
-        Array [
-          "strokeWidth",
-        ]
-      }
       r={0}
-      strokeWidth={0}
     />
   </RNSVGGroup>
 </RNSVGSvgView>
