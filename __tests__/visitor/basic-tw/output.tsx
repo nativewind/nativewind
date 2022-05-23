@@ -4,7 +4,7 @@ import { Text, View } from "react-native";
 import { TailwindProvider } from "tailwindcss-react-native";
 export function Test() {
   return (
-    <TailwindProvider platform="native">
+    <TailwindProvider>
       <StyledComponent tw="container" component={View}>
         <StyledComponent tw="font-bold" component={Text}>
           Hello world!

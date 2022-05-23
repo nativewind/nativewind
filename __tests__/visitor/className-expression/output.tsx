@@ -7,7 +7,7 @@ export function Test({ isBold, isUnderline }) {
   if (isBold) classNames.push("font-bold");
   if (isUnderline) classNames.push("underline");
   return (
-    <TailwindProvider platform="native">
+    <TailwindProvider>
       <StyledComponent className={classNames.join(" ")} component={Text}>
         Hello world!
       </StyledComponent>

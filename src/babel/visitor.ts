@@ -7,7 +7,6 @@ import { getImportBlockedComponents } from "./utils/get-import-blocked-component
 import { someAttributes } from "./utils/has-attribute";
 
 import { toStyledComponent } from "./transforms/to-component";
-import { appendPlatformAttribute } from "./transforms/append-platform-attribute";
 
 import {
   AllowPathOptions,
@@ -53,14 +52,10 @@ export const visitor: Visitor<VisitorState> = {
     );
   },
   JSXElement(path, state) {
-    const { platform, blockList, canTransform } = state;
+    const { blockList, canTransform } = state;
     const name = getJSXElementName(path.node.openingElement);
 
     state.hasProvider ||= name === "TailwindProvider";
-
-    if (name === "TailwindProvider" && canTransform) {
-      appendPlatformAttribute(path, platform);
-    }
 
     if (blockList.has(name) || name[0] !== name[0].toUpperCase()) {
       return;

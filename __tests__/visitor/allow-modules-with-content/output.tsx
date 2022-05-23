@@ -6,7 +6,7 @@ import { MotiText } from "moti";
 import { TestComponent } from "./test";
 export function Test() {
   return (
-    <TailwindProvider platform="native">
+    <TailwindProvider>
       <StyledComponent className="font-bold" component={Text}>
         Hello world!
       </StyledComponent>

@@ -5,7 +5,7 @@ import { TailwindProvider } from "tailwindcss-react-native";
 import { MotiText } from "moti";
 export function Test() {
   return (
-    <TailwindProvider platform="native">
+    <TailwindProvider>
       <StyledComponent className="container" component={View}>
         <StyledComponent className="font-bold" component={Text}>
           Hello world!
