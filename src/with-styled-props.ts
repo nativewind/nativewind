@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { StyleProp } from "react-native";
-import { usePlatform } from "./context/platform";
+// import { usePlatform } from "./context/platform";
 import { AtRuleRecord } from "./types/common";
 import { UseTailwindCallback } from "./use-tailwind";
 
@@ -9,13 +9,13 @@ export const ChildClassNameSymbol = Symbol("tailwind-child");
 export interface WithStyledPropsOptions<S, T extends string> {
   classes: string | undefined;
   styleProp: StyleProp<S>;
-  propsToTransform?: false | T[];
+  propsToTransform?: T[];
   componentProps: Record<string, unknown>;
   tw: UseTailwindCallback<S>;
-  svg?: boolean;
+  valueProps?: T[];
 }
 
-export type WithStyledProps<S, T extends string> = Record<T, StyleProp<S>> & {
+export type WithStyledProps<S, T extends string> = Record<T, unknown> & {
   childStyles?: AtRuleRecord[];
   style: StyleProp<S>;
 };
@@ -26,47 +26,25 @@ export function withStyledProps<S, T extends string>({
   propsToTransform,
   styleProp,
   componentProps,
-  svg = true,
+  valueProps,
 }: WithStyledPropsOptions<S, T>): WithStyledProps<S, T> {
-  const { preview } = usePlatform();
+  // const { preview } = usePlatform();
   const mainStyles = tw(classes, { flatten: false });
 
-  const styledProps: Partial<Record<T, StyleProp<S>>> = {};
+  const styledProps: Partial<Record<T, unknown>> = {};
 
-  /**
-   * There are 3 special SVG props: fill, stroke & strokeWidth
-   *
-   * Unlike other props, their value is extracted from the style object and passed to the prop
-   *
-   * Native: <SVG fill="fill-white" />  --->  <SVG fill="#fff" />
-   * CSS: <SVG fill="fill-white" />  --->  <SVG className="fill-white" />
-   */
-  if (svg) {
-    const fillProp = componentProps["fill"];
-    if (typeof fillProp === "string" && fillProp.includes("fill-")) {
-      if (preview) {
-        mainStyles.push({ $$css: true, fillProp } as any);
-      } else {
-        const { fill } = tw(fillProp) as any;
-        styledProps["fill" as T] = fill;
-      }
-    }
+  if (valueProps) {
+    for (const prop of valueProps) {
+      const value = componentProps[prop];
 
-    const strokeProp = componentProps["stroke"];
-    if (typeof strokeProp === "string" && strokeProp.includes("stroke-")) {
-      if (preview) {
-        mainStyles.push({ $$css: true, strokeProp } as any);
-      } else {
-        const { stroke, strokeWidth } = tw(strokeProp) as any;
-        /**
-         * We always need to override the 'stroke' prop, even if its undefined
-         * If we only do it on defined values, strokeWidth will then pass
-         * { stroke: stroke-1, strokeWidth: 1 }.
-         *
-         * Hence it needs to be set to undefined
-         */
-        styledProps["stroke" as T] = stroke;
-        if (strokeWidth) styledProps["strokeWidth" as T] = strokeWidth;
+      if (typeof value === "string") {
+        const entries = Object.entries(tw(value, { flatten: true }));
+        if (entries.length > 0) {
+          styledProps[prop] = undefined;
+          for (const [key, value] of entries) {
+            styledProps[key as T] = value;
+          }
+        }
       }
     }
   }
@@ -90,6 +68,7 @@ export function withStyledProps<S, T extends string>({
   return {
     childStyles: mainStyles[ChildClassNameSymbol],
     style,
+    ...componentProps,
     ...styledProps,
   };
 }

@@ -1,7 +1,9 @@
 import plugin from "tailwindcss/plugin";
+import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
 import { platforms, nativePlatforms } from "../shared/platforms";
+import toColorValue from "tailwindcss/lib/util/toColorValue";
 
-export default plugin(function ({ addVariant }) {
+export default plugin(function ({ addVariant, matchUtilities, theme }) {
   for (const platform of platforms) {
     addVariant(platform, `@media ${platform}`);
   }
@@ -12,4 +14,13 @@ export default plugin(function ({ addVariant }) {
   );
 
   addVariant("parent", "& > *");
+
+  matchUtilities(
+    {
+      color: (value: string) => {
+        return { color: toColorValue(value) };
+      },
+    },
+    { values: flattenColorPalette(theme("textColor")), type: "color" }
+  );
 });

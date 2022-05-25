@@ -1,7 +1,7 @@
 import { Svg, Circle } from "react-native-svg";
 import { render } from "@testing-library/react-native";
 import { TestProvider } from "./runner";
-import { StyledComponent } from "../../src";
+import { styled } from "../../src";
 
 const cases: Array<[string, string]> = [
   ["transparent", "transparent"],
@@ -31,12 +31,14 @@ const cases: Array<[string, string]> = [
   ["rose-50", "#fff1f2"],
 ];
 
+const StyledCircle = styled(Circle, { valueProps: ["fill", "stroke"] });
+
 describe("Svg - Stroke", () => {
   test.each(cases)("stroke-%s", (unit) => {
     const tree = render(
       <TestProvider css={`stroke-${unit}`}>
         <Svg>
-          <StyledComponent component={Circle} stroke={`stroke-${unit}`} />
+          <StyledCircle stroke={`stroke-${unit}`} />
         </Svg>
       </TestProvider>
     ).toJSON();
@@ -48,7 +50,7 @@ describe("Svg - Stroke", () => {
     const tree = render(
       <TestProvider css="stroke-white stroke-1">
         <Svg>
-          <StyledComponent component={Circle} stroke="stroke-white stroke-1" />
+          <StyledCircle stroke="stroke-white stroke-1" />
         </Svg>
       </TestProvider>
     ).toJSON();

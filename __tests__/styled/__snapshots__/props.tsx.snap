@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Styled - Custom Props can style custom props 1`] = `
+exports[`Styled - Props can style custom props 1`] = `
 Array [
   <View
     style={
@@ -27,4 +27,20 @@ Array [
     }
   />,
 ]
+`;
+
+exports[`Styled - Values Props can style custom props 1`] = `
+<ActivityIndicator
+  color="#ef4444"
+  style={
+    Array [
+      Object {
+        "marginBottom": 4,
+        "marginLeft": 4,
+        "marginRight": 4,
+        "marginTop": 4,
+      },
+    ]
+  }
+/>
 `;

@@ -18,6 +18,7 @@ import { skew } from "./skew";
 import { space } from "./space";
 import { translate } from "./translate";
 import { parent } from "./parent";
+import { color } from "./color";
 
 export interface NativePluginOptions {
   rem?: number;
@@ -38,6 +39,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
     }
 
     return (helpers) => {
+      color(helpers, notSupported);
       space(helpers, notSupported);
       divide(helpers, notSupported);
       gap(helpers, notSupported);
