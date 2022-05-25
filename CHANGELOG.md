@@ -1,3 +1,10 @@
+# [1.5.0-next.11](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.10...v1.5.0-next.11) (2022-05-25)
+
+
+### Features
+
+* add preview support for flattened styles ([b5b8273](https://github.com/marklawlor/tailwindcss-react-native/commit/b5b8273f7d3f5c4b1a8b6906b2ac24e5227262d7))
+
 # [1.5.0-next.10](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.9...v1.5.0-next.10) (2022-05-25)
 
 
