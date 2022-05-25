@@ -1,4 +1,5 @@
 import { ImageStyle, TextStyle, ViewStyle } from "react-native";
+import { classNameToInline } from "./classname-to-inline";
 import { usePlatform } from "./context/platform";
 import {
   RWNCssStyle,
@@ -14,17 +15,11 @@ export function useTailwind<
   const { platform, preview } = usePlatform();
 
   if (platform === "web" && preview) {
-    if (!options?.flatten) {
-      return (className = "") => {
-        return {
-          $$css: true,
-          tailwindClassName: className,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any;
-      };
-    } else {
-      // TODO
-    }
+    return ((className = "") => {
+      return options?.flatten
+        ? classNameToInline(className)
+        : { $$css: true, tailwindClassName: className };
+    }) as UseTailwindCallback<P>;
   }
 
   return useNativeTailwind<P>(options);
