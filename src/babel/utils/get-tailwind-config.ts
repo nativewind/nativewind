@@ -16,20 +16,18 @@ export function getTailwindConfig(
 ): TailwindConfig {
   const { tailwindConfigPath } = options;
 
-  let userConfig;
   const fullConfigPath = resolve(
     cwd,
     tailwindConfigPath || "./tailwind.config.js"
   );
 
-  // Throw an error if configPath was set but we were unable to find it
+  let userConfig: Partial<TailwindConfig> = {};
   if (existsSync(fullConfigPath)) {
     // eslint-disable-next-line unicorn/prefer-module
     userConfig = require(fullConfigPath);
   } else if (tailwindConfigPath) {
+    // Throw an error if configPath was set but we were unable to find it
     throw new Error(`Unable to find config ${fullConfigPath}`);
-  } else {
-    userConfig = {};
   }
 
   const mergedConfig = {
@@ -37,5 +35,5 @@ export function getTailwindConfig(
     plugins: [nativePlugin(options), ...(userConfig.plugins ?? [])],
   };
 
-  return resolveTailwindConfig(mergedConfig);
+  return resolveTailwindConfig(mergedConfig as TailwindConfig);
 }
