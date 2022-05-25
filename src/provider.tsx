@@ -1,4 +1,5 @@
-import React, { PropsWithChildren, useState } from "react";
+import * as React from "react";
+import { PropsWithChildren, useState } from "react";
 import {
   useWindowDimensions,
   ColorSchemeName,
