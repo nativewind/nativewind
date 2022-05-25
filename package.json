@@ -61,7 +61,7 @@
   "devDependencies": {
     "@babel/core": "7.18.2",
     "@babel/plugin-syntax-jsx": "7.17.12",
-    "@commitlint/cli": "17.0.0",
+    "@commitlint/cli": "17.0.1",
     "@commitlint/config-conventional": "17.0.0",
     "@cspell/eslint-plugin": "^6.0.0",
     "@semantic-release/changelog": "6.0.1",
