@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.0...v1.4.1) (2022-05-25)
+
+
+### Bug Fixes
+
+* add import React to component files ([1cbee33](https://github.com/marklawlor/tailwindcss-react-native/commit/1cbee331a7adb157856c2f00457fb7b7c0f0eb07))
+
 # [1.4.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.3...v1.4.0) (2022-05-18)
 
 
