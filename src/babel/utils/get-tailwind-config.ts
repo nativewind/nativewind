@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { resolve } from "node:path";
 import { existsSync } from "node:fs";
 
 import resolveTailwindConfig from "tailwindcss/resolveConfig";
@@ -17,7 +17,7 @@ export function getTailwindConfig(
   const { tailwindConfigPath } = options;
 
   let userConfig;
-  const fullConfigPath = join(
+  const fullConfigPath = resolve(
     cwd,
     tailwindConfigPath || "./tailwind.config.js"
   );
