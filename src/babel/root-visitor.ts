@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { Program } from "@babel/types";
 import { NodePath } from "@babel/traverse";
 
@@ -16,7 +17,12 @@ export default function rootVisitor(
 ) {
   const errors: StyleError[] = [];
 
-  const tailwindConfig = getTailwindConfig(cwd, {
+  const tailwindConfigPath = resolve(
+    cwd,
+    options.tailwindConfigPath || "./tailwind.config.js"
+  );
+
+  const tailwindConfig = getTailwindConfig(tailwindConfigPath, {
     ...options,
     onError(error) {
       errors.push(error);
@@ -57,8 +63,8 @@ export default function rootVisitor(
           }
 
           const visitorState: VisitorState = {
+            cwd,
             rem: 16,
-            tailwindConfigPath: "tailwind.config.js",
             platform: "native",
             hmr: true,
             mode: "compileAndTransform",
@@ -75,6 +81,7 @@ export default function rootVisitor(
             hasProvider: false,
             hasStyleSheetImport: false,
             tailwindConfig,
+            tailwindConfigPath,
           };
 
           // Traverse the file

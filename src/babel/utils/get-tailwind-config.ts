@@ -1,4 +1,3 @@
-import { resolve } from "node:path";
 import { existsSync } from "node:fs";
 
 import resolveTailwindConfig from "tailwindcss/resolveConfig";
@@ -11,15 +10,10 @@ export interface GetTailwindConfigOptions extends NativePluginOptions {
 }
 
 export function getTailwindConfig(
-  cwd: string,
+  fullConfigPath: string,
   options: GetTailwindConfigOptions
 ): TailwindConfig {
   const { tailwindConfigPath } = options;
-
-  const fullConfigPath = resolve(
-    cwd,
-    tailwindConfigPath || "./tailwind.config.js"
-  );
 
   let userConfig: Partial<TailwindConfig> = {};
   if (existsSync(fullConfigPath)) {
