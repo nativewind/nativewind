@@ -1,3 +1,10 @@
+# [1.5.0-next.10](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.9...v1.5.0-next.10) (2022-05-25)
+
+
+### Bug Fixes
+
+* rename valueProps to spreadProps. Add cssProps ([3ae8d94](https://github.com/marklawlor/tailwindcss-react-native/commit/3ae8d940612be59d0c2016497c75fdbebabc43e1))
+
 # [1.5.0-next.9](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.8...v1.5.0-next.9) (2022-05-23)
 
 
