@@ -24,8 +24,8 @@ You will need to install `tailwindcss-react-native` and it's peer dependancy `ta
 
 ```bash
 cd my-tailwind-native-app
-npm install tailwindcss-react-native
-npm install --save-dev tailwindcss
+yarn add tailwindcss-react-native
+yarn add --dev tailwindcss
 ```
 
 ## 3. Setup Tailwind CSS
@@ -64,7 +64,6 @@ Modify your `App.js` to add the `TailwindProvider`
 
 ```diff
 // App.js
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 + import { TailwindProvider } from 'tailwindcss-react-native';
@@ -74,7 +73,6 @@ export default function App() {
 +   <TailwindProvider>
       <View style={styles.container}>
         <Text>Open up App.js to start working on your app!</Text>
-        <StatusBar style="auto" />
       </View>
 +   </TailwindProvider>
   );
