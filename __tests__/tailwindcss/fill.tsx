@@ -31,7 +31,7 @@ const cases: Array<[string, string]> = [
   ["rose-50", "#fff1f2"],
 ];
 
-const StyledCircle = styled(Circle, { valueProps: ["fill", "stroke"] });
+const StyledCircle = styled(Circle, { cssProps: ["fill", "stroke"] });
 
 describe("Svg - Fill", () => {
   test.each(cases)("fill-%s", (unit) => {

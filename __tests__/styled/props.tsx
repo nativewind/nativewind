@@ -35,7 +35,7 @@ describe("Styled - Props", () => {
 
 describe("Styled - Values Props", () => {
   const StyledActivityIndicator = styled(ActivityIndicator, {
-    valueProps: ["color"],
+    spreadProps: ["color"],
   });
 
   test("can style custom props", () => {

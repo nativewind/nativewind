@@ -14,13 +14,17 @@ export function useTailwind<
   const { platform, preview } = usePlatform();
 
   if (platform === "web" && preview) {
-    return (className = "") => {
-      return {
-        $$css: true,
-        tailwindClassName: className,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any;
-    };
+    if (!options?.flatten) {
+      return (className = "") => {
+        return {
+          $$css: true,
+          tailwindClassName: className,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any;
+      };
+    } else {
+      // TODO
+    }
   }
 
   return useNativeTailwind<P>(options);

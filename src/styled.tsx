@@ -9,7 +9,8 @@ import { useTailwind } from "./use-tailwind";
 
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
-  valueProps?: Array<keyof P & string>;
+  spreadProps?: Array<keyof P & string>;
+  cssProps?: Array<keyof P & string>;
 }
 
 /*
@@ -17,32 +18,21 @@ export interface StyledOptions<P> {
  */
 export function styled<T>(
   Component: Component<T>,
-  options?: { props?: undefined; valueProps?: undefined }
+  options?: { props?: undefined; spreadProps?: undefined }
 ): FC<StyledProps<T>>;
 /**
  * With either props or valueProps
  */
 export function styled<T, K extends keyof T & string>(
   Component: Component<T>,
-  options: { props: Array<K> } | { valueProps: Array<K> }
-): FC<StyledPropsWithKeys<T, K>>;
-/**
- * With both props and valueProps
- */
-export function styled<
-  T,
-  K extends keyof T & string,
-  J extends keyof T & string
->(
-  Component: Component<T>,
-  options: { props: Array<K>; valueProps: Array<J> }
+  options: { props?: Array<K>; spreadProps?: Array<K>; cssProps?: Array<K> }
 ): FC<StyledPropsWithKeys<T, K>>;
 /**
  * Actual implementation
  */
 export function styled<T>(
   Component: Component<T>,
-  { props: propsToTransform, valueProps }: StyledOptions<T> = {}
+  { props: propsToTransform, spreadProps, cssProps }: StyledOptions<T> = {}
 ) {
   function Styled({
     className,
@@ -70,7 +60,8 @@ export function styled<T>(
       styleProp,
       propsToTransform,
       componentProps,
-      valueProps,
+      spreadProps,
+      cssProps,
     });
 
     const children = childStyles

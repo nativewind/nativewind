@@ -23,6 +23,7 @@ export function useTailwind<
   active = false,
 }: UseTailwindOptions = {}): UseTailwindCallback<P> {
   const { platform } = usePlatform();
+
   const { colorScheme } = useColorScheme();
   const stylesheetContext = useStyleSheet();
   const deviceMediaContext = useDeviceMedia();
