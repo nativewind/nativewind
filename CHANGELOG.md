@@ -1,3 +1,11 @@
+# [1.5.0-next.12](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.11...v1.5.0-next.12) (2022-05-25)
+
+
+### Bug Fixes
+
+* allow absolute paths to tailwind config ([0421a91](https://github.com/marklawlor/tailwindcss-react-native/commit/0421a9110ebc68ee4087c416630ce97dfd136675))
+* better matching with relative content paths in tailwind.config.js ([f99bc1f](https://github.com/marklawlor/tailwindcss-react-native/commit/f99bc1fd2e3647c5a0319133d25f969d47300b45)), closes [#57](https://github.com/marklawlor/tailwindcss-react-native/issues/57)
+
 # [1.5.0-next.11](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.10...v1.5.0-next.11) (2022-05-25)
 
 
