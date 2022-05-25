@@ -18,6 +18,7 @@ import {
 export interface VisitorState
   extends State,
     Required<TailwindcssReactNativeBabelOptions> {
+  cwd: string;
   allowRelativeModules: AllowPathOptions;
   blockList: Set<string>;
   hasClassNames: boolean;
@@ -25,6 +26,7 @@ export interface VisitorState
   hasProvider: boolean;
   hasStyleSheetImport: boolean;
   tailwindConfig: TailwindConfig;
+  tailwindConfigPath: string;
   canCompile: boolean;
   canTransform: boolean;
 }

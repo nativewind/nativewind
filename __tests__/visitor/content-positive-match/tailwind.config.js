@@ -1,3 +1,3 @@
 module.exports = {
-  content: [`./content-positive-match/code.{js,ts,jsx,tsx}`],
+  content: [`./content-positive-match/*.{js,ts,jsx,tsx}`],
 };

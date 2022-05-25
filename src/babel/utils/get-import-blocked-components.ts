@@ -1,5 +1,5 @@
 import { createRequire } from "node:module";
-import { join, dirname, basename } from "node:path";
+import { join, dirname, basename, resolve } from "node:path";
 import { readdirSync, lstatSync, existsSync } from "node:fs";
 import micromatch from "micromatch";
 
@@ -24,6 +24,7 @@ export function getImportBlockedComponents(
     allowRelativeModules,
     blockModuleTransform,
     filename,
+    cwd,
   } = state;
 
   const require = createRequire(filename);
@@ -85,12 +86,13 @@ export function getImportBlockedComponents(
     isAllowed ??= micromatch.isMatch(moduleName, allowModuleTransform);
     returnComponentsAsBlocked = isBlocked || !isAllowed;
   } else {
-    const isNotAllowedRelative =
-      Array.isArray(allowRelativeModules) &&
-      allowRelativeModules.length > 0 &&
-      !modulePaths.some((modulePath) =>
-        micromatch.isMatch(modulePath, allowRelativeModules)
-      );
+    const normalizedAllowRelativeModules = !Array.isArray(allowRelativeModules)
+      ? []
+      : allowRelativeModules.map((modulePath) => resolve(cwd, modulePath));
+
+    const isNotAllowedRelative = !modulePaths.some((modulePath) =>
+      micromatch.isMatch(modulePath, normalizedAllowRelativeModules)
+    );
 
     returnComponentsAsBlocked = isNotAllowedRelative;
   }
