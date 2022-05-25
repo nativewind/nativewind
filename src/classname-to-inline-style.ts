@@ -4,7 +4,7 @@ let stylesheet: CSSStyleSheet & {
   [cacheKey]: Record<string, Record<string, unknown>>;
 };
 
-export function classNameToInline(className: string) {
+export function classNameToInlineStyle(className: string) {
   if (!stylesheet) findStyleSheet(className);
 
   const styles = {};

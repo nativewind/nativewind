@@ -1,5 +1,5 @@
 import { ImageStyle, TextStyle, ViewStyle } from "react-native";
-import { classNameToInline } from "./classname-to-inline";
+import { classNameToInlineStyle } from "./classname-to-inline-style";
 import { usePlatform } from "./context/platform";
 import {
   RWNCssStyle,
@@ -17,7 +17,7 @@ export function useTailwind<
   if (platform === "web" && preview) {
     return ((className = "") => {
       return options?.flatten
-        ? classNameToInline(className)
+        ? classNameToInlineStyle(className)
         : { $$css: true, tailwindClassName: className };
     }) as UseTailwindCallback<P>;
   }
