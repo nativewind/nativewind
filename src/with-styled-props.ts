@@ -40,9 +40,12 @@ export function withStyledProps<S, T extends string>({
     if (typeof value === "string") {
       if (preview) {
         styledProps[prop] = undefined;
-        (mainStyles as unknown as Record<string, unknown>)[prop] = tw(value, {
-          flatten: false,
-        });
+        (mainStyles as unknown as Record<string, unknown>)[prop] = (
+          tw(value, {
+            flatten: false,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          }) as any
+        ).tailwindClassName;
       } else {
         const entries = Object.entries(tw(value, { flatten: true }));
         if (entries.length > 0) {

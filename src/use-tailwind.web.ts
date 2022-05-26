@@ -4,6 +4,7 @@ import { usePlatform } from "./context/platform";
 import {
   RWNCssStyle,
   UseTailwindCallback,
+  UseTailwindCallbackOptions,
   UseTailwindOptions,
 } from "./use-tailwind";
 
@@ -11,16 +12,19 @@ import { useTailwind as useNativeTailwind } from "./use-tailwind.native";
 
 export function useTailwind<
   P extends ViewStyle | TextStyle | ImageStyle | RWNCssStyle
->(options?: UseTailwindOptions): UseTailwindCallback<P> {
+>(useTailwindOptions?: UseTailwindOptions): UseTailwindCallback<P> {
   const { platform, preview } = usePlatform();
 
   if (platform === "web" && preview) {
-    return ((className = "") => {
-      return options?.flatten
+    return (<F extends boolean | undefined = true>(
+      className = "",
+      { flatten = true }: UseTailwindCallbackOptions<F> = {}
+    ) => {
+      return flatten
         ? classNameToInlineStyle(className)
         : { $$css: true, tailwindClassName: className };
     }) as UseTailwindCallback<P>;
   }
 
-  return useNativeTailwind<P>(options);
+  return useNativeTailwind<P>(useTailwindOptions);
 }
