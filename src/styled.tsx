@@ -5,6 +5,7 @@ import { useInteraction } from "./use-interaction";
 import { withStyledChildren } from "./with-styled-children";
 import { withStyledProps } from "./with-styled-props";
 import { useTailwind } from "./use-tailwind";
+import { withClassNames } from "./with-class-names";
 
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
@@ -12,7 +13,7 @@ export interface StyledOptions<P> {
   cssProps?: Array<keyof P & string>;
 }
 
-/*
+/**
  * Normal usage
  */
 export function styled<T>(
@@ -40,21 +41,29 @@ export function styled<T>(
     children: componentChildren,
     ...componentProps
   }: StyledProps<T>) {
-    const classes = twClassName ?? className ?? "";
-    const isComponent = classes.split(/\s+/).includes("component");
+    const { classes, allClasses, isComponent } = withClassNames({
+      className,
+      twClassName,
+      componentProps,
+      propsToTransform,
+      spreadProps,
+      cssProps,
+    });
 
     const { hover, focus, active, ...handlers } = useInteraction({
-      className,
+      className: allClasses,
       isComponent,
       ...componentProps,
     });
 
+    const tw = useTailwind({
+      hover,
+      focus,
+      active,
+    });
+
     const { childStyles, ...styledProps } = withStyledProps({
-      tw: useTailwind({
-        hover,
-        focus,
-        active,
-      }),
+      tw,
       classes,
       styleProp,
       propsToTransform,
