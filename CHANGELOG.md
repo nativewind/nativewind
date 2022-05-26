@@ -1,3 +1,10 @@
+# [1.5.0-next.15](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.14...v1.5.0-next.15) (2022-05-26)
+
+
+### Bug Fixes
+
+* include optional props in useInteraction parsing ([0b6d0a6](https://github.com/marklawlor/tailwindcss-react-native/commit/0b6d0a62721843f8799fdc2e019b1bf8a9956cd4))
+
 # [1.5.0-next.14](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.13...v1.5.0-next.14) (2022-05-26)
 
 
