@@ -1,6 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as React from "react";
-import { createElement, FC, ComponentProps } from "react";
 
 import { Component, StyledProps, StyledPropsWithKeys } from "./utils/styled";
 import { ComponentContext } from "./context/component";
@@ -21,14 +19,14 @@ export interface StyledOptions<P> {
 export function styled<T>(
   Component: Component<T>,
   options?: { props?: undefined; spreadProps?: undefined }
-): FC<StyledProps<T>>;
+): React.FC<StyledProps<T>>;
 /**
  * With either props or valueProps
  */
 export function styled<T, K extends keyof T & string>(
   Component: Component<T>,
   options: { props?: Array<K>; spreadProps?: Array<K>; cssProps?: Array<K> }
-): FC<StyledPropsWithKeys<T, K>>;
+): React.FC<StyledPropsWithKeys<T, K>>;
 /**
  * Actual implementation
  */
@@ -73,7 +71,7 @@ export function styled<T>(
         })
       : componentChildren;
 
-    const element = createElement(Component, {
+    const element = React.createElement(Component, {
       ...handlers,
       ...styledProps,
       children,
@@ -81,13 +79,12 @@ export function styled<T>(
 
     return !isComponent
       ? element
-      : createElement<ComponentProps<typeof ComponentContext.Provider>>(
-          ComponentContext.Provider,
-          {
-            children: element,
-            value: { hover, focus, active },
-          }
-        );
+      : React.createElement<
+          React.ComponentProps<typeof ComponentContext.Provider>
+        >(ComponentContext.Provider, {
+          children: element,
+          value: { hover, focus, active },
+        });
   }
 
   if (typeof Component !== "string") {
