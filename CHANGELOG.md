@@ -1,3 +1,10 @@
+# [1.5.0-next.14](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.13...v1.5.0-next.14) (2022-05-26)
+
+
+### Bug Fixes
+
+* react import for classic JSX ([2e7bf03](https://github.com/marklawlor/tailwindcss-react-native/commit/2e7bf03e23dd72335a1aadf23985903910146ed4))
+
 # [1.5.0-next.13](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.12...v1.5.0-next.13) (2022-05-26)
 
 
