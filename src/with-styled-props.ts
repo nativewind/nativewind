@@ -34,22 +34,36 @@ export function withStyledProps<S, T extends string>({
 
   const styledProps: Partial<Record<T, unknown>> = {};
 
-  if (spreadProps.length > 0 || cssProps.length > 0) {
-    for (const prop of [...spreadProps, ...cssProps]) {
-      const value = componentProps[prop];
+  for (const prop of cssProps) {
+    const value = componentProps[prop];
 
-      if (typeof value === "string") {
-        if (preview) {
+    if (typeof value === "string") {
+      if (preview) {
+        styledProps[prop] = undefined;
+        (mainStyles as unknown as Record<string, unknown>)[prop] = tw(value, {
+          flatten: false,
+        });
+      } else {
+        const entries = Object.entries(tw(value, { flatten: true }));
+        if (entries.length > 0) {
           styledProps[prop] = undefined;
-          mainStyles.push(...tw(value, { flatten: false }));
-        } else {
-          const entries = Object.entries(tw(value, { flatten: true }));
-          if (entries.length > 0) {
-            styledProps[prop] = undefined;
-            for (const [key, value] of entries) {
-              styledProps[key as T] = value;
-            }
+          for (const [key, value] of entries) {
+            styledProps[key as T] = value;
           }
+        }
+      }
+    }
+  }
+
+  for (const prop of spreadProps) {
+    const value = componentProps[prop];
+
+    if (typeof value === "string") {
+      const entries = Object.entries(tw(value, { flatten: true }));
+      if (entries.length > 0) {
+        styledProps[prop] = undefined;
+        for (const [key, value] of entries) {
+          styledProps[key as T] = value;
         }
       }
     }
@@ -67,7 +81,9 @@ export function withStyledProps<S, T extends string>({
 
   const style = styleProp
     ? [mainStyles, styleProp]
-    : mainStyles.length > 0
+    : Array.isArray(mainStyles) && mainStyles.length > 0
+    ? mainStyles
+    : "$$css" in mainStyles
     ? mainStyles
     : undefined;
 
