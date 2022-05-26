@@ -1,4 +1,4 @@
-import { ViewStyle } from "react-native";
+import { ViewStyle, StyleSheet } from "react-native";
 import { ComponentContext, TailwindContext } from "./context";
 import { matchAtRule } from "./match-at-rule";
 import { normaliseSelector } from "./shared/selector";
@@ -85,8 +85,16 @@ export function getRuntimeStyles<P>({
         }
       }
 
-      const { transform, ...style } = styleRecord;
+      // For RWN <=0.17 we need to convert the styleID into an object to handle
+      // merging transform.
+      //
+      // This is a performance issue, but hopefully move people will move onto
+      // RWN 0.18 and use CSS
+      if (typeof styleRecord === "number") {
+        styleRecord = StyleSheet.flatten(styleRecord);
+      }
 
+      const { transform, ...style } = styleRecord;
       tailwindStyles.push(style as P);
 
       if (transform) {
