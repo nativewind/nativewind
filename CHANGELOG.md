@@ -1,3 +1,13 @@
+# [1.5.0-next.13](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.12...v1.5.0-next.13) (2022-05-26)
+
+
+### Bug Fixes
+
+* add import React to component files ([467f7d2](https://github.com/marklawlor/tailwindcss-react-native/commit/467f7d2883d614e195a17231c565d75caa190cc5))
+* add import React to component files ([1cbee33](https://github.com/marklawlor/tailwindcss-react-native/commit/1cbee331a7adb157856c2f00457fb7b7c0f0eb07))
+* runtime error with RNW <=0.17 ([fe8c181](https://github.com/marklawlor/tailwindcss-react-native/commit/fe8c181a4b6a454a98d65d45bcda521c72f5ef81))
+* runtime-styles parsing for RWN <=0.17 ([6dc1958](https://github.com/marklawlor/tailwindcss-react-native/commit/6dc195811a65b60fff7bf8abded759de2ad5c681))
+
 <<<<<<< HEAD
 
 # [1.5.0-next.12](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.11...v1.5.0-next.12) (2022-05-25)
