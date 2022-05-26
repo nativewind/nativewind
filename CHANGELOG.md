@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.3...v1.4.4) (2022-05-26)
+
+
+### Bug Fixes
+
+* runtime error with RNW <=0.17 ([fe8c181](https://github.com/marklawlor/tailwindcss-react-native/commit/fe8c181a4b6a454a98d65d45bcda521c72f5ef81))
+
 ## [1.4.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.2...v1.4.3) (2022-05-26)
 
 
