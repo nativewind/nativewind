@@ -1,3 +1,10 @@
+# [1.5.0-next.17](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.16...v1.5.0-next.17) (2022-05-26)
+
+
+### Bug Fixes
+
+* cssProps working in preview mode ([73cd4b6](https://github.com/marklawlor/tailwindcss-react-native/commit/73cd4b6e32a66030aed4e6b9deac73f472c0efbf))
+
 # [1.5.0-next.16](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.15...v1.5.0-next.16) (2022-05-26)
 
 
