@@ -1,42 +1,73 @@
+<<<<<<< HEAD
+
 # [1.5.0-next.12](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.11...v1.5.0-next.12) (2022-05-25)
 
+=======
+
+## [1.4.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.3...v1.4.4) (2022-05-26)
+
+> > > > > > > main
 
 ### Bug Fixes
 
-* allow absolute paths to tailwind config ([0421a91](https://github.com/marklawlor/tailwindcss-react-native/commit/0421a9110ebc68ee4087c416630ce97dfd136675))
-* better matching with relative content paths in tailwind.config.js ([f99bc1f](https://github.com/marklawlor/tailwindcss-react-native/commit/f99bc1fd2e3647c5a0319133d25f969d47300b45)), closes [#57](https://github.com/marklawlor/tailwindcss-react-native/issues/57)
+<<<<<<< HEAD
+
+- allow absolute paths to tailwind config ([0421a91](https://github.com/marklawlor/tailwindcss-react-native/commit/0421a9110ebc68ee4087c416630ce97dfd136675))
+- better matching with relative content paths in tailwind.config.js ([f99bc1f](https://github.com/marklawlor/tailwindcss-react-native/commit/f99bc1fd2e3647c5a0319133d25f969d47300b45)), closes [#57](https://github.com/marklawlor/tailwindcss-react-native/issues/57)
 
 # [1.5.0-next.11](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.10...v1.5.0-next.11) (2022-05-25)
 
+=======
+
+- runtime error with RNW <=0.17 ([fe8c181](https://github.com/marklawlor/tailwindcss-react-native/commit/fe8c181a4b6a454a98d65d45bcda521c72f5ef81))
+
+## [1.4.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.2...v1.4.3) (2022-05-26)
+
+### Bug Fixes
+
+- runtime-styles parsing for RWN <=0.17 ([6dc1958](https://github.com/marklawlor/tailwindcss-react-native/commit/6dc195811a65b60fff7bf8abded759de2ad5c681))
+
+## [1.4.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.1...v1.4.2) (2022-05-25)
+
+### Bug Fixes
+
+- add import React to component files ([467f7d2](https://github.com/marklawlor/tailwindcss-react-native/commit/467f7d2883d614e195a17231c565d75caa190cc5))
+
+## [1.4.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.0...v1.4.1) (2022-05-25)
+
+### Bug Fixes
+
+- add import React to component files ([1cbee33](https://github.com/marklawlor/tailwindcss-react-native/commit/1cbee331a7adb157856c2f00457fb7b7c0f0eb07))
+
+# [1.4.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.3.3...v1.4.0) (2022-05-18)
+
+> > > > > > > main
 
 ### Features
 
-* add preview support for flattened styles ([b5b8273](https://github.com/marklawlor/tailwindcss-react-native/commit/b5b8273f7d3f5c4b1a8b6906b2ac24e5227262d7))
+- add preview support for flattened styles ([b5b8273](https://github.com/marklawlor/tailwindcss-react-native/commit/b5b8273f7d3f5c4b1a8b6906b2ac24e5227262d7))
 
 # [1.5.0-next.10](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.9...v1.5.0-next.10) (2022-05-25)
 
-
 ### Bug Fixes
 
-* rename valueProps to spreadProps. Add cssProps ([3ae8d94](https://github.com/marklawlor/tailwindcss-react-native/commit/3ae8d940612be59d0c2016497c75fdbebabc43e1))
+- rename valueProps to spreadProps. Add cssProps ([3ae8d94](https://github.com/marklawlor/tailwindcss-react-native/commit/3ae8d940612be59d0c2016497c75fdbebabc43e1))
 
 # [1.5.0-next.9](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.8...v1.5.0-next.9) (2022-05-23)
 
-
 ### Bug Fixes
 
-* ensure stroke is set to a valid value ([8970f65](https://github.com/marklawlor/tailwindcss-react-native/commit/8970f655a38ef1b3a63b1a3712657af234d98dc0))
-* prevent passing undefined svg props ([244be39](https://github.com/marklawlor/tailwindcss-react-native/commit/244be3997ce55b7c089dc858ac8f1d9456a53e92))
-* remove empty line in generated styles ([20e6973](https://github.com/marklawlor/tailwindcss-react-native/commit/20e697321a4269efe095ca39a8da610717725ae5))
+- ensure stroke is set to a valid value ([8970f65](https://github.com/marklawlor/tailwindcss-react-native/commit/8970f655a38ef1b3a63b1a3712657af234d98dc0))
+- prevent passing undefined svg props ([244be39](https://github.com/marklawlor/tailwindcss-react-native/commit/244be3997ce55b7c089dc858ac8f1d9456a53e92))
+- remove empty line in generated styles ([20e6973](https://github.com/marklawlor/tailwindcss-react-native/commit/20e697321a4269efe095ca39a8da610717725ae5))
 
 # [1.5.0-next.8](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.7...v1.5.0-next.8) (2022-05-23)
 
-
 ### Bug Fixes
 
-* stop babel appending platform to TailwindProvider ([fc8fdc8](https://github.com/marklawlor/tailwindcss-react-native/commit/fc8fdc8b9243439a3a75fc8966739b615c8dc5aa))
-* transform components using fill and stroke ([f4161ef](https://github.com/marklawlor/tailwindcss-react-native/commit/f4161ef3b2a20c984feab76e1dd300dbbaaa5678))
-* useInteraction not adding handlers ([f3c4127](https://github.com/marklawlor/tailwindcss-react-native/commit/f3c412789208430046834b4f6f294bb3bb49e8af))
+- stop babel appending platform to TailwindProvider ([fc8fdc8](https://github.com/marklawlor/tailwindcss-react-native/commit/fc8fdc8b9243439a3a75fc8966739b615c8dc5aa))
+- transform components using fill and stroke ([f4161ef](https://github.com/marklawlor/tailwindcss-react-native/commit/f4161ef3b2a20c984feab76e1dd300dbbaaa5678))
+- useInteraction not adding handlers ([f3c4127](https://github.com/marklawlor/tailwindcss-react-native/commit/f3c412789208430046834b4f6f294bb3bb49e8af))
 
 # [1.5.0-next.7](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.6...v1.5.0-next.7) (2022-05-20)
 

@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as React from "react";
 import { createElement, FC, ComponentProps } from "react";
 
 import { Component, StyledProps, StyledPropsWithKeys } from "./utils/styled";
