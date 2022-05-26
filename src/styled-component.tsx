@@ -1,3 +1,4 @@
+import * as React from "react";
 import { styled } from "./styled";
 import { Component, StyledProps } from "./utils/styled";
 

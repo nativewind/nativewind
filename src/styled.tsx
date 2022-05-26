@@ -1,5 +1,4 @@
-import * as React from "react";
-
+import { ComponentProps, createElement, FC } from "react";
 import { Component, StyledProps, StyledPropsWithKeys } from "./utils/styled";
 import { ComponentContext } from "./context/component";
 import { useInteraction } from "./use-interaction";
@@ -19,14 +18,14 @@ export interface StyledOptions<P> {
 export function styled<T>(
   Component: Component<T>,
   options?: { props?: undefined; spreadProps?: undefined }
-): React.FC<StyledProps<T>>;
+): FC<StyledProps<T>>;
 /**
  * With either props or valueProps
  */
 export function styled<T, K extends keyof T & string>(
   Component: Component<T>,
   options: { props?: Array<K>; spreadProps?: Array<K>; cssProps?: Array<K> }
-): React.FC<StyledPropsWithKeys<T, K>>;
+): FC<StyledPropsWithKeys<T, K>>;
 /**
  * Actual implementation
  */
@@ -71,7 +70,7 @@ export function styled<T>(
         })
       : componentChildren;
 
-    const element = React.createElement(Component, {
+    const element = createElement(Component, {
       ...handlers,
       ...styledProps,
       children,
@@ -79,12 +78,13 @@ export function styled<T>(
 
     return !isComponent
       ? element
-      : React.createElement<
-          React.ComponentProps<typeof ComponentContext.Provider>
-        >(ComponentContext.Provider, {
-          children: element,
-          value: { hover, focus, active },
-        });
+      : createElement<ComponentProps<typeof ComponentContext.Provider>>(
+          ComponentContext.Provider,
+          {
+            children: element,
+            value: { hover, focus, active },
+          }
+        );
   }
 
   if (typeof Component !== "string") {
