@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.2...v1.4.3) (2022-05-26)
+
+
+### Bug Fixes
+
+* runtime-styles parsing for RWN <=0.17 ([6dc1958](https://github.com/marklawlor/tailwindcss-react-native/commit/6dc195811a65b60fff7bf8abded759de2ad5c681))
+
 ## [1.4.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.1...v1.4.2) (2022-05-25)
 
 
