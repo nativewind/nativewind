@@ -1,3 +1,10 @@
+# [1.5.0-next.18](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.17...v1.5.0-next.18) (2022-05-26)
+
+
+### Bug Fixes
+
+* ensure spreadProps use flat styles on preview ([7c2cc8b](https://github.com/marklawlor/tailwindcss-react-native/commit/7c2cc8b3fced2abe45f16482ee413af2103924db))
+
 # [1.5.0-next.17](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.16...v1.5.0-next.17) (2022-05-26)
 
 
