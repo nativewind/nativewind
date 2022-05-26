@@ -1,3 +1,10 @@
+# [1.5.0-next.16](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.15...v1.5.0-next.16) (2022-05-26)
+
+
+### Bug Fixes
+
+* improve active: styles on web ([30fdfdd](https://github.com/marklawlor/tailwindcss-react-native/commit/30fdfdde6325ced776c6a8d40875188c12c53e45))
+
 # [1.5.0-next.15](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.14...v1.5.0-next.15) (2022-05-26)
 
 
