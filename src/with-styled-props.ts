@@ -1,5 +1,4 @@
 import { StyleProp } from "react-native";
-import { usePlatform } from "./context/platform";
 import { AtRuleRecord } from "./types/common";
 import { UseTailwindCallback } from "./use-tailwind";
 
@@ -13,6 +12,7 @@ export interface WithStyledPropsOptions<S, T extends string> {
   tw: UseTailwindCallback<S>;
   spreadProps?: T[];
   cssProps?: T[];
+  preview: boolean;
 }
 
 export type WithStyledProps<S, T extends string> = Record<T, unknown> & {
@@ -28,8 +28,8 @@ export function withStyledProps<S, T extends string>({
   componentProps,
   spreadProps = [],
   cssProps = [],
+  preview,
 }: WithStyledPropsOptions<S, T>): WithStyledProps<S, T> {
-  const { preview } = usePlatform();
   const mainStyles = tw(classes, { flatten: false });
 
   const styledProps: Partial<Record<T, unknown>> = {};

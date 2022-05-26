@@ -12,6 +12,15 @@ export interface Interaction extends PressableProps {
   active: boolean;
   hover: boolean;
   focus: boolean;
+  onMouseDown?: PressableProps["onPressIn"];
+  onMouseUp?: PressableProps["onPressOut"];
+}
+
+export interface UseInteractionOptions extends PressableProps {
+  className?: string;
+  isComponent?: boolean;
+  platform: string;
+  preview: boolean;
 }
 
 export function useInteraction({
@@ -24,9 +33,10 @@ export function useInteraction({
   onHoverOut,
   onPressIn,
   onPressOut,
-  onPress,
   className = "",
-}: PressableProps & { className?: string; isComponent?: boolean } = {}) {
+  preview,
+  platform,
+}: UseInteractionOptions) {
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
   const [active, setActive] = useState(false);
@@ -123,19 +133,6 @@ export function useInteraction({
     [disabled, onPressOut, setActive]
   );
 
-  const handlePress = useCallback(
-    (event: GestureResponderEvent) => {
-      if (disabled) {
-        return;
-      }
-
-      if (onPress) {
-        onPress(event);
-      }
-    },
-    [disabled, onPress, setActive]
-  );
-
   const interaction: Interaction = {
     active,
     hover,
@@ -148,7 +145,6 @@ export function useInteraction({
       onFocus: handleFocus,
       onHoverIn: handleHoverIn,
       onHoverOut: handleHoverOut,
-      onPress: handlePress,
       onPressIn: handlePressIn,
       onPressOut: handlePressOut,
     });
@@ -163,9 +159,13 @@ export function useInteraction({
       interaction.onHoverOut = handleHoverOut;
     }
     if (className.includes("active:")) {
-      interaction.onPress = handlePress;
       interaction.onPressIn = handlePressIn;
       interaction.onPressOut = handlePressOut;
+
+      if (platform === "web" && !preview) {
+        interaction.onMouseUp = handlePressOut;
+        interaction.onMouseDown = handlePressIn;
+      }
     }
   }
 

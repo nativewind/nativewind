@@ -6,6 +6,7 @@ import { withStyledChildren } from "./with-styled-children";
 import { withStyledProps } from "./with-styled-props";
 import { useTailwind } from "./use-tailwind";
 import { withClassNames } from "./with-class-names";
+import { usePlatform } from "./context/platform";
 
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
@@ -41,6 +42,8 @@ export function styled<T>(
     children: componentChildren,
     ...componentProps
   }: StyledProps<T>) {
+    const { platform, preview } = usePlatform();
+
     const { classes, allClasses, isComponent } = withClassNames({
       className,
       twClassName,
@@ -53,6 +56,8 @@ export function styled<T>(
     const { hover, focus, active, ...handlers } = useInteraction({
       className: allClasses,
       isComponent,
+      platform,
+      preview,
       ...componentProps,
     });
 
@@ -70,6 +75,7 @@ export function styled<T>(
       componentProps,
       spreadProps,
       cssProps,
+      preview,
     });
 
     const children = childStyles
