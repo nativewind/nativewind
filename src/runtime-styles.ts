@@ -49,7 +49,8 @@ export function getRuntimeStyles<P>({
     }
 
     for (let styleRecord of styleArray) {
-      if ("atRules" in styleRecord) {
+      // react-native-web <=17 still uses style IDs, so styleRecord may be a number
+      if (typeof styleRecord === "object" && "atRules" in styleRecord) {
         let isForChildren = false;
 
         const { atRules, ...style } = styleRecord;
