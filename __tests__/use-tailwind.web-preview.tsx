@@ -11,7 +11,7 @@ const wrapper = ({
   <TailwindProvider {...props}>{children}</TailwindProvider>
 );
 
-describe("web", () => {
+describe.skip("web", () => {
   test("can accept no arguments", () => {
     const { result } = renderHook(() => useTailwind<RWNCssStyle>()(), {
       wrapper,
