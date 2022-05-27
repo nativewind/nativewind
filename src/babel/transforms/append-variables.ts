@@ -1,10 +1,12 @@
 import {
   arrayExpression,
+  assignmentExpression,
   booleanLiteral,
   callExpression,
   Expression,
   expressionStatement,
   identifier,
+  logicalExpression,
   memberExpression,
   nullLiteral,
   numericLiteral,
@@ -23,30 +25,52 @@ export function appendVariables(body: Statement[], styleRecord: StyleRecord) {
 
   body.push(
     expressionStatement(
-      callExpression(
-        memberExpression(identifier("Object"), identifier("assign")),
-        [
-          memberExpression(
-            identifier("globalThis"),
-            identifier("tailwindcss_react_native_style")
-          ),
-          callExpression(
-            memberExpression(identifier("StyleSheet"), identifier("create")),
-            [serialize(styles)]
-          ),
-        ]
+      assignmentExpression(
+        "=",
+        memberExpression(
+          identifier("globalThis"),
+          identifier("tailwindcss_react_native_style")
+        ),
+        callExpression(
+          memberExpression(identifier("Object"), identifier("assign")),
+          [
+            logicalExpression(
+              "||",
+              memberExpression(
+                identifier("globalThis"),
+                identifier("tailwindcss_react_native_style")
+              ),
+              identifier("{}")
+            ),
+            callExpression(
+              memberExpression(identifier("StyleSheet"), identifier("create")),
+              [serialize(styles)]
+            ),
+          ]
+        )
       )
     ),
     expressionStatement(
-      callExpression(
-        memberExpression(identifier("Object"), identifier("assign")),
-        [
-          memberExpression(
-            identifier("globalThis"),
-            identifier("tailwindcss_react_native_media")
-          ),
-          serialize(media),
-        ]
+      assignmentExpression(
+        "=",
+        memberExpression(
+          identifier("globalThis"),
+          identifier("tailwindcss_react_native_media")
+        ),
+        callExpression(
+          memberExpression(identifier("Object"), identifier("assign")),
+          [
+            logicalExpression(
+              "||",
+              memberExpression(
+                identifier("globalThis"),
+                identifier("tailwindcss_react_native_media")
+              ),
+              identifier("{}")
+            ),
+            serialize(media),
+          ]
+        )
       )
     )
   );
