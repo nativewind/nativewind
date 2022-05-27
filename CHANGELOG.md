@@ -1,47 +1,45 @@
-# [1.5.0-next.18](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.17...v1.5.0-next.18) (2022-05-26)
+## [1.4.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.4...v1.4.5) (2022-05-27)
 
+- better matching with relative content paths in tailwind.config.js ([fd43261](https://github.com/marklawlor/tailwindcss-react-native/commit/fd43261ebaeaab1cad29a959ed3f2de338838d6f)), closes [#57](https://github.com/marklawlor/tailwindcss-react-native/issues/57)
+
+# [1.5.0-next.18](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.17...v1.5.0-next.18) (2022-05-26)
 
 ### Bug Fixes
 
-* ensure spreadProps use flat styles on preview ([7c2cc8b](https://github.com/marklawlor/tailwindcss-react-native/commit/7c2cc8b3fced2abe45f16482ee413af2103924db))
+- ensure spreadProps use flat styles on preview ([7c2cc8b](https://github.com/marklawlor/tailwindcss-react-native/commit/7c2cc8b3fced2abe45f16482ee413af2103924db))
 
 # [1.5.0-next.17](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.16...v1.5.0-next.17) (2022-05-26)
 
-
 ### Bug Fixes
 
-* cssProps working in preview mode ([73cd4b6](https://github.com/marklawlor/tailwindcss-react-native/commit/73cd4b6e32a66030aed4e6b9deac73f472c0efbf))
+- cssProps working in preview mode ([73cd4b6](https://github.com/marklawlor/tailwindcss-react-native/commit/73cd4b6e32a66030aed4e6b9deac73f472c0efbf))
 
 # [1.5.0-next.16](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.15...v1.5.0-next.16) (2022-05-26)
 
-
 ### Bug Fixes
 
-* improve active: styles on web ([30fdfdd](https://github.com/marklawlor/tailwindcss-react-native/commit/30fdfdde6325ced776c6a8d40875188c12c53e45))
+- improve active: styles on web ([30fdfdd](https://github.com/marklawlor/tailwindcss-react-native/commit/30fdfdde6325ced776c6a8d40875188c12c53e45))
 
 # [1.5.0-next.15](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.14...v1.5.0-next.15) (2022-05-26)
 
-
 ### Bug Fixes
 
-* include optional props in useInteraction parsing ([0b6d0a6](https://github.com/marklawlor/tailwindcss-react-native/commit/0b6d0a62721843f8799fdc2e019b1bf8a9956cd4))
+- include optional props in useInteraction parsing ([0b6d0a6](https://github.com/marklawlor/tailwindcss-react-native/commit/0b6d0a62721843f8799fdc2e019b1bf8a9956cd4))
 
 # [1.5.0-next.14](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.13...v1.5.0-next.14) (2022-05-26)
 
-
 ### Bug Fixes
 
-* react import for classic JSX ([2e7bf03](https://github.com/marklawlor/tailwindcss-react-native/commit/2e7bf03e23dd72335a1aadf23985903910146ed4))
+- react import for classic JSX ([2e7bf03](https://github.com/marklawlor/tailwindcss-react-native/commit/2e7bf03e23dd72335a1aadf23985903910146ed4))
 
 # [1.5.0-next.13](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.12...v1.5.0-next.13) (2022-05-26)
 
-
 ### Bug Fixes
 
-* add import React to component files ([467f7d2](https://github.com/marklawlor/tailwindcss-react-native/commit/467f7d2883d614e195a17231c565d75caa190cc5))
-* add import React to component files ([1cbee33](https://github.com/marklawlor/tailwindcss-react-native/commit/1cbee331a7adb157856c2f00457fb7b7c0f0eb07))
-* runtime error with RNW <=0.17 ([fe8c181](https://github.com/marklawlor/tailwindcss-react-native/commit/fe8c181a4b6a454a98d65d45bcda521c72f5ef81))
-* runtime-styles parsing for RWN <=0.17 ([6dc1958](https://github.com/marklawlor/tailwindcss-react-native/commit/6dc195811a65b60fff7bf8abded759de2ad5c681))
+- add import React to component files ([467f7d2](https://github.com/marklawlor/tailwindcss-react-native/commit/467f7d2883d614e195a17231c565d75caa190cc5))
+- add import React to component files ([1cbee33](https://github.com/marklawlor/tailwindcss-react-native/commit/1cbee331a7adb157856c2f00457fb7b7c0f0eb07))
+- runtime error with RNW <=0.17 ([fe8c181](https://github.com/marklawlor/tailwindcss-react-native/commit/fe8c181a4b6a454a98d65d45bcda521c72f5ef81))
+- runtime-styles parsing for RWN <=0.17 ([6dc1958](https://github.com/marklawlor/tailwindcss-react-native/commit/6dc195811a65b60fff7bf8abded759de2ad5c681))
 
 <<<<<<< HEAD
 
