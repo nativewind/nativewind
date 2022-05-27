@@ -10,8 +10,8 @@ export function Test() {
     </TailwindProvider>
   );
 }
-Object.assign(
-  globalThis.tailwindcss_react_native_style,
+globalThis.tailwindcss_react_native_style = Object.assign(
+  globalThis.tailwindcss_react_native_style || {},
   StyleSheet.create({
     container: {
       width: "100%",
@@ -36,12 +36,15 @@ Object.assign(
     },
   })
 );
-Object.assign(globalThis.tailwindcss_react_native_media, {
-  container: [
-    [["media", "(min-width: 640px)"]],
-    [["media", "(min-width: 768px)"]],
-    [["media", "(min-width: 1024px)"]],
-    [["media", "(min-width: 1280px)"]],
-    [["media", "(min-width: 1536px)"]],
-  ],
-});
+globalThis.tailwindcss_react_native_media = Object.assign(
+  globalThis.tailwindcss_react_native_media || {},
+  {
+    container: [
+      [["media", "(min-width: 640px)"]],
+      [["media", "(min-width: 768px)"]],
+      [["media", "(min-width: 1024px)"]],
+      [["media", "(min-width: 1280px)"]],
+      [["media", "(min-width: 1536px)"]],
+    ],
+  }
+);

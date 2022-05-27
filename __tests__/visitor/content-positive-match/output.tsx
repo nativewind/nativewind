@@ -12,8 +12,8 @@ export function Test() {
     </>
   );
 }
-Object.assign(
-  globalThis.tailwindcss_react_native_style,
+globalThis.tailwindcss_react_native_style = Object.assign(
+  globalThis.tailwindcss_react_native_style || {},
   StyleSheet.create({
     "font-bold": {
       fontWeight: "700",
@@ -23,4 +23,7 @@ Object.assign(
     },
   })
 );
-Object.assign(globalThis.tailwindcss_react_native_media, {});
+globalThis.tailwindcss_react_native_media = Object.assign(
+  globalThis.tailwindcss_react_native_media || {},
+  {}
+);
