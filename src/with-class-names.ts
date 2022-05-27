@@ -4,7 +4,7 @@ export interface WithClassNames {
   propsToTransform?: string[];
   componentProps: Record<string, unknown>;
   spreadProps?: string[];
-  cssProps?: string[];
+  classProps?: string[];
 }
 export function withClassNames({
   className,
@@ -12,14 +12,14 @@ export function withClassNames({
   componentProps,
   propsToTransform = [],
   spreadProps = [],
-  cssProps = [],
+  classProps = [],
 }: WithClassNames) {
   const classes = twClassName ?? className ?? "";
   const isComponent = classes.split(/\s+/).includes("component");
 
   const allClasses = [];
 
-  for (const prop of [...propsToTransform, ...spreadProps, ...cssProps]) {
+  for (const prop of [...propsToTransform, ...spreadProps, ...classProps]) {
     if (typeof componentProps[prop] === "string") {
       allClasses.push(componentProps[prop]);
     }

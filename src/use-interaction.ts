@@ -34,8 +34,6 @@ export function useInteraction({
   onPressIn,
   onPressOut,
   className = "",
-  preview,
-  platform,
 }: UseInteractionOptions) {
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
@@ -161,11 +159,6 @@ export function useInteraction({
     if (className.includes("active:")) {
       interaction.onPressIn = handlePressIn;
       interaction.onPressOut = handlePressOut;
-
-      if (platform === "web" && !preview) {
-        interaction.onMouseUp = handlePressOut;
-        interaction.onMouseDown = handlePressIn;
-      }
     }
   }
 

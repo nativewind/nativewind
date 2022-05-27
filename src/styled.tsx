@@ -11,7 +11,8 @@ import { usePlatform } from "./context/platform";
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
   spreadProps?: Array<keyof P & string>;
-  cssProps?: Array<keyof P & string>;
+  classProps?: Array<keyof P & string>;
+  supportsClassName?: boolean;
 }
 
 /**
@@ -26,14 +27,19 @@ export function styled<T>(
  */
 export function styled<T, K extends keyof T & string>(
   Component: Component<T>,
-  options: { props?: Array<K>; spreadProps?: Array<K>; cssProps?: Array<K> }
+  options: { props?: Array<K>; spreadProps?: Array<K>; classProps?: Array<K> }
 ): FC<StyledPropsWithKeys<T, K>>;
 /**
  * Actual implementation
  */
 export function styled<T>(
   Component: Component<T>,
-  { props: propsToTransform, spreadProps, cssProps }: StyledOptions<T> = {}
+  {
+    props: propsToTransform,
+    spreadProps,
+    classProps,
+    supportsClassName = false,
+  }: StyledOptions<T> = {}
 ) {
   function Styled({
     className,
@@ -50,7 +56,7 @@ export function styled<T>(
       componentProps,
       propsToTransform,
       spreadProps,
-      cssProps,
+      classProps,
     });
 
     const { hover, focus, active, ...handlers } = useInteraction({
@@ -74,8 +80,9 @@ export function styled<T>(
       propsToTransform,
       componentProps,
       spreadProps,
-      cssProps,
+      classProps,
       preview,
+      supportsClassName,
     });
 
     const children = childStyles

@@ -58,7 +58,9 @@ function getStyles(className: string) {
   if (rule) {
     for (const key of rule.style as unknown as string[]) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stylesheet[cacheKey][className][key] = (rule.style as any)[key];
+      stylesheet[cacheKey][className][toCamelCase(key)] = (rule.style as any)[
+        key
+      ];
     }
   }
 
@@ -67,4 +69,10 @@ function getStyles(className: string) {
 
 function isCSSStyleRule(rule: CSSRule): rule is CSSStyleRule {
   return "selectorText" in rule;
+}
+
+function toCamelCase(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^\dA-Za-z]+(.)/g, (_, chr) => chr.toUpperCase());
 }

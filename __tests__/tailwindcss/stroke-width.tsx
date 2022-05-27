@@ -9,7 +9,7 @@ const cases: Array<[string, string]> = [
   ["2", "2"],
 ];
 
-const StyledCircle = styled(Circle, { cssProps: ["fill", "stroke"] });
+const StyledCircle = styled(Circle, { classProps: ["fill", "stroke"] });
 
 describe("Svg - Stroke Width", () => {
   test.each(cases)("stroke-%s", (unit) => {

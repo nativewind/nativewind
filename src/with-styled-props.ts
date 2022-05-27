@@ -11,8 +11,9 @@ export interface WithStyledPropsOptions<S, T extends string> {
   componentProps: Record<string, unknown>;
   tw: UseTailwindCallback<S>;
   spreadProps?: T[];
-  cssProps?: T[];
+  classProps?: T[];
   preview: boolean;
+  supportsClassName: boolean;
 }
 
 export type WithStyledProps<S, T extends string> = Record<T, unknown> & {
@@ -27,14 +28,14 @@ export function withStyledProps<S, T extends string>({
   styleProp,
   componentProps,
   spreadProps = [],
-  cssProps = [],
+  classProps = [],
   preview,
 }: WithStyledPropsOptions<S, T>): WithStyledProps<S, T> {
   const mainStyles = tw(classes, { flatten: false });
 
   const styledProps: Partial<Record<T, unknown>> = {};
 
-  for (const prop of cssProps) {
+  for (const prop of classProps) {
     const value = componentProps[prop];
 
     if (typeof value === "string") {
@@ -48,6 +49,7 @@ export function withStyledProps<S, T extends string>({
         ).tailwindClassName;
       } else {
         const entries = Object.entries(tw(value, { flatten: true }));
+
         if (entries.length > 0) {
           styledProps[prop] = undefined;
           for (const [key, value] of entries) {
