@@ -21,7 +21,7 @@ export function useTailwind<
       { flatten = true }: UseTailwindCallbackOptions<F> = {}
     ) => {
       return flatten
-        ? classNameToInlineStyle(className)
+        ? classNameToInlineStyle(className, useTailwindOptions)
         : { $$css: true, tailwindClassName: className };
     }) as UseTailwindCallback<P>;
   }
