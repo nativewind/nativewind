@@ -1,3 +1,10 @@
+# [1.5.0-next.19](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.18...v1.5.0-next.19) (2022-05-27)
+
+
+### Bug Fixes
+
+* better matching with relative content paths in tailwind.config.js ([fd43261](https://github.com/marklawlor/tailwindcss-react-native/commit/fd43261ebaeaab1cad29a959ed3f2de338838d6f)), closes [#57](https://github.com/marklawlor/tailwindcss-react-native/issues/57)
+
 ## [1.4.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.4...v1.4.5) (2022-05-27)
 
 - better matching with relative content paths in tailwind.config.js ([fd43261](https://github.com/marklawlor/tailwindcss-react-native/commit/fd43261ebaeaab1cad29a959ed3f2de338838d6f)), closes [#57](https://github.com/marklawlor/tailwindcss-react-native/issues/57)
