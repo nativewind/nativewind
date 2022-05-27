@@ -1,3 +1,10 @@
+## [1.4.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.5...v1.4.6) (2022-05-27)
+
+
+### Bug Fixes
+
+* define the global variable during babel transform ([1edda15](https://github.com/marklawlor/tailwindcss-react-native/commit/1edda15988e431341c125211b11da425980516db)), closes [#60](https://github.com/marklawlor/tailwindcss-react-native/issues/60)
+
 ## [1.4.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.4...v1.4.5) (2022-05-27)
 
 
