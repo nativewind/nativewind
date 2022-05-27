@@ -4,6 +4,14 @@ let stylesheet: CSSStyleSheet & {
   [cacheKey]: Record<string, Record<string, unknown>>;
 };
 
+/**
+ * When preview = true, all the styles are compiled to CSS.
+ * This means useTailwind and spreadProps need to pull their values
+ * from the CSS StyleSheet to get their runtime values.
+ *
+ * This hasn't been benched-marked, but is assumed to be slow and unreliable.
+ * This is why we recommend people avoid using useTailwind()/spreadProps for runtime values.
+ */
 export function classNameToInlineStyle(className: string) {
   if (!stylesheet) findStyleSheet(className);
 
