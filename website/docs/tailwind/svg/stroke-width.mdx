@@ -11,16 +11,19 @@ Styled components can use the `stroke` attribute to pass the stroke width to rea
 
 ```tsc
 import { styled } from "tailwindcss-react-native"
+import { Svg, Rect } from "react-native-svg"
 
-const MyStyledSvg = styled({ strokeWidth, ...props })
+const StyledRect = styled(Rect, { classProps: ["fill", "stroke"]})
+
+function MyStyledSvg({ stroke, ...props }) {
   return (
     <Svg height="100" width="100" {...props }>
-      <Rect x="0" y="0" width="100" height="100" strokeWidth={strokeWidth} />
+      <StyledRect x="0" y="0" width="100" height="100" stroke={stroke} />
     </Svg>
   )
 }
 
-<MyStyledSvg className="p-4" stroke="stroke-1" />
+<MyStyledSvg stroke="stroke-1" />
 ```
 
 <Compatibility supported={["stroke-{n}", "stroke-[n]"]} />

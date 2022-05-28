@@ -11,16 +11,19 @@ Styled components can use the `fill` attribute to pass the fill color to react-n
 
 ```tsc
 import { styled } from "tailwindcss-react-native"
+import { Svg, Rect } from "react-native-svg"
 
-const MyStyledSvg = styled({ fill, ...props })
+const StyledRect = styled(Rect, { classProps: ["fill", "stroke"]})
+
+function MyStyledSvg({ fill, ...props }) {
   return (
     <Svg height="100" width="100" {...props }>
-      <Rect x="0" y="0" width="100" height="100" fill={fill} />
+      <StyledRect x="0" y="0" width="100" height="100" fill={fill} />
     </Svg>
   )
 }
 
-<MyStyledSvg className="p-4" fill="fill-blue-500" />
+<MyStyledSvg fill="fill-blue-500" />
 ```
 
 <Compatibility
