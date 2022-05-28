@@ -12,7 +12,7 @@ slug: /
 
 `tailwindcss-react-native` processes your styles during your application build, and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
 
-> :exclamation: This example uses Babel which is one of the many setups available.
+> :point_right: This example uses Babel which is one of the many setups available.
 
 ```tsx
 import { Pressable, View, Text } from "react-native";
