@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0...v1.5.1) (2022-05-28)
+
+
+### Bug Fixes
+
+* path matching on windows ([2ec7363](https://github.com/marklawlor/tailwindcss-react-native/commit/2ec7363d072b10f5c85924a59b11b7d7e9d93297)), closes [#64](https://github.com/marklawlor/tailwindcss-react-native/issues/64)
+
 # [1.5.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.4.6...v1.5.0) (2022-05-28)
 
 
