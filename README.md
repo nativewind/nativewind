@@ -12,12 +12,14 @@
 </div>
 <br />
 
-`tailwindcss-react-native` uses [Tailwind CSS](https://tailwindcss.com) as **universal design system** for all React Native platforms. It lets you share code between all React Native platforms and improves DX, performance and code maintainability.
+`tailwindcss-react-native` uses [Tailwind CSS](https://tailwindcss.com) as high-level scripting language to create a **universal design system**. Styled components can be shared between all React Native platforms, using the best style engine for that platform (e.g. CSS StyleSheet or StyleSheet.create). It's goals are to to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
 
-At during your applications build, it uses the Tailwind CSS compiler to process the styles, themes, and conditional logic. It uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation).
+`tailwindcss-react-native` processes your styles during your application build, and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
+
+> :exclamation: This example uses Babel which is one of the many setups available.
 
 ```tsx
-import { Text } from "react-native";
+import { Pressable, View, Text } from "react-native";
 
 /**
  * A button that changes color when hovered or pressed
@@ -34,10 +36,11 @@ export function MyFancyButton(props) {
 
 ## Features
 
-- Works on **all** RN platforms
-- Uses the Tailwind compiler - **styles computed at build time**
-- Small runtime
-- Babel plugin for **simple setup** and better **intellisense support**
+- Works on **all** RN platforms, uses the best style system for each platform.
+- Uses the Tailwind CSS compiler
+- Styles are computed at **build time**
+- Small runtime keeps your components fast
+- Babel plugin for **simple setup** and improving **intellisense support**
 - Respects all tailwind.config.js settings, including **themes, custom values, plugins**
 - **dark mode / arbitrary classes / media queries**
 - pseudo classes - **hover / focus / active** on compatible components [(docs)](https://tailwindcss-react-native.vercel.app/tailwind/core-concepts/pseudo-classes)
@@ -64,11 +67,11 @@ export function BoldText(props) {
 }
 ```
 
-Or use the Component API to be more explicit about what gets the styles.
+Usage of Babel is optional! You can use the Component API to be more explicit about what gets the styles.
 
 ```tsx
 import { Text } from "react-native";
-import { styles } from "tailwindcss-react-native";
+import { styled } from "tailwindcss-react-native";
 
 const StyledText = styled(Text);
 
@@ -93,9 +96,61 @@ export function MyText({ bold, italic, lineThrough, ...props }) {
 }
 ```
 
+Additional options can improve compatibilty with existing RN libraries
+
+```tsx
+import { Text } from "react-native";
+import { styled } from "tailwindcss-react-native";
+import { Svg, Circle, Rect } from "react-native-svg";
+
+/**
+ * These components can now use the "stroke" & "fill" props with Tailwind classes
+ * They will use inline-props on native, and className on web.
+ */
+const StyledCircle = styled(Circle, { classProps: ["stroke", "fill"] });
+const StyledRect = styled(Rect, { classProps: ["stroke", "fill"] });
+
+export function BoldText(props) {
+  return (
+    <Svg height="50%" width="50%" viewBox="0 0 100 100">
+      <StyledCircle
+        cx="50"
+        cy="50"
+        r="45"
+        stroke="stroke-blue-500 stroke-2"
+        fill="color-green-500"
+      />
+      <StyledRect
+        x="15"
+        y="15"
+        width="70"
+        height="70"
+        stroke="stroke-red-500 stroke-2"
+        fill="color-yellow-500"
+      />
+    </Svg>
+  );
+}
+```
+
+Lastly `useTailwind()` can be used for manual styling or situations where `styled` cannot be used.
+
+> :warning: This is a example of `useTailwind()` that you shouldn't use in practice. There are often more performant patterns than `useTailwind()` and it should be used as a last resort. Please see our docs for more information.
+
+```tsx
+import { ActivityIndicator } from "react-native";
+
+export function MyText({ bold, italic, lineThrough, ...props }) {
+  const tw = useTailwind();
+  const { color } = useTailwind("color-black dark:color-white");
+
+  return <ActivityIndicator color={color} />;
+}
+```
+
 # Quick start guide
 
-> There are more setup configurations and in-depth guides [on our website](https://tailwindcss-react-native.vercel.app/installation)
+> This example uses Babel as it provides the fastest setup. There are more setup configurations and in-depth guides [on our website](https://tailwindcss-react-native.vercel.app/installation)
 
 ## 1. Create a new React Native application
 
@@ -117,8 +172,8 @@ cd my-tailwind-native-app
 You will need to install `tailwindcss-react-native` and it's peer dependency `tailwindcss`.
 
 ```bash
-npm install tailwindcss-react-native
-npm install --save-dev tailwindcss
+yarn add tailwindcss-react-native
+yarn add tailwindcss -D
 ```
 
 ## 3. Setup Tailwind CSS
@@ -179,7 +234,6 @@ export default function App() {
 Start writing code!
 
 ```diff
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 - import { StyleSheet, Text, View } from 'react-native';
 + import { Text, View } from 'react-native';
@@ -191,7 +245,6 @@ export default function App() {
 -     <View style={styles.container}>
 +     <View className="flex-1 items-center justify-center bg-white">
         <Text>Open up App.js to start working on your app!</Text>
-        <StatusBar style="auto" />
       </View>
     </TailwindProvider>
   );
