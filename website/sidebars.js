@@ -364,6 +364,16 @@ const sidebars = {
         },
       ],
     },
+    {
+      type: "category",
+      label: "SVG",
+      collapsed: false,
+      items: [
+        "tailwind/svg/fill",
+        "tailwind/svg/stroke",
+        "tailwind/svg/stroke-width",
+      ],
+    },
   ],
 };
 module.exports = sidebars;
