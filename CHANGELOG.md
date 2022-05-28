@@ -1,3 +1,10 @@
+# [1.5.0-next.21](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.20...v1.5.0-next.21) (2022-05-27)
+
+
+### Bug Fixes
+
+* improvements to spreadProps with preview mode ([3d4941a](https://github.com/marklawlor/tailwindcss-react-native/commit/3d4941ac9d55c46e11c2423416aefdfbb04c64f5))
+
 # [1.5.0-next.20](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0-next.19...v1.5.0-next.20) (2022-05-27)
 
 
