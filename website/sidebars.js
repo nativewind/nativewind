@@ -56,6 +56,7 @@ const sidebars = {
         "api/StyledComponent",
         "api/tailwind-provider",
         "api/use-tailwind",
+        "api/use-color-scheme",
       ],
     },
     {

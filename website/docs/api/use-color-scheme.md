@@ -3,7 +3,7 @@ title: useColorScheme()
 sidebar_label: useColorScheme()
 ---
 
-useColorScheme() provides low level access to the devices color scheme.
+useColorScheme() provides access to the devices color scheme.
 
 | Value          | Description                                                                                      |
 | -------------- | ------------------------------------------------------------------------------------------------ |
