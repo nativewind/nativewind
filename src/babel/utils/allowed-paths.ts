@@ -1,5 +1,5 @@
 import micromatch from "micromatch";
-import { join, isAbsolute } from "node:path";
+import { resolve, sep, posix } from "node:path";
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { TailwindcssReactNativeBabelOptions, AllowPathOptions } from "../types";
 
@@ -43,9 +43,19 @@ export function isAllowedProgramPath({
     return true;
   }
 
+  /**
+   * This is my naive way to get path matching working on Windows.
+   * Basically I turn it into a posix path which seems to work fine
+   *
+   * If you are a windows user and understand micromatch, can you please send a PR
+   * to do this the proper way
+   */
+  const posixPath = path.split(sep).join(posix.sep);
+
   return allowRelativeModules.some((modulePath) => {
-    return isAbsolute(modulePath)
-      ? micromatch.isMatch(path, modulePath)
-      : micromatch.isMatch(path, join(cwd, modulePath));
+    return micromatch.isMatch(
+      posixPath,
+      resolve(cwd, modulePath).split(sep).join(posix.sep)
+    );
   });
 }

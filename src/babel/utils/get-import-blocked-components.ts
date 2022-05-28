@@ -1,5 +1,5 @@
 import { createRequire } from "node:module";
-import { join, dirname, basename, resolve } from "node:path";
+import { join, dirname, basename, resolve, sep, posix } from "node:path";
 import { readdirSync, lstatSync, existsSync } from "node:fs";
 import micromatch from "micromatch";
 
@@ -88,11 +88,24 @@ export function getImportBlockedComponents(
   } else {
     const normalizedAllowRelativeModules = !Array.isArray(allowRelativeModules)
       ? []
-      : allowRelativeModules.map((modulePath) => resolve(cwd, modulePath));
+      : allowRelativeModules.map((modulePath) =>
+          resolve(cwd, modulePath).split(sep).join(posix.sep)
+        );
 
-    const isNotAllowedRelative = !modulePaths.some((modulePath) =>
-      micromatch.isMatch(modulePath, normalizedAllowRelativeModules)
-    );
+    const isNotAllowedRelative = !modulePaths.some((modulePath) => {
+      /**
+       * This is my naive way to get path matching working on Windows.
+       * Basically I turn it into a posix path which seems to work fine
+       *
+       * If you are a windows user and understand micromatch, can you please send a PR
+       * to do this the proper way
+       */
+      const posixModulePath = modulePath.split(sep).join(posix.sep);
+      return micromatch.isMatch(
+        posixModulePath,
+        normalizedAllowRelativeModules
+      );
+    });
 
     returnComponentsAsBlocked = isNotAllowedRelative;
   }
