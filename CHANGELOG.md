@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.2...v1.5.3) (2022-05-29)
+
+
+### Bug Fixes
+
+* forwarding refs of styled components ([c89e314](https://github.com/marklawlor/tailwindcss-react-native/commit/c89e3146ae831ebf2b801a93011ef5afa5a55886))
+
 ## [1.5.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.1...v1.5.2) (2022-05-29)
 
 
