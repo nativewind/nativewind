@@ -1,9 +1,14 @@
 import {
   ComponentProps,
   createElement,
-  FC,
   ReactNode,
   ComponentType,
+  forwardRef,
+  RefAttributes,
+  ForwardedRef,
+  ClassAttributes,
+  ForwardRefExoticComponent,
+  PropsWithoutRef,
 } from "react";
 import { StyledProps, StyledPropsWithKeys } from "./utils/styled";
 import { ComponentContext } from "./context/component";
@@ -22,20 +27,30 @@ export interface StyledOptions<P> {
   supportsClassName?: boolean;
 }
 
+type ForwardRef<T, P> = ForwardRefExoticComponent<
+  PropsWithoutRef<P> & RefAttributes<T>
+>;
+
+type InferRef<T> = T extends RefAttributes<infer R> | ClassAttributes<infer R>
+  ? R
+  : unknown;
+
 /**
  * Normal usage
  */
 export function styled<T>(
   Component: ComponentType<T>,
   options?: { props?: undefined; spreadProps?: undefined }
-): FC<StyledProps<T>>;
+): ForwardRef<InferRef<T>, StyledProps<T>>;
+
 /**
  * With either props or valueProps
  */
 export function styled<T, K extends keyof T & string>(
   Component: ComponentType<T>,
   options: { props?: Array<K>; spreadProps?: Array<K>; classProps?: Array<K> }
-): FC<StyledPropsWithKeys<T, K>>;
+): ForwardRef<InferRef<T>, StyledPropsWithKeys<T, K>>;
+
 /**
  * Actual implementation
  */
@@ -50,13 +65,16 @@ export function styled<
     supportsClassName = false,
   }: StyledOptions<T> = {}
 ) {
-  function Styled({
-    className,
-    tw: twClassName,
-    style: styleProp,
-    children: componentChildren,
-    ...componentProps
-  }: StyledProps<T>) {
+  function Styled(
+    {
+      className,
+      tw: twClassName,
+      style: styleProp,
+      children: componentChildren,
+      ...componentProps
+    }: StyledProps<T>,
+    ref: ForwardedRef<unknown>
+  ) {
     const { platform, preview } = usePlatform();
 
     const { classes, allClasses, isComponent } = withClassNames({
@@ -105,6 +123,7 @@ export function styled<
       ...handlers,
       ...styledProps,
       children,
+      ref,
     } as unknown as T);
 
     return !isComponent
@@ -124,5 +143,5 @@ export function styled<
     }`;
   }
 
-  return Styled;
+  return forwardRef(Styled);
 }
