@@ -1,9 +1,9 @@
 import * as React from "react";
 import { styled } from "./styled";
-import { Component, StyledProps } from "./utils/styled";
+import { StyledProps } from "./utils/styled";
 
 export type StyledComponentProps<P> = StyledProps<P> & {
-  component: Component<P>;
+  component: React.ComponentType<P>;
 };
 
 export function StyledComponent<P>({

@@ -1,5 +1,11 @@
-import { ComponentProps, createElement, FC } from "react";
-import { Component, StyledProps, StyledPropsWithKeys } from "./utils/styled";
+import {
+  ComponentProps,
+  createElement,
+  FC,
+  ReactNode,
+  ComponentType,
+} from "react";
+import { StyledProps, StyledPropsWithKeys } from "./utils/styled";
 import { ComponentContext } from "./context/component";
 import { useInteraction } from "./use-interaction";
 import { withStyledChildren } from "./with-styled-children";
@@ -7,6 +13,7 @@ import { withStyledProps } from "./with-styled-props";
 import { useTailwind } from "./use-tailwind";
 import { withClassNames } from "./with-class-names";
 import { usePlatform } from "./context/platform";
+import { StyleProp } from "react-native";
 
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
@@ -19,21 +26,23 @@ export interface StyledOptions<P> {
  * Normal usage
  */
 export function styled<T>(
-  Component: Component<T>,
+  Component: ComponentType<T>,
   options?: { props?: undefined; spreadProps?: undefined }
 ): FC<StyledProps<T>>;
 /**
  * With either props or valueProps
  */
 export function styled<T, K extends keyof T & string>(
-  Component: Component<T>,
+  Component: ComponentType<T>,
   options: { props?: Array<K>; spreadProps?: Array<K>; classProps?: Array<K> }
 ): FC<StyledPropsWithKeys<T, K>>;
 /**
  * Actual implementation
  */
-export function styled<T>(
-  Component: Component<T>,
+export function styled<
+  T extends { style?: StyleProp<unknown>; children?: ReactNode | undefined }
+>(
+  Component: ComponentType<T>,
   {
     props: propsToTransform,
     spreadProps,
