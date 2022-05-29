@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.1...v1.5.2) (2022-05-29)
+
+
+### Bug Fixes
+
+* ensure StyledProps are exported ([93ab927](https://github.com/marklawlor/tailwindcss-react-native/commit/93ab9271df86312add43c1c3fe3819b8a0aabe54))
+
 ## [1.5.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0...v1.5.1) (2022-05-28)
 
 
