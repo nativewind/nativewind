@@ -2,6 +2,10 @@
 
 ### Bug Fixes
 
+- **deps:** update dependency @babel/types to v7.18.4 ([16e94d4](https://github.com/marklawlor/tailwindcss-react-native/commit/16e94d450b653646073c28407ac5d88c6985c201))
+
+## [1.5.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.0...v1.5.1) (2022-05-28)
+
 - forwarding refs of styled components ([c89e314](https://github.com/marklawlor/tailwindcss-react-native/commit/c89e3146ae831ebf2b801a93011ef5afa5a55886))
 
 ## [1.5.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.1...v1.5.2) (2022-05-29)
