@@ -18,13 +18,15 @@ export interface Interaction extends PressableProps {
 
 export interface UseInteractionOptions extends PressableProps {
   className?: string;
-  isComponent?: boolean;
+  isComponent: boolean;
+  isParent: boolean;
   platform: string;
   preview: boolean;
 }
 
 export function useInteraction({
   isComponent,
+  isParent,
   disabled = false,
   focusable = true,
   onFocus,
@@ -138,7 +140,7 @@ export function useInteraction({
     focus,
   };
 
-  if (isComponent) {
+  if (isComponent || isParent) {
     Object.assign(interaction, {
       onBlur: handleBlur,
       onFocus: handleFocus,

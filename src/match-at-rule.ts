@@ -57,12 +57,18 @@ export interface MatchChildAtRuleOptions {
   nthChild: number;
   rule: string;
   params: string;
+  parentHover: boolean;
+  parentFocus: boolean;
+  parentActive: boolean;
 }
 
 export function matchChildAtRule({
   nthChild,
   rule,
   params,
+  parentHover,
+  parentFocus,
+  parentActive,
 }: MatchChildAtRuleOptions) {
   if (
     rule === "selector" &&
@@ -72,6 +78,12 @@ export function matchChildAtRule({
     return true;
   } else if (rule === "selector" && params === "(> *)") {
     return true;
+  } else if (rule === "component" && params === "hover") {
+    return parentHover;
+  } else if (rule === "component" && params === "focus") {
+    return parentFocus;
+  } else if (rule === "component" && params === "active") {
+    return parentActive;
   }
 
   return false;

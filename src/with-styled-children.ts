@@ -6,12 +6,24 @@ import { AtRuleRecord } from "./types/common";
 export interface WithStyledChildrenOptions {
   componentChildren: ReactNode;
   childStyles: AtRuleRecord[];
+  isParent: boolean;
+  parentHover: boolean;
+  parentFocus: boolean;
+  parentActive: boolean;
 }
 
 export function withStyledChildren({
   componentChildren,
   childStyles,
+  isParent,
+  parentHover,
+  parentFocus,
+  parentActive,
 }: WithStyledChildrenOptions): ReactNode {
+  if (!childStyles && !isParent) {
+    return componentChildren;
+  }
+
   let children = isFragment(componentChildren)
     ? // This probably needs to be recursive
       componentChildren.props.children
@@ -42,8 +54,12 @@ export function withStyledChildren({
           nthChild: index + 1,
           rule,
           params,
+          parentHover,
+          parentFocus,
+          parentActive,
         });
       });
+
       if (matches) {
         matchingStyles.push(styles);
       }

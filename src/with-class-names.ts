@@ -6,6 +6,10 @@ export interface WithClassNames {
   spreadProps?: string[];
   classProps?: string[];
 }
+
+const isComponentRegex = /(?:^|\s)(component)(?:$|\s)/gi;
+const isParentRegex = /(?:^|\s)(parent)(?:$|\s)/gi;
+
 export function withClassNames({
   className,
   twClassName,
@@ -15,7 +19,8 @@ export function withClassNames({
   classProps = [],
 }: WithClassNames) {
   const classes = twClassName ?? className ?? "";
-  const isComponent = classes.split(/\s+/).includes("component");
+  const isComponent = isComponentRegex.test(classes);
+  const isParent = isParentRegex.test(classes);
 
   const allClasses = [];
 
@@ -29,5 +34,6 @@ export function withClassNames({
     classes,
     allClasses: allClasses.join(" "),
     isComponent,
+    isParent,
   };
 }

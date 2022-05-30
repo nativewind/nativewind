@@ -77,7 +77,7 @@ export function styled<
   ) {
     const { platform, preview } = usePlatform();
 
-    const { classes, allClasses, isComponent } = withClassNames({
+    const { classes, allClasses, isComponent, isParent } = withClassNames({
       className,
       twClassName,
       componentProps,
@@ -89,6 +89,7 @@ export function styled<
     const { hover, focus, active, ...handlers } = useInteraction({
       className: allClasses,
       isComponent,
+      isParent,
       platform,
       preview,
       ...componentProps,
@@ -116,6 +117,10 @@ export function styled<
       ? withStyledChildren({
           componentChildren,
           childStyles,
+          isParent,
+          parentHover: hover,
+          parentFocus: focus,
+          parentActive: active,
         })
       : componentChildren;
 

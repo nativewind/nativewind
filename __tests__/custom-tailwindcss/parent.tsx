@@ -18,6 +18,20 @@ tailwindRunner("Custom - Parent Variant", [
   ],
 ]);
 
+tailwindRunner("Custom - Parent State Variants", [
+  [
+    "parent-hover:text-white",
+    {
+      "parent-hover_text-white": [
+        {
+          atRules: [["parent", "hover"]],
+          color: "#fff",
+        },
+      ],
+    },
+  ],
+]);
+
 describe("Custom - Parent Variant Snapshots", () => {
   test("parent:text-white", () => {
     const tree = render(
