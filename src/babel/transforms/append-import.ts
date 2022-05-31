@@ -8,12 +8,14 @@ import {
 
 export function prependImport(
   body: Statement[],
-  variable: string,
+  variable: string | string[],
   source: string
 ) {
   body.unshift(
     importDeclaration(
-      [importSpecifier(identifier(variable), identifier(variable))],
+      typeof variable === "string"
+        ? [importSpecifier(identifier(variable), identifier(variable))]
+        : [importSpecifier(identifier(variable[0]), identifier(variable[1]))],
       stringLiteral(source)
     )
   );

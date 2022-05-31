@@ -43,7 +43,10 @@ export function appendVariables(body: Statement[], styleRecord: StyleRecord) {
               identifier("{}")
             ),
             callExpression(
-              memberExpression(identifier("StyleSheet"), identifier("create")),
+              memberExpression(
+                identifier("RNStyleSheet"),
+                identifier("create")
+              ),
               [serialize(styles)]
             ),
           ]
@@ -86,7 +89,7 @@ function serialize(literal: unknown): Expression {
     case "string":
       if (literal === "hairlineWidth") {
         return memberExpression(
-          identifier("StyleSheet"),
+          identifier("RNStyleSheet"),
           identifier("hairlineWidth")
         );
       }

@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet as RNStyleSheet } from "react-native";
 import { StyledComponent } from "tailwindcss-react-native";
 import { Text, View } from "react-native";
 import { TailwindProvider } from "tailwindcss-react-native";
@@ -17,7 +17,7 @@ export function Test() {
 }
 globalThis.tailwindcss_react_native_style = Object.assign(
   globalThis.tailwindcss_react_native_style || {},
-  StyleSheet.create({
+  RNStyleSheet.create({
     container: {
       width: "100%",
     },

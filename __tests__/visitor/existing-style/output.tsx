@@ -1,3 +1,4 @@
+import { StyleSheet as RNStyleSheet } from "react-native";
 import { StyledComponent } from "tailwindcss-react-native";
 import { StyleSheet, Text } from "react-native";
 import { TailwindProvider } from "tailwindcss-react-native";
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
 });
 globalThis.tailwindcss_react_native_style = Object.assign(
   globalThis.tailwindcss_react_native_style || {},
-  StyleSheet.create({
+  RNStyleSheet.create({
     "font-bold": {
       fontWeight: "700",
     },

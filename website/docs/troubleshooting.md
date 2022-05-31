@@ -47,3 +47,33 @@ The TailwindCSS compiler [does not allow for dynamic class names](https://tailwi
 ## className is not passed to child components
 
 The `className` prop is not passed to child components, it is transformed into a style object and passed via the `style` prop.
+
+## Identifier '\*\*\*' has already been declared inside a node_module
+
+Example error:
+
+```
+/node_modules/react-native-web/dist/vendor/react-native/FlatList/index.js 105:7
+Module parse failed: Identifier 'StyleSheet' has already been declared (105:7)
+File was processed with these loaders:
+
+./node_modules/@expo/webpack-config/node_modules/babel-loader/lib/index.js
+You may need an additional loader to handle the result of these loaders.
+| import deepDiffer from "../deepDiffer";
+| import * as React from 'react';
+```
+
+This can occur when your `tailwind.config.js` processes an unexpected file in your `node_modules`. You need to avoid [broad content patterns](https://tailwindcss.com/docs/content-configuration#pattern-recommendations), as it will process things like your `node_modules`
+
+```diff
+// tailwind.config.js
+module.exports = {
+  content: [
+-   './**/*.{html,js,jsx}',
++   './src/**/*.{html,js,jsx}',
+  ],
+  // ...
+}
+```
+
+After changing your `tailwind.config.js` you will need to reset your cache either by `expo start -c` or `react-native start --reset-cache`.
