@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.0...v1.7.1) (2022-05-31)
+
+
+### Bug Fixes
+
+* prevent duplicate identifiers when accidentally importing RWN ([ef1e83e](https://github.com/marklawlor/tailwindcss-react-native/commit/ef1e83ed9c01f6cf7864ef05aa0714ff404f1474))
+
 # [1.7.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.3...v1.7.0) (2022-05-31)
 
 
