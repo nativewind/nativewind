@@ -13,7 +13,6 @@ export interface WithStyledPropsOptions<S, T extends string> {
   spreadProps?: T[];
   classProps?: T[];
   preview: boolean;
-  supportsClassName: boolean;
 }
 
 export type WithStyledProps<S, T extends string> = Record<T, unknown> & {
