@@ -1,5 +1,11 @@
 import { render } from "@testing-library/react-native";
-import { ActivityIndicator, View, ViewProps, ViewStyle } from "react-native";
+import {
+  ActivityIndicator,
+  Text,
+  View,
+  ViewProps,
+  ViewStyle,
+} from "react-native";
 import { styled } from "../../src";
 import { TestProvider } from "../tailwindcss/runner";
 
@@ -68,6 +74,25 @@ describe("Styled - Base Class Name", () => {
     const tree = render(
       <TestProvider css="flex-row p-4">
         <StyledView className="p-4" />
+      </TestProvider>
+    ).toJSON();
+
+    expect(tree).toMatchSnapshot();
+  });
+});
+
+describe("Styled - Default props", () => {
+  const StyledText = styled(Text, {
+    baseClassName: "p-4",
+  });
+  StyledText.defaultProps = {
+    accessibilityRole: "header",
+  };
+
+  test("can render with default props", () => {
+    const tree = render(
+      <TestProvider css="p-4">
+        <StyledText />
       </TestProvider>
     ).toJSON();
 

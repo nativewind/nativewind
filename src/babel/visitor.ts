@@ -20,7 +20,6 @@ export interface VisitorState
   cwd: string;
   allowRelativeModules: AllowPathOptions;
   blockList: Set<string>;
-  hasClassNames: boolean;
   hasStyledComponentImport: boolean;
   hasProvider: boolean;
   hasStyleSheetImport: boolean;
@@ -63,9 +62,8 @@ export const visitor: Visitor<VisitorState> = {
       return;
     }
 
-    if (someAttributes(path, ["className", "tw", "fill", "stroke"])) {
-      if (canTransform) toStyledComponent(path);
-      state.hasClassNames = true;
+    if (someAttributes(path, ["className", "tw"]) && canTransform) {
+      toStyledComponent(path);
     }
   },
 };

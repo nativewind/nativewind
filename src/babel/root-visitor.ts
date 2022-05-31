@@ -70,7 +70,6 @@ export default function rootVisitor(
             mode: "compileAndTransform",
             blockModuleTransform: [],
             hasStyledComponentImport: false,
-            hasClassNames: false,
             canCompile,
             canTransform,
             ...state,
@@ -92,16 +91,10 @@ export default function rootVisitor(
             hasStyleSheetImport,
             hasProvider,
             hasStyledComponentImport,
-            hasClassNames,
             hmr,
           } = visitorState;
 
           if (hmr) {
-            // There are no classNames so skip this file
-            if (!hasClassNames) {
-              return;
-            }
-
             /**
              * Override tailwind to only process the classnames in this file
              */
