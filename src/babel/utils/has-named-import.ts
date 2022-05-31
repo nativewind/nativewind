@@ -21,7 +21,7 @@ export function hasNamedImport(
 
       return isStringLiteral(specifier.imported)
         ? specifier.imported.value === variable
-        : specifier.imported.name === variable;
+        : specifier.local.name === variable;
     });
   }
 

@@ -42,7 +42,7 @@ export const visitor: Visitor<VisitorState> = {
 
     state.hasStyleSheetImport ||= hasNamedImport(
       path,
-      "StyleSheet",
+      "RNStyleSheet",
       "react-native"
     );
 

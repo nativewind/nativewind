@@ -116,10 +116,17 @@ export default function rootVisitor(
               );
             }
 
+            // If there are no styles, early exit
+            if (Object.keys(styles).length === 0) return;
+
             appendVariables(bodyNode, styles);
 
             if (!hasStyleSheetImport) {
-              prependImport(bodyNode, "StyleSheet", "react-native");
+              prependImport(
+                bodyNode,
+                ["RNStyleSheet", "StyleSheet"],
+                "react-native"
+              );
             }
           } else {
             if (!hasProvider) {
@@ -131,11 +138,18 @@ export default function rootVisitor(
              */
             const { styles } = extractStyles(tailwindConfig);
 
+            // If there are no styles, early exit
+            if (Object.keys(styles).length === 0) return;
+
             const bodyNode = path.node.body;
             appendVariables(bodyNode, styles);
 
             if (!hasStyleSheetImport) {
-              prependImport(bodyNode, "StyleSheet", "react-native");
+              prependImport(
+                bodyNode,
+                ["RNStyleSheet", "StyleSheet"],
+                "react-native"
+              );
             }
           }
         },
