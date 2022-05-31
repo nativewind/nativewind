@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.3...v1.6.0) (2022-05-31)
+
+
+### Features
+
+* add baseClassName option to styled() ([199e23e](https://github.com/marklawlor/tailwindcss-react-native/commit/199e23e967acde90ecda1d60c02ec510674e4a33))
+
 ## [1.5.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.2...v1.5.3) (2022-05-29)
 
 
