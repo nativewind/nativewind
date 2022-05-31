@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.1...v1.6.2) (2022-05-31)
+
+
+### Bug Fixes
+
+* warnings when hmr on native. Move baseClassName to styled() props ([5d29a74](https://github.com/marklawlor/tailwindcss-react-native/commit/5d29a74dd4e8cdb3be07a4ab5058c568c5f10864))
+
 ## [1.6.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.0...v1.6.1) (2022-05-31)
 
 
