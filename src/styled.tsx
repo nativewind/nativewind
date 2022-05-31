@@ -24,7 +24,7 @@ export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
   spreadProps?: Array<keyof P & string>;
   classProps?: Array<keyof P & string>;
-  supportsClassName?: boolean;
+  baseClassName?: string;
 }
 
 type ForwardRef<T, P> = ForwardRefExoticComponent<
@@ -36,19 +36,43 @@ type InferRef<T> = T extends RefAttributes<infer R> | ClassAttributes<infer R>
   : unknown;
 
 /**
- * Normal usage
+ * Default
  */
 export function styled<T>(
-  Component: ComponentType<T>,
-  options?: { props?: undefined; spreadProps?: undefined }
+  Component: ComponentType<T>
 ): ForwardRef<InferRef<T>, StyledProps<T>>;
 
 /**
- * With either props or valueProps
+ * Base className
+ */
+export function styled<T>(
+  Component: ComponentType<T>,
+  baseClassName: string
+): ForwardRef<InferRef<T>, StyledProps<T>>;
+
+/**
+ * Base className w/ options
  */
 export function styled<T, K extends keyof T & string>(
   Component: ComponentType<T>,
-  options: { props?: Array<K>; spreadProps?: Array<K>; classProps?: Array<K> }
+  baseClassName: string,
+  options: StyledOptions<T> & {
+    props?: Array<K>;
+    spreadProps?: Array<K>;
+    classProps?: Array<K>;
+  }
+): ForwardRef<InferRef<T>, StyledPropsWithKeys<T, K>>;
+
+/**
+ * Only options
+ */
+export function styled<T, K extends keyof T & string>(
+  Component: ComponentType<T>,
+  options: StyledOptions<T> & {
+    props?: Array<K>;
+    spreadProps?: Array<K>;
+    classProps?: Array<K>;
+  }
 ): ForwardRef<InferRef<T>, StyledPropsWithKeys<T, K>>;
 
 /**
@@ -58,17 +82,27 @@ export function styled<
   T extends { style?: StyleProp<unknown>; children?: ReactNode | undefined }
 >(
   Component: ComponentType<T>,
-  {
+  styledBaseClassNameOrOptions?: string | StyledOptions<T>,
+  maybeOptions: StyledOptions<T> = {}
+) {
+  const {
     props: propsToTransform,
     spreadProps,
     classProps,
-    supportsClassName = false,
-  }: StyledOptions<T> = {}
-) {
+  } = typeof styledBaseClassNameOrOptions === "object"
+    ? styledBaseClassNameOrOptions
+    : maybeOptions;
+
+  const baseClassName =
+    typeof styledBaseClassNameOrOptions === "string"
+      ? styledBaseClassNameOrOptions
+      : maybeOptions?.baseClassName;
+
   function Styled(
     {
       className,
       tw: twClassName,
+      baseTw,
       style: styleProp,
       children: componentChildren,
       ...componentProps
@@ -78,8 +112,10 @@ export function styled<
     const { platform, preview } = usePlatform();
 
     const { classes, allClasses, isComponent, isParent } = withClassNames({
+      baseClassName,
       className,
       twClassName,
+      baseTw,
       componentProps,
       propsToTransform,
       spreadProps,
@@ -110,7 +146,6 @@ export function styled<
       spreadProps,
       classProps,
       preview,
-      supportsClassName,
     });
 
     const children = childStyles

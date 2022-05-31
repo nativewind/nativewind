@@ -1,3 +1,28 @@
+## [1.6.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.2...v1.6.3) (2022-05-31)
+
+### Bug Fixes
+
+- remove react forwardRef override ([ecdcaa6](https://github.com/marklawlor/tailwindcss-react-native/commit/ecdcaa64081d00e4b3fdc30deebf8fa4ffb2450f))
+- typing of forwardRef override ([2745669](https://github.com/marklawlor/tailwindcss-react-native/commit/2745669296356cac9a1354703a163a793c319ea0))
+
+## [1.6.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.1...v1.6.2) (2022-05-31)
+
+### Bug Fixes
+
+- warnings when hmr on native. Move baseClassName to styled() props ([5d29a74](https://github.com/marklawlor/tailwindcss-react-native/commit/5d29a74dd4e8cdb3be07a4ab5058c568c5f10864))
+
+## [1.6.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.0...v1.6.1) (2022-05-31)
+
+### Bug Fixes
+
+- always try to extract styles ([17c450e](https://github.com/marklawlor/tailwindcss-react-native/commit/17c450e7eb45764c8ea5039ebe7e12b20c09299f))
+
+# [1.6.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.3...v1.6.0) (2022-05-31)
+
+### Features
+
+- add baseClassName option to styled() ([199e23e](https://github.com/marklawlor/tailwindcss-react-native/commit/199e23e967acde90ecda1d60c02ec510674e4a33))
+
 ## [1.5.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.2...v1.5.3) (2022-05-29)
 
 ### Bug Fixes

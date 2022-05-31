@@ -39,6 +39,8 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
     }
 
     return (helpers) => {
+      helpers.addUtilities({ ".native-empty": {} });
+
       color(helpers, notSupported);
       space(helpers, notSupported);
       divide(helpers, notSupported);
