@@ -56,9 +56,10 @@ describe("Styled - Values Props", () => {
 });
 
 describe("Styled - Base Class Name", () => {
-  const StyledView = styled(View, {
+  const StyledView = styled(View);
+  StyledView.defaultProps = {
     baseClassName: "flex-row",
-  });
+  };
 
   test("can set base classNames", () => {
     const tree = render(
@@ -82,11 +83,10 @@ describe("Styled - Base Class Name", () => {
 });
 
 describe("Styled - Default props", () => {
-  const StyledText = styled(Text, {
-    baseClassName: "p-4",
-  });
+  const StyledText = styled(Text);
   StyledText.defaultProps = {
     accessibilityRole: "header",
+    baseClassName: "p-4",
   };
 
   test("can render with default props", () => {

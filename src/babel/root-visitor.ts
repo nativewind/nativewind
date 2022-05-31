@@ -101,6 +101,9 @@ export default function rootVisitor(
             const { styles } = extractStyles({
               ...tailwindConfig,
               content: [filename],
+              // If the file doesn't have any Tailwind styles, it will print a warning
+              // We force an empty style to prevent this
+              safelist: [".native-hmr-empty"],
             });
 
             const bodyNode = path.node.body;

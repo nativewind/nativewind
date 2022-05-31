@@ -1,6 +1,7 @@
 export interface WithClassNames {
   baseClassName?: string;
   className?: string;
+  baseTw?: string;
   twClassName?: string;
   propsToTransform?: string[];
   componentProps: Record<string, unknown>;
@@ -8,15 +9,19 @@ export interface WithClassNames {
   classProps?: string[];
 }
 export function withClassNames({
-  baseClassName = "",
+  baseClassName,
   className,
+  baseTw,
   twClassName,
   componentProps,
   propsToTransform = [],
   spreadProps = [],
   classProps = [],
 }: WithClassNames) {
-  const classes = [baseClassName, twClassName ?? className ?? ""].join(" ");
+  const classes = [
+    baseTw ?? baseClassName ?? "",
+    twClassName ?? className ?? "",
+  ].join(" ");
   const isComponent = classes.split(/\s+/).includes("component");
 
   const allClasses = [];

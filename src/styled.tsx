@@ -25,7 +25,6 @@ export interface StyledOptions<P> {
   spreadProps?: Array<keyof P & string>;
   classProps?: Array<keyof P & string>;
   supportsClassName?: boolean;
-  baseClassName?: string;
 }
 
 type ForwardRef<T, P> = ForwardRefExoticComponent<
@@ -68,13 +67,14 @@ export function styled<
     spreadProps,
     classProps,
     supportsClassName = false,
-    baseClassName,
   }: StyledOptions<T> = {}
 ) {
   function Styled(
     {
       className,
       tw: twClassName,
+      baseClassName,
+      baseTw,
       style: styleProp,
       children: componentChildren,
       ...componentProps
@@ -87,6 +87,7 @@ export function styled<
       baseClassName,
       className,
       twClassName,
+      baseTw,
       componentProps,
       propsToTransform,
       spreadProps,
