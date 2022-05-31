@@ -1,3 +1,11 @@
+## [1.6.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.2...v1.6.3) (2022-05-31)
+
+
+### Bug Fixes
+
+* remove react forwardRef override ([ecdcaa6](https://github.com/marklawlor/tailwindcss-react-native/commit/ecdcaa64081d00e4b3fdc30deebf8fa4ffb2450f))
+* typing of forwardRef override ([2745669](https://github.com/marklawlor/tailwindcss-react-native/commit/2745669296356cac9a1354703a163a793c319ea0))
+
 ## [1.6.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.1...v1.6.2) (2022-05-31)
 
 
