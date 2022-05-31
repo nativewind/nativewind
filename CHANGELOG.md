@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.3...v1.7.0) (2022-05-31)
+
+
+### Features
+
+* allow styled to accep baseClassName as second parameter ([469c6af](https://github.com/marklawlor/tailwindcss-react-native/commit/469c6af4b813bbc8e0a830fc58ce017a57390ae6))
+
 ## [1.6.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.2...v1.6.3) (2022-05-31)
 
 
