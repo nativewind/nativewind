@@ -48,7 +48,7 @@ The TailwindCSS compiler [does not allow for dynamic class names](https://tailwi
 
 The `className` prop is not passed to child components, it is transformed into a style object and passed via the `style` prop.
 
-## Identifier '***' has already been declared inside a node_module
+## Identifier '\*\*\*' has already been declared inside a node_module
 
 Example error:
 
@@ -64,7 +64,6 @@ You may need an additional loader to handle the result of these loaders.
 ```
 
 This can occur when your `tailwind.config.js` processes an unexpected file in your `node_modules`. You need to avoid [broad content patterns](https://tailwindcss.com/docs/content-configuration#pattern-recommendations), as it will process things like your `node_modules`
-
 
 ```diff
 // tailwind.config.js
