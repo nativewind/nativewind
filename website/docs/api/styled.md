@@ -51,7 +51,7 @@ Some components can either accept a value as a prop or be styled by CSS. An exam
 
 You can flag a components props as `classProps` to ensure the best output is used.
 
-```tsc
+```tsx
 import { styled } from "tailwindcss-react-native"
 import { Svg, Rect } from "react-native-svg"
 
@@ -72,7 +72,7 @@ function MyStyledSvg({ stroke, ...props }) {
 
 Not all libraries use style objects, with many accepting single values as a props. You can use `spreadProps` to help style these components. At runtime, `spreadProps` will remove those props and replace them with the computed styles "spread" as props.
 
-```tsc
+```tsx
 import { ActivityIndicator } from "react-native";
 import { styled } from "tailwindcss-react-native"
 
