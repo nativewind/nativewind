@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.0...v1.6.1) (2022-05-31)
+
+
+### Bug Fixes
+
+* always try to extract styles ([17c450e](https://github.com/marklawlor/tailwindcss-react-native/commit/17c450e7eb45764c8ea5039ebe7e12b20c09299f))
+
 # [1.6.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.5.3...v1.6.0) (2022-05-31)
 
 
