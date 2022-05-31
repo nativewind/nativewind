@@ -1,4 +1,5 @@
 export interface WithClassNames {
+  baseClassName?: string;
   className?: string;
   twClassName?: string;
   propsToTransform?: string[];
@@ -7,6 +8,7 @@ export interface WithClassNames {
   classProps?: string[];
 }
 export function withClassNames({
+  baseClassName = "",
   className,
   twClassName,
   componentProps,
@@ -14,7 +16,7 @@ export function withClassNames({
   spreadProps = [],
   classProps = [],
 }: WithClassNames) {
-  const classes = twClassName ?? className ?? "";
+  const classes = [baseClassName, twClassName ?? className ?? ""].join(" ");
   const isComponent = classes.split(/\s+/).includes("component");
 
   const allClasses = [];

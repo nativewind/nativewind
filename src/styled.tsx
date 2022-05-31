@@ -25,6 +25,7 @@ export interface StyledOptions<P> {
   spreadProps?: Array<keyof P & string>;
   classProps?: Array<keyof P & string>;
   supportsClassName?: boolean;
+  baseClassName?: string;
 }
 
 type ForwardRef<T, P> = ForwardRefExoticComponent<
@@ -40,7 +41,7 @@ type InferRef<T> = T extends RefAttributes<infer R> | ClassAttributes<infer R>
  */
 export function styled<T>(
   Component: ComponentType<T>,
-  options?: { props?: undefined; spreadProps?: undefined }
+  options?: StyledOptions<T> & { props?: undefined; spreadProps?: undefined }
 ): ForwardRef<InferRef<T>, StyledProps<T>>;
 
 /**
@@ -48,7 +49,11 @@ export function styled<T>(
  */
 export function styled<T, K extends keyof T & string>(
   Component: ComponentType<T>,
-  options: { props?: Array<K>; spreadProps?: Array<K>; classProps?: Array<K> }
+  options: StyledOptions<T> & {
+    props?: Array<K>;
+    spreadProps?: Array<K>;
+    classProps?: Array<K>;
+  }
 ): ForwardRef<InferRef<T>, StyledPropsWithKeys<T, K>>;
 
 /**
@@ -63,6 +68,7 @@ export function styled<
     spreadProps,
     classProps,
     supportsClassName = false,
+    baseClassName,
   }: StyledOptions<T> = {}
 ) {
   function Styled(
@@ -78,6 +84,7 @@ export function styled<
     const { platform, preview } = usePlatform();
 
     const { classes, allClasses, isComponent } = withClassNames({
+      baseClassName,
       className,
       twClassName,
       componentProps,

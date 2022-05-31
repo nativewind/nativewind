@@ -48,3 +48,29 @@ describe("Styled - Values Props", () => {
     expect(tree).toMatchSnapshot();
   });
 });
+
+describe("Styled - Base Class Name", () => {
+  const StyledView = styled(View, {
+    baseClassName: "flex-row",
+  });
+
+  test("can set base classNames", () => {
+    const tree = render(
+      <TestProvider css="flex-row">
+        <StyledView />
+      </TestProvider>
+    ).toJSON();
+
+    expect(tree).toMatchSnapshot();
+  });
+
+  test("can add new classNames", () => {
+    const tree = render(
+      <TestProvider css="flex-row p-4">
+        <StyledView className="p-4" />
+      </TestProvider>
+    ).toJSON();
+
+    expect(tree).toMatchSnapshot();
+  });
+});
