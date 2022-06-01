@@ -1,3 +1,10 @@
+## [1.7.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.4...v1.7.5) (2022-06-01)
+
+
+### Bug Fixes
+
+* wrap styled(component) in useMemo so it doesn't re-mount on every render ([#69](https://github.com/marklawlor/tailwindcss-react-native/issues/69)) ([cad2934](https://github.com/marklawlor/tailwindcss-react-native/commit/cad293411d3d8dc91bd96ca8c4eec480a5371d8a))
+
 ## [1.7.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.3...v1.7.4) (2022-06-01)
 
 
