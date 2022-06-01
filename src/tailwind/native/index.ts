@@ -39,7 +39,10 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
     }
 
     return (helpers) => {
-      helpers.addUtilities({ ".native-empty": {} });
+      // This helper is used by babel to stop warnings from being printed
+      // on files without styles when using Hot Module Reload.
+      // Because it doesn't have any styles, it will be omitted from the output
+      helpers.addUtilities({ ".babel-empty": {} });
 
       color(helpers, notSupported);
       space(helpers, notSupported);

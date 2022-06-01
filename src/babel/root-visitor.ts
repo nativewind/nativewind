@@ -103,7 +103,7 @@ export default function rootVisitor(
               content: [filename],
               // If the file doesn't have any Tailwind styles, it will print a warning
               // We force an empty style to prevent this
-              safelist: [".native-hmr-empty"],
+              safelist: ["native-empty"],
             });
 
             const bodyNode = path.node.body;
