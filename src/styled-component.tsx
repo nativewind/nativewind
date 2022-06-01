@@ -8,7 +8,7 @@ export type StyledComponentProps<P> = StyledProps<P> & {
 
 export const StyledComponent = React.forwardRef(
   ({ component, ...options }, ref) => {
-    const Component = styled(component);
+    const Component = React.useMemo(() => styled(component), [component]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return <Component {...(options as any)} ref={ref as any} />;
   }
