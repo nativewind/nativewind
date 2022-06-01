@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.1...v1.7.2) (2022-06-01)
+
+
+### Bug Fixes
+
+* react is not defined in some environments ([a4d9634](https://github.com/marklawlor/tailwindcss-react-native/commit/a4d96343d5bd4270d5de371a614723392d53f7c3))
+
 ## [1.7.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.0...v1.7.1) (2022-05-31)
 
 
