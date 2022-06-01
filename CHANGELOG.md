@@ -1,3 +1,10 @@
+## [1.7.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.3...v1.7.4) (2022-06-01)
+
+
+### Bug Fixes
+
+* multiple no utility classes warnings ([c4b4a17](https://github.com/marklawlor/tailwindcss-react-native/commit/c4b4a172bf0598cb482f3c4e999fc7a1d21c52de)), closes [#67](https://github.com/marklawlor/tailwindcss-react-native/issues/67)
+
 ## [1.7.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.2...v1.7.3) (2022-06-01)
 
 
