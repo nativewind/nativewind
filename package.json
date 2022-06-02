@@ -47,7 +47,6 @@
   ],
   "dependencies": {
     "@babel/types": "7.18.2",
-    "@react-native-community/hooks": "^2.8.1",
     "css-mediaquery": "^0.1.2",
     "css-to-react-native": "^3.0.0",
     "micromatch": "^4.0.5",
