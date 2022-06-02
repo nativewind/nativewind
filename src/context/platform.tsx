@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useContext } from "react";
+import React, { createContext, PropsWithChildren, useContext } from "react";
 import { Platform } from "react-native";
 
 export interface PlatformContext {

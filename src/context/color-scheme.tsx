@@ -1,4 +1,9 @@
-import { createContext, PropsWithChildren, useContext, useState } from "react";
+import React, {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useState,
+} from "react";
 import { Appearance, ColorSchemeName } from "react-native";
 
 export interface ColorSchemeContext {

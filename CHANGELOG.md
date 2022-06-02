@@ -1,16 +1,38 @@
-## [1.7.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.0...v1.7.1) (2022-05-31)
-
+## [1.7.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.4...v1.7.5) (2022-06-01)
 
 ### Bug Fixes
 
-* prevent duplicate identifiers when accidentally importing RWN ([ef1e83e](https://github.com/marklawlor/tailwindcss-react-native/commit/ef1e83ed9c01f6cf7864ef05aa0714ff404f1474))
+- wrap styled(component) in useMemo so it doesn't re-mount on every render ([#69](https://github.com/marklawlor/tailwindcss-react-native/issues/69)) ([cad2934](https://github.com/marklawlor/tailwindcss-react-native/commit/cad293411d3d8dc91bd96ca8c4eec480a5371d8a))
+
+## [1.7.4](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.3...v1.7.4) (2022-06-01)
+
+### Bug Fixes
+
+- multiple no utility classes warnings ([c4b4a17](https://github.com/marklawlor/tailwindcss-react-native/commit/c4b4a172bf0598cb482f3c4e999fc7a1d21c52de)), closes [#67](https://github.com/marklawlor/tailwindcss-react-native/issues/67)
+
+## [1.7.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.2...v1.7.3) (2022-06-01)
+
+### Bug Fixes
+
+- multiple no utility classes warnings ([b6a61ff](https://github.com/marklawlor/tailwindcss-react-native/commit/b6a61ff5d83b5767c5be232cbea88a54b861454a)), closes [#67](https://github.com/marklawlor/tailwindcss-react-native/issues/67)
+
+## [1.7.2](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.1...v1.7.2) (2022-06-01)
+
+### Bug Fixes
+
+- react is not defined in some environments ([a4d9634](https://github.com/marklawlor/tailwindcss-react-native/commit/a4d96343d5bd4270d5de371a614723392d53f7c3))
+
+## [1.7.1](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.0...v1.7.1) (2022-05-31)
+
+### Bug Fixes
+
+- prevent duplicate identifiers when accidentally importing RWN ([ef1e83e](https://github.com/marklawlor/tailwindcss-react-native/commit/ef1e83ed9c01f6cf7864ef05aa0714ff404f1474))
 
 # [1.7.0](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.3...v1.7.0) (2022-05-31)
 
-
 ### Features
 
-* allow styled to accep baseClassName as second parameter ([469c6af](https://github.com/marklawlor/tailwindcss-react-native/commit/469c6af4b813bbc8e0a830fc58ce017a57390ae6))
+- allow styled to accep baseClassName as second parameter ([469c6af](https://github.com/marklawlor/tailwindcss-react-native/commit/469c6af4b813bbc8e0a830fc58ce017a57390ae6))
 
 ## [1.6.3](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.6.2...v1.6.3) (2022-05-31)
 
