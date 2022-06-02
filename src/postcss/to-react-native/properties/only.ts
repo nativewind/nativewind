@@ -1,11 +1,6 @@
 import { getStylesForProperty, Style } from "css-to-react-native";
 import { ImageStyle, TextStyle, ViewStyle } from "react-native";
 
-declare global {
-  // eslint-disable-next-line no-var
-  var hairlineWidthValue: number | undefined;
-}
-
 export type PropertyGuard<T extends string> = (
   value: string,
   name: string
@@ -56,16 +51,37 @@ export function only<
   const callback = (value: string, name: string) => {
     const isNaN = Number.isNaN(Number.parseInt(value));
 
-    if (number) {
-      if (value === "hairlineWidth") {
-        return JSON.parse(
-          JSON.stringify(getStylesForProperty(name, "1px")).replace(
-            new RegExp("1", "g"),
-            globalThis.hairlineWidthValue?.toString() ?? '"hairlineWidth"'
-          )
-        );
-      }
+    if (isFunctionValue(value)) {
+      /**
+       * This is a hack to support platform values: styleSheet(hairlineWidth)
+       *
+       * We need to preserve this value all the way to the style serialization
+       * where they are outputted as runtime values: StyleSheet.hairlineWidth
+       *
+       * But we also need to convert shorthand css property names to their long form
+       *
+       * so { borderWidth: styleSheet(hairlineWidth) } needs to be turned into
+       *
+       * {
+       *  "borderBottomWidth": "styleSheet(hairlineWidth)",
+       *  "borderLeftWidth": "styleSheet(hairlineWidth)",
+       *  "borderRightWidth": "styleSheet(hairlineWidth)",
+       *  "borderTopWidth": "styleSheet(hairlineWidth)",
+       * }
+       *
+       * We achieve this by generating a fake style object and replacing its values.
+       */
+      const fakePropertyStyles =
+        number || units
+          ? getStylesForProperty(name, "1px")
+          : getStylesForProperty(name, "transparent");
 
+      return Object.fromEntries(
+        Object.entries(fakePropertyStyles).map(([key]) => [key, value])
+      );
+    }
+
+    if (number) {
       if (isNaN) {
         throw new Error(name);
       }
@@ -95,4 +111,8 @@ export function only<
   };
 
   return callback;
+}
+
+function isFunctionValue(value: string) {
+  return value.startsWith("styleSheet(") || value.startsWith("platformColor(");
 }

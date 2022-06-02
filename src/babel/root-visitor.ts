@@ -10,6 +10,7 @@ import { visitor, VisitorState } from "./visitor";
 import { getAllowedOptions, isAllowedProgramPath } from "./utils/allowed-paths";
 import { getTailwindConfig } from "./utils/get-tailwind-config";
 import { StyleError } from "../types/common";
+import { babelStyleSerializer } from "../utils/serialize-styles";
 
 export default function rootVisitor(
   options: TailwindcssReactNativeBabelOptions,
@@ -98,12 +99,13 @@ export default function rootVisitor(
             /**
              * Override tailwind to only process the classnames in this file
              */
-            const { styles } = extractStyles({
+            const { output } = extractStyles({
               ...tailwindConfig,
               content: [filename],
               // If the file doesn't have any Tailwind styles, it will print a warning
               // We force an empty style to prevent this
               safelist: [".native-hmr-empty"],
+              serializer: babelStyleSerializer,
             });
 
             const bodyNode = path.node.body;
@@ -117,9 +119,9 @@ export default function rootVisitor(
             }
 
             // If there are no styles, early exit
-            if (Object.keys(styles).length === 0) return;
+            if (Object.keys(output.styles).length === 0) return;
 
-            appendVariables(bodyNode, styles);
+            appendVariables(bodyNode, output);
 
             if (!hasStyleSheetImport) {
               prependImport(
@@ -136,13 +138,16 @@ export default function rootVisitor(
             /**
              * Override tailwind to only process the classnames in this file
              */
-            const { styles } = extractStyles(tailwindConfig);
+            const { output } = extractStyles({
+              ...tailwindConfig,
+              serializer: babelStyleSerializer,
+            });
 
             // If there are no styles, early exit
-            if (Object.keys(styles).length === 0) return;
+            if (Object.keys(output.styles).length === 0) return;
 
             const bodyNode = path.node.body;
-            appendVariables(bodyNode, styles);
+            appendVariables(bodyNode, output);
 
             if (!hasStyleSheetImport) {
               prependImport(

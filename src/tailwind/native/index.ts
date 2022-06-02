@@ -77,7 +77,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
           widest: "1px",
         },
         borderWidth: {
-          DEFAULT: "hairlineWidth",
+          DEFAULT: "styleSheet(hairlineWidth)",
           0: "0px",
           2: "2px",
           4: "4px",

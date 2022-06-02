@@ -1,3 +1,5 @@
+import { DefaultSerializedStyles } from "../../utils/serialize-styles";
+
 import {
   arrayExpression,
   assignmentExpression,
@@ -6,6 +8,7 @@ import {
   Expression,
   expressionStatement,
   identifier,
+  isExpression,
   logicalExpression,
   memberExpression,
   nullLiteral,
@@ -17,12 +20,10 @@ import {
   unaryExpression,
 } from "@babel/types";
 
-import { StyleRecord } from "../../types/common";
-import { serializeStyles } from "../../utils/serialize-styles";
-
-export function appendVariables(body: Statement[], styleRecord: StyleRecord) {
-  const { styles, media } = serializeStyles(styleRecord);
-
+export function appendVariables(
+  body: Statement[],
+  { styles, media }: DefaultSerializedStyles
+) {
   body.push(
     expressionStatement(
       assignmentExpression(
@@ -47,7 +48,7 @@ export function appendVariables(body: Statement[], styleRecord: StyleRecord) {
                 identifier("RNStyleSheet"),
                 identifier("create")
               ),
-              [serialize(styles)]
+              [babelSerializeObject(styles)]
             ),
           ]
         )
@@ -71,7 +72,7 @@ export function appendVariables(body: Statement[], styleRecord: StyleRecord) {
               ),
               identifier("{}")
             ),
-            serialize(media),
+            babelSerializeObject(media),
           ]
         )
       )
@@ -79,21 +80,20 @@ export function appendVariables(body: Statement[], styleRecord: StyleRecord) {
   );
 }
 
-function serialize(literal: unknown): Expression {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function babelSerializeObject(literal: any): Expression {
+  if (isExpression(literal)) {
+    return literal;
+  }
+
   if (literal === null) {
     return nullLiteral();
   }
+
   switch (typeof literal) {
     case "number":
       return numericLiteral(literal);
     case "string":
-      if (literal === "hairlineWidth") {
-        return memberExpression(
-          identifier("RNStyleSheet"),
-          identifier("hairlineWidth")
-        );
-      }
-
       return stringLiteral(literal);
     case "boolean":
       return booleanLiteral(literal);
@@ -101,7 +101,7 @@ function serialize(literal: unknown): Expression {
       return unaryExpression("void", numericLiteral(0), true);
     default:
       if (Array.isArray(literal)) {
-        return arrayExpression(literal.map((n) => serialize(n)));
+        return arrayExpression(literal.map((n) => babelSerializeObject(n)));
       }
 
       if (isObject(literal)) {
@@ -111,7 +111,10 @@ function serialize(literal: unknown): Expression {
               return typeof literal[k] !== "undefined";
             })
             .map((k) => {
-              return objectProperty(stringLiteral(k), serialize(literal[k]));
+              return objectProperty(
+                stringLiteral(k),
+                babelSerializeObject(literal[k])
+              );
             })
         );
       }

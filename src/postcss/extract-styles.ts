@@ -6,10 +6,19 @@ import plugin from "../postcss";
 
 import { StyleError, StyleRecord } from "../types/common";
 
-export function extractStyles(
-  tailwindConfig: TailwindConfig,
+export interface ExtractStylesOptions<T> extends TailwindConfig {
+  serializer: (styleRecord: StyleRecord) => T;
+}
+
+export interface ExtractStyles<T> {
+  output: T;
+  errors: StyleError[];
+}
+
+export function extractStyles<T>(
+  { serializer, ...tailwindConfig }: ExtractStylesOptions<T>,
   cssInput = "@tailwind components;@tailwind utilities;"
-) {
+): ExtractStyles<T> {
   let styles: StyleRecord = {};
   let errors: StyleError[] = [];
 
@@ -27,7 +36,7 @@ export function extractStyles(
   postcss(plugins).process(cssInput).css;
 
   return {
-    styles,
+    output: serializer(styles),
     errors,
   };
 }

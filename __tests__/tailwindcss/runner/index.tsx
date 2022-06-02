@@ -1,12 +1,12 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { extractStyles } from "../../../src/postcss/extract-styles";
 import { StyleError, StyleRecord } from "../../../src/types/common";
+import { testStyleSerializer } from "../../../src/utils/serialize-styles";
 
 import plugin from "../../../src/tailwind";
 import { nativePlugin } from "../../../src/tailwind/native";
 import { TailwindProvider, TailwindProviderProps } from "../../../src";
 import { PropsWithChildren } from "react";
-import { serializeStyles } from "../../../src/utils/serialize-styles";
 
 export type Test = [string, StyleRecord] | [string, StyleRecord, true];
 
@@ -40,30 +40,31 @@ export function assertStyles(
       { raw: "", extension: "html" },
     ] as unknown as TailwindConfig["content"],
     safelist: [css],
+    serializer: (styles) => styles,
   });
 
-  expect(output).toEqual({ styles });
   if (shouldError) {
-    errors.push(...outputErrors);
-    expect(errors.length).toBeGreaterThan(0);
+    expect([...errors, ...outputErrors].length).toBeGreaterThan(0);
+  } else {
+    expect(outputErrors.length).toBe(0);
   }
+
+  expect(output.output).toEqual(styles);
 }
 
 export function TestProvider({
   css,
   ...props
 }: PropsWithChildren<TailwindProviderProps & { css: string }>) {
-  globalThis.hairlineWidthValue = 1;
-
-  const { styles } = extractStyles({
+  const { output } = extractStyles({
     theme: {},
     plugins: [plugin, nativePlugin()],
     content: [
       { raw: "", extension: "html" },
     ] as unknown as TailwindConfig["content"],
     safelist: [css],
+    serializer: testStyleSerializer,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <TailwindProvider {...serializeStyles(styles)} {...props} />;
+  return <TailwindProvider {...output} {...props} />;
 }

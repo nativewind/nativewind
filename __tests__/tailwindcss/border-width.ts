@@ -17,10 +17,10 @@ tailwindRunner(
       {
         border: [
           {
-            borderBottomWidth: "hairlineWidth",
-            borderTopWidth: "hairlineWidth",
-            borderLeftWidth: "hairlineWidth",
-            borderRightWidth: "hairlineWidth",
+            borderBottomWidth: "styleSheet(hairlineWidth)",
+            borderTopWidth: "styleSheet(hairlineWidth)",
+            borderLeftWidth: "styleSheet(hairlineWidth)",
+            borderRightWidth: "styleSheet(hairlineWidth)",
           } as Style,
         ],
       },
@@ -30,8 +30,8 @@ tailwindRunner(
       {
         "border-x": [
           {
-            borderLeftWidth: "hairlineWidth",
-            borderRightWidth: "hairlineWidth",
+            borderLeftWidth: "styleSheet(hairlineWidth)",
+            borderRightWidth: "styleSheet(hairlineWidth)",
           } as Style,
         ],
       },
@@ -41,27 +41,39 @@ tailwindRunner(
       {
         "border-y": [
           {
-            borderTopWidth: "hairlineWidth",
-            borderBottomWidth: "hairlineWidth",
+            borderTopWidth: "styleSheet(hairlineWidth)",
+            borderBottomWidth: "styleSheet(hairlineWidth)",
           } as Style,
         ],
       },
     ],
     [
       "border-t",
-      { "border-t": [{ borderTopWidth: "hairlineWidth" } as Style] },
+      {
+        "border-t": [{ borderTopWidth: "styleSheet(hairlineWidth)" } as Style],
+      },
     ],
     [
       "border-b",
-      { "border-b": [{ borderBottomWidth: "hairlineWidth" } as Style] },
+      {
+        "border-b": [
+          { borderBottomWidth: "styleSheet(hairlineWidth)" } as Style,
+        ],
+      },
     ],
     [
       "border-l",
-      { "border-l": [{ borderLeftWidth: "hairlineWidth" } as Style] },
+      {
+        "border-l": [{ borderLeftWidth: "styleSheet(hairlineWidth)" } as Style],
+      },
     ],
     [
       "border-r",
-      { "border-r": [{ borderRightWidth: "hairlineWidth" } as Style] },
+      {
+        "border-r": [
+          { borderRightWidth: "styleSheet(hairlineWidth)" } as Style,
+        ],
+      },
     ],
   ],
   createTests("border", scenarios, (n) => ({
