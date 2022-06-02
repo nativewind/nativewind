@@ -1,3 +1,10 @@
+## [1.7.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.5...v1.7.6) (2022-06-02)
+
+
+### Bug Fixes
+
+* downgrade tsconfig target to ES2019 ([5447022](https://github.com/marklawlor/tailwindcss-react-native/commit/5447022d26af58213a8b11e9c9e3783614de2e20))
+
 ## [1.7.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.4...v1.7.5) (2022-06-01)
 
 
