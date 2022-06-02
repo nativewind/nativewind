@@ -76,9 +76,9 @@ function getStyles(
       // We cannot just test for `:active` as it will match hover\\:active-foobar:hover
       // Due to how classNames are escaped, we can just check for :active and ensure
       // it doesn't have an escape character before it.
-      if (/(?<!\\):active/.test(cssRule.selectorText)) states.push(active);
-      if (/(?<!\\):focus/.test(cssRule.selectorText)) states.push(focus);
-      if (/(?<!\\):hover/.test(cssRule.selectorText)) states.push(hover);
+      if (/[^\\]:active/.test(cssRule.selectorText)) states.push(active);
+      if (/[^\\]:focus/.test(cssRule.selectorText)) states.push(focus);
+      if (/[^\\]:hover/.test(cssRule.selectorText)) states.push(hover);
 
       return states.every(Boolean);
     }
