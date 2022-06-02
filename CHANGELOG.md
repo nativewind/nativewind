@@ -1,3 +1,11 @@
+## [1.7.7](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.6...v1.7.7) (2022-06-02)
+
+
+### Bug Fixes
+
+* inline useDeviceOrientation to remove need to transpile ([c0659cd](https://github.com/marklawlor/tailwindcss-react-native/commit/c0659cd8615e6168b8bfa5da45b5ba5880482ac0))
+* remove regex negative lookbehind for safari compatibility ([#72](https://github.com/marklawlor/tailwindcss-react-native/issues/72)) ([25476cb](https://github.com/marklawlor/tailwindcss-react-native/commit/25476cb57a88e9e46d33ce055c9f6df0b0dd7c36))
+
 ## [1.7.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.5...v1.7.6) (2022-06-02)
 
 
