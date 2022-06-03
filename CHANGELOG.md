@@ -1,3 +1,10 @@
+## [1.7.8](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.7...v1.7.8) (2022-06-03)
+
+
+### Bug Fixes
+
+* merging classes of styled(styled()) components ([ad7f692](https://github.com/marklawlor/tailwindcss-react-native/commit/ad7f6924cfa7e6e3a66ac2ffc4617e2f96739504))
+
 ## [1.7.7](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.6...v1.7.7) (2022-06-02)
 
 
