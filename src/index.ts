@@ -6,3 +6,4 @@ export type { StyledProps } from "./utils/styled";
 export { useColorScheme } from "./context/color-scheme";
 export { useComponent, ComponentContext } from "./context/component";
 export { usePlatform } from "./context/platform";
+export { withPlatformTheme } from "./utils/with-platform-theme";

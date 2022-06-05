@@ -7,7 +7,7 @@ interface WithPlatformThemeOptions {
 
 export function withPlatformTheme(
   tailwindConfig: TailwindConfig,
-  { previewCss = false }: WithPlatformThemeOptions
+  { previewCss = false }: WithPlatformThemeOptions = {}
 ) {
   const config = resolveTailwindConfig(tailwindConfig);
 
@@ -25,7 +25,9 @@ export function withPlatformTheme(
 
     if (hasPlatformKeys(value)) {
       if (previewCss) {
-        root[key] = value.web || value.default;
+        root[key] =
+          (value as Record<string, unknown>).web ||
+          (value as Record<string, unknown>).default;
       } else {
         const platformParameter = Object.entries(value)
           .map((entry) => entry.join(":"))
