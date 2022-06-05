@@ -4,7 +4,7 @@ import { NodePath } from "@babel/traverse";
 
 import { extractStyles } from "../postcss/extract-styles";
 import { appendVariables } from "./transforms/append-variables";
-import { prependImport } from "./transforms/append-import";
+import { prependImport, prependImports } from "./transforms/append-import";
 import { TailwindcssReactNativeBabelOptions, State } from "./types";
 import { visitor, VisitorState } from "./visitor";
 import { getAllowedOptions, isAllowedProgramPath } from "./utils/allowed-paths";
@@ -69,6 +69,7 @@ export default function rootVisitor(
             platform: "native",
             hmr: true,
             mode: "compileAndTransform",
+            didTransform: false,
             blockModuleTransform: [],
             hasStyledComponentImport: false,
             canCompile,
@@ -90,72 +91,66 @@ export default function rootVisitor(
           const {
             filename,
             hasStyleSheetImport,
+            didTransform,
             hasProvider,
             hasStyledComponentImport,
             hmr,
           } = visitorState;
 
-          if (hmr) {
-            /**
-             * Override tailwind to only process the classnames in this file
-             */
-            const { output } = extractStyles({
-              ...tailwindConfig,
-              content: [filename],
-              // If the file doesn't have any Tailwind styles, it will print a warning
-              // We force an empty style to prevent this
-              safelist: ["babel-empty"],
-              serializer: babelStyleSerializer,
-            });
+          /*
+           * If we are not hmr, we only care if this file has a provider
+           */
+          if (!hmr && !hasProvider) {
+            return;
+          }
 
-            const bodyNode = path.node.body;
+          const extractStylesOptions = hmr
+            ? {
+                ...tailwindConfig,
+                content: [filename],
+                // If the file doesn't have any Tailwind styles, it will print a warning
+                // We force an empty style to prevent this
+                safelist: ["babel-empty"],
+                serializer: babelStyleSerializer,
+              }
+            : {
+                ...tailwindConfig,
+                serializer: babelStyleSerializer,
+              };
 
-            if (!hasStyledComponentImport && canTransform) {
-              prependImport(
-                bodyNode,
-                "StyledComponent",
-                "tailwindcss-react-native"
-              );
-            }
+          const { output } = extractStyles(extractStylesOptions);
 
-            // If there are no styles, early exit
-            if (Object.keys(output.styles).length === 0) return;
+          const bodyNode = path.node.body;
 
-            appendVariables(bodyNode, output);
+          if (didTransform && !hasStyledComponentImport) {
+            prependImport(
+              bodyNode,
+              "StyledComponent",
+              "tailwindcss-react-native"
+            );
+          }
 
-            if (!hasStyleSheetImport) {
-              prependImport(
-                bodyNode,
-                ["RNStyleSheet", "StyleSheet"],
-                "react-native"
-              );
-            }
-          } else {
-            if (!hasProvider) {
-              return;
-            }
+          // If there are no styles, early exit
+          if (Object.keys(output.styles).length === 0) return;
 
-            /**
-             * Override tailwind to only process the classnames in this file
-             */
-            const { output } = extractStyles({
-              ...tailwindConfig,
-              serializer: babelStyleSerializer,
-            });
+          appendVariables(bodyNode, output);
 
-            // If there are no styles, early exit
-            if (Object.keys(output.styles).length === 0) return;
+          const imports = [];
 
-            const bodyNode = path.node.body;
-            appendVariables(bodyNode, output);
+          if (!hasStyleSheetImport) {
+            imports.push(["RNStyleSheet", "StyleSheet"]);
+          }
 
-            if (!hasStyleSheetImport) {
-              prependImport(
-                bodyNode,
-                ["RNStyleSheet", "StyleSheet"],
-                "react-native"
-              );
-            }
+          if (output.hasPlatform) {
+            imports.push(["RNPlatform", "Platform"]);
+          }
+
+          if (output.hasPlatformColor) {
+            imports.push(["RNPlatformColor", "PlatformColor"]);
+          }
+
+          if (imports.length > 0) {
+            prependImports(bodyNode, imports, "react-native");
           }
         },
       },

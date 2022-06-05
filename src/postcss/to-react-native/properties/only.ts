@@ -114,5 +114,9 @@ export function only<
 }
 
 function isFunctionValue(value: string) {
-  return value.startsWith("styleSheet(") || value.startsWith("platformColor(");
+  return (
+    value.startsWith("styleSheet(") ||
+    value.startsWith("platformColor(") ||
+    value.startsWith("platform(")
+  );
 }

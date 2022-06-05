@@ -27,6 +27,7 @@ export interface VisitorState
   tailwindConfigPath: string;
   canCompile: boolean;
   canTransform: boolean;
+  didTransform: boolean;
 }
 
 /**
@@ -63,6 +64,7 @@ export const visitor: Visitor<VisitorState> = {
     }
 
     if (someAttributes(path, ["className", "tw"]) && canTransform) {
+      state.didTransform ||= true;
       toStyledComponent(path);
     }
   },

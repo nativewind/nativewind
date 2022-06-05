@@ -119,7 +119,7 @@ function babelSerializeObject(literal: any): Expression {
         );
       }
 
-      throw new Error("unserializable literal");
+      throw new Error("un-serializable literal");
   }
 }
 
