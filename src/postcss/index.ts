@@ -13,7 +13,7 @@ const pluginPack: PluginCreator<PostcssPluginOptions> = (options) => {
     calc({
       warnWhenCannotResolve: true,
     }),
-    postcssNested({ bubble: ["selector", "pseudo-class"] }),
+    postcssNested({ bubble: ["selector", "pseudo-class", "dynamic-style"] }),
     plugin(options),
   ]);
 };

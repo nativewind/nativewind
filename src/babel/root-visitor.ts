@@ -118,8 +118,6 @@ export default function rootVisitor(
                 serializer: babelStyleSerializer,
               };
 
-          const { output } = extractStyles(extractStylesOptions);
-
           const bodyNode = path.node.body;
 
           if (didTransform && !hasStyledComponentImport) {
@@ -130,8 +128,9 @@ export default function rootVisitor(
             );
           }
 
-          // If there are no styles, early exit
-          if (Object.keys(output.styles).length === 0) return;
+          const { output } = extractStyles(extractStylesOptions);
+
+          if (!output.hasStyles) return;
 
           appendVariables(bodyNode, output);
 

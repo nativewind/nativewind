@@ -26,18 +26,29 @@ export function matchAtRule({
   colorScheme,
   deviceMediaContext: { width, height, orientation },
 }: MatchAtRuleOptions) {
-  if (rule === "pseudo-class" && params === "hover") {
-    return hover;
-  } else if (rule === "pseudo-class" && params === "focus") {
-    return focus;
-  } else if (rule === "pseudo-class" && params === "active") {
-    return active;
-  } else if (rule === "component" && params === "hover") {
-    return componentInteraction.hover;
-  } else if (rule === "component" && params === "focus") {
-    return componentInteraction.focus;
-  } else if (rule === "component" && params === "active") {
-    return componentInteraction.active;
+  // eslint-disable-next-line unicorn/prefer-switch
+  if (rule === "pseudo-class") {
+    switch (params) {
+      case "hover":
+        return hover;
+      case "focus":
+        return focus;
+      case "active":
+        return active;
+      default:
+        return false;
+    }
+  } else if (rule === "component") {
+    switch (params) {
+      case "hover":
+        return componentInteraction.hover;
+      case "focus":
+        return componentInteraction.focus;
+      case "active":
+        return componentInteraction.active;
+      default:
+        return false;
+    }
   } else if (rule === "media") {
     return match(params, {
       "aspect-ratio": width / height,
@@ -50,7 +61,11 @@ export function matchAtRule({
       orientation,
       "prefers-color-scheme": colorScheme,
     });
+  } else if (rule === "dynamic-style") {
+    return true;
   }
+
+  return false;
 }
 
 export interface MatchChildAtRuleOptions {
@@ -78,12 +93,17 @@ export function matchChildAtRule({
     return true;
   } else if (rule === "selector" && params === "(> *)") {
     return true;
-  } else if (rule === "component" && params === "hover") {
-    return parentHover;
-  } else if (rule === "component" && params === "focus") {
-    return parentFocus;
-  } else if (rule === "component" && params === "active") {
-    return parentActive;
+  } else if (rule === "component") {
+    switch (params) {
+      case "hover":
+        return parentHover;
+      case "focus":
+        return parentFocus;
+      case "active":
+        return parentActive;
+      default:
+        return false;
+    }
   }
 
   return false;

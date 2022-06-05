@@ -7,7 +7,7 @@ import {
   objectProperty,
   stringLiteral,
 } from "@babel/types";
-import { MediaRecord, Style, StyleRecord } from "../types/common";
+import { MediaRecord, Style, StyleRecord } from "../../types/common";
 
 export interface DefaultSerializedStyles {
   styles: {

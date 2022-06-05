@@ -64,9 +64,10 @@ export function getRuntimeStyles<T>({
       );
 
       for (const styleRecord of atRuleStyles) {
-        let isForChildren = false;
-
         const { atRules, transform, ...style } = styleRecord;
+
+        let isForChildren = false;
+        let shouldInline = false;
 
         const atRulesResult = atRules.every(([rule, params]) => {
           /**
@@ -80,6 +81,8 @@ export function getRuntimeStyles<T>({
             isForChildren = true;
             return true;
           }
+
+          shouldInline ||= rule === "dynamic-style";
 
           return matchAtRule({
             rule,
@@ -97,7 +100,11 @@ export function getRuntimeStyles<T>({
         if (isForChildren) {
           childStyles.push(styleRecord);
         } else if (atRulesResult) {
-          tailwindStyles.push(style as T);
+          if (shouldInline) {
+            tailwindStyles.push({ ...style } as T);
+          } else {
+            tailwindStyles.push(style as T);
+          }
 
           if (transform) {
             transforms.push(...transform);
