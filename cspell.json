@@ -16,21 +16,19 @@
     "website/static/*",
     "website/src/css/*"
   ],
-  "dictionaries": ["tailwind-words"],
+  "dictionaries": ["tailwind", "project", "react-native"],
   "dictionaryDefinitions": [
     {
-      "name": "tailwind-words",
-      "path": "./.cspell/tailwind-words.txt"
+      "name": "tailwind",
+      "path": "./.cspell/tailwind.txt"
+    },
+    {
+      "name": "project",
+      "path": "./.cspell/project.txt"
+    },
+    {
+      "name": "react-native",
+      "path": "./.cspell/react-native.txt"
     }
-  ],
-  "words": [
-    "pressable",
-    "marklawlor",
-    "commitlint",
-    "lawlor",
-    "moti",
-    "solito",
-    "atrule",
-    "nextjs"
   ]
 }

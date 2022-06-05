@@ -1,3 +1,3 @@
 module.exports = {
-  content: ["./dont-match-anything"],
+  content: ["./do-not-match-anything"],
 };
