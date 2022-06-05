@@ -62,6 +62,8 @@ export function getRuntimeStyles<T>({
      * Media styles contain atRules and need to be validated
      */
     if (media[selector]) {
+      dynamicStyle = true;
+
       const atRuleStyles: AtRuleRecord[] = media[selector].map(
         (atRules, index) => ({
           ...flattenIfRWN(styles[`${selector}.${index}`]),
@@ -86,8 +88,6 @@ export function getRuntimeStyles<T>({
             isForChildren = true;
             return true;
           }
-
-          dynamicStyle ||= rule === "dynamic-style";
 
           return matchAtRule({
             rule,
