@@ -14,6 +14,12 @@ if (
   )
 ) {
   config.plugins.push("@semantic-release/changelog", [
+    [
+      "@semantic-release/exec",
+      {
+        prepare: "npx prettier -w CHANGELOG.md",
+      },
+    ],
     "@semantic-release/git",
     {
       assets: ["CHANGELOG.md"],
