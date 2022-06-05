@@ -1,6 +1,6 @@
 import React, { createContext, PropsWithChildren, useContext } from "react";
 import { useWindowDimensions } from "react-native";
-import { useDeviceOrientation } from "@react-native-community/hooks";
+import { useDeviceOrientation } from "./use-device-orientation";
 
 export interface DeviceMediaContext {
   width: number;

@@ -1,3 +1,22 @@
+## [1.7.8](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.7...v1.7.8) (2022-06-03)
+
+### Bug Fixes
+
+- merging classes of styled(styled()) components ([ad7f692](https://github.com/marklawlor/tailwindcss-react-native/commit/ad7f6924cfa7e6e3a66ac2ffc4617e2f96739504))
+
+## [1.7.7](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.6...v1.7.7) (2022-06-02)
+
+### Bug Fixes
+
+- inline useDeviceOrientation to remove need to transpile ([c0659cd](https://github.com/marklawlor/tailwindcss-react-native/commit/c0659cd8615e6168b8bfa5da45b5ba5880482ac0))
+- remove regex negative lookbehind for safari compatibility ([#72](https://github.com/marklawlor/tailwindcss-react-native/issues/72)) ([25476cb](https://github.com/marklawlor/tailwindcss-react-native/commit/25476cb57a88e9e46d33ce055c9f6df0b0dd7c36))
+
+## [1.7.6](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.5...v1.7.6) (2022-06-02)
+
+### Bug Fixes
+
+- downgrade tsconfig target to ES2019 ([5447022](https://github.com/marklawlor/tailwindcss-react-native/commit/5447022d26af58213a8b11e9c9e3783614de2e20))
+
 ## [1.7.5](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.4...v1.7.5) (2022-06-01)
 
 ### Bug Fixes

@@ -2,9 +2,9 @@
   "compilerOptions": {
     // Recommended settings for Node 14
     // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
-    "lib": ["ES2020"],
+    "lib": ["esnext"],
     "module": "commonjs",
-    "target": "ES2020",
+    "target": "ES2019",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

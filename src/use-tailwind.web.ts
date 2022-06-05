@@ -22,7 +22,7 @@ export function useTailwind<
     ) => {
       return flatten
         ? classNameToInlineStyle(className, useTailwindOptions)
-        : { $$css: true, tailwindClassName: className };
+        : { $$css: true, [className]: className };
     }) as UseTailwindCallback<P>;
   }
 
