@@ -120,6 +120,7 @@ export function getRuntimeStyles<T>({
     tailwindStyles.push({ transform: transforms } as any);
   }
 
+  // If these styles are 100% static, then we can cache them
   if (!dynamicStyle) {
     cache[className] = [tailwindStyles, childStyles];
   }
