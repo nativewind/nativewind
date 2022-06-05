@@ -18,6 +18,8 @@ export interface GetStylesOptions {
   deviceMediaContext: DeviceMediaContext;
 }
 
+const cache: Record<string, [unknown[], AtRuleRecord[]]> = {};
+
 export function getRuntimeStyles<T>({
   className,
   hover,
@@ -29,10 +31,14 @@ export function getRuntimeStyles<T>({
   componentInteraction,
   deviceMediaContext,
 }: GetStylesOptions): [T[], AtRuleRecord[]] {
+  if (cache[className]) return cache[className] as [T[], AtRuleRecord[]];
+
   const { styles, media } = stylesheetContext;
   const tailwindStyles: T[] = [];
   const childStyles: AtRuleRecord[] = [];
   const transforms: ViewStyle["transform"] = [];
+
+  let dynamicStyle = false;
 
   for (const name of className.split(/\s+/)) {
     if (!name) continue; // Happens if there are leading or trailing whitespace
@@ -67,7 +73,6 @@ export function getRuntimeStyles<T>({
         const { atRules, transform, ...style } = styleRecord;
 
         let isForChildren = false;
-        let shouldInline = false;
 
         const atRulesResult = atRules.every(([rule, params]) => {
           /**
@@ -82,7 +87,7 @@ export function getRuntimeStyles<T>({
             return true;
           }
 
-          shouldInline ||= rule === "dynamic-style";
+          dynamicStyle ||= rule === "dynamic-style";
 
           return matchAtRule({
             rule,
@@ -100,11 +105,7 @@ export function getRuntimeStyles<T>({
         if (isForChildren) {
           childStyles.push(styleRecord);
         } else if (atRulesResult) {
-          if (shouldInline) {
-            tailwindStyles.push({ ...style } as T);
-          } else {
-            tailwindStyles.push(style as T);
-          }
+          tailwindStyles.push(style as T);
 
           if (transform) {
             transforms.push(...transform);
@@ -117,6 +118,10 @@ export function getRuntimeStyles<T>({
   if (transforms.length > 0) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tailwindStyles.push({ transform: transforms } as any);
+  }
+
+  if (!dynamicStyle) {
+    cache[className] = [tailwindStyles, childStyles];
   }
 
   if (childStyles.length > 0) {
