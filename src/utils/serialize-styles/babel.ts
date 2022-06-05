@@ -30,6 +30,10 @@ export function babelStyleSerializer(styleRecord: StyleRecord) {
   };
 }
 
+export function babelImport(name: string) {
+  return `___tw_${name}`;
+}
+
 function babelReplacer(key: string, value: string): [string, unknown] {
   if (typeof value !== "string") {
     return [key, value];
@@ -93,6 +97,17 @@ function babelReplacer(key: string, value: string): [string, unknown] {
         [objectExpression(props)]
       ),
     ];
+  }
+
+  // Match vw() or vh()
+  const result = value.match(/(v[hw])\((.+)\)/);
+  if (result) {
+    const variables = result[2]
+      .split(/[ ,]+/)
+      .filter(Boolean)
+      .map((v: string) => numericLiteral(Number.parseFloat(v)));
+
+    return [key, callExpression(identifier(babelImport(result[1])), variables)];
   }
 
   return [key, value];

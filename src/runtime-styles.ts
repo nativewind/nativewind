@@ -82,7 +82,7 @@ export function getRuntimeStyles<T>({
            * @selector (> *:not(:first-child))
            * @selector (> *)
            */
-          if (rule === "selector" && params.startsWith("(>")) {
+          if (rule === "selector" && params && params.startsWith("(>")) {
             isForChildren = true;
             return true;
           }

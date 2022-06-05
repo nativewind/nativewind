@@ -5,7 +5,7 @@ import { DeviceMediaContext } from "./context/device-media";
 
 interface MatchAtRuleOptions {
   rule: string;
-  params: string;
+  params?: string;
   hover: boolean;
   active: boolean;
   focus: boolean;
@@ -49,7 +49,7 @@ export function matchAtRule({
       default:
         return false;
     }
-  } else if (rule === "media") {
+  } else if (rule === "media" && params) {
     return match(params, {
       "aspect-ratio": width / height,
       "device-aspect-ratio": width / height,
@@ -71,7 +71,7 @@ export function matchAtRule({
 export interface MatchChildAtRuleOptions {
   nthChild: number;
   rule: string;
-  params: string;
+  params?: string;
   parentHover: boolean;
   parentFocus: boolean;
   parentActive: boolean;

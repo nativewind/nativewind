@@ -17,5 +17,18 @@ const scenarios: Record<string, ViewStyle["height"]> = {
 tailwindRunner(
   "Sizing - Height",
   createTests("h", scenarios, (n) => ({ height: n })),
-  expectError(["h-auto", "h-screen", "h-min", "h-max", "h-fit"])
+  expectError(["h-auto", "h-min", "h-max", "h-fit"]),
+  [
+    [
+      "h-screen",
+      {
+        "h-screen": [
+          {
+            atRules: [["dynamic-style", undefined]],
+            height: "vh(100)",
+          },
+        ],
+      },
+    ],
+  ]
 );

@@ -5,7 +5,7 @@ export type Style = ViewStyle | TextStyle | ImageStyle;
 export type StyleRecord = Record<string, Array<Style | AtRuleRecord>>;
 export type MediaRecord = Record<string, Array<AtRuleTuple[]>>;
 
-export type AtRuleTuple = [string, string];
+export type AtRuleTuple = [string, string | undefined];
 
 export interface AtRuleRecord extends Style {
   atRules: AtRuleTuple[];

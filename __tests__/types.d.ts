@@ -6,3 +6,7 @@ declare module "tailwindcss-react-native" {
   export const useTailwind: (...arg: any[]) => any;
   export const StyledComponent: FunctionComponent<any>;
 }
+
+declare module "tailwindcss-react-native/units" {
+  export const vw: (...arg: any[]) => any;
+}

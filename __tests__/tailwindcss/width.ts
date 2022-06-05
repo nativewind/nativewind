@@ -17,5 +17,18 @@ const scenarios: Record<string, ViewStyle["width"]> = {
 tailwindRunner(
   "Sizing - Width",
   createTests("w", scenarios, (n) => ({ width: n })),
-  expectError(["w-auto", "w-screen", "w-min", "w-max", "w-fit"])
+  expectError(["w-auto", "w-min", "w-max", "w-fit"]),
+  [
+    [
+      "w-screen",
+      {
+        "w-screen": [
+          {
+            atRules: [["dynamic-style", undefined]],
+            width: "vw(100)",
+          },
+        ],
+      },
+    ],
+  ]
 );
