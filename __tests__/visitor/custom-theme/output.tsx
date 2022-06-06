@@ -2,6 +2,7 @@ import {
   StyleSheet as RNStyleSheet,
   Platform as RNPlatform,
   PlatformColor as RNPlatformColor,
+  PixelRatio as RNPixelRatio,
 } from "react-native";
 import { StyledComponent } from "tailwindcss-react-native";
 import { Text } from "react-native";
@@ -9,7 +10,7 @@ import { TailwindProvider } from "tailwindcss-react-native";
 export function Test() {
   return (
     <TailwindProvider>
-      <StyledComponent className="text-blue-500" component={Text}>
+      <StyledComponent className="p-px text-blue-500" component={Text}>
         Hello world!
       </StyledComponent>
     </TailwindProvider>
@@ -18,6 +19,12 @@ export function Test() {
 globalThis.tailwindcss_react_native_style = Object.assign(
   globalThis.tailwindcss_react_native_style || {},
   RNStyleSheet.create({
+    "p-px": {
+      paddingTop: RNPixelRatio.roundToNearestPixel(4),
+      paddingRight: RNPixelRatio.roundToNearestPixel(4),
+      paddingBottom: RNPixelRatio.roundToNearestPixel(4),
+      paddingLeft: RNPixelRatio.roundToNearestPixel(4),
+    },
     "text-blue-500": {
       color: RNPlatform.select({
         ios: RNPlatformColor("systemTealColor"),

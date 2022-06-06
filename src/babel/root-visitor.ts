@@ -148,6 +148,10 @@ export default function rootVisitor(
             imports.push(["RNPlatformColor", "PlatformColor"]);
           }
 
+          if (output.hasPlatformColor) {
+            imports.push(["RNPixelRatio", "PixelRatio"]);
+          }
+
           if (imports.length > 0) {
             prependImports(bodyNode, imports, "react-native");
           }

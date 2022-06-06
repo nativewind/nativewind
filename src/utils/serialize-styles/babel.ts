@@ -46,6 +46,28 @@ function babelReplacer(key: string, value: string): [string, unknown] {
     ];
   }
 
+  if (value.startsWith("roundToNearestPixel(")) {
+    const result = value.match(/roundToNearestPixel\((.+)\)/);
+
+    if (!result) return [key, identifier("undefined")];
+
+    const variables = result[1]
+      .split(/[ ,]+/)
+      .filter(Boolean)
+      .map((v) => numericLiteral(Number.parseFloat(v)));
+
+    return [
+      key,
+      callExpression(
+        memberExpression(
+          identifier("RNPixelRatio"),
+          identifier("roundToNearestPixel")
+        ),
+        variables
+      ),
+    ];
+  }
+
   if (value.startsWith("platformColor(")) {
     const result = value.match(/platformColor\((.+)\)/);
 

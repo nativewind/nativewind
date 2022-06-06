@@ -2,6 +2,9 @@ module.exports = {
   content: [`./custom-theme/*.{js,ts,jsx,tsx}`],
   theme: {
     extend: {
+      padding: {
+        px: "roundToNearestPixel(4)",
+      },
       colors: {
         blue: {
           500: {
