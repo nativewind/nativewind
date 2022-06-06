@@ -24,8 +24,8 @@ tailwindRunner(
       {
         "h-screen": [
           {
-            atRules: [["dynamic-style", undefined]],
-            height: "vh(100)",
+            atRules: [["dynamic-style", "vh"]],
+            height: 100,
           },
         ],
       },

@@ -34,13 +34,14 @@ const plugin: PluginCreator<never> = () => {
         if (matches) {
           const dynamicStyle = new AtRule({
             name: "dynamic-style",
+            params: matches[2],
             nodes: [
               {
                 selector: rule.selector,
                 nodes: [
                   {
                     prop: decl.prop,
-                    value: `${matches[2]}(${matches[1]})`,
+                    value: matches[1],
                   },
                 ],
               },

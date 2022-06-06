@@ -6,6 +6,9 @@ import { matchAtRule } from "./match-at-rule";
 import { normalizeSelector } from "./shared/selector";
 import { AtRuleRecord } from "./types/common";
 
+import vh from "./units/vh";
+import vw from "./units/vw";
+
 export interface GetStylesOptions {
   className: string;
   hover: boolean;
@@ -19,6 +22,11 @@ export interface GetStylesOptions {
 }
 
 const cache: Record<string, [unknown[], AtRuleRecord[]]> = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dynamicStyles: Record<string, (value: string) => any> = {
+  vw,
+  vh,
+};
 
 export function getRuntimeStyles<T>({
   className,
@@ -38,7 +46,7 @@ export function getRuntimeStyles<T>({
   const childStyles: AtRuleRecord[] = [];
   const transforms: ViewStyle["transform"] = [];
 
-  let dynamicStyle = false;
+  let canCache = false;
 
   for (const name of className.split(/\s+/)) {
     if (!name) continue; // Happens if there are leading or trailing whitespace
@@ -62,23 +70,15 @@ export function getRuntimeStyles<T>({
      * Media styles contain atRules and need to be validated
      */
     if (media[selector]) {
-      dynamicStyle = true;
+      canCache = true;
 
-      const atRuleStyles: AtRuleRecord[] = media[selector].map(
-        (atRules, index) => ({
-          ...flattenIfRWN(styles[`${selector}.${index}`]),
-          atRules,
-        })
-      );
-
-      for (const styleRecord of atRuleStyles) {
-        const { atRules, transform, ...style } = styleRecord;
-
+      for (const [index, atRules] of media[selector].entries()) {
         let isForChildren = false;
+        let dynamicStyleKey: string | undefined;
 
         const atRulesResult = atRules.every(([rule, params]) => {
           /**
-           * This is a match string, but it makes sense
+           * This is a magic string, but it makes sense
            * Child selectors look like this and will always start with (>
            *
            * @selector (> *:not(:first-child))
@@ -86,6 +86,11 @@ export function getRuntimeStyles<T>({
            */
           if (rule === "selector" && params && params.startsWith("(>")) {
             isForChildren = true;
+            return true;
+          }
+
+          if (rule === "dynamicStyle") {
+            dynamicStyleKey = params;
             return true;
           }
 
@@ -102,8 +107,21 @@ export function getRuntimeStyles<T>({
           });
         });
 
+        const { transform, ...style } = flattenIfRWN(
+          styles[`${selector}.${index}`]
+        );
+
+        if (dynamicStyleKey) {
+          for (const [key, value] of Object.entries(style)) {
+            style[key as keyof typeof style] =
+              dynamicStyles[dynamicStyleKey](value);
+          }
+        }
+
         if (isForChildren) {
-          childStyles.push(styleRecord);
+          transform
+            ? childStyles.push({ transform, ...style, atRules })
+            : childStyles.push({ ...style, atRules });
         } else if (atRulesResult) {
           tailwindStyles.push(style as T);
 
@@ -121,7 +139,7 @@ export function getRuntimeStyles<T>({
   }
 
   // If these styles are 100% static, then we can cache them
-  if (!dynamicStyle) {
+  if (!canCache) {
     cache[className] = [tailwindStyles, childStyles];
   }
 

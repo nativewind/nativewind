@@ -1,12 +1,6 @@
 import { Dimensions } from "react-native";
 
-export default function vh(value: number) {
-  return new Proxy(
-    {},
-    {
-      get() {
-        return Dimensions.get("window").height * (value / 100);
-      },
-    }
-  );
+export default function vh(value: string | number) {
+  const parsed = typeof value === "number" ? value : Number.parseFloat(value);
+  return Dimensions.get("window").height * (parsed / 100);
 }

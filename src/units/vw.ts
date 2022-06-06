@@ -1,12 +1,6 @@
 import { Dimensions } from "react-native";
 
-export default function vw(value: number) {
-  return new Proxy(
-    {},
-    {
-      get() {
-        return Dimensions.get("window").width * (value / 100);
-      },
-    }
-  );
+export default function vw(value: string | number) {
+  const parsed = typeof value === "number" ? value : Number.parseFloat(value);
+  return Dimensions.get("window").width * (parsed / 100);
 }

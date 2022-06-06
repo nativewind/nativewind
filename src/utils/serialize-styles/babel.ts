@@ -99,17 +99,6 @@ function babelReplacer(key: string, value: string): [string, unknown] {
     ];
   }
 
-  // Match vw() or vh()
-  const result = value.match(/(v[hw])\((.+)\)/);
-  if (result) {
-    const variables = result[2]
-      .split(/[ ,]+/)
-      .filter(Boolean)
-      .map((v: string) => numericLiteral(Number.parseFloat(v)));
-
-    return [key, callExpression(identifier(babelImport(result[1])), variables)];
-  }
-
   return [key, value];
 }
 

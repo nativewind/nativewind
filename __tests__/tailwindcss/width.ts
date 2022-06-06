@@ -24,8 +24,8 @@ tailwindRunner(
       {
         "w-screen": [
           {
-            atRules: [["dynamic-style", undefined]],
-            width: "vw(100)",
+            atRules: [["dynamic-style", "vw"]],
+            width: 100,
           },
         ],
       },

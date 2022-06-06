@@ -11,7 +11,6 @@ import { getAllowedOptions, isAllowedProgramPath } from "./utils/allowed-paths";
 import { getTailwindConfig } from "./utils/get-tailwind-config";
 import { StyleError } from "../types/common";
 import { babelStyleSerializer } from "../utils/serialize-styles";
-import { babelImport } from "../utils/serialize-styles/babel";
 
 export default function rootVisitor(
   options: TailwindcssReactNativeBabelOptions,
@@ -135,37 +134,22 @@ export default function rootVisitor(
 
           appendVariables(bodyNode, output);
 
-          const reactNativeImports = [];
-          const unitImports = [];
+          const imports = [];
 
           if (!hasStyleSheetImport) {
-            reactNativeImports.push(["RNStyleSheet", "StyleSheet"]);
+            imports.push(["RNStyleSheet", "StyleSheet"]);
           }
 
           if (output.hasPlatform) {
-            reactNativeImports.push(["RNPlatform", "Platform"]);
+            imports.push(["RNPlatform", "Platform"]);
           }
 
           if (output.hasPlatformColor) {
-            reactNativeImports.push(["RNPlatformColor", "PlatformColor"]);
+            imports.push(["RNPlatformColor", "PlatformColor"]);
           }
 
-          if (output.hasViewWidth) {
-            unitImports.push([babelImport("vw"), "vw"]);
-          }
-
-          if (reactNativeImports.length > 0) {
-            prependImports(bodyNode, reactNativeImports, "react-native");
-          }
-
-          if (unitImports.length > 0) {
-            for (const [unitImport, test] of unitImports) {
-              prependImports(
-                bodyNode,
-                unitImport,
-                `tailwindcss-react-native/units/${test}`
-              );
-            }
+          if (imports.length > 0) {
+            prependImports(bodyNode, imports, "react-native");
           }
         },
       },

@@ -16,8 +16,6 @@ export interface DefaultSerializedStyles {
   media: MediaRecord;
   hasPlatform: boolean;
   hasPlatformColor: boolean;
-  hasViewWidth: boolean;
-  hasViewHeight: boolean;
 }
 
 /**
@@ -31,8 +29,6 @@ export function serializeStyles(
 
   let hasPlatform = false;
   let hasPlatformColor = false;
-  let hasViewWidth = false;
-  let hasViewHeight = false;
 
   const styles = Object.fromEntries(
     Object.entries(styleRecord).flatMap(([key, value]) => {
@@ -52,8 +48,6 @@ export function serializeStyles(
               if (typeof v === "string") {
                 hasPlatform ||= v.includes("platform(");
                 hasPlatformColor ||= v.includes("platformColor(");
-                hasViewWidth ||= v.includes("vw(");
-                hasViewHeight ||= v.includes("vh(");
               }
               return replacer(k, v);
             })
@@ -70,8 +64,6 @@ export function serializeStyles(
     media,
     hasPlatform,
     hasPlatformColor,
-    hasViewWidth,
-    hasViewHeight,
   };
 }
 

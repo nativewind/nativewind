@@ -49,7 +49,8 @@ export function only<
   }: OnlyOptions<T, S> = Array.isArray(options) ? { values: options } : options;
 
   const callback = (value: string, name: string) => {
-    const isNaN = Number.isNaN(Number.parseInt(value));
+    const float = Number.parseFloat(value);
+    const isNaN = Number.isNaN(float);
 
     if (isFunctionValue(value)) {
       /**
@@ -84,8 +85,15 @@ export function only<
     if (number) {
       if (isNaN) {
         throw new Error(name);
+      } else if (units && float.toString() === value) {
+        return getStylesForProperty(name, `${float}${units[0]}`);
       }
-      return getStylesForProperty(name, value);
+
+      if (!units) {
+        return getStylesForProperty(name, value);
+      } else if (units.some((unit) => value.endsWith(unit))) {
+        return getStylesForProperty(name, value);
+      }
     }
 
     if (
