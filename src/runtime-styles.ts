@@ -89,7 +89,7 @@ export function getRuntimeStyles<T>({
             return true;
           }
 
-          if (rule === "dynamicStyle") {
+          if (rule === "dynamic-style") {
             dynamicStyleKey = params;
             return true;
           }

@@ -61,8 +61,6 @@ export function matchAtRule({
       orientation,
       "prefers-color-scheme": colorScheme,
     });
-  } else if (rule === "dynamic-style") {
-    return true;
   }
 
   return false;
