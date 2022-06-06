@@ -73,7 +73,7 @@
     "@types/css-to-react-native": "3.0.0",
     "@types/jest": "28.1.1",
     "@types/micromatch": "4.0.2",
-    "@types/react": "18.0.11",
+    "@types/react": "18.0.12",
     "@types/react-is": "^17.0.3",
     "@types/react-native": "0.67.8",
     "@types/tailwindcss": "3.0.10",
