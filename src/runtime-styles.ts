@@ -46,7 +46,7 @@ export function getRuntimeStyles<T>({
   const childStyles: AtRuleRecord[] = [];
   const transforms: ViewStyle["transform"] = [];
 
-  let canCache = false;
+  let canCache = true;
 
   for (const name of className.split(/\s+/)) {
     if (!name) continue; // Happens if there are leading or trailing whitespace
@@ -70,7 +70,7 @@ export function getRuntimeStyles<T>({
      * Media styles contain atRules and need to be validated
      */
     if (media[selector]) {
-      canCache = true;
+      canCache = false;
 
       for (const [index, atRules] of media[selector].entries()) {
         let isForChildren = false;
@@ -139,7 +139,7 @@ export function getRuntimeStyles<T>({
   }
 
   // If these styles are 100% static, then we can cache them
-  if (!canCache) {
+  if (canCache) {
     cache[className] = [tailwindStyles, childStyles];
   }
 
