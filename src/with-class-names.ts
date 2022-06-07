@@ -24,11 +24,12 @@ export function withClassNames({
   ].join(" ");
   const isComponent = classes.split(/\s+/).includes("component");
 
-  const allClasses = [];
+  const allClasses = [classes];
 
   for (const prop of [...propsToTransform, ...spreadProps, ...classProps]) {
-    if (typeof componentProps[prop] === "string") {
-      allClasses.push(componentProps[prop]);
+    const componentProp = componentProps[prop];
+    if (typeof componentProp === "string") {
+      allClasses.push(componentProp);
     }
   }
 

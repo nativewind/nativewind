@@ -33,7 +33,6 @@ export function useInteraction({
   onHoverOut,
   onPressIn,
   onPressOut,
-  platform,
   className = "",
 }: UseInteractionOptions) {
   const [hover, setHover] = useState(false);
@@ -158,13 +157,8 @@ export function useInteraction({
       interaction.onHoverOut = handleHoverOut;
     }
     if (className.includes("active:")) {
-      if (platform === "web") {
-        interaction.onPointerDown = handlePressIn;
-        interaction.onPointerUp = handlePressOut;
-      } else {
-        interaction.onPressIn = handlePressIn;
-        interaction.onPressOut = handlePressOut;
-      }
+      interaction.onPressIn = handlePressIn;
+      interaction.onPressOut = handlePressOut;
     }
   }
 
