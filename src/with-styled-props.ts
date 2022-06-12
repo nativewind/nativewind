@@ -1,100 +1,62 @@
-import { StyleProp } from "react-native";
-import { AtRuleRecord } from "./types/common";
-import { UseTailwindCallback } from "./use-tailwind";
+import { StyleProp, StyleSheet } from "react-native";
+import { StylesArray } from "./style-sheet-store";
+import { useTailwind } from "./use-tailwind";
 
 export const ChildClassNameSymbol = Symbol("tailwind-child");
 
-export interface WithStyledPropsOptions<S, T extends string> {
-  classes: string | undefined;
-  styleProp: StyleProp<S>;
+export interface WithStyledPropsOptions<T extends string> {
+  preprocessed: boolean;
   propsToTransform?: T[];
   componentProps: Record<string, unknown>;
-  tw: UseTailwindCallback<S>;
   spreadProps?: T[];
   classProps?: T[];
-  preview: boolean;
 }
 
-export type WithStyledProps<S, T extends string> = Record<T, unknown> & {
-  childStyles?: AtRuleRecord[];
-  style: StyleProp<S>;
-};
-
 export function withStyledProps<S, T extends string>({
-  tw,
-  classes,
-  propsToTransform,
-  styleProp,
+  propsToTransform = [],
   componentProps,
-  spreadProps = [],
   classProps = [],
-  preview,
-}: WithStyledPropsOptions<S, T>): WithStyledProps<S, T> {
-  const mainStyles = tw(classes, { flatten: false });
-
+  preprocessed,
+}: WithStyledPropsOptions<T>) {
   const styledProps: Partial<Record<T, unknown>> = {};
 
+  const additionalStyles: StylesArray = [];
+
   for (const prop of classProps) {
-    const value = componentProps[prop];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stylesArray = useTailwind<S>(componentProps[prop] as any);
 
-    if (typeof value === "string") {
-      if (preview) {
-        styledProps[prop] = undefined;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        mainStyles[prop as any] = Object.values(
-          tw(value, {
-            flatten: false,
-          })
-        )[1];
-      } else {
-        const entries = Object.entries(tw(value, { flatten: true }));
+    if (stylesArray.length === 0) {
+      continue;
+    }
 
-        if (entries.length > 0) {
-          styledProps[prop] = undefined;
-          for (const [key, value] of entries) {
-            styledProps[key as T] = value;
-          }
-        }
+    styledProps[prop] = undefined;
+
+    if (preprocessed) {
+      additionalStyles.push(...stylesArray);
+    } else {
+      for (const [key, value] of Object.entries(
+        StyleSheet.flatten(stylesArray as StyleProp<T>)
+      )) {
+        styledProps[key as T] = value;
       }
     }
   }
 
-  for (const prop of spreadProps) {
-    const value = componentProps[prop];
+  for (const prop of propsToTransform) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stylesArray = useTailwind<S>(componentProps[prop] as any);
 
-    if (typeof value === "string") {
-      const entries = Object.entries(tw(value, { flatten: true }));
-      if (entries.length > 0) {
-        styledProps[prop] = undefined;
-        for (const [key, value] of entries) {
-          styledProps[key as T] = value;
-        }
-      }
+    if (stylesArray.length === 0) {
+      continue;
     }
+
+    styledProps[prop] = StyleSheet.flatten(stylesArray as StyleProp<T>);
   }
-
-  if (propsToTransform) {
-    for (const prop of propsToTransform) {
-      const value = componentProps[prop];
-
-      if (typeof value === "string") {
-        styledProps[prop] = tw(value, { flatten: false });
-      }
-    }
-  }
-
-  const style = styleProp
-    ? [mainStyles, styleProp]
-    : Array.isArray(mainStyles) && mainStyles.length > 0
-    ? mainStyles
-    : "$$css" in mainStyles
-    ? mainStyles
-    : undefined;
 
   return {
-    childStyles: mainStyles[ChildClassNameSymbol],
-    style,
     ...componentProps,
     ...styledProps,
+    additionalStyles,
   };
 }

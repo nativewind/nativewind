@@ -1,37 +1,42 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { PropsWithChildren } from "react";
 import { ColorSchemeName, Platform } from "react-native";
 
-import { PlatformProvider } from "./context/platform";
-import { ColorSchemeProvider } from "./context/color-scheme";
-import { DeviceMediaProvider } from "./context/device-media";
-
-import { StyleSheetContext } from "./context/style-sheet";
+import { StoreContext, StyleSheetStore } from "./style-sheet-store";
 
 export interface TailwindProviderProps {
   styles?: typeof globalThis["tailwindcss_react_native_style"];
   media?: typeof globalThis["tailwindcss_react_native_media"];
   initialColorScheme?: ColorSchemeName;
   platform?: typeof Platform.OS | "native";
-  preview?: boolean;
+  webOutput?: "css" | "native";
+  nativeOutput?: "css" | "native";
 }
 
 export function TailwindProvider({
   styles = globalThis.tailwindcss_react_native_style,
   media = globalThis.tailwindcss_react_native_media ?? {},
   initialColorScheme,
-  preview,
-  platform,
+  webOutput,
+  nativeOutput = "native",
   children,
 }: PropsWithChildren<TailwindProviderProps>) {
-  const stylesheet = { styles, media };
+  const output = Platform.select({
+    web: webOutput,
+    native: nativeOutput,
+    default: "native",
+  });
+
+  const store = useMemo(() => {
+    return new StyleSheetStore({
+      styles,
+      atRules: media,
+      preprocessed: output === "css",
+      colorScheme: initialColorScheme,
+    });
+  }, [styles, media]);
+
   return (
-    <PlatformProvider preview={preview} platform={platform}>
-      <ColorSchemeProvider initialColorScheme={initialColorScheme}>
-        <StyleSheetContext.Provider value={stylesheet}>
-          <DeviceMediaProvider>{children}</DeviceMediaProvider>
-        </StyleSheetContext.Provider>
-      </ColorSchemeProvider>
-    </PlatformProvider>
+    <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
   );
 }

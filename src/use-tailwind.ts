@@ -1,41 +1,52 @@
-import { AtRuleRecord } from "./types/common";
-import type { ChildClassNameSymbol } from "./with-styled-props";
+import { useContext, useMemo } from "react";
+import { StyleProp } from "react-native";
+import {
+  SelectorOptions,
+  StoreContext,
+  StylesArray,
+} from "./style-sheet-store";
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 
-export { useTailwind } from "./use-tailwind.web";
+export function useTailwind<T>(
+  classNames: string,
+  options: SelectorOptions = {},
+  inlineStyles?: StyleProp<T>,
+  additionalStyles: StylesArray<T> = []
+): StylesArray<T> {
+  const store = useContext(StoreContext);
 
-export type RWNCssStyle = {
-  $$css: true;
-  tailwindClassName: string;
-};
+  // useSyncExternalStore doesn't require but stable selector but
+  // useSyncExternalStoreWithSelector does :(
+  const selector = useMemo(
+    () => store.createSelector(classNames, options),
+    [
+      store,
+      classNames,
+      options.hover,
+      options.focus,
+      options.active,
+      options.componentHover,
+      options.componentFocus,
+      options.componentActive,
+    ]
+  );
 
-export interface UseTailwindCallbackOptions<
-  Flatten extends boolean | undefined
-> {
-  flatten?: Flatten;
-}
+  const styles = useSyncExternalStoreWithSelector(
+    store.subscribe,
+    store.getSnapshot,
+    undefined,
+    selector
+  );
 
-export type UseTailwindCallback<P> = <
-  Flatten extends boolean | undefined = true
->(
-  className?: string,
-  options?: UseTailwindCallbackOptions<Flatten>
-) => UseTailwindCallbackResult<P, Flatten>;
+  return useMemo(() => {
+    const stylesArray: StylesArray = [
+      ...styles,
+      ...additionalStyles,
+      inlineStyles,
+    ].filter(Boolean);
 
-export type UseTailwindCallbackResult<
-  P,
-  Flatten extends boolean | undefined = true
-> = Flatten extends true
-  ? WithChildClassNameSymbol<P>
-  : WithChildClassNameSymbol<P[]>;
+    stylesArray.childStyles = styles.childStyles;
 
-export type WithChildClassNameSymbol<T> = T & {
-  [ChildClassNameSymbol]?: AtRuleRecord[];
-};
-
-export interface UseTailwindOptions {
-  flatten?: boolean;
-  hover?: boolean;
-  focus?: boolean;
-  active?: boolean;
-  [ChildClassNameSymbol]?: string;
+    return stylesArray;
+  }, [styles, inlineStyles, additionalStyles]) as StylesArray<T>;
 }

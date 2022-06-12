@@ -1,18 +1,20 @@
 import { match } from "css-mediaquery";
-import { ColorSchemeName } from "react-native";
-import { ComponentContext } from "./context/component";
-import { DeviceMediaContext } from "./context/device-media";
+import { ColorSchemeName, Platform } from "react-native";
 
 interface MatchAtRuleOptions {
   rule: string;
   params?: string;
-  hover: boolean;
-  active: boolean;
-  focus: boolean;
-  platform: string;
+  hover?: boolean;
+  active?: boolean;
+  focus?: boolean;
+  componentHover?: boolean;
+  componentActive?: boolean;
+  componentFocus?: boolean;
+  platform: typeof Platform.OS;
   colorScheme: ColorSchemeName;
-  componentInteraction: ComponentContext;
-  deviceMediaContext: DeviceMediaContext;
+  width: number;
+  height: number;
+  orientation: OrientationLockType;
 }
 
 export function matchAtRule({
@@ -21,10 +23,14 @@ export function matchAtRule({
   hover,
   active,
   focus,
-  componentInteraction,
+  componentHover,
+  componentActive,
+  componentFocus,
   platform,
   colorScheme,
-  deviceMediaContext: { width, height, orientation },
+  width,
+  height,
+  orientation,
 }: MatchAtRuleOptions) {
   // eslint-disable-next-line unicorn/prefer-switch
   if (rule === "pseudo-class") {
@@ -41,11 +47,11 @@ export function matchAtRule({
   } else if (rule === "component") {
     switch (params) {
       case "hover":
-        return componentInteraction.hover;
+        return componentHover;
       case "focus":
-        return componentInteraction.focus;
+        return componentFocus;
       case "active":
-        return componentInteraction.active;
+        return componentActive;
       default:
         return false;
     }
@@ -67,22 +73,22 @@ export function matchAtRule({
 }
 
 export interface MatchChildAtRuleOptions {
-  nthChild: number;
-  rule: string;
-  params?: string;
-  parentHover: boolean;
-  parentFocus: boolean;
-  parentActive: boolean;
+  nthChild?: number;
+  parentHover?: boolean;
+  parentFocus?: boolean;
+  parentActive?: boolean;
 }
 
-export function matchChildAtRule({
-  nthChild,
-  rule,
-  params,
-  parentHover,
-  parentFocus,
-  parentActive,
-}: MatchChildAtRuleOptions) {
+export function matchChildAtRule(
+  rule: string,
+  params = "",
+  {
+    nthChild = -1,
+    parentHover = false,
+    parentFocus = false,
+    parentActive = false,
+  }: MatchChildAtRuleOptions
+) {
   if (
     rule === "selector" &&
     params === "(> *:not(:first-child))" &&
@@ -91,7 +97,7 @@ export function matchChildAtRule({
     return true;
   } else if (rule === "selector" && params === "(> *)") {
     return true;
-  } else if (rule === "component") {
+  } else if (rule === "parent") {
     switch (params) {
       case "hover":
         return parentHover;
