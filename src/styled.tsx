@@ -9,16 +9,17 @@ import {
   ClassAttributes,
   ForwardRefExoticComponent,
   PropsWithoutRef,
+  useContext,
 } from "react";
 import { StyledProps, StyledPropsWithKeys } from "./utils/styled";
-import { ComponentContext } from "./context/component";
 import { useInteraction } from "./use-interaction";
 import { withStyledChildren } from "./with-styled-children";
 import { withStyledProps } from "./with-styled-props";
 import { useTailwind } from "./use-tailwind";
 import { withClassNames } from "./with-class-names";
-import { usePlatform } from "./context/platform";
 import { StyleProp } from "react-native";
+import { StoreContext } from "./style-sheet-store";
+import { ComponentContext } from "./component-context";
 
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
@@ -100,7 +101,7 @@ export function styled<
 
   function Styled(
     {
-      className,
+      className: propClassName,
       tw: twClassName,
       baseTw,
       style: styleProp,
@@ -109,11 +110,11 @@ export function styled<
     }: StyledProps<T>,
     ref: ForwardedRef<unknown>
   ) {
-    const { platform, preview } = usePlatform();
+    const store = useContext(StoreContext);
 
-    const { classes, allClasses, isComponent, isParent } = withClassNames({
+    const { className, allClasses, isComponent, isParent } = withClassNames({
       baseClassName,
-      className,
+      propClassName,
       twClassName,
       baseTw,
       componentProps,
@@ -126,42 +127,41 @@ export function styled<
       className: allClasses,
       isComponent,
       isParent,
-      platform,
-      preview,
+      store,
       ...componentProps,
     });
 
-    const tw = useTailwind({
-      hover,
-      focus,
-      active,
-    });
-
-    const { childStyles, ...styledProps } = withStyledProps({
-      tw,
-      classes,
-      styleProp,
+    const { additionalStyles, ...styledProps } = withStyledProps({
+      preprocessed: store.preprocessed,
       propsToTransform,
       componentProps,
-      spreadProps,
       classProps,
-      preview,
     });
 
-    const children = childStyles
-      ? withStyledChildren({
-          componentChildren,
-          childStyles,
-          isParent,
-          parentHover: hover,
-          parentFocus: focus,
-          parentActive: active,
-        })
-      : componentChildren;
+    const style = useTailwind(
+      className,
+      {
+        hover,
+        focus,
+        active,
+      },
+      styleProp,
+      additionalStyles
+    );
+
+    const children = withStyledChildren({
+      store,
+      componentChildren,
+      stylesArray: style,
+      parentHover: hover,
+      parentFocus: focus,
+      parentActive: active,
+    });
 
     const element = createElement(Component, {
       ...handlers,
       ...styledProps,
+      style: style.length > 0 ? style : undefined,
       children,
       ref,
     } as unknown as T);

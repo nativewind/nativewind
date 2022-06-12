@@ -1,6 +1,6 @@
 export interface WithClassNames {
   baseClassName?: string;
-  className?: string;
+  propClassName?: string;
   baseTw?: string;
   twClassName?: string;
   propsToTransform?: string[];
@@ -14,7 +14,7 @@ const isParentRegex = /(?:^|\s)(parent)(?:$|\s)/gi;
 
 export function withClassNames({
   baseClassName,
-  className,
+  propClassName,
   baseTw,
   twClassName,
   componentProps,
@@ -22,13 +22,15 @@ export function withClassNames({
   spreadProps = [],
   classProps = [],
 }: WithClassNames) {
-  const classes = [
+  const className = [
     baseTw ?? baseClassName ?? "",
-    twClassName ?? className ?? "",
-  ].join(" ");
+    twClassName ?? propClassName ?? "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  const isComponent = isComponentRegex.test(classes);
-  const isParent = isParentRegex.test(classes);
+  const isComponent = isComponentRegex.test(className);
+  const isParent = isParentRegex.test(className);
 
   const allClasses = [];
 
@@ -39,7 +41,7 @@ export function withClassNames({
   }
 
   return {
-    classes,
+    className,
     allClasses: allClasses.join(" "),
     isComponent,
     isParent,

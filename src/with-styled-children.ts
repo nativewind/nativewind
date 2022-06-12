@@ -1,12 +1,11 @@
 import { ReactNode, Children, cloneElement } from "react";
 import { isFragment } from "react-is";
-import { matchChildAtRule } from "./match-at-rule";
-import { AtRuleRecord } from "./types/common";
+import { StylesArray, StyleSheetStore } from "./style-sheet-store";
 
 export interface WithStyledChildrenOptions {
   componentChildren: ReactNode;
-  childStyles: AtRuleRecord[];
-  isParent: boolean;
+  store: StyleSheetStore;
+  stylesArray: StylesArray<unknown>;
   parentHover: boolean;
   parentFocus: boolean;
   parentActive: boolean;
@@ -14,65 +13,35 @@ export interface WithStyledChildrenOptions {
 
 export function withStyledChildren({
   componentChildren,
-  childStyles,
-  isParent,
+  store,
+  stylesArray,
   parentHover,
   parentFocus,
   parentActive,
 }: WithStyledChildrenOptions): ReactNode {
-  if (!childStyles && !isParent) {
+  if (!stylesArray.childStyles) {
     return componentChildren;
   }
 
-  let children = isFragment(componentChildren)
+  const children = isFragment(componentChildren)
     ? // This probably needs to be recursive
       componentChildren.props.children
     : componentChildren;
 
-  children = Children.map(children, (child, index) => {
-    /**
-     * For every child:
-     *  For every style:
-     *    For every atRule:
-     *      Ensure all atRules match
-     *    If all atRules match, push the style
-     *  Add the styles to the child
-     * Return the children
-     *
-     * This is a inefficient and makes parent: selectors a bit slow
-     * as we repeat the logic for nearly every child. Sometimes that's required (eg. nthChild)
-     * but typically not.
-     *
-     * We should split the childStyles into static and dynamic and only loop the dynamic
-     * ones for each child.
-     */
-    const matchingStyles = [];
+  return Children.map(children, (child, index) => {
+    const style = store.getChildStyles(stylesArray, {
+      nthChild: index + 1,
+      parentHover,
+      parentFocus,
+      parentActive,
+    });
 
-    for (const { atRules, ...styles } of childStyles) {
-      const matches = atRules.every(([rule, params]) => {
-        return matchChildAtRule({
-          nthChild: index + 1,
-          rule,
-          params,
-          parentHover,
-          parentFocus,
-          parentActive,
-        });
-      });
-
-      if (matches) {
-        matchingStyles.push(styles);
-      }
+    if (!style || style.length === 0) {
+      return child;
     }
 
-    return cloneElement(child, {
-      style: child.props.style
-        ? [child.props.style, matchingStyles]
-        : matchingStyles.length > 0
-        ? matchingStyles
-        : undefined,
-    });
+    return child.props.style
+      ? cloneElement(child, { style: [child.props.style, style] })
+      : cloneElement(child, { style });
   });
-
-  return children;
 }

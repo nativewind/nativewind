@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { GestureResponderEvent, PressableProps } from "react-native";
+import { StyleSheetStore } from "./style-sheet-store";
 
 declare module "react-native" {
   interface PressableProps {
@@ -20,8 +21,7 @@ export interface UseInteractionOptions extends PressableProps {
   className?: string;
   isComponent: boolean;
   isParent: boolean;
-  platform: string;
-  preview: boolean;
+  store: StyleSheetStore;
 }
 
 export function useInteraction({
@@ -35,7 +35,7 @@ export function useInteraction({
   onHoverOut,
   onPressIn,
   onPressOut,
-  platform,
+  store,
   className = "",
 }: UseInteractionOptions) {
   const [hover, setHover] = useState(false);
@@ -159,8 +159,9 @@ export function useInteraction({
       interaction.onHoverIn = handleHoverIn;
       interaction.onHoverOut = handleHoverOut;
     }
+
     if (className.includes("active:")) {
-      if (platform === "web") {
+      if (store.platform === "web") {
         interaction.onPointerDown = handlePressIn;
         interaction.onPointerUp = handlePressOut;
       } else {

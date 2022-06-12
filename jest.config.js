@@ -15,6 +15,7 @@ module.exports = {
     "/node_modules/",
     "/__tests__/visitor/",
     "/__tests__/tailwindcss/runner/",
+    "/__tests__/style-sheet-store/utils",
     "/__tests__/types.d.ts",
   ],
 };
