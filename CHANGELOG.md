@@ -1,3 +1,10 @@
+## [1.7.10](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.9...v1.7.10) (2022-06-13)
+
+
+### Bug Fixes
+
+* import detection when using react-native-web babel plugin ([6fc986d](https://github.com/marklawlor/tailwindcss-react-native/commit/6fc986d7e43835f8672b7c8bcd9406c5bbdacd2f))
+
 ## [1.7.9](https://github.com/marklawlor/tailwindcss-react-native/compare/v1.7.8...v1.7.9) (2022-06-07)
 
 
