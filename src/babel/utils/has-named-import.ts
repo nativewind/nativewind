@@ -1,6 +1,7 @@
 import { NodePath } from "@babel/core";
 import {
   ImportDeclaration,
+  isImportDefaultSpecifier,
   isImportSpecifier,
   isStringLiteral,
 } from "@babel/types";
@@ -13,15 +14,17 @@ export function hasNamedImport(
   variable: string,
   source: string
 ) {
-  if (path.node.source.value === source) {
+  if (path.node.source.value.startsWith(source)) {
     return path.node.specifiers.some((specifier) => {
-      if (!isImportSpecifier(specifier)) {
-        return;
+      if (isImportDefaultSpecifier(specifier)) {
+        return specifier.local.name === variable;
+      } else if (isImportSpecifier(specifier)) {
+        return isStringLiteral(specifier.imported)
+          ? specifier.imported.value === variable
+          : specifier.imported.name === variable;
       }
 
-      return isStringLiteral(specifier.imported)
-        ? specifier.imported.value === variable
-        : specifier.local.name === variable;
+      return false;
     });
   }
 
