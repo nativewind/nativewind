@@ -20,8 +20,6 @@ export interface UseInteractionOptions extends PressableProps {
   className?: string;
   isComponent: boolean;
   isParent: boolean;
-  platform: string;
-  preview: boolean;
 }
 
 export function useInteraction({
@@ -158,6 +156,7 @@ export function useInteraction({
       interaction.onHoverIn = handleHoverIn;
       interaction.onHoverOut = handleHoverOut;
     }
+
     if (className.includes("active:")) {
       interaction.onPressIn = handlePressIn;
       interaction.onPressOut = handlePressOut;

@@ -32,6 +32,7 @@
   },
   "scripts": {
     "test": "jest",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
     "prepare": "husky install",
@@ -55,7 +56,8 @@
     "postcss-color-functional-notation": "^4.2.2",
     "postcss-css-variables": "^0.18.0",
     "postcss-nested": "^5.0.6",
-    "react-is": "^18.1.0"
+    "react-is": "^18.1.0",
+    "use-sync-external-store": "^1.1.0"
   },
   "devDependencies": {
     "@babel/core": "7.18.2",
@@ -77,6 +79,7 @@
     "@types/react-is": "^17.0.3",
     "@types/react-native": "0.67.8",
     "@types/tailwindcss": "3.0.10",
+    "@types/use-sync-external-store": "^0.0.3",
     "@typescript-eslint/eslint-plugin": "5.27.1",
     "@typescript-eslint/parser": "5.27.1",
     "babel-plugin-tester": "10.1.0",
