@@ -1,6 +1,6 @@
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import postcss from "postcss";
-import tailwind from "tailwindcss";
+import tailwind, { Config } from "tailwindcss";
 
 import plugin from "../postcss";
 
@@ -23,7 +23,7 @@ export function extractStyles<T>(
   let errors: StyleError[] = [];
 
   const plugins = [
-    tailwind(tailwindConfig),
+    tailwind(tailwindConfig as Config),
     plugin({
       ...tailwindConfig,
       done: (output) => {

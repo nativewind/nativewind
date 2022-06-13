@@ -1,8 +1,5 @@
 import plugin from "tailwindcss/plugin";
-import {
-  TailwindConfig,
-  TailwindThemeValue,
-} from "tailwindcss/tailwind-config";
+import { TailwindThemeValue } from "tailwindcss/tailwind-config";
 import { StyleError } from "../../types/common";
 import { boxShadow } from "./box-shadow";
 import { component } from "./component";
@@ -19,6 +16,7 @@ import { space } from "./space";
 import { translate } from "./translate";
 import { parent } from "./parent";
 import { color } from "./color";
+import { Config } from "tailwindcss";
 
 export interface NativePluginOptions {
   rem?: number;
@@ -63,7 +61,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
   },
   function ({ rem = 16 } = {}) {
     const config: Partial<
-      TailwindConfig & { theme: { elevation: TailwindThemeValue } }
+      Config & { theme: { elevation: TailwindThemeValue } }
     > = {
       theme: {
         aspectRatio: {
@@ -229,6 +227,6 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions | undefined>(
       },
     };
 
-    return config;
+    return config as Config;
   }
 );

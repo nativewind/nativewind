@@ -1,4 +1,4 @@
-import { TailwindPluginFn } from "tailwindcss/plugin";
+import { PluginAPI } from "tailwindcss/types/config";
 import { isPlainObject } from "./utils";
 
 /**
@@ -9,7 +9,7 @@ import { isPlainObject } from "./utils";
  * { lineHeight: 1, fontSize: 12 } -> { lineHeight: 12, fontSize 12}
  * { lineHeight: 1px, fontSize: 12 } -> { lineHeight: 1px, fontSize 12}
  */
-export const fontSize: TailwindPluginFn = ({ matchUtilities, theme }) => {
+export const fontSize = ({ matchUtilities, theme }: PluginAPI) => {
   matchUtilities(
     {
       text: (value: unknown) => {

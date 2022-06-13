@@ -1,6 +1,6 @@
-import { TailwindPluginFn } from "tailwindcss/plugin";
+import { PluginAPI } from "tailwindcss/plugin";
 
 export type CustomPluginFunction = (
-  helpers: Parameters<TailwindPluginFn>[0],
+  helpers: PluginAPI,
   notSupported: (property: string) => () => void
 ) => void;
