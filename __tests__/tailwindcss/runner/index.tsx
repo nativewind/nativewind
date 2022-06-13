@@ -3,7 +3,7 @@ import { extractStyles } from "../../../src/postcss/extract-styles";
 import { StyleError, StyleRecord } from "../../../src/types/common";
 import { testStyleSerializer } from "../../../src/utils/serialize-styles";
 
-import plugin from "../../../src/tailwind";
+import cssPlugin from "../../../src/tailwind/css";
 import { nativePlugin } from "../../../src/tailwind/native";
 import { TailwindProvider, TailwindProviderProps } from "../../../src";
 import { PropsWithChildren } from "react";
@@ -29,7 +29,7 @@ export function assertStyles(
   const { errors: outputErrors, ...output } = extractStyles({
     theme: {},
     plugins: [
-      plugin,
+      cssPlugin,
       nativePlugin({
         onError(error) {
           errors.push(error);
@@ -58,7 +58,7 @@ export function TestProvider({
 }: PropsWithChildren<TailwindProviderProps & { css: string }>) {
   const { output } = extractStyles({
     theme: {},
-    plugins: [plugin, nativePlugin()],
+    plugins: [cssPlugin, nativePlugin()],
     content: [
       { raw: "", extension: "html" },
     ] as unknown as TailwindConfig["content"],
