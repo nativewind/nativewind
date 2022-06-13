@@ -13,7 +13,7 @@ module.exports = {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   testPathIgnorePatterns: [
     "/node_modules/",
-    "/__tests__/visitor/",
+    "/__tests__/babel/",
     "/__tests__/tailwindcss/runner/",
     "/__tests__/style-sheet-store/utils",
     "/__tests__/types.d.ts",
