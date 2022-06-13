@@ -1,8 +1,12 @@
 import React, { useMemo } from "react";
 import { PropsWithChildren } from "react";
-import { ColorSchemeName, Platform } from "react-native";
+import { Platform } from "react-native";
 
-import { StoreContext, StyleSheetStore } from "./style-sheet-store";
+import {
+  ColorSchemeName,
+  StoreContext,
+  StyleSheetStore,
+} from "./style-sheet-store";
 
 export interface TailwindProviderProps {
   styles?: typeof globalThis["tailwindcss_react_native_style"];

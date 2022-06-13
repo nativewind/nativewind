@@ -3,7 +3,6 @@ import {
   Dimensions,
   Appearance,
   ScaledSize,
-  ColorSchemeName,
   EmitterSubscription,
   NativeEventSubscription,
   TextStyle,
@@ -17,10 +16,11 @@ import {
   matchChildAtRule,
   MatchChildAtRuleOptions,
 } from "./match-at-rule";
-import { normalizeSelector } from "./shared/selector";
-import { AtRuleTuple, MediaRecord } from "./types/common";
+import { normalizeSelector } from "../shared/selector";
+import { AtRuleTuple, MediaRecord } from "../types/common";
 import vh from "./units/vh";
 import vw from "./units/vw";
+import { ColorSchemeStore, ColorSchemeSystem } from "./color-scheme";
 
 export type Style = ViewStyle | ImageStyle | TextStyle;
 export type InlineStyle<T extends Style> = T;
@@ -84,7 +84,7 @@ interface StyleSheetStoreConstructor {
   appearance?: typeof Appearance;
   platform?: typeof Platform.OS;
   preprocessed?: boolean;
-  colorScheme?: ColorSchemeName;
+  colorScheme?: ColorSchemeSystem;
 }
 
 /**
@@ -109,7 +109,7 @@ interface StyleSheetStoreConstructor {
  * If you are interested in helping me build a more robust store, please create an issue on Github.
  *
  */
-export class StyleSheetStore {
+export class StyleSheetStore extends ColorSchemeStore {
   snapshot: Snapshot = {};
   listeners = new Set<() => void>();
   atRuleListeners = new Set<(topics: string[]) => void>();
@@ -125,10 +125,6 @@ export class StyleSheetStore {
   window: ScaledSize;
   orientation: OrientationLockType;
 
-  colorSchemeListeners = new Set<() => void>();
-  colorScheme: ColorSchemeName;
-  manualColorScheme = false;
-
   constructor({
     styles = global.tailwindcss_react_native_style,
     atRules = global.tailwindcss_react_native_media || [],
@@ -138,18 +134,13 @@ export class StyleSheetStore {
     preprocessed = false,
     colorScheme,
   }: StyleSheetStoreConstructor = {}) {
+    super(colorScheme);
+
     this.platform = platform;
     this.styles = styles;
     this.atRules = atRules;
     this.preprocessed = preprocessed;
     this.window = dimensions.get("window");
-
-    if (colorScheme) {
-      this.colorScheme = colorScheme;
-      this.manualColorScheme = true;
-    } else {
-      this.colorScheme = Appearance.getColorScheme();
-    }
 
     const screen = dimensions.get("screen");
     this.orientation = screen.height >= screen.width ? "portrait" : "landscape";
@@ -170,16 +161,14 @@ export class StyleSheetStore {
         this.orientation = orientation;
 
         this.notifyMedia(topics);
-        this.notify();
       }
     );
 
     this.appearanceListener = appearance.addChangeListener(
       ({ colorScheme }) => {
-        if (!this.manualColorScheme) {
-          this.colorScheme = colorScheme;
+        if (this.colorSchemeSystem === "system") {
+          this.colorScheme = colorScheme || "light";
           this.notifyMedia(["colorScheme"]);
-          this.notify();
         }
       }
     );
@@ -207,33 +196,6 @@ export class StyleSheetStore {
     for (const l of this.listeners) l();
   }
 
-  subscribeColorScheme = (listener: () => void) => {
-    this.colorSchemeListeners.add(listener);
-    return () => this.colorSchemeListeners.delete(listener);
-  };
-
-  getColorScheme = () => {
-    return this.colorScheme;
-  };
-
-  notifyColorScheme() {
-    for (const l of this.colorSchemeListeners) l();
-  }
-
-  setColorScheme(colorScheme: ColorSchemeName) {
-    this.colorScheme = colorScheme;
-    this.manualColorScheme = true;
-    this.notifyMedia(["colorScheme"]);
-    this.notify();
-  }
-
-  toggleColorScheme() {
-    this.colorScheme = this.colorScheme === "light" ? "dark" : "light";
-    this.manualColorScheme = true;
-    this.notifyMedia(["colorScheme"]);
-    this.notify();
-  }
-
   subscribeMedia(listener: (topics: string[]) => void) {
     this.atRuleListeners.add(listener);
     return () => this.atRuleListeners.delete(listener);
@@ -241,6 +203,7 @@ export class StyleSheetStore {
 
   notifyMedia(topics: string[]) {
     for (const l of this.atRuleListeners) l(topics);
+    this.notify();
   }
 
   isEqual(a: StylesArray, b: StylesArray): boolean {
