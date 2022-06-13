@@ -32,7 +32,7 @@ export function withClassNames({
   const isComponent = isComponentRegex.test(className);
   const isParent = isParentRegex.test(className);
 
-  const allClasses = [classes];
+  const allClasses = [className];
 
   for (const prop of [...propsToTransform, ...spreadProps, ...classProps]) {
     const componentProp = componentProps[prop];

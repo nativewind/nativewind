@@ -1,1 +1,1 @@
-module.exports = require("../dist/tailwind").default;
+module.exports = require("../dist/tailwind/css").default;
