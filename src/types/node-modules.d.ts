@@ -20,6 +20,10 @@ declare module "css-mediaquery" {
 /**
  * Tailwindcss internal functions
  */
+declare module "tailwindcss/resolveConfig" {
+  export default function (options: unknown): any;
+}
+
 declare module "tailwindcss/lib/util/withAlphaVariable" {
   export default function (options: unknown): any;
 }

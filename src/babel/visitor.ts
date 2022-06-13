@@ -1,5 +1,4 @@
 import type { Visitor } from "@babel/traverse";
-import { TailwindConfig } from "tailwindcss/tailwind-config";
 
 import { getJSXElementName } from "./utils/get-jsx-element-name";
 import { hasNamedImport } from "./utils/has-named-import";
@@ -13,6 +12,7 @@ import {
   State,
   TailwindcssReactNativeBabelOptions,
 } from "./types";
+import { Config } from "tailwindcss";
 
 export interface VisitorState
   extends State,
@@ -23,7 +23,7 @@ export interface VisitorState
   hasStyledComponentImport: boolean;
   hasProvider: boolean;
   hasStyleSheetImport: boolean;
-  tailwindConfig: TailwindConfig;
+  tailwindConfig: Config;
   tailwindConfigPath: string;
   canCompile: boolean;
   canTransform: boolean;

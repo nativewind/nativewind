@@ -1,4 +1,3 @@
-import { TailwindConfig } from "tailwindcss/tailwind-config";
 import { extractStyles } from "../../../src/postcss/extract-styles";
 import { StyleError, StyleRecord } from "../../../src/types/common";
 import { testStyleSerializer } from "../../../src/utils/serialize-styles";
@@ -31,14 +30,12 @@ export function assertStyles(
     plugins: [
       cssPlugin,
       nativePlugin({
-        onError(error) {
+        onError(error: StyleError) {
           errors.push(error);
         },
       }),
     ],
-    content: [
-      { raw: "", extension: "html" },
-    ] as unknown as TailwindConfig["content"],
+    content: [{ raw: "", extension: "html" }],
     safelist: [css],
     serializer: (styles) => styles,
   });
@@ -58,10 +55,8 @@ export function TestProvider({
 }: PropsWithChildren<TailwindProviderProps & { css: string }>) {
   const { output } = extractStyles({
     theme: {},
-    plugins: [cssPlugin, nativePlugin()],
-    content: [
-      { raw: "", extension: "html" },
-    ] as unknown as TailwindConfig["content"],
+    plugins: [cssPlugin, nativePlugin({})],
+    content: [{ raw: "", extension: "html" }],
     safelist: [css],
     serializer: testStyleSerializer,
   });

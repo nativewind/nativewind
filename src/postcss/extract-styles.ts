@@ -1,4 +1,3 @@
-import { TailwindConfig } from "tailwindcss/tailwind-config";
 import postcss from "postcss";
 import tailwind, { Config } from "tailwindcss";
 
@@ -6,7 +5,7 @@ import plugin from "../postcss";
 
 import { StyleError, StyleRecord } from "../types/common";
 
-export interface ExtractStylesOptions<T> extends TailwindConfig {
+export interface ExtractStylesOptions<T> extends Config {
   serializer: (styleRecord: StyleRecord) => T;
 }
 

@@ -1,9 +1,9 @@
 import micromatch from "micromatch";
 import { resolve, sep, posix } from "node:path";
-import { TailwindConfig } from "tailwindcss/tailwind-config";
+import { Config } from "tailwindcss";
 import { TailwindcssReactNativeBabelOptions, AllowPathOptions } from "../types";
 
-const defaultContent: NonNullable<TailwindConfig["content"]> = {
+const defaultContent: NonNullable<Config["content"]> = {
   files: ["*"],
   extract: undefined,
   transform: undefined,
@@ -15,10 +15,12 @@ interface GetAllowedOptionsOptions {
 }
 
 export function getAllowedOptions(
-  { content = defaultContent }: TailwindConfig,
+  { content = defaultContent }: Config,
   { allowModuleTransform = "*" }: TailwindcssReactNativeBabelOptions
 ): GetAllowedOptionsOptions {
-  const contentPaths = Array.isArray(content) ? content : content.files;
+  const contentPaths = (
+    Array.isArray(content) ? content : content.files
+  ).filter((a): a is string => typeof a === "string");
 
   return {
     allowModuleTransform: Array.isArray(allowModuleTransform)

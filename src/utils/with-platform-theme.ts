@@ -1,4 +1,4 @@
-import { TailwindConfig, TailwindTheme } from "tailwindcss/tailwind-config";
+import { Config } from "tailwindcss";
 import resolveTailwindConfig from "tailwindcss/resolveConfig";
 
 interface WithPlatformThemeOptions {
@@ -6,10 +6,10 @@ interface WithPlatformThemeOptions {
 }
 
 export function withPlatformTheme(
-  tailwindConfig: TailwindConfig,
+  tailwindConfig: Config,
   { previewCss = false }: WithPlatformThemeOptions = {}
 ) {
-  const config = resolveTailwindConfig(tailwindConfig);
+  const config: Config = resolveTailwindConfig(tailwindConfig);
 
   if (!config.theme) return config;
 
@@ -48,7 +48,7 @@ export function withPlatformTheme(
   }
 
   for (const [key, value] of Object.entries(config.theme) as Array<
-    [keyof TailwindTheme, string | Record<string, unknown>]
+    [keyof Config["theme"], string | Record<string, unknown>]
   >) {
     resolvePlatformThemes(key, value);
   }

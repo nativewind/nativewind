@@ -1,4 +1,4 @@
-import { TailwindConfig } from "tailwindcss/tailwind-config";
+import { Config } from "tailwindcss";
 
 /**
  * normalize a selector to be object key friendly
@@ -7,7 +7,7 @@ import { TailwindConfig } from "tailwindcss/tailwind-config";
  */
 export function normalizeSelector(
   selector: string,
-  { important }: Partial<TailwindConfig> = {}
+  { important }: Partial<Config> = {}
 ) {
   const leadingDots = "^\\.";
   const nonWordCharactersExceptDashAndSpaces = new RegExp(
