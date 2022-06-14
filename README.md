@@ -2,7 +2,7 @@
 <p align="center">
   <a href="https://tailwindcss-react-native.vercel.app" target="_blank">
     <img src="https://tailwindcss-react-native.vercel.app/img/logo.svg" alt="Tailwind CSS" width="70" height="70">
-    <h1 align="center" style="color:red;">tailwindcss-react-native</h1>
+    <h1 align="center" style="color:red;">NativeWind</h1>
   </a>
 </p>
 <img alt="GitHub branch checks state" src="https://img.shields.io/github/checks-status/marklawlor/tailwindcss-react-native/next">
@@ -12,9 +12,11 @@
 </div>
 <br />
 
-`tailwindcss-react-native` uses [Tailwind CSS](https://tailwindcss.com) as high-level scripting language to create a **universal design system**. Styled components can be shared between all React Native platforms, using the best style engine for that platform (e.g. CSS StyleSheet or StyleSheet.create). It's goals are to to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
+> `tailwindcss-react-native` is current working on v2, which includes a renaming of the project to NativeWind!
 
-`tailwindcss-react-native` processes your styles during your application build, and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
+`NativeWind` uses [Tailwind CSS](https://tailwindcss.com) as high-level scripting language to create a **universal design system**. Styled components can be shared between all React Native platforms, using the best style engine for that platform (e.g. CSS StyleSheet or StyleSheet.create). It's goals are to to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
+
+`NativeWind` processes your styles during your application build, and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
 
 > :point_right: This example uses Babel which is one of the many setups available.
 
@@ -155,7 +157,7 @@ export function MyText({ bold, italic, lineThrough, ...props }) {
 ## 1. Create a new React Native application
 
 ```
-npx create-react-native-app my-tailwind-native-app;
+npx create-react-native-app my-nativewind-app;
 
 ```
 
@@ -164,15 +166,15 @@ Choose "Default new app"
 Then change your `cwd` to the folder containing the project
 
 ```bash
-cd my-tailwind-native-app
+cd my-nativewind-app
 ```
 
 ## 2. Install the dependencies
 
-You will need to install `tailwindcss-react-native` and it's peer dependency `tailwindcss`.
+You will need to install `nativewind` and it's peer dependency `tailwindcss`.
 
 ```bash
-yarn add tailwindcss-react-native
+yarn add nativewind
 yarn add tailwindcss -D
 ```
 
