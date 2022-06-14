@@ -1,15 +1,15 @@
 import { createContext, useContext } from "react";
 
 export interface ComponentContext {
-  hover: boolean;
-  focus: boolean;
-  active: boolean;
+  componentHover: boolean;
+  componentFocus: boolean;
+  componentActive: boolean;
 }
 
 export const ComponentContext = createContext<ComponentContext>({
-  hover: false,
-  focus: false,
-  active: false,
+  componentHover: false,
+  componentFocus: false,
+  componentActive: false,
 });
 
 export function useComponent() {
