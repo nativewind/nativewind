@@ -1,4 +1,5 @@
-import { useContext, useSyncExternalStore } from "react";
+import { useContext } from "react";
+import { useSyncExternalStore } from "use-sync-external-store/shim";
 import { StoreContext } from "./style-sheet-store";
 
 export function useColorScheme() {
