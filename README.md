@@ -14,7 +14,7 @@
 
 > `tailwindcss-react-native` is current working on v2, which includes a renaming of the project to NativeWind!
 > 
-> You can download the current stable version via `npm i tailwindcss-react-native`
+> You can see the current stable version on the `main` branch and download it via `npm i tailwindcss-react-native`
 
 `NativeWind` uses [Tailwind CSS](https://tailwindcss.com) as high-level scripting language to create a **universal design system**. Styled components can be shared between all React Native platforms, using the best style engine for that platform (e.g. CSS StyleSheet or StyleSheet.create). It's goals are to to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
 
