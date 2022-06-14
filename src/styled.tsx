@@ -111,6 +111,7 @@ export function styled<
     ref: ForwardedRef<unknown>
   ) {
     const store = useContext(StoreContext);
+    const componentContext = useContext(ComponentContext);
 
     const { className, allClasses, isComponent, isParent } = withClassNames({
       baseClassName,
@@ -144,6 +145,7 @@ export function styled<
         hover,
         focus,
         active,
+        ...componentContext,
       },
       styleProp,
       additionalStyles
@@ -153,9 +155,9 @@ export function styled<
       store,
       componentChildren,
       stylesArray: style,
-      parentHover: hover,
-      parentFocus: focus,
-      parentActive: active,
+      parentHover: isParent && hover,
+      parentFocus: isParent && focus,
+      parentActive: isParent && active,
     });
 
     const element = createElement(Component, {
@@ -166,15 +168,21 @@ export function styled<
       ref,
     } as unknown as T);
 
-    return !isComponent
-      ? element
-      : createElement<ComponentProps<typeof ComponentContext.Provider>>(
-          ComponentContext.Provider,
-          {
-            children: element,
-            value: { hover, focus, active },
-          }
-        );
+    if (isComponent) {
+      return createElement<ComponentProps<typeof ComponentContext.Provider>>(
+        ComponentContext.Provider,
+        {
+          children: element,
+          value: {
+            componentHover: hover,
+            componentFocus: focus,
+            componentActive: active,
+          },
+        }
+      );
+    }
+
+    return element;
   }
 
   if (typeof Component !== "string") {
