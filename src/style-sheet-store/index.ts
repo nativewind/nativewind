@@ -22,6 +22,7 @@ import vh from "./units/vh";
 import vw from "./units/vw";
 import { ColorSchemeStore, ColorSchemeSystem } from "./color-scheme";
 
+export type { ColorSchemeSystem, ColorSchemeName } from "./color-scheme";
 export type Style = ViewStyle | ImageStyle | TextStyle;
 export type InlineStyle<T extends Style> = T;
 export type AtRuleStyle<T extends Style> = T & { atRules: unknown[] };

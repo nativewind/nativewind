@@ -3,15 +3,15 @@ import { PropsWithChildren } from "react";
 import { Platform } from "react-native";
 
 import {
-  ColorSchemeName,
   StoreContext,
   StyleSheetStore,
+  ColorSchemeSystem,
 } from "./style-sheet-store";
 
 export interface TailwindProviderProps {
   styles?: typeof globalThis["tailwindcss_react_native_style"];
   media?: typeof globalThis["tailwindcss_react_native_media"];
-  initialColorScheme?: ColorSchemeName;
+  initialColorScheme?: ColorSchemeSystem;
   platform?: typeof Platform.OS | "native";
   webOutput?: "css" | "native";
   nativeOutput?: "css" | "native";
