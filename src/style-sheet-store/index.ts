@@ -55,9 +55,9 @@ export interface SelectorOptions {
   hover?: boolean;
   active?: boolean;
   focus?: boolean;
-  componentHover?: boolean;
-  componentActive?: boolean;
-  componentFocus?: boolean;
+  scopedGroupHover?: boolean;
+  scopedGroupActive?: boolean;
+  scopedGroupFocus?: boolean;
 }
 
 declare global {
@@ -221,14 +221,14 @@ export class StyleSheetStore extends ColorSchemeStore {
       hover = false,
       active = false,
       focus = false,
-      componentHover = false,
-      componentActive = false,
-      componentFocus = false,
+      scopedGroupHover = false,
+      scopedGroupActive = false,
+      scopedGroupFocus = false,
     }: SelectorOptions = {}
   ) {
     return this.preprocessed
       ? className
-      : `${className}.${+hover}${+active}${+focus}${+componentHover}${+componentActive}${+componentFocus}`;
+      : `${className}.${+hover}${+active}${+focus}${+scopedGroupHover}${+scopedGroupActive}${+scopedGroupFocus}`;
   }
 
   createSelector(
@@ -256,8 +256,14 @@ export class StyleSheetStore extends ColorSchemeStore {
     options: SelectorOptions = {}
   ) {
     if (this.preprocessed) {
+      const classNames = [className];
+
+      if (options.scopedGroupActive) classNames.push("component-active");
+      if (options.scopedGroupFocus) classNames.push("component-focus");
+      if (options.scopedGroupHover) classNames.push("component-hover");
+
       const styleArray: StylesArray = [
-        { $$css: true, [key]: key } as CompiledStyle,
+        { $$css: true, [key]: classNames.join(" ") } as CompiledStyle,
       ];
       styleArray.dynamic = false;
       this.snapshot = { ...this.snapshot, [key]: styleArray };

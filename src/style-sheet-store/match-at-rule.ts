@@ -7,9 +7,9 @@ interface MatchAtRuleOptions {
   hover?: boolean;
   active?: boolean;
   focus?: boolean;
-  componentHover?: boolean;
-  componentActive?: boolean;
-  componentFocus?: boolean;
+  scopedGroupHover?: boolean;
+  scopedGroupActive?: boolean;
+  scopedGroupFocus?: boolean;
   platform: typeof Platform.OS;
   colorScheme: ColorSchemeName;
   width: number;
@@ -23,9 +23,9 @@ export function matchAtRule({
   hover,
   active,
   focus,
-  componentHover,
-  componentActive,
-  componentFocus,
+  scopedGroupHover,
+  scopedGroupActive,
+  scopedGroupFocus,
   platform,
   colorScheme,
   width,
@@ -44,14 +44,14 @@ export function matchAtRule({
       default:
         return false;
     }
-  } else if (rule === "component") {
+  } else if (rule === "scoped-group") {
     switch (params) {
       case "hover":
-        return componentHover;
+        return scopedGroupHover;
       case "focus":
-        return componentFocus;
+        return scopedGroupFocus;
       case "active":
-        return componentActive;
+        return scopedGroupActive;
       default:
         return false;
     }

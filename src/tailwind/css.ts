@@ -14,6 +14,9 @@ export default plugin(function ({ addVariant, matchUtilities, theme }) {
   );
 
   addVariant("parent", "& > *");
+  addVariant("group-scoped-hover", "&.group-hover");
+  addVariant("group-scoped-focus", "&.group-focus");
+  addVariant("group-scoped-active", "&.group-active");
 
   matchUtilities(
     {

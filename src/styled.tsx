@@ -1,5 +1,4 @@
 import {
-  ComponentProps,
   createElement,
   ReactNode,
   ComponentType,
@@ -19,7 +18,7 @@ import { useTailwind } from "./use-tailwind";
 import { withClassNames } from "./with-class-names";
 import { StyleProp } from "react-native";
 import { StoreContext } from "./style-sheet-store";
-import { ComponentContext } from "./component-context";
+import { ScopedGroupContext } from "./scoped-group-context";
 
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
@@ -111,7 +110,7 @@ export function styled<
     ref: ForwardedRef<unknown>
   ) {
     const store = useContext(StoreContext);
-    const componentContext = useContext(ComponentContext);
+    const scopedGroupContext = useContext(ScopedGroupContext);
 
     const { className, allClasses, isComponent, isParent } = withClassNames({
       baseClassName,
@@ -145,7 +144,7 @@ export function styled<
         hover,
         focus,
         active,
-        ...componentContext,
+        ...scopedGroupContext,
       },
       styleProp,
       additionalStyles
@@ -169,17 +168,14 @@ export function styled<
     } as unknown as T);
 
     if (isComponent) {
-      return createElement<ComponentProps<typeof ComponentContext.Provider>>(
-        ComponentContext.Provider,
-        {
-          children: element,
-          value: {
-            componentHover: hover,
-            componentFocus: focus,
-            componentActive: active,
-          },
-        }
-      );
+      return createElement(ScopedGroupContext.Provider, {
+        children: element,
+        value: {
+          scopedGroupHover: hover,
+          scopedGroupFocus: focus,
+          scopedGroupActive: active,
+        },
+      });
     }
 
     return element;

@@ -1,7 +1,7 @@
 import { CustomPluginFunction } from "./types";
 
 export const component: CustomPluginFunction = ({ addVariant }) => {
-  addVariant("component-hover", "@component hover");
-  addVariant("component-focus", "@component focus");
-  addVariant("component-active", "@component active");
+  addVariant("group-scoped-hover", "@scoped-group hover");
+  addVariant("group-scoped-focus", "@scoped-group focus");
+  addVariant("group-scoped-active", "@scoped-group active");
 };

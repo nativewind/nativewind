@@ -25,9 +25,9 @@ export function useTailwind<T>(
       options.hover,
       options.focus,
       options.active,
-      options.componentHover,
-      options.componentFocus,
-      options.componentActive,
+      options.scopedGroupHover,
+      options.scopedGroupFocus,
+      options.scopedGroupActive,
     ]
   );
 
