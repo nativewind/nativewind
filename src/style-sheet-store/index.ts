@@ -216,6 +216,7 @@ export class StyleSheetStore extends ColorSchemeStore {
 
     const selector = createNormalizedSelector(className, {
       ...options,
+      platform: Platform.OS,
       composed: true,
     });
 
@@ -254,7 +255,10 @@ export class StyleSheetStore extends ColorSchemeStore {
       const styleArray: StylesArray = [];
 
       for (const name of className.split(/\s+/)) {
-        const normalizedSelector = createNormalizedSelector(name, options);
+        const normalizedSelector = createNormalizedSelector(name, {
+          ...options,
+          platform: Platform.OS,
+        });
         const classNameStyles = this.upsertAtomicStyle(
           normalizedSelector,
           options

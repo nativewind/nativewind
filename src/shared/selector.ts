@@ -1,4 +1,4 @@
-import { Platform } from "react-native";
+import type { Platform } from "react-native";
 
 const commonReplacements = `^\\.|\\\\`;
 
@@ -81,7 +81,7 @@ export function createNormalizedSelector(
     parentHover = false,
     parentFocus = false,
     parentActive = false,
-    platform = Platform.OS,
+    platform,
   }: CreateSelectorOptions = {}
 ) {
   let finalBit = 0;
@@ -121,13 +121,17 @@ export function createAtRuleSelector(className: string, atRuleIndex: number) {
   return `${className}@${atRuleIndex}`;
 }
 
-export interface $Options extends CreateSelectorOptions {
+export interface $Options extends Omit<CreateSelectorOptions, "platform"> {
   atRuleIndex?: number;
+  platform?: CreateSelectorOptions["platform"];
 }
 
 export function $(...strings: TemplateStringsArray[]) {
   return function ({ atRuleIndex, ...options }: $Options = {}) {
-    const selector = createNormalizedSelector(strings[0].raw[0], options);
+    const selector = createNormalizedSelector(strings[0].raw[0], {
+      platform: "ios",
+      ...options,
+    });
 
     return typeof atRuleIndex === "number"
       ? createAtRuleSelector(selector, atRuleIndex)
