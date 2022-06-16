@@ -5,3 +5,4 @@ moti
 solito
 atrule
 nextjs
+nativewind

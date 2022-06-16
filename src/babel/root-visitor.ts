@@ -121,11 +121,7 @@ export default function rootVisitor(
           const bodyNode = path.node.body;
 
           if (didTransform && !hasStyledComponentImport) {
-            prependImports(
-              bodyNode,
-              ["StyledComponent"],
-              "tailwindcss-react-native"
-            );
+            prependImports(bodyNode, ["StyledComponent"], "nativewind");
           }
 
           const { output } = extractStyles(extractStylesOptions);
