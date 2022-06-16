@@ -19,36 +19,40 @@ export function normalizeCssSelector(
 
   let bitLevel = 1;
 
-  for (const regex of [
-    /\w+(:hover)/,
-    /\w+(:active)/,
-    /\w+(:focus)/,
-    /\w+(:group-hover)/,
-    /\w+(:group-active)/,
-    /\w+(:group-focus)/,
-    /\w+(:group-scoped-hover)/,
-    /\w+(:group-scoped-active)/,
-    /\w+(:group-scoped-focus)/,
-    /\w+(:parent-hover)/,
-    /\w+(:parent-active)/,
-    /\w+(:parent-focus)/,
-    /\w+(:android)/,
-    /\w+(:ios)/,
-    /\w+(:web)/,
-    /\w+(:windows)/,
-    /\w+(:macos)/,
+  for (const test of [
+    "hover",
+    "active",
+    "focus",
+    "group-hover",
+    "group-active",
+    "group-focus",
+    "group-scoped-hover",
+    "group-scoped-active",
+    "group-scoped-focus",
+    "parent-hover",
+    "parent-active",
+    "parent-focus",
+    "android",
+    "ios",
+    "web",
+    "windows",
+    "macos",
+    "dark",
   ]) {
-    if (regex.test(selector)) {
+    if (new RegExp(`\\w+(::${test})(:|\\b)`).test(selector)) {
       finalBit = finalBit | bitLevel;
     }
 
     bitLevel = bitLevel * 2;
   }
 
+  selector = selector.split("::")[0];
+
   return `${selector}.${finalBit}`;
 }
 
 export interface CreateSelectorOptions {
+  darkMode?: boolean;
   composed?: boolean;
   hover?: boolean;
   active?: boolean;
@@ -68,6 +72,7 @@ export interface CreateSelectorOptions {
 export function createNormalizedSelector(
   selector: string,
   {
+    darkMode = false,
     composed = false,
     hover = false,
     focus = false,
@@ -89,7 +94,9 @@ export function createNormalizedSelector(
   let bitLevel = 1;
 
   const hasPlatformPrefix =
-    /(^|\w:)(ios|android|native|web|windows|macos):/.test(selector);
+    /(^|\b|\w:)(ios|android|native|web|windows|macos):/.test(selector);
+
+  const hasDarkPrefix = /(^|\b|\w:)dark:/.test(selector);
 
   for (const value of [
     hover,
@@ -109,6 +116,7 @@ export function createNormalizedSelector(
     hasPlatformPrefix && platform === "web",
     hasPlatformPrefix && platform === "windows",
     hasPlatformPrefix && platform === "macos",
+    hasDarkPrefix && darkMode,
   ]) {
     if (value) finalBit |= bitLevel;
     bitLevel = bitLevel * 2;
@@ -137,4 +145,8 @@ export function $(...strings: TemplateStringsArray[]) {
       ? createAtRuleSelector(selector, atRuleIndex)
       : selector;
   };
+}
+
+export function css(...strings: TemplateStringsArray[]) {
+  return normalizeCssSelector(strings[0].raw[0]);
 }

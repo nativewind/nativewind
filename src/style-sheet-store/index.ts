@@ -216,6 +216,7 @@ export class StyleSheetStore extends ColorSchemeStore {
 
     const selector = createNormalizedSelector(className, {
       ...options,
+      darkMode: this.colorScheme === "dark",
       platform: Platform.OS,
       composed: true,
     });
@@ -257,8 +258,10 @@ export class StyleSheetStore extends ColorSchemeStore {
       for (const name of className.split(/\s+/)) {
         const normalizedSelector = createNormalizedSelector(name, {
           ...options,
+          darkMode: this.colorScheme === "dark",
           platform: Platform.OS,
         });
+
         const classNameStyles = this.upsertAtomicStyle(
           normalizedSelector,
           options
@@ -392,10 +395,8 @@ export class StyleSheetStore extends ColorSchemeStore {
           return matchAtRule({
             rule,
             params,
-            platform: this.platform,
             width: this.window.width,
             height: this.window.height,
-            colorScheme: this.colorScheme,
             orientation: this.orientation,
             ...options,
           });

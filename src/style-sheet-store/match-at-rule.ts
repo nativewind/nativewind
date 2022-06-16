@@ -1,11 +1,8 @@
 import { match } from "css-mediaquery";
-import { ColorSchemeName, Platform } from "react-native";
 
 interface MatchAtRuleOptions {
   rule: string;
   params?: string;
-  platform: typeof Platform.OS;
-  colorScheme: ColorSchemeName;
   width: number;
   height: number;
   orientation: OrientationLockType;
@@ -14,8 +11,6 @@ interface MatchAtRuleOptions {
 export function matchAtRule({
   rule,
   params,
-  platform,
-  colorScheme,
   width,
   height,
   orientation,
@@ -24,13 +19,11 @@ export function matchAtRule({
     return match(params, {
       "aspect-ratio": width / height,
       "device-aspect-ratio": width / height,
-      type: platform,
       width,
       height,
       "device-width": width,
       "device-height": width,
       orientation,
-      "prefers-color-scheme": colorScheme,
     });
   }
 

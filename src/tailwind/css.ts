@@ -5,12 +5,12 @@ import toColorValue from "tailwindcss/lib/util/toColorValue";
 
 export default plugin(function ({ addVariant, matchUtilities, theme }) {
   for (const platform of platforms) {
-    addVariant(platform, `&:${platform}`);
+    addVariant(platform, `&::${platform}`);
   }
 
   addVariant(
     "native",
-    nativePlatforms.map((platform) => `&:${platform}`)
+    nativePlatforms.map((platform) => `&::${platform}`)
   );
 
   addVariant("parent", "& > *");

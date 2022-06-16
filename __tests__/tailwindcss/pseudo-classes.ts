@@ -1,28 +1,28 @@
-import { tailwindRunner } from "./runner";
+import { tailwindRunner, css } from "./runner";
 
 tailwindRunner("Pseudo-classes", [
   [
     "hover:text-green-500",
     {
-      "hover:text-green-500:hover.1": [{ color: "#22c55e" }],
+      [css`hover:text-green-500::hover`]: [{ color: "#22c55e" }],
     },
   ],
   [
     "active:text-green-500",
     {
-      "active:text-green-500:active.2": [{ color: "#22c55e" }],
+      [css`active:text-green-500::active`]: [{ color: "#22c55e" }],
     },
   ],
   [
     "focus:text-green-500",
     {
-      "focus:text-green-500:focus.4": [{ color: "#22c55e" }],
+      [css`focus:text-green-500::focus`]: [{ color: "#22c55e" }],
     },
   ],
   [
     "active:hover:text-green-500",
     {
-      "active:hover:text-green-500:hover:active.3": [{ color: "#22c55e" }],
+      [css`active:hover:text-green-500::hover::active`]: [{ color: "#22c55e" }],
     },
   ],
 ]);

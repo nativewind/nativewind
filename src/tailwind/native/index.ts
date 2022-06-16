@@ -7,7 +7,6 @@ import { elevation } from "./elevation";
 import { fontSize } from "./font-size";
 import { gap } from "./gap";
 import { lineHeight } from "./line-height";
-import { pseudoClasses } from "./pseudo-classes";
 import { rotate } from "./rotate";
 import { scale } from "./scale";
 import { skew } from "./skew";
@@ -16,6 +15,9 @@ import { translate } from "./translate";
 import { parent } from "./parent";
 import { color } from "./color";
 import { Config } from "tailwindcss";
+import { dark } from "./dark";
+import { DarkModeConfig } from "tailwindcss/types/config";
+import { pseudoClasses } from "./pseudo-classes";
 export interface NativePluginOptions {
   rem?: number;
   onError?: (error: StyleError) => void;
@@ -41,18 +43,19 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
       helpers.addUtilities({ ".babel-empty": {} });
 
       color(helpers, notSupported);
+      dark(helpers, notSupported);
       space(helpers, notSupported);
       divide(helpers, notSupported);
       gap(helpers, notSupported);
       fontSize(helpers);
       lineHeight(helpers, notSupported);
+      pseudoClasses(helpers, notSupported);
       elevation(helpers, notSupported);
       scale(helpers, notSupported);
       rotate(helpers, notSupported);
       translate(helpers, notSupported);
       skew(helpers, notSupported);
       boxShadow(helpers, notSupported);
-      pseudoClasses(helpers, notSupported);
       component(helpers, notSupported);
       parent(helpers, notSupported);
     };
@@ -61,6 +64,8 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
     const config: Partial<
       Config & { theme: { elevation: Record<string, string> } }
     > = {
+      // We need to do this to force dark mode off
+      darkMode: "off" as DarkModeConfig,
       theme: {
         aspectRatio: {
           auto: "0",
@@ -207,21 +212,21 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
         },
       },
       corePlugins: {
-        space: false,
-        fontSize: false,
-        lineHeight: false,
-        divideWidth: false,
-        divideColor: false,
-        divideStyle: false,
-        divideOpacity: false,
-        textOpacity: false,
-        scale: false,
-        transform: false,
-        rotate: false,
-        skew: false,
-        translate: false,
         boxShadow: false,
+        divideColor: false,
+        divideOpacity: false,
+        divideStyle: false,
+        divideWidth: false,
+        fontSize: false,
         gap: false,
+        lineHeight: false,
+        rotate: false,
+        scale: false,
+        skew: false,
+        space: false,
+        textOpacity: false,
+        transform: false,
+        translate: false,
       },
     };
 
