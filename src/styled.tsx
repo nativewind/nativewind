@@ -18,7 +18,7 @@ import { useTailwind } from "./use-tailwind";
 import { withClassNames } from "./with-class-names";
 import { StyleProp } from "react-native";
 import { StoreContext } from "./style-sheet-store";
-import { ScopedGroupContext } from "./scoped-group-context";
+import { ScopedGroupContext } from "./group-context";
 
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;

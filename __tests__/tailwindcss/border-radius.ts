@@ -1,5 +1,5 @@
 import { ViewStyle } from "react-native";
-import { createTests, tailwindRunner } from "./runner";
+import { createTests, tailwindRunner, $ } from "./runner";
 
 const scenarios: Record<string, ViewStyle["borderRadius"]> = {
   none: 0,
@@ -18,7 +18,7 @@ tailwindRunner(
     [
       "rounded",
       {
-        rounded: [
+        [$`rounded`()]: [
           {
             borderBottomLeftRadius: 4,
             borderBottomRightRadius: 4,

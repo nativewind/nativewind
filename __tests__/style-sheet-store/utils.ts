@@ -4,21 +4,23 @@ import {
   Dimensions,
   ScaledSize,
 } from "react-native";
+import { CreateSelectorOptions } from "../../src/shared/selector";
 
-import { StyleSheetStore, SelectorOptions } from "../../src/style-sheet-store";
+import { StyleSheetStore } from "../../src/style-sheet-store";
 
 export class TestStyleSheetStore extends StyleSheetStore {
   // Helper to easily retrieve a style from the latest snapshot
-  getStyle(classNames: string, options?: SelectorOptions) {
-    return this.createSelector(classNames, options)(this.getSnapshot());
+  getStyle(className: string, options?: CreateSelectorOptions) {
+    const selector = this.prepare(className, options);
+    return this.getSnapshot()[selector];
   }
 
   // Remove the extra meta-data properties from StyleArray, allows you to compare
   // the results with toEqual
   //
   // Note: If you want check the stability of results, you need to use getStyle()
-  getTestStyle(classNames: string, options?: SelectorOptions) {
-    return [...this.createSelector(classNames, options)(this.getSnapshot())];
+  getTestStyle(className: string, options?: CreateSelectorOptions) {
+    return [...this.getStyle(className, options)];
   }
 }
 

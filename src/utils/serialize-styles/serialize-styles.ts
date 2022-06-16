@@ -7,6 +7,7 @@ import {
   objectProperty,
   stringLiteral,
 } from "@babel/types";
+import { createAtRuleSelector } from "../../shared/selector";
 import { MediaRecord, Style, StyleRecord } from "../../types/common";
 
 export interface DefaultSerializedStyles {
@@ -39,7 +40,7 @@ export function serializeStyles(
         if ("atRules" in style) {
           const { atRules, ...rest } = style;
           media[key] ??= [];
-          newKey = `${key}.${media[key].length}`;
+          newKey = createAtRuleSelector(key, media[key].length);
           media[key].push(atRules);
           style = rest;
         }

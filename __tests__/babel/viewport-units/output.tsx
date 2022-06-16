@@ -14,7 +14,7 @@ export function Test() {
 globalThis.tailwindcss_react_native_style = Object.assign(
   globalThis.tailwindcss_react_native_style || {},
   RNStyleSheet.create({
-    "w-screen.0": {
+    "w-screen.0@0": {
       width: 100,
     },
   })
@@ -22,6 +22,6 @@ globalThis.tailwindcss_react_native_style = Object.assign(
 globalThis.tailwindcss_react_native_media = Object.assign(
   globalThis.tailwindcss_react_native_media || {},
   {
-    "w-screen": [[["dynamic-style", "vw"]]],
+    "w-screen.0": [[["dynamic-style", "vw"]]],
   }
 );

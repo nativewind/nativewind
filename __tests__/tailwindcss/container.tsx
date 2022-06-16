@@ -1,10 +1,10 @@
-import { tailwindRunner } from "./runner";
+import { tailwindRunner, $ } from "./runner";
 
 tailwindRunner("Layout - Container", [
   [
     "container",
     {
-      container: [
+      [$`container`()]: [
         {
           width: "100%",
         },
@@ -34,7 +34,7 @@ tailwindRunner("Layout - Container", [
   [
     "sm:container",
     {
-      sm_container: [
+      [$`sm:container`()]: [
         {
           atRules: [["media", "(min-width: 640px)"]],
           width: "100%",

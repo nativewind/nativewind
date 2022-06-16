@@ -1,4 +1,4 @@
-import { expectError, tailwindRunner } from "./runner";
+import { expectError, tailwindRunner, $ } from "./runner";
 
 tailwindRunner(
   "Effects - Box Shadow",
@@ -6,7 +6,7 @@ tailwindRunner(
     [
       "shadow-sm",
       {
-        "shadow-sm": [
+        [$`shadow-sm`()]: [
           {
             shadowColor: "rgba(0, 0, 0, 0.1)",
             shadowOffset: { height: 1, width: 0 },
@@ -20,7 +20,7 @@ tailwindRunner(
     [
       "shadow",
       {
-        shadow: [
+        [$`shadow`()]: [
           {
             shadowColor: "rgba(0, 0, 0, 0.1)",
             shadowOffset: { height: 2, width: 0 },
@@ -34,7 +34,7 @@ tailwindRunner(
     [
       "shadow-md",
       {
-        "shadow-md": [
+        [$`shadow-md`()]: [
           {
             shadowColor: "rgba(0, 0, 0, 0.1)",
             shadowOffset: { height: 6, width: 0 },
@@ -48,7 +48,7 @@ tailwindRunner(
     [
       "shadow-lg",
       {
-        "shadow-lg": [
+        [$`shadow-lg`()]: [
           {
             shadowColor: "rgba(0, 0, 0, 0.1)",
             shadowOffset: { height: 10, width: 0 },
@@ -62,7 +62,7 @@ tailwindRunner(
     [
       "shadow-xl",
       {
-        "shadow-xl": [
+        [$`shadow-xl`()]: [
           {
             shadowColor: "rgba(0, 0, 0, 0.1)",
             shadowOffset: { height: 20, width: 0 },
@@ -76,7 +76,7 @@ tailwindRunner(
     [
       "shadow-2xl",
       {
-        "shadow-2xl": [
+        [$`shadow-2xl`()]: [
           {
             shadowColor: "rgba(0, 0, 0, 0.1)",
             shadowOffset: { height: 25, width: 0 },
@@ -90,7 +90,7 @@ tailwindRunner(
     [
       "shadow-none",
       {
-        "shadow-none": [
+        [$`shadow-none`()]: [
           {
             shadowColor: "rgba(0, 0, 0, 0)",
             shadowOffset: { height: 0, width: 0 },

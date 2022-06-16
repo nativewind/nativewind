@@ -16,7 +16,11 @@ import {
   matchChildAtRule,
   MatchChildAtRuleOptions,
 } from "./match-at-rule";
-import { normalizeSelector } from "../shared/selector";
+import {
+  createAtRuleSelector,
+  createNormalizedSelector,
+  CreateSelectorOptions,
+} from "../shared/selector";
 import { AtRuleTuple, MediaRecord } from "../types/common";
 import vh from "./units/vh";
 import vw from "./units/vw";
@@ -34,9 +38,8 @@ export type EitherStyle<T extends Style = Style> =
   | StyleProp<T>;
 
 export type Snapshot = Record<string, StylesArray>;
-export type MatchAtRule = (options: SelectorOptions) => boolean | undefined;
 
-const unknownStyles: StylesArray = [];
+const emptyStyles: StylesArray = [];
 
 export interface ChildStyle {
   className: string;
@@ -49,15 +52,6 @@ export interface StylesArray<T = Style> extends Array<EitherStyle<T>> {
   isForChildren?: boolean;
   childStyles?: ChildStyle[];
   topics?: Set<string>;
-}
-
-export interface SelectorOptions {
-  hover?: boolean;
-  active?: boolean;
-  focus?: boolean;
-  scopedGroupHover?: boolean;
-  scopedGroupActive?: boolean;
-  scopedGroupFocus?: boolean;
 }
 
 declare global {
@@ -111,7 +105,7 @@ interface StyleSheetStoreConstructor {
  *
  */
 export class StyleSheetStore extends ColorSchemeStore {
-  snapshot: Snapshot = {};
+  snapshot: Snapshot = { "": emptyStyles };
   listeners = new Set<() => void>();
   atRuleListeners = new Set<(topics: string[]) => void>();
 
@@ -179,6 +173,10 @@ export class StyleSheetStore extends ColorSchemeStore {
     return this.snapshot;
   };
 
+  getServerSnapshot() {
+    return this.snapshot;
+  }
+
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
@@ -187,10 +185,6 @@ export class StyleSheetStore extends ColorSchemeStore {
   destroy() {
     this.dimensionListener.remove();
     this.appearanceListener.remove();
-  }
-
-  getServerSnapshot() {
-    return this.snapshot;
   }
 
   notify() {
@@ -215,47 +209,19 @@ export class StyleSheetStore extends ColorSchemeStore {
     return a.every((style, index) => Object.is(style, b[index]));
   }
 
-  getKey(
-    className: string,
-    {
-      hover = false,
-      active = false,
-      focus = false,
-      scopedGroupHover = false,
-      scopedGroupActive = false,
-      scopedGroupFocus = false,
-    }: SelectorOptions = {}
-  ) {
-    return this.preprocessed
-      ? className
-      : `${className}.${+hover}${+active}${+focus}${+scopedGroupHover}${+scopedGroupActive}${+scopedGroupFocus}`;
-  }
-
-  createSelector(
-    className: string,
-    options: SelectorOptions = {}
-  ): (snapshot: Snapshot) => StylesArray {
+  prepare(className?: string, options: CreateSelectorOptions = {}): string {
     if (typeof className !== "string") {
-      return () => unknownStyles;
+      return "";
     }
 
-    const key = this.getKey(className, options);
+    const selector = createNormalizedSelector(className, {
+      ...options,
+      composed: true,
+    });
 
-    if (!this.snapshot[key]) {
-      this.insertComposedStyle(className, key, options);
-    }
-
-    return ((snapshot: Snapshot) => {
-      return snapshot[key];
-    }).bind(this);
-  }
-
-  insertComposedStyle(
-    className: string,
-    key: string,
-    options: SelectorOptions = {}
-  ) {
     if (this.preprocessed) {
+      if (this.snapshot[className]) return className;
+
       const classNames = [className];
 
       if (options.scopedGroupActive) classNames.push("component-active");
@@ -263,24 +229,37 @@ export class StyleSheetStore extends ColorSchemeStore {
       if (options.scopedGroupHover) classNames.push("component-hover");
 
       const styleArray: StylesArray = [
-        { $$css: true, [key]: classNames.join(" ") } as CompiledStyle,
+        {
+          $$css: true,
+          [className]: classNames.join(" "),
+        } as CompiledStyle,
       ];
       styleArray.dynamic = false;
-      this.snapshot = { ...this.snapshot, [key]: styleArray };
-      return;
+      this.snapshot = {
+        ...this.snapshot,
+        [className]: styleArray,
+      };
+      return className;
     }
+
+    if (this.snapshot[selector]) return selector;
 
     const topics = new Set<string>();
 
     let init = true;
     let isDynamic = false;
-    let childStyles: ChildStyle[] | undefined;
+    const childStyles: ChildStyle[] = [];
 
     const reEvaluate = () => {
       const styleArray: StylesArray = [];
 
       for (const name of className.split(/\s+/)) {
-        const classNameStyles = this.upsertAtomicStyle(name, options);
+        const normalizedSelector = createNormalizedSelector(name, options);
+        const classNameStyles = this.upsertAtomicStyle(
+          normalizedSelector,
+          options
+        );
+
         styleArray.push(...classNameStyles);
 
         // These values will not change, so we can skip them after the first run
@@ -290,10 +269,6 @@ export class StyleSheetStore extends ColorSchemeStore {
           }
 
           if (classNameStyles.childStyles) {
-            if (!childStyles) {
-              childStyles = [];
-            }
-
             childStyles.push(...classNameStyles.childStyles);
           }
 
@@ -303,10 +278,23 @@ export class StyleSheetStore extends ColorSchemeStore {
         }
       }
 
-      styleArray.dynamic = isDynamic;
-      styleArray.childStyles = childStyles;
+      if (styleArray.length > 0 || childStyles.length > 0) {
+        styleArray.dynamic = isDynamic;
 
-      this.snapshot = { ...this.snapshot, [key]: styleArray };
+        if (childStyles.length > 0) {
+          styleArray.childStyles = childStyles;
+        }
+
+        this.snapshot = {
+          ...this.snapshot,
+          [selector]: styleArray,
+        };
+      } else {
+        this.snapshot = {
+          ...this.snapshot,
+          [selector]: emptyStyles,
+        };
+      }
     };
 
     reEvaluate();
@@ -317,6 +305,8 @@ export class StyleSheetStore extends ColorSchemeStore {
         reEvaluate();
       }
     });
+
+    return selector;
   }
 
   /**
@@ -326,30 +316,29 @@ export class StyleSheetStore extends ColorSchemeStore {
    */
   upsertAtomicStyle(
     className: string,
-    options: SelectorOptions = {}
+    options: CreateSelectorOptions = {}
   ): StylesArray {
     // This atomic style has already been processed, we can skip it
     if (this.snapshot[className]) return this.snapshot[className];
 
-    const normalizeClassName = normalizeSelector(className);
-
     // To keep things consistent, even atomic styles are arrays
-    const styleArray: StylesArray = this.styles[normalizeClassName]
-      ? [this.styles[normalizeClassName]]
+    const styleArray: StylesArray = this.styles[className]
+      ? [this.styles[className]]
       : [];
 
-    const atRulesTuple = this.atRules[normalizeClassName];
+    const atRulesTuple = this.atRules[className];
 
     // If there are no atRules, this style is static.
     // We can add it to the snapshot and early exit.
     if (!atRulesTuple) {
-      styleArray.dynamic = false;
-      this.snapshot = { ...this.snapshot, [className]: styleArray };
+      if (styleArray.length > 0) {
+        styleArray.dynamic = false;
+        this.snapshot = { ...this.snapshot, [className]: styleArray };
+      } else {
+        this.snapshot = { ...this.snapshot, [className]: emptyStyles };
+      }
       return styleArray;
     }
-
-    // Change the className to the dynamic version
-    className = this.getKey(className, options);
 
     // The dynamic version may have already been processed, we can skip it
     if (this.snapshot[className]) return this.snapshot[className];
@@ -412,7 +401,7 @@ export class StyleSheetStore extends ColorSchemeStore {
           continue;
         }
 
-        const stylesKey = `${normalizeClassName}.${index}`;
+        const stylesKey = createAtRuleSelector(className, index);
 
         const style = this.styles[stylesKey];
 
@@ -423,7 +412,11 @@ export class StyleSheetStore extends ColorSchemeStore {
         }
 
         if (isForChildren) {
-          childStyles.push({ className, style, atRules: childAtRules });
+          childStyles.push({
+            className: className,
+            style,
+            atRules: childAtRules,
+          });
         } else {
           newStyles.push(style);
         }
@@ -450,7 +443,10 @@ export class StyleSheetStore extends ColorSchemeStore {
         return existingStyles;
       }
 
-      this.snapshot = { ...this.snapshot, [className]: newStyles };
+      this.snapshot =
+        newStyles.length > 0 || newStyles?.childStyles?.length
+          ? { ...this.snapshot, [className]: newStyles }
+          : { ...this.snapshot, [className]: emptyStyles };
 
       return newStyles;
     };

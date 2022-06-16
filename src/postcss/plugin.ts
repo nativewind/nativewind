@@ -1,6 +1,6 @@
 import { writeFileSync } from "node:fs";
 import { Plugin, PluginCreator } from "postcss";
-import { normalizeSelector } from "../shared/selector";
+import { normalizeCssSelector } from "../shared/selector";
 import { toReactNative } from "./to-react-native";
 import { StyleRecord, Style, StyleError, AtRuleTuple } from "../types/common";
 import { outputFormatter } from "./output-formatter";
@@ -57,7 +57,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
           }
 
           for (const s of node.selectors) {
-            const selector = normalizeSelector(s, { important });
+            const selector = normalizeCssSelector(s, { important });
 
             styles[selector] ??= [];
 

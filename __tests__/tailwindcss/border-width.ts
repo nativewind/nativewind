@@ -1,6 +1,6 @@
 import { Style } from "css-to-react-native";
 import { ViewStyle } from "react-native";
-import { createTests, tailwindRunner } from "./runner";
+import { createTests, tailwindRunner, $ } from "./runner";
 
 const scenarios: Record<string, ViewStyle["borderWidth"]> = {
   0: 0,
@@ -15,7 +15,7 @@ tailwindRunner(
     [
       "border",
       {
-        border: [
+        [$`border`()]: [
           {
             borderBottomWidth: "styleSheet(hairlineWidth)",
             borderTopWidth: "styleSheet(hairlineWidth)",
@@ -28,7 +28,7 @@ tailwindRunner(
     [
       "border-x",
       {
-        "border-x": [
+        [$`border-x`()]: [
           {
             borderLeftWidth: "styleSheet(hairlineWidth)",
             borderRightWidth: "styleSheet(hairlineWidth)",
@@ -39,7 +39,7 @@ tailwindRunner(
     [
       "border-y",
       {
-        "border-y": [
+        [$`border-y`()]: [
           {
             borderTopWidth: "styleSheet(hairlineWidth)",
             borderBottomWidth: "styleSheet(hairlineWidth)",
@@ -50,13 +50,15 @@ tailwindRunner(
     [
       "border-t",
       {
-        "border-t": [{ borderTopWidth: "styleSheet(hairlineWidth)" } as Style],
+        [$`border-t`()]: [
+          { borderTopWidth: "styleSheet(hairlineWidth)" } as Style,
+        ],
       },
     ],
     [
       "border-b",
       {
-        "border-b": [
+        [$`border-b`()]: [
           { borderBottomWidth: "styleSheet(hairlineWidth)" } as Style,
         ],
       },
@@ -64,13 +66,15 @@ tailwindRunner(
     [
       "border-l",
       {
-        "border-l": [{ borderLeftWidth: "styleSheet(hairlineWidth)" } as Style],
+        [$`border-l`()]: [
+          { borderLeftWidth: "styleSheet(hairlineWidth)" } as Style,
+        ],
       },
     ],
     [
       "border-r",
       {
-        "border-r": [
+        [$`border-r`()]: [
           { borderRightWidth: "styleSheet(hairlineWidth)" } as Style,
         ],
       },

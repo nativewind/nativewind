@@ -1,39 +1,39 @@
 import { useContext, useMemo } from "react";
 import { StyleProp } from "react-native";
-import {
-  SelectorOptions,
-  StoreContext,
-  StylesArray,
-} from "./style-sheet-store";
+import { Snapshot, StoreContext, StylesArray } from "./style-sheet-store";
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
+import { CreateSelectorOptions } from "./shared/selector";
 
 export function useTailwind<T>(
   classNames: string,
-  options: SelectorOptions = {},
+  options: CreateSelectorOptions = {},
   inlineStyles?: StyleProp<T>,
   additionalStyles: StylesArray<T> = []
 ): StylesArray<T> {
   const store = useContext(StoreContext);
 
-  // useSyncExternalStore doesn't require but stable selector but
-  // useSyncExternalStoreWithSelector does :(
-  const selector = useMemo(
-    () => store.createSelector(classNames, options),
-    [
-      store,
-      classNames,
-      options.hover,
-      options.focus,
-      options.active,
-      options.scopedGroupHover,
-      options.scopedGroupFocus,
-      options.scopedGroupActive,
-    ]
-  );
+  const [subscribe, getSnapshot, selector] = useMemo(() => {
+    const selector = store.prepare(classNames, options);
+
+    return [
+      store.subscribe,
+      store.getSnapshot,
+      (snapshot: Snapshot) => snapshot[selector],
+    ];
+  }, [
+    store,
+    classNames,
+    options.hover,
+    options.focus,
+    options.active,
+    options.scopedGroupHover,
+    options.scopedGroupFocus,
+    options.scopedGroupActive,
+  ]);
 
   const styles = useSyncExternalStoreWithSelector(
-    store.subscribe,
-    store.getSnapshot,
+    subscribe,
+    getSnapshot,
     undefined,
     selector
   );

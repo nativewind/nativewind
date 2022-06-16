@@ -18,25 +18,25 @@ export function Test() {
 globalThis.tailwindcss_react_native_style = Object.assign(
   globalThis.tailwindcss_react_native_style || {},
   RNStyleSheet.create({
-    container: {
+    "container.0": {
       width: "100%",
     },
-    "container.0": {
+    "container.0@0": {
       maxWidth: 640,
     },
-    "container.1": {
+    "container.0@1": {
       maxWidth: 768,
     },
-    "container.2": {
+    "container.0@2": {
       maxWidth: 1024,
     },
-    "container.3": {
+    "container.0@3": {
       maxWidth: 1280,
     },
-    "container.4": {
+    "container.0@4": {
       maxWidth: 1536,
     },
-    "font-bold": {
+    "font-bold.0": {
       fontWeight: "700",
     },
   })
@@ -44,7 +44,7 @@ globalThis.tailwindcss_react_native_style = Object.assign(
 globalThis.tailwindcss_react_native_media = Object.assign(
   globalThis.tailwindcss_react_native_media || {},
   {
-    container: [
+    "container.0": [
       [["media", "(min-width: 640px)"]],
       [["media", "(min-width: 768px)"]],
       [["media", "(min-width: 1024px)"]],

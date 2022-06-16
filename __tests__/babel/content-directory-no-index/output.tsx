@@ -15,10 +15,10 @@ export function Test() {
 globalThis.tailwindcss_react_native_style = Object.assign(
   globalThis.tailwindcss_react_native_style || {},
   RNStyleSheet.create({
-    "font-bold": {
+    "font-bold.0": {
       fontWeight: "700",
     },
-    "text-blue-500": {
+    "text-blue-500.0": {
       color: "#3b82f6",
     },
   })

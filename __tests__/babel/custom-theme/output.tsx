@@ -19,13 +19,13 @@ export function Test() {
 globalThis.tailwindcss_react_native_style = Object.assign(
   globalThis.tailwindcss_react_native_style || {},
   RNStyleSheet.create({
-    "p-px": {
+    "p-px.0": {
       paddingTop: RNPixelRatio.roundToNearestPixel(4),
       paddingRight: RNPixelRatio.roundToNearestPixel(4),
       paddingBottom: RNPixelRatio.roundToNearestPixel(4),
       paddingLeft: RNPixelRatio.roundToNearestPixel(4),
     },
-    "text-blue-500": {
+    "text-blue-500.0": {
       color: RNPlatform.select({
         ios: RNPlatformColor("systemTealColor"),
         android: RNPlatformColor("@androidcolor/holo_blue_bright"),

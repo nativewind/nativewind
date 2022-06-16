@@ -4,12 +4,6 @@ import { ColorSchemeName, Platform } from "react-native";
 interface MatchAtRuleOptions {
   rule: string;
   params?: string;
-  hover?: boolean;
-  active?: boolean;
-  focus?: boolean;
-  scopedGroupHover?: boolean;
-  scopedGroupActive?: boolean;
-  scopedGroupFocus?: boolean;
   platform: typeof Platform.OS;
   colorScheme: ColorSchemeName;
   width: number;
@@ -20,42 +14,13 @@ interface MatchAtRuleOptions {
 export function matchAtRule({
   rule,
   params,
-  hover,
-  active,
-  focus,
-  scopedGroupHover,
-  scopedGroupActive,
-  scopedGroupFocus,
   platform,
   colorScheme,
   width,
   height,
   orientation,
 }: MatchAtRuleOptions) {
-  // eslint-disable-next-line unicorn/prefer-switch
-  if (rule === "pseudo-class") {
-    switch (params) {
-      case "hover":
-        return hover;
-      case "focus":
-        return focus;
-      case "active":
-        return active;
-      default:
-        return false;
-    }
-  } else if (rule === "scoped-group") {
-    switch (params) {
-      case "hover":
-        return scopedGroupHover;
-      case "focus":
-        return scopedGroupFocus;
-      case "active":
-        return scopedGroupActive;
-      default:
-        return false;
-    }
-  } else if (rule === "media" && params) {
+  if (rule === "media" && params) {
     return match(params, {
       "aspect-ratio": width / height,
       "device-aspect-ratio": width / height,

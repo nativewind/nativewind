@@ -1,12 +1,12 @@
-import { tailwindRunner, expectError } from "./runner";
+import { tailwindRunner, expectError, $ } from "./runner";
 
 tailwindRunner(
-  "Layout - Scale",
+  "Layout - Translate",
   [
     [
       "translate-x-0",
       {
-        "translate-x-0": [
+        [$`translate-x-0`()]: [
           { transform: [{ translateY: 0 }, { translateX: 0 }] },
         ],
       },
@@ -14,7 +14,7 @@ tailwindRunner(
     [
       "translate-y-0",
       {
-        "translate-y-0": [
+        [$`translate-y-0`()]: [
           {
             transform: [{ translateY: 0 }, { translateX: 0 }],
           },
@@ -24,7 +24,7 @@ tailwindRunner(
     [
       "translate-x-px",
       {
-        "translate-x-px": [
+        [$`translate-x-px`()]: [
           {
             transform: [{ translateY: 0 }, { translateX: 1 }],
           },
@@ -34,7 +34,7 @@ tailwindRunner(
     [
       "translate-y-px",
       {
-        "translate-y-px": [
+        [$`translate-y-px`()]: [
           {
             transform: [{ translateY: 1 }, { translateX: 0 }],
           },
@@ -44,7 +44,7 @@ tailwindRunner(
     [
       "translate-x-1",
       {
-        "translate-x-1": [
+        [$`translate-x-1`()]: [
           {
             transform: [{ translateY: 0 }, { translateX: 4 }],
           },
@@ -54,7 +54,7 @@ tailwindRunner(
     [
       "translate-y-1",
       {
-        "translate-y-1": [
+        [$`translate-y-1`()]: [
           {
             transform: [{ translateY: 4 }, { translateX: 0 }],
           },

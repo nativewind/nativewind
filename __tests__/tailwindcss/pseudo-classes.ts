@@ -1,28 +1,28 @@
 import { tailwindRunner } from "./runner";
 
-tailwindRunner("Pseudo-classes - hover", [
+tailwindRunner("Pseudo-classes", [
   [
     "hover:text-green-500",
     {
-      "hover_text-green-500": [
-        { atRules: [["pseudo-class", "hover"]], color: "#22c55e" },
-      ],
-    },
-  ],
-  [
-    "focus:text-green-500",
-    {
-      "focus_text-green-500": [
-        { atRules: [["pseudo-class", "focus"]], color: "#22c55e" },
-      ],
+      "hover:text-green-500:hover.1": [{ color: "#22c55e" }],
     },
   ],
   [
     "active:text-green-500",
     {
-      "active_text-green-500": [
-        { atRules: [["pseudo-class", "active"]], color: "#22c55e" },
-      ],
+      "active:text-green-500:active.2": [{ color: "#22c55e" }],
+    },
+  ],
+  [
+    "focus:text-green-500",
+    {
+      "focus:text-green-500:focus.4": [{ color: "#22c55e" }],
+    },
+  ],
+  [
+    "active:hover:text-green-500",
+    {
+      "active:hover:text-green-500:hover:active.3": [{ color: "#22c55e" }],
     },
   ],
 ]);

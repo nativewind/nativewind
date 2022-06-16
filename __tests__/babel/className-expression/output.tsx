@@ -17,10 +17,10 @@ export function Test({ isBold, isUnderline }) {
 globalThis.tailwindcss_react_native_style = Object.assign(
   globalThis.tailwindcss_react_native_style || {},
   RNStyleSheet.create({
-    "font-bold": {
+    "font-bold.0": {
       fontWeight: "700",
     },
-    underline: {
+    "underline.0": {
       textDecorationLine: "underline",
     },
   })

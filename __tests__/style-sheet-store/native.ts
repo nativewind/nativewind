@@ -1,4 +1,5 @@
 import { TextStyle } from "react-native";
+import { $ } from "../../src/shared/selector";
 import {
   createTestAppearance,
   createTestDimensions,
@@ -10,7 +11,7 @@ describe("StyleSheetStore", () => {
     const style = { color: "black" };
     const store = new TestStyleSheetStore({
       styles: {
-        "text-black": style,
+        [$`text-black`()]: style,
       },
     });
 
@@ -23,8 +24,8 @@ describe("StyleSheetStore", () => {
 
     const store = new TestStyleSheetStore({
       styles: {
-        "text-black": textStyle,
-        "font-400": fontStyle,
+        [$`text-black`()]: textStyle,
+        [$`font-400`()]: fontStyle,
       },
     });
 
@@ -37,20 +38,19 @@ describe("StyleSheetStore", () => {
   test("retrieving the same style will keep the same identity", () => {
     const store = new TestStyleSheetStore({
       styles: {
-        "text-black": { color: "black" },
+        [$`text-black`()]: { color: "black" },
       },
     });
 
     expect(store.getStyle("text-black")).toBe(store.getStyle("text-black"));
   });
 
-  test("can match atRules", () => {
+  test("can match pseudo-classes", () => {
     const store = new TestStyleSheetStore({
       styles: {
-        "hover_text-black.0": { color: "black" },
-      },
-      atRules: {
-        "hover_text-black": [[["pseudo-class", "hover"]]],
+        [$`hover:text-black`({ hover: true })]: {
+          color: "black",
+        },
       },
     });
 
@@ -65,10 +65,10 @@ describe("StyleSheetStore", () => {
 
     const store = new TestStyleSheetStore({
       styles: {
-        "dark_text-black.0": { color: "black" },
+        [$`dark:text-black`({ atRuleIndex: 0 })]: { color: "black" },
       },
       atRules: {
-        "dark_text-black": [[["media", "(prefers-color-scheme: dark)"]]],
+        [$`dark:text-black`()]: [[["media", "(prefers-color-scheme: dark)"]]],
       },
       appearance,
     });
@@ -88,11 +88,11 @@ describe("StyleSheetStore", () => {
 
     const store = new TestStyleSheetStore({
       styles: {
-        "text-white": staticText,
-        "dark_text-black.0": atRuleText,
+        [$`text-white`()]: staticText,
+        [$`dark:text-black`({ atRuleIndex: 0 })]: atRuleText,
       },
       atRules: {
-        "dark_text-black": [[["media", "(prefers-color-scheme: dark)"]]],
+        [$`dark:text-black`()]: [[["media", "(prefers-color-scheme: dark)"]]],
       },
       appearance,
     });
@@ -113,13 +113,13 @@ describe("StyleSheetStore", () => {
     const dimensions = createTestDimensions();
 
     const styles = {
-      container: {
+      [$`container`()]: {
         width: "100%",
       },
-      "container.0": {
+      [$`container`({ atRuleIndex: 0 })]: {
         maxWidth: 640,
       },
-      "container.1": {
+      [$`container`({ atRuleIndex: 1 })]: {
         maxWidth: 768,
       },
     };
@@ -127,7 +127,7 @@ describe("StyleSheetStore", () => {
     const store = new TestStyleSheetStore({
       styles,
       atRules: {
-        container: [
+        [$`container`()]: [
           [["media", "(min-width: 640px)"]],
           [["media", "(min-width: 768px)"]],
         ],
@@ -136,8 +136,8 @@ describe("StyleSheetStore", () => {
     });
 
     expect(store.getTestStyle("container")).toEqual([
-      styles["container"],
-      styles["container.0"],
+      styles[$`container`()],
+      styles[$`container`({ atRuleIndex: 0 })],
     ]);
 
     dimensions.change({
@@ -158,21 +158,21 @@ describe("StyleSheetStore", () => {
     expect(store.getStyle("container")).toBe(store.getStyle("container"));
 
     expect(store.getTestStyle("container")).toEqual([
-      styles["container"],
-      styles["container.0"],
-      styles["container.1"],
+      styles[$`container`()],
+      styles[$`container`({ atRuleIndex: 0 })],
+      styles[$`container`({ atRuleIndex: 1 })],
     ]);
   });
 
   test("works with children styles", () => {
     const store = new TestStyleSheetStore({
       styles: {
-        "divide-solid.0": {
+        [$`divide-solid`({ atRuleIndex: 0 })]: {
           borderStyle: "solid",
         },
       },
       atRules: {
-        "divide-solid": [[["selector", "(> *:not(:first-child))"]]],
+        [$`divide-solid`()]: [[["selector", "(> *:not(:first-child))"]]],
       },
     });
 
@@ -187,16 +187,13 @@ describe("StyleSheetStore", () => {
   test("works with children styles and atRules", () => {
     const store = new TestStyleSheetStore({
       styles: {
-        "hover_divide-solid.0": {
+        [$`hover:divide-solid`({ hover: true, atRuleIndex: 0 })]: {
           borderStyle: "solid",
         },
       },
       atRules: {
-        "hover_divide-solid": [
-          [
-            ["pseudo-class", "hover"],
-            ["selector", "(> *:not(:first-child))"],
-          ],
+        [$`hover:divide-solid`({ hover: true })]: [
+          [["selector", "(> *:not(:first-child))"]],
         ],
       },
     });
