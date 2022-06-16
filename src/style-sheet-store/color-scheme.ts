@@ -1,4 +1,4 @@
-import { Appearance, Platform } from "react-native";
+import { Appearance } from "react-native";
 
 export type ColorSchemeName = "light" | "dark";
 export type ColorSchemeSystem = "light" | "dark" | "system";
@@ -17,7 +17,7 @@ export abstract class ColorSchemeStore {
       this.colorSchemeSystem = colorSchemeSystem;
     }
 
-    if (Platform.OS === "web") {
+    if (typeof localStorage !== "undefined") {
       if (
         localStorage.theme === "dark" ||
         (!("theme" in localStorage) &&
