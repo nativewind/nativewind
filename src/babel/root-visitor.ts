@@ -67,7 +67,6 @@ export default function rootVisitor(
             cwd,
             rem: 16,
             platform: "native",
-            hmr: true,
             mode: "compileAndTransform",
             didTransform: false,
             blockModuleTransform: [],
@@ -79,7 +78,6 @@ export default function rootVisitor(
             allowModuleTransform,
             allowRelativeModules,
             blockList: new Set(),
-            hasProvider: false,
             hasStyleSheetImport: false,
             tailwindConfig,
             tailwindConfigPath,
@@ -92,31 +90,8 @@ export default function rootVisitor(
             filename,
             hasStyleSheetImport,
             didTransform,
-            hasProvider,
             hasStyledComponentImport,
-            hmr,
           } = visitorState;
-
-          /*
-           * If we are not hmr, we only care if this file has a provider
-           */
-          if (!hmr && !hasProvider) {
-            return;
-          }
-
-          const extractStylesOptions = hmr
-            ? {
-                ...tailwindConfig,
-                content: [filename],
-                // If the file doesn't have any Tailwind styles, it will print a warning
-                // We force an empty style to prevent this
-                safelist: ["babel-empty"],
-                serializer: babelStyleSerializer,
-              }
-            : {
-                ...tailwindConfig,
-                serializer: babelStyleSerializer,
-              };
 
           const bodyNode = path.node.body;
 
@@ -124,7 +99,14 @@ export default function rootVisitor(
             prependImports(bodyNode, ["StyledComponent"], "nativewind");
           }
 
-          const { output } = extractStyles(extractStylesOptions);
+          const { output } = extractStyles({
+            ...tailwindConfig,
+            content: [filename],
+            // If the file doesn't have any Tailwind styles, it will print a warning
+            // We force an empty style to prevent this
+            safelist: ["babel-empty"],
+            serializer: babelStyleSerializer,
+          });
 
           if (!output.hasStyles) return;
 

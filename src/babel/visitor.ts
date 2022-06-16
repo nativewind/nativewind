@@ -21,7 +21,6 @@ export interface VisitorState
   allowRelativeModules: AllowPathOptions;
   blockList: Set<string>;
   hasStyledComponentImport: boolean;
-  hasProvider: boolean;
   hasStyleSheetImport: boolean;
   tailwindConfig: Config;
   tailwindConfigPath: string;
@@ -50,14 +49,12 @@ export const visitor: Visitor<VisitorState> = {
     state.hasStyledComponentImport ||= hasNamedImport(
       path,
       "StyledComponent",
-      "tailwindcss-react-native"
+      "nativewind"
     );
   },
   JSXElement(path, state) {
     const { blockList, canTransform } = state;
     const name = getJSXElementName(path.node.openingElement);
-
-    state.hasProvider ||= name === "TailwindProvider";
 
     if (blockList.has(name) || name[0] !== name[0].toUpperCase()) {
       return;

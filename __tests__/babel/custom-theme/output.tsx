@@ -4,16 +4,13 @@ import {
   PlatformColor as RNPlatformColor,
   PixelRatio as RNPixelRatio,
 } from "react-native";
-import { StyledComponent } from "tailwindcss-react-native";
+import { StyledComponent } from "nativewind";
 import { Text } from "react-native";
-import { TailwindProvider } from "tailwindcss-react-native";
 export function Test() {
   return (
-    <TailwindProvider>
-      <StyledComponent className="p-px text-blue-500" component={Text}>
-        Hello world!
-      </StyledComponent>
-    </TailwindProvider>
+    <StyledComponent className="p-px text-blue-500" component={Text}>
+      Hello world!
+    </StyledComponent>
   );
 }
 globalThis.tailwindcss_react_native_style = Object.assign(

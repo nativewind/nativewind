@@ -9,7 +9,6 @@ export interface TailwindcssReactNativeBabelOptions {
   mode?: "compileAndTransform" | "compileOnly" | "transformOnly";
   rem?: number;
   tailwindConfigPath?: string;
-  hmr?: boolean;
 }
 
 export type State = {

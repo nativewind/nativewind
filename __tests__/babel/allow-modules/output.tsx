@@ -1,18 +1,15 @@
 import { StyleSheet as RNStyleSheet } from "react-native";
-import { StyledComponent } from "tailwindcss-react-native";
+import { StyledComponent } from "nativewind";
 import { Text, View } from "react-native";
-import { TailwindProvider } from "tailwindcss-react-native";
 import { MotiText } from "moti";
 export function Test() {
   return (
-    <TailwindProvider>
-      <StyledComponent className="container" component={View}>
-        <StyledComponent className="font-bold" component={Text}>
-          Hello world!
-        </StyledComponent>
-        <MotiText className="font-bold">Not in allowModuleTransform</MotiText>
+    <StyledComponent className="container" component={View}>
+      <StyledComponent className="font-bold" component={Text}>
+        Hello world!
       </StyledComponent>
-    </TailwindProvider>
+      <MotiText className="font-bold">Not in allowModuleTransform</MotiText>
+    </StyledComponent>
   );
 }
 globalThis.tailwindcss_react_native_style = Object.assign(

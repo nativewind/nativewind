@@ -1,5 +1,5 @@
 import { StyleSheet as RNStyleSheet } from "react-native";
-import { StyledComponent } from "tailwindcss-react-native";
+import { StyledComponent } from "nativewind";
 import { Text } from "react-native";
 import { TestComponent } from "./test-directory";
 export function Test() {

@@ -1,16 +1,13 @@
 import { StyleSheet as RNStyleSheet } from "react-native";
-import { StyledComponent } from "tailwindcss-react-native";
+import { StyledComponent } from "nativewind";
 import { Text, View } from "react-native";
-import { TailwindProvider } from "tailwindcss-react-native";
 export function Test() {
   return (
-    <TailwindProvider>
-      <StyledComponent className="container" component={View}>
-        <StyledComponent className="font-bold" component={Text}>
-          Hello world!
-        </StyledComponent>
+    <StyledComponent className="container" component={View}>
+      <StyledComponent className="font-bold" component={Text}>
+        Hello world!
       </StyledComponent>
-    </TailwindProvider>
+    </StyledComponent>
   );
 }
 globalThis.tailwindcss_react_native_style = Object.assign(
