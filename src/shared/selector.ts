@@ -93,10 +93,7 @@ export function createNormalizedSelector(
 
   let bitLevel = 1;
 
-  const hasPlatformPrefix =
-    /(^|\b|\w:)(ios|android|native|web|windows|macos):/.test(selector);
-
-  const hasDarkPrefix = /(^|\b|\w:)dark:/.test(selector);
+  const platformPrefix = hasPlatformPrefix(selector);
 
   for (const value of [
     hover,
@@ -111,12 +108,12 @@ export function createNormalizedSelector(
     parentHover,
     parentActive,
     parentFocus,
-    hasPlatformPrefix && platform === "android",
-    hasPlatformPrefix && platform === "ios",
-    hasPlatformPrefix && platform === "web",
-    hasPlatformPrefix && platform === "windows",
-    hasPlatformPrefix && platform === "macos",
-    hasDarkPrefix && darkMode,
+    platformPrefix && platform === "android",
+    platformPrefix && platform === "ios",
+    platformPrefix && platform === "web",
+    platformPrefix && platform === "windows",
+    platformPrefix && platform === "macos",
+    hasDarkPrefix(selector) && darkMode,
   ]) {
     if (value) finalBit |= bitLevel;
     bitLevel = bitLevel * 2;
@@ -150,3 +147,8 @@ export function $(...strings: TemplateStringsArray[]) {
 export function css(...strings: TemplateStringsArray[]) {
   return normalizeCssSelector(strings[0].raw[0]);
 }
+
+export const hasDarkPrefix = RegExp.prototype.test.bind(/(^|\b|\w:)dark:/);
+export const hasPlatformPrefix = RegExp.prototype.test.bind(
+  /(^|\b|\w:)(ios|android|native|web|windows|macos):/
+);

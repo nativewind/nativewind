@@ -20,6 +20,7 @@ import {
   createAtRuleSelector,
   createNormalizedSelector,
   CreateSelectorOptions,
+  hasDarkPrefix,
 } from "../shared/selector";
 import { AtRuleTuple, MediaRecord } from "../types/common";
 import vh from "./units/vh";
@@ -214,35 +215,14 @@ export class StyleSheetStore extends ColorSchemeStore {
       return "";
     }
 
+    if (this.preprocessed) return this.preparePreprocessed(className, options);
+
     const selector = createNormalizedSelector(className, {
       ...options,
       darkMode: this.colorScheme === "dark",
       platform: Platform.OS,
       composed: true,
     });
-
-    if (this.preprocessed) {
-      if (this.snapshot[className]) return className;
-
-      const classNames = [className];
-
-      if (options.scopedGroupActive) classNames.push("component-active");
-      if (options.scopedGroupFocus) classNames.push("component-focus");
-      if (options.scopedGroupHover) classNames.push("component-hover");
-
-      const styleArray: StylesArray = [
-        {
-          $$css: true,
-          [className]: classNames.join(" "),
-        } as CompiledStyle,
-      ];
-      styleArray.dynamic = false;
-      this.snapshot = {
-        ...this.snapshot,
-        [className]: styleArray,
-      };
-      return className;
-    }
 
     if (this.snapshot[selector]) return selector;
 
@@ -307,6 +287,8 @@ export class StyleSheetStore extends ColorSchemeStore {
     reEvaluate();
     init = false;
 
+    if (hasDarkPrefix(className)) topics.add("colorScheme");
+
     this.subscribeMedia((notificationTopics: string[]) => {
       if (notificationTopics.some((topic) => topics.has(topic))) {
         reEvaluate();
@@ -314,6 +296,32 @@ export class StyleSheetStore extends ColorSchemeStore {
     });
 
     return selector;
+  }
+
+  preparePreprocessed(
+    className: string,
+    options: CreateSelectorOptions = {}
+  ): string {
+    if (this.snapshot[className]) return className;
+
+    const classNames = [className];
+
+    if (options.scopedGroupActive) classNames.push("component-active");
+    if (options.scopedGroupFocus) classNames.push("component-focus");
+    if (options.scopedGroupHover) classNames.push("component-hover");
+
+    const styleArray: StylesArray = [
+      {
+        $$css: true,
+        [className]: classNames.join(" "),
+      } as CompiledStyle,
+    ];
+    styleArray.dynamic = false;
+    this.snapshot = {
+      ...this.snapshot,
+      [className]: styleArray,
+    };
+    return className;
   }
 
   /**
@@ -464,7 +472,6 @@ export class StyleSheetStore extends ColorSchemeStore {
         if (params.includes("height")) topics.add("height");
         if (params.includes("orientation")) topics.add("orientation");
         if (params.includes("aspect-ratio")) topics.add("window");
-        if (params.includes("prefers-color-scheme")) topics.add("colorScheme");
       }
     }
 
