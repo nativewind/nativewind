@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RTL left 1`] = `
+Array [
+  <View />,
+  <View />,
+]
+`;
+
+exports[`RTL right 1`] = `
+Array [
+  <View />,
+  <View />,
+]
+`;

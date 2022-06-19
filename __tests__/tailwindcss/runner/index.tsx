@@ -17,8 +17,6 @@ export type Test = [string, TestValues] | [string, StyleRecord, true];
 export { spacing, spacingCases } from "./spacing";
 export { createTests, expectError } from "./tests";
 
-export { css } from "../../../src/shared/selector";
-
 export function tailwindRunner(name: string, ...testCases: Array<Test[]>) {
   describe(name, () => {
     test.each(testCases.flat())("%s", assertStyles);

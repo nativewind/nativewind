@@ -1,43 +1,6 @@
 import { Platform } from "react-native";
 import { AtRuleTuple, Style } from "../types/common";
 
-const commonReplacements = `^\\.|\\\\`;
-
-export function getSelectorMask(selector: string): number {
-  let mask = 0;
-  let bitLevel = 1;
-
-  for (const test of [
-    "hover",
-    "active",
-    "focus",
-    "group-hover",
-    "group-active",
-    "group-focus",
-    "group-scoped-hover",
-    "group-scoped-active",
-    "group-scoped-focus",
-    "parent-hover",
-    "parent-active",
-    "parent-focus",
-    "android",
-    "ios",
-    "web",
-    "windows",
-    "macos",
-    "dark",
-    "rtl",
-  ]) {
-    if (new RegExp(`\\w+(::${test})(:|\\b)`).test(selector)) {
-      mask |= bitLevel;
-    }
-
-    bitLevel *= 2;
-  }
-
-  return mask;
-}
-
 export function getSelectorTopics(
   selector: string,
   _declarations: Style,
@@ -64,23 +27,10 @@ export function getSelectorTopics(
   return [...topics.values()];
 }
 
-export interface NormalizeCssSelectorOptions {
-  important?: string | boolean;
-}
-
-export function normalizeCssSelector(
-  selector: string,
-  { important }: NormalizeCssSelectorOptions = {}
-) {
-  const regex = new RegExp(
-    typeof important === "string"
-      ? `(^${important}|${commonReplacements})`
-      : commonReplacements,
-    "g"
-  );
-
-  selector = selector.trim().replace(regex, "");
+export function normalizeCssSelector(selector: string) {
+  selector = selector.trim().replace(/^\.|\\/g, "");
   selector = selector.split("::")[0];
+  selector = selector.split(" ").pop()!;
 
   return selector;
 }
@@ -100,6 +50,7 @@ export interface StateBitOptions {
   parentFocus?: boolean;
   parentActive?: boolean;
   platform?: typeof Platform.OS;
+  rtl?: boolean;
 }
 
 export function getStateBit({
@@ -116,6 +67,7 @@ export function getStateBit({
   parentHover = false,
   parentFocus = false,
   parentActive = false,
+  rtl = false,
   platform,
 }: StateBitOptions = {}) {
   let finalBit = 0;
@@ -141,6 +93,7 @@ export function getStateBit({
     platform === "windows",
     platform === "macos",
     darkMode,
+    rtl,
   ]) {
     if (value) finalBit |= bitLevel;
     bitLevel = bitLevel * 2;
@@ -153,13 +106,57 @@ export function createAtRuleSelector(className: string, atRuleIndex: number) {
   return `${className}@${atRuleIndex}`;
 }
 
-export function css(...strings: TemplateStringsArray[]) {
-  return normalizeCssSelector(strings[0].raw[0]);
-}
-
 const makePseudoClassTest = (pseudoClass: string) => {
   const regex = new RegExp(`\\w+(::${pseudoClass})(:|\\b)`);
   return regex.test.bind(regex);
 };
 
+export const hasHover = makePseudoClassTest("hover");
+export const hasActive = makePseudoClassTest("active");
+export const hasFocus = makePseudoClassTest("focus");
+export const hasGroupHover = makePseudoClassTest("group-hover");
+export const hasGroupActive = makePseudoClassTest("group-active");
+export const hasGroupFocus = makePseudoClassTest("group-focus");
+export const hasGroupScopedHover = makePseudoClassTest("group-scoped-hover");
+export const hasGroupScopedActive = makePseudoClassTest("group-scoped-active");
+export const hasGroupScopedFocus = makePseudoClassTest("group-scoped-focus");
+export const hasParentHover = makePseudoClassTest("parent-hover");
+export const hasParentActive = makePseudoClassTest("parent-active");
+export const hasParentFocus = makePseudoClassTest("parent-focus");
+export const hasIos = makePseudoClassTest("ios");
+export const hasAndroid = makePseudoClassTest("android");
+export const hasWindows = makePseudoClassTest("windows");
+export const hasMacos = makePseudoClassTest("macos");
+export const hasWeb = makePseudoClassTest("web");
 export const hasDarkPseudoClass = makePseudoClassTest("dark");
+export const hasRtl = RegExp.prototype.test.bind(new RegExp("(^|:|s)rtl:"));
+
+export function getSelectorMask(selector: string, rtl = false): number {
+  return getStateBit({
+    rtl,
+    hover: hasHover(selector),
+    active: hasActive(selector),
+    focus: hasFocus(selector),
+    groupHover: hasGroupHover(selector),
+    groupActive: hasGroupActive(selector),
+    groupFocus: hasGroupFocus(selector),
+    scopedGroupHover: hasGroupScopedHover(selector),
+    scopedGroupActive: hasGroupScopedActive(selector),
+    scopedGroupFocus: hasGroupScopedFocus(selector),
+    parentHover: hasParentHover(selector),
+    parentActive: hasParentActive(selector),
+    parentFocus: hasParentFocus(selector),
+    darkMode: hasDarkPseudoClass(selector),
+    platform: hasIos(selector)
+      ? "ios"
+      : hasAndroid(selector)
+      ? "android"
+      : hasWindows(selector)
+      ? "windows"
+      : hasMacos(selector)
+      ? "macos"
+      : hasWeb(selector)
+      ? "web"
+      : ("" as any),
+  });
+}

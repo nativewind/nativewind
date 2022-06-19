@@ -10,6 +10,7 @@ import {
   ViewStyle,
   Platform,
   StyleProp,
+  I18nManager,
 } from "react-native";
 import {
   matchAtRule,
@@ -251,9 +252,12 @@ export class StyleSheetStore extends ColorSchemeStore {
     const reEvaluate = () => {
       const styleArray: StylesArray = [];
 
+      console.log(1, { isRTL: I18nManager.isRTL })
+
       const stateBit = getStateBit({
         ...options,
         darkMode: this.colorScheme === "dark",
+        rtl: I18nManager.isRTL,
         platform: Platform.OS,
       });
 

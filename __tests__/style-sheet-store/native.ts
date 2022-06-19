@@ -1,5 +1,4 @@
 import { TextStyle } from "react-native";
-import { css } from "../../src/shared/selector";
 import {
   createTestAppearance,
   // createTestDimensions,
@@ -11,7 +10,7 @@ describe("StyleSheetStore", () => {
     const style = { color: "black" };
     const store = new TestStyleSheetStore({
       styles: {
-        [css`text-black`]: style,
+        "text-black": style,
       },
     });
 
@@ -24,8 +23,8 @@ describe("StyleSheetStore", () => {
 
     const store = new TestStyleSheetStore({
       styles: {
-        [css`text-black`]: textStyle,
-        [css`font-400`]: fontStyle,
+        "text-black": textStyle,
+        "font-400": fontStyle,
       },
     });
 
@@ -38,7 +37,7 @@ describe("StyleSheetStore", () => {
   test("retrieving the same style will keep the same identity", () => {
     const store = new TestStyleSheetStore({
       styles: {
-        [css`text-black`]: { color: "black" },
+        "text-black": { color: "black" },
       },
     });
 

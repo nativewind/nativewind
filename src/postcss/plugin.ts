@@ -30,7 +30,6 @@ export interface DoneResult extends ExtractedValues {
 }
 
 export interface PostcssPluginOptions {
-  important?: boolean | string;
   output?: string;
   platform?: string;
   done?: (result: DoneResult) => void;
@@ -40,7 +39,6 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
   done,
   output,
   platform,
-  important,
 } = {}) => {
   const styles: DoneResult["styles"] = {};
   const topics: Record<string, Set<string>> = {};
@@ -76,10 +74,10 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
           }
 
           for (const s of node.selectors) {
-            const mask = getSelectorMask(s);
+            const mask = getSelectorMask(s, s.includes('[dir="rtl"]'));
             const rules = node.parent?.[atRuleSymbol];
             const selectorTopics = getSelectorTopics(s, declarations, rules);
-            let selector = normalizeCssSelector(s, { important });
+            let selector = normalizeCssSelector(s);
 
             if (selectorTopics.length > 0) {
               topics[selector] ??= new Set();
