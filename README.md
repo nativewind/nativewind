@@ -12,9 +12,12 @@
 </div>
 <br />
 
+> **Note**
 > `tailwindcss-react-native` is current working on v2, which includes a renaming of the project to NativeWind!
-> 
-> You can see the current stable version on the `main` branch and download it via `npm i tailwindcss-react-native`
+>
+> NativeWind is somewhat stable and is available via `npm i nativewind`.
+>  
+> The last stable version of `tailwindcss-react-native` via `npm i tailwindcss-react-native` and has its docs on the `main` branch
 
 `NativeWind` uses [Tailwind CSS](https://tailwindcss.com) as high-level scripting language to create a **universal design system**. Styled components can be shared between all React Native platforms, using the best style engine for that platform (e.g. CSS StyleSheet or StyleSheet.create). It's goals are to to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
 
@@ -137,21 +140,6 @@ export function BoldText(props) {
 }
 ```
 
-Lastly `useTailwind()` can be used for manual styling or situations where `styled` cannot be used.
-
-> :warning: This is a example of `useTailwind()` that you shouldn't use in practice. There are often more performant patterns than `useTailwind()` and it should be used as a last resort. Please see our docs for more information.
-
-```tsx
-import { ActivityIndicator } from "react-native";
-
-export function MyText({ bold, italic, lineThrough, ...props }) {
-  const tw = useTailwind();
-  const { color } = useTailwind("color-black dark:color-white");
-
-  return <ActivityIndicator color={color} />;
-}
-```
-
 # Quick start guide
 
 > This example uses Babel as it provides the fastest setup. There are more setup configurations and in-depth guides [on our website](https://tailwindcss-react-native.vercel.app/installation)
@@ -210,29 +198,6 @@ module.exports = {
 };
 ```
 
-## 5. Add the TailwindProvider
-
-Modify your `App.js` to add the `TailwindProvider`
-
-```diff
-// App.js
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-+ import { TailwindProvider } from 'tailwindcss-react-native';
-
-export default function App() {
-  return (
-+   <TailwindProvider>
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-        <StatusBar style="auto" />
-      </View>
-+   </TailwindProvider>
-  );
-}
-```
-
 ## Thats it 🎉
 
 Start writing code!
@@ -245,12 +210,10 @@ import { TailwindProvider } from 'tailwindcss-react-native';
 
 export default function App() {
   return (
-    <TailwindProvider>
 -     <View style={styles.container}>
 +     <View className="flex-1 items-center justify-center bg-white">
         <Text>Open up App.js to start working on your app!</Text>
       </View>
-    </TailwindProvider>
   );
 }
 
