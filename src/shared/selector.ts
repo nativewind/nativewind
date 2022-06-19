@@ -1,4 +1,4 @@
-import { Platform } from "react-native";
+import type { Platform } from "react-native";
 import { AtRuleTuple, Style } from "../types/common";
 
 const commonReplacements = `^\\.|\\\\`;
@@ -116,7 +116,7 @@ export function getStateBit({
   parentHover = false,
   parentFocus = false,
   parentActive = false,
-  platform = Platform.OS,
+  platform,
 }: StateBitOptions = {}) {
   let finalBit = 0;
 
