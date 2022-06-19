@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { GestureResponderEvent, PressableProps } from "react-native";
+import { GestureResponderEvent, Platform, PressableProps } from "react-native";
 
 declare module "react-native" {
   interface PressableProps {
@@ -12,8 +12,8 @@ export interface Interaction extends PressableProps {
   active: boolean;
   hover: boolean;
   focus: boolean;
-  onPointerDown?: PressableProps["onPressIn"];
-  onPointerUp?: PressableProps["onPressOut"];
+  onMouseDown?: PressableProps["onPressIn"];
+  onMouseUp?: PressableProps["onPressOut"];
 }
 
 export interface UseInteractionOptions extends PressableProps {
@@ -126,8 +126,13 @@ export function useInteraction({
   }
 
   if (isComponentOrParent || className.includes("active:")) {
-    interaction.onPressIn = handlePressIn;
-    interaction.onPressOut = handlePressOut;
+    if (Platform.OS === "web") {
+      interaction.onMouseDown = handlePressIn;
+      interaction.onMouseUp = handlePressOut;
+    } else {
+      interaction.onPressIn = handlePressIn;
+      interaction.onPressOut = handlePressOut;
+    }
   }
 
   return interaction;
