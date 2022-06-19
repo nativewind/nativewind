@@ -100,7 +100,8 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
             styles[selector] = declarations;
 
             if (mask > 0) {
-              masks[selector] = masks[selector] ? masks[selector] | mask : mask;
+              masks[selector] ??= 0;
+              masks[selector] |= mask;
             }
           }
         }

@@ -118,6 +118,33 @@ describe("StyleSheetStore", () => {
     ]);
   });
 
+  test.only("test", () => {
+    const atRuleText = { backgroundColor: "black" };
+
+    const appearance = createTestAppearance();
+
+    const store = new TestStyleSheetStore({
+      styles: {
+        "dark:bg-black": atRuleText,
+      },
+      masks: {
+        "dark:bg-black": 131_072,
+      },
+      topics: {
+        "dark:bg-black": ["colorScheme"],
+      },
+      appearance,
+    });
+
+    expect(store.getTestStyle("dark:bg-black")).toEqual([]);
+
+    appearance.change({ colorScheme: "dark" });
+
+    expect(store.getTestStyle("text-white dark:bg-black")).toEqual([
+      atRuleText,
+    ]);
+  });
+
   // test("works with atomic styles which are a mix of static and dynamic values", () => {
   //   const dimensions = createTestDimensions();
 

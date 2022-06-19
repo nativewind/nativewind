@@ -230,19 +230,12 @@ export class StyleSheetStore extends ColorSchemeStore {
     if (this.preprocessed)
       return this.preparePreprocessed(composedClassName, options);
 
-    const stateBit = getStateBit({
-      ...options,
-      darkMode: this.colorScheme === "dark",
-      platform: Platform.OS,
-    });
+    const stateBit = getStateBit(options);
 
     const snapshotKey = `(${composedClassName}).${stateBit}`;
     if (this.snapshot[snapshotKey]) return snapshotKey;
 
-    const childStyles: ChildStyle[] = [];
-
     const classNames = composedClassName.split(/\s+/);
-
     const topics = new Set<string>();
 
     for (const className of classNames) {
@@ -252,6 +245,8 @@ export class StyleSheetStore extends ColorSchemeStore {
         }
       }
     }
+
+    const childStyles: ChildStyle[] = [];
 
     const reEvaluate = () => {
       const styleArray: StylesArray = [];

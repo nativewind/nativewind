@@ -212,9 +212,18 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
         },
       },
       corePlugins: {
+        // These are v2 plugins that don't work well with this library
+        // we only support v3, so its safe to disable them
+        divideOpacity: false,
+        borderOpacity: false,
+        placeholderOpacity: false,
+        ringOpacity: false,
+        backgroundOpacity: false,
+        textOpacity: false,
+
+        // These libraries are replaced with custom logic
         boxShadow: false,
         divideColor: false,
-        divideOpacity: false,
         divideStyle: false,
         divideWidth: false,
         fontSize: false,
@@ -224,7 +233,6 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
         scale: false,
         skew: false,
         space: false,
-        textOpacity: false,
         transform: false,
         translate: false,
       },

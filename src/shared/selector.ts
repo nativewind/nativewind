@@ -1,4 +1,4 @@
-import type { Platform } from "react-native";
+import { Platform } from "react-native";
 import { AtRuleTuple, Style } from "../types/common";
 
 const commonReplacements = `^\\.|\\\\`;
