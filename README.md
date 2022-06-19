@@ -140,21 +140,6 @@ export function BoldText(props) {
 }
 ```
 
-Lastly `useTailwind()` can be used for manual styling or situations where `styled` cannot be used.
-
-> :warning: This is a example of `useTailwind()` that you shouldn't use in practice. There are often more performant patterns than `useTailwind()` and it should be used as a last resort. Please see our docs for more information.
-
-```tsx
-import { ActivityIndicator } from "react-native";
-
-export function MyText({ bold, italic, lineThrough, ...props }) {
-  const tw = useTailwind();
-  const { color } = useTailwind("color-black dark:color-white");
-
-  return <ActivityIndicator color={color} />;
-}
-```
-
 # Quick start guide
 
 > This example uses Babel as it provides the fastest setup. There are more setup configurations and in-depth guides [on our website](https://tailwindcss-react-native.vercel.app/installation)
