@@ -1,5 +1,5 @@
 import { ViewStyle } from "react-native";
-import { createTests, expectError, tailwindRunner, $ } from "./runner";
+import { createTests, expectError, tailwindRunner } from "./runner";
 
 const scenarios: Record<string, ViewStyle["height"]> = {
   0: 0,
@@ -22,12 +22,17 @@ tailwindRunner(
     [
       "h-screen",
       {
-        [$`h-screen`()]: [
-          {
-            atRules: [["dynamic-style", "vh"]],
+        styles: {
+          "h-screen@0": {
             height: 100,
           },
-        ],
+        },
+        topics: {
+          "h-screen": ["height"],
+        },
+        atRules: {
+          "h-screen": [[["dynamic-style", "vh"]]],
+        },
       },
     ],
   ]

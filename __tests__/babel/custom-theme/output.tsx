@@ -13,16 +13,16 @@ export function Test() {
     </StyledComponent>
   );
 }
-globalThis.tailwindcss_react_native_style = Object.assign(
-  globalThis.tailwindcss_react_native_style || {},
+globalThis.nativewind_styles = Object.assign(
+  globalThis.nativewind_styles || {},
   RNStyleSheet.create({
-    "p-px.0": {
+    "p-px": {
       paddingTop: RNPixelRatio.roundToNearestPixel(4),
       paddingRight: RNPixelRatio.roundToNearestPixel(4),
       paddingBottom: RNPixelRatio.roundToNearestPixel(4),
       paddingLeft: RNPixelRatio.roundToNearestPixel(4),
     },
-    "text-blue-500.0": {
+    "text-blue-500": {
       color: RNPlatform.select({
         ios: RNPlatformColor("systemTealColor"),
         android: RNPlatformColor("@androidcolor/holo_blue_bright"),
@@ -30,8 +30,4 @@ globalThis.tailwindcss_react_native_style = Object.assign(
       }),
     },
   })
-);
-globalThis.tailwindcss_react_native_media = Object.assign(
-  globalThis.tailwindcss_react_native_media || {},
-  {}
 );

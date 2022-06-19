@@ -13,25 +13,30 @@ import {
   stringLiteral,
   unaryExpression,
 } from "@babel/types";
-import { StyleRecord } from "../../types/common";
-import { serializeStyles } from "./serialize-styles";
+import { ExtractedValues } from "../../postcss/plugin";
+import { serializeHelper } from "./helper";
 
-export function babelStyleSerializer(styleRecord: StyleRecord) {
-  const { styles, media, ...rest } = serializeStyles(
-    styleRecord,
-    babelReplacer
-  );
+export function babelStyleSerializer({
+  styles: rawStyles,
+  atRules,
+  masks,
+  topics,
+}: ExtractedValues) {
+  const { styles, ...rest } = serializeHelper(rawStyles, babelReplacer);
 
   return {
     styles: babelSerializeObject(styles),
-    media: babelSerializeObject(media),
+    atRules:
+      Object.keys(atRules).length > 0
+        ? babelSerializeObject(atRules)
+        : undefined,
+    masks:
+      Object.keys(masks).length > 0 ? babelSerializeObject(masks) : undefined,
+    topics:
+      Object.keys(topics).length > 0 ? babelSerializeObject(topics) : undefined,
     hasStyles: Object.keys(styles).length > 0,
     ...rest,
   };
-}
-
-export function babelImport(name: string) {
-  return `___tw_${name}`;
 }
 
 function babelReplacer(key: string, value: string): [string, unknown] {

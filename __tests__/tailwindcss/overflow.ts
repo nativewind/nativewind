@@ -1,4 +1,4 @@
-import { tailwindRunner, expectError, $ } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 tailwindRunner(
   "Layout - Overflow",
@@ -17,11 +17,17 @@ tailwindRunner(
     "overflow-y-scroll",
   ]),
   [
-    ["overflow-hidden", { [$`overflow-hidden`()]: [{ overflow: "hidden" }] }],
+    [
+      "overflow-hidden",
+      { styles: { "overflow-hidden": { overflow: "hidden" } } },
+    ],
     [
       "overflow-visible",
-      { [$`overflow-visible`()]: [{ overflow: "visible" }] },
+      { styles: { "overflow-visible": { overflow: "visible" } } },
     ],
-    ["overflow-scroll", { [$`overflow-scroll`()]: [{ overflow: "scroll" }] }],
+    [
+      "overflow-scroll",
+      { styles: { "overflow-scroll": { overflow: "scroll" } } },
+    ],
   ]
 );

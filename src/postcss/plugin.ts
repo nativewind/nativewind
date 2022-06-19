@@ -1,6 +1,11 @@
 import { writeFileSync } from "node:fs";
 import { Plugin, PluginCreator } from "postcss";
-import { normalizeCssSelector } from "../shared/selector";
+import {
+  createAtRuleSelector,
+  getSelectorMask,
+  getSelectorTopics,
+  normalizeCssSelector,
+} from "../shared/selector";
 import { toReactNative } from "./to-react-native";
 import { StyleRecord, Style, StyleError, AtRuleTuple } from "../types/common";
 import { outputFormatter } from "./output-formatter";
@@ -13,11 +18,22 @@ declare module "postcss" {
   }
 }
 
+export interface ExtractedValues {
+  styles: StyleRecord;
+  topics: Record<string, Array<string>>;
+  masks: Record<string, number>;
+  atRules: Record<string, Array<AtRuleTuple[]>>;
+}
+
+export interface DoneResult extends ExtractedValues {
+  errors: StyleError[];
+}
+
 export interface PostcssPluginOptions {
   important?: boolean | string;
   output?: string;
   platform?: string;
-  done?: (options: { styles: StyleRecord; errors: StyleError[] }) => void;
+  done?: (result: DoneResult) => void;
 }
 
 export const plugin: PluginCreator<PostcssPluginOptions> = ({
@@ -26,8 +42,11 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
   platform,
   important,
 } = {}) => {
-  const styles: StyleRecord = {};
-  const errors: StyleError[] = [];
+  const styles: DoneResult["styles"] = {};
+  const topics: Record<string, Set<string>> = {};
+  const masks: DoneResult["masks"] = {};
+  const atRules: DoneResult["atRules"] = {};
+  const errors: DoneResult["errors"] = [];
 
   return {
     postcssPlugin: "tailwindcss-react-native-style-extractor",
@@ -57,26 +76,52 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
           }
 
           for (const s of node.selectors) {
-            const selector = normalizeCssSelector(s, { important });
+            const mask = getSelectorMask(s);
+            const rules = node.parent?.[atRuleSymbol];
+            const selectorTopics = getSelectorTopics(s, declarations, rules);
+            let selector = normalizeCssSelector(s, { important });
 
-            styles[selector] ??= [];
+            if (selectorTopics.length > 0) {
+              topics[selector] ??= new Set();
+              for (const topic of selectorTopics) {
+                topics[selector].add(topic);
+              }
+            }
 
-            if (node.parent?.[atRuleSymbol]) {
-              styles[selector].push({
-                atRules: node.parent[atRuleSymbol],
-                ...declarations,
-              });
-            } else {
-              styles[selector].push(declarations);
+            if (rules) {
+              atRules[selector] ??= [];
+              atRules[selector].push(rules);
+              selector = createAtRuleSelector(
+                selector,
+                atRules[selector].length - 1
+              );
+            }
+
+            styles[selector] = declarations;
+
+            if (mask > 0) {
+              masks[selector] = masks[selector] ? masks[selector] | mask : mask;
             }
           }
         }
       });
 
-      if (done) done({ styles, errors });
+      const arrayTopics: DoneResult["topics"] = {};
+
+      for (const [key, value] of Object.entries(topics)) {
+        arrayTopics[key] = [...value.values()];
+      }
+
+      if (done) done({ styles, masks, atRules, topics: arrayTopics, errors });
 
       if (output) {
-        writeFileSync(output, outputFormatter(styles, platform));
+        writeFileSync(
+          output,
+          outputFormatter(
+            { styles, masks, atRules, topics: arrayTopics },
+            platform
+          )
+        );
       }
     },
   } as Plugin;

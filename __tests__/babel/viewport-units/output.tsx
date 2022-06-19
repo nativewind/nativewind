@@ -8,17 +8,23 @@ export function Test() {
     </StyledComponent>
   );
 }
-globalThis.tailwindcss_react_native_style = Object.assign(
-  globalThis.tailwindcss_react_native_style || {},
+globalThis.nativewind_styles = Object.assign(
+  globalThis.nativewind_styles || {},
   RNStyleSheet.create({
-    "w-screen.0@0": {
+    "w-screen@0": {
       width: 100,
     },
   })
 );
-globalThis.tailwindcss_react_native_media = Object.assign(
-  globalThis.tailwindcss_react_native_media || {},
+globalThis.nativewind_at_rules = Object.assign(
+  globalThis.nativewind_at_rules || {},
   {
-    "w-screen.0": [[["dynamic-style", "vw"]]],
+    "w-screen": [[["dynamic-style", "vw"]]],
+  }
+);
+globalThis.nativewind_topics = Object.assign(
+  globalThis.nativewind_topics || {},
+  {
+    "w-screen": ["width"],
   }
 );

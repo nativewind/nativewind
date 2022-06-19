@@ -7,7 +7,7 @@ const fixtures = join(__dirname, "babel");
 pluginTester({
   plugin,
   fixtures,
-  pluginName: "tailwindcss-react-native",
+  pluginName: "nativewind",
   babelOptions: {
     plugins: ["@babel/plugin-syntax-jsx"],
     cwd: fixtures,

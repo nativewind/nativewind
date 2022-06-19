@@ -11,59 +11,51 @@ import {
 
 export function appendVariables(
   body: Statement[],
-  { styles, media }: { styles: Expression; media: Expression }
+  {
+    styles,
+    atRules,
+    masks,
+    topics,
+  }: {
+    styles: Expression;
+    atRules?: Expression;
+    masks?: Expression;
+    topics?: Expression;
+  }
 ) {
   body.push(
-    expressionStatement(
-      assignmentExpression(
-        "=",
-        memberExpression(
-          identifier("globalThis"),
-          identifier("tailwindcss_react_native_style")
-        ),
-        callExpression(
-          memberExpression(identifier("Object"), identifier("assign")),
-          [
-            logicalExpression(
-              "||",
-              memberExpression(
-                identifier("globalThis"),
-                identifier("tailwindcss_react_native_style")
-              ),
-              identifier("{}")
-            ),
-            callExpression(
-              memberExpression(
-                identifier("RNStyleSheet"),
-                identifier("create")
-              ),
-              [styles]
-            ),
-          ]
-        )
+    assignGlobalThis(
+      "nativewind_styles",
+      callExpression(
+        memberExpression(identifier("RNStyleSheet"), identifier("create")),
+        [styles]
       )
-    ),
-    expressionStatement(
-      assignmentExpression(
-        "=",
-        memberExpression(
-          identifier("globalThis"),
-          identifier("tailwindcss_react_native_media")
-        ),
-        callExpression(
-          memberExpression(identifier("Object"), identifier("assign")),
-          [
-            logicalExpression(
-              "||",
-              memberExpression(
-                identifier("globalThis"),
-                identifier("tailwindcss_react_native_media")
-              ),
-              identifier("{}")
-            ),
-            media,
-          ]
-        )
+    )
+  );
+
+  if (atRules) body.push(assignGlobalThis("nativewind_at_rules", atRules));
+  if (topics) body.push(assignGlobalThis("nativewind_topics", topics));
+  if (masks) body.push(assignGlobalThis("nativewind_masks", masks));
+}
+
+function assignGlobalThis(
+  name: keyof typeof globalThis,
+  ...parameters: Expression[]
+) {
+  return expressionStatement(
+    assignmentExpression(
+      "=",
+      memberExpression(identifier("globalThis"), identifier(name)),
+      callExpression(
+        memberExpression(identifier("Object"), identifier("assign")),
+        [
+          logicalExpression(
+            "||",
+            memberExpression(identifier("globalThis"), identifier(name)),
+            identifier("{}")
+          ),
+          ...parameters,
+        ]
       )
     )
   );

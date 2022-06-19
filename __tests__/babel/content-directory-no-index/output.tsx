@@ -12,18 +12,14 @@ export function Test() {
     </>
   );
 }
-globalThis.tailwindcss_react_native_style = Object.assign(
-  globalThis.tailwindcss_react_native_style || {},
+globalThis.nativewind_styles = Object.assign(
+  globalThis.nativewind_styles || {},
   RNStyleSheet.create({
-    "font-bold.0": {
+    "font-bold": {
       fontWeight: "700",
     },
-    "text-blue-500.0": {
+    "text-blue-500": {
       color: "#3b82f6",
     },
   })
-);
-globalThis.tailwindcss_react_native_media = Object.assign(
-  globalThis.tailwindcss_react_native_media || {},
-  {}
 );

@@ -1,5 +1,5 @@
 import { ViewStyle } from "react-native";
-import { createTests, expectError, tailwindRunner, $ } from "./runner";
+import { createTests, expectError, tailwindRunner } from "./runner";
 
 const scenarios: Record<string, ViewStyle["width"]> = {
   0: 0,
@@ -22,12 +22,17 @@ tailwindRunner(
     [
       "w-screen",
       {
-        [$`w-screen`()]: [
-          {
-            atRules: [["dynamic-style", "vw"]],
+        styles: {
+          "w-screen@0": {
             width: 100,
           },
-        ],
+        },
+        topics: {
+          "w-screen": ["width"],
+        },
+        atRules: {
+          "w-screen": [[["dynamic-style", "vw"]]],
+        },
       },
     ],
   ]

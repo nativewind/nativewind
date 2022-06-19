@@ -99,7 +99,7 @@ export default function rootVisitor(
             prependImports(bodyNode, ["StyledComponent"], "nativewind");
           }
 
-          const { output } = extractStyles({
+          const output = extractStyles({
             ...tailwindConfig,
             content: [filename],
             // If the file doesn't have any Tailwind styles, it will print a warning

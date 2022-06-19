@@ -1,5 +1,10 @@
 import { extractStyles } from "../../../src/postcss/extract-styles";
-import { StyleError, StyleRecord } from "../../../src/types/common";
+import {
+  AtRuleTuple,
+  Style,
+  StyleError,
+  StyleRecord,
+} from "../../../src/types/common";
 import { testStyleSerializer } from "../../../src/utils/serialize-styles";
 
 import cssPlugin from "../../../src/tailwind/css";
@@ -7,12 +12,12 @@ import { nativePlugin } from "../../../src/tailwind/native";
 import { TailwindProvider, TailwindProviderProps } from "../../../src";
 import { PropsWithChildren } from "react";
 
-export type Test = [string, StyleRecord] | [string, StyleRecord, true];
+export type Test = [string, TestValues] | [string, StyleRecord, true];
 
 export { spacing, spacingCases } from "./spacing";
 export { createTests, expectError } from "./tests";
 
-export { $, css } from "../../../src/shared/selector";
+export { css } from "../../../src/shared/selector";
 
 export function tailwindRunner(name: string, ...testCases: Array<Test[]>) {
   describe(name, () => {
@@ -20,14 +25,21 @@ export function tailwindRunner(name: string, ...testCases: Array<Test[]>) {
   });
 }
 
+export interface TestValues {
+  styles?: Record<string, Style>;
+  topics?: Record<string, Array<string>>;
+  masks?: Record<string, number>;
+  atRules?: Record<string, Array<AtRuleTuple[]>>;
+}
+
 export function assertStyles(
   css: string,
-  styles: StyleRecord,
+  expectedValues: TestValues,
   shouldError = false
 ) {
   const errors: StyleError[] = [];
 
-  const { errors: outputErrors, ...output } = extractStyles({
+  const { errors: outputErrors, ...actualValues } = extractStyles({
     theme: {},
     plugins: [
       cssPlugin,
@@ -44,18 +56,24 @@ export function assertStyles(
 
   if (shouldError) {
     expect([...errors, ...outputErrors].length).toBeGreaterThan(0);
+    expect(actualValues.styles).toEqual({});
+    expect(actualValues.masks).toEqual({});
+    expect(actualValues.atRules).toEqual({});
+    expect(actualValues.topics).toEqual({});
   } else {
     expect(outputErrors.length).toBe(0);
+    expect(actualValues.styles).toEqual(expectedValues.styles);
+    expect(actualValues.masks).toEqual(expectedValues.masks || {});
+    expect(actualValues.atRules).toEqual(expectedValues.atRules || {});
+    expect(actualValues.topics).toEqual(expectedValues.topics || {});
   }
-
-  expect(output.output).toEqual(styles);
 }
 
 export function TestProvider({
   css,
   ...props
 }: PropsWithChildren<TailwindProviderProps & { css: string }>) {
-  const { output } = extractStyles({
+  const { styles, atRules } = extractStyles({
     theme: {},
     plugins: [cssPlugin, nativePlugin({})],
     content: [{ raw: "", extension: "html" }],
@@ -63,5 +81,5 @@ export function TestProvider({
     serializer: testStyleSerializer,
   });
 
-  return <TailwindProvider {...output} {...props} />;
+  return <TailwindProvider styles={styles} media={atRules} {...props} />;
 }

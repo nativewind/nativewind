@@ -7,41 +7,47 @@ export function Test() {
     </View>
   );
 }
-globalThis.tailwindcss_react_native_style = Object.assign(
-  globalThis.tailwindcss_react_native_style || {},
+globalThis.nativewind_styles = Object.assign(
+  globalThis.nativewind_styles || {},
   RNStyleSheet.create({
-    "container.0": {
+    container: {
       width: "100%",
     },
-    "container.0@0": {
+    "container@0": {
       maxWidth: 640,
     },
-    "container.0@1": {
+    "container@1": {
       maxWidth: 768,
     },
-    "container.0@2": {
+    "container@2": {
       maxWidth: 1024,
     },
-    "container.0@3": {
+    "container@3": {
       maxWidth: 1280,
     },
-    "container.0@4": {
+    "container@4": {
       maxWidth: 1536,
     },
-    "font-bold.0": {
+    "font-bold": {
       fontWeight: "700",
     },
   })
 );
-globalThis.tailwindcss_react_native_media = Object.assign(
-  globalThis.tailwindcss_react_native_media || {},
+globalThis.nativewind_at_rules = Object.assign(
+  globalThis.nativewind_at_rules || {},
   {
-    "container.0": [
+    container: [
       [["media", "(min-width: 640px)"]],
       [["media", "(min-width: 768px)"]],
       [["media", "(min-width: 1024px)"]],
       [["media", "(min-width: 1280px)"]],
       [["media", "(min-width: 1536px)"]],
     ],
+  }
+);
+globalThis.nativewind_topics = Object.assign(
+  globalThis.nativewind_topics || {},
+  {
+    container: ["width"],
   }
 );

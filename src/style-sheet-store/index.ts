@@ -18,9 +18,8 @@ import {
 } from "./match-at-rule";
 import {
   createAtRuleSelector,
-  createNormalizedSelector,
-  CreateSelectorOptions,
-  hasDarkPrefix,
+  getStateBit,
+  StateBitOptions,
 } from "../shared/selector";
 import { AtRuleTuple, MediaRecord } from "../types/common";
 import vh from "./units/vh";
@@ -49,10 +48,7 @@ export interface ChildStyle {
 }
 
 export interface StylesArray<T = Style> extends Array<EitherStyle<T>> {
-  dynamic?: boolean;
-  isForChildren?: boolean;
   childStyles?: ChildStyle[];
-  topics?: Set<string>;
 }
 
 declare global {
@@ -60,6 +56,14 @@ declare global {
   var tailwindcss_react_native_style: Record<string, Style>;
   // eslint-disable-next-line no-var
   var tailwindcss_react_native_media: MediaRecord;
+  // eslint-disable-next-line no-var
+  var nativewind_styles: Record<string, Style>;
+  // eslint-disable-next-line no-var
+  var nativewind_at_rules: MediaRecord;
+  // eslint-disable-next-line no-var
+  var nativewind_masks: Record<string, number>;
+  // eslint-disable-next-line no-var
+  var nativewind_topics: Record<string, string[]>;
 }
 
 globalThis.tailwindcss_react_native_style ??= {};
@@ -81,6 +85,8 @@ interface StyleSheetStoreConstructor {
   platform?: typeof Platform.OS;
   preprocessed?: boolean;
   colorScheme?: ColorSchemeSystem;
+  topics?: Record<string, Array<string>>;
+  masks?: Record<string, number>;
 }
 
 /**
@@ -115,6 +121,8 @@ export class StyleSheetStore extends ColorSchemeStore {
 
   styles: Record<string, Style>;
   atRules: MediaRecord;
+  topics: Record<string, Array<string>>;
+  masks: Record<string, number>;
   preprocessed: boolean;
 
   platform: typeof Platform.OS;
@@ -122,8 +130,10 @@ export class StyleSheetStore extends ColorSchemeStore {
   orientation: OrientationLockType;
 
   constructor({
-    styles = global.tailwindcss_react_native_style,
-    atRules = global.tailwindcss_react_native_media || [],
+    styles = (global.nativewind_styles ||= {}),
+    atRules = (global.nativewind_at_rules ||= {}),
+    masks = (global.nativewind_masks ||= {}),
+    topics = (global.nativewind_topics ||= {}),
     dimensions = Dimensions,
     appearance = Appearance,
     platform = Platform.OS,
@@ -135,6 +145,8 @@ export class StyleSheetStore extends ColorSchemeStore {
     this.platform = platform;
     this.styles = styles;
     this.atRules = atRules;
+    this.masks = masks;
+    this.topics = topics;
     this.preprocessed = preprocessed;
     this.window = dimensions.get("window");
 
@@ -210,84 +222,75 @@ export class StyleSheetStore extends ColorSchemeStore {
     return a.every((style, index) => Object.is(style, b[index]));
   }
 
-  prepare(className?: string, options: CreateSelectorOptions = {}): string {
-    if (typeof className !== "string") {
+  prepare(composedClassName?: string, options: StateBitOptions = {}): string {
+    if (typeof composedClassName !== "string") {
       return "";
     }
 
-    if (this.preprocessed) return this.preparePreprocessed(className, options);
+    if (this.preprocessed)
+      return this.preparePreprocessed(composedClassName, options);
 
-    const selector = createNormalizedSelector(className, {
+    const stateBit = getStateBit({
       ...options,
       darkMode: this.colorScheme === "dark",
       platform: Platform.OS,
-      composed: true,
     });
 
-    if (this.snapshot[selector]) return selector;
+    const snapshotKey = `(${composedClassName}).${stateBit}`;
+    if (this.snapshot[snapshotKey]) return snapshotKey;
+
+    const childStyles: ChildStyle[] = [];
+
+    const classNames = composedClassName.split(/\s+/);
 
     const topics = new Set<string>();
 
-    let init = true;
-    let isDynamic = false;
-    const childStyles: ChildStyle[] = [];
+    for (const className of classNames) {
+      if (this.topics[className]) {
+        for (const topic of this.topics[className]) {
+          topics.add(topic);
+        }
+      }
+    }
 
     const reEvaluate = () => {
       const styleArray: StylesArray = [];
 
-      for (const name of className.split(/\s+/)) {
-        const normalizedSelector = createNormalizedSelector(name, {
-          ...options,
-          darkMode: this.colorScheme === "dark",
-          platform: Platform.OS,
-        });
+      const stateBit = getStateBit({
+        ...options,
+        darkMode: this.colorScheme === "dark",
+        platform: Platform.OS,
+      });
 
-        const classNameStyles = this.upsertAtomicStyle(
-          normalizedSelector,
-          options
-        );
+      for (const className of classNames) {
+        const mask = this.masks[className] || 0;
 
-        styleArray.push(...classNameStyles);
-
-        // These values will not change, so we can skip them after the first run
-        if (init) {
-          if (classNameStyles.dynamic) {
-            isDynamic = true;
-          }
-
+        // If we match this class's state, then process it
+        if (matchesMask(stateBit, mask)) {
+          const classNameStyles = this.upsertAtomicStyle(className);
+          styleArray.push(...classNameStyles);
           if (classNameStyles.childStyles) {
             childStyles.push(...classNameStyles.childStyles);
-          }
-
-          for (const topic of classNameStyles.topics || []) {
-            topics.add(topic);
           }
         }
       }
 
       if (styleArray.length > 0 || childStyles.length > 0) {
-        styleArray.dynamic = isDynamic;
-
         if (childStyles.length > 0) {
           styleArray.childStyles = childStyles;
         }
 
         this.snapshot = {
           ...this.snapshot,
-          [selector]: styleArray,
+          [snapshotKey]: styleArray,
         };
       } else {
         this.snapshot = {
           ...this.snapshot,
-          [selector]: emptyStyles,
+          [snapshotKey]: emptyStyles,
         };
       }
     };
-
-    reEvaluate();
-    init = false;
-
-    if (hasDarkPrefix(className)) topics.add("colorScheme");
 
     this.subscribeMedia((notificationTopics: string[]) => {
       if (notificationTopics.some((topic) => topics.has(topic))) {
@@ -295,20 +298,26 @@ export class StyleSheetStore extends ColorSchemeStore {
       }
     });
 
-    return selector;
+    reEvaluate();
+
+    return snapshotKey;
   }
 
   preparePreprocessed(
     className: string,
-    options: CreateSelectorOptions = {}
+    {
+      scopedGroupActive = false,
+      scopedGroupFocus = false,
+      scopedGroupHover = false,
+    } = {}
   ): string {
     if (this.snapshot[className]) return className;
 
     const classNames = [className];
 
-    if (options.scopedGroupActive) classNames.push("component-active");
-    if (options.scopedGroupFocus) classNames.push("component-focus");
-    if (options.scopedGroupHover) classNames.push("component-hover");
+    if (scopedGroupActive) classNames.push("component-active");
+    if (scopedGroupFocus) classNames.push("component-focus");
+    if (scopedGroupHover) classNames.push("component-hover");
 
     const styleArray: StylesArray = [
       {
@@ -316,7 +325,6 @@ export class StyleSheetStore extends ColorSchemeStore {
         [className]: classNames.join(" "),
       } as CompiledStyle,
     ];
-    styleArray.dynamic = false;
     this.snapshot = {
       ...this.snapshot,
       [className]: styleArray,
@@ -329,10 +337,7 @@ export class StyleSheetStore extends ColorSchemeStore {
    *
    * This function will be called for each atomic style
    */
-  upsertAtomicStyle(
-    className: string,
-    options: CreateSelectorOptions = {}
-  ): StylesArray {
+  upsertAtomicStyle(className: string): StylesArray {
     // This atomic style has already been processed, we can skip it
     if (this.snapshot[className]) return this.snapshot[className];
 
@@ -346,30 +351,18 @@ export class StyleSheetStore extends ColorSchemeStore {
     // If there are no atRules, this style is static.
     // We can add it to the snapshot and early exit.
     if (!atRulesTuple) {
-      if (styleArray.length > 0) {
-        styleArray.dynamic = false;
-        this.snapshot = { ...this.snapshot, [className]: styleArray };
-      } else {
-        this.snapshot = { ...this.snapshot, [className]: emptyStyles };
-      }
+      this.snapshot =
+        styleArray.length > 0
+          ? { ...this.snapshot, [className]: styleArray }
+          : { ...this.snapshot, [className]: emptyStyles };
       return styleArray;
     }
 
-    // The dynamic version may have already been processed, we can skip it
-    if (this.snapshot[className]) return this.snapshot[className];
-
-    // These are the media topics the atomic style has subscribed to.
-    // They may be things like window, window.width, orientation, colorScheme, etc
-    const topics = new Set<string>();
-
     // When a topic has new information, this function will be called.
-    // Its purpose is to compute
     const reEvaluate = () => {
       const childStyles: ChildStyle[] = [];
 
       const newStyles: StylesArray = [...styleArray];
-      newStyles.dynamic = true;
-      newStyles.topics = topics;
 
       for (const [index, atRules] of atRulesTuple.entries()) {
         let isForChildren = false;
@@ -406,7 +399,6 @@ export class StyleSheetStore extends ColorSchemeStore {
             width: this.window.width,
             height: this.window.height,
             orientation: this.orientation,
-            ...options,
           });
         });
 
@@ -439,23 +431,6 @@ export class StyleSheetStore extends ColorSchemeStore {
         newStyles.childStyles = childStyles;
       }
 
-      const existingStyles = this.snapshot[className];
-
-      if (!existingStyles) {
-        this.snapshot[className] = newStyles;
-        return newStyles;
-      }
-
-      if (
-        this.isEqual(existingStyles, newStyles) &&
-        this.isEqual(
-          existingStyles.childStyles || [],
-          newStyles.childStyles || []
-        )
-      ) {
-        return existingStyles;
-      }
-
       this.snapshot =
         newStyles.length > 0 || newStyles?.childStyles?.length
           ? { ...this.snapshot, [className]: newStyles }
@@ -464,22 +439,14 @@ export class StyleSheetStore extends ColorSchemeStore {
       return newStyles;
     };
 
-    // Loop over the atRules and either subscribe to topics
-    // or create matchAtRule functions
-    for (const [[atRule, params]] of atRulesTuple) {
-      if (atRule === "media" && params) {
-        if (params.includes("width")) topics.add("width");
-        if (params.includes("height")) topics.add("height");
-        if (params.includes("orientation")) topics.add("orientation");
-        if (params.includes("aspect-ratio")) topics.add("window");
-      }
+    if (this.topics[className]) {
+      const topics = new Set(this.topics[className]);
+      this.subscribeMedia((notificationTopics: string[]) => {
+        if (notificationTopics.some((topic) => topics.has(topic))) {
+          reEvaluate();
+        }
+      });
     }
-
-    this.subscribeMedia((notificationTopics: string[]) => {
-      if (notificationTopics.some((topic) => topics.has(topic))) {
-        reEvaluate();
-      }
-    });
 
     return reEvaluate();
   }
@@ -512,5 +479,7 @@ export class StyleSheetStore extends ColorSchemeStore {
     return this.snapshot[className];
   }
 }
+
+const matchesMask = (value: number, mask: number) => (value & mask) === mask;
 
 export const StoreContext = createContext(new StyleSheetStore());

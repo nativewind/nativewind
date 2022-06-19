@@ -1,7 +1,7 @@
 import { ColorValue } from "react-native";
 import { Test } from ".";
 import { normalizeCssSelector } from "../../../src/shared/selector";
-import { AtRuleRecord, Style, StyleRecord } from "../../../src/types/common";
+import { Style, StyleRecord } from "../../../src/types/common";
 
 export function expectError(names: string[]): Test[] {
   return names.map((name) => [name, {}, true]);
@@ -10,10 +10,7 @@ export function expectError(names: string[]): Test[] {
 export function createTests<T extends string | number | ColorValue | undefined>(
   prefix: string,
   suffixes: Record<string, T>,
-  valueFunction: (
-    n: T,
-    suffix: string
-  ) => Style | AtRuleRecord | Array<Style | AtRuleRecord>
+  valueFunction: (n: T, suffix: string) => Style
 ): Test[] {
   return Object.entries(suffixes).map(([suffix, value]) => {
     const styles: StyleRecord = {};
@@ -32,19 +29,15 @@ export function createTests<T extends string | number | ColorValue | undefined>(
         flooredNumber.toString()
       );
 
-      styles[normalizeCssSelector(key)] = Array.isArray(result)
-        ? result
-        : [result];
+      styles[normalizeCssSelector(key)] = result;
     }
 
     const key = suffix ? `${prefix}-${suffix}` : prefix;
 
     const result = valueFunction(value, suffix);
 
-    styles[normalizeCssSelector(key)] = Array.isArray(result)
-      ? result
-      : [result];
+    styles[normalizeCssSelector(key)] = result;
 
-    return [key, styles];
+    return [key, { styles }];
   });
 }

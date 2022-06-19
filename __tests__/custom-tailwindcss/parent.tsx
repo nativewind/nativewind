@@ -2,18 +2,20 @@ import { Text, View } from "react-native";
 import { render } from "@testing-library/react-native";
 import { TestProvider } from "../tailwindcss/runner";
 import { StyledComponent } from "../../src";
-import { tailwindRunner, css as a } from "../tailwindcss/runner";
+import { tailwindRunner } from "../tailwindcss/runner";
 
 tailwindRunner("Custom - Parent", [
   [
     "parent:text-white",
     {
-      [a`parent:text-white`]: [
-        {
-          atRules: [["selector", "(> *)"]],
+      styles: {
+        "parent:text-white@0": {
           color: "#fff",
         },
-      ],
+      },
+      atRules: {
+        "parent:text-white": [[["selector", "(> *)"]]],
+      },
     },
   ],
 ]);
@@ -22,11 +24,14 @@ tailwindRunner("Custom - Parent State Variants", [
   [
     "parent-hover:text-white",
     {
-      [a`parent-hover:text-white::parent-hover`]: [
-        {
+      styles: {
+        "parent-hover:text-white": {
           color: "#fff",
         },
-      ],
+      },
+      masks: {
+        "parent-hover:text-white": 512,
+      },
     },
   ],
 ]);

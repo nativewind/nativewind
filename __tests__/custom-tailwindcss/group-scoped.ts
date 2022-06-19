@@ -1,12 +1,15 @@
-import { tailwindRunner, css } from "../tailwindcss/runner";
+import { tailwindRunner } from "../tailwindcss/runner";
 
 tailwindRunner("Custom Tailwind CSS - Scoped Group", [
   [
     "group-scoped-hover:text-green-500",
     {
-      [css`group-scoped-hover:text-green-500::group-scoped-hover`]: [
-        { color: "#22c55e" },
-      ],
+      styles: {
+        "group-scoped-hover:text-green-500": { color: "#22c55e" },
+      },
+      masks: {
+        "group-scoped-hover:text-green-500": 64,
+      },
     },
   ],
 ]);

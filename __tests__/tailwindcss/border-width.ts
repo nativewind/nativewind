@@ -1,6 +1,6 @@
 import { Style } from "css-to-react-native";
 import { ViewStyle } from "react-native";
-import { createTests, tailwindRunner, $ } from "./runner";
+import { createTests, tailwindRunner } from "./runner";
 
 const scenarios: Record<string, ViewStyle["borderWidth"]> = {
   0: 0,
@@ -15,68 +15,72 @@ tailwindRunner(
     [
       "border",
       {
-        [$`border`()]: [
-          {
+        styles: {
+          border: {
             borderBottomWidth: "styleSheet(hairlineWidth)",
             borderTopWidth: "styleSheet(hairlineWidth)",
             borderLeftWidth: "styleSheet(hairlineWidth)",
             borderRightWidth: "styleSheet(hairlineWidth)",
           } as Style,
-        ],
+        },
       },
     ],
     [
       "border-x",
       {
-        [$`border-x`()]: [
-          {
+        styles: {
+          "border-x": {
             borderLeftWidth: "styleSheet(hairlineWidth)",
             borderRightWidth: "styleSheet(hairlineWidth)",
           } as Style,
-        ],
+        },
       },
     ],
     [
       "border-y",
       {
-        [$`border-y`()]: [
-          {
+        styles: {
+          "border-y": {
             borderTopWidth: "styleSheet(hairlineWidth)",
             borderBottomWidth: "styleSheet(hairlineWidth)",
           } as Style,
-        ],
+        },
       },
     ],
     [
       "border-t",
       {
-        [$`border-t`()]: [
-          { borderTopWidth: "styleSheet(hairlineWidth)" } as Style,
-        ],
+        styles: {
+          "border-t": { borderTopWidth: "styleSheet(hairlineWidth)" } as Style,
+        },
       },
     ],
     [
       "border-b",
       {
-        [$`border-b`()]: [
-          { borderBottomWidth: "styleSheet(hairlineWidth)" } as Style,
-        ],
+        styles: {
+          "border-b": {
+            borderBottomWidth: "styleSheet(hairlineWidth)",
+          } as Style,
+        },
       },
     ],
     [
       "border-l",
       {
-        [$`border-l`()]: [
-          { borderLeftWidth: "styleSheet(hairlineWidth)" } as Style,
-        ],
+        styles: {
+          "border-l": { borderLeftWidth: "styleSheet(hairlineWidth)" } as Style,
+        },
       },
     ],
     [
       "border-r",
       {
-        [$`border-r`()]: [
-          { borderRightWidth: "styleSheet(hairlineWidth)" } as Style,
-        ],
+        styles: {
+          "border-r": {
+            borderRightWidth: "styleSheet(hairlineWidth)",
+          } as Style,
+        },
       },
     ],
   ],

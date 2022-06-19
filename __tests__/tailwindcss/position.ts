@@ -1,12 +1,12 @@
-import { tailwindRunner, expectError, $ } from "./runner";
+import { tailwindRunner, expectError } from "./runner";
 
 tailwindRunner(
   "Layout - Position",
   expectError(["fixed", "sticky"]),
   // static is a special scenario see to-react-native/properties/position.ts
   [
-    ["static", {}],
-    ["absolute", { [$`absolute`()]: [{ position: "absolute" }] }],
-    ["relative", { [$`relative`()]: [{ position: "relative" }] }],
+    ["static", { styles: {} }],
+    ["absolute", { styles: { absolute: { position: "absolute" } } }],
+    ["relative", { styles: { relative: { position: "relative" } } }],
   ]
 );

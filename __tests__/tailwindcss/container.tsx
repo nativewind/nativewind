@@ -1,80 +1,94 @@
-import { tailwindRunner, $ } from "./runner";
+import { tailwindRunner } from "./runner";
 
 tailwindRunner("Layout - Container", [
   [
     "container",
     {
-      [$`container`()]: [
-        {
+      styles: {
+        container: {
           width: "100%",
         },
-        {
-          atRules: [["media", "(min-width: 640px)"]],
+        "container@0": {
           maxWidth: 640,
         },
-        {
-          atRules: [["media", "(min-width: 768px)"]],
+        "container@1": {
           maxWidth: 768,
         },
-        {
-          atRules: [["media", "(min-width: 1024px)"]],
+        "container@2": {
           maxWidth: 1024,
         },
-        {
-          atRules: [["media", "(min-width: 1280px)"]],
+        "container@3": {
           maxWidth: 1280,
         },
-        {
-          atRules: [["media", "(min-width: 1536px)"]],
+        "container@4": {
           maxWidth: 1536,
         },
-      ],
+      },
+      topics: {
+        container: ["width"],
+      },
+      atRules: {
+        container: [
+          [["media", "(min-width: 640px)"]],
+          [["media", "(min-width: 768px)"]],
+          [["media", "(min-width: 1024px)"]],
+          [["media", "(min-width: 1280px)"]],
+          [["media", "(min-width: 1536px)"]],
+        ],
+      },
     },
   ],
   [
     "sm:container",
     {
-      [$`sm:container`()]: [
-        {
-          atRules: [["media", "(min-width: 640px)"]],
+      styles: {
+        "sm:container@0": {
           width: "100%",
         },
-        {
-          atRules: [
+        "sm:container@1": {
+          maxWidth: 640,
+        },
+        "sm:container@2": {
+          maxWidth: 768,
+        },
+        "sm:container@3": {
+          maxWidth: 1024,
+        },
+        "sm:container@4": {
+          maxWidth: 1280,
+        },
+        "sm:container@5": {
+          maxWidth: 1536,
+        },
+      },
+      topics: {
+        "sm:container": ["width"],
+      },
+      atRules: {
+        "sm:container": [
+          [["media", "(min-width: 640px)"]],
+          [
             ["media", "(min-width: 640px)"],
             ["media", "(min-width: 640px)"],
           ],
-          maxWidth: 640,
-        },
-        {
-          atRules: [
+          [
             ["media", "(min-width: 640px)"],
             ["media", "(min-width: 768px)"],
           ],
-          maxWidth: 768,
-        },
-        {
-          atRules: [
+          [
             ["media", "(min-width: 640px)"],
             ["media", "(min-width: 1024px)"],
           ],
-          maxWidth: 1024,
-        },
-        {
-          atRules: [
+          [
             ["media", "(min-width: 640px)"],
             ["media", "(min-width: 1280px)"],
           ],
-          maxWidth: 1280,
-        },
-        {
-          atRules: [
+          [
             ["media", "(min-width: 640px)"],
             ["media", "(min-width: 1536px)"],
           ],
-          maxWidth: 1536,
-        },
-      ],
+        ],
+      },
     },
   ],
 ]);

@@ -10,5 +10,5 @@ const scenarios: Record<string, ViewStyle["aspectRatio"]> = {
 tailwindRunner(
   "Layout - Aspect Ratio",
   createTests("aspect", scenarios, (n) => ({ aspectRatio: n })),
-  [["aspect-auto", {}]]
+  [["aspect-auto", { styles: {} }]]
 );

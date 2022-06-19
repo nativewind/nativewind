@@ -4,7 +4,7 @@ import {
   createTestAppearance,
   // createTestDimensions,
   TestStyleSheetStore,
-} from "./utils";
+} from "./tests";
 
 describe("StyleSheetStore", () => {
   test("can retrieve a style", () => {
@@ -48,9 +48,12 @@ describe("StyleSheetStore", () => {
   test("can match pseudo-classes", () => {
     const store = new TestStyleSheetStore({
       styles: {
-        [css`hover:text-black::hover`]: {
+        "hover:text-black": {
           color: "black",
         },
+      },
+      masks: {
+        "hover:text-black": 1,
       },
     });
 
@@ -65,9 +68,15 @@ describe("StyleSheetStore", () => {
 
     const store = new TestStyleSheetStore({
       styles: {
-        [css`dark:text-black::dark`]: { color: "black" },
+        "dark:text-black": { color: "black" },
       },
       appearance,
+      masks: {
+        "dark:text-black": 131_072,
+      },
+      topics: {
+        "dark:text-black": ["colorScheme"],
+      },
     });
 
     expect(store.getTestStyle("dark:text-black")).toEqual([]);
@@ -85,8 +94,14 @@ describe("StyleSheetStore", () => {
 
     const store = new TestStyleSheetStore({
       styles: {
-        [css`text-white`]: staticText,
-        [css`dark:text-black::dark`]: atRuleText,
+        "text-white": staticText,
+        "dark:text-black": atRuleText,
+      },
+      masks: {
+        "dark:text-black": 131_072,
+      },
+      topics: {
+        "dark:text-black": ["colorScheme"],
       },
       appearance,
     });

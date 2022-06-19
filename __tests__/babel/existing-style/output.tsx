@@ -13,15 +13,11 @@ const styles = StyleSheet.create({
     color: "blue",
   },
 });
-globalThis.tailwindcss_react_native_style = Object.assign(
-  globalThis.tailwindcss_react_native_style || {},
+globalThis.nativewind_styles = Object.assign(
+  globalThis.nativewind_styles || {},
   RNStyleSheet.create({
-    "font-bold.0": {
+    "font-bold": {
       fontWeight: "700",
     },
   })
-);
-globalThis.tailwindcss_react_native_media = Object.assign(
-  globalThis.tailwindcss_react_native_media || {},
-  {}
 );

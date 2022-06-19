@@ -1,6 +1,6 @@
-import { tailwindRunner, $ } from "./runner";
+import { tailwindRunner } from "./runner";
 
 tailwindRunner("Typography - Font Style", [
-  ["italic", { [$`italic`()]: [{ fontStyle: "italic" }] }],
-  ["not-italic", { [$`not-italic`()]: [{ fontStyle: "normal" }] }],
+  ["italic", { styles: { italic: { fontStyle: "italic" } } }],
+  ["not-italic", { styles: { "not-italic": { fontStyle: "normal" } } }],
 ]);

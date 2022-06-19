@@ -1,4 +1,4 @@
-import { TestStyleSheetStore } from "./utils";
+import { TestStyleSheetStore } from "./tests";
 
 describe("StyleSheetStore - preprocessed", () => {
   test("can retrieve a style", () => {

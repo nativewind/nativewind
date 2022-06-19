@@ -1,43 +1,70 @@
-import { tailwindRunner, css } from "../tailwindcss/runner";
+import { tailwindRunner } from "../tailwindcss/runner";
 
 tailwindRunner("Platform Prefixes", [
   [
     "ios:w-px",
     {
-      [css`ios:w-px::ios`]: [{ width: 1 }],
+      styles: {
+        "ios:w-px": { width: 1 },
+      },
+      masks: {
+        "ios:w-px": 8192,
+      },
     },
   ],
   [
     "android:w-px",
     {
-      [css`android:w-px::android`]: [{ width: 1 }],
+      styles: {
+        "android:w-px": { width: 1 },
+      },
+      masks: {
+        "android:w-px": 4096,
+      },
     },
   ],
   [
     "windows:w-px",
     {
-      [css`windows:w-px::windows`]: [{ width: 1 }],
+      styles: {
+        "windows:w-px": { width: 1 },
+      },
+      masks: {
+        "windows:w-px": 32_768,
+      },
     },
   ],
   [
     "macos:w-px",
     {
-      [css`macos:w-px::macos`]: [{ width: 1 }],
+      styles: {
+        "macos:w-px": { width: 1 },
+      },
+      masks: {
+        "macos:w-px": 65_536,
+      },
     },
   ],
   [
     "web:w-px",
     {
-      [css`web:w-px::web`]: [{ width: 1 }],
+      styles: {
+        "web:w-px": { width: 1 },
+      },
+      masks: {
+        "web:w-px": 16_384,
+      },
     },
   ],
   [
     "native:w-px",
     {
-      [css`native:w-px::ios`]: [{ width: 1 }],
-      [css`native:w-px::android`]: [{ width: 1 }],
-      [css`native:w-px::macos`]: [{ width: 1 }],
-      [css`native:w-px::windows`]: [{ width: 1 }],
+      styles: {
+        "native:w-px": { width: 1 },
+      },
+      masks: {
+        "native:w-px": 110_592,
+      },
     },
   ],
 ]);

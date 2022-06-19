@@ -4,13 +4,13 @@ import {
   Dimensions,
   ScaledSize,
 } from "react-native";
-import { CreateSelectorOptions } from "../../src/shared/selector";
+import { StateBitOptions } from "../../src/shared/selector";
 
 import { StyleSheetStore } from "../../src/style-sheet-store";
 
 export class TestStyleSheetStore extends StyleSheetStore {
   // Helper to easily retrieve a style from the latest snapshot
-  getStyle(className: string, options?: CreateSelectorOptions) {
+  getStyle(className: string, options?: StateBitOptions) {
     const selector = this.prepare(className, options);
     return this.getSnapshot()[selector];
   }
@@ -19,7 +19,7 @@ export class TestStyleSheetStore extends StyleSheetStore {
   // the results with toEqual
   //
   // Note: If you want check the stability of results, you need to use getStyle()
-  getTestStyle(className: string, options?: CreateSelectorOptions) {
+  getTestStyle(className: string, options?: StateBitOptions) {
     return [...this.getStyle(className, options)];
   }
 }

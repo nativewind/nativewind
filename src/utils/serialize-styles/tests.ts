@@ -1,12 +1,15 @@
-import { StyleRecord } from "../../types/common";
-import { serializeStyles } from "./serialize-styles";
+import { ExtractedValues } from "../../postcss/plugin";
+import { serializeHelper } from "./helper";
 
-export function testStyleSerializer(styleRecord: StyleRecord) {
-  return serializeStyles(styleRecord, (key, value) => {
-    if (value === "styleSheet(hairlineWidth)") {
-      return [key, 1];
-    }
+export function testStyleSerializer({ styles, ...rest }: ExtractedValues) {
+  return {
+    ...rest,
+    ...serializeHelper(styles, (key, value) => {
+      if (value === "styleSheet(hairlineWidth)") {
+        return [key, 1];
+      }
 
-    return [key, value];
-  });
+      return [key, value];
+    }),
+  };
 }
