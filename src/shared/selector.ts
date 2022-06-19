@@ -30,7 +30,7 @@ export function getSelectorTopics(
 export function normalizeCssSelector(selector: string) {
   selector = selector.trim().replace(/^\.|\\/g, "");
   selector = selector.split("::")[0];
-  selector = selector.split(" ").pop()!;
+  selector = selector.split(" ").pop() as string;
 
   return selector;
 }
@@ -157,6 +157,6 @@ export function getSelectorMask(selector: string, rtl = false): number {
       ? "macos"
       : hasWeb(selector)
       ? "web"
-      : ("" as any),
+      : undefined,
   });
 }

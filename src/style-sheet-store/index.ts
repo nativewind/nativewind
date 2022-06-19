@@ -252,8 +252,6 @@ export class StyleSheetStore extends ColorSchemeStore {
     const reEvaluate = () => {
       const styleArray: StylesArray = [];
 
-      console.log(1, { isRTL: I18nManager.isRTL })
-
       const stateBit = getStateBit({
         ...options,
         darkMode: this.colorScheme === "dark",
