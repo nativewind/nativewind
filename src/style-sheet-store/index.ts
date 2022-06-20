@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import {
+  StyleSheet,
   Dimensions,
   Appearance,
   ScaledSize,
@@ -405,9 +406,11 @@ export class StyleSheetStore extends ColorSchemeStore {
 
         const stylesKey = createAtRuleSelector(className, index);
 
-        const style = this.styles[stylesKey];
+        // This causes performance issues on RNW <17, but hopefully people upgrade soon
+        let style = flattenIfRNW(this.styles[stylesKey]);
 
         if (unitKey) {
+          style = { ...style };
           for (const [key, value] of Object.entries(style)) {
             (style as Record<string, unknown>)[key] = units[unitKey](value);
           }
@@ -478,5 +481,10 @@ export class StyleSheetStore extends ColorSchemeStore {
 }
 
 const matchesMask = (value: number, mask: number) => (value & mask) === mask;
+const flattenIfRNW = <T extends Style>(style: T | number): T => {
+  return typeof style === "number"
+    ? (StyleSheet.flatten(style) as unknown as T)
+    : style;
+};
 
 export const StoreContext = createContext(new StyleSheetStore());
