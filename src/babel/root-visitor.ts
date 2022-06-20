@@ -112,26 +112,16 @@ export default function rootVisitor(
 
           appendVariables(bodyNode, output);
 
-          const imports = [];
-
           if (!hasStyleSheetImport) {
-            imports.push(["RNStyleSheet", "StyleSheet"]);
+            prependImports(
+              bodyNode,
+              [["RNStyleSheet", "StyleSheet"]],
+              "react-native"
+            );
           }
 
-          if (output.hasPlatform) {
-            imports.push(["RNPlatform", "Platform"]);
-          }
-
-          if (output.hasPlatformColor) {
-            imports.push(["RNPlatformColor", "PlatformColor"]);
-          }
-
-          if (output.hasPlatformColor) {
-            imports.push(["RNPixelRatio", "PixelRatio"]);
-          }
-
-          if (imports.length > 0) {
-            prependImports(bodyNode, imports, "react-native");
+          if (output.hasRuntimeFunction) {
+            prependImports(bodyNode, ["NWRuntimeParser"], "nativewind");
           }
         },
       },

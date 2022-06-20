@@ -5,7 +5,6 @@ import {
   Expression,
   identifier,
   isExpression,
-  memberExpression,
   nullLiteral,
   numericLiteral,
   objectExpression,
@@ -14,7 +13,7 @@ import {
   unaryExpression,
 } from "@babel/types";
 import { ExtractedValues } from "../../postcss/plugin";
-import { serializeHelper } from "./helper";
+import { isRuntimeFunction, serializeHelper } from "./helper";
 
 export function babelStyleSerializer({
   styles: rawStyles,
@@ -49,85 +48,10 @@ function babelReplacer(key: string, value: string): [string, unknown] {
     return [key, value];
   }
 
-  if (value === "styleSheet(hairlineWidth)") {
+  if (isRuntimeFunction(value)) {
     return [
       key,
-      memberExpression(identifier("RNStyleSheet"), identifier("hairlineWidth")),
-    ];
-  }
-
-  if (value.startsWith("roundToNearestPixel(")) {
-    const result = value.match(/roundToNearestPixel\((.+)\)/);
-
-    if (!result) return [key, identifier("undefined")];
-
-    const variables = result[1]
-      .split(/[ ,]+/)
-      .filter(Boolean)
-      .map((v) => numericLiteral(Number.parseFloat(v)));
-
-    return [
-      key,
-      callExpression(
-        memberExpression(
-          identifier("RNPixelRatio"),
-          identifier("roundToNearestPixel")
-        ),
-        variables
-      ),
-    ];
-  }
-
-  if (value.startsWith("platformColor(")) {
-    const result = value.match(/platformColor\((.+)\)/);
-
-    if (!result) return [key, identifier("undefined")];
-
-    const variables = result[1]
-      .split(/[ ,]+/)
-      .filter(Boolean)
-      .map((v: string) => stringLiteral(v));
-
-    return [key, callExpression(identifier("RNPlatformColor"), variables)];
-  }
-
-  if (value.startsWith("platform(")) {
-    const result = value.match(/platform\((.+)\)/);
-
-    if (!result) return [key, identifier("undefined")];
-
-    const props = result[1]
-      .trim()
-      .split(/\s+/)
-      .map((a) => {
-        // Edge case:
-        //   platform(android:platformColor(@android:color/holo_blue_bright))
-        // Sometimes the value can has a colon, so we need to collect all values
-        // and join them
-        let [platform, ...values] = a.split(":");
-
-        if (!values) {
-          values = [platform];
-          platform = "default";
-        }
-
-        const [key, value] = babelReplacer(platform, `${values.join("")}`);
-
-        if (typeof value === "object" && isExpression(value)) {
-          return objectProperty(identifier(key), value);
-        } else if (typeof value === "string") {
-          return objectProperty(identifier(key), stringLiteral(value));
-        } else {
-          throw new TypeError("Shouldn't reach here");
-        }
-      });
-
-    return [
-      key,
-      callExpression(
-        memberExpression(identifier("RNPlatform"), identifier("select")),
-        [objectExpression(props)]
-      ),
+      callExpression(identifier("NWRuntimeParser"), [stringLiteral(value)]),
     ];
   }
 

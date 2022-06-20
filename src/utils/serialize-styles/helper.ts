@@ -4,18 +4,14 @@ export function serializeHelper(
   styleRecord: StyleRecord,
   replacer: (key: string, value: string) => [string, unknown]
 ) {
-  let hasPlatform = false;
-  let hasPlatformColor = false;
-  let hasRoundToNearestPixel = false;
+  let hasRuntimeFunction = false;
 
   const styles = Object.fromEntries(
     Object.entries(styleRecord).map(([key, style]) => {
       const transformedStyle = Object.fromEntries(
         Object.entries(style).map(([k, v]) => {
           if (typeof v === "string") {
-            hasPlatform ||= v.includes("platform(");
-            hasPlatformColor ||= v.includes("platformColor(");
-            hasRoundToNearestPixel ||= v.includes("roundToNearestPixel(");
+            hasRuntimeFunction ||= isRuntimeFunction(v);
           }
           return replacer(k, v);
         })
@@ -27,8 +23,18 @@ export function serializeHelper(
 
   return {
     styles,
-    hasPlatform,
-    hasPlatformColor,
-    hasRoundToNearestPixel,
+    hasRuntimeFunction,
   };
+}
+
+export function isRuntimeFunction(input: string) {
+  return (
+    input === "styleSheet(hairlineWidth)" ||
+    input.startsWith("roundToNearestPixel(") ||
+    input.startsWith("getPixelSizeForLayoutSize(") ||
+    input.startsWith("getFontSizeForLayoutSize(") ||
+    input.startsWith("roundToNearestFontScale(") ||
+    input.startsWith("platformColor(") ||
+    input.startsWith("platform(")
+  );
 }

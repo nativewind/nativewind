@@ -5,8 +5,5 @@ declare module "nativewind" {
   export const TailwindProvider: any;
   export const useTailwind: (...arg: any[]) => any;
   export const StyledComponent: FunctionComponent<any>;
-}
-
-declare module "nativewind/units" {
-  export const vw: (...arg: any[]) => any;
+  export const NWRuntimeParser: (...arg: any[]) => any;
 }

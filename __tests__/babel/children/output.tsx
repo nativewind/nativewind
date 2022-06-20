@@ -1,3 +1,4 @@
+import { NWRuntimeParser } from "nativewind";
 import { StyleSheet as RNStyleSheet } from "react-native";
 import { StyledComponent } from "nativewind";
 import { Text, View } from "react-native";
@@ -21,7 +22,7 @@ globalThis.nativewind_styles = Object.assign(
     },
     "divide-y.children@0": {
       borderBottomWidth: 0,
-      borderTopWidth: RNStyleSheet.hairlineWidth,
+      borderTopWidth: NWRuntimeParser("styleSheet(hairlineWidth)"),
     },
   })
 );
