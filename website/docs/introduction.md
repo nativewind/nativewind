@@ -8,14 +8,14 @@ slug: /
 [Want to jump straight in? Read our quick-start guide!](/quick-start)
 :::
 
-`tailwindcss-react-native` uses [Tailwind CSS](https://tailwindcss.com) as high-level scripting language to create a **universal design system**. Styled components can be shared between all React Native platforms, using the best style engine for that platform (e.g. CSS StyleSheet or StyleSheet.create). It's goals are to to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
+NativeWind uses [Tailwind CSS](https://tailwindcss.com) as high-level scripting language to create a **universal design system**. Styled components can be shared between all React Native platforms, using the best style engine for that platform (e.g. CSS StyleSheet or StyleSheet.create). It's goals are to to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
 
-`tailwindcss-react-native` processes your styles during your application build, and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
-
-> :point_right: This example uses Babel which is one of the many setups available.
+NativeWind processes your styles during your application build, and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
 
 ```tsx
 import { Pressable, View, Text } from "react-native";
+
+// 👉 This example uses Babel which is one of the many setups available.
 
 /**
  * A button that changes color when hovered or pressed
@@ -122,21 +122,6 @@ export function BoldText(props) {
       />
     </Svg>
   );
-}
-```
-
-Lastly `useTailwind()` can be used for manual styling or situations where `styled` cannot be used.
-
-> :warning: This is a example of `useTailwind()` that you shouldn't use in practice. There are often more performant patterns than `useTailwind()` and it should be used as a last resort. Please see our docs for more information.
-
-```tsx
-import { ActivityIndicator } from "react-native";
-
-export function MyText({ bold, italic, lineThrough, ...props }) {
-  const tw = useTailwind();
-  const { color } = useTailwind("color-black dark:color-white");
-
-  return <ActivityIndicator color={color} />;
 }
 ```
 

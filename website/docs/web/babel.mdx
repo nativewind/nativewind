@@ -1,0 +1,81 @@
+import StartCoding from "../_start-coding.md";
+import Dependencies from "../_dependencies.mdx";
+import Tailwind from "../_tailwind.mdx";
+
+# Babel
+
+The default babel configuration will both compile/inject the Tailwind CSS styles and transform any component with the `className` attributed into a `styled` version.
+
+This is the recommended configuration as it provides the fastest setup and best DX experience, with support for Tailwind intellisense within your IDE.
+
+```tsx
+/* Example how your code will look */
+import { Text } from "react-native";
+
+export function MyFancyButton(props) {
+  return (
+    <Pressable className="component bg-violet-500 hover:bg-violet-600 active:bg-violet-700">
+      <Text className="font-bold component-active:font-extrabold" {...props} />;
+    </Pressable>
+  );
+}
+```
+
+## Setup
+
+### 1. Install the dependencies
+
+<Dependencies />
+
+### 2. Setup Tailwindcss
+
+<Tailwind />
+
+### 3. Configure your babel.config.js
+
+```js
+// babel.config.js
+module.exports = {
+  plugins: ["nativewind/babel"],
+};
+```
+
+<StartCoding />
+
+## Configuring what is transformed
+
+When targeting `Web` you may be using components that should not be transformed.
+
+By default native components (e.g. `div`) are not transformed.
+
+However if you are using a `web` only library such as `react-select`, you can disabled the transform on components imported from this library.
+
+Either by explicitly stating which modules can be transformed.
+
+```diff
+// babel.config.js
+module.exports = {
+- plugins: ["nativewind/babel"],
++ plugins: [
++   [
++    "nativewind/babel"
++    { allowModuleTransform: ["moti"] }
++   ]
++ ],
+};
+```
+
+Or blocking modules you don't want transformed.
+
+```diff
+// babel.config.js
+module.exports = {
+- plugins: ["nativewind/babel"],
++ plugins: [
++   [
++    "nativewind/babel"
++    { blockModuleTransform: ["react-select"] }
++   ]
++ ],
+};
+```

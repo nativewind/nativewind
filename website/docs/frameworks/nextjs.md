@@ -8,33 +8,14 @@ This guide assumes you already have Next.js configured with [React Native Web](h
 
 ## Setup
 
-### 1. Compilation
+Next.js has built in support for either Babel with PostCSS or SWC with PostCSS.
 
-Next.js has built in support for both Babel and PostCSS, so either compilation guide is suitable. You can also manually setup the Tailwind CLI.
+Next.js pages are often rendered via SSR which requires React Native Web 0.18 for proper CSS support.
 
-- [Babel](../compilation/babel.md)
-- [Babel (Compile Only)](../compilation/babel-compile-only.md)
-- [PostCSS](../compilation/postcss-native.md)
-- [Tailwind CLI](../compilation/cli-native.md)
+### Babel
 
-If you willing to try bleeding-edge features, you can also use Next.js to output CSS style sheets by following [PostCSS (CSS) 🔬](../compilation/postcss-css.md). This will provide the best performance and features and allow you to use the [SWC compiler](https://nextjs.org/docs/advanced-features/compiler).
+Follow the setup guide for [Babel (Transform Only)](../web/babel-transform-only.md) which allows you to use the inbuilt PostCSS pipeline.
 
-### 2. Transpilation
+### SWC
 
-Unlike Metro, Next.js does not transpile `node_modules`. You will need to add [next-transpile-modules](https://github.com/martpie/next-transpile-modules) to your `next.config.js`
-
-```
-npm install --save-dev next-transpile-modules
-```
-
-Follow the [setup instructions](https://github.com/martpie/next-transpile-modules#usage) to add `tailwindcss-react-native`
-
-```js
-// An example next.config.js
-const withTM = require("next-transpile-modules")([
-  "tailwindcss-react-native",
-  "@react-native-community/hooks", // A dependency used at runtime.
-]);
-
-module.exports = withTM({});
-```
+Follow the setup guide for [PostCSS (Web)](../web/postcss.md).

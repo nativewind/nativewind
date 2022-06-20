@@ -1,6 +1,6 @@
 import StartCoding from "../\_start-coding-components.md"
 
-# Tailwind CLI
+# Tailwind CLI (Native)
 
 The Tailwind CLI can be used to output pre-compiled RN StyleSheet objects.
 
@@ -12,24 +12,24 @@ The Tailwind CLI can be used to output pre-compiled RN StyleSheet objects.
 // postcss.config.js
 module.exports = {
   plugins: {
-    "tailwindcss-react-native/postcss": {
-      output: "tailwindcss-react-native-output.js",
+    "nativewind/postcss": {
+      output: "nativewind-output.js",
     },
   },
 };
 ```
 
-### 2. Add the native tailwind plugin to your `tailwind.config.js`
+### 2. Add the NativeWind plugin to your `tailwind.config.js`
 
 ```diff
 // tailwind.config.js
-+ const tailwindcssReactNative = require("tailwindcss-react-native/tailwind/native")
++ const nativewind = require("nativewind/tailwind/native")
 +
 module.exports = {
   content: [
     './App.{js,ts,jsx,tsx}',
   ],
-+ plugins: [tailwindcssReactNative()],
++ plugins: [nativewind()],
 };
 ```
 
@@ -43,7 +43,7 @@ module.exports = {
 
 ### 3. Run Tailwind CLI
 
-Running the Tailwind CLI will generate `tailwindcss-react-native-output.js`. This can be configured via the [PostCSS options](../configuration/postcss)
+Running the Tailwind CLI will generate `nativewind-output.js`. This can be configured via the [PostCSS options](../configuration/postcss)
 
 ```bash
 npx tailwindcss -i input.css --postcss postcss.config.js
@@ -52,8 +52,8 @@ npx tailwindcss -i input.css --postcss postcss.config.js
 ### 4. Update the TailwindProvider
 
 ```diff
-import { TailwindProvider } from 'tailwindcss-react-native'
-+ import * as tailwindProviderProps from "./tailwindcss-react-native-output"
+import { TailwindProvider } from 'nativewind'
++ import * as tailwindProviderProps from "./nativewind-output"
 
 function MyAppsProviders ({ children }) {
     return (

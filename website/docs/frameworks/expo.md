@@ -4,11 +4,12 @@ If you are using Expo with a framework (Next.js, Gatsby, Storybook, etc), please
 
 Otherwise you can setup Expo by using Babel or the Tailwind CLI
 
-- [Babel](../compilation/babel.md)
-- [Babel (Compile Only)](../compilation/babel-compile-only.md)
-- [Tailwind CLI](../compilation/cli-native.md)
+- [Babel](../native/babel.mdx)
+- [Babel (Compile Only)](../native/babel-compile-only.md)
 
-## Expo Web
+## Additional setup for Expo Web
+
+### Webpack setup
 
 If you are using Expo Web without a framework, you will need to add a custom webpack configuration file.
 
@@ -21,7 +22,7 @@ module.exports = async function (env, argv) {
     {
       ...env,
       babel: {
-        dangerouslyAddModulePathsToTranspile: ["tailwindcss-react-native"],
+        dangerouslyAddModulePathsToTranspile: ["nativewind"],
       },
     },
     argv
@@ -29,4 +30,22 @@ module.exports = async function (env, argv) {
 
   return config;
 };
+```
+
+### Output
+
+Expo SDK <45 does not support React Native Web 0.18 and cannot output the class attribute on components. You need to add a `<TailwindProvider />` to the root of your application to change the `webOutput` option to `native`
+
+```tsx
+// App.js
+
+import { TailwindProvider } from "nativewind"
+
+export default function App() {
+  return (
+    <TailwindProvider webOutput="native">
+      { // your app }
+    </TailwindProvider>
+  )
+}
 ```

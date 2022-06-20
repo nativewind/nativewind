@@ -1,5 +1,4 @@
 ---
-sidebar_position: 999
 title: TailwindProvider
 sidebar_label: <TailwindProvider />
 ---
@@ -14,10 +13,17 @@ function MyAppsProviders({ children }) {
 }
 ```
 
-| Prop               | Values                                                | Default                                  | Description                                                      |
-| ------------------ | ----------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------- |
-| platform           | `web`, `native`, `ios`, `android`, `windows`, `macos` | Platform.OS                              | Used to match platform media queries                             |
-| preview            | `boolean`                                             | `false`                                  | Enable preview features                                          |
-| initialColorScheme | `ColorSchemeName`                                     | `Appearance.getColorScheme() ?? 'light'` | Set an ColorScheme value.                                        |
-| style              | Compiled style object                                 | `undefined`                              | For manual injection via the [CLI](../compilation/cli-native.md) |
-| media              | Compiled media object                                 | `undefined`                              | For manual injection via the [CLI](../compilation/cli-native.md) |
+## Options
+
+| Prop               | Values            | Default                                   | Description                           |
+| ------------------ | ----------------- | ----------------------------------------- | ------------------------------------- |
+| initialColorScheme | `ColorSchemeName` | `Appearance.getColorScheme() ?? 'light'`  | Set an ColorScheme value.             |
+| webOutput          | `css`, `native`   | `ReactNativeWeb >=0.8 ? 'css' : 'native'` | Specify how web styles are outputted. |
+
+## Advanced options
+
+| Prop     | Values                   | Default     | Description                                                 |
+| -------- | ------------------------ | ----------- | ----------------------------------------------------------- |
+| platform | Override the Platform.OS | Platform.OS | Used to match platform media queries                        |
+| style    | Compiled style object    | `undefined` | For manual injection via the [CLI](../manual/cli-native.md) |
+| media    | Compiled media object    | `undefined` | For manual injection via the [CLI](../manual/cli-native.md) |

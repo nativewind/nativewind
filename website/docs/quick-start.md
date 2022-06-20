@@ -2,29 +2,24 @@ import StartCoding from "./\_start-coding.md"
 
 # Quick Start
 
-:::info
-[Want a more details? View our detailed installation guide.](/installation)
-:::
-
 ## 1. Create a new React Native application
 
 ```
-npx create-react-native-app my-tailwind-native-app
+npx create-react-native-app my-nativewind-app
 ```
 
-Choose "Default new app"
+Choose "Default new app" and then move into the project's directory.
 
 ```bash
-cd my-tailwind-native-app
+cd my-nativewind-app
 ```
 
 ## 2. Install the dependencies
 
-You will need to install `tailwindcss-react-native` and it's peer dependency `tailwindcss`.
+You will need to install `nativewind` and it's peer dependency `tailwindcss`.
 
 ```bash
-cd my-tailwind-native-app
-yarn add tailwindcss-react-native
+yarn add nativewind
 yarn add --dev tailwindcss
 ```
 
@@ -36,6 +31,7 @@ Add the paths to all of your component files in your tailwind.config.js file.
 
 ```diff
 // tailwind.config.js
+
 module.exports = {
 - content: [],
 + content: ["./App.{js,jsx,ts,tsx}", "./src/**/*.{js,jsx,ts,tsx}"],
@@ -56,27 +52,6 @@ module.exports = {
 - plugins: [],
 + plugins: ["tailwindcss-react-native/babel"],
 };
-```
-
-## 5. Add the TailwindProvider
-
-Modify your `App.js` to add the `TailwindProvider`
-
-```diff
-// App.js
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-+ import { TailwindProvider } from 'tailwindcss-react-native';
-
-export default function App() {
-  return (
-+   <TailwindProvider>
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-      </View>
-+   </TailwindProvider>
-  );
-}
 ```
 
 <StartCoding />

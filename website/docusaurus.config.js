@@ -6,15 +6,15 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "tailwindcss-react-native",
+  title: "NativeWind",
   tagline: "",
-  url: "https://tailwindcss-react-native.vercel.app/",
+  url: "https://tailwindcss-react-native-git-next-mwlawlor.vercel.app/",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "marklawlor", // Usually your GitHub org/user name.
-  projectName: "tailwindcss-react-native", // Usually your repo name.
+  projectName: "NativeWind", // Usually your repo name.
 
   scripts: [
     {
@@ -45,9 +45,9 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: "tailwindcss-react-native",
+        title: "NativeWind",
         logo: {
-          alt: "My Site Logo",
+          alt: "NativeWind Logo",
           src: "img/logo.svg",
         },
         items: [

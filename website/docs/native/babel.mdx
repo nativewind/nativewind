@@ -1,4 +1,6 @@
-import StartCoding from "../\_start-coding.md"
+import StartCoding from "../_start-coding.md";
+import Dependencies from "../_dependencies.mdx";
+import Tailwind from "../_tailwind.mdx";
 
 # Babel
 
@@ -21,34 +23,24 @@ export function MyFancyButton(props) {
 
 ## Setup
 
-### 1. Configure your babel.config.js
+### 1. Install the dependencies
+
+<Dependencies />
+
+### 2. Setup Tailwindcss
+
+<Tailwind />
+
+### 3. Configure your babel.config.js
 
 ```js
 // babel.config.js
 module.exports = {
-  plugins: ["tailwindcss-react-native/babel"],
+  plugins: ["nativewind/babel"],
 };
 ```
 
-### 2. Style components using the className prop
-
-```tsx
-import { Text } from "react-native";
-
-export function BoldText(props) {
-  return <Text className="font-bold" {...props} />;
-}
-```
-
 <StartCoding />
-
-## Typescript
-
-Create a file (eg. `src/tailwindcss-react-native.d.ts`) and paste this line
-
-```js
-import "tailwindcss-react-native/types.d";
-```
 
 ## Configuring what is transformed
 
@@ -63,10 +55,10 @@ Either by explicitly stating which modules can be transformed.
 ```diff
 // babel.config.js
 module.exports = {
-- plugins: ["tailwindcss-react-native/babel"],
+- plugins: ["nativewind/babel"],
 + plugins: [
 +   [
-+    "tailwindcss-react-native/babel"
++    "nativewind/babel"
 +    { allowModuleTransform: ["moti"] }
 +   ]
 + ],
@@ -78,10 +70,10 @@ Or blocking modules you don't want transformed.
 ```diff
 // babel.config.js
 module.exports = {
-- plugins: ["tailwindcss-react-native/babel"],
+- plugins: ["nativewind/babel"],
 + plugins: [
 +   [
-+    "tailwindcss-react-native/babel"
++    "nativewind/babel"
 +    { blockModuleTransform: ["react-select"] }
 +   ]
 + ],
