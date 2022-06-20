@@ -56,7 +56,7 @@ const sidebars = {
       type: "category",
       label: "Guides",
       collapsed: true,
-      items: ["guides/goals", "guides/use-tailwind"],
+      items: ["guides/goals", "guides/theme-values"],
     },
     {
       type: "category",

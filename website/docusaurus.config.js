@@ -31,6 +31,7 @@ const config = {
         docs: {
           routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),
+          editUrl: `https://github.com/marklawlor/tailwindcss-react-native/edit/main/website/`,
         },
         blog: false,
         theme: {

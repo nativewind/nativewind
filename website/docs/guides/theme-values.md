@@ -1,8 +1,4 @@
-# Don't overuse useTailwind()
-
-`useTailwind()` can seem like a powerful utility allowing you to style any component with Tailwind. This mindset can lead to some common anti-patterns that reduce performance and ability to create a universal components.
-
-## Retrieving theme values
+# Retrieving theme values
 
 :::tip
 
@@ -16,15 +12,12 @@ It might be tempting to write to parse a Tailwind class to extract single values
 import { useTailwind } from "tailwindcss-react-native";
 
 export function MyActivityIndicator(props) {
-  const tw = useTailwind();
+  const { color } = useTailwind("text-blue-500");
 
-  const { color } = tw("text-blue-500");
-
+  // This only works on native, and will fail on web!
   return <ActivityIndicator size="small" color={color} {...props} />;
 }
 ```
-
-While this works, it forces you component to be reactive to the `<TailwindProvider>` and may cause unnecessary re-renders - along with the overhead of actually calling the `useTailwind()` hook.
 
 A better solution is to either access the color directly from your theme.
 

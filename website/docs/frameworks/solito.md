@@ -5,4 +5,4 @@ Solito apps are typically a monorepo containing both `react-native` (either vani
 We recommend
 
 - Native: follow the [native Babel setup](../native/babel.mdx)
-- Next.js: follow the [Next.js setup](../framewors/nextjs.mdx)
+- Next.js: follow the [Next.js setup](../frameworks/nextjs.md)
