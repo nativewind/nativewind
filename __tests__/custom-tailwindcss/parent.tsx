@@ -9,12 +9,15 @@ tailwindRunner("Custom - Parent", [
     "parent:text-white",
     {
       styles: {
-        "parent:text-white@0": {
+        "parent:text-white.children@0": {
           color: "#fff",
         },
       },
+      childClasses: {
+        "parent:text-white": ["parent:text-white.children"],
+      },
       atRules: {
-        "parent:text-white": [[["selector", "(> *)"]]],
+        "parent:text-white.children": [[["selector", "(> *)"]]],
       },
     },
   ],

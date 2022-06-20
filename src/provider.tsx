@@ -6,26 +6,32 @@ import {
   StoreContext,
   StyleSheetStore,
   ColorSchemeSystem,
+  StyleSheetStoreConstructor,
 } from "./style-sheet-store";
 
-export interface TailwindProviderProps {
-  styles?: typeof globalThis["tailwindcss_react_native_style"];
-  media?: typeof globalThis["tailwindcss_react_native_media"];
+export interface TailwindProviderProps
+  extends Omit<StyleSheetStoreConstructor, "colorScheme" | "preprocessed"> {
   initialColorScheme?: ColorSchemeSystem;
-  platform?: typeof Platform.OS | "native";
+  platform?: typeof Platform.OS;
   webOutput?: "css" | "native";
   nativeOutput?: "css" | "native";
 }
 
 export function TailwindProvider({
-  styles = globalThis.tailwindcss_react_native_style,
-  media = globalThis.tailwindcss_react_native_media ?? {},
   initialColorScheme,
+  children,
+  platform,
+  dimensions,
+  appearance,
+  styles,
+  atRules,
+  topics,
+  masks,
+  childClasses,
   nativeOutput = "native",
   webOutput = typeof StyleSheet.create({ test: {} }).test === "number"
     ? "native"
     : "css",
-  children,
 }: PropsWithChildren<TailwindProviderProps>) {
   const output = Platform.select({
     web: webOutput,
@@ -35,12 +41,27 @@ export function TailwindProvider({
 
   const store = useMemo(() => {
     return new StyleSheetStore({
+      platform,
+      dimensions,
+      appearance,
       styles,
-      atRules: media,
+      atRules,
+      topics,
+      masks,
+      childClasses,
       preprocessed: output === "css",
       colorScheme: initialColorScheme,
     });
-  }, [styles, media]);
+  }, [
+    platform,
+    dimensions,
+    appearance,
+    styles,
+    atRules,
+    topics,
+    masks,
+    childClasses,
+  ]);
 
   return (
     <StoreContext.Provider value={store}>{children}</StoreContext.Provider>

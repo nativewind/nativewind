@@ -19,7 +19,7 @@ export function withStyledChildren({
   parentFocus,
   parentActive,
 }: WithStyledChildrenOptions): ReactNode {
-  if (!stylesArray.childStyles) {
+  if (!stylesArray.childClassNames) {
     return componentChildren;
   }
 

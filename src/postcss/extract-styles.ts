@@ -25,6 +25,7 @@ export function extractStyles<T>(
     topics: {},
     masks: {},
     atRules: {},
+    childClasses: {},
   };
 
   const plugins = [

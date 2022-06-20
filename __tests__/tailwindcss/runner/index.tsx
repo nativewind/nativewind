@@ -28,6 +28,7 @@ export interface TestValues {
   topics?: Record<string, Array<string>>;
   masks?: Record<string, number>;
   atRules?: Record<string, Array<AtRuleTuple[]>>;
+  childClasses?: Record<string, string[]>;
 }
 
 export function assertStyles(
@@ -49,21 +50,32 @@ export function assertStyles(
     ],
     content: [{ raw: "", extension: "html" }],
     safelist: [css],
-    serializer: (styles) => styles,
+    serializer: (output) => {
+      const actualValues: TestValues = {};
+
+      actualValues.styles =
+        Object.keys(output.styles).length > 0 ? output.styles : undefined;
+      actualValues.topics =
+        Object.keys(output.topics).length > 0 ? output.topics : undefined;
+      actualValues.masks =
+        Object.keys(output.masks).length > 0 ? output.masks : undefined;
+      actualValues.atRules =
+        Object.keys(output.atRules).length > 0 ? output.atRules : undefined;
+      actualValues.childClasses =
+        Object.keys(output.childClasses).length > 0
+          ? output.childClasses
+          : undefined;
+
+      return actualValues;
+    },
   });
 
   if (shouldError) {
     expect([...errors, ...outputErrors].length).toBeGreaterThan(0);
-    expect(actualValues.styles).toEqual({});
-    expect(actualValues.masks).toEqual({});
-    expect(actualValues.atRules).toEqual({});
-    expect(actualValues.topics).toEqual({});
+    expect(actualValues).toEqual({});
   } else {
     expect(outputErrors.length).toBe(0);
-    expect(actualValues.styles).toEqual(expectedValues.styles);
-    expect(actualValues.masks).toEqual(expectedValues.masks || {});
-    expect(actualValues.atRules).toEqual(expectedValues.atRules || {});
-    expect(actualValues.topics).toEqual(expectedValues.topics || {});
+    expect(actualValues).toEqual(expectedValues);
   }
 }
 
@@ -71,7 +83,7 @@ export function TestProvider({
   css,
   ...props
 }: PropsWithChildren<TailwindProviderProps & { css: string }>) {
-  const { styles, atRules } = extractStyles({
+  const { styles, atRules, topics, masks, childClasses } = extractStyles({
     theme: {},
     plugins: [cssPlugin, nativePlugin({})],
     content: [{ raw: "", extension: "html" }],
@@ -79,5 +91,14 @@ export function TestProvider({
     serializer: testStyleSerializer,
   });
 
-  return <TailwindProvider styles={styles} media={atRules} {...props} />;
+  return (
+    <TailwindProvider
+      styles={styles}
+      atRules={atRules}
+      topics={topics}
+      masks={masks}
+      childClasses={childClasses}
+      {...props}
+    />
+  );
 }

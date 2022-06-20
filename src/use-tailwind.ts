@@ -45,7 +45,7 @@ export function useTailwind<T>(
       inlineStyles,
     ].filter(Boolean);
 
-    stylesArray.childStyles = styles.childStyles;
+    stylesArray.childClassNames = styles.childClassNames;
 
     return stylesArray;
   }, [styles, inlineStyles, additionalStyles]) as StylesArray<T>;

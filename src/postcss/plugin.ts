@@ -11,10 +11,12 @@ import { StyleRecord, Style, StyleError, AtRuleTuple } from "../types/common";
 import { outputFormatter } from "./output-formatter";
 
 const atRuleSymbol = Symbol("media");
+const isForChildrenSymbol = Symbol("children");
 
 declare module "postcss" {
   abstract class Container {
     [atRuleSymbol]: AtRuleTuple[];
+    [isForChildrenSymbol]: boolean;
   }
 }
 
@@ -22,6 +24,7 @@ export interface ExtractedValues {
   styles: StyleRecord;
   topics: Record<string, Array<string>>;
   masks: Record<string, number>;
+  childClasses: Record<string, string[]>;
   atRules: Record<string, Array<AtRuleTuple[]>>;
 }
 
@@ -42,6 +45,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
 } = {}) => {
   const styles: DoneResult["styles"] = {};
   const topics: Record<string, Set<string>> = {};
+  const childClasses: Record<string, string[]> = {};
   const masks: DoneResult["masks"] = {};
   const atRules: DoneResult["atRules"] = {};
   const errors: DoneResult["errors"] = [];
@@ -54,6 +58,10 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
           node[atRuleSymbol] ??= node?.parent?.[atRuleSymbol]
             ? [...node.parent[atRuleSymbol]]
             : [];
+
+          if (node.name === "selector" && node.params.startsWith("(>")) {
+            node[isForChildrenSymbol] = true;
+          }
 
           node[atRuleSymbol].push([node.name, node.params]);
         } else if (node.type === "rule") {
@@ -76,8 +84,16 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
           for (const s of node.selectors) {
             const mask = getSelectorMask(s, s.includes('[dir="rtl"]'));
             const rules = node.parent?.[atRuleSymbol];
+
             const selectorTopics = getSelectorTopics(s, declarations, rules);
             let selector = normalizeCssSelector(s);
+
+            if (node.parent?.[isForChildrenSymbol]) {
+              const childSelector = `${selector}.children`;
+              childClasses[selector] ??= [];
+              childClasses[selector].push(childSelector);
+              selector = childSelector;
+            }
 
             if (selectorTopics.length > 0) {
               topics[selector] ??= new Set();
@@ -111,13 +127,21 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
         arrayTopics[key] = [...value.values()];
       }
 
-      if (done) done({ styles, masks, atRules, topics: arrayTopics, errors });
+      if (done)
+        done({
+          styles,
+          masks,
+          atRules,
+          childClasses,
+          topics: arrayTopics,
+          errors,
+        });
 
       if (output) {
         writeFileSync(
           output,
           outputFormatter(
-            { styles, masks, atRules, topics: arrayTopics },
+            { styles, masks, atRules, childClasses, topics: arrayTopics },
             platform
           )
         );

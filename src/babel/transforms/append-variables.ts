@@ -8,6 +8,7 @@ import {
   memberExpression,
   Statement,
 } from "@babel/types";
+import { babelStyleSerializer } from "../../utils/serialize-styles";
 
 export function appendVariables(
   body: Statement[],
@@ -16,12 +17,8 @@ export function appendVariables(
     atRules,
     masks,
     topics,
-  }: {
-    styles: Expression;
-    atRules?: Expression;
-    masks?: Expression;
-    topics?: Expression;
-  }
+    childClasses,
+  }: ReturnType<typeof babelStyleSerializer>
 ) {
   body.push(
     assignGlobalThis(
@@ -36,6 +33,8 @@ export function appendVariables(
   if (atRules) body.push(assignGlobalThis("nativewind_at_rules", atRules));
   if (topics) body.push(assignGlobalThis("nativewind_topics", topics));
   if (masks) body.push(assignGlobalThis("nativewind_masks", masks));
+  if (childClasses)
+    body.push(assignGlobalThis("nativewind_child_classes", childClasses));
 }
 
 function assignGlobalThis(

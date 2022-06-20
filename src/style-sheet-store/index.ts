@@ -23,7 +23,7 @@ import {
   getStateBit,
   StateBitOptions,
 } from "../shared/selector";
-import { AtRuleTuple, MediaRecord } from "../types/common";
+import { MediaRecord } from "../types/common";
 import vh from "./units/vh";
 import vw from "./units/vw";
 import { ColorSchemeStore, ColorSchemeSystem } from "./color-scheme";
@@ -43,14 +43,8 @@ export type Snapshot = Record<string, StylesArray>;
 
 const emptyStyles: StylesArray = [];
 
-export interface ChildStyle {
-  className: string;
-  style: Style;
-  atRules: AtRuleTuple[];
-}
-
 export interface StylesArray<T = Style> extends Array<EitherStyle<T>> {
-  childStyles?: ChildStyle[];
+  childClassNames?: string[];
 }
 
 declare global {
@@ -66,10 +60,9 @@ declare global {
   var nativewind_masks: Record<string, number>;
   // eslint-disable-next-line no-var
   var nativewind_topics: Record<string, string[]>;
+  // eslint-disable-next-line no-var
+  var nativewind_child_classes: Record<string, string[]>;
 }
-
-globalThis.tailwindcss_react_native_style ??= {};
-globalThis.tailwindcss_react_native_media ??= {};
 
 const units: Record<
   string,
@@ -79,7 +72,7 @@ const units: Record<
   vh,
 };
 
-interface StyleSheetStoreConstructor {
+export interface StyleSheetStoreConstructor {
   styles?: typeof global.tailwindcss_react_native_style;
   atRules?: typeof global.tailwindcss_react_native_media;
   dimensions?: Dimensions;
@@ -89,6 +82,7 @@ interface StyleSheetStoreConstructor {
   colorScheme?: ColorSchemeSystem;
   topics?: Record<string, Array<string>>;
   masks?: Record<string, number>;
+  childClasses?: Record<string, string[]>;
 }
 
 /**
@@ -124,6 +118,7 @@ export class StyleSheetStore extends ColorSchemeStore {
   styles: Record<string, Style>;
   atRules: MediaRecord;
   topics: Record<string, Array<string>>;
+  childClasses: Record<string, Array<string>>;
   masks: Record<string, number>;
   preprocessed: boolean;
 
@@ -135,6 +130,7 @@ export class StyleSheetStore extends ColorSchemeStore {
     styles = (global.nativewind_styles ||= {}),
     atRules = (global.nativewind_at_rules ||= {}),
     masks = (global.nativewind_masks ||= {}),
+    childClasses = (global.nativewind_child_classes ||= {}),
     topics = (global.nativewind_topics ||= {}),
     dimensions = Dimensions,
     appearance = Appearance,
@@ -148,6 +144,7 @@ export class StyleSheetStore extends ColorSchemeStore {
     this.styles = styles;
     this.atRules = atRules;
     this.masks = masks;
+    this.childClasses = childClasses;
     this.topics = topics;
     this.preprocessed = preprocessed;
     this.window = dimensions.get("window");
@@ -248,7 +245,7 @@ export class StyleSheetStore extends ColorSchemeStore {
       }
     }
 
-    const childStyles: ChildStyle[] = [];
+    const childStyles: string[] = [];
 
     const reEvaluate = () => {
       const styleArray: StylesArray = [];
@@ -267,15 +264,15 @@ export class StyleSheetStore extends ColorSchemeStore {
         if (matchesMask(stateBit, mask)) {
           const classNameStyles = this.upsertAtomicStyle(className);
           styleArray.push(...classNameStyles);
-          if (classNameStyles.childStyles) {
-            childStyles.push(...classNameStyles.childStyles);
+          if (classNameStyles.childClassNames) {
+            childStyles.push(...classNameStyles.childClassNames);
           }
         }
       }
 
       if (styleArray.length > 0 || childStyles.length > 0) {
         if (childStyles.length > 0) {
-          styleArray.childStyles = childStyles;
+          styleArray.childClassNames = childStyles;
         }
 
         this.snapshot = {
@@ -344,6 +341,10 @@ export class StyleSheetStore extends ColorSchemeStore {
       ? [this.styles[className]]
       : [];
 
+    if (this.childClasses[className]) {
+      styleArray.childClassNames = this.childClasses[className];
+    }
+
     const atRulesTuple = this.atRules[className];
 
     // If there are no atRules, this style is static.
@@ -358,28 +359,16 @@ export class StyleSheetStore extends ColorSchemeStore {
 
     // When a topic has new information, this function will be called.
     const reEvaluate = () => {
-      const childStyles: ChildStyle[] = [];
-
       const newStyles: StylesArray = [...styleArray];
 
       for (const [index, atRules] of atRulesTuple.entries()) {
-        let isForChildren = false;
         let unitKey: string | undefined;
 
-        const childAtRules: AtRuleTuple[] = [];
-
         const atRulesResult = atRules.every(([rule, params]) => {
-          /**
-           * This is a magic string, but it makes sense
-           * Child selectors look like this and will always start with (>
-           *
-           * @selector (> *:not(:first-child))
-           * @selector (> *)
-           */
-          if (rule === "selector" && params && params.startsWith("(>")) {
-            isForChildren = true;
-            childAtRules.push([rule, params]);
-            return true;
+          if (rule === "selector") {
+            // These atRules shouldn't be on the atomic styles, they only
+            // apply to childStyles
+            return false;
           }
 
           if (rule === "dynamic-style") {
@@ -416,23 +405,11 @@ export class StyleSheetStore extends ColorSchemeStore {
           }
         }
 
-        if (isForChildren) {
-          childStyles.push({
-            className: className,
-            style,
-            atRules: childAtRules,
-          });
-        } else {
-          newStyles.push(style);
-        }
-      }
-
-      if (childStyles.length > 0) {
-        newStyles.childStyles = childStyles;
+        newStyles.push(style);
       }
 
       this.snapshot =
-        newStyles.length > 0 || newStyles?.childStyles?.length
+        newStyles.length > 0 || newStyles?.childClassNames?.length
           ? { ...this.snapshot, [className]: newStyles }
           : { ...this.snapshot, [className]: emptyStyles };
 
@@ -452,19 +429,25 @@ export class StyleSheetStore extends ColorSchemeStore {
   }
 
   getChildStyles<T>(parent: StylesArray<T>, options: MatchChildAtRuleOptions) {
-    if (!parent.childStyles) return;
+    if (!parent.childClassNames) return;
 
     const styles: Style[] = [];
     const classNames = new Set();
 
-    for (const { className, style, atRules } of parent.childStyles) {
-      const match = atRules.every(([rule, params]) => {
-        return matchChildAtRule(rule, params, options);
-      });
+    for (const className of parent.childClassNames) {
+      for (const [index, atRules] of this.atRules[className].entries()) {
+        const match = atRules.every(([rule, params]) => {
+          return matchChildAtRule(rule, params, options);
+        });
 
-      if (match) {
-        classNames.add(className);
-        styles.push(style);
+        const stylesKey = createAtRuleSelector(className, index);
+        const style = this.styles[stylesKey];
+
+        if (match && style) {
+          classNames.add(className);
+
+          styles.push(style);
+        }
       }
     }
 
