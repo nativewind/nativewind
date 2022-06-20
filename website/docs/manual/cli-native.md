@@ -43,7 +43,7 @@ module.exports = {
 
 ### 3. Run Tailwind CLI
 
-Running the Tailwind CLI will generate `nativewind-output.js`. This can be configured via the [PostCSS options](../configuration/postcss)
+Running the Tailwind CLI will generate `nativewind-output.js`.
 
 ```bash
 npx tailwindcss -i input.css --postcss postcss.config.js
