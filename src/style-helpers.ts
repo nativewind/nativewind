@@ -12,7 +12,7 @@ export function NWRuntimeParser(value: string) {
   } else if (value.startsWith("roundToNearestFontScale(")) {
     return parseFloat(value, roundToNearestFontScale);
   } else if (value.startsWith("platformColor(")) {
-    return parseString(value, PlatformColor);
+    return parseString(value, platformColor);
   } else if (value.startsWith("platform(")) {
     return parseString(value, platform);
   }
@@ -44,6 +44,12 @@ export function getFontSizeForLayoutSize(layoutSize: number) {
 export function roundToNearestFontScale(layoutSize: number) {
   const ratio = PixelRatio.getFontScale();
   return Math.round(layoutSize * ratio) / ratio;
+}
+
+function platformColor(color: string) {
+  // RWN does not implement PlatformColor
+  // https://github.com/necolas/react-native-web/issues/2128
+  return PlatformColor ? PlatformColor(color) : color;
 }
 
 function platform(platformValues: string) {
