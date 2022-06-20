@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { PropsWithChildren } from "react";
-import { Platform } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 import {
   StoreContext,
@@ -21,8 +21,10 @@ export function TailwindProvider({
   styles = globalThis.tailwindcss_react_native_style,
   media = globalThis.tailwindcss_react_native_media ?? {},
   initialColorScheme,
-  webOutput,
   nativeOutput = "native",
+  webOutput = typeof StyleSheet.create({ test: {} }).test === "number"
+    ? "native"
+    : "css",
   children,
 }: PropsWithChildren<TailwindProviderProps>) {
   const output = Platform.select({
