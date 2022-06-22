@@ -1,6 +1,7 @@
 import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
 
-export function NWRuntimeParser(value: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function NWRuntimeParser(value: string): any {
   if (value === "styleSheet(hairlineWidth)") {
     return StyleSheet.hairlineWidth;
   } else if (value.startsWith("roundToNearestPixel(")) {
@@ -12,29 +13,33 @@ export function NWRuntimeParser(value: string) {
   } else if (value.startsWith("roundToNearestFontScale(")) {
     return parseFloat(value, roundToNearestFontScale);
   } else if (value.startsWith("platformColor(")) {
-    return parseString(value, platformColor);
+    return parse(value, platformColor);
   } else if (value.startsWith("platform(")) {
-    return parseString(value, platform);
+    return parse(value, platform);
   }
 
   return value;
 }
 
-function parseString(input: string, callback: (value: string) => unknown) {
+function parse<T extends (value: string) => S, S>(input: string, callback: T) {
   const result = input.match(/.+?\((.+)\)/);
   if (!result) return;
-  return callback(result[1]);
+  const recursiveValue = NWRuntimeParser(result[1]);
+  if (recursiveValue === undefined) return;
+  return callback(recursiveValue);
 }
 
-function parseFloat(input: string, callback: (value: number) => unknown) {
-  const result = input.match(/.+?\((.+)\)/);
+function parseFloat<T extends (value: number) => S, S>(
+  input: string,
+  callback: T
+) {
+  const result = parse(input, (v) => v);
   if (!result) return;
-
-  const value = Number.parseFloat(result[1]);
+  const value = typeof result === "string" ? Number.parseFloat(result) : result;
 
   if (Number.isNaN(value)) return;
 
-  return callback(value);
+  return callback(value as number);
 }
 
 export function getFontSizeForLayoutSize(layoutSize: number) {
