@@ -38,9 +38,9 @@ export function MyFancyButton(props) {
 
 🔥 **Lots of features** dark mode / arbitrary classes / media queries / themes / custom values / plugins
 
-✨ **Pseudo classes** hover / focus / active on compatible components [(docs)](https://tailwindcss-react-native.vercel.app/tailwind/core-concepts/pseudo-classes)
+✨ **Pseudo classes** hover / focus / active on compatible components [(docs)](https://nativewind.vercel.app/tailwind/core-concepts/pseudo-classes)
 
-👪 **Parent state styles** automatically style children based upon parent pseudo classes [(docs)](https://tailwindcss-react-native.vercel.app/tailwind/core-concepts/component)
+👪 **Parent state styles** automatically style children based upon parent pseudo classes [(docs)](https://nativewind.vercel.app/tailwind/core-concepts/component)
 
 ## What is a universal style system?
 
@@ -83,7 +83,7 @@ Usage of Babel is optional! You can use the Component API to be more explicit ab
 
 ```tsx
 import { Text } from "react-native";
-import { styled } from "tailwindcss-react-native";
+import { styled } from "nativewind";
 
 const StyledText = styled(Text);
 
@@ -112,7 +112,7 @@ Additional options can improve compatibilty with existing RN libraries
 
 ```tsx
 import { Text } from "react-native";
-import { styled } from "tailwindcss-react-native";
+import { styled } from "nativewind";
 import { Svg, Circle, Rect } from "react-native-svg";
 
 /**
@@ -144,7 +144,3 @@ export function BoldText(props) {
   );
 }
 ```
-
-## See the code on Github
-
-[![marklawlor/tailwindcss-react-native - GitHub](https://github-link-card.s3.ap-northeast-1.amazonaws.com/marklawlor/tailwindcss-react-native.png)](https://github.com/marklawlor/tailwindcss-react-native)
