@@ -8,7 +8,7 @@ const cases: Array<ViewStyle["borderWidth"][]> = [[0], [2], [4], [8]];
 describe("Border - Divide Width", () => {
   test("divide-x", () => {
     const tree = render(
-      <TestProvider css={`divide-x`}>
+      <TestProvider>
         <StyledComponent component={View} className="divide-x">
           <Text>A</Text>
           <Text>B</Text>
@@ -21,7 +21,7 @@ describe("Border - Divide Width", () => {
 
   test("divide-y", () => {
     const tree = render(
-      <TestProvider css={`divide-y`}>
+      <TestProvider>
         <StyledComponent component={View} className="divide-y">
           <Text>A</Text>
           <Text>B</Text>
@@ -34,7 +34,7 @@ describe("Border - Divide Width", () => {
 
   test.each(cases)("divide-x-%s", (unit) => {
     const tree = render(
-      <TestProvider css={`divide-x-${unit}`}>
+      <TestProvider>
         <StyledComponent component={View} className={`divide-x-${unit}`}>
           <Text>A</Text>
           <Text>B</Text>
@@ -47,7 +47,7 @@ describe("Border - Divide Width", () => {
 
   test.each(cases)("divide-y-%s", (unit) => {
     const tree = render(
-      <TestProvider css={`divide-y-${unit}`}>
+      <TestProvider>
         <StyledComponent component={View} className={`divide-y-${unit}`}>
           <Text>A</Text>
           <Text>B</Text>

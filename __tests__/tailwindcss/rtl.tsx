@@ -6,7 +6,7 @@ import { StyledComponent } from "../../src";
 describe("RTL", () => {
   test("left", () => {
     const tree = render(
-      <TestProvider css="ltr:p-4 rtl:p-4">
+      <TestProvider>
         <StyledComponent component={View} className="ltr:p-4" />
         <StyledComponent component={View} className="rtl:p-4" />
       </TestProvider>
@@ -17,7 +17,7 @@ describe("RTL", () => {
 
   test.only("right", () => {
     const tree = render(
-      <TestProvider css="ltr:p-4 rtl:p-4">
+      <TestProvider>
         <StyledComponent component={View} className="ltr:p-4" />
         <StyledComponent component={View} className="rtl:p-4" />
       </TestProvider>

@@ -9,7 +9,7 @@ import { StyledComponent } from "../../src";
 describe("Flexbox & Grid - Gap", () => {
   test.each([["0"]])("gap-%s", (unit) => {
     const tree = render(
-      <TestProvider css={`gap-${unit}`}>
+      <TestProvider>
         <StyledComponent component={View} className={`gap-${unit}`}>
           <Text>A</Text>
           <Text>B</Text>

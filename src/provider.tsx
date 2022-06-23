@@ -32,6 +32,7 @@ export function TailwindProvider({
   webOutput = typeof StyleSheet.create({ test: {} }).test === "number"
     ? "native"
     : "css",
+  dangerouslyCompileStyles,
 }: PropsWithChildren<TailwindProviderProps>) {
   const output = Platform.select({
     web: webOutput,
@@ -51,6 +52,7 @@ export function TailwindProvider({
       childClasses,
       preprocessed: output === "css",
       colorScheme: initialColorScheme,
+      dangerouslyCompileStyles,
     });
   }, [
     platform,

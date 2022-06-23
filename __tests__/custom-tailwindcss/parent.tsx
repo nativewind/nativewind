@@ -42,7 +42,7 @@ tailwindRunner("Custom - Parent State Variants", [
 describe("Custom - Parent Variant Snapshots", () => {
   test("parent:text-white", () => {
     const tree = render(
-      <TestProvider css="parent:text-white">
+      <TestProvider>
         <StyledComponent component={View} className="parent:text-white">
           <Text>A</Text>
           <Text>B</Text>

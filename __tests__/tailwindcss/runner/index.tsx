@@ -11,6 +11,7 @@ import cssPlugin from "../../../src/tailwind/css";
 import { nativePlugin } from "../../../src/tailwind/native";
 import { TailwindProvider, TailwindProviderProps } from "../../../src";
 import { PropsWithChildren } from "react";
+import { StyleSheetStore } from "../../../src/style-sheet-store";
 
 export type Test = [string, TestValues] | [string, StyleRecord, true];
 
@@ -79,10 +80,7 @@ export function assertStyles(
   }
 }
 
-export function TestProvider({
-  css,
-  ...props
-}: PropsWithChildren<TailwindProviderProps & { css: string }>) {
+function dangerouslyCompileStyles(css: string, store: StyleSheetStore) {
   const { styles, atRules, topics, masks, childClasses } = extractStyles({
     theme: {},
     plugins: [cssPlugin, nativePlugin({})],
@@ -91,14 +89,18 @@ export function TestProvider({
     serializer: testStyleSerializer,
   });
 
+  Object.assign(store.styles, styles);
+  Object.assign(store.atRules, atRules);
+  Object.assign(store.topics, topics);
+  Object.assign(store.masks, masks);
+  Object.assign(store.childClasses, childClasses);
+}
+
+export function TestProvider(props: PropsWithChildren<TailwindProviderProps>) {
   return (
     <TailwindProvider
-      styles={styles}
-      atRules={atRules}
-      topics={topics}
-      masks={masks}
-      childClasses={childClasses}
       {...props}
+      dangerouslyCompileStyles={dangerouslyCompileStyles}
     />
   );
 }

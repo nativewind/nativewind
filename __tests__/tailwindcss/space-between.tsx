@@ -12,7 +12,7 @@ tailwindRunner(
 describe("Border - Divide Width", () => {
   test.each(spacingCases)("space-x-%s", (unit) => {
     const tree = render(
-      <TestProvider css={`space-x-${unit}`}>
+      <TestProvider>
         <StyledComponent component={View} className={`space-x-${unit}`}>
           <Text>A</Text>
           <Text>B</Text>
@@ -25,7 +25,7 @@ describe("Border - Divide Width", () => {
 
   test.each(spacingCases)("space-y-%s", (unit) => {
     const tree = render(
-      <TestProvider css={`space-y-${unit}`}>
+      <TestProvider>
         <StyledComponent component={View} className={`space-y-${unit}`}>
           <Text>A</Text>
           <Text>B</Text>

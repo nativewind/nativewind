@@ -36,7 +36,7 @@ const StyledCircle = styled(Circle, { classProps: ["fill", "stroke"] });
 describe("Svg - Fill", () => {
   test.each(cases)("fill-%s", (unit) => {
     const tree = render(
-      <TestProvider css={`fill-${unit}`}>
+      <TestProvider>
         <Svg>
           <StyledCircle fill={`fill-${unit}`} />
         </Svg>

@@ -34,7 +34,7 @@ const cases: Array<[string, ViewStyle["borderColor"]]> = [
 describe("Border - Divide Color", () => {
   test.each(cases)("divide-%s", (unit) => {
     const tree = render(
-      <TestProvider css={`divide-${unit}`}>
+      <TestProvider>
         <StyledComponent component={View} className={`divide-${unit}`}>
           <Text>A</Text>
           <Text>B</Text>

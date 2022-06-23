@@ -14,7 +14,7 @@ const StyledCircle = styled(Circle, { classProps: ["fill", "stroke"] });
 describe("Svg - Stroke Width", () => {
   test.each(cases)("stroke-%s", (unit) => {
     const tree = render(
-      <TestProvider css={`stroke-${unit}`}>
+      <TestProvider>
         <Svg>
           <StyledCircle stroke={`stroke-${unit}`} />
         </Svg>

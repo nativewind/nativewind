@@ -83,6 +83,12 @@ export interface StyleSheetStoreConstructor {
   topics?: Record<string, Array<string>>;
   masks?: Record<string, number>;
   childClasses?: Record<string, string[]>;
+
+  // This is used for tests & snack demos
+  dangerouslyCompileStyles?: (
+    className: string,
+    store: StyleSheetStore
+  ) => void;
 }
 
 /**
@@ -114,6 +120,7 @@ export class StyleSheetStore extends ColorSchemeStore {
 
   dimensionListener: EmitterSubscription;
   appearanceListener: NativeEventSubscription;
+  dangerouslyCompileStyles: StyleSheetStoreConstructor["dangerouslyCompileStyles"];
 
   styles: Record<string, Style>;
   atRules: MediaRecord;
@@ -137,6 +144,7 @@ export class StyleSheetStore extends ColorSchemeStore {
     platform = Platform.OS,
     preprocessed = false,
     colorScheme,
+    dangerouslyCompileStyles,
   }: StyleSheetStoreConstructor = {}) {
     super(colorScheme);
 
@@ -148,6 +156,7 @@ export class StyleSheetStore extends ColorSchemeStore {
     this.topics = topics;
     this.preprocessed = preprocessed;
     this.window = dimensions.get("window");
+    this.dangerouslyCompileStyles = dangerouslyCompileStyles;
 
     const screen = dimensions.get("screen");
     this.orientation = screen.height >= screen.width ? "portrait" : "landscape";
@@ -233,6 +242,8 @@ export class StyleSheetStore extends ColorSchemeStore {
 
     const snapshotKey = `(${composedClassName}).${stateBit}`;
     if (this.snapshot[snapshotKey]) return snapshotKey;
+
+    this.dangerouslyCompileStyles?.(composedClassName, this);
 
     const classNames = composedClassName.split(/\s+/);
     const topics = new Set<string>();

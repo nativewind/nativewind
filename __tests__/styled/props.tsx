@@ -34,7 +34,7 @@ const TestClassPropsComponent = styled(
 describe("Styled", () => {
   test("can render components", () => {
     const tree = render(
-      <TestProvider css="m-1 p-2">
+      <TestProvider>
         <StyledView className="m-1" />
         <StyledView className="p-2" />
       </TestProvider>
@@ -45,7 +45,7 @@ describe("Styled", () => {
 
   test("can style custom props", () => {
     const tree = render(
-      <TestProvider css="m-1 p-2">
+      <TestProvider>
         <TestPropsComponent className="m-1" style2="p-2" />
       </TestProvider>
     ).toJSON();
@@ -55,7 +55,7 @@ describe("Styled", () => {
 
   test("can set base classNames", () => {
     const tree = render(
-      <TestProvider css="flex-row">
+      <TestProvider>
         <Row />
       </TestProvider>
     ).toJSON();
@@ -65,7 +65,7 @@ describe("Styled", () => {
 
   test("can add new classNames", () => {
     const tree = render(
-      <TestProvider css="flex-row p-4">
+      <TestProvider>
         <Row className="p-4" />
       </TestProvider>
     ).toJSON();
@@ -75,7 +75,7 @@ describe("Styled", () => {
 
   test("can render with default props", () => {
     const tree = render(
-      <TestProvider css="p-4">
+      <TestProvider>
         <StyledText className="p-4" />
       </TestProvider>
     ).toJSON();
@@ -85,7 +85,7 @@ describe("Styled", () => {
 
   test("classProps on native", () => {
     const tree = render(
-      <TestProvider css="m-1 p-4">
+      <TestProvider>
         <TestClassPropsComponent className="p-4" style2="m-1" />
       </TestProvider>
     ).toJSON();
@@ -95,7 +95,7 @@ describe("Styled", () => {
 
   test("classProps on css", () => {
     const tree = render(
-      <TestProvider nativeOutput="css" css="m-1 p-4">
+      <TestProvider nativeOutput="css">
         <TestClassPropsComponent className="p-4" style2="m-1" />
       </TestProvider>
     ).toJSON();
