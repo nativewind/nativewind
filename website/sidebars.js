@@ -14,58 +14,58 @@
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   docs: [
-    "introduction",
+    "overview",
+    {
+      type: "html",
+      value: "<br />",
+    },
     {
       type: "category",
-      label: "Getting Started",
+      label: "Quick Starts",
       collapsed: false,
       items: [
-        "quick-start",
-        {
-          type: "category",
-          label: "Native",
-          collapsed: true,
-          items: ["native/babel", "native/babel-compile-only"],
-        },
-        {
-          type: "category",
-          label: "Web",
-          collapsed: true,
-          items: [
-            "web/babel",
-            "web/babel-transform-only",
-            "web/babel-compile-only",
-            "web/postcss",
-          ],
-        },
-        {
-          type: "category",
-          label: "Frameworks",
-          collapsed: true,
-          items: ["frameworks/expo", "frameworks/nextjs", "frameworks/solito"],
-        },
-        {
-          type: "category",
-          label: "Advanced",
-          collapsed: true,
-          items: ["manual/cli-native", "manual/postcss-native"],
-        },
+        "quick-starts/expo",
+        "quick-starts/react-native-cli",
+        "quick-starts/create-react-native-app",
       ],
+    },
+    {
+      type: "html",
+      value: "<br />",
     },
     {
       type: "category",
       label: "Guides",
-      collapsed: true,
+      collapsed: false,
       items: [
+        "getting-started/editor",
+        "getting-started/typescript",
+        {
+          type: "category",
+          label: "Detailed installation",
+          collapsed: true,
+          items: [
+            "guides/babel",
+            "guides/babel-compile-only",
+            "guides/babel-transform-only",
+            "guides/postcss",
+            "guides/cli-native",
+            "guides/postcss-native",
+          ],
+        },
         "guides/goals",
         "guides/theme-values",
         "guides/tailwindcss-react-native",
       ],
     },
     {
+      type: "html",
+      value: "<br />",
+    },
+    {
       type: "category",
       label: "API",
-      collapsed: true,
+      collapsed: false,
       items: [
         "api/styled",
         "api/StyledComponent",
@@ -75,60 +75,45 @@ const sidebars = {
       ],
     },
     {
-      type: "category",
-      label: "Configuration",
-      collapsed: true,
-      items: ["configuration/babel"],
-    },
-    {
       type: "html",
-      value: "<hr />",
-    },
-    {
-      type: "html",
-      value: `<details style="padding-bottom:10px;"><summary>Legend</summary>
-
-<p style="margin-top: 5px">Tailwind CSS classes not present are not supported.</p>
-
-  <table style="width:100%;display: table;">
-    <tbody>
-      <tr>
-        <th style="padding: 5px 12px; font-size: 0.8em;">Icon</th>
-        <th></th>
-      </tr>
-      <tr>
-        <td><svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_node_modules-@docusaurus-theme-classic-lib-next-theme-IconExternalLink-styles-module"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></td>
-        <td style="padding: 0px 12px; font-size: 0.8em;">Full support <br/> Links to tailwindcss.com</td>
-      </tr>
-      <tr>
-        <td>🆕</td>
-        <td style="padding: 0px 12px; font-size: 0.8em;">New feature</td>
-      </tr>
-      <tr>
-        <td>⭐</td>
-        <td style="padding: 0px 12px; font-size: 0.8em;">New concepts / Featured</td>
-      </tr>
-      <tr>
-        <td>⚠️ </td>
-        <td style="padding: 0px 12px; font-size: 0.8em;">Different functionality</td>
-      </tr>
-    </tbody>
-  </table>
-</details>`,
+      value: "<br />",
     },
     {
       type: "category",
       label: "Core concepts",
-      collapsible: false,
+      collapsed: false,
       items: [
-        "tailwind/core-concepts/pseudo-classes",
-        "tailwind/core-concepts/component",
+        "core-concepts/tailwindcss",
+        "core-concepts/quirks",
+        "core-concepts/states",
+        "core-concepts/responsive-design",
+        "core-concepts/dark-mode",
       ],
+    },
+    {
+      type: "html",
+      value: "<br />",
+    },
+    {
+      type: "category",
+      label: "Customization",
+      collapsed: false,
+      items: [
+        "customization/configuration",
+        "customization/content",
+        "customization/theme",
+        "customization/colors",
+        "customization/babel",
+      ],
+    },
+    {
+      type: "html",
+      value: "<br />",
     },
     {
       type: "category",
       label: "Layout",
-      collapsible: false,
+      collapsed: false,
       items: [
         {
           type: "link",
@@ -152,9 +137,13 @@ const sidebars = {
       ],
     },
     {
+      type: "html",
+      value: "<br />",
+    },
+    {
       type: "category",
       label: "Flexbox",
-      collapsible: false,
+      collapsed: false,
       items: [
         "tailwind/flexbox/flex-basis",
         {
@@ -201,9 +190,13 @@ const sidebars = {
       ],
     },
     {
+      type: "html",
+      value: "<br />",
+    },
+    {
       type: "category",
       label: "Spacing",
-      collapsible: false,
+      collapsed: false,
       items: [
         {
           type: "link",
@@ -219,9 +212,13 @@ const sidebars = {
       ],
     },
     {
+      type: "html",
+      value: "<br />",
+    },
+    {
       type: "category",
       label: "Sizing",
-      collapsible: false,
+      collapsed: false,
       items: [
         {
           type: "link",
@@ -256,9 +253,13 @@ const sidebars = {
       ],
     },
     {
+      type: "html",
+      value: "<br />",
+    },
+    {
       type: "category",
       label: "Typography",
-      collapsible: false,
+      collapsed: false,
       items: [
         {
           type: "link",
@@ -303,15 +304,23 @@ const sidebars = {
       ],
     },
     {
+      type: "html",
+      value: "<br />",
+    },
+    {
       type: "category",
       label: "Background",
-      collapsible: false,
+      collapsed: false,
       items: ["tailwind/backgrounds/background-color"],
+    },
+    {
+      type: "html",
+      value: "<br />",
     },
     {
       type: "category",
       label: "Borders",
-      collapsible: false,
+      collapsed: false,
       items: [
         {
           type: "link",
@@ -331,9 +340,13 @@ const sidebars = {
       ],
     },
     {
+      type: "html",
+      value: "<br />",
+    },
+    {
       type: "category",
       label: "Effects",
-      collapsible: false,
+      collapsed: false,
       items: [
         {
           type: "link",
@@ -348,9 +361,13 @@ const sidebars = {
       ],
     },
     {
+      type: "html",
+      value: "<br />",
+    },
+    {
       type: "category",
       label: "Transforms",
-      collapsible: false,
+      collapsed: false,
       items: [
         {
           type: "link",
@@ -373,6 +390,10 @@ const sidebars = {
           href: "https://tailwindcss.com/docs/skew",
         },
       ],
+    },
+    {
+      type: "html",
+      value: "<br />",
     },
     {
       type: "category",

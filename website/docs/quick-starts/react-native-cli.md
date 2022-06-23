@@ -1,20 +1,13 @@
-import StartCoding from "./\_start-coding.md"
+import StartCoding from "../\_start-coding.md"
 
-# Quick Start
+# React Native CLI
 
-## 1. Create a new React Native application
+## 1. Create the project
 
 ```
-npx create-react-native-app my-nativewind-app
+react-native init AwesomeProject
+cd AwesomeProject
 ```
-
-Choose "Default new app" and then move into the project's directory.
-
-```bash
-cd my-nativewind-app
-```
-
-## 2. Install the dependencies
 
 You will need to install `nativewind` and it's peer dependency `tailwindcss`.
 
@@ -23,7 +16,7 @@ yarn add nativewind
 yarn add --dev tailwindcss
 ```
 
-## 3. Setup Tailwind CSS
+## 2. Setup Tailwind CSS
 
 Run `npx tailwindcss init` to create a `tailwind.config.ts` file
 
@@ -34,7 +27,7 @@ Add the paths to all of your component files in your tailwind.config.js file.
 
 module.exports = {
 - content: [],
-+ content: ["./App.{js,jsx,ts,tsx}", "./src/**/*.{js,jsx,ts,tsx}"],
++ content: ["./App.{js,jsx,ts,tsx}", "./screens/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {},
   },
@@ -42,7 +35,7 @@ module.exports = {
 }
 ```
 
-## 4. Add the Babel plugin
+## 3. Add the Babel plugin
 
 Modify your `babel.config.js`
 

@@ -2,7 +2,7 @@ import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function NWRuntimeParser(value: string): any {
-  if (value === "styleSheet(hairlineWidth)") {
+  if (value === "hairlineWidth()") {
     return StyleSheet.hairlineWidth;
   } else if (value.startsWith("roundToNearestPixel(")) {
     return parseFloat(value, PixelRatio.roundToNearestPixel);

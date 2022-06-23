@@ -1,0 +1,37 @@
+# Dark Mode
+
+NativeWind includes a `dark` variant that lets you style your site differently when dark mode is enabled
+
+By default this uses `Appearance.getColorScheme()` on native and `prefers-color-scheme` on web.
+
+## Toggling dark mode manually
+
+The `dark:` variant is controlled by the [`useColorScheme()`](../../api/use-color-scheme) hook.
+
+```tsx
+import { useColorScheme } from "nativewind";
+
+function MyComponent() {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
+
+  return (
+    <Text
+      onPress={toggleColorScheme}
+      style={{ color: colorScheme === "dark" ? "#FFF" : "#000" }}
+    />
+  );
+}
+```
+
+### CSS
+
+To manualy toggle dark mode on web, you will need to enable the [`class` strategy](https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually). This is all you need to do, we implement the logic to support both system preference and manual selection
+
+```
+// tailwind.config.js
+
+module.exports = {
+  darkMode: 'class',
+  // ...
+}
+```
