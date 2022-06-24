@@ -14,13 +14,14 @@ NativeWind processes your styles during your application's build and uses a mini
 import { Text, View } from 'react-native';
 import { styled } from 'nativewind';
 
+const StyledView = styled(View)
 const StyledText = styled(Text)
 
 const App = () => {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <StyledText className="text-red-500">Try editing me! 🎉</StyledText>
-    </View>
+    <StyledView className="flex-1 items-center justify-center">
+      <StyledText className="text-slate-500">Try editing me! 🎉</StyledText>
+    </StyledView>
   );
 }
 ```
