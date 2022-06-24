@@ -6,3 +6,4 @@ export type { StyledProps } from "./utils/styled";
 export { useColorScheme } from "./use-color-scheme";
 export { withPlatformTheme } from "./utils/with-platform-theme";
 export { NWRuntimeParser } from "./style-helpers";
+export { withExpoSnack } from "./expo-snack";

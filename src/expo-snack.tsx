@@ -50,6 +50,6 @@ function HOC({ component: Component }: { component: ComponentType }) {
   );
 }
 
-export default function withExpoSnack(component: ComponentType) {
+export function withExpoSnack(component: ComponentType) {
   return () => <HOC component={component} />;
 }
