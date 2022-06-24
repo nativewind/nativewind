@@ -16,11 +16,13 @@ const config = {
   organizationName: "marklawlor", // Usually your GitHub org/user name.
   projectName: "NativeWind", // Usually your repo name.
 
+  clientModules: [
+    require.resolve("./src/remark-snackplayer/snack-initializer.js"),
+  ],
+
   scripts: [
-    {
-      src: "https://cdn.splitbee.io/sb.js",
-      async: true,
-    },
+    { src: "https://cdn.splitbee.io/sb.js", defer: true },
+    { src: "https://snack.expo.dev/embed.js", defer: true },
   ],
 
   presets: [
@@ -31,6 +33,7 @@ const config = {
         docs: {
           routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),
+          remarkPlugins: [require("./src/remark-snackplayer")],
           editUrl: `https://github.com/marklawlor/tailwindcss-react-native/edit/main/website/`,
         },
         blog: false,

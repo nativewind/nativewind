@@ -51,6 +51,9 @@ export interface StateBitOptions {
   parentActive?: boolean;
   platform?: typeof Platform.OS;
   rtl?: boolean;
+
+  // Used By expo-snack
+  forceBit?: number;
 }
 
 export function getStateBit({
@@ -69,7 +72,10 @@ export function getStateBit({
   parentActive = false,
   rtl = false,
   platform,
+  forceBit,
 }: StateBitOptions = {}) {
+  if (forceBit !== undefined) return forceBit;
+
   let finalBit = 0;
 
   let bitLevel = 1;

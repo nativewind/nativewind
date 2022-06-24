@@ -25,5 +25,5 @@ function MyAppsProviders({ children }) {
 | Prop     | Values                   | Default     | Description                                                 |
 | -------- | ------------------------ | ----------- | ----------------------------------------------------------- |
 | platform | Override the Platform.OS | Platform.OS | Used to match platform media queries                        |
-| style    | Compiled style object    | `undefined` | For manual injection via the [CLI](../manual/cli-native.md) |
-| media    | Compiled media object    | `undefined` | For manual injection via the [CLI](../manual/cli-native.md) |
+| style    | Compiled style object    | `undefined` | For manual injection via the [CLI](../guides/cli-native.md) |
+| media    | Compiled media object    | `undefined` | For manual injection via the [CLI](../guides/cli-native.md) |

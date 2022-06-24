@@ -6,3 +6,4 @@ solito
 atrule
 nextjs
 nativewind
+snackplayer

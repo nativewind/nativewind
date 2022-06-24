@@ -77,3 +77,18 @@ blockquote.twitter-tweet a:focus {
 /**
  * END: Twitter Tweets
  */
+
+/**
+ * START: Expo Snack
+ */
+.snack-player {
+  /* border: 1px solid var(--ifm-table-border-color); */
+  /* border-radius: var(--ifm-global-radius); */
+  height: 544px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  width: 100%;
+}
+/**
+ * END: Expo Snack
+ */
