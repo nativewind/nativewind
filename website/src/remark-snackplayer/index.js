@@ -51,7 +51,6 @@ export default withExpoSnack(App);
 
       // Generate Node for SnackPlayer
       // See https://github.com/expo/snack/blob/main/docs/embedding-snacks.md
-      // data-snack-code="${encodedSampleCode}"
       const snackPlayerDiv = u("html", {
         value: dedent`
           <div
