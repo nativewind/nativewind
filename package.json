@@ -69,7 +69,7 @@
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "10.0.1",
     "@testing-library/react-hooks": "8.0.1",
-    "@testing-library/react-native": "^9.1.0",
+    "@testing-library/react-native": "10.1.1",
     "@types/css": "0.0.33",
     "@types/css-mediaquery": "0.1.1",
     "@types/css-to-react-native": "3.0.0",
