@@ -44,6 +44,7 @@
     "postcss.js",
     "babel.js",
     "plugin.js",
+    "expo-snack.js",
     "types.d.ts"
   ],
   "dependencies": {
