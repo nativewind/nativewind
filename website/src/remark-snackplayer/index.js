@@ -31,7 +31,7 @@ const processNode = (node, parent) => {
         : "Example usage";
       const sampleCode = node.value;
       const code = `import React from 'react';
-import withExpoSnack from 'nativewind/expo-snack';
+import { withExpoSnack } from 'nativewind';
 
 ${sampleCode}
 

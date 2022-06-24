@@ -20,7 +20,7 @@ const StyledText = styled(Text)
 const App = () => {
   return (
     <StyledView className="flex-1 items-center justify-center">
-      <StyledText className="text-slate-500">Try editing me! 🎉</StyledText>
+      <StyledText className="text-slate-800">Try editing me! 🎉</StyledText>
     </StyledView>
   );
 }
