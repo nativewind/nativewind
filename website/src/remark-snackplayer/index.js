@@ -49,18 +49,6 @@ export default withExpoSnack(App);
       const dependencies =
         params.dependencies || "react,react-native,nativewind@latest";
 
-      const files = {
-        "App.tsx": {
-          type: "CODE",
-          contents: code,
-        },
-        "demo-use-only.tsx": {
-          type: "CODE",
-          contents: `
-`,
-        },
-      };
-
       // Generate Node for SnackPlayer
       // See https://github.com/expo/snack/blob/main/docs/embedding-snacks.md
       // data-snack-code="${encodedSampleCode}"
@@ -76,7 +64,7 @@ export default withExpoSnack(App);
             data-snack-theme="${theme}"
             data-snack-preview="${preview}"
             data-snack-loading="${loading}"
-            data-snack-files="${encodeURIComponent(JSON.stringify(files))}"
+            data-snack-code="${encodeURIComponent(code)}"
           ></div>
           `,
       });
