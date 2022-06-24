@@ -8,17 +8,26 @@ By default this uses `Appearance.getColorScheme()` on native and `prefers-color-
 
 The `dark:` variant is controlled by the [`useColorScheme()`](../../api/use-color-scheme) hook.
 
-```tsx
-import { useColorScheme } from "nativewind";
+```SnackPlayer name=Dark Mode
+import { View, Text } from "react-native"
+import { styled, useColorScheme } from "nativewind";
 
-function MyComponent() {
+const StyledView = styled(View)
+const StyledText = styled(Text)
+
+function App() {
   const { colorScheme, toggleColorScheme } = useColorScheme();
 
   return (
-    <Text
-      onPress={toggleColorScheme}
-      style={{ color: colorScheme === "dark" ? "#FFF" : "#000" }}
-    />
+    <StyledView className="flex-1 items-center justify-center dark:bg-slate-800">
+      <StyledText
+        selectable={false}
+        onPress={toggleColorScheme}
+        className="dark:underline dark:text-white"
+      >
+        {`Try clicking me! ${colorScheme === "dark" ? "🌙" : "🌞"}`}
+      </StyledText>
+    </StyledView>
   );
 }
 ```
