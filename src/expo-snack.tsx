@@ -23,7 +23,7 @@ function HOC({ component: Component }: { component: ComponentType }) {
           // This the async, the store will have already cached
           // incorrect results, so we need to clear these
           // and set the correct ones
-          for (const className of css.split(" ")) {
+          for (const className of css.split(/\s+/)) {
             delete store.snapshot[className];
           }
 
@@ -31,7 +31,7 @@ function HOC({ component: Component }: { component: ComponentType }) {
             if (key.includes(css)) {
               delete store.snapshot[key];
               const [, bit] = key.split(".");
-              store.prepare(css, { forceBit: Number.parseInt(bit) });
+              store.prepare(css, { baseBit: Number.parseInt(bit) });
             }
           }
           store.notify();

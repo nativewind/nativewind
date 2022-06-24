@@ -298,13 +298,15 @@ export class StyleSheetStore extends ColorSchemeStore {
       }
     };
 
-    this.subscribeMedia((notificationTopics: string[]) => {
-      if (notificationTopics.some((topic) => topics.has(topic))) {
-        reEvaluate();
-      }
-    });
-
     reEvaluate();
+
+    if (topics.size > 0) {
+      this.subscribeMedia((notificationTopics: string[]) => {
+        if (notificationTopics.some((topic) => topics.has(topic))) {
+          reEvaluate();
+        }
+      });
+    }
 
     return snapshotKey;
   }
