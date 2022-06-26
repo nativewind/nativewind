@@ -80,7 +80,6 @@ export default function rootVisitor(
             blockList: new Set(),
             hasStyleSheetImport: false,
             tailwindConfig,
-            tailwindConfigPath,
           };
 
           // Traverse the file

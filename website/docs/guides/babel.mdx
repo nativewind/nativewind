@@ -1,12 +1,15 @@
 import StartCoding from "../_start-coding.md";
 import Dependencies from "../_dependencies.mdx";
 import Tailwind from "../_tailwind.mdx";
+import BabelEditor from "../../src/babel-editor";
 
 # Babel
 
 The default babel configuration will both compile/inject the Tailwind CSS styles and transform any component with the `className` attributed into a `styled` version.
 
 This is the recommended configuration as it provides the fastest setup and best DX experience, with support for Tailwind intellisense within your IDE.
+
+<BabelEditor />
 
 ```tsx
 /* Example how your code will look */

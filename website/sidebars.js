@@ -120,6 +120,7 @@ const sidebars = {
           label: "Aspect ratio",
           href: "https://tailwindcss.com/docs/aspect-ratio",
         },
+        "tailwind/layout/container",
         {
           type: "link",
           label: "Container",

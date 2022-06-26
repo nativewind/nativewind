@@ -483,4 +483,5 @@ const flattenIfRNW = <T extends Style>(style: T | number): T => {
     : style;
 };
 
-export const StoreContext = createContext(new StyleSheetStore());
+export const StyleSheetStoreSingleton = new StyleSheetStore();
+export const StoreContext = createContext(StyleSheetStoreSingleton);

@@ -16,14 +16,13 @@ import { Config } from "tailwindcss";
 
 export interface VisitorState
   extends State,
-    Required<TailwindcssReactNativeBabelOptions> {
+    Omit<Required<TailwindcssReactNativeBabelOptions>, "tailwindConfigPath"> {
   cwd: string;
   allowRelativeModules: AllowPathOptions;
   blockList: Set<string>;
   hasStyledComponentImport: boolean;
   hasStyleSheetImport: boolean;
   tailwindConfig: Config;
-  tailwindConfigPath: string;
   canCompile: boolean;
   canTransform: boolean;
   didTransform: boolean;
