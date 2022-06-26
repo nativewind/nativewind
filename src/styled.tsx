@@ -112,7 +112,7 @@ export function styled<
     const store = useContext(StoreContext);
     const scopedGroupContext = useContext(ScopedGroupContext);
 
-    const { className, allClasses, isComponent, isParent } = withClassNames({
+    const { className, allClasses, isGroupScoped, isParent } = withClassNames({
       baseClassName,
       propClassName,
       twClassName,
@@ -125,7 +125,7 @@ export function styled<
 
     const { hover, focus, active, ...handlers } = useInteraction({
       className: allClasses,
-      isComponent,
+      isGroupScoped,
       isParent,
       store,
       ...componentProps,
@@ -167,7 +167,7 @@ export function styled<
       ref,
     } as unknown as T);
 
-    if (isComponent) {
+    if (isGroupScoped) {
       return createElement(ScopedGroupContext.Provider, {
         children: element,
         value: {

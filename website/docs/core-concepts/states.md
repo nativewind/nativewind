@@ -1,8 +1,8 @@
 # Hover, Focus and Other States
 
-:::info
-If you are using CSS on web, please refer to the [offical Tailwind CSS docs](https://tailwindcss.com/docs/hover-focus-and-other-states)
-:::
+NativeWind polyfills a subset of the Tailwind states for React Native by adding event listeners on your components. This documentation only applies when compiling for native or when `webOutput` is set to `native`.
+
+When using CSS on web, please refer to the [offical Tailwind CSS docs](https://tailwindcss.com/docs/hover-focus-and-other-states).
 
 ## Hover, focus, and active
 
@@ -12,11 +12,38 @@ If you are using NativeWind you need to ensure these listeners are passed to the
 
 The supported psuedo-classes and their related listeners are:
 
-| Variant  | Listeners                            |
-| -------- | ------------------------------------ |
-| `hover`  | `onHoverIn`, `onHoverOut`            |
-| `focus`  | `onBlur`, `onFocus`                  |
-| `active` | `onPress`, `onPressIn`, `onPressOut` |
+| Variant  | Event Listeners           |
+| -------- | ------------------------- |
+| `hover`  | `onHoverIn`, `onHoverOut` |
+| `focus`  | `onBlur`, `onFocus`       |
+| `active` | `onPressIn`, `onPressOut` |
+
+```SnackPlayer name=States
+import { Text, Pressable } from 'react-native';
+import { styled } from 'nativewind';
+
+const StyledPressable = styled(Pressable)
+const StyledText = styled(Text)
+
+const App = () => {
+  return (
+    <StyledPressable className={`
+      flex-1
+      items-center
+      justify-center
+      hover:bg-slate-300
+      active:bg-slate-500
+    `}>
+      <StyledText
+        selectable={false}
+        className="text-slate-800"
+      >
+        Hover and click me! 🎉
+      </StyledText>
+    </StyledPressable>
+  );
+}
+```
 
 ## Styling based on parent state
 
@@ -27,6 +54,33 @@ The difference between `group` and `group-scoped` is that components under a `gr
 `group-scoped` helps apply state based styling on components that may not accept the psuedo-class listeners.
 
 `group` and `group-scoped` both work with the `hover`/`active`/`focus` psuedo-classes.
+
+```SnackPlayer name=States
+import { Text, Pressable } from 'react-native';
+import { styled } from 'nativewind';
+
+const StyledPressable = styled(Pressable)
+const StyledText = styled(Text)
+
+const App = () => {
+  return (
+    <StyledPressable className={`
+      flex-1
+      items-center
+      justify-center
+      group-scoped
+    `}>
+      <StyledText className={`
+        text-slate-800
+        group-scoped-hover:text-blue-500
+        group-scoped-active:text-red-500
+      `}>
+        Hover and click me! 🎉
+      </StyledText>
+    </StyledPressable>
+  );
+}
+```
 
 ## Responsive breakpoints
 

@@ -18,12 +18,12 @@ export interface Interaction extends PressableProps {
 
 export interface UseInteractionOptions extends PressableProps {
   className?: string;
-  isComponent: boolean;
+  isGroupScoped: boolean;
   isParent: boolean;
 }
 
 export function useInteraction({
-  isComponent,
+  isGroupScoped,
   isParent,
   focusable = true,
   onFocus,
@@ -113,7 +113,7 @@ export function useInteraction({
     focus,
   };
 
-  const isComponentOrParent = isComponent || isParent;
+  const isComponentOrParent = isGroupScoped || isParent;
 
   if (isComponentOrParent || className.includes("focus:")) {
     interaction.onBlur = handleBlur;
