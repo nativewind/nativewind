@@ -206,7 +206,6 @@ Start writing code!
 import React from 'react';
 - import { StyleSheet, Text, View } from 'react-native';
 + import { Text, View } from 'react-native';
-import { TailwindProvider } from 'tailwindcss-react-native';
 
 export default function App() {
   return (
