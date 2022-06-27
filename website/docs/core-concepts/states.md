@@ -87,7 +87,7 @@ const App = () => {
           group-isolate-hover:text-blue-500
           group-isolate-active:text-red-500
         `}>
-          Text in a child group - hover and click me!
+          Child group-isolate have their own state!
         </StyledText>
       </StyledPressable>
     </StyledPressable>

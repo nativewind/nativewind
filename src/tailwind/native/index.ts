@@ -1,7 +1,7 @@
 import plugin from "tailwindcss/plugin";
 import { StyleError } from "../../types/common";
 import { boxShadow } from "./box-shadow";
-import { component } from "./component";
+import { groupIsolate } from "./group-isolate";
 import { divide } from "./divide";
 import { elevation } from "./elevation";
 import { fontSize } from "./font-size";
@@ -56,7 +56,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
       translate(helpers, notSupported);
       skew(helpers, notSupported);
       boxShadow(helpers, notSupported);
-      component(helpers, notSupported);
+      groupIsolate(helpers, notSupported);
       parent(helpers, notSupported);
     };
   },
