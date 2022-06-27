@@ -10,7 +10,7 @@ The TailwindProvider is no longer required, unless you wish to inject styles or 
 
 Nativewind defaults to CSS for web if using React Native Web >=0.18
 
-You can control this setting via the `webOutput` option on `TailwindProvider`.
+You can control this setting via the `NativeWindStyleSheet.setPreprocessed(false)`
 
 ## useTailwind()
 

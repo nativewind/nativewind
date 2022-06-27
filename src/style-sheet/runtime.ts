@@ -123,13 +123,13 @@ export class StyleSheetRuntime extends ColorSchemeStore {
 
   setDimensions(dimensions: Dimensions) {
     this.window = dimensions.get("window");
-    const screen = dimensions.get("screen");
-    this.orientation = screen.height >= screen.width ? "portrait" : "landscape";
+    this.orientation =
+      this.window.height >= this.window.width ? "portrait" : "landscape";
 
     this.dimensionListener?.remove();
     this.dimensionListener = dimensions.addEventListener(
       "change",
-      ({ window, screen }) => {
+      ({ window }) => {
         const topics: string[] = ["window"];
 
         if (window.width !== this.window.width) topics.push("width");
@@ -138,7 +138,7 @@ export class StyleSheetRuntime extends ColorSchemeStore {
         this.window = window;
 
         const orientation =
-          screen.height >= screen.width ? "portrait" : "landscape";
+          window.height >= window.width ? "portrait" : "landscape";
         if (orientation !== this.orientation) topics.push("orientation");
         this.orientation = orientation;
 

@@ -69,8 +69,8 @@ const sidebars = {
       items: [
         "api/styled",
         "api/StyledComponent",
-        "api/tailwind-provider",
         "api/use-color-scheme",
+        "api/native-wind-style-sheet",
         "api/use-tailwind",
       ],
     },
