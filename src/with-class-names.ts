@@ -9,7 +9,7 @@ export interface WithClassNames {
   classProps?: string[];
 }
 
-const isGroupScopedRegex = /(?:^|\s)(component)(?:$|\s)/gi;
+const isGroupScopedRegex = /(?:^|\s)(group-scoped)(?:$|\s)/gi;
 const isParentRegex = /(?:^|\s)(parent)(?:$|\s)/gi;
 
 export function withClassNames({
