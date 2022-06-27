@@ -85,6 +85,7 @@ const sidebars = {
       items: [
         "core-concepts/tailwindcss",
         "core-concepts/quirks",
+        "core-concepts/platforms",
         "core-concepts/states",
         "core-concepts/responsive-design",
         "core-concepts/dark-mode",
