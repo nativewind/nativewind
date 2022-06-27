@@ -88,6 +88,11 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
             const selectorTopics = getSelectorTopics(s, declarations, rules);
             let selector = normalizeCssSelector(s);
 
+            if (mask > 0) {
+              masks[selector] ??= 0;
+              masks[selector] |= mask;
+            }
+
             if (node.parent?.[isForChildrenSymbol]) {
               const childSelector = `${selector}.children`;
               childClasses[selector] ??= [];
@@ -112,11 +117,6 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
             }
 
             styles[selector] = declarations;
-
-            if (mask > 0) {
-              masks[selector] ??= 0;
-              masks[selector] |= mask;
-            }
           }
         }
       });
