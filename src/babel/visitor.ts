@@ -21,7 +21,7 @@ export interface VisitorState
   allowRelativeModules: AllowPathOptions;
   blockList: Set<string>;
   hasStyledComponentImport: boolean;
-  hasStyleSheetImport: boolean;
+  hasNWStyleSheetImport: boolean;
   tailwindConfig: Config;
   canCompile: boolean;
   canTransform: boolean;
@@ -39,15 +39,15 @@ export const visitor: Visitor<VisitorState> = {
       state.blockList.add(component);
     }
 
-    state.hasStyleSheetImport ||= hasNamedImport(
-      path,
-      "RNStyleSheet",
-      "react-native"
-    );
-
     state.hasStyledComponentImport ||= hasNamedImport(
       path,
       "StyledComponent",
+      "nativewind"
+    );
+
+    state.hasNWStyleSheetImport ||= hasNamedImport(
+      path,
+      "NativeWindStyleSheet",
       "nativewind"
     );
   },

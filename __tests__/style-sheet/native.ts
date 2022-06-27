@@ -2,13 +2,13 @@ import { TextStyle } from "react-native";
 import {
   createTestAppearance,
   // createTestDimensions,
-  TestStyleSheetStore,
+  TestStyleSheetRuntime,
 } from "./tests";
 
 describe("StyleSheetStore", () => {
   test("can retrieve a style", () => {
     const style = { color: "black" };
-    const store = new TestStyleSheetStore({
+    const store = new TestStyleSheetRuntime({
       styles: {
         "text-black": style,
       },
@@ -21,7 +21,7 @@ describe("StyleSheetStore", () => {
     const textStyle: TextStyle = { color: "black" };
     const fontStyle: TextStyle = { fontWeight: "400" };
 
-    const store = new TestStyleSheetStore({
+    const store = new TestStyleSheetRuntime({
       styles: {
         "text-black": textStyle,
         "font-400": fontStyle,
@@ -35,7 +35,7 @@ describe("StyleSheetStore", () => {
   });
 
   test("retrieving the same style will keep the same identity", () => {
-    const store = new TestStyleSheetStore({
+    const store = new TestStyleSheetRuntime({
       styles: {
         "text-black": { color: "black" },
       },
@@ -45,7 +45,7 @@ describe("StyleSheetStore", () => {
   });
 
   test("can match pseudo-classes", () => {
-    const store = new TestStyleSheetStore({
+    const store = new TestStyleSheetRuntime({
       styles: {
         "hover:text-black": {
           color: "black",
@@ -65,7 +65,7 @@ describe("StyleSheetStore", () => {
   test("can react to changes in atRules", () => {
     const appearance = createTestAppearance();
 
-    const store = new TestStyleSheetStore({
+    const store = new TestStyleSheetRuntime({
       styles: {
         "dark:text-black": { color: "black" },
       },
@@ -91,7 +91,7 @@ describe("StyleSheetStore", () => {
 
     const appearance = createTestAppearance();
 
-    const store = new TestStyleSheetStore({
+    const store = new TestStyleSheetRuntime({
       styles: {
         "text-white": staticText,
         "dark:text-black": atRuleText,
@@ -122,7 +122,7 @@ describe("StyleSheetStore", () => {
 
     const appearance = createTestAppearance();
 
-    const store = new TestStyleSheetStore({
+    const store = new TestStyleSheetRuntime({
       styles: {
         "dark:bg-black": atRuleText,
       },

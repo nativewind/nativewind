@@ -1,5 +1,5 @@
 import { StyleProp, StyleSheet } from "react-native";
-import { StylesArray } from "./style-sheet-store";
+import { StylesArray } from "./style-sheet";
 import { useTailwind } from "./use-tailwind";
 
 export const ChildClassNameSymbol = Symbol("tailwind-child");

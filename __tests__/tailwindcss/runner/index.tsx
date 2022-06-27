@@ -9,9 +9,12 @@ import { testStyleSerializer } from "../../../src/utils/serialize-styles";
 
 import cssPlugin from "../../../src/tailwind/css";
 import { nativePlugin } from "../../../src/tailwind/native";
-import { TailwindProvider, TailwindProviderProps } from "../../../src";
-import { PropsWithChildren } from "react";
-import { StyleSheetStore } from "../../../src/style-sheet-store";
+import { PropsWithChildren, useMemo } from "react";
+import { StoreContext, StyleSheetRuntime } from "../../../src/style-sheet";
+import {
+  TestStyleSheetRuntime,
+  TestStyleSheetStoreConstructor,
+} from "../../style-sheet/tests";
 
 export type Test = [string, TestValues] | [string, StyleRecord, true];
 
@@ -80,8 +83,8 @@ export function assertStyles(
   }
 }
 
-function dangerouslyCompileStyles(css: string, store: StyleSheetStore) {
-  const { styles, atRules, topics, masks, childClasses } = extractStyles({
+function dangerouslyCompileStyles(css: string, store: StyleSheetRuntime) {
+  const output = extractStyles({
     theme: {},
     plugins: [cssPlugin, nativePlugin({})],
     content: [{ raw: "", extension: "html" }],
@@ -89,18 +92,18 @@ function dangerouslyCompileStyles(css: string, store: StyleSheetStore) {
     serializer: testStyleSerializer,
   });
 
-  Object.assign(store.styles, styles);
-  Object.assign(store.atRules, atRules);
-  Object.assign(store.topics, topics);
-  Object.assign(store.masks, masks);
-  Object.assign(store.childClasses, childClasses);
+  store.create(output);
 }
 
-export function TestProvider(props: PropsWithChildren<TailwindProviderProps>) {
+export function TestProvider({
+  children,
+  ...props
+}: PropsWithChildren<TestStyleSheetStoreConstructor>) {
+  const store = useMemo(
+    () => new TestStyleSheetRuntime({ ...props, dangerouslyCompileStyles }),
+    []
+  );
   return (
-    <TailwindProvider
-      {...props}
-      dangerouslyCompileStyles={dangerouslyCompileStyles}
-    />
+    <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
   );
 }

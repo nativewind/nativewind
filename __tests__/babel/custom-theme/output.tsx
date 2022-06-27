@@ -1,5 +1,4 @@
-import { NWRuntimeParser } from "nativewind";
-import { StyleSheet as RNStyleSheet } from "react-native";
+import { NativeWindStyleSheet } from "nativewind";
 import { StyledComponent } from "nativewind";
 import { Text } from "react-native";
 export function Test() {
@@ -9,19 +8,17 @@ export function Test() {
     </StyledComponent>
   );
 }
-globalThis.nativewind_styles = Object.assign(
-  globalThis.nativewind_styles || {},
-  RNStyleSheet.create({
+NativeWindStyleSheet.create({
+  styles: {
     "p-px": {
-      paddingTop: NWRuntimeParser("roundToNearestPixel(4)"),
-      paddingRight: NWRuntimeParser("roundToNearestPixel(4)"),
-      paddingBottom: NWRuntimeParser("roundToNearestPixel(4)"),
-      paddingLeft: NWRuntimeParser("roundToNearestPixel(4)"),
+      paddingTop: "roundToNearestPixel(4)",
+      paddingRight: "roundToNearestPixel(4)",
+      paddingBottom: "roundToNearestPixel(4)",
+      paddingLeft: "roundToNearestPixel(4)",
     },
     "text-blue-500": {
-      color: NWRuntimeParser(
-        "platform(ios:platformColor(systemTealColor) android:platformColor(@android:color/holo_blue_bright) default:black)"
-      ),
+      color:
+        "platform(ios:platformColor(systemTealColor) android:platformColor(@android:color/holo_blue_bright) default:black)",
     },
-  })
-);
+  },
+});

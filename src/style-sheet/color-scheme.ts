@@ -54,14 +54,18 @@ export abstract class ColorSchemeStore {
   };
 
   setColorScheme = (colorSchemeSystem: ColorSchemeSystem) => {
+    const oldColorScheme = this.colorScheme;
+
     this.colorSchemeSystem = colorSchemeSystem;
     this.colorScheme =
-      colorSchemeSystem === "system"
+      this.colorSchemeSystem === "system"
         ? Appearance.getColorScheme() || "light"
-        : colorSchemeSystem;
+        : this.colorSchemeSystem;
 
-    this.notifyMedia(["colorScheme"]);
-    this.notifyColorScheme();
+    if (oldColorScheme !== this.colorScheme) {
+      this.notifyMedia(["colorScheme"]);
+      this.notifyColorScheme();
+    }
   };
 
   toggleColorScheme = () => {

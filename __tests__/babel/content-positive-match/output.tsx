@@ -1,4 +1,4 @@
-import { StyleSheet as RNStyleSheet } from "react-native";
+import { NativeWindStyleSheet } from "nativewind";
 import { StyledComponent } from "nativewind";
 import { Text } from "react-native";
 import { TestComponent } from "./test";
@@ -12,14 +12,13 @@ export function Test() {
     </>
   );
 }
-globalThis.nativewind_styles = Object.assign(
-  globalThis.nativewind_styles || {},
-  RNStyleSheet.create({
+NativeWindStyleSheet.create({
+  styles: {
     "font-bold": {
       fontWeight: "700",
     },
     "text-red-500": {
       color: "#ef4444",
     },
-  })
-);
+  },
+});

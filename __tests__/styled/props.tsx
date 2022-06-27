@@ -95,7 +95,7 @@ describe("Styled", () => {
 
   test("classProps on css", () => {
     const tree = render(
-      <TestProvider nativeOutput="css">
+      <TestProvider preprocessed>
         <TestClassPropsComponent className="p-4" style2="m-1" />
       </TestProvider>
     ).toJSON();

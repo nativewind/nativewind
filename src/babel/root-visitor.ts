@@ -71,6 +71,7 @@ export default function rootVisitor(
             didTransform: false,
             blockModuleTransform: [],
             hasStyledComponentImport: false,
+            hasNWStyleSheetImport: false,
             canCompile,
             canTransform,
             ...state,
@@ -78,7 +79,6 @@ export default function rootVisitor(
             allowModuleTransform,
             allowRelativeModules,
             blockList: new Set(),
-            hasStyleSheetImport: false,
             tailwindConfig,
           };
 
@@ -87,9 +87,9 @@ export default function rootVisitor(
 
           const {
             filename,
-            hasStyleSheetImport,
             didTransform,
             hasStyledComponentImport,
+            hasNWStyleSheetImport,
           } = visitorState;
 
           const bodyNode = path.node.body;
@@ -111,16 +111,8 @@ export default function rootVisitor(
 
           appendVariables(bodyNode, output);
 
-          if (!hasStyleSheetImport) {
-            prependImports(
-              bodyNode,
-              [["RNStyleSheet", "StyleSheet"]],
-              "react-native"
-            );
-          }
-
-          if (output.hasRuntimeFunction) {
-            prependImports(bodyNode, ["NWRuntimeParser"], "nativewind");
+          if (!hasNWStyleSheetImport) {
+            prependImports(bodyNode, ["NativeWindStyleSheet"], "nativewind");
           }
         },
       },

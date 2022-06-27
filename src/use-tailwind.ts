@@ -1,6 +1,6 @@
 import { useContext, useMemo } from "react";
 import { StyleProp } from "react-native";
-import { Snapshot, StoreContext, StylesArray } from "./style-sheet-store";
+import { Snapshot, StoreContext, StylesArray } from "./style-sheet";
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 import { StateBitOptions } from "./shared/selector";
 

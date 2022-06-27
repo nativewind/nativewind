@@ -1,10 +1,10 @@
 import { ReactNode, Children, cloneElement } from "react";
 import { isFragment } from "react-is";
-import { StylesArray, StyleSheetStore } from "./style-sheet-store";
+import { StylesArray, StyleSheetRuntime } from "./style-sheet";
 
 export interface WithStyledChildrenOptions {
   componentChildren: ReactNode;
-  store: StyleSheetStore;
+  store: StyleSheetRuntime;
   stylesArray: StylesArray<unknown>;
   parentHover: boolean;
   parentFocus: boolean;

@@ -2,13 +2,46 @@ import {
   Appearance,
   ColorSchemeName,
   Dimensions,
+  Platform,
   ScaledSize,
 } from "react-native";
 import { StateBitOptions } from "../../src/shared/selector";
 
-import { StyleSheetStore } from "../../src/style-sheet-store";
+import { StyleSheetRuntime, AddOptions } from "../../src/style-sheet/runtime";
 
-export class TestStyleSheetStore extends StyleSheetStore {
+export interface TestStyleSheetStoreConstructor extends AddOptions {
+  dimensions?: Dimensions;
+  appearance?: typeof Appearance;
+  platform?: typeof Platform.OS;
+  preprocessed?: boolean;
+
+  // This is used for tests & snack demos
+  dangerouslyCompileStyles?: StyleSheetRuntime["dangerouslyCompileStyles"];
+}
+
+export class TestStyleSheetRuntime extends StyleSheetRuntime {
+  constructor({
+    styles,
+    atRules,
+    topics,
+    masks,
+    childClasses,
+    dimensions,
+    appearance,
+    dangerouslyCompileStyles,
+    preprocessed,
+  }: TestStyleSheetStoreConstructor) {
+    super();
+    this.create({ styles, atRules, topics, masks, childClasses });
+    if (dimensions) this.setDimensions(dimensions);
+    if (appearance) this.setAppearance(appearance);
+    if (preprocessed) this.setPreprocessed(preprocessed);
+
+    if (dangerouslyCompileStyles) {
+      this.setDangerouslyCompileStyles(dangerouslyCompileStyles);
+    }
+  }
+
   // Helper to easily retrieve a style from the latest snapshot
   getStyle(className: string, options?: StateBitOptions) {
     const selector = this.prepare(className, options);

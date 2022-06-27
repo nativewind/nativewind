@@ -1,4 +1,4 @@
-import { StyleSheet as RNStyleSheet } from "react-native";
+import { NativeWindStyleSheet } from "nativewind";
 import { Text, View } from "react-native";
 export function Test() {
   return (
@@ -7,9 +7,8 @@ export function Test() {
     </View>
   );
 }
-globalThis.nativewind_styles = Object.assign(
-  globalThis.nativewind_styles || {},
-  RNStyleSheet.create({
+NativeWindStyleSheet.create({
+  styles: {
     container: {
       width: "100%",
     },
@@ -31,11 +30,8 @@ globalThis.nativewind_styles = Object.assign(
     "font-bold": {
       fontWeight: "700",
     },
-  })
-);
-globalThis.nativewind_at_rules = Object.assign(
-  globalThis.nativewind_at_rules || {},
-  {
+  },
+  atRules: {
     container: [
       [["media", "(min-width: 640px)"]],
       [["media", "(min-width: 768px)"]],
@@ -43,11 +39,8 @@ globalThis.nativewind_at_rules = Object.assign(
       [["media", "(min-width: 1280px)"]],
       [["media", "(min-width: 1536px)"]],
     ],
-  }
-);
-globalThis.nativewind_topics = Object.assign(
-  globalThis.nativewind_topics || {},
-  {
+  },
+  topics: {
     container: ["width"],
-  }
-);
+  },
+});

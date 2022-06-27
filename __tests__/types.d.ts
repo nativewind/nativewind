@@ -6,4 +6,5 @@ declare module "nativewind" {
   export const useTailwind: (...arg: any[]) => any;
   export const StyledComponent: FunctionComponent<any>;
   export const NWRuntimeParser: (...arg: any[]) => any;
+  export const NativeWindStyleSheet: { create: (obj: any) => void };
 }

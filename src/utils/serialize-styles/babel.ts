@@ -1,9 +1,7 @@
 import {
   arrayExpression,
   booleanLiteral,
-  callExpression,
   Expression,
-  identifier,
   isExpression,
   nullLiteral,
   numericLiteral,
@@ -13,7 +11,7 @@ import {
   unaryExpression,
 } from "@babel/types";
 import { ExtractedValues } from "../../postcss/plugin";
-import { isRuntimeFunction, serializeHelper } from "./helper";
+import { serializeHelper } from "./helper";
 
 export function babelStyleSerializer({
   styles: rawStyles,
@@ -22,7 +20,7 @@ export function babelStyleSerializer({
   topics,
   childClasses,
 }: ExtractedValues) {
-  const { styles, ...rest } = serializeHelper(rawStyles, babelReplacer);
+  const { styles, ...rest } = serializeHelper(rawStyles, (k, v) => [k, v]);
 
   return {
     styles: babelSerializeObject(styles),
@@ -41,21 +39,6 @@ export function babelStyleSerializer({
     hasStyles: Object.keys(styles).length > 0,
     ...rest,
   };
-}
-
-function babelReplacer(key: string, value: string): [string, unknown] {
-  if (typeof value !== "string") {
-    return [key, value];
-  }
-
-  if (isRuntimeFunction(value)) {
-    return [
-      key,
-      callExpression(identifier("NWRuntimeParser"), [stringLiteral(value)]),
-    ];
-  }
-
-  return [key, value];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

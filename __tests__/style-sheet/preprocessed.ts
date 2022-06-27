@@ -1,8 +1,8 @@
-import { TestStyleSheetStore } from "./tests";
+import { TestStyleSheetRuntime } from "./tests";
 
 describe("StyleSheetStore - preprocessed", () => {
   test("can retrieve a style", () => {
-    const store = new TestStyleSheetStore({
+    const store = new TestStyleSheetRuntime({
       preprocessed: true,
     });
 
@@ -11,7 +11,7 @@ describe("StyleSheetStore - preprocessed", () => {
   });
 
   test("can retrieve multiple styles", () => {
-    const store = new TestStyleSheetStore({
+    const store = new TestStyleSheetRuntime({
       preprocessed: true,
     });
 
@@ -21,7 +21,7 @@ describe("StyleSheetStore - preprocessed", () => {
   });
 
   test("retrieving the same style will keep the same identity", () => {
-    const store = new TestStyleSheetStore({
+    const store = new TestStyleSheetRuntime({
       preprocessed: true,
     });
 

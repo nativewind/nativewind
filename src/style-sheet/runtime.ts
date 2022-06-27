@@ -1,4 +1,3 @@
-import { createContext } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -26,7 +25,8 @@ import {
 import { MediaRecord } from "../types/common";
 import vh from "./units/vh";
 import vw from "./units/vw";
-import { ColorSchemeStore, ColorSchemeSystem } from "./color-scheme";
+import { ColorSchemeStore } from "./color-scheme";
+import { NWRuntimeParser } from "../style-helpers";
 
 export type { ColorSchemeSystem, ColorSchemeName } from "./color-scheme";
 export type Style = ViewStyle | ImageStyle | TextStyle;
@@ -47,23 +47,6 @@ export interface StylesArray<T = Style> extends Array<EitherStyle<T>> {
   childClassNames?: string[];
 }
 
-declare global {
-  // eslint-disable-next-line no-var
-  var tailwindcss_react_native_style: Record<string, Style>;
-  // eslint-disable-next-line no-var
-  var tailwindcss_react_native_media: MediaRecord;
-  // eslint-disable-next-line no-var
-  var nativewind_styles: Record<string, Style>;
-  // eslint-disable-next-line no-var
-  var nativewind_at_rules: MediaRecord;
-  // eslint-disable-next-line no-var
-  var nativewind_masks: Record<string, number>;
-  // eslint-disable-next-line no-var
-  var nativewind_topics: Record<string, string[]>;
-  // eslint-disable-next-line no-var
-  var nativewind_child_classes: Record<string, string[]>;
-}
-
 const units: Record<
   string,
   (value: string | number) => string | number | Record<string, unknown>
@@ -71,25 +54,6 @@ const units: Record<
   vw,
   vh,
 };
-
-export interface StyleSheetStoreConstructor {
-  styles?: typeof global.tailwindcss_react_native_style;
-  atRules?: typeof global.tailwindcss_react_native_media;
-  dimensions?: Dimensions;
-  appearance?: typeof Appearance;
-  platform?: typeof Platform.OS;
-  preprocessed?: boolean;
-  colorScheme?: ColorSchemeSystem;
-  topics?: Record<string, Array<string>>;
-  masks?: Record<string, number>;
-  childClasses?: Record<string, string[]>;
-
-  // This is used for tests & snack demos
-  dangerouslyCompileStyles?: (
-    className: string,
-    store: StyleSheetStore
-  ) => void;
-}
 
 /**
  * Tailwind styles are strings of atomic classes. eg "a b" compiles to [a, b]
@@ -113,54 +77,56 @@ export interface StyleSheetStoreConstructor {
  * If you are interested in helping me build a more robust store, please create an issue on Github.
  *
  */
-export class StyleSheetStore extends ColorSchemeStore {
+export interface AddOptions {
+  styles?: StyleSheetRuntime["styles"];
+  atRules?: StyleSheetRuntime["atRules"];
+  topics?: StyleSheetRuntime["topics"];
+  masks?: StyleSheetRuntime["masks"];
+  childClasses?: StyleSheetRuntime["childClasses"];
+}
+
+export class StyleSheetRuntime extends ColorSchemeStore {
   snapshot: Snapshot = { "": emptyStyles };
   listeners = new Set<() => void>();
   atRuleListeners = new Set<(topics: string[]) => void>();
 
-  dimensionListener: EmitterSubscription;
-  appearanceListener: NativeEventSubscription;
-  dangerouslyCompileStyles: StyleSheetStoreConstructor["dangerouslyCompileStyles"];
+  dimensionListener?: EmitterSubscription;
+  appearanceListener?: NativeEventSubscription;
+  dangerouslyCompileStyles?: (
+    className: string,
+    store: StyleSheetRuntime
+  ) => void;
 
-  styles: Record<string, Style>;
-  atRules: MediaRecord;
-  topics: Record<string, Array<string>>;
-  childClasses: Record<string, Array<string>>;
-  masks: Record<string, number>;
-  preprocessed: boolean;
+  styles: Record<string, Style> = {};
+  atRules: MediaRecord = {};
+  topics: Record<string, Array<string>> = {};
+  childClasses: Record<string, Array<string>> = {};
+  masks: Record<string, number> = {};
+  preprocessed = false;
 
-  platform: typeof Platform.OS;
-  window: ScaledSize;
-  orientation: OrientationLockType;
+  platform: typeof Platform.OS = Platform.OS;
+  window: ScaledSize = Dimensions.get("window");
+  orientation: OrientationLockType = "portrait";
 
-  constructor({
-    styles = (global.nativewind_styles ||= {}),
-    atRules = (global.nativewind_at_rules ||= {}),
-    masks = (global.nativewind_masks ||= {}),
-    childClasses = (global.nativewind_child_classes ||= {}),
-    topics = (global.nativewind_topics ||= {}),
-    dimensions = Dimensions,
-    appearance = Appearance,
-    platform = Platform.OS,
-    preprocessed = false,
-    colorScheme,
-    dangerouslyCompileStyles,
-  }: StyleSheetStoreConstructor = {}) {
-    super(colorScheme);
+  constructor() {
+    super();
+    this.setDimensions(Dimensions);
+    this.setAppearance(Appearance);
+    this.setPlatform(Platform.OS);
+    this.setPreprocessed(
+      Platform.select({
+        web: StyleSheet.create({ test: {} }).test !== "number",
+        default: false,
+      })
+    );
+  }
 
-    this.platform = platform;
-    this.styles = styles;
-    this.atRules = atRules;
-    this.masks = masks;
-    this.childClasses = childClasses;
-    this.topics = topics;
-    this.preprocessed = preprocessed;
+  setDimensions(dimensions: Dimensions) {
     this.window = dimensions.get("window");
-    this.dangerouslyCompileStyles = dangerouslyCompileStyles;
-
     const screen = dimensions.get("screen");
     this.orientation = screen.height >= screen.width ? "portrait" : "landscape";
 
+    this.dimensionListener?.remove();
     this.dimensionListener = dimensions.addEventListener(
       "change",
       ({ window, screen }) => {
@@ -179,7 +145,10 @@ export class StyleSheetStore extends ColorSchemeStore {
         this.notifyMedia(topics);
       }
     );
+  }
 
+  setAppearance(appearance: typeof Appearance) {
+    this.appearanceListener?.remove();
     this.appearanceListener = appearance.addChangeListener(
       ({ colorScheme }) => {
         if (this.colorSchemeSystem === "system") {
@@ -188,6 +157,23 @@ export class StyleSheetStore extends ColorSchemeStore {
         }
       }
     );
+  }
+
+  setPlatform(platform: typeof Platform.OS) {
+    this.platform = platform;
+  }
+
+  setPreprocessed(boolean: boolean) {
+    this.preprocessed = boolean;
+  }
+
+  setDangerouslyCompileStyles(
+    dangerouslyCompileStyles: (
+      className: string,
+      store: StyleSheetRuntime
+    ) => void
+  ) {
+    this.dangerouslyCompileStyles = dangerouslyCompileStyles;
   }
 
   getSnapshot = () => {
@@ -204,8 +190,8 @@ export class StyleSheetStore extends ColorSchemeStore {
   };
 
   destroy() {
-    this.dimensionListener.remove();
-    this.appearanceListener.remove();
+    this.dimensionListener?.remove();
+    this.appearanceListener?.remove();
   }
 
   notify() {
@@ -474,6 +460,27 @@ export class StyleSheetStore extends ColorSchemeStore {
     this.snapshot = { ...this.snapshot, [className]: styles };
     return this.snapshot[className];
   }
+
+  create({ styles, atRules, masks, topics, childClasses }: AddOptions) {
+    const parsedStyles: StyleSheetRuntime["styles"] = {};
+
+    if (styles) {
+      for (const [key, style] of Object.entries(styles)) {
+        parsedStyles[key] = {};
+
+        for (const [styleKey, styleValue] of Object.entries(style)) {
+          parsedStyles[key][styleKey as keyof Style] =
+            NWRuntimeParser(styleValue);
+        }
+      }
+    }
+
+    Object.assign(this.styles, StyleSheet.create(styles));
+    Object.assign(this.atRules, atRules);
+    Object.assign(this.masks, masks);
+    Object.assign(this.topics, topics);
+    Object.assign(this.childClasses, childClasses);
+  }
 }
 
 const matchesMask = (value: number, mask: number) => (value & mask) === mask;
@@ -482,6 +489,3 @@ const flattenIfRNW = <T extends Style>(style: T | number): T => {
     ? (StyleSheet.flatten(style) as unknown as T)
     : style;
 };
-
-export const StyleSheetStoreSingleton = new StyleSheetStore();
-export const StoreContext = createContext(StyleSheetStoreSingleton);

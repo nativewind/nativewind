@@ -1,5 +1,4 @@
-import { NWRuntimeParser } from "nativewind";
-import { StyleSheet as RNStyleSheet } from "react-native";
+import { NativeWindStyleSheet } from "nativewind";
 import { StyledComponent } from "nativewind";
 import { Text, View } from "react-native";
 export function Test() {
@@ -14,27 +13,20 @@ export function Test() {
     </StyledComponent>
   );
 }
-globalThis.nativewind_styles = Object.assign(
-  globalThis.nativewind_styles || {},
-  RNStyleSheet.create({
+NativeWindStyleSheet.create({
+  styles: {
     "font-bold": {
       fontWeight: "700",
     },
     "divide-y.children@0": {
       borderBottomWidth: 0,
-      borderTopWidth: NWRuntimeParser("styleSheet(hairlineWidth)"),
+      borderTopWidth: "styleSheet(hairlineWidth)",
     },
-  })
-);
-globalThis.nativewind_at_rules = Object.assign(
-  globalThis.nativewind_at_rules || {},
-  {
+  },
+  atRules: {
     "divide-y.children": [[["selector", "(> *:not(:first-child))"]]],
-  }
-);
-globalThis.nativewind_child_classes = Object.assign(
-  globalThis.nativewind_child_classes || {},
-  {
+  },
+  childClasses: {
     "divide-y": ["divide-y.children"],
-  }
-);
+  },
+});
