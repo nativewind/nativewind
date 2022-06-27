@@ -18,6 +18,7 @@ import { Config } from "tailwindcss";
 import { dark } from "./dark";
 import { DarkModeConfig } from "tailwindcss/types/config";
 import { pseudoClasses } from "./pseudo-classes";
+import { platforms, nativePlatforms } from "../../shared/platforms";
 export interface NativePluginOptions {
   rem?: number;
   onError?: (error: StyleError) => void;
@@ -41,6 +42,15 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
       // on files without styles when using Hot Module Reload.
       // Because it doesn't have any styles, it will be omitted from the output
       helpers.addUtilities({ ".babel-empty": {} });
+
+      for (const platform of platforms) {
+        helpers.addVariant(platform, `&::${platform}`);
+      }
+
+      helpers.addVariant(
+        "native",
+        nativePlatforms.map((platform) => `&::${platform}`)
+      );
 
       color(helpers, notSupported);
       dark(helpers, notSupported);

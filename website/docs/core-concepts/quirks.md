@@ -1,14 +1,12 @@
 # Quirks
 
-While NativeWind is stable, its developers still consider it a work-in-progress and as such it has some small quirks.
-
-We are open to community assistance in helping us resolving these issues.
+NativeWind aligns CSS and React Native into a common language. However the two style engines do have their differences. We refer to these differences as quirks.
 
 ## Explicit styles
 
 React Native has various issues when conditionally applying styles. To prevent these issues it's best to declare all styles.
 
-For example, instead of only apply a text color for dark mode, provide both a light and dark mode text color.
+For example, instead of only applying a text color for dark mode, provide both a light and dark mode text color.
 
 ## Dp vs px
 

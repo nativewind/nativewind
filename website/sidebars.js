@@ -88,6 +88,7 @@ const sidebars = {
         "core-concepts/states",
         "core-concepts/responsive-design",
         "core-concepts/dark-mode",
+        "core-concepts/units",
       ],
     },
     {
