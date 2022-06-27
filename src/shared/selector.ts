@@ -111,7 +111,7 @@ export function createAtRuleSelector(className: string, atRuleIndex: number) {
 }
 
 const makePseudoClassTest = (pseudoClass: string) => {
-  const regex = new RegExp(`\\w+(::${pseudoClass})(:|\\b)`);
+  const regex = new RegExp(`\\S+(::${pseudoClass})(:|\\b)`);
   return regex.test.bind(regex);
 };
 
