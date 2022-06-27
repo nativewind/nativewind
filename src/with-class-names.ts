@@ -9,7 +9,7 @@ export interface WithClassNames {
   classProps?: string[];
 }
 
-const isGroupScopedRegex = /(?:^|\s)(group-scoped)(?:$|\s)/gi;
+const isGroupIsolateRegex = /(?:^|\s)(group-isolate)(?:$|\s)/gi;
 const isParentRegex = /(?:^|\s)(parent)(?:$|\s)/gi;
 
 export function withClassNames({
@@ -29,7 +29,7 @@ export function withClassNames({
     .filter(Boolean)
     .join(" ");
 
-  const isGroupScoped = isGroupScopedRegex.test(className);
+  const isGroupIsolate = isGroupIsolateRegex.test(className);
   const isParent = isParentRegex.test(className);
 
   const allClasses = [className];
@@ -44,7 +44,7 @@ export function withClassNames({
   return {
     className,
     allClasses: allClasses.join(" "),
-    isGroupScoped,
+    isGroupIsolate,
     isParent,
   };
 }

@@ -47,13 +47,13 @@ const App = () => {
 
 ## Styling based on parent state
 
-NativeWind supports [`group` parent state](https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state), and a new `group-scoped` class.
+NativeWind supports [`group` parent state](https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state), and a new `group-isolate` class.
 
-The difference between `group` and `group-scoped` is that components under a `group-scoped` tree will only use the state of the closest `group-scoped` parent, while components under `group` will use the state of any parent `group`.
+The difference between `group` and `group-isolate` is that components under a `group-isolate` tree will only use the state of the closest `group-isolate` parent, while components under `group` will use the state of any parent `group`.
 
-`group-scoped` helps apply state based styling on components that may not accept the psuedo-class listeners.
+`group-isolate` helps apply state based styling on components that may not accept the psuedo-class listeners.
 
-`group` and `group-scoped` both work with the `hover`/`active`/`focus` psuedo-classes.
+`group` and `group-isolate` both work with the `hover`/`active`/`focus` psuedo-classes.
 
 ```SnackPlayer name=States
 import { Text, Pressable } from 'react-native';
@@ -68,15 +68,28 @@ const App = () => {
       flex-1
       items-center
       justify-center
-      group-scoped
+      group-isolate
     `}>
       <StyledText className={`
         text-slate-800
-        group-scoped-hover:text-blue-500
-        group-scoped-active:text-red-500
+        group-isolate-hover:text-blue-500
+        group-isolate-active:text-red-500
       `}>
         Hover and click me! 🎉
       </StyledText>
+      <StyledPressable className={`
+        group-isolate
+        bg-slate-300
+        h-20
+      `}>
+        <StyledText className={`
+          text-slate-800
+          group-isolate-hover:text-blue-500
+          group-isolate-active:text-red-500
+        `}>
+          Text in a child group - hover and click me!
+        </StyledText>
+      </StyledPressable>
     </StyledPressable>
   );
 }

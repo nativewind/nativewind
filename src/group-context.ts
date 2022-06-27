@@ -6,8 +6,8 @@ export const GroupContext = createContext({
   groupActive: false,
 });
 
-export const ScopedGroupContext = createContext({
-  scopedGroupHover: false,
-  scopedGroupFocus: false,
-  scopedGroupActive: false,
+export const IsolateGroupContext = createContext({
+  isolateGroupHover: false,
+  isolateGroupFocus: false,
+  isolateGroupActive: false,
 });

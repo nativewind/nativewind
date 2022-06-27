@@ -26,9 +26,9 @@ export function useTailwind<T>(
     options.hover,
     options.focus,
     options.active,
-    options.scopedGroupHover,
-    options.scopedGroupFocus,
-    options.scopedGroupActive,
+    options.isolateGroupHover,
+    options.isolateGroupFocus,
+    options.isolateGroupActive,
   ]);
 
   const styles = useSyncExternalStoreWithSelector(

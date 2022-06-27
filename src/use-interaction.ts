@@ -18,12 +18,12 @@ export interface Interaction extends PressableProps {
 
 export interface UseInteractionOptions extends PressableProps {
   className?: string;
-  isGroupScoped: boolean;
+  isGroupIsolate: boolean;
   isParent: boolean;
 }
 
 export function useInteraction({
-  isGroupScoped,
+  isGroupIsolate,
   isParent,
   focusable = true,
   onFocus,
@@ -89,6 +89,7 @@ export function useInteraction({
       if (onPressIn) {
         onPressIn(event);
       }
+      event.stopPropagation();
 
       setActive(true);
       setFocus(false);
@@ -101,6 +102,7 @@ export function useInteraction({
       if (onPressOut) {
         onPressOut(event);
       }
+      event.stopPropagation();
 
       setActive(false);
     },
@@ -113,19 +115,19 @@ export function useInteraction({
     focus,
   };
 
-  const isComponentOrParent = isGroupScoped || isParent;
+  const isGroupIsolateOrParent = isGroupIsolate || isParent;
 
-  if (isComponentOrParent || className.includes("focus:")) {
+  if (isGroupIsolateOrParent || className.includes("focus:")) {
     interaction.onBlur = handleBlur;
     interaction.onFocus = handleFocus;
   }
 
-  if (isComponentOrParent || className.includes("hover:")) {
+  if (isGroupIsolateOrParent || className.includes("hover:")) {
     interaction.onHoverIn = handleHoverIn;
     interaction.onHoverOut = handleHoverOut;
   }
 
-  if (isComponentOrParent || className.includes("active:")) {
+  if (isGroupIsolateOrParent || className.includes("active:")) {
     if (Platform.OS === "web") {
       interaction.onMouseDown = handlePressIn;
       interaction.onMouseUp = handlePressOut;

@@ -43,9 +43,9 @@ export interface StateBitOptions {
   groupHover?: boolean;
   groupActive?: boolean;
   groupFocus?: boolean;
-  scopedGroupHover?: boolean;
-  scopedGroupActive?: boolean;
-  scopedGroupFocus?: boolean;
+  isolateGroupHover?: boolean;
+  isolateGroupActive?: boolean;
+  isolateGroupFocus?: boolean;
   parentHover?: boolean;
   parentFocus?: boolean;
   parentActive?: boolean;
@@ -64,9 +64,9 @@ export function getStateBit({
   groupHover = false,
   groupFocus = false,
   groupActive = false,
-  scopedGroupHover = false,
-  scopedGroupFocus = false,
-  scopedGroupActive = false,
+  isolateGroupHover = false,
+  isolateGroupFocus = false,
+  isolateGroupActive = false,
   parentHover = false,
   parentFocus = false,
   parentActive = false,
@@ -85,9 +85,9 @@ export function getStateBit({
     groupHover,
     groupActive,
     groupFocus,
-    scopedGroupHover,
-    scopedGroupActive,
-    scopedGroupFocus,
+    isolateGroupHover,
+    isolateGroupActive,
+    isolateGroupFocus,
     parentHover,
     parentActive,
     parentFocus,
@@ -121,9 +121,11 @@ export const hasFocus = makePseudoClassTest("focus");
 export const hasGroupHover = makePseudoClassTest("group-hover");
 export const hasGroupActive = makePseudoClassTest("group-active");
 export const hasGroupFocus = makePseudoClassTest("group-focus");
-export const hasGroupScopedHover = makePseudoClassTest("group-scoped-hover");
-export const hasGroupScopedActive = makePseudoClassTest("group-scoped-active");
-export const hasGroupScopedFocus = makePseudoClassTest("group-scoped-focus");
+export const hasGroupIsolateHover = makePseudoClassTest("group-isolate-hover");
+export const hasGroupIsolateActive = makePseudoClassTest(
+  "group-isolate-active"
+);
+export const hasGroupIsolateFocus = makePseudoClassTest("group-isolate-focus");
 export const hasParentHover = makePseudoClassTest("parent-hover");
 export const hasParentActive = makePseudoClassTest("parent-active");
 export const hasParentFocus = makePseudoClassTest("parent-focus");
@@ -144,9 +146,9 @@ export function getSelectorMask(selector: string, rtl = false): number {
     groupHover: hasGroupHover(selector),
     groupActive: hasGroupActive(selector),
     groupFocus: hasGroupFocus(selector),
-    scopedGroupHover: hasGroupScopedHover(selector),
-    scopedGroupActive: hasGroupScopedActive(selector),
-    scopedGroupFocus: hasGroupScopedFocus(selector),
+    isolateGroupHover: hasGroupIsolateHover(selector),
+    isolateGroupActive: hasGroupIsolateActive(selector),
+    isolateGroupFocus: hasGroupIsolateFocus(selector),
     parentHover: hasParentHover(selector),
     parentActive: hasParentActive(selector),
     parentFocus: hasParentFocus(selector),

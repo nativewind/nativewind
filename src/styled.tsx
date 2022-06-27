@@ -18,7 +18,7 @@ import { useTailwind } from "./use-tailwind";
 import { withClassNames } from "./with-class-names";
 import { StyleProp } from "react-native";
 import { StoreContext } from "./style-sheet-store";
-import { ScopedGroupContext } from "./group-context";
+import { IsolateGroupContext } from "./group-context";
 
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
@@ -110,9 +110,9 @@ export function styled<
     ref: ForwardedRef<unknown>
   ) {
     const store = useContext(StoreContext);
-    const scopedGroupContext = useContext(ScopedGroupContext);
+    const isolateGroupContext = useContext(IsolateGroupContext);
 
-    const { className, allClasses, isGroupScoped, isParent } = withClassNames({
+    const { className, allClasses, isGroupIsolate, isParent } = withClassNames({
       baseClassName,
       propClassName,
       twClassName,
@@ -125,7 +125,7 @@ export function styled<
 
     const { hover, focus, active, ...handlers } = useInteraction({
       className: allClasses,
-      isGroupScoped,
+      isGroupIsolate,
       isParent,
       store,
       ...componentProps,
@@ -144,7 +144,7 @@ export function styled<
         hover,
         focus,
         active,
-        ...scopedGroupContext,
+        ...isolateGroupContext,
       },
       styleProp,
       additionalStyles
@@ -167,13 +167,13 @@ export function styled<
       ref,
     } as unknown as T);
 
-    if (isGroupScoped) {
-      return createElement(ScopedGroupContext.Provider, {
+    if (isGroupIsolate) {
+      return createElement(IsolateGroupContext.Provider, {
         children: element,
         value: {
-          scopedGroupHover: hover,
-          scopedGroupFocus: focus,
-          scopedGroupActive: active,
+          isolateGroupHover: hover,
+          isolateGroupFocus: focus,
+          isolateGroupActive: active,
         },
       });
     }

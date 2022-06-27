@@ -314,18 +314,18 @@ export class StyleSheetStore extends ColorSchemeStore {
   preparePreprocessed(
     className: string,
     {
-      scopedGroupActive = false,
-      scopedGroupFocus = false,
-      scopedGroupHover = false,
+      isolateGroupActive = false,
+      isolateGroupFocus = false,
+      isolateGroupHover = false,
     } = {}
   ): string {
     if (this.snapshot[className]) return className;
 
     const classNames = [className];
 
-    if (scopedGroupActive) classNames.push("component-active");
-    if (scopedGroupFocus) classNames.push("component-focus");
-    if (scopedGroupHover) classNames.push("component-hover");
+    if (isolateGroupActive) classNames.push("group-isolate-active");
+    if (isolateGroupFocus) classNames.push("group-isolate-focus");
+    if (isolateGroupHover) classNames.push("group-isolate-hover");
 
     const styleArray: StylesArray = [
       {
