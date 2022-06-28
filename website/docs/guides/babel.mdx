@@ -9,21 +9,6 @@ The default babel configuration will both compile/inject the Tailwind CSS styles
 
 This is the recommended configuration as it provides the fastest setup and best DX experience, with support for Tailwind intellisense within your IDE.
 
-<BabelEditor />
-
-```tsx
-/* Example how your code will look */
-import { Text } from "react-native";
-
-export function MyFancyButton(props) {
-  return (
-    <Pressable className="component bg-violet-500 hover:bg-violet-600 active:bg-violet-700">
-      <Text className="font-bold component-active:font-extrabold" {...props} />;
-    </Pressable>
-  );
-}
-```
-
 ## Setup
 
 ### 1. Install the dependencies
@@ -44,6 +29,10 @@ module.exports = {
 ```
 
 <StartCoding />
+
+## Playground
+
+<BabelEditor initialCode={` `} />
 
 ## Configuring what is transformed
 

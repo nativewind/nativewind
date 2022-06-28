@@ -35,7 +35,11 @@ export class TestStyleSheetRuntime extends StyleSheetRuntime {
     this.create({ styles, atRules, topics, masks, childClasses });
     if (dimensions) this.setDimensions(dimensions);
     if (appearance) this.setAppearance(appearance);
-    if (preprocessed) this.setPreprocessed(preprocessed);
+    if (preprocessed) {
+      this.setOutput({ default: "css" });
+    } else {
+      this.setOutput({ default: "native" });
+    }
 
     if (dangerouslyCompileStyles) {
       this.setDangerouslyCompileStyles(dangerouslyCompileStyles);

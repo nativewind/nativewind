@@ -11,6 +11,7 @@ import {
   Platform,
   StyleProp,
   I18nManager,
+  PlatformOSType,
 } from "react-native";
 import {
   matchAtRule,
@@ -113,12 +114,10 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     this.setDimensions(Dimensions);
     this.setAppearance(Appearance);
     this.setPlatform(Platform.OS);
-    this.setPreprocessed(
-      Platform.select({
-        web: StyleSheet.create({ test: {} }).test !== "number",
-        default: false,
-      })
-    );
+    this.setOutput({
+      web: StyleSheet.create({ test: {} }).test !== "number" ? "css" : "native",
+      default: "native",
+    });
   }
 
   setDimensions(dimensions: Dimensions) {
@@ -163,8 +162,10 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     this.platform = platform;
   }
 
-  setPreprocessed(boolean: boolean) {
-    this.preprocessed = boolean;
+  setOutput(specifics: {
+    [platform in PlatformOSType | "default"]?: "css" | "native";
+  }) {
+    this.preprocessed = Platform.select(specifics) === "css";
   }
 
   setDangerouslyCompileStyles(

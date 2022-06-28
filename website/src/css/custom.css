@@ -82,8 +82,6 @@ blockquote.twitter-tweet a:focus {
  * START: Expo Snack
  */
 .snack-player {
-  /* border: 1px solid var(--ifm-table-border-color); */
-  /* border-radius: var(--ifm-global-radius); */
   height: 544px;
   margin-bottom: 24px;
   overflow: hidden;
@@ -91,4 +89,19 @@ blockquote.twitter-tweet a:focus {
 }
 /**
  * END: Expo Snack
+ */
+
+/**
+ * START: Babel Editor
+ */
+.babel-editor {
+}
+
+.cm-theme {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/**
+ * END: Babel Editor
  */

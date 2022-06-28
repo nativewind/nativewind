@@ -2,19 +2,23 @@
 
 Previously this project was called `tailwindcss-react-native`. If you are migrating from this project these are the breaking changes
 
-## TailwindProvider is no longer required
+## TailwindProvider has been removed
 
-The TailwindProvider is no longer required, unless you wish to inject styles or override default options for the library.
+`tailwindcss-react-native` used React context to push updates to components. Unfortunately this approach does not scale, as every styled component needed to revaluate when the context changed. NativeWind replaces the `TailwindProvider` and `useContext` with `NativeWindStyleSheet` and `useSyncExternalStore`, providing greater control over which components should re-render.
+
+As such, you will need to remove `TailwindProvider` from your application.
+
+Configuration is now performed by calling methods on `NativeWindStyleSheet`. Please see the
 
 ## CSS is the default for web
 
 Nativewind defaults to CSS for web if using React Native Web >=0.18
 
-You can control this setting via the `NativeWindStyleSheet.setPreprocessed(false)`
+You can control this setting via the `NativeWindStyleSheet.setOutput({ web: 'native' })`
 
-## useTailwind()
+## useTailwind() has been removed
 
-`useTailwind` no longer returns a callback and its options object has been updated
+`useTailwind` no longer returns a callback and its options object has been updated.
 
 ## spreadProps option on styled() has been removed
 

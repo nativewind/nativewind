@@ -11,7 +11,8 @@ export const NativeWindStyleSheet = {
   setDimensions: runtime.setDimensions.bind(runtime),
   setAppearance: runtime.setAppearance.bind(runtime),
   setPlatform: runtime.setPlatform.bind(runtime),
-  setCSS: runtime.setPreprocessed.bind(runtime),
+  setOutput: runtime.setOutput.bind(runtime),
+  setColorScheme: runtime.setColorScheme.bind(runtime),
   setDangerouslyCompileStyles:
     runtime.setDangerouslyCompileStyles.bind(runtime),
 };

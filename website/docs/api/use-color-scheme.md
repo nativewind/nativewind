@@ -5,12 +5,13 @@ sidebar_label: useColorScheme()
 
 useColorScheme() provides access to the devices color scheme.
 
-| Value          | Description                                                                                      |
-| -------------- | ------------------------------------------------------------------------------------------------ |
-| colorScheme    | The current device colorScheme                                                                   |
-| setColorScheme | Override the current colorScheme with a different scheme (accepted values are `light` or `dark`) |
+| Value             | Description                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| colorScheme       | The current device colorScheme                                                                         |
+| setColorScheme    | Override the current colorScheme with a different scheme (accepted values are `light`/`dark`/`system`) |
+| toggleColorScheme | Toggle the color scheme between `light` and `dark`                                                     |
 
-If you do not use to use the device's current color scheme, you can provide an initial color scheme to the [TailwindProvider](./tailwind-provider) via the `initialColorScheme` prop.
+You can also manually change the color scheme via `NativeWindStyleSheet.setColorScheme(colorScheme)`
 
 ```tsx
 import { useColorScheme } from "tailwindcss-react-native";

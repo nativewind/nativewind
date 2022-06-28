@@ -3,18 +3,27 @@ title: useTailwind
 sidebar_label: useTailwind()
 ---
 
-Components can have multiple style props, or you may need programmatic access to the generated styles. In these instances you can use the `useTailwind` hook.
+`useTailwind()` is a low level hook to manually subscribe to `NativeWindStyleSheet`. Unlike `styled()` and `<StyledComponent />`, it requires the user to manual manage component state like `hover`/`active`/`focus`.
+
+This hook is designed for advanced use-cases only.
+
+::: note
+
+While ios and android will return an array with your styles, some platforms uses numerical style IDs.
+
+Please see [retrieving theme values](../guides/theme-values) if you want programmatic access to your theme.
+
+:::
 
 ```tsx
-import { MotiView } from "moti";
-import { useTailwind } from "tailwindcss-react-native";
+import { Text } from "react-native";
+import { useTailwind } from "nativewind";
 
 export function MyComponent() {
-  const tw = useTailwind();
+  const textStyles = useTailwind("hover:text-red-500", {
+    hover: true,
+  });
 
-  const opacity0 = tw("opacity-0");
-  const opacity1 = tw("opacity-1");
-
-  return <MotiView from={opacity0} animate={opacity1} exit={opacity0} />;
+  return <Text style={viewStyles} />;
 }
 ```

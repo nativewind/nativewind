@@ -4,13 +4,16 @@ A StyleSheet is an abstraction similar to CSS StyleSheets and React Native's Sty
 
 ## Methods
 
-### setPlatform(platform: Platform.OS)
+### setOutput(specifics)
 
-Override the platform used by the platform prefixes. Defaults to Platform.OS
+Set the style output per Platform
 
-### setCss(boolean)
-
-Override if the StyleSheet should use setCss or native styles. Defaults to `true` if Platform.OS === `web` && React Native Web >0.18.
+```
+NativeWindStyleSheet.setOutput({
+  web: 'css',
+  default: 'native'
+})
+```
 
 ### setDimensions(dimensions: Dimensions)
 
@@ -19,3 +22,7 @@ Override how window dimensions are calculated. Defaults to Dimensions from React
 ### setAppearance(appearance: Appearance)
 
 Override the app's appearance. Defaults to Appearance from React Native.
+
+### setColorScheme(colorScheme: 'light' | 'dark' | 'system')
+
+Set the applications color scheme
