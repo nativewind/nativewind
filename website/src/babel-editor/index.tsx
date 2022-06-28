@@ -7,9 +7,6 @@ import { eclipse } from "@uiw/codemirror-theme-eclipse";
 import { javascript } from "@codemirror/lang-javascript";
 import { useColorMode } from "@docusaurus/theme-common";
 
-// import nativewind from "nativewind/babel";
-// import { transform } from "@babel/standalone";
-
 const initialText = "console.log('hello world!');";
 
 export default function BabelEditor() {
@@ -18,11 +15,15 @@ export default function BabelEditor() {
   const update = useMemo(
     () =>
       debounce((code: string) => {
-        // const output = transform(code, {
-        //   plugins: [nativewind],
-        // });
-
-        setText(code);
+        fetch(
+          `https://nativewind-demo-compiler.vercel.app/api/transform?a=${encodeURIComponent(
+            code
+          )}`
+        )
+          .then((response) => response.json())
+          .then(({ body }) => {
+            setText(body);
+          });
       }),
     [setText]
   );

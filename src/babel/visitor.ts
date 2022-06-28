@@ -12,7 +12,7 @@ import {
   State,
   TailwindcssReactNativeBabelOptions,
 } from "./types";
-import { Config } from "tailwindcss";
+import type { Config } from "tailwindcss";
 
 export interface VisitorState
   extends State,

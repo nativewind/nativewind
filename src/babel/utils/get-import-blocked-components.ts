@@ -39,9 +39,7 @@ export function getImportBlockedComponents(
 
   try {
     modulePaths = [require.resolve(moduleName)];
-    isNodeModule =
-      modulePaths[0].includes("node_modules") ||
-      moduleName === "tailwindcss-react-native"; // Need this, coz the tests get confused
+    isNodeModule = modulePaths[0].includes("node_modules");
   } catch {
     /**
      * Hello user! If your are reading this then your probably wondering why your exotic import isn't working.

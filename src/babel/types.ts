@@ -1,4 +1,5 @@
-import { ViewStyle, TextStyle, ImageStyle } from "react-native";
+import { BabelFile } from "@babel/core";
+import type { Config } from "tailwindcss";
 
 export type AllowPathOptions = "*" | string[];
 
@@ -9,12 +10,11 @@ export interface TailwindcssReactNativeBabelOptions {
   mode?: "compileAndTransform" | "compileOnly" | "transformOnly";
   rem?: number;
   tailwindConfigPath?: string;
+  tailwindConfig?: Config | undefined;
 }
 
 export type State = {
-  get: (name: string) => any;
-  set: (name: string, value: any) => any;
   opts: TailwindcssReactNativeBabelOptions;
-  file: BabelCore.BabelFile;
+  file: BabelFile;
   filename: string;
 };

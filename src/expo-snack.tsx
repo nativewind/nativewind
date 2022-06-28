@@ -1,4 +1,5 @@
-import React, { ComponentType } from "react";
+import React, { ComponentType, useEffect } from "react";
+import { Platform, StyleSheet } from "react-native";
 import { Config } from "tailwindcss";
 import { runtime, StyleSheetRuntime } from "./style-sheet";
 
@@ -8,6 +9,20 @@ export function withExpoSnack(
   component: ComponentType,
   theme: Config["theme"]
 ) {
+  useEffect(() => {
+    if (
+      Platform.OS === "web" &&
+      StyleSheet.create({ test: {} }).test !== "number" &&
+      !document.querySelector("#tailwind-cdn")
+    ) {
+      const script = document.createElement("script");
+      script.id = "tailwind-cdn";
+      script.type = "text/javascript";
+      script.src = "https://cdn.tailwindcss.com";
+      document.querySelectorAll("head")[0].append(script);
+    }
+  }, []);
+
   function dangerouslyCompileStyles(css: string, store: StyleSheetRuntime) {
     const themeString = JSON.stringify(theme);
     const cacheKey = `${css}${themeString}`;

@@ -11,24 +11,30 @@ import { getAllowedOptions, isAllowedProgramPath } from "./utils/allowed-paths";
 import { getTailwindConfig } from "./utils/get-tailwind-config";
 import { StyleError } from "../types/common";
 import { babelStyleSerializer } from "../utils/serialize-styles";
+import type { Config } from "tailwindcss";
 
 export default function rootVisitor(
   options: TailwindcssReactNativeBabelOptions,
   cwd: string
 ) {
   const errors: StyleError[] = [];
+  let tailwindConfig: Config;
 
-  const tailwindConfigPath = resolve(
-    cwd,
-    options.tailwindConfigPath || "./tailwind.config.js"
-  );
+  if (options.tailwindConfig) {
+    tailwindConfig = options.tailwindConfig;
+  } else {
+    const tailwindConfigPath = resolve(
+      cwd,
+      options.tailwindConfigPath || "./tailwind.config.js"
+    );
 
-  const tailwindConfig = getTailwindConfig(tailwindConfigPath, {
-    ...options,
-    onError(error) {
-      errors.push(error);
-    },
-  });
+    tailwindConfig = getTailwindConfig(tailwindConfigPath, {
+      ...options,
+      onError(error) {
+        errors.push(error);
+      },
+    });
+  }
 
   const { allowModuleTransform, allowRelativeModules } = getAllowedOptions(
     tailwindConfig,
@@ -79,7 +85,7 @@ export default function rootVisitor(
             allowModuleTransform,
             allowRelativeModules,
             blockList: new Set(),
-            tailwindConfig,
+            tailwindConfig: tailwindConfig,
           };
 
           // Traverse the file
