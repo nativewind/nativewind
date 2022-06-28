@@ -11,6 +11,7 @@ export interface TailwindcssReactNativeBabelOptions {
   rem?: number;
   tailwindConfigPath?: string;
   tailwindConfig?: Config | undefined;
+  rawContent?: string;
 }
 
 export type State = {

@@ -16,7 +16,10 @@ import type { Config } from "tailwindcss";
 
 export interface VisitorState
   extends State,
-    Omit<Required<TailwindcssReactNativeBabelOptions>, "tailwindConfigPath"> {
+    Omit<
+      Required<TailwindcssReactNativeBabelOptions>,
+      "tailwindConfigPath" | "rawContent"
+    > {
   cwd: string;
   allowRelativeModules: AllowPathOptions;
   blockList: Set<string>;

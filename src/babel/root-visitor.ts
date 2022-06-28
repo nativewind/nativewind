@@ -104,9 +104,15 @@ export default function rootVisitor(
             prependImports(bodyNode, ["StyledComponent"], "nativewind");
           }
 
+          const content: Config["content"] = [filename];
+
+          if (options.rawContent) {
+            content.push({ raw: options.rawContent, extension: "html" });
+          }
+
           const output = extractStyles({
             ...tailwindConfig,
-            content: [filename],
+            content,
             // If the file doesn't have any Tailwind styles, it will print a warning
             // We force an empty style to prevent this
             safelist: ["babel-empty"],
