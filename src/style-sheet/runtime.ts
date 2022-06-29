@@ -470,7 +470,7 @@ export class StyleSheetRuntime extends ColorSchemeStore {
   }
 
   create({ styles, atRules, masks, topics, units, childClasses }: AddOptions) {
-    const parsedStyles: StyleSheetRuntime["styles"] = {};
+    const parsedStyles = styles || {};
 
     if (styles) {
       for (const [key, style] of Object.entries(styles)) {
@@ -481,11 +481,10 @@ export class StyleSheetRuntime extends ColorSchemeStore {
             NWRuntimeParser(styleValue);
         }
       }
+
+      Object.assign(this.styles, StyleSheet.create(parsedStyles));
     }
 
-    console.log(parsedStyles);
-
-    Object.assign(this.styles, StyleSheet.create(parsedStyles));
     Object.assign(this.atRules, atRules);
     Object.assign(this.masks, masks);
     Object.assign(this.topics, topics);
