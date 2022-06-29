@@ -93,7 +93,7 @@
     "prettier": "2.7.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "0.69.0",
+    "react-native": "0.69.1",
     "react-native-svg": "^12.3.0",
     "react-native-web": "0.18.2",
     "react-test-renderer": "18.2.0",
