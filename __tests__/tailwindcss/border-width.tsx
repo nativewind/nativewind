@@ -1,6 +1,9 @@
 import { Style } from "css-to-react-native";
-import { ViewStyle } from "react-native";
+import { render } from "@testing-library/react-native";
+import { Text, View, ViewStyle } from "react-native";
 import { createTests, tailwindRunner } from "./runner";
+import { TestProvider } from "./runner";
+import { StyledComponent } from "../../src";
 
 const scenarios: Record<string, ViewStyle["borderWidth"]> = {
   0: 0,
@@ -8,6 +11,20 @@ const scenarios: Record<string, ViewStyle["borderWidth"]> = {
   4: 4,
   8: 8,
 };
+
+describe.only("Border - Border Width", () => {
+  test("divide-x", () => {
+    const tree = render(
+      <TestProvider>
+        <StyledComponent component={View} className="border">
+          <Text>A</Text>
+        </StyledComponent>
+      </TestProvider>
+    ).toJSON();
+
+    expect(tree).toMatchSnapshot();
+  });
+});
 
 tailwindRunner(
   "Border - Border Width",
@@ -17,10 +34,10 @@ tailwindRunner(
       {
         styles: {
           border: {
-            borderBottomWidth: "styleSheet(hairlineWidth)",
-            borderTopWidth: "styleSheet(hairlineWidth)",
-            borderLeftWidth: "styleSheet(hairlineWidth)",
-            borderRightWidth: "styleSheet(hairlineWidth)",
+            borderBottomWidth: "hairlineWidth()",
+            borderTopWidth: "hairlineWidth()",
+            borderLeftWidth: "hairlineWidth()",
+            borderRightWidth: "hairlineWidth()",
           } as Style,
         },
       },
@@ -30,8 +47,8 @@ tailwindRunner(
       {
         styles: {
           "border-x": {
-            borderLeftWidth: "styleSheet(hairlineWidth)",
-            borderRightWidth: "styleSheet(hairlineWidth)",
+            borderLeftWidth: "hairlineWidth()",
+            borderRightWidth: "hairlineWidth()",
           } as Style,
         },
       },
@@ -41,8 +58,8 @@ tailwindRunner(
       {
         styles: {
           "border-y": {
-            borderTopWidth: "styleSheet(hairlineWidth)",
-            borderBottomWidth: "styleSheet(hairlineWidth)",
+            borderTopWidth: "hairlineWidth()",
+            borderBottomWidth: "hairlineWidth()",
           } as Style,
         },
       },
@@ -51,7 +68,7 @@ tailwindRunner(
       "border-t",
       {
         styles: {
-          "border-t": { borderTopWidth: "styleSheet(hairlineWidth)" } as Style,
+          "border-t": { borderTopWidth: "hairlineWidth()" } as Style,
         },
       },
     ],
@@ -60,7 +77,7 @@ tailwindRunner(
       {
         styles: {
           "border-b": {
-            borderBottomWidth: "styleSheet(hairlineWidth)",
+            borderBottomWidth: "hairlineWidth()",
           } as Style,
         },
       },
@@ -69,7 +86,7 @@ tailwindRunner(
       "border-l",
       {
         styles: {
-          "border-l": { borderLeftWidth: "styleSheet(hairlineWidth)" } as Style,
+          "border-l": { borderLeftWidth: "hairlineWidth()" } as Style,
         },
       },
     ],
@@ -78,7 +95,7 @@ tailwindRunner(
       {
         styles: {
           "border-r": {
-            borderRightWidth: "styleSheet(hairlineWidth)",
+            borderRightWidth: "hairlineWidth()",
           } as Style,
         },
       },

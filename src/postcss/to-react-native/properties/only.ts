@@ -54,20 +54,20 @@ export function only<
 
     if (isFunctionValue(value)) {
       /**
-       * This is a hack to support platform values: styleSheet(hairlineWidth)
+       * This is a hack to support platform values: hairlineWidth()
        *
        * We need to preserve this value all the way to the style serialization
        * where they are outputted as runtime values: StyleSheet.hairlineWidth
        *
        * But we also need to convert shorthand css property names to their long form
        *
-       * so { borderWidth: styleSheet(hairlineWidth) } needs to be turned into
+       * so { borderWidth: styleSheet(hairlineWidth() } needs to be turned into
        *
        * {
-       *  "borderBottomWidth": "styleSheet(hairlineWidth)",
-       *  "borderLeftWidth": "styleSheet(hairlineWidth)",
-       *  "borderRightWidth": "styleSheet(hairlineWidth)",
-       *  "borderTopWidth": "styleSheet(hairlineWidth)",
+       *  "borderBottomWidth": "hairlineWidth()",
+       *  "borderLeftWidth": "hairlineWidth()",
+       *  "borderRightWidth": "hairlineWidth()",
+       *  "borderTopWidth": "hairlineWidth()",
        * }
        *
        * We achieve this by generating a fake style object and replacing its values.

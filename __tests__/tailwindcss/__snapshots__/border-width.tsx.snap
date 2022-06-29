@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Border - Border Width divide-x 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "borderBottomWidth": 0.5,
+        "borderLeftWidth": 0.5,
+        "borderRightWidth": 0.5,
+        "borderTopWidth": 0.5,
+      },
+    ]
+  }
+>
+  <Text>
+    A
+  </Text>
+</View>
+`;

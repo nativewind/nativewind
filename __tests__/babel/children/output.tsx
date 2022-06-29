@@ -20,7 +20,7 @@ NativeWindStyleSheet.create({
     },
     "divide-y.children@0": {
       borderBottomWidth: 0,
-      borderTopWidth: "styleSheet(hairlineWidth)",
+      borderTopWidth: "hairlineWidth()",
     },
   },
   atRules: {

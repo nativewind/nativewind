@@ -29,7 +29,7 @@ export function serializeHelper(
 
 export function isRuntimeFunction(input: string) {
   return (
-    input === "styleSheet(hairlineWidth)" ||
+    input === "hairlineWidth()" ||
     input.startsWith("roundToNearestPixel(") ||
     input.startsWith("getPixelSizeForLayoutSize(") ||
     input.startsWith("getFontSizeForLayoutSize(") ||

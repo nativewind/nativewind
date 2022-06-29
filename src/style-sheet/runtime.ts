@@ -483,7 +483,9 @@ export class StyleSheetRuntime extends ColorSchemeStore {
       }
     }
 
-    Object.assign(this.styles, StyleSheet.create(styles));
+    console.log(parsedStyles);
+
+    Object.assign(this.styles, StyleSheet.create(parsedStyles));
     Object.assign(this.atRules, atRules);
     Object.assign(this.masks, masks);
     Object.assign(this.topics, topics);
