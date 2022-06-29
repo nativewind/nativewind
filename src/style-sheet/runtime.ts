@@ -83,6 +83,7 @@ export interface AddOptions {
   atRules?: StyleSheetRuntime["atRules"];
   topics?: StyleSheetRuntime["topics"];
   masks?: StyleSheetRuntime["masks"];
+  units?: StyleSheetRuntime["units"];
   childClasses?: StyleSheetRuntime["childClasses"];
 }
 
@@ -103,6 +104,8 @@ export class StyleSheetRuntime extends ColorSchemeStore {
   topics: Record<string, Array<string>> = {};
   childClasses: Record<string, Array<string>> = {};
   masks: Record<string, number> = {};
+  units: Record<string, Record<string, string>> = {};
+
   preprocessed = false;
 
   platform: typeof Platform.OS = Platform.OS;
@@ -327,6 +330,34 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     return className;
   }
 
+  getStyleArray(className: string): StylesArray {
+    let styles = this.styles[className];
+
+    if (this.units[className]) {
+      // Having a dynamic unit forces us to switch away from StyleSheet.create
+      // to an inline-style
+      styles = { ...flattenIfStyleId(styles) };
+      for (const [key, value] of Object.entries(styles)) {
+        const unitFunction = this.units[className][key]
+          ? units[this.units[className][key]]
+          : undefined;
+
+        if (unitFunction) {
+          (styles as Record<string, unknown>)[key] = unitFunction(value);
+        }
+      }
+    }
+
+    // To keep things consistent, even atomic styles are arrays
+    const styleArray: StylesArray = styles ? [styles] : [];
+
+    if (this.childClasses[className]) {
+      styleArray.childClassNames = this.childClasses[className];
+    }
+
+    return styleArray;
+  }
+
   /**
    * ClassNames are made of multiple atomic styles. eg "a b" are the styles [a, b]
    *
@@ -337,9 +368,7 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     if (this.snapshot[className]) return this.snapshot[className];
 
     // To keep things consistent, even atomic styles are arrays
-    const styleArray: StylesArray = this.styles[className]
-      ? [this.styles[className]]
-      : [];
+    const styleArray = this.getStyleArray(className);
 
     if (this.childClasses[className]) {
       styleArray.childClassNames = this.childClasses[className];
@@ -362,22 +391,11 @@ export class StyleSheetRuntime extends ColorSchemeStore {
       const newStyles: StylesArray = [...styleArray];
 
       for (const [index, atRules] of atRulesTuple.entries()) {
-        let unitKey: string | undefined;
-
         const atRulesResult = atRules.every(([rule, params]) => {
           if (rule === "selector") {
             // These atRules shouldn't be on the atomic styles, they only
             // apply to childStyles
             return false;
-          }
-
-          if (rule === "dynamic-style") {
-            if (unitKey) {
-              throw new Error("cannot have multiple unit keys");
-            }
-
-            unitKey = params;
-            return true;
           }
 
           return matchAtRule({
@@ -393,19 +411,8 @@ export class StyleSheetRuntime extends ColorSchemeStore {
           continue;
         }
 
-        const stylesKey = createAtRuleSelector(className, index);
-
-        // This causes performance issues on RNW <17, but hopefully people upgrade soon
-        let style = flattenIfRNW(this.styles[stylesKey]);
-
-        if (unitKey) {
-          style = { ...style };
-          for (const [key, value] of Object.entries(style)) {
-            (style as Record<string, unknown>)[key] = units[unitKey](value);
-          }
-        }
-
-        newStyles.push(style);
+        const ruleSelector = createAtRuleSelector(className, index);
+        newStyles.push(this.styles[ruleSelector]);
       }
 
       this.snapshot =
@@ -462,7 +469,7 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     return this.snapshot[className];
   }
 
-  create({ styles, atRules, masks, topics, childClasses }: AddOptions) {
+  create({ styles, atRules, masks, topics, units, childClasses }: AddOptions) {
     const parsedStyles: StyleSheetRuntime["styles"] = {};
 
     if (styles) {
@@ -481,11 +488,22 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     Object.assign(this.masks, masks);
     Object.assign(this.topics, topics);
     Object.assign(this.childClasses, childClasses);
+    Object.assign(this.units, units);
   }
 }
 
 const matchesMask = (value: number, mask: number) => (value & mask) === mask;
-const flattenIfRNW = <T extends Style>(style: T | number): T => {
+
+/**
+ * Some RN platforms still use style ids. Unfortunately this means we cannot
+ * support transform or dynamic units.
+ *
+ * In these cases we need to call flatten on the style to return it to an object.
+ *
+ * This causes a minor performance issue for these styles, but it should only
+ * be a subset
+ */
+const flattenIfStyleId = <T extends Style>(style: T | number): T => {
   return typeof style === "number"
     ? (StyleSheet.flatten(style) as unknown as T)
     : style;

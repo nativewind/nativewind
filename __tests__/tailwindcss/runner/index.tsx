@@ -31,6 +31,7 @@ export interface TestValues {
   styles?: Record<string, Style>;
   topics?: Record<string, Array<string>>;
   masks?: Record<string, number>;
+  units?: StyleSheetRuntime["units"];
   atRules?: Record<string, Array<AtRuleTuple[]>>;
   childClasses?: Record<string, string[]>;
 }
@@ -63,6 +64,8 @@ export function assertStyles(
         Object.keys(output.topics).length > 0 ? output.topics : undefined;
       actualValues.masks =
         Object.keys(output.masks).length > 0 ? output.masks : undefined;
+      actualValues.units =
+        Object.keys(output.units).length > 0 ? output.units : undefined;
       actualValues.atRules =
         Object.keys(output.atRules).length > 0 ? output.atRules : undefined;
       actualValues.childClasses =
@@ -78,6 +81,9 @@ export function assertStyles(
     expect([...errors, ...outputErrors].length).toBeGreaterThan(0);
     expect(actualValues).toEqual({});
   } else {
+    if (outputErrors.length > 0) {
+      for (const error of outputErrors) console.error(error);
+    }
     expect(outputErrors.length).toBe(0);
     expect(actualValues).toEqual(expectedValues);
   }

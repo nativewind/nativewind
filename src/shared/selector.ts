@@ -1,31 +1,4 @@
 import { Platform } from "react-native";
-import { AtRuleTuple, Style } from "../types/common";
-
-export function getSelectorTopics(
-  selector: string,
-  _declarations: Style,
-  atRules: AtRuleTuple[] | undefined
-) {
-  const topics: Set<string> = new Set();
-
-  if (hasDarkPseudoClass(selector)) topics.add("colorScheme");
-
-  if (atRules) {
-    for (const [atRule, params] of atRules) {
-      if (atRule === "media" && params) {
-        if (params.includes("width")) topics.add("width");
-        if (params.includes("height")) topics.add("height");
-        if (params.includes("orientation")) topics.add("orientation");
-        if (params.includes("aspect-ratio")) topics.add("window");
-      } else if (atRule === "dynamic-style") {
-        if (params === "vw") topics.add("width");
-        if (params === "vh") topics.add("height");
-      }
-    }
-  }
-
-  return [...topics.values()];
-}
 
 export function normalizeCssSelector(selector: string) {
   selector = selector.trim().replace(/^\.|\\/g, "");

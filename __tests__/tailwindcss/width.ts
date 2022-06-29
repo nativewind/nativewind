@@ -23,15 +23,15 @@ tailwindRunner(
       "w-screen",
       {
         styles: {
-          "w-screen@0": {
+          "w-screen": {
             width: 100,
           },
         },
         topics: {
           "w-screen": ["width"],
         },
-        atRules: {
-          "w-screen": [[["dynamic-style", "vw"]]],
+        units: {
+          "w-screen": { width: "vw" },
         },
       },
     ],

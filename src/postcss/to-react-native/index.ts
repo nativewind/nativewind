@@ -17,7 +17,8 @@ export function toReactNative(
   declaration: Declaration,
   { onError }: ToReactNativeOptions
 ) {
-  const { prop, value } = declaration;
+  const prop = declaration.prop;
+  let value = declaration.value;
 
   const name = getPropertyName(prop) as keyof typeof properties;
 
@@ -25,9 +26,22 @@ export function toReactNative(
 
   try {
     const transform = properties[name];
+
+    let unit: string | undefined;
+    if (value.endsWith("vw") || value.endsWith("vh")) {
+      unit = value.slice(-2);
+      value = value.slice(0, -2);
+    }
+
     styles = transform
       ? transform(value, name)
       : getStylesForProperty(name, value);
+
+    if (unit) {
+      for (const [key, value] of Object.entries(styles)) {
+        styles[key] = { value, unit };
+      }
+    }
   } catch (error) {
     if (error instanceof Error) {
       onError({ declaration, error: error.message, result: styles });

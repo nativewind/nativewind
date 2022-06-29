@@ -3,12 +3,13 @@ import { Plugin, PluginCreator } from "postcss";
 import {
   createAtRuleSelector,
   getSelectorMask,
-  getSelectorTopics,
   normalizeCssSelector,
 } from "../shared/selector";
 import { toReactNative } from "./to-react-native";
 import { StyleRecord, Style, StyleError, AtRuleTuple } from "../types/common";
 import { outputFormatter } from "./output-formatter";
+import { StyleSheetRuntime } from "../style-sheet";
+import { getRuntime } from "./get-runtime";
 
 const atRuleSymbol = Symbol("media");
 const isForChildrenSymbol = Symbol("children");
@@ -24,6 +25,7 @@ export interface ExtractedValues {
   styles: StyleRecord;
   topics: Record<string, Array<string>>;
   masks: Record<string, number>;
+  units: StyleSheetRuntime["units"];
   childClasses: Record<string, string[]>;
   atRules: Record<string, Array<AtRuleTuple[]>>;
 }
@@ -47,6 +49,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
   const topics: Record<string, Set<string>> = {};
   const childClasses: Record<string, string[]> = {};
   const masks: DoneResult["masks"] = {};
+  const units: DoneResult["units"] = {};
   const atRules: DoneResult["atRules"] = {};
   const errors: DoneResult["errors"] = [];
 
@@ -65,19 +68,19 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
 
           node[atRuleSymbol].push([node.name, node.params]);
         } else if (node.type === "rule") {
-          let declarations: Style = {};
+          let nativeDeclarations: Style = {};
 
           // Get all the declarations
           node.walkDecls((decl) => {
-            declarations = {
-              ...declarations,
+            nativeDeclarations = {
+              ...nativeDeclarations,
               ...toReactNative(decl, {
                 onError: (error) => errors.push(error),
               }),
             };
           });
 
-          if (Object.keys(declarations).length === 0) {
+          if (Object.keys(nativeDeclarations).length === 0) {
             return;
           }
 
@@ -85,7 +88,12 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
             const mask = getSelectorMask(s, s.includes('[dir="rtl"]'));
             const rules = node.parent?.[atRuleSymbol];
 
-            const selectorTopics = getSelectorTopics(s, declarations, rules);
+            const {
+              declarations,
+              units: selectorUnits,
+              topics: selectorTopics,
+            } = getRuntime(s, nativeDeclarations, rules);
+
             let selector = normalizeCssSelector(s);
 
             if (mask > 0) {
@@ -100,7 +108,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
               selector = childSelector;
             }
 
-            if (selectorTopics.length > 0) {
+            if (selectorTopics) {
               topics[selector] ??= new Set();
               for (const topic of selectorTopics) {
                 topics[selector].add(topic);
@@ -114,6 +122,10 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
                 selector,
                 atRules[selector].length - 1
               );
+            }
+
+            if (selectorUnits) {
+              units[selector] = selectorUnits;
             }
 
             styles[selector] = declarations;
@@ -134,6 +146,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
           atRules,
           childClasses,
           topics: arrayTopics,
+          units,
           errors,
         });
 
@@ -141,7 +154,14 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
         writeFileSync(
           output,
           outputFormatter(
-            { styles, masks, atRules, childClasses, topics: arrayTopics },
+            {
+              styles,
+              masks,
+              atRules,
+              childClasses,
+              units,
+              topics: arrayTopics,
+            },
             platform
           )
         );

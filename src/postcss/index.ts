@@ -5,7 +5,6 @@ import postcssColorFunctionalNotation from "postcss-color-functional-notation";
 import postcssNested from "postcss-nested";
 
 import plugin, { PostcssPluginOptions } from "./plugin";
-import viewportUnits from "./viewport-units";
 
 const pluginPack: PluginCreator<PostcssPluginOptions> = (options) => {
   return postcss([
@@ -14,8 +13,7 @@ const pluginPack: PluginCreator<PostcssPluginOptions> = (options) => {
     calc({
       warnWhenCannotResolve: true,
     }),
-    postcssNested({ bubble: ["selector", "pseudo-class", "dynamic-style"] }),
-    viewportUnits(),
+    postcssNested({ bubble: ["selector"] }),
     plugin(options),
   ]);
 };

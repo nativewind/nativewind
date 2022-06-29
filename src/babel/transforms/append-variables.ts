@@ -17,6 +17,7 @@ export function appendVariables(
     atRules,
     masks,
     topics,
+    units,
     childClasses,
   }: ReturnType<typeof babelStyleSerializer>
 ) {
@@ -34,6 +35,10 @@ export function appendVariables(
 
   if (topics) {
     objectProperties.push(objectProperty(identifier("topics"), topics));
+  }
+
+  if (units) {
+    objectProperties.push(objectProperty(identifier("units"), units));
   }
 
   if (childClasses) {

@@ -10,14 +10,16 @@ export function Test() {
 }
 NativeWindStyleSheet.create({
   styles: {
-    "w-screen@0": {
+    "w-screen": {
       width: 100,
     },
   },
-  atRules: {
-    "w-screen": [[["dynamic-style", "vw"]]],
-  },
   topics: {
     "w-screen": ["width"],
+  },
+  units: {
+    "w-screen": {
+      width: "vw",
+    },
   },
 });

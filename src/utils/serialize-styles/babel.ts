@@ -17,6 +17,7 @@ export function babelStyleSerializer({
   styles: rawStyles,
   atRules,
   masks,
+  units,
   topics,
   childClasses,
 }: ExtractedValues) {
@@ -32,6 +33,8 @@ export function babelStyleSerializer({
       Object.keys(masks).length > 0 ? babelSerializeObject(masks) : undefined,
     topics:
       Object.keys(topics).length > 0 ? babelSerializeObject(topics) : undefined,
+    units:
+      Object.keys(units).length > 0 ? babelSerializeObject(units) : undefined,
     childClasses:
       Object.keys(childClasses).length > 0
         ? babelSerializeObject(childClasses)

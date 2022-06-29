@@ -23,15 +23,15 @@ tailwindRunner(
       "h-screen",
       {
         styles: {
-          "h-screen@0": {
+          "h-screen": {
             height: 100,
           },
         },
         topics: {
           "h-screen": ["height"],
         },
-        atRules: {
-          "h-screen": [[["dynamic-style", "vh"]]],
+        units: {
+          "h-screen": { height: "vh" },
         },
       },
     ],
