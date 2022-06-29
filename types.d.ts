@@ -37,4 +37,9 @@ declare module "react-native" {
     $$css?: true;
     tailwindcssReactNative?: string;
   }
+
+  interface TouchableWithoutFeedbackProps {
+    className?: string;
+    tw?: string;
+  }
 }
