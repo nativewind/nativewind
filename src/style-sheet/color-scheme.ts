@@ -9,25 +9,29 @@ export abstract class ColorSchemeStore {
   colorSchemeSystem: ColorSchemeSystem = "system";
 
   constructor() {
-    if (typeof localStorage !== "undefined") {
-      const isDarkMode = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
+    try {
+      if (typeof localStorage !== "undefined") {
+        const isDarkMode = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
 
-      if (
-        localStorage.theme === "dark" ||
-        (!("theme" in localStorage) && isDarkMode)
-      ) {
-        document.documentElement.classList.add("dark");
-        this.colorScheme = "dark";
-      } else {
-        document.documentElement.classList.remove("dark");
-        this.colorScheme = "light";
+        if (
+          localStorage.theme === "dark" ||
+          (!("theme" in localStorage) && isDarkMode)
+        ) {
+          document.documentElement.classList.add("dark");
+          this.colorScheme = "dark";
+        } else {
+          document.documentElement.classList.remove("dark");
+          this.colorScheme = "light";
+        }
+
+        this.subscribeColorScheme(() => {
+          localStorage.theme = this.colorScheme;
+        });
       }
-
-      this.subscribeColorScheme(() => {
-        localStorage.theme = this.colorScheme;
-      });
+    } catch {
+      // Just silently fail
     }
   }
 
