@@ -1,4 +1,8 @@
 import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
+import {
+  isRuntimeFunction,
+  matchRuntimeFunction,
+} from "./style-function-helpers";
 
 export function parseStyleFunction(
   functionString?: string,
@@ -31,28 +35,6 @@ export function parseStyleFunction(
   }
 
   throw new Error(`Unknown functionString: ${functionString}`);
-}
-
-export function isRuntimeFunction(input: string | number) {
-  if (typeof input !== "string") return false;
-
-  return (
-    input === "hairlineWidth()" ||
-    input.startsWith("roundToNearestPixel(") ||
-    input.startsWith("getPixelSizeForLayoutSize(") ||
-    input.startsWith("getFontSizeForLayoutSize(") ||
-    input.startsWith("roundToNearestFontScale(") ||
-    input.startsWith("platformColor(") ||
-    input.startsWith("platform(")
-  );
-}
-
-export function matchRuntimeFunction(
-  input: string
-): [string, string] | [undefined, undefined] {
-  const matches = input.match(/(.+?)\((.*)\)/);
-  if (!matches) return [undefined, undefined];
-  return [matches[1], matches[2]];
 }
 
 export function parseString<T extends (value: string) => S, S>(

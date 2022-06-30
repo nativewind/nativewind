@@ -17,7 +17,7 @@ import {
 import {
   isRuntimeFunction,
   matchRuntimeFunction,
-} from "../style-sheet/style-functions";
+} from "../style-sheet/style-function-helpers";
 import { ExtractedValues } from "./plugin";
 
 export function serializer({

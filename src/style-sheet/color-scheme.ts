@@ -5,35 +5,28 @@ export type ColorSchemeSystem = "light" | "dark" | "system";
 
 export abstract class ColorSchemeStore {
   colorSchemeListeners = new Set<() => void>();
-  colorScheme: ColorSchemeName;
-  colorSchemeSystem: ColorSchemeSystem;
+  colorScheme: ColorSchemeName = Appearance.getColorScheme() || "light";
+  colorSchemeSystem: ColorSchemeSystem = "system";
 
-  constructor(colorSchemeSystem?: ColorSchemeSystem) {
-    if (colorSchemeSystem === "system" || colorSchemeSystem === undefined) {
-      this.colorScheme = Appearance.getColorScheme() || "light";
-      this.colorSchemeSystem = "system";
-    } else {
-      this.colorScheme = colorSchemeSystem;
-      this.colorSchemeSystem = colorSchemeSystem;
-    }
-
+  constructor() {
     if (typeof localStorage !== "undefined") {
+      const isDarkMode = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+
       if (
         localStorage.theme === "dark" ||
-        (!("theme" in localStorage) &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
+        (!("theme" in localStorage) && isDarkMode)
       ) {
         document.documentElement.classList.add("dark");
+        this.colorScheme = "dark";
       } else {
         document.documentElement.classList.remove("dark");
+        this.colorScheme = "light";
       }
 
       this.subscribeColorScheme(() => {
-        if (this.colorSchemeSystem === "system") {
-          localStorage.removeItem("theme");
-        } else {
-          localStorage.theme = this.colorSchemeSystem;
-        }
+        localStorage.theme = this.colorScheme;
       });
     }
   }

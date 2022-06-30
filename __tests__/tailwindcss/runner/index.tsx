@@ -14,10 +14,8 @@ import {
   TestStyleSheetRuntime,
   TestStyleSheetStoreConstructor,
 } from "../../style-sheet/tests";
-import {
-  isRuntimeFunction,
-  parseString,
-} from "../../../src/style-sheet/style-functions";
+import { parseString } from "../../../src/style-sheet/style-functions";
+import { isRuntimeFunction } from "../../../src/style-sheet/style-function-helpers";
 
 export type Test = [string, TestValues] | [string, StyleRecord, true];
 
