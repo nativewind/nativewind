@@ -25,7 +25,7 @@ function ExpoSnackWrapper({ children }: PropsWithChildren<unknown>) {
 
 export function withExpoSnack(
   Component: ComponentType,
-  theme: Config["theme"]
+  theme: Config["theme"] = {}
 ) {
   function dangerouslyCompileStyles(css: string, store: StyleSheetRuntime) {
     const themeString = JSON.stringify(theme);
