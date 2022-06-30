@@ -118,7 +118,10 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     this.setAppearance(Appearance);
     this.setPlatform(Platform.OS);
     this.setOutput({
-      web: StyleSheet.create({ test: {} }).test !== "number" ? "css" : "native",
+      web:
+        typeof StyleSheet.create({ test: {} }).test !== "number"
+          ? "css"
+          : "native",
       default: "native",
     });
   }
