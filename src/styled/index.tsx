@@ -10,14 +10,14 @@ import {
   PropsWithoutRef,
   useContext,
 } from "react";
-import { StyledProps, StyledPropsWithKeys } from "./utils/styled";
+import { StyledProps, StyledPropsWithKeys } from "../utils/styled";
 import { useInteraction } from "./use-interaction";
 import { withStyledChildren } from "./with-styled-children";
 import { withStyledProps } from "./with-styled-props";
 import { useTailwind } from "./use-tailwind";
 import { withClassNames } from "./with-class-names";
 import { StyleProp } from "react-native";
-import { StoreContext } from "./style-sheet";
+import { StoreContext } from "../style-sheet";
 import { IsolateGroupContext } from "./group-context";
 
 export interface StyledOptions<P> {

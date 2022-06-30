@@ -1,7 +1,7 @@
 import { ColorValue } from "react-native";
 import { Test } from ".";
-import { normalizeCssSelector } from "../../../src/shared/selector";
 import { Style, StyleRecord } from "../../../src/types/common";
+import { normalizeCssSelector } from "../../../src/utils/selector";
 
 export function expectError(names: string[]): Test[] {
   return names.map((name) => [name, {}, true]);

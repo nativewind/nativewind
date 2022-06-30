@@ -5,9 +5,8 @@ import {
   Platform,
   ScaledSize,
 } from "react-native";
-import { StateBitOptions } from "../../src/shared/selector";
-
 import { StyleSheetRuntime, AddOptions } from "../../src/style-sheet/runtime";
+import { StateBitOptions } from "../../src/utils/selector";
 
 export interface TestStyleSheetStoreConstructor extends AddOptions {
   dimensions?: Dimensions;
