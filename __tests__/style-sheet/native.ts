@@ -117,7 +117,7 @@ describe("StyleSheetStore", () => {
     ]);
   });
 
-  test.only("test", () => {
+  test("test", () => {
     const atRuleText = { backgroundColor: "black" };
 
     const appearance = createTestAppearance();

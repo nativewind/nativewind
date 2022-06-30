@@ -1,16 +1,14 @@
 import { resolve } from "node:path";
-import { Program } from "@babel/types";
+import { expressionStatement, Program } from "@babel/types";
 import { NodePath } from "@babel/traverse";
 
 import { extractStyles } from "../postcss/extract-styles";
-import { appendVariables } from "./transforms/append-variables";
 import { prependImports } from "./transforms/append-import";
 import { TailwindcssReactNativeBabelOptions, State } from "./types";
 import { visitor, VisitorState } from "./visitor";
 import { getAllowedOptions, isAllowedProgramPath } from "./utils/allowed-paths";
 import { getTailwindConfig } from "./utils/get-tailwind-config";
 import { StyleError } from "../types/common";
-import { babelStyleSerializer } from "../utils/serialize-styles";
 import type { Config } from "tailwindcss";
 
 export default function rootVisitor(
@@ -116,12 +114,11 @@ export default function rootVisitor(
             // If the file doesn't have any Tailwind styles, it will print a warning
             // We force an empty style to prevent this
             safelist: ["babel-empty"],
-            serializer: babelStyleSerializer,
           });
 
           if (!output.hasStyles) return;
 
-          appendVariables(bodyNode, output);
+          bodyNode.push(expressionStatement(output.stylesheetCreateExpression));
 
           if (!hasNWStyleSheetImport) {
             prependImports(bodyNode, ["NativeWindStyleSheet"], "nativewind");

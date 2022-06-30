@@ -12,7 +12,7 @@ const scenarios: Record<string, ViewStyle["borderWidth"]> = {
   8: 8,
 };
 
-describe.only("Border - Border Width", () => {
+describe("Border - Border Width", () => {
   test("divide-x", () => {
     const tree = render(
       <TestProvider>

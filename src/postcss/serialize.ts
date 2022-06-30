@@ -9,15 +9,18 @@ import {
   nullLiteral,
   numericLiteral,
   objectExpression,
+  ObjectProperty,
   objectProperty,
   stringLiteral,
   unaryExpression,
 } from "@babel/types";
-import { ExtractedValues } from "../../postcss/plugin";
-import { matchRuntimeFunction } from "../../style-sheet/style-functions";
-import { isRuntimeFunction, serializeHelper } from "./helper";
+import {
+  isRuntimeFunction,
+  matchRuntimeFunction,
+} from "../style-sheet/style-functions";
+import { ExtractedValues } from "./plugin";
 
-export function babelStyleSerializer({
+export function serializer({
   styles: rawStyles,
   atRules,
   masks,
@@ -25,40 +28,79 @@ export function babelStyleSerializer({
   topics,
   childClasses,
 }: ExtractedValues) {
-  const { styles, ...rest } = serializeHelper(rawStyles, babelReplacer);
+  const serializedStyles: Record<string, Record<string, unknown>> = {};
 
-  return {
-    styles: babelSerializeLiteral(styles),
-    atRules:
-      Object.keys(atRules).length > 0
-        ? babelSerializeLiteral(atRules)
-        : undefined,
-    masks:
-      Object.keys(masks).length > 0 ? babelSerializeLiteral(masks) : undefined,
-    topics:
-      Object.keys(topics).length > 0
-        ? babelSerializeLiteral(topics)
-        : undefined,
-    units:
-      Object.keys(units).length > 0 ? babelSerializeLiteral(units) : undefined,
-    childClasses:
-      Object.keys(childClasses).length > 0
-        ? babelSerializeLiteral(childClasses)
-        : undefined,
-    hasStyles: Object.keys(styles).length > 0,
-    ...rest,
-  };
-}
+  for (const [key, style] of Object.entries(rawStyles)) {
+    serializedStyles[key] = {};
 
-function babelReplacer(
-  key: string,
-  value: string
-): [string, string | Expression | undefined] {
-  if (!isRuntimeFunction(value)) {
-    return [key, value];
+    for (const [k, v] of Object.entries(style)) {
+      if (isRuntimeFunction(v)) {
+        serializedStyles[key][k] = functionReplacer(v);
+      } else {
+        serializedStyles[key][k] = v;
+      }
+    }
   }
 
-  return [key, functionReplacer(value)];
+  const styles = babelSerializeLiteral(serializedStyles);
+
+  const objectProperties: ObjectProperty[] = [
+    objectProperty(identifier("styles"), styles),
+  ];
+
+  const raw: Partial<ExtractedValues> = {
+    styles: rawStyles,
+  };
+
+  if (Object.keys(atRules).length > 0) {
+    raw.atRules = atRules;
+    objectProperties.push(
+      objectProperty(identifier("atRules"), babelSerializeLiteral(atRules))
+    );
+  }
+
+  if (Object.keys(masks).length > 0) {
+    raw.masks = masks;
+    objectProperties.push(
+      objectProperty(identifier("masks"), babelSerializeLiteral(masks))
+    );
+  }
+
+  if (Object.keys(topics).length > 0) {
+    raw.topics = topics;
+    objectProperties.push(
+      objectProperty(identifier("topics"), babelSerializeLiteral(topics))
+    );
+  }
+
+  if (Object.keys(units).length > 0) {
+    raw.units = units;
+    objectProperties.push(
+      objectProperty(identifier("units"), babelSerializeLiteral(units))
+    );
+  }
+
+  if (Object.keys(childClasses).length > 0) {
+    raw.childClasses = childClasses;
+    objectProperties.push(
+      objectProperty(
+        identifier("childClasses"),
+        babelSerializeLiteral(childClasses)
+      )
+    );
+  }
+
+  return {
+    raw,
+    hasStyles: Object.keys(rawStyles).length > 0,
+    stylesheetCreateExpression: callExpression(
+      memberExpression(
+        identifier("NativeWindStyleSheet"),
+        identifier("create")
+      ),
+      [objectExpression(objectProperties)]
+    ),
+  };
 }
 
 function functionReplacer(functionString: string): Expression {

@@ -1,4 +1,3 @@
-import { writeFileSync } from "node:fs";
 import { Plugin, PluginCreator } from "postcss";
 import {
   createAtRuleSelector,
@@ -7,7 +6,7 @@ import {
 } from "../shared/selector";
 import { toReactNative } from "./to-react-native";
 import { StyleRecord, Style, StyleError, AtRuleTuple } from "../types/common";
-import { outputFormatter } from "./output-formatter";
+import { outputWriter } from "./fs-writer";
 import { StyleSheetRuntime } from "../style-sheet";
 import { getRuntime } from "./get-runtime";
 
@@ -36,14 +35,12 @@ export interface DoneResult extends ExtractedValues {
 
 export interface PostcssPluginOptions {
   output?: string;
-  platform?: string;
   done?: (result: DoneResult) => void;
 }
 
 export const plugin: PluginCreator<PostcssPluginOptions> = ({
   done,
   output,
-  platform,
 } = {}) => {
   const styles: DoneResult["styles"] = {};
   const topics: Record<string, Set<string>> = {};
@@ -54,7 +51,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
   const errors: DoneResult["errors"] = [];
 
   return {
-    postcssPlugin: "tailwindcss-react-native-style-extractor",
+    postcssPlugin: "nativewind-style-extractor",
     OnceExit: (root) => {
       root.walk((node) => {
         if (node.type === "atrule") {
@@ -151,20 +148,14 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
         });
 
       if (output) {
-        writeFileSync(
-          output,
-          outputFormatter(
-            {
-              styles,
-              masks,
-              atRules,
-              childClasses,
-              units,
-              topics: arrayTopics,
-            },
-            platform
-          )
-        );
+        outputWriter(output, {
+          styles,
+          masks,
+          atRules,
+          childClasses,
+          units,
+          topics: arrayTopics,
+        });
       }
     },
   } as Plugin;

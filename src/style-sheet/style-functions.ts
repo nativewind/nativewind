@@ -55,7 +55,7 @@ export function matchRuntimeFunction(
   return [matches[1], matches[2]];
 }
 
-function parseString<T extends (value: string) => S, S>(
+export function parseString<T extends (value: string) => S, S>(
   input: string,
   callback: T
 ) {

@@ -5,7 +5,6 @@ import {
   StyleError,
   StyleRecord,
 } from "../../../src/types/common";
-import { testStyleSerializer } from "../../../src/utils/serialize-styles";
 
 import cssPlugin from "../../../src/tailwind/css";
 import { nativePlugin } from "../../../src/tailwind/native";
@@ -15,6 +14,10 @@ import {
   TestStyleSheetRuntime,
   TestStyleSheetStoreConstructor,
 } from "../../style-sheet/tests";
+import {
+  isRuntimeFunction,
+  parseString,
+} from "../../../src/style-sheet/style-functions";
 
 export type Test = [string, TestValues] | [string, StyleRecord, true];
 
@@ -43,7 +46,7 @@ export function assertStyles(
 ) {
   const errors: StyleError[] = [];
 
-  const { errors: outputErrors, ...actualValues } = extractStyles({
+  const { errors: outputErrors, raw: actualValues } = extractStyles({
     theme: {},
     plugins: [
       cssPlugin,
@@ -55,31 +58,11 @@ export function assertStyles(
     ],
     content: [{ raw: "", extension: "html" }],
     safelist: [css],
-    serializer: (output) => {
-      const actualValues: TestValues = {};
-
-      actualValues.styles =
-        Object.keys(output.styles).length > 0 ? output.styles : undefined;
-      actualValues.topics =
-        Object.keys(output.topics).length > 0 ? output.topics : undefined;
-      actualValues.masks =
-        Object.keys(output.masks).length > 0 ? output.masks : undefined;
-      actualValues.units =
-        Object.keys(output.units).length > 0 ? output.units : undefined;
-      actualValues.atRules =
-        Object.keys(output.atRules).length > 0 ? output.atRules : undefined;
-      actualValues.childClasses =
-        Object.keys(output.childClasses).length > 0
-          ? output.childClasses
-          : undefined;
-
-      return actualValues;
-    },
   });
 
   if (shouldError) {
     expect([...errors, ...outputErrors].length).toBeGreaterThan(0);
-    expect(actualValues).toEqual({});
+    expect(actualValues.styles).toEqual({});
   } else {
     if (outputErrors.length > 0) {
       for (const error of outputErrors) console.error(error);
@@ -90,15 +73,31 @@ export function assertStyles(
 }
 
 function dangerouslyCompileStyles(css: string, store: StyleSheetRuntime) {
-  const output = extractStyles({
+  const { raw } = extractStyles({
     theme: {},
     plugins: [cssPlugin, nativePlugin({})],
     content: [{ raw: "", extension: "html" }],
     safelist: [css],
-    serializer: testStyleSerializer,
   });
 
-  store.create(output);
+  const serializedStyles: Record<string, Record<string, unknown>> = {};
+
+  for (const [key, style] of Object.entries(raw.styles || {})) {
+    serializedStyles[key] = {};
+
+    for (const [k, v] of Object.entries(style)) {
+      if (isRuntimeFunction(v)) {
+        serializedStyles[key][k] = parseString(v, (x) => x);
+      } else {
+        serializedStyles[key][k] = v;
+      }
+    }
+  }
+
+  store.create({
+    ...raw,
+    styles: serializedStyles,
+  });
 }
 
 export function TestProvider({

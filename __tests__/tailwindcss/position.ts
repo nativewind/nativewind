@@ -5,7 +5,7 @@ tailwindRunner(
   expectError(["fixed", "sticky"]),
   // static is a special scenario see to-react-native/properties/position.ts
   [
-    ["static", {}],
+    ["static", { styles: {} }],
     ["absolute", { styles: { absolute: { position: "absolute" } } }],
     ["relative", { styles: { relative: { position: "relative" } } }],
   ]

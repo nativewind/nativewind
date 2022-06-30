@@ -5,19 +5,12 @@ import plugin from "../postcss";
 
 import { StyleError } from "../types/common";
 import { ExtractedValues } from "./plugin";
+import { serializer } from "./serialize";
 
-export interface ExtractStylesOptions<T> extends Config {
-  serializer: (values: ExtractedValues) => T;
-}
-
-export type ExtractStyles<T> = T & {
-  errors: StyleError[];
-};
-
-export function extractStyles<T>(
-  { serializer, ...tailwindConfig }: ExtractStylesOptions<T>,
+export function extractStyles(
+  tailwindConfig: Config,
   cssInput = "@tailwind components;@tailwind utilities;"
-): ExtractStyles<T> {
+) {
   let errors: StyleError[] = [];
 
   let output: ExtractedValues = {
