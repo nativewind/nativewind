@@ -27,7 +27,9 @@ export function serializeHelper(
   };
 }
 
-export function isRuntimeFunction(input: string) {
+export function isRuntimeFunction(input: string | number) {
+  if (typeof input !== "string") return false;
+
   return (
     input === "hairlineWidth()" ||
     input.startsWith("roundToNearestPixel(") ||

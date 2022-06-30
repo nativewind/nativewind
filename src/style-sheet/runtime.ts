@@ -27,7 +27,7 @@ import { MediaRecord } from "../types/common";
 import vh from "./units/vh";
 import vw from "./units/vw";
 import { ColorSchemeStore } from "./color-scheme";
-import { NWRuntimeParser } from "../style-helpers";
+import { parseStyleFunction } from "./style-functions";
 
 export type { ColorSchemeSystem, ColorSchemeName } from "./color-scheme";
 export type Style = ViewStyle | ImageStyle | TextStyle;
@@ -469,22 +469,12 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     return this.snapshot[className];
   }
 
+  parse(functionString: string, value: string) {
+    return parseStyleFunction(functionString, value);
+  }
+
   create({ styles, atRules, masks, topics, units, childClasses }: AddOptions) {
-    const parsedStyles = styles || {};
-
-    if (styles) {
-      for (const [key, style] of Object.entries(styles)) {
-        parsedStyles[key] = {};
-
-        for (const [styleKey, styleValue] of Object.entries(style)) {
-          parsedStyles[key][styleKey as keyof Style] =
-            NWRuntimeParser(styleValue);
-        }
-      }
-
-      Object.assign(this.styles, StyleSheet.create(parsedStyles));
-    }
-
+    Object.assign(this.styles, StyleSheet.create(styles));
     Object.assign(this.atRules, atRules);
     Object.assign(this.masks, masks);
     Object.assign(this.topics, topics);

@@ -11,14 +11,16 @@ export function Test() {
 NativeWindStyleSheet.create({
   styles: {
     "p-px": {
-      paddingTop: "roundToNearestPixel(4)",
-      paddingRight: "roundToNearestPixel(4)",
-      paddingBottom: "roundToNearestPixel(4)",
-      paddingLeft: "roundToNearestPixel(4)",
+      paddingTop: NativeWindStyleSheet.parse("roundToNearestPixel", "4"),
+      paddingRight: NativeWindStyleSheet.parse("roundToNearestPixel", "4"),
+      paddingBottom: NativeWindStyleSheet.parse("roundToNearestPixel", "4"),
+      paddingLeft: NativeWindStyleSheet.parse("roundToNearestPixel", "4"),
     },
     "text-blue-500": {
-      color:
-        "platform(ios:platformColor(systemTealColor) android:platformColor(@android:color/holo_blue_bright) default:black)",
+      color: NativeWindStyleSheet.parse(
+        "platform",
+        "ios:platformColor(systemTealColor) android:platformColor(@android:color/holo_blue_bright) default:black"
+      ),
     },
   },
 });
