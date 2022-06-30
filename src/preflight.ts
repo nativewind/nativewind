@@ -35,7 +35,6 @@ import {
  * We're still undecided on what this should be, but if you'd like to start please
  * open a PR or a Github discussion
  */
-
 export const ActivityIndicator = styled(RNActivityIndicator);
 export const FlatList = styled(RNFlatList);
 export const Image = styled(RNImage);
