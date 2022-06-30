@@ -4,7 +4,7 @@ import { StyleSheetRuntime } from "./runtime";
 export type { StylesArray, Snapshot } from "./runtime";
 export { StyleSheetRuntime } from "./runtime";
 
-export const runtime = new StyleSheetRuntime();
+const runtime = new StyleSheetRuntime();
 
 export const NativeWindStyleSheet = {
   create: runtime.create.bind(runtime),

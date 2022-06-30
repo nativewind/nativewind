@@ -1,18 +1,15 @@
-import React, { ComponentType, useEffect } from "react";
+import React, { ComponentType, PropsWithChildren, useEffect } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { Config } from "tailwindcss";
-import { runtime, StyleSheetRuntime } from "./style-sheet";
+import { NativeWindStyleSheet, StyleSheetRuntime } from "./style-sheet";
 
 const fetched: Record<string, boolean> = {};
 
-export function withExpoSnack(
-  component: ComponentType,
-  theme: Config["theme"]
-) {
+function ExpoSnackWrapper({ children }: PropsWithChildren<unknown>) {
   useEffect(() => {
     if (
       Platform.OS === "web" &&
-      StyleSheet.create({ test: {} }).test !== "number" &&
+      typeof StyleSheet.create({ test: {} }).test !== "number" &&
       !document.querySelector("#tailwind-cdn")
     ) {
       const script = document.createElement("script");
@@ -23,6 +20,13 @@ export function withExpoSnack(
     }
   }, []);
 
+  return <>{children}</>;
+}
+
+export function withExpoSnack(
+  Component: ComponentType,
+  theme: Config["theme"]
+) {
   function dangerouslyCompileStyles(css: string, store: StyleSheetRuntime) {
     const themeString = JSON.stringify(theme);
     const cacheKey = `${css}${themeString}`;
@@ -57,7 +61,11 @@ export function withExpoSnack(
       });
   }
 
-  runtime.setDangerouslyCompileStyles(dangerouslyCompileStyles);
+  NativeWindStyleSheet.setDangerouslyCompileStyles(dangerouslyCompileStyles);
 
-  return <>{component}</>;
+  return (
+    <ExpoSnackWrapper>
+      <Component />
+    </ExpoSnackWrapper>
+  );
 }
