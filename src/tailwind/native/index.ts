@@ -18,7 +18,7 @@ import { Config } from "tailwindcss";
 import { dark } from "./dark";
 import { DarkModeConfig } from "tailwindcss/types/config";
 import { pseudoClasses } from "./pseudo-classes";
-import { platforms, nativePlatforms } from "../../shared/platforms";
+import { platforms, nativePlatforms } from "../../utils/platforms";
 export interface NativePluginOptions {
   rem?: number;
   onError?: (error: StyleError) => void;

@@ -6,7 +6,7 @@ import micromatch from "micromatch";
 import { NodePath } from "@babel/core";
 import { ImportDeclaration } from "@babel/types";
 import { VisitorState } from "../visitor";
-import { platforms } from "../../shared/platforms";
+import { platforms } from "../../utils/platforms";
 
 const allowedIndexFiles: string[] = [];
 for (const platform of platforms) {

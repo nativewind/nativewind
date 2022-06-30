@@ -22,7 +22,7 @@ import {
   createAtRuleSelector,
   getStateBit,
   StateBitOptions,
-} from "../shared/selector";
+} from "../utils/selector";
 import { MediaRecord } from "../types/common";
 import vh from "./units/vh";
 import vw from "./units/vw";

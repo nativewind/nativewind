@@ -3,7 +3,7 @@ import {
   createAtRuleSelector,
   getSelectorMask,
   normalizeCssSelector,
-} from "../shared/selector";
+} from "../utils/selector";
 import { toReactNative } from "./to-react-native";
 import { StyleRecord, Style, StyleError, AtRuleTuple } from "../types/common";
 import { outputWriter } from "./fs-writer";

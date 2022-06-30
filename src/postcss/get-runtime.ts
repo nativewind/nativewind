@@ -1,4 +1,4 @@
-import { hasDarkPseudoClass } from "../shared/selector";
+import { hasDarkPseudoClass } from "../utils/selector";
 import { AtRuleTuple, Style } from "../types/common";
 
 export function getRuntime(
