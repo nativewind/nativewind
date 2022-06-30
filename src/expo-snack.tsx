@@ -63,7 +63,7 @@ export function withExpoSnack(
 
   NativeWindStyleSheet.setDangerouslyCompileStyles(dangerouslyCompileStyles);
 
-  return (
+  return () => (
     <ExpoSnackWrapper>
       <Component />
     </ExpoSnackWrapper>
