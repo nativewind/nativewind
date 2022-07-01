@@ -1,0 +1,38 @@
+{
+  "errors": [],
+  "warnings": [],
+  "significant": [],
+  "meaningless": [
+    {
+      "name": "Simple test",
+      "baseline": {
+        "name": "Simple test",
+        "runs": 10,
+        "meanDuration": 0.1,
+        "stdevDuration": 0.31622776601683794,
+        "durations": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      },
+      "current": {
+        "name": "Simple test",
+        "runs": 10,
+        "meanDuration": 0,
+        "stdevDuration": 0,
+        "durations": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      },
+      "durationDiff": -0.1,
+      "relativeDurationDiff": -1,
+      "isDurationDiffSignificant": false,
+      "countDiff": 0,
+      "relativeCountDiff": 0
+    }
+  ],
+  "countChanged": [],
+  "added": [],
+  "removed": []
+}

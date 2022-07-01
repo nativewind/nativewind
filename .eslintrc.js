@@ -38,18 +38,6 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["./src/babel/native-style-extraction/patches/*"],
-      rules: {
-        "unicorn/no-null": "off",
-      },
-    },
-    {
-      files: ["__tests__/**"],
-      rules: {
-        "unicorn/prefer-module": "off",
-      },
-    },
-    {
       files: [
         "*rc.js",
         "*.config.js",
@@ -67,7 +55,7 @@ module.exports = {
       },
     },
     {
-      files: ["website/*.js"],
+      files: ["packages/website/*.js"],
       rules: {
         "unicorn/prefer-module": "off",
         "@typescript-eslint/no-var-requires": "off",

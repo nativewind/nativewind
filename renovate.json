@@ -6,7 +6,11 @@
   "dependencyDashboard": false,
   "packageRules": [
     {
-      "paths": ["website/package.json"],
+      "paths": ["apps/website/package.json"],
+      "commitBody": "[skip release]"
+    },
+    {
+      "paths": ["apps/benchmarks/package.json"],
       "commitBody": "[skip release]"
     }
   ]

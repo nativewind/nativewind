@@ -52,20 +52,27 @@ Some components can either accept a value as a prop or be styled by CSS. An exam
 You can flag a components props as `classProps` to ensure the best output is used.
 
 ```tsx
-import { styled } from "tailwindcss-react-native"
-import { Svg, Rect } from "react-native-svg"
+import { styled } from "tailwindcss-react-native";
+import { Svg, Rect } from "react-native-svg";
 
-const StyledRect = styled(Rect, { classProps: ["fill", "stroke"]})
+const StyledRect = styled(Rect, { classProps: ["fill", "stroke"] });
 
 function MyStyledSvg({ stroke, ...props }) {
   return (
-    <Svg height="100" width="100" {...props }>
-      <StyledRect x="0" y="0" width="100" height="100" fill={fill} stroke={stroke} />
+    <Svg height="100" width="100" {...props}>
+      <StyledRect
+        x="0"
+        y="0"
+        width="100"
+        height="100"
+        fill={fill}
+        stroke={stroke}
+      />
     </Svg>
-  )
+  );
 }
 
-<MyStyledSvg fill="fill-black" stroke="stroke-2 stroke-blue-500" />
+<MyStyledSvg fill="fill-black" stroke="stroke-2 stroke-blue-500" />;
 ```
 
 ## Styling props that only accept values

@@ -15,13 +15,5 @@
     "strict": true,
     "skipLibCheck": true,
     "declaration": true
-  },
-  "include": ["src/**/*"],
-  "exclude": [
-    "cli/*",
-    "node_modules",
-    "babel.config.js",
-    "metro.config.js",
-    "jest.config.js"
-  ]
+  }
 }
