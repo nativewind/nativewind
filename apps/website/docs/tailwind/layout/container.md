@@ -1,7 +1,7 @@
 # Container
 
 :::caution
-NativeWind's default theme is not yet designed for native devices and still uses breakpoints that were mostly designed for web.
+NativeWind's default breakpoints are not yet designed for native devices and still uses the web defaults.
 :::
 
 `container` is fully supported by NativeWind. Please see [Tailwind CSS documentation for usuage](https://tailwindcss.com/docs/container)

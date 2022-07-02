@@ -1,7 +1,3 @@
----
-slug: /
----
-
 # Overview
 
 ## What is NativeWind?
@@ -26,22 +22,6 @@ const App = () => {
 }
 ```
 
-```tsx
-import { Pressable, View, Text } from "react-native";
-
-/**
- * A button that changes color when hovered or pressed
- * The text will change font weight when the Pressable is pressed
- */
-export function MyFancyButton(props) {
-  return (
-    <Pressable className="component bg-violet-500 hover:bg-violet-600 active:bg-violet-700">
-      <Text className="font-bold component-active:font-extrabold" {...props} />;
-    </Pressable>
-  );
-}
-```
-
 ## Key Features
 
 🌐 **Universal** Uses the best style system for each platform.
@@ -54,9 +34,9 @@ export function MyFancyButton(props) {
 
 🔥 **Lots of features** dark mode / arbitrary classes / media queries / themes / custom values / plugins
 
-✨ **Pseudo classes** hover / focus / active on compatible components [(docs)](https://nativewind.vercel.app/tailwind/core-concepts/pseudo-classes)
+✨ **Pseudo classes** hover / focus / active on compatible components [(docs)](../core-concepts/states#hover-focus-and-active)
 
-👪 **Parent state styles** automatically style children based upon parent pseudo classes [(docs)](https://nativewind.vercel.app/tailwind/core-concepts/component)
+👪 **Parent state styles** automatically style children based upon parent pseudo classes [(docs)](../core-concepts/states#hover-focus-and-active#styling-based-on-parent-state)
 
 ## What is a universal style system?
 
@@ -74,14 +54,6 @@ React Native's StyleSheet system only provides static styles, with other feature
 On web, CSS already has all these features and is highly optimised. While on web NativeWind provides a compatibilty layer between React Native and CSS.
 
 This is what makes NativeWind a universal style system - it allows you to use the same components with rich styles on all React Native platforms.
-
-## Why Tailwind CSS?
-
-While we would love to port CSS to React Native, the core philosophy between the two systems are too different. So the next best approach is to use a style pre-processor that can compile to both to _both_ CSS and React Native StyleSheets.
-
-The project originally was going to use a custom style language, but we quickly realised that Tailwind CSS was mature and matched all our core needs; it is language agnostic and shares the same core philosophy as React Native: every style should be atomic, including state-based styling.
-
-So we adopted the Tailwind CSS language and haven't looked back!
 
 ## In action
 

@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "NativeWind",
   tagline: "",
-  url: "https://tailwindcss-react-native-git-next-mwlawlor.vercel.app/",
+  url: "https://nativewind.vercel.app/",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -25,21 +25,23 @@ const config = {
     { src: "https://snack.expo.dev/embed.js", defer: true },
   ],
 
+  plugins: ["docusaurus-plugin-sass"],
+
   presets: [
     [
       "classic",
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          breadcrumbs: false,
+          editUrl: `https://github.com/marklawlor/nativewind/edit/main/website/`,
+          remarkPlugins: [require("./src/remark-snackplayer")],
           routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),
-          remarkPlugins: [require("./src/remark-snackplayer")],
-          editUrl: `https://github.com/marklawlor/tailwindcss-react-native/edit/main/website/`,
         },
         blog: false,
         theme: {
-          defaultMode: "dark",
-          customCss: require.resolve("./src/css/custom.css"),
+          customCss: require.resolve("./src/css/custom.scss"),
         },
       }),
     ],
@@ -48,6 +50,22 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      announcementBar: {
+        id: "prerelease",
+        content:
+          "NativeWind is in pre-release. Documentation is a work-in-progress",
+        backgroundColor: "var(--ifm-navbar-background-color)",
+        textColor: "var(--ifm-heading-color)",
+        isCloseable: false,
+      },
+      docs: {
+        sidebar: {
+          autoCollapseCategories: false,
+        },
+      },
+      colorMode: {
+        respectPrefersColorScheme: true,
+      },
       navbar: {
         title: "NativeWind",
         logo: {
@@ -56,7 +74,7 @@ const config = {
         },
         items: [
           {
-            href: "https://github.com/marklawlor/tailwindcss-react-native",
+            href: "https://github.com/marklawlor/nativewind",
             label: "GitHub",
             position: "right",
           },
@@ -70,7 +88,7 @@ const config = {
             items: [
               {
                 label: "GitHub",
-                href: "https://github.com/marklawlor/tailwindcss-react-native",
+                href: "https://github.com/marklawlor/nativewind",
               },
             ],
           },

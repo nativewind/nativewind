@@ -7,21 +7,41 @@ sidebar_label: styled()
 
 `styled()` is a [Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) which allows your component to accept either the `tw` or `className` props. These props are compiled into StyleSheet objects and passed to your component via the `style` prop.
 
-There is no difference between `tw` and `className`, but `tw` has priority.
+There are no differences between `tw` and `className`.
 
-```tsx
+```SnackPlayer name=Styled
 import { Text } from "react-native";
-import { styled } from "tailwindcss-react-native";
+import { styled } from "nativewind";
 
 const StyledText = styled(Text);
 
-export function MyComponent() {
+function App() {
   return (
     <>
-      <StyledText tw="font-bold">Hello world</StyledText>
-      <StyledText className="font-bold">Hello world</StyledText>
+      <StyledText tw="font-bold">Hello world.</StyledText>
+      <StyledText className="font-bold">Hello world.</StyledText>
     </>
   );
+}
+```
+
+## Default styles
+
+`styled()` can be used similar to Styled Components, and provide base styling.
+
+```SnackPlayer name=Styled
+import { View, Text } from "react-native";
+import { styled } from "nativewind";
+
+const StyledView = styled(View, 'flex-1 items-center justify-center');
+const StyledText = styled(Text, 'font-bold');
+
+function App() {
+  return (
+    <StyledView>
+      <StyledText>Hello world.</StyledText>;
+    </StyledView>
+  )
 }
 ```
 

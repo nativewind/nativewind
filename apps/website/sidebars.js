@@ -14,10 +14,16 @@
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   docs: [
-    "overview",
     {
-      type: "html",
-      value: "<br />",
+      type: "doc",
+      id: "home",
+      className: "home",
+    },
+    {
+      type: "category",
+      label: "overview",
+      collapsed: false,
+      items: ["overview/overview", "overview/how-it-works", "guides/goals"],
     },
     {
       type: "category",
@@ -35,28 +41,28 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Guides",
+      label: "Setup",
       collapsed: false,
       items: [
         "getting-started/editor",
         "getting-started/typescript",
-        {
-          type: "category",
-          label: "Detailed installation",
-          collapsed: true,
-          items: [
-            "guides/babel",
-            "guides/babel-compile-only",
-            "guides/babel-transform-only",
-            "guides/postcss",
-            "guides/cli-native",
-            "guides/postcss-native",
-          ],
-        },
-        "guides/goals",
-        "guides/theme-values",
-        "guides/tailwindcss-react-native",
+        "guides/babel",
+        "guides/babel-compile-only",
+        "guides/babel-transform-only",
+        "guides/postcss",
+        "guides/cli-native",
+        "guides/postcss-native",
       ],
+    },
+    {
+      type: "html",
+      value: "<br />",
+    },
+    {
+      type: "category",
+      label: "Guides",
+      collapsed: false,
+      items: ["guides/theme-values", "guides/tailwindcss-react-native"],
     },
     {
       type: "html",
@@ -117,25 +123,12 @@ const sidebars = {
       label: "Layout",
       collapsed: false,
       items: [
-        {
-          type: "link",
-          label: "Aspect ratio",
-          href: "https://tailwindcss.com/docs/aspect-ratio",
-        },
+        "tailwind/layout/aspect-ratio",
         "tailwind/layout/container",
-        {
-          type: "link",
-          label: "Container",
-          href: "https://tailwindcss.com/docs/container",
-        },
         "tailwind/layout/display",
         "tailwind/layout/overflow",
         "tailwind/layout/position",
-        {
-          type: "link",
-          label: "Top / Right Bottom Left",
-          href: "https://tailwindcss.com/docs/top-right-bottom-left",
-        },
+        "tailwind/layout/top-right-bottom-left",
         "tailwind/layout/z-index",
       ],
     },
