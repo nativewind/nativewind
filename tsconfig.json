@@ -11,7 +11,6 @@
     "isolatedModules": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "outDir": "dist",
     "strict": true,
     "skipLibCheck": true,
     "declaration": true

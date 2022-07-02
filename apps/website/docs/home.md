@@ -72,15 +72,13 @@ const App = () => {
 Our babel plugin will automatically wrap your components in `styled()` reducing the required boilerplate.
 
 ```tsx
-import { Text, View } from 'react-native';
+import { Text, View } from "react-native";
 
 const App = () => {
   return (
     <View className="flex-1 items-center justify-center">
-      <Text className="text-slate-800">
-        Try editing me! 🎉
-      </Text>
+      <Text className="text-slate-800">Try editing me! 🎉</Text>
     </View>
   );
-}
+};
 ```

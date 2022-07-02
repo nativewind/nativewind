@@ -182,7 +182,7 @@ export function styled<
   }
 
   if (typeof Component !== "string") {
-    Styled.displayName = `TailwindCssReactNative.${
+    Styled.displayName = `NativeWind.${
       Component.displayName || Component.name || "NoName"
     }`;
   }

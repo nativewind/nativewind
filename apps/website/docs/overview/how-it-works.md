@@ -9,13 +9,13 @@ When compiling for native platforms, NativeWind uses the Tailwind PostCSS plugin
 ### Static styles
 
 ```tsx
-<Text class="text-black"/>
+<Text class="text-black" />;
 
 NativeWindStyleSheet.create({
-  'text-black': {
-    color: '#000'
-  }
-})
+  "text-black": {
+    color: "#000",
+  },
+});
 ```
 
 As you can see, `NativeWindStyleSheet.create()` looks very similar to `StyleSheet.create()`. Under-the-hood these static styles are passed into `StyleSheet.create()` and cached.
@@ -23,7 +23,7 @@ As you can see, `NativeWindStyleSheet.create()` looks very similar to `StyleShee
 ### Dynamic styles
 
 ```tsx
-<View class="container"/>
+<View class="container" />;
 
 NativeWindStyleSheet.create({
   styles: {
@@ -73,7 +73,7 @@ The `container` example also introducted topics. NativeWind works on a subscript
 ### Dynamic Units
 
 ```tsx
-<View class="w-screen"/>
+<View class="w-screen" />;
 
 NativeWindStyleSheet.create({
   styles: {
@@ -87,7 +87,7 @@ NativeWindStyleSheet.create({
   units: {
     "w-screen": { width: "vw" },
   },
-})
+});
 ```
 
 Topics are not just for atRules and can be used for multiple purposes. The topic subscription model also allows us to implement dynamic units.
@@ -95,22 +95,21 @@ Topics are not just for atRules and can be used for multiple purposes. The topic
 ### State
 
 ```tsx
-<Text class="text-black ios:text-blue-500"/>
+<Text class="text-black ios:text-blue-500" />;
 
 NativeWindStyleSheet.create({
   styles: {
     "text-black": {
-      color: '#000',
+      color: "#000",
     },
     "ios:text-blue-500": {
-      width: 'rgb(59 130 246)',
+      width: "rgb(59 130 246)",
     },
   },
   masks: {
     "ios:text-blue-500": 8192,
   },
-})
+});
 ```
 
 Styles can be conditional based upon a componet's or the app's state. The conditions can be UI state (active/hover), color scheme (light/dark), platform (ios/android/web), etc. These conditions are pre-computed into a bitmask for quick runtime evaluation.
-

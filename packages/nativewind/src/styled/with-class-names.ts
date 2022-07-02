@@ -13,8 +13,8 @@ const isGroupIsolateRegex = /(?:^|\s)(group-isolate)(?:$|\s)/gi;
 const isParentRegex = /(?:^|\s)(parent)(?:$|\s)/gi;
 
 export function withClassNames({
-  baseClassName,
-  propClassName,
+  baseClassName = "",
+  propClassName = "",
   baseTw,
   twClassName,
   componentProps,
@@ -22,13 +22,9 @@ export function withClassNames({
   spreadProps = [],
   classProps = [],
 }: WithClassNames) {
-  const className = [
-    baseTw ?? baseClassName ?? "",
-    twClassName ?? propClassName ?? "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
+  const className = `${baseTw ?? baseClassName} ${
+    twClassName ?? propClassName
+  }`;
   const isGroupIsolate = isGroupIsolateRegex.test(className);
   const isParent = isParentRegex.test(className);
 

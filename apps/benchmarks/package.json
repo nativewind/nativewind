@@ -1,9 +1,9 @@
 {
   "name": "benchmarks",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "test": "./test.sh",
+    "test": "reassure measure",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
@@ -12,18 +12,19 @@
   },
   "dependencies": {
     "expo": "~45.0.0",
-    "expo-status-bar": "~1.3.0",
-    "jest": "^28.1.2",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
-    "react-native": "^0.68.2",
-    "react-native-web": "0.17.7",
+    "jest": "28.1.1",
+    "native-base": "^3.4.7",
+    "nativewind": "*",
+    "react": "*",
+    "react-dom": "*",
+    "react-native": "0.69.1",
+    "react-native-safe-area-context": "^4.3.1",
     "reassure": "^0.1.0",
-    "ts-jest": "^28.0.5",
-    "typescript": "^4.7.4"
+    "ts-jest": "^28.0.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9"
+    "@babel/core": "^7.12.9",
+    "patch-package": "^6.4.7"
   },
   "private": true
 }

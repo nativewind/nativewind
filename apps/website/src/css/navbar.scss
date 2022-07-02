@@ -36,7 +36,7 @@
     background-position: 50%;
     background-repeat: no-repeat;
     margin-right: 0.5rem;
-    content: '';
+    content: "";
     justify-items: center;
     margin-right: 0.5rem;
     background-size: contain;
@@ -68,7 +68,7 @@
   }
 }
 
-html[data-theme='dark'] {
+html[data-theme="dark"] {
   .navbar {
     background-color: $color-gray-1;
     border-bottom: 1px solid $color-gray-3;
@@ -91,7 +91,7 @@ html[data-theme='dark'] {
   }
 }
 
-html[data-theme='light'] {
+html[data-theme="light"] {
   .navbar {
     border-bottom: 1px solid $color-gray-10;
     box-shadow: none;

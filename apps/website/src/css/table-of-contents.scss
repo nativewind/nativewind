@@ -23,7 +23,7 @@
   }
 }
 
-html[data-theme='dark'] {
+html[data-theme="dark"] {
   .table-of-contents {
     &__link {
       color: $color-white;
@@ -35,7 +35,7 @@ html[data-theme='dark'] {
   }
 }
 
-html[data-theme='light'] {
+html[data-theme="light"] {
   .table-of-contents {
     &__link {
       color: $color-gray-4;

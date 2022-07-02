@@ -23,7 +23,7 @@
       top: 14px;
       position: absolute;
       left: -1px;
-      content: '';
+      content: "";
       background-repeat: no-repeat;
       width: 10px;
       height: 7px;
@@ -102,7 +102,7 @@ nav.menu {
   }
 }
 
-html[data-theme='dark'] {
+html[data-theme="dark"] {
   .menu {
     background-color: $color-gray-1;
 
@@ -135,7 +135,7 @@ html[data-theme='dark'] {
   }
 }
 
-html[data-theme='light'] {
+html[data-theme="light"] {
   .menu {
     .menu__link:hover,
     .menu__caret:hover {

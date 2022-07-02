@@ -6,6 +6,7 @@
   ],
   "scripts": {
     "test": "npm run test --workspace=nativewind",
+    "benchmarks": "npm run test --workspace=benchmarks",
     "build": "npm run build --workspace=nativewind",
     "prepare": "husky install"
   },
@@ -21,5 +22,8 @@
     "husky": "8.0.1",
     "prettier": "2.7.1",
     "typescript": "4.7.4"
+  },
+  "dependencies": {
+    "benchmarks": "^0.0.0"
   }
 }
