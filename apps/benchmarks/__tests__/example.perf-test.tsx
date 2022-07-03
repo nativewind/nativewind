@@ -33,16 +33,6 @@ test("Text - Native", async () => {
   );
 });
 
-test("Text - Native2", async () => {
-  await measurePerformance(
-    <>
-      {range.map((key) => (
-        <RNText key={key}>{key}</RNText>
-      ))}
-    </>
-  );
-});
-
 test("Text - NativeWind", async () => {
   await measurePerformance(
     <>

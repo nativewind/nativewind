@@ -1,4 +1,3 @@
-{"name":"Text - NativeBase","runs":10,"meanDuration":0.6,"stdevDuration":0.5163977794943222,"durations":[1,1,1,1,1,1,0,0,0,0],"meanCount":1,"stdevCount":0,"counts":[1,1,1,1,1,1,1,1,1,1]}
-{"name":"Text - Native","runs":10,"meanDuration":4.8,"stdevDuration":0.9189365834726815,"durations":[6,6,5,5,5,5,5,4,4,3],"meanCount":1,"stdevCount":0,"counts":[1,1,1,1,1,1,1,1,1,1]}
-{"name":"Text - Native2","runs":10,"meanDuration":4.2,"stdevDuration":0.7888106377466155,"durations":[5,5,5,5,4,4,4,4,3,3],"meanCount":1,"stdevCount":0,"counts":[1,1,1,1,1,1,1,1,1,1]}
-{"name":"Text - NativeWind","runs":10,"meanDuration":9.2,"stdevDuration":0.9189365834726816,"durations":[11,10,10,9,9,9,9,9,8,8],"meanCount":1,"stdevCount":0,"counts":[1,1,1,1,1,1,1,1,1,1]}
+{"name":"Text - NativeBase","runs":10,"meanDuration":0.4,"stdevDuration":0.5163977794943223,"durations":[1,1,1,1,0,0,0,0,0,0],"meanCount":1,"stdevCount":0,"counts":[1,1,1,1,1,1,1,1,1,1]}
+{"name":"Text - Native","runs":10,"meanDuration":4.8,"stdevDuration":1.1352924243950933,"durations":[6,6,6,5,5,5,5,4,3,3],"meanCount":1,"stdevCount":0,"counts":[1,1,1,1,1,1,1,1,1,1]}
+{"name":"Text - NativeWind","runs":10,"meanDuration":7.6,"stdevDuration":1.429840705968481,"durations":[10,9,8,8,8,8,7,7,6,5],"meanCount":1,"stdevCount":0,"counts":[1,1,1,1,1,1,1,1,1,1]}
