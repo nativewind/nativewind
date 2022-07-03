@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "next",
+  "initialVersions": {
+    "benchmarks": "0.0.0",
+    "website": "0.0.0",
+    "nativewind": "2.0.0-next.43"
+  },
+  "changesets": []
+}
