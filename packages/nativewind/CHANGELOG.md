@@ -1,0 +1,7 @@
+# nativewind
+
+## 2.0.0-next.44
+
+### Major Changes
+
+- 4047ee2: remove runtime regex matching

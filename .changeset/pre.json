@@ -6,5 +6,5 @@
     "website": "0.0.0",
     "nativewind": "2.0.0-next.43"
   },
-  "changesets": []
+  "changesets": ["lazy-bananas-deliver"]
 }
