@@ -3,6 +3,7 @@ import { render } from "@testing-library/react-native";
 import { TestProvider } from "../tailwindcss/runner";
 import { StyledComponent } from "../../src";
 import { tailwindRunner } from "../tailwindcss/runner";
+import { PARENT_HOVER } from "../../src/utils/selector";
 
 tailwindRunner("Custom - Parent", [
   [
@@ -33,7 +34,7 @@ tailwindRunner("Custom - Parent State Variants", [
         },
       },
       masks: {
-        "parent-hover:text-white": 512,
+        "parent-hover:text-white": PARENT_HOVER,
       },
     },
   ],

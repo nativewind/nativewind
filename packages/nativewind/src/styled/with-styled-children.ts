@@ -1,25 +1,27 @@
 import { ReactNode, Children, cloneElement } from "react";
 import { isFragment } from "react-is";
 import { StylesArray, StyleSheetRuntime } from "../style-sheet";
+import { matchesMask, PARENT } from "../utils/selector";
+import { ComponentState } from "./use-component-state";
 
 export interface WithStyledChildrenOptions {
   componentChildren: ReactNode;
   store: StyleSheetRuntime;
   stylesArray: StylesArray<unknown>;
-  parentHover: boolean;
-  parentFocus: boolean;
-  parentActive: boolean;
+  mask: number;
+  componentState: ComponentState;
 }
 
 export function withStyledChildren({
   componentChildren,
+  componentState,
+  mask,
   store,
   stylesArray,
-  parentHover,
-  parentFocus,
-  parentActive,
 }: WithStyledChildrenOptions): ReactNode {
-  if (!stylesArray.childClassNames) {
+  const isParent = matchesMask(mask, PARENT);
+
+  if (!stylesArray.childClassNames && !isParent) {
     return componentChildren;
   }
 
@@ -31,9 +33,9 @@ export function withStyledChildren({
   return Children.map(children, (child, index) => {
     const style = store.getChildStyles(stylesArray, {
       nthChild: index + 1,
-      parentHover,
-      parentFocus,
-      parentActive,
+      parentHover: componentState.hover,
+      parentFocus: componentState.focus,
+      parentActive: componentState.active,
     });
 
     if (!style || style.length === 0) {

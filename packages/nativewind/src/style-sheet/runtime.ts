@@ -21,6 +21,7 @@ import {
 import {
   createAtRuleSelector,
   getStateBit,
+  matchesMask,
   StateBitOptions,
 } from "../utils/selector";
 import { MediaRecord } from "../types/common";
@@ -42,10 +43,11 @@ export type EitherStyle<T extends Style = Style> =
 
 export type Snapshot = Record<string, StylesArray>;
 
-const emptyStyles: StylesArray = [];
+const emptyStyles: StylesArray = Object.assign([], { mask: 0 });
 
 export interface StylesArray<T = Style> extends Array<EitherStyle<T>> {
   childClassNames?: string[];
+  mask?: number;
 }
 
 const units: Record<
@@ -228,8 +230,9 @@ export class StyleSheetRuntime extends ColorSchemeStore {
       return "";
     }
 
-    if (this.preprocessed)
+    if (this.preprocessed) {
       return this.preparePreprocessed(composedClassName, options);
+    }
 
     const stateBit = getStateBit(options);
 
@@ -253,6 +256,7 @@ export class StyleSheetRuntime extends ColorSchemeStore {
 
     const reEvaluate = () => {
       const styleArray: StylesArray = [];
+      styleArray.mask = 0;
 
       const stateBit = getStateBit({
         ...options,
@@ -263,6 +267,7 @@ export class StyleSheetRuntime extends ColorSchemeStore {
 
       for (const className of classNames) {
         const mask = this.masks[className] || 0;
+        styleArray.mask |= mask;
 
         // If we match this class's state, then process it
         if (matchesMask(stateBit, mask)) {
@@ -472,21 +477,25 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     return this.snapshot[className];
   }
 
+  create({ styles, atRules, masks, topics, units, childClasses }: AddOptions) {
+    if (atRules) Object.assign(this.atRules, atRules);
+    if (masks) Object.assign(this.masks, masks);
+    if (topics) Object.assign(this.topics, topics);
+    if (childClasses) Object.assign(this.childClasses, childClasses);
+    if (units) Object.assign(this.units, units);
+
+    if (styles) {
+      Object.assign(this.styles, StyleSheet.create(styles));
+      for (const className of Object.keys(styles)) {
+        this.upsertAtomicStyle(className);
+      }
+    }
+  }
+
   parse(functionString: string, value: string) {
     return parseStyleFunction(functionString, value);
   }
-
-  create({ styles, atRules, masks, topics, units, childClasses }: AddOptions) {
-    Object.assign(this.styles, StyleSheet.create(styles));
-    Object.assign(this.atRules, atRules);
-    Object.assign(this.masks, masks);
-    Object.assign(this.topics, topics);
-    Object.assign(this.childClasses, childClasses);
-    Object.assign(this.units, units);
-  }
 }
-
-const matchesMask = (value: number, mask: number) => (value & mask) === mask;
 
 /**
  * Some RN platforms still use style ids. Unfortunately this means we cannot

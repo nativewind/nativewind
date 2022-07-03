@@ -1,3 +1,4 @@
+import { IOS } from "../../src/utils/selector";
 import { tailwindRunner } from "../tailwindcss/runner";
 
 tailwindRunner("Masks", [
@@ -11,7 +12,7 @@ tailwindRunner("Masks", [
         "ios:w-screen": { width: "vw" },
       },
       masks: {
-        "ios:w-screen": 8192,
+        "ios:w-screen": IOS,
       },
       topics: {
         "ios:w-screen": ["width"],

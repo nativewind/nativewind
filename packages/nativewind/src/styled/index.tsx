@@ -11,14 +11,15 @@ import {
   useContext,
 } from "react";
 import { StyledProps, StyledPropsWithKeys } from "../utils/styled";
-import { useInteraction } from "./use-interaction";
+import { InteractionProps, useInteraction } from "./use-interaction";
 import { withStyledChildren } from "./with-styled-children";
 import { withStyledProps } from "./with-styled-props";
 import { useTailwind } from "./use-tailwind";
-import { withClassNames } from "./with-class-names";
 import { StyleProp } from "react-native";
 import { StoreContext } from "../style-sheet";
 import { IsolateGroupContext } from "./group-context";
+import { useComponentState } from "./use-component-state";
+import { GROUP_ISO, matchesMask } from "../utils/selector";
 
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
@@ -100,10 +101,9 @@ export function styled<
 
   function Styled(
     {
-      className: propClassName,
+      className: propClassName = "",
       tw: twClassName,
-      baseTw,
-      style: styleProp,
+      style: inlineStyles,
       children: componentChildren,
       ...componentProps
     }: StyledProps<T>,
@@ -112,54 +112,65 @@ export function styled<
     const store = useContext(StoreContext);
     const isolateGroupContext = useContext(IsolateGroupContext);
 
-    const { className, allClasses, isGroupIsolate, isParent } = withClassNames({
-      baseClassName,
-      propClassName,
-      twClassName,
-      baseTw,
-      componentProps,
-      propsToTransform,
-      spreadProps,
-      classProps,
-    });
+    const classNameWithDefaults = baseClassName
+      ? `${baseClassName} ${twClassName ?? propClassName}`
+      : twClassName ?? propClassName;
 
-    const { hover, focus, active, ...handlers } = useInteraction({
-      className: allClasses,
-      isGroupIsolate,
-      isParent,
-      store,
-      ...componentProps,
-    });
+    /**
+     * Get the hover/focus/active state of this component
+     */
+    const [componentState, dispatch] = useComponentState();
 
-    const { additionalStyles, ...styledProps } = withStyledProps({
-      preprocessed: store.preprocessed,
-      propsToTransform,
-      componentProps,
-      classProps,
-    });
-
-    const style = useTailwind(
+    /**
+     * Resolve the props/classProps/spreadProps options
+     */
+    const {
+      styledProps,
+      mask: propsMask,
       className,
-      {
-        hover,
-        focus,
-        active,
-        ...isolateGroupContext,
-      },
-      styleProp,
-      additionalStyles
+    } = withStyledProps({
+      className: classNameWithDefaults,
+      preprocessed: store.preprocessed,
+      componentProps,
+      propsToTransform,
+      classProps,
+      spreadProps,
+    });
+
+    /**
+     * Resolve the className->style
+     */
+    const style = useTailwind({
+      className,
+      inlineStyles,
+      ...componentState,
+      ...isolateGroupContext,
+    });
+
+    const mask = (style.mask || 0) | propsMask;
+
+    /**
+     * Determine if we need event handlers for our styles
+     */
+    const handlers = useInteraction(
+      dispatch,
+      mask,
+      componentProps as InteractionProps
     );
 
+    /**
+     * Resolve the child styles
+     */
     const children = withStyledChildren({
-      store,
       componentChildren,
+      componentState,
+      mask,
+      store,
       stylesArray: style,
-      parentHover: isParent && hover,
-      parentFocus: isParent && focus,
-      parentActive: isParent && active,
     });
 
     const element = createElement(Component, {
+      ...componentProps,
       ...handlers,
       ...styledProps,
       style: style.length > 0 ? style : undefined,
@@ -167,13 +178,13 @@ export function styled<
       ref,
     } as unknown as T);
 
-    if (isGroupIsolate) {
+    if (matchesMask(mask, GROUP_ISO)) {
       return createElement(IsolateGroupContext.Provider, {
         children: element,
         value: {
-          isolateGroupHover: hover,
-          isolateGroupFocus: focus,
-          isolateGroupActive: active,
+          isolateGroupHover: componentState.hover,
+          isolateGroupFocus: componentState.focus,
+          isolateGroupActive: componentState.active,
         },
       });
     }

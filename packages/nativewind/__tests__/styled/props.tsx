@@ -93,7 +93,7 @@ describe("Styled", () => {
     expect(tree).toMatchSnapshot();
   });
 
-  test("classProps on css", () => {
+  test.only("classProps on css", () => {
     const tree = render(
       <TestProvider preprocessed>
         <TestClassPropsComponent className="p-4" style2="m-1" />

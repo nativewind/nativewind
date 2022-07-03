@@ -1,4 +1,5 @@
 import { TextStyle } from "react-native";
+import { DARK_MODE, HOVER } from "../../src/utils/selector";
 import {
   createTestAppearance,
   // createTestDimensions,
@@ -52,7 +53,7 @@ describe("StyleSheetStore", () => {
         },
       },
       masks: {
-        "hover:text-black": 1,
+        "hover:text-black": HOVER,
       },
     });
 
@@ -71,7 +72,7 @@ describe("StyleSheetStore", () => {
       },
       appearance,
       masks: {
-        "dark:text-black": 131_072,
+        "dark:text-black": DARK_MODE,
       },
       topics: {
         "dark:text-black": ["colorScheme"],
@@ -97,7 +98,7 @@ describe("StyleSheetStore", () => {
         "dark:text-black": atRuleText,
       },
       masks: {
-        "dark:text-black": 131_072,
+        "dark:text-black": DARK_MODE,
       },
       topics: {
         "dark:text-black": ["colorScheme"],
@@ -127,7 +128,7 @@ describe("StyleSheetStore", () => {
         "dark:bg-black": atRuleText,
       },
       masks: {
-        "dark:bg-black": 131_072,
+        "dark:bg-black": DARK_MODE,
       },
       topics: {
         "dark:bg-black": ["colorScheme"],

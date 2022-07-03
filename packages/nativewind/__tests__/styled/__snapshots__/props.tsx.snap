@@ -91,12 +91,14 @@ Array [
   />,
   <View
     style={
-      Object {
-        "paddingBottom": 8,
-        "paddingLeft": 8,
-        "paddingRight": 8,
-        "paddingTop": 8,
-      }
+      Array [
+        Object {
+          "paddingBottom": 8,
+          "paddingLeft": 8,
+          "paddingRight": 8,
+          "paddingTop": 8,
+        },
+      ]
     }
   />,
 ]
@@ -108,11 +110,7 @@ exports[`Styled classProps on css 1`] = `
     Array [
       Object {
         "$$css": true,
-        "p-4": "p-4",
-      },
-      Object {
-        "$$css": true,
-        "m-1": "m-1",
+        "p-4 m-1": "p-4 m-1",
       },
     ]
   }

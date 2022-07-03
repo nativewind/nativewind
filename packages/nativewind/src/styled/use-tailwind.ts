@@ -1,19 +1,39 @@
 import { useContext, useMemo } from "react";
-import { StyleProp } from "react-native";
+import { StyleProp, StyleSheet } from "react-native";
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 import { Snapshot, StoreContext, StylesArray } from "../style-sheet";
 import { StateBitOptions } from "../utils/selector";
 
-export function useTailwind<T>(
-  classNames: string,
-  options: StateBitOptions = {},
-  inlineStyles?: StyleProp<T>,
-  additionalStyles: StylesArray<T> = []
-): StylesArray<T> {
+export interface UseTailwindOptions<T> extends StateBitOptions {
+  className: string;
+  inlineStyles?: StyleProp<T>;
+  additionalStyles?: StylesArray<T>;
+  flatten?: boolean;
+}
+
+export function useTailwind<T>({
+  className,
+  inlineStyles,
+  additionalStyles,
+  hover,
+  focus,
+  active,
+  isolateGroupHover,
+  isolateGroupFocus,
+  isolateGroupActive,
+  flatten,
+}: UseTailwindOptions<T>): StylesArray<T> {
   const store = useContext(StoreContext);
 
   const [subscribe, getSnapshot, selector] = useMemo(() => {
-    const selector = store.prepare(classNames, options);
+    const selector = store.prepare(className, {
+      hover,
+      focus,
+      active,
+      isolateGroupHover,
+      isolateGroupFocus,
+      isolateGroupActive,
+    });
 
     return [
       store.subscribe,
@@ -22,13 +42,13 @@ export function useTailwind<T>(
     ];
   }, [
     store,
-    classNames,
-    options.hover,
-    options.focus,
-    options.active,
-    options.isolateGroupHover,
-    options.isolateGroupFocus,
-    options.isolateGroupActive,
+    className,
+    hover,
+    focus,
+    active,
+    isolateGroupHover,
+    isolateGroupFocus,
+    isolateGroupActive,
   ]);
 
   const styles = useSyncExternalStoreWithSelector(
@@ -39,14 +59,21 @@ export function useTailwind<T>(
   );
 
   return useMemo(() => {
-    const stylesArray: StylesArray = [
-      ...styles,
-      ...additionalStyles,
-      inlineStyles,
-    ].filter(Boolean);
+    const stylesArray: StylesArray = [...styles];
+
+    if (additionalStyles) {
+      stylesArray.push(...additionalStyles);
+    }
+    if (inlineStyles) {
+      stylesArray.push(inlineStyles);
+    }
 
     stylesArray.childClassNames = styles.childClassNames;
 
+    if (flatten) {
+      return StyleSheet.flatten(stylesArray);
+    }
+
     return stylesArray;
-  }, [styles, inlineStyles, additionalStyles]) as StylesArray<T>;
+  }, [styles, inlineStyles, additionalStyles, flatten]) as StylesArray<T>;
 }
