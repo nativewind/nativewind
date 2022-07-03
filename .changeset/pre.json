@@ -6,5 +6,8 @@
     "website": "0.0.0",
     "nativewind": "2.0.0-next.43"
   },
-  "changesets": ["lazy-bananas-deliver"]
+  "changesets": [
+    "lazy-bananas-deliver",
+    "many-pants-whisper"
+  ]
 }
