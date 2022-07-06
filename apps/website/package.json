@@ -22,7 +22,7 @@
     "@uiw/codemirror-theme-dracula": "^4.9.4",
     "@uiw/codemirror-theme-eclipse": "^4.9.4",
     "@uiw/react-codemirror": "^4.9.4",
-    "clsx": "1.2.0",
+    "clsx": "1.2.1",
     "dedent": "^0.7.0",
     "docusaurus-plugin-sass": "^0.2.2",
     "lodash.debounce": "^4.0.8",
