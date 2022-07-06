@@ -1,25 +1,6 @@
 # Retrieving theme values
 
-:::tip
-
-Please also read the [Tailwind CSS guide on referencing theme values in Javascript](https://tailwindcss.com/docs/configuration#referencing-in-java-script)
-
-:::
-
-It might be tempting to write to parse a Tailwind class to extract single values.
-
-```tsx
-import { useTailwind } from "tailwindcss-react-native";
-
-export function MyActivityIndicator(props) {
-  const { color } = useTailwind("text-blue-500");
-
-  // This only works on native, and will fail on web!
-  return <ActivityIndicator size="small" color={color} {...props} />;
-}
-```
-
-A better solution is to either access the color directly from your theme.
+If you need theme values at runtime, its best to retrieve them directly from tailwind or your `tailwind.config.js`. [Tailwind CSS has documentation on referencing theme values in Javascript](https://tailwindcss.com/docs/configuration#referencing-in-java-script).
 
 ```tsx
 import colors from "tailwindcss/colors";

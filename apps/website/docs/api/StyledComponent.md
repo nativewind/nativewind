@@ -8,11 +8,11 @@ sidebar_label: <StyledComponent />
 
 `StyledComponent` will pass all props to your component, except for `tw` and `className` which it will convert into StyledSheet objects and will pass them to your component via the `style` prop.
 
-There is no difference between `tw` and `className`, but `tw` has priority.
+There is no difference between `tw` and `className`, `tw` exists for users who prefer not to use `className` on non-web projects.
 
 ```tsx
 import { Text } from "react-native";
-import { StyledComponent } from "tailwindcss-react-native";
+import { StyledComponent } from "nativewind";
 
 export function MyComponent() {
   return (

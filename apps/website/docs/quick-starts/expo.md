@@ -46,7 +46,7 @@ Modify your `babel.config.js`
 // babel.config.js
 module.exports = {
 - plugins: [],
-+ plugins: ["tailwindcss-react-native/babel"],
++ plugins: ["nativewind/babel"],
 };
 ```
 

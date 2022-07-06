@@ -14,7 +14,7 @@ useColorScheme() provides access to the devices color scheme.
 You can also manually change the color scheme via `NativeWindStyleSheet.setColorScheme(colorScheme)`
 
 ```tsx
-import { useColorScheme } from "tailwindcss-react-native";
+import { useColorScheme } from "nativewind";
 import { Text } from "react-native";
 
 function MyComponent() {

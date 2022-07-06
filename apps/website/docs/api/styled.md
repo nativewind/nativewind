@@ -72,7 +72,7 @@ Some components can either accept a value as a prop or be styled by CSS. An exam
 You can flag a components props as `classProps` to ensure the best output is used.
 
 ```tsx
-import { styled } from "tailwindcss-react-native";
+import { styled } from "nativewind";
 import { Svg, Rect } from "react-native-svg";
 
 const StyledRect = styled(Rect, { classProps: ["fill", "stroke"] });
@@ -101,7 +101,7 @@ Not all libraries use style objects, with many accepting single values as a prop
 
 ```tsx
 import { ActivityIndicator } from "react-native";
-import { styled } from "tailwindcss-react-native"
+import { styled } from "nativewind"
 
 const StyledActivityIndicator = styled(ActivityIndicator, {
   spreadProps: ["color"]

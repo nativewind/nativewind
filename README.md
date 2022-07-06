@@ -1,23 +1,22 @@
 <div align="center">
 <p align="center">
-  <a href="https://tailwindcss-react-native.vercel.app" target="_blank">
-    <img src="https://tailwindcss-react-native.vercel.app/img/logo.svg" alt="Tailwind CSS" width="70" height="70">
+  <a href="https://nativewind.vercel.app" target="_blank">
+    <img src="https://nativewind.vercel.app/img/logo.svg" alt="Tailwind CSS" width="70" height="70">
     <h1 align="center" style="color:red;">NativeWind</h1>
   </a>
 </p>
-<img alt="GitHub branch checks state" src="https://img.shields.io/github/checks-status/marklawlor/tailwindcss-react-native/next">
-<img alt="npm" src="https://img.shields.io/npm/v/tailwindcss-react-native">
-<img alt="npm" src="https://img.shields.io/npm/dt/tailwindcss-react-native">
-<img alt="GitHub" src="https://img.shields.io/github/license/marklawlor/tailwindcss-react-native">
+<img alt="GitHub branch checks state" src="https://img.shields.io/github/checks-status/marklawlor/nativewind/next">
+<img alt="npm" src="https://img.shields.io/npm/v/nativewind">
+<img alt="npm" src="https://img.shields.io/npm/dt/nativewind">
+<img alt="GitHub" src="https://img.shields.io/github/license/marklawlor/nativewind">
 </div>
 <br />
 
 > **Note**
+
 > `tailwindcss-react-native` is current working on v2, which includes a renaming of the project to NativeWind!
 >
-> NativeWind is somewhat stable and is available via `npm i nativewind`.
->  
-> The last stable version of `tailwindcss-react-native` via `npm i tailwindcss-react-native` and has its docs on the `main` branch
+> NativeWind is still under development
 
 `NativeWind` uses [Tailwind CSS](https://tailwindcss.com) as high-level scripting language to create a **universal design system**. Styled components can be shared between all React Native platforms, using the best style engine for that platform (e.g. CSS StyleSheet or StyleSheet.create). It's goals are to to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
 
@@ -50,17 +49,17 @@ export function MyFancyButton(props) {
 - Babel plugin for **simple setup** and improving **intellisense support**
 - Respects all tailwind.config.js settings, including **themes, custom values, plugins**
 - **dark mode / arbitrary classes / media queries**
-- pseudo classes - **hover / focus / active** on compatible components [(docs)](https://tailwindcss-react-native.vercel.app/tailwind/core-concepts/pseudo-classes)
-- styling based on **parent state** - automatically style children based upon parent pseudo classes [(docs)](https://tailwindcss-react-native.vercel.app/tailwind/core-concepts/component)
+- pseudo classes - **hover / focus / active** on compatible components [(docs)](https://nativewind.vercel.app/tailwind/core-concepts/pseudo-classes)
+- styling based on **parent state** - automatically style children based upon parent pseudo classes [(docs)](https://nativewind.vercel.app/tailwind/core-concepts/component)
 - **children styles** - create simple layouts based upon parent class
 
 ## Documentation
 
-All documentation is on our website https://tailwindcss-react-native.vercel.app
+All documentation is on our website https://nativewind.vercel.app
 
-- [Introduction](https://tailwindcss-react-native.vercel.app/)
-- [Quick Start](https://tailwindcss-react-native.vercel.app/quick-start)
-- [Installation](https://tailwindcss-react-native.vercel.app/installation)
+- [Introduction](https://nativewind.vercel.app/)
+- [Quick Start](https://nativewind.vercel.app/quick-start)
+- [Installation](https://nativewind.vercel.app/installation)
 
 ## In action
 
@@ -78,7 +77,7 @@ Usage of Babel is optional! You can use the Component API to be more explicit ab
 
 ```tsx
 import { Text } from "react-native";
-import { styled } from "tailwindcss-react-native";
+import { styled } from "nativewind";
 
 const StyledText = styled(Text);
 
@@ -107,7 +106,7 @@ Additional options can improve compatibilty with existing RN libraries
 
 ```tsx
 import { Text } from "react-native";
-import { styled } from "tailwindcss-react-native";
+import { styled } from "nativewind";
 import { Svg, Circle, Rect } from "react-native-svg";
 
 /**
@@ -142,7 +141,7 @@ export function BoldText(props) {
 
 # Quick start guide
 
-> This example uses Babel as it provides the fastest setup. There are more setup configurations and in-depth guides [on our website](https://tailwindcss-react-native.vercel.app/installation)
+> This example uses Babel as it provides the fastest setup. There are more setup configurations and in-depth guides [on our website](https://nativewind.vercel.app/installation)
 
 ## 1. Create a new React Native application
 
@@ -194,7 +193,7 @@ Modify your `babel.config.js`
 // babel.config.js
 module.exports = {
 - plugins: [],
-+ plugins: ["tailwindcss-react-native/babel"],
++ plugins: ["nativewind/babel"],
 };
 ```
 
