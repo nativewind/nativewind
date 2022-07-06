@@ -79,7 +79,7 @@
     "babel-plugin-tester": "10.1.0",
     "jest": "28.1.2",
     "jest-environment-jsdom": "28.1.2",
-    "metro-react-native-babel-preset": "0.71.2",
+    "metro-react-native-babel-preset": "0.71.3",
     "moti": "0.18.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
