@@ -7,3 +7,4 @@ atrule
 nextjs
 nativewind
 snackplayer
+dripsy

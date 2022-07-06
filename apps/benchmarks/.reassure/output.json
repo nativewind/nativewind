@@ -4,29 +4,267 @@
   "significant": [],
   "meaningless": [
     {
-      "name": "Simple test",
+      "name": "Text - No Styles: React Native Paper",
       "baseline": {
-        "name": "Simple test",
-        "runs": 10,
-        "meanDuration": 0.1,
-        "stdevDuration": 0.31622776601683794,
-        "durations": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "name": "Text - No Styles: React Native Paper",
+        "runs": 50,
+        "meanDuration": 11.4,
+        "stdevDuration": 1.293626448305346,
+        "durations": [
+          15, 14, 14, 13, 13, 13, 13, 13, 13, 12, 12, 12, 12, 12, 12, 12, 12,
+          12, 12, 12, 12, 12, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+          11, 11, 11, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 9, 9
+        ],
         "meanCount": 1,
         "stdevCount": 0,
-        "counts": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
       },
       "current": {
-        "name": "Simple test",
-        "runs": 10,
-        "meanDuration": 0,
-        "stdevDuration": 0,
-        "durations": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "name": "Text - No Styles: React Native Paper",
+        "runs": 50,
+        "meanDuration": 11.92,
+        "stdevDuration": 1.75940620781036,
+        "durations": [
+          17, 16, 16, 14, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
+          13, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 11,
+          11, 11, 11, 11, 11, 10, 10, 10, 10, 10, 10, 10, 9, 9, 9, 8
+        ],
         "meanCount": 1,
         "stdevCount": 0,
-        "counts": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
       },
-      "durationDiff": -0.1,
-      "relativeDurationDiff": -1,
+      "durationDiff": 0.5199999999999996,
+      "relativeDurationDiff": 0.04561403508771926,
+      "isDurationDiffSignificant": false,
+      "countDiff": 0,
+      "relativeCountDiff": 0
+    },
+    {
+      "name": "Text - No Styles: Native",
+      "baseline": {
+        "name": "Text - No Styles: Native",
+        "runs": 50,
+        "meanDuration": 4.28,
+        "stdevDuration": 0.8091315576289313,
+        "durations": [
+          5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+          5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3,
+          3, 3, 3, 2
+        ],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
+      },
+      "current": {
+        "name": "Text - No Styles: Native",
+        "runs": 50,
+        "meanDuration": 4.5,
+        "stdevDuration": 0.762648446573665,
+        "durations": [
+          6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+          5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+          3, 3, 3, 2
+        ],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
+      },
+      "durationDiff": 0.21999999999999975,
+      "relativeDurationDiff": 0.05140186915887844,
+      "isDurationDiffSignificant": false,
+      "countDiff": 0,
+      "relativeCountDiff": 0
+    },
+    {
+      "name": "Text - No Styles: NativeWind",
+      "baseline": {
+        "name": "Text - No Styles: NativeWind",
+        "runs": 50,
+        "meanDuration": 8,
+        "stdevDuration": 0.989743318610787,
+        "durations": [
+          11, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8, 8, 8, 8, 8, 8,
+          8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+          7, 7, 6, 6
+        ],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
+      },
+      "current": {
+        "name": "Text - No Styles: NativeWind",
+        "runs": 50,
+        "meanDuration": 7.76,
+        "stdevDuration": 1.238168496001169,
+        "durations": [
+          10, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+          8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 7, 7, 7, 6, 6,
+          6, 5, 4, 4
+        ],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
+      },
+      "durationDiff": -0.2400000000000002,
+      "relativeDurationDiff": -0.030000000000000027,
+      "isDurationDiffSignificant": false,
+      "countDiff": 0,
+      "relativeCountDiff": 0
+    },
+    {
+      "name": "Text - No Styles: UI Kitten",
+      "baseline": {
+        "name": "Text - No Styles: UI Kitten",
+        "runs": 50,
+        "meanDuration": 556.56,
+        "stdevDuration": 10.317727957456597,
+        "durations": [
+          600, 588, 581, 569, 568, 565, 564, 563, 563, 561, 561, 559, 559, 558,
+          557, 556, 556, 556, 556, 555, 555, 554, 554, 554, 554, 554, 554, 553,
+          553, 553, 553, 553, 552, 552, 552, 551, 551, 551, 551, 551, 551, 550,
+          550, 549, 549, 548, 548, 547, 547, 539
+        ],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
+      },
+      "current": {
+        "name": "Text - No Styles: UI Kitten",
+        "runs": 50,
+        "meanDuration": 556.24,
+        "stdevDuration": 10.574439725593226,
+        "durations": [
+          583, 583, 580, 577, 575, 573, 571, 570, 564, 562, 561, 560, 559, 559,
+          559, 558, 558, 557, 557, 556, 556, 555, 555, 555, 554, 554, 553, 553,
+          553, 553, 552, 552, 552, 551, 551, 550, 549, 549, 549, 549, 549, 547,
+          546, 545, 545, 544, 544, 543, 542, 540
+        ],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
+      },
+      "durationDiff": -0.31999999999993634,
+      "relativeDurationDiff": -0.0005749604714674723,
+      "isDurationDiffSignificant": false,
+      "countDiff": 0,
+      "relativeCountDiff": 0
+    },
+    {
+      "name": "Text - No Styles: Dripsy",
+      "baseline": {
+        "name": "Text - No Styles: Dripsy",
+        "runs": 50,
+        "meanDuration": 16.52,
+        "stdevDuration": 1.4319958955590484,
+        "durations": [
+          21, 19, 18, 18, 18, 18, 18, 18, 18, 17, 17, 17, 17, 17, 17, 17, 17,
+          17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 16, 16, 16,
+          16, 16, 16, 15, 15, 15, 15, 15, 15, 15, 15, 15, 14, 14, 14, 13
+        ],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
+      },
+      "current": {
+        "name": "Text - No Styles: Dripsy",
+        "runs": 50,
+        "meanDuration": 15.44,
+        "stdevDuration": 1.1095135907970057,
+        "durations": [
+          18, 17, 17, 17, 17, 17, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+          16, 16, 16, 16, 16, 16, 16, 16, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+          15, 15, 15, 15, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 13, 12
+        ],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
+      },
+      "durationDiff": -1.08,
+      "relativeDurationDiff": -0.06537530266343826,
+      "isDurationDiffSignificant": false,
+      "countDiff": 0,
+      "relativeCountDiff": 0
+    },
+    {
+      "name": "Text - No Styles: NativeBase",
+      "baseline": {
+        "name": "Text - No Styles: NativeBase",
+        "runs": 50,
+        "meanDuration": 68.1,
+        "stdevDuration": 5.131932841910304,
+        "durations": [
+          84, 81, 80, 79, 77, 75, 72, 72, 72, 72, 71, 71, 70, 70, 69, 69, 69,
+          68, 68, 68, 68, 68, 67, 67, 67, 67, 66, 66, 66, 66, 66, 66, 65, 65,
+          65, 65, 65, 65, 65, 65, 64, 64, 63, 63, 63, 63, 63, 62, 62, 61
+        ],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
+      },
+      "current": {
+        "name": "Text - No Styles: NativeBase",
+        "runs": 50,
+        "meanDuration": 65.2,
+        "stdevDuration": 2.5872528966106887,
+        "durations": [
+          75, 73, 69, 68, 68, 67, 67, 67, 67, 67, 67, 67, 66, 66, 66, 66, 66,
+          66, 66, 66, 65, 65, 65, 65, 65, 65, 65, 65, 65, 64, 64, 64, 64, 64,
+          64, 64, 64, 64, 64, 63, 63, 63, 63, 62, 62, 62, 62, 62, 62, 61
+        ],
+        "meanCount": 1,
+        "stdevCount": 0,
+        "counts": [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1
+        ]
+      },
+      "durationDiff": -2.8999999999999915,
+      "relativeDurationDiff": -0.042584434654919116,
       "isDurationDiffSignificant": false,
       "countDiff": 0,
       "relativeCountDiff": 0

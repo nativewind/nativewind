@@ -23,7 +23,12 @@ const sidebars = {
       type: "category",
       label: "overview",
       collapsed: false,
-      items: ["overview/overview", "overview/how-it-works", "guides/goals"],
+      items: [
+        "overview/overview",
+        "overview/how-it-works",
+        "guides/goals",
+        "overview/benchmarks",
+      ],
     },
     {
       type: "category",
