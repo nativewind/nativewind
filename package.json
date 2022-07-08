@@ -19,7 +19,7 @@
     "@semantic-release/git": "10.0.1",
     "eslint": "8.19.0",
     "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-unicorn": "43.0.0",
+    "eslint-plugin-unicorn": "43.0.1",
     "husky": "8.0.1",
     "prettier": "2.7.1",
     "typescript": "4.7.4"
