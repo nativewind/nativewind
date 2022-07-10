@@ -11,7 +11,7 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.23.0",
+    "@changesets/cli": "2.23.1",
     "@commitlint/cli": "17.0.3",
     "@commitlint/config-conventional": "17.0.3",
     "@semantic-release/changelog": "6.0.1",
@@ -19,7 +19,7 @@
     "@semantic-release/git": "10.0.1",
     "eslint": "8.19.0",
     "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-unicorn": "43.0.0",
+    "eslint-plugin-unicorn": "43.0.1",
     "husky": "8.0.1",
     "prettier": "2.7.1",
     "typescript": "4.7.4"
