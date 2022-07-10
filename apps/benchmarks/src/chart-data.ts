@@ -30,26 +30,48 @@ import type { IErrorBarXDataPoint } from "chartjs-chart-error-bars";
       };
     });
 
+  const preChartData: Record<
+    string,
+    Array<{ label: string; data: IErrorBarXDataPoint }>
+  > = {};
+
   const chartData: Record<string, ChartData<"bar", IErrorBarXDataPoint[]>> = {};
 
   for (const entry of entries) {
-    chartData[entry.group] ??= {
-      labels: [],
-      datasets: [{ data: [] }],
-    };
-
-    chartData[entry.group].labels?.push(entry.name);
-
-    chartData[entry.group].datasets[0].data.push({
-      x: entry.meanDuration,
-      xMin: [],
-      // eslint-disable-next-line @cspell/spellchecker
-      xMax: entry.meanDuration + entry.stdevDuration,
+    preChartData[entry.group] ??= [];
+    preChartData[entry.group].push({
+      label: entry.name,
+      data: {
+        x: entry.meanDuration,
+        xMin: [],
+        // eslint-disable-next-line @cspell/spellchecker
+        xMax: entry.meanDuration + entry.stdevDuration,
+      },
     });
+  }
 
-    chartData[entry.group].datasets[0].borderColor = "rgb(53, 162, 235)";
-    chartData[entry.group].datasets[0].backgroundColor =
-      "rgba(53, 162, 235, 0.5)";
+  const order = ["StyleSheet", "NativeWind"];
+
+  for (const [key, value] of Object.entries(preChartData)) {
+    chartData[key] = {
+      labels: [],
+      datasets: [
+        {
+          data: value
+            .sort((a, b) => {
+              const aOrder = order.includes(a.label)
+                ? order.indexOf(a.label)
+                : 99;
+
+              const bOrder = order.includes(b.label)
+                ? order.indexOf(b.label)
+                : 99;
+              return aOrder - bOrder;
+            })
+            .map((a) => a.data),
+        },
+      ],
+    };
   }
 
   for (const group of Object.keys(chartData)) {

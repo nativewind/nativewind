@@ -1,10 +1,10 @@
 import { measurePerformance } from "reassure";
 
 // Native
-import { Text as RNText } from "react-native";
+import { Text as RNText, StyleSheet } from "react-native";
 
 // NativeWind
-import { styled as NWStyled } from "nativewind";
+import { styled as NWStyled, NativeWindStyleSheet } from "nativewind";
 
 // Tailwind React Native Classnames
 import tw from "twrnc";
@@ -39,12 +39,22 @@ const measureOptions: Parameters<typeof measurePerformance>[1] = {
   runs: 50,
 };
 
-describe("Text - No Styles:", () => {
+describe("Text - Basic Styles:", () => {
   test("StyleSheet", async () => {
+    const styles = StyleSheet.create({
+      test: {
+        color: "#000",
+        fontSize: 14,
+        fontWeight: "bold",
+      },
+    });
+
     await measurePerformance(
       <>
         {range.map((key) => (
-          <RNText key={key}>{key}</RNText>
+          <RNText key={key} style={styles.test}>
+            {key}
+          </RNText>
         ))}
       </>,
       measureOptions
@@ -52,7 +62,27 @@ describe("Text - No Styles:", () => {
   });
 
   test("NativeWind", async () => {
-    const NWText = NWStyled(RNText);
+    NativeWindStyleSheet.create({
+      styles: {
+        "text-black": {
+          color: "#000",
+        },
+        "text-sm": {
+          fontSize: 14,
+        },
+        "font-bold": {
+          fontWeight: "bold",
+        },
+      },
+    });
+
+    const NWText = NWStyled(
+      RNText,
+      `text-black
+      text-sm
+      font-bold`
+    );
+
     await measurePerformance(
       <>
         {range.map((key) => (
@@ -67,7 +97,7 @@ describe("Text - No Styles:", () => {
     await measurePerformance(
       <>
         {range.map((key) => (
-          <RNText key={key} style={tw``}>
+          <RNText key={key} style={tw`text-black text-sm font-bold`}>
             {key}
           </RNText>
         ))}
@@ -80,7 +110,9 @@ describe("Text - No Styles:", () => {
     await measurePerformance(
       <>
         {range.map((key) => (
-          <RNPaperText key={key}>{key}</RNPaperText>
+          <RNPaperText key={key} variant="bodyLarge">
+            {key}
+          </RNPaperText>
         ))}
       </>,
       {
@@ -96,7 +128,9 @@ describe("Text - No Styles:", () => {
     await measurePerformance(
       <>
         {range.map((key) => (
-          <UIKittenText key={key}>{key}</UIKittenText>
+          <UIKittenText key={key} category="s1">
+            {key}
+          </UIKittenText>
         ))}
       </>,
       {
@@ -117,7 +151,16 @@ describe("Text - No Styles:", () => {
     await measurePerformance(
       <>
         {range.map((key) => (
-          <DText key={key}>{key}</DText>
+          <DText
+            key={key}
+            sx={{
+              color: "#000",
+              fontSize: 14,
+              fontWeight: "bold",
+            }}
+          >
+            {key}
+          </DText>
         ))}
       </>,
       {
@@ -133,7 +176,9 @@ describe("Text - No Styles:", () => {
     await measurePerformance(
       <>
         {range.map((key) => (
-          <NativeBaseText key={key}>{key}</NativeBaseText>
+          <NativeBaseText key={key} fontSize="sm" bold color="#000">
+            {key}
+          </NativeBaseText>
         ))}
       </>,
       {

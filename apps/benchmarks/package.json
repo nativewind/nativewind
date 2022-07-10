@@ -18,17 +18,18 @@
     "chartjs-chart-error-bars": "^3.8.0",
     "dripsy": "^3.6.0",
     "expo": "~45.0.0",
-    "jest": "28.1.2",
+    "jest": "28.1.0",
     "native-base": "3.4.8",
     "nativewind": "2.0.0-next.45",
     "react": "*",
     "react-dom": "*",
     "react-native": "0.69.1",
-    "react-native-paper": "^4.12.2",
+    "react-native-paper": "rc",
     "react-native-safe-area-context": "^4.3.1",
     "reassure": "^0.1.0",
     "tamagui": "^1.0.1-beta.93",
-    "ts-jest": "^28.0.5"
+    "ts-jest": "^28.0.5",
+    "twrnc": "^3.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
