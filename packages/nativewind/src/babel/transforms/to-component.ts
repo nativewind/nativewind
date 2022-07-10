@@ -4,7 +4,6 @@ import {
   isJSXIdentifier,
   isJSXMemberExpression,
   jSXAttribute,
-  JSXElement,
   jsxExpressionContainer,
   JSXIdentifier,
   jsxIdentifier,
@@ -14,9 +13,9 @@ import {
   memberExpression,
   MemberExpression,
 } from "@babel/types";
-import { NodePath } from "@babel/core";
+import { NodePath, types } from "@babel/core";
 
-export function toStyledComponent(path: NodePath<JSXElement>): boolean {
+export function toStyledComponent(path: NodePath<types.JSXElement>): boolean {
   const openingElement = path.node.openingElement;
 
   openingElement.attributes.push(

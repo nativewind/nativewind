@@ -1,6 +1,5 @@
-import { NodePath } from "@babel/core";
+import { NodePath, types } from "@babel/core";
 import {
-  ImportDeclaration,
   isImportDefaultSpecifier,
   isImportSpecifier,
   isStringLiteral,
@@ -10,7 +9,7 @@ import {
  * Finds if an import declaration has an imported value
  */
 export function hasNamedImport(
-  path: NodePath<ImportDeclaration>,
+  path: NodePath<types.ImportDeclaration>,
   variable: string,
   source: string
 ) {

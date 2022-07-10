@@ -1,11 +1,14 @@
-import { NodePath } from "@babel/core";
+import { NodePath, types } from "@babel/core";
 import {
+  isJSXAttribute,
   isJSXIdentifier,
   isJSXSpreadAttribute,
-  JSXElement,
 } from "@babel/types";
 
-export function someAttributes(path: NodePath<JSXElement>, names: string[]) {
+export function someAttributes(
+  path: NodePath<types.JSXElement>,
+  names: string[]
+) {
   const openingElement = path.node.openingElement;
 
   return openingElement.attributes.some((attribute) => {
@@ -14,6 +17,10 @@ export function someAttributes(path: NodePath<JSXElement>, names: string[]) {
       return false;
     }
 
-    return names.some((name) => isJSXIdentifier(attribute.name, { name }));
+    return names.some((name) => {
+      return (
+        isJSXAttribute(attribute) && isJSXIdentifier(attribute.name, { name })
+      );
+    });
   });
 }

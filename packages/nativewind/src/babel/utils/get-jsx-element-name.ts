@@ -1,10 +1,10 @@
+import { types } from "@babel/core";
 import {
   isJSXIdentifier,
   isJSXNamespacedName,
   JSXIdentifier,
   JSXMemberExpression,
   JSXNamespacedName,
-  JSXOpeningElement,
 } from "@babel/types";
 
 /**
@@ -25,7 +25,7 @@ import {
  * This was abstracted as it needs to be recursive
  *
  */
-export function getJSXElementName(node: JSXOpeningElement) {
+export function getJSXElementName(node: types.JSXOpeningElement) {
   return getElementName(node.name);
 }
 

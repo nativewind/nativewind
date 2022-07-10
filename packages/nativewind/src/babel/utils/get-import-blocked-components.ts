@@ -3,10 +3,9 @@ import { join, dirname, basename, resolve, sep, posix } from "node:path";
 import { readdirSync, lstatSync, existsSync } from "node:fs";
 import micromatch from "micromatch";
 
-import { NodePath } from "@babel/core";
-import { ImportDeclaration } from "@babel/types";
 import { VisitorState } from "../visitor";
 import { platforms } from "../../utils/platforms";
+import type { NodePath, types } from "@babel/core";
 
 const allowedIndexFiles: string[] = [];
 for (const platform of platforms) {
@@ -16,7 +15,7 @@ for (const platform of platforms) {
 }
 
 export function getImportBlockedComponents(
-  path: NodePath<ImportDeclaration>,
+  path: NodePath<types.ImportDeclaration>,
   state: VisitorState
 ): string[] {
   const {
