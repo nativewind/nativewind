@@ -49,18 +49,11 @@ Running the Tailwind CLI will generate `nativewind-output.js`.
 npx tailwindcss -i input.css --postcss postcss.config.js
 ```
 
-### 4. Update the TailwindProvider
+### 4. Import your styles
 
-```diff
-import { TailwindProvider } from 'nativewind'
-+ import * as tailwindProviderProps from "./nativewind-output"
-
-function MyAppsProviders ({ children }) {
-    return (
--       <TailwindProvider>{children}</TailwindProvider>
-+       <TailwindProvider {...tailwindProviderProps}>{children}</TailwindProvider>
-    )
-}
+```tsx
+// App.jsx
++ import "./nativewind-output"
 ```
 
 <StartCoding />

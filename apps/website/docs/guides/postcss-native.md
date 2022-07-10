@@ -39,18 +39,11 @@ Run your build process with npm run dev or whatever command is configured in you
 
 This will create `nativewind-output.js`
 
-### 4. Update the TailwindProvider
+### 4. Import your styles
 
-```diff
-import { TailwindProvider } from 'nativewind'
-+ import * as tailwindProviderProps from "./nativewind-output"
-
-function MyAppsProviders ({ children }) {
-    return (
--       <TailwindProvider>{children}</TailwindProvider>
-+       <TailwindProvider {...tailwindProviderProps}>{children}</TailwindProvider>
-    )
-}
+```tsx
+// App.jsx
+import "./nativewind-output";
 ```
 
 <StartCoding />

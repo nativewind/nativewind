@@ -79,18 +79,14 @@ module.exports = async function (env, argv) {
 
 ### React Native Web 0.17
 
-Expo SDK <=45 only supports React Native Web 0.17 which cannot output classNames. You need to add a `<TailwindProvider />` to the root of your application to change the `webOutput` option to `native`. This will cause your web app to behave exactly like a native app.
+Expo SDK <=46 only supports React Native Web 0.17 which cannot output classNames. You need to change the NativeWindStyleSheet output to use `native` for all platforms.
 
 ```tsx
 // App.js
 
-import { TailwindProvider } from "nativewind"
+import { NativeWindStyleSheet } from "nativewind";
 
-export default function App() {
-  return (
-    <TailwindProvider webOutput="native">
-      { // your app }
-    </TailwindProvider>
-  )
-}
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
 ```

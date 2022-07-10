@@ -2,7 +2,6 @@
 // They just stop editors complaining when viewing the files :)
 
 declare module "nativewind" {
-  export const TailwindProvider: any;
   export const useTailwind: (...arg: any[]) => any;
   export const StyledComponent: FunctionComponent<any>;
   export const NWRuntimeParser: (...arg: any[]) => any;
