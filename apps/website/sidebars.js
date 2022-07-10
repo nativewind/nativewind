@@ -21,7 +21,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "overview",
+      label: "Overview",
       collapsed: false,
       items: [
         "overview/overview",
@@ -41,10 +41,6 @@ const sidebars = {
       ],
     },
     {
-      type: "html",
-      value: "<br />",
-    },
-    {
       type: "category",
       label: "Setup",
       collapsed: false,
@@ -60,18 +56,10 @@ const sidebars = {
       ],
     },
     {
-      type: "html",
-      value: "<br />",
-    },
-    {
       type: "category",
       label: "Guides",
       collapsed: false,
       items: ["guides/theme-values", "guides/tailwindcss-react-native"],
-    },
-    {
-      type: "html",
-      value: "<br />",
     },
     {
       type: "category",
@@ -84,10 +72,6 @@ const sidebars = {
         "api/native-wind-style-sheet",
         "api/use-tailwind",
       ],
-    },
-    {
-      type: "html",
-      value: "<br />",
     },
     {
       type: "category",
@@ -104,10 +88,6 @@ const sidebars = {
       ],
     },
     {
-      type: "html",
-      value: "<br />",
-    },
-    {
       type: "category",
       label: "Customization",
       collapsed: false,
@@ -118,10 +98,6 @@ const sidebars = {
         "customization/colors",
         "customization/babel",
       ],
-    },
-    {
-      type: "html",
-      value: "<br />",
     },
     {
       type: "category",
@@ -136,10 +112,6 @@ const sidebars = {
         "tailwind/layout/top-right-bottom-left",
         "tailwind/layout/z-index",
       ],
-    },
-    {
-      type: "html",
-      value: "<br />",
     },
     {
       type: "category",
@@ -191,10 +163,6 @@ const sidebars = {
       ],
     },
     {
-      type: "html",
-      value: "<br />",
-    },
-    {
       type: "category",
       label: "Spacing",
       collapsed: false,
@@ -211,10 +179,6 @@ const sidebars = {
         },
         "tailwind/spacing/space-between",
       ],
-    },
-    {
-      type: "html",
-      value: "<br />",
     },
     {
       type: "category",
@@ -252,10 +216,6 @@ const sidebars = {
           href: "https://tailwindcss.com/docs/max-height",
         },
       ],
-    },
-    {
-      type: "html",
-      value: "<br />",
     },
     {
       type: "category",
@@ -305,18 +265,10 @@ const sidebars = {
       ],
     },
     {
-      type: "html",
-      value: "<br />",
-    },
-    {
       type: "category",
       label: "Background",
       collapsed: false,
       items: ["tailwind/backgrounds/background-color"],
-    },
-    {
-      type: "html",
-      value: "<br />",
     },
     {
       type: "category",
@@ -341,10 +293,6 @@ const sidebars = {
       ],
     },
     {
-      type: "html",
-      value: "<br />",
-    },
-    {
       type: "category",
       label: "Effects",
       collapsed: false,
@@ -360,10 +308,6 @@ const sidebars = {
           href: "https://tailwindcss.com/docs/opacity",
         },
       ],
-    },
-    {
-      type: "html",
-      value: "<br />",
     },
     {
       type: "category",
@@ -391,10 +335,6 @@ const sidebars = {
           href: "https://tailwindcss.com/docs/skew",
         },
       ],
-    },
-    {
-      type: "html",
-      value: "<br />",
     },
     {
       type: "category",

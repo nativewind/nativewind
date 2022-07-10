@@ -139,12 +139,12 @@ html[data-theme="light"] {
   .menu {
     .menu__link:hover,
     .menu__caret:hover {
-      color: $color-secondary-purple;
+      color: $color-secondary-blue;
     }
 
     .menu__list-item-collapsible:hover {
       .menu__link {
-        color: $color-secondary-purple;
+        color: $color-secondary-blue;
       }
     }
 
@@ -156,7 +156,7 @@ html[data-theme="light"] {
       }
 
       &--active:not(.menu__link--sublist) {
-        color: $color-secondary-purple;
+        color: $color-secondary-blue;
       }
     }
 
