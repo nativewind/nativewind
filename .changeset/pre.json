@@ -5,7 +5,7 @@
     "benchmarks": "0.0.0",
     "website": "0.0.0",
     "nativewind": "2.0.0-next.43",
-    "example": "1.0.0"
+    "example": "0.0.0"
   },
   "changesets": [
     "lazy-bananas-deliver",
