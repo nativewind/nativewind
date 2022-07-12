@@ -94,6 +94,9 @@ dist
 # Serverless directories
 .serverless/
 
+# Vercel directories
+.vercel
+
 # FuseBox cache
 .fusebox/
 

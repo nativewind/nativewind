@@ -1,0 +1,24 @@
+{
+  "name": "nativewind-demo-compiler",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "vercel deploy --prod",
+    "start": "vercel dev"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/plugin-syntax-jsx": "^7.18.6",
+    "@babel/preset-react": "^7.18.6",
+    "@babel/standalone": "^7.18.6",
+    "@swc/plugin-transform-imports": "^0.7.0",
+    "nativewind": "2.0.0-next.47",
+    "tailwindcss": "3.0.24"
+  },
+  "devDependencies": {
+    "vercel": "^25.1.0"
+  }
+}
