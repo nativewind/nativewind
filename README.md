@@ -1,7 +1,7 @@
 <div align="center">
 <p align="center">
   <a href="https://nativewind.vercel.app" target="_blank">
-    <img src="https://nativewind.vercel.app/img/logo.svg" alt="Tailwind CSS" width="70" height="70">
+    <img src="https://nativewind.dev/img/logo.svg" alt="Tailwind CSS" width="70" height="70">
     <h1 align="center" style="color:red;">NativeWind</h1>
   </a>
 </p>
@@ -22,23 +22,12 @@
 
 `NativeWind` processes your styles during your application build, and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
 
-> :point_right: This example uses Babel which is one of the many setups available.
-
-```tsx
-import { Pressable, View, Text } from "react-native";
-
-/**
- * A button that changes color when hovered or pressed
- * The text will change font weight when the Pressable is pressed
- */
-export function MyFancyButton(props) {
-  return (
-    <Pressable className="component bg-violet-500 hover:bg-violet-600 active:bg-violet-700">
-      <Text className="font-bold component-active:font-extrabold" {...props} />;
-    </Pressable>
-  );
-}
-```
+<a href="https://snack.expo.dev?name=Hello World&dependencies=react,react-native,nativewind@latest&platform=web&supportedPlatforms=ios,android,web&code=import%20React%20from%20'react'%3B%0Aimport%20%7B%20withExpoSnack%20%7D%20from%20'nativewind'%3B%0A%0Aimport%20%7B%20Text%2C%20View%20%7D%20from%20'react-native'%3B%0Aimport%20%7B%20styled%20%7D%20from%20'nativewind'%3B%0A%0Aconst%20StyledView%20%3D%20styled(View)%0Aconst%20StyledText%20%3D%20styled(Text)%0A%0Aconst%20App%20%3D%20()%20%3D%3E%20%7B%0A%20%20return%20(%0A%20%20%20%20%3CStyledView%20className%3D%22flex-1%20items-center%20justify-center%22%3E%0A%20%20%20%20%20%20%3CStyledText%20className%3D%22text-slate-800%22%3E%0A%20%20%20%20%20%20%20%20Try%20editing%20me!%20%F0%9F%8E%89%0A%20%20%20%20%20%20%3C%2FStyledText%3E%0A%20%20%20%20%3C%2FStyledView%3E%0A%20%20)%3B%0A%7D%0A%0A%2F%2F%20This%20demo%20is%20using%20a%20external%20compiler%20that%20will%20only%20work%20in%20Expo%20Snacks.%0A%2F%2F%20You%20may%20see%20flashes%20of%20unstyled%20content%2C%20this%20will%20not%20occur%20under%20normal%20use!%0A%2F%2F%20Please%20see%20the%20documentation%20to%20setup%20your%20application%0Aexport%20default%20withExpoSnack(App)%3B%0A">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/3946701/178458845-c9ac0299-6809-4002-99a0-78030f27b06a.png">
+    <img src="https://user-images.githubusercontent.com/3946701/178458837-df03c080-eb13-4dcc-9080-186b061a8678.png">
+  </picture>
+</a>
 
 ## Features
 
@@ -49,178 +38,10 @@ export function MyFancyButton(props) {
 - Babel plugin for **simple setup** and improving **intellisense support**
 - Respects all tailwind.config.js settings, including **themes, custom values, plugins**
 - **dark mode / arbitrary classes / media queries**
-- pseudo classes - **hover / focus / active** on compatible components [(docs)](https://nativewind.vercel.app/tailwind/core-concepts/pseudo-classes)
-- styling based on **parent state** - automatically style children based upon parent pseudo classes [(docs)](https://nativewind.vercel.app/tailwind/core-concepts/component)
+- pseudo classes - **hover / focus / active** on compatible components
+- styling based on **parent state** - automatically style children based upon parent pseudo classes
 - **children styles** - create simple layouts based upon parent class
 
 ## Documentation
 
-All documentation is on our website https://nativewind.vercel.app
-
-- [Introduction](https://nativewind.vercel.app/)
-- [Quick Start](https://nativewind.vercel.app/quick-start)
-- [Installation](https://nativewind.vercel.app/installation)
-
-## In action
-
-You can use the Babel plugin to instantly start writing code! This will also enable your editor's language support and provide features such as autocomplete with no extra setup!
-
-```tsx
-import { Text } from "react-native";
-
-export function BoldText(props) {
-  return <Text className="text-bold" {...props} />;
-}
-```
-
-Usage of Babel is optional! You can use the Component API to be more explicit about what gets the styles.
-
-```tsx
-import { Text } from "react-native";
-import { styled } from "nativewind";
-
-const StyledText = styled(Text);
-
-export function BoldText(props) {
-  return <StyledText className="text-bold" {...props} />;
-}
-```
-
-You still have the ability to perform conditional logic and built up complex style objects.
-
-```tsx
-import { Text } from "react-native";
-
-export function MyText({ bold, italic, lineThrough, ...props }) {
-  const classNames = [];
-
-  if (bold) classNames.push("font-bold");
-  if (italic) classNames.push("italic");
-  if (lineThrough) classNames.push("line-through");
-
-  return <Text className={classNames.join(" ")} {...props} />;
-}
-```
-
-Additional options can improve compatibilty with existing RN libraries
-
-```tsx
-import { Text } from "react-native";
-import { styled } from "nativewind";
-import { Svg, Circle, Rect } from "react-native-svg";
-
-/**
- * These components can now use the "stroke" & "fill" props with Tailwind classes
- * They will use inline-props on native, and className on web.
- */
-const StyledCircle = styled(Circle, { classProps: ["stroke", "fill"] });
-const StyledRect = styled(Rect, { classProps: ["stroke", "fill"] });
-
-export function BoldText(props) {
-  return (
-    <Svg height="50%" width="50%" viewBox="0 0 100 100">
-      <StyledCircle
-        cx="50"
-        cy="50"
-        r="45"
-        stroke="stroke-blue-500 stroke-2"
-        fill="color-green-500"
-      />
-      <StyledRect
-        x="15"
-        y="15"
-        width="70"
-        height="70"
-        stroke="stroke-red-500 stroke-2"
-        fill="color-yellow-500"
-      />
-    </Svg>
-  );
-}
-```
-
-# Quick start guide
-
-> This example uses Babel as it provides the fastest setup. There are more setup configurations and in-depth guides [on our website](https://nativewind.vercel.app/installation)
-
-## 1. Create a new React Native application
-
-```
-npx create-react-native-app my-nativewind-app;
-
-```
-
-Choose "Default new app"
-
-Then change your `cwd` to the folder containing the project
-
-```bash
-cd my-nativewind-app
-```
-
-## 2. Install the dependencies
-
-You will need to install `nativewind` and it's peer dependency `tailwindcss`.
-
-```bash
-yarn add nativewind
-yarn add tailwindcss -D
-```
-
-## 3. Setup Tailwind CSS
-
-Run `npx tailwindcss init` to create a `tailwind.config.ts` file
-
-Add the paths to all of your component files in your tailwind.config.js file.
-
-```diff
-// tailwind.config.js
-module.exports = {
-- content: [],
-+ content: ["./App.{js,jsx,ts,tsx}", "./src/**/*.{js,jsx,ts,tsx}"],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
-```
-
-## 4. Add the Babel plugin
-
-Modify your `babel.config.js`
-
-```diff
-// babel.config.js
-module.exports = {
-- plugins: [],
-+ plugins: ["nativewind/babel"],
-};
-```
-
-## Thats it 🎉
-
-Start writing code!
-
-```diff
-import React from 'react';
-- import { StyleSheet, Text, View } from 'react-native';
-+ import { Text, View } from 'react-native';
-
-export default function App() {
-  return (
--     <View style={styles.container}>
-+     <View className="flex-1 items-center justify-center bg-white">
-        <Text>Open up App.js to start working on your app!</Text>
-      </View>
-  );
-}
-
-- const styles = StyleSheet.create({
--   container: {
--     flex: 1,
--     backgroundColor: '#fff',
--     alignItems: 'center',
--     justifyContent: 'center',
--   },
-- });
-```
+All documentation is on our website https://nativewind.dev
