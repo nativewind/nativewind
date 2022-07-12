@@ -13,6 +13,7 @@
 <br />
 
 > **Note**
+>
 > tailwindcss-react-native is current working on v2, which includes a renaming of the project to NativeWind!
 >
 > NativeWind is still under development
