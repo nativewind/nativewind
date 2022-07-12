@@ -22,8 +22,8 @@ const StyledText = styled(Text)
 
 const App = () => {
   return (
-    <StyledView className="container bg-slate-300 items-center">
-      <StyledText className="text-slate-800">Try editing me! 🎉</StyledText>
+    <StyledView className="container h-12 justify-center bg-slate-300 items-center">
+      <StyledText className="text-slate-800">Try resizing me! 🎉</StyledText>
     </StyledView>
   );
 }

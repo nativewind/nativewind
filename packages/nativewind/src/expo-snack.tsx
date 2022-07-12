@@ -29,6 +29,7 @@ export function withExpoSnack(
 ) {
   function dangerouslyCompileStyles(css: string, store: StyleSheetRuntime) {
     const themeString = JSON.stringify(theme);
+    css = css.replace(/\s+/g, " ").trim();
     const cacheKey = `${css}${themeString}`;
 
     if (fetched[cacheKey]) return;

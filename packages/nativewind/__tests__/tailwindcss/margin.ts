@@ -1,4 +1,4 @@
-import { expectError, createTests, tailwindRunner, spacing } from "./runner";
+import { createTests, tailwindRunner, spacing } from "./runner";
 
 tailwindRunner(
   "Layout - Margin",
@@ -34,14 +34,81 @@ tailwindRunner(
   createTests("ml", spacing, (n) => ({
     marginLeft: n,
   })),
-
-  expectError([
-    "m-auto",
-    "mx-auto",
-    "my-auto",
-    "mt-auto",
-    "mr-auto",
-    "mb-auto",
-    "ml-auto",
-  ])
+  [
+    [
+      "m-auto",
+      {
+        styles: {
+          "m-auto": {
+            marginBottom: "auto",
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginTop: "auto",
+          },
+        },
+      },
+    ],
+    [
+      "mx-auto",
+      {
+        styles: {
+          "mx-auto": {
+            marginLeft: "auto",
+            marginRight: "auto",
+          },
+        },
+      },
+    ],
+    [
+      "my-auto",
+      {
+        styles: {
+          "my-auto": {
+            marginBottom: "auto",
+            marginTop: "auto",
+          },
+        },
+      },
+    ],
+    [
+      "mt-auto",
+      {
+        styles: {
+          "mt-auto": {
+            marginTop: "auto",
+          },
+        },
+      },
+    ],
+    [
+      "mr-auto",
+      {
+        styles: {
+          "mr-auto": {
+            marginRight: "auto",
+          },
+        },
+      },
+    ],
+    [
+      "mb-auto",
+      {
+        styles: {
+          "mb-auto": {
+            marginBottom: "auto",
+          },
+        },
+      },
+    ],
+    [
+      "ml-auto",
+      {
+        styles: {
+          "ml-auto": {
+            marginLeft: "auto",
+          },
+        },
+      },
+    ],
+  ]
 );

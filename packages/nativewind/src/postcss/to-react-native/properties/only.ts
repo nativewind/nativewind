@@ -22,6 +22,7 @@ interface OnlyOptions<
   units?: string[];
   number?: boolean;
   color?: boolean;
+  auto?: boolean;
 }
 
 // eslint-disable-next-line unicorn/consistent-function-scoping
@@ -46,11 +47,13 @@ export function only<
     units,
     number,
     color,
+    auto,
   }: OnlyOptions<T, S> = Array.isArray(options) ? { values: options } : options;
 
   const callback = (value: string, name: string) => {
     const float = Number.parseFloat(value);
     const isNaN = Number.isNaN(float);
+    const isAuto = value === "auto";
 
     if (isFunctionValue(value)) {
       /**
@@ -79,6 +82,15 @@ export function only<
 
       return Object.fromEntries(
         Object.entries(fakePropertyStyles).map(([key]) => [key, value])
+      );
+    }
+
+    if (auto && isAuto) {
+      return Object.fromEntries(
+        Object.entries(getStylesForProperty(name, "1px")).map(([key]) => [
+          key,
+          value,
+        ])
       );
     }
 

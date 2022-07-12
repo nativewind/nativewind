@@ -8,9 +8,9 @@ React Native has various issues when conditionally applying styles. To prevent t
 
 For example, instead of only applying a text color for dark mode, provide both a light and dark mode text color.
 
-## Dp vs px
+## dp vs px
 
-React Native's default unit is device-independent pixels (dp) while the web's default is pixels (px). These two units are different, however NativeWind treats them as if they are equalivant. Additionally, the NativeWind's compiler requires a unit for most numeric values forcing some styles to use a `px` unit.
+React Native's default unit is density-independent pixels (dp) while the web's default is pixels (px). These two units are different, however NativeWind treats them as if they are equalivant. Additionally, the NativeWind's compiler requires a unit for most numeric values forcing some styles to use a `px` unit.
 
 ## Flex
 
