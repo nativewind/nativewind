@@ -17,7 +17,7 @@ const StyledView = styled(View)
 
 function Box({ className, children }) {
   return (
-    <StyledView className="relative h-20 w-20 bg-violet-300">
+    <StyledView className="relative w-1/3 bg-violet-300">
       <StyledView className={`
         absolute
         bg-violet-600
@@ -35,15 +35,15 @@ function Box({ className, children }) {
 const App = () => {
   return (
     <StyledView className="w-screen h-screen shrink flex-row flex-wrap justify-between">
-      <Box className="left-0 top-0 h-8 w-8">01</Box>
-      <Box className="left-0 inset-x-0 h-8">02</Box>
-      <Box className="top-0 right-0 h-8 w-8">03</Box>
-      <Box className="inset-y-0 left-0 w-8">04</Box>
+      <Box className="left-0 top-0 h-1/2 w-1/2">01</Box>
+      <Box className="left-0 inset-x-0 h-1/2">02</Box>
+      <Box className="top-0 right-0 h-1/2 w-1/2">03</Box>
+      <Box className="inset-y-0 left-0 w-1/2">04</Box>
       <Box className="inset-0">05</Box>
-      <Box className="inset-y-0 right-0 w-8">06</Box>
-      <Box className="bottom-0 left-0 h-8 w-8">07</Box>
-      <Box className="inset-x-0 bottom-0 h-8">08</Box>
-      <Box className="bottom-0 right-0 h-8 w-8">09</Box>
+      <Box className="inset-y-0 right-0 w-1/2">06</Box>
+      <Box className="bottom-0 left-0 h-1/2 w-1/2">07</Box>
+      <Box className="inset-x-0 bottom-0 h-1/2">08</Box>
+      <Box className="bottom-0 right-0 h-1/2 w-1/2">09</Box>
     </StyledView>
   );
 }
