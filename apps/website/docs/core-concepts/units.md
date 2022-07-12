@@ -18,7 +18,7 @@ const App = () => {
       justify-center
       bg-slate-300
       m-auto
-      h-[50vh]
+      h-[25vh]
       w-[50vh]
     `}>
       <StyledText
