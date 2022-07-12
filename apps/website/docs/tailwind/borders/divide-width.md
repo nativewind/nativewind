@@ -1,11 +1,15 @@
----
-title: Divide Width
-sidebar_label: Divide Width ⭐
----
-
 import Compatibility from "../\_compatibility.mdx"
+import Usage from "../\_usage.mdx"
 
-React Native does not have support child selectors, however `styled` components are context aware and can pass down information.
+# Divide Width
+
+## Usage
+
+<Usage />
+
+## How it works
+
+React Native does not have support child selectors, so the `styled` components clones its children and appends the child styles.
 
 ```tsx
 // With this code
@@ -23,11 +27,7 @@ React Native does not have support child selectors, however `styled` components 
 </View>
 ```
 
-:::caution
-
-This class only works if both the parent and it's children are transformed or wrapped in `styled`
-
-:::
+## Compatibility
 
 <Compatibility
 supported={[

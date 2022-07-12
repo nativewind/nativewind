@@ -1,6 +1,13 @@
+import Compatibility from "../\_compatibility.mdx"
+import Usage from "../\_usage.mdx"
+
 # Top / Right / Bottom / Left
 
-Top / Right / Bottom / Left is fully supported by NativeWind. Please see [Tailwind CSS documentation for usuage](https://tailwindcss.com/docs/top-right-bottom-left)
+## Usage
+
+<Usage />
+
+## Example
 
 ```SnackPlayer name=Top / Right / Bottom / Left
 import { View } from 'react-native';
@@ -41,3 +48,31 @@ const App = () => {
   );
 }
 ```
+
+## Compatibility
+
+<Compatibility
+supported={[
+"inset-{n}",
+"inset-[n]",
+"inset-x-{n}",
+"inset-y-[n]",
+"top-{n}",
+"top-[n]",
+"bottom-{n}",
+"bottom-[n]",
+"left-{n}",
+"left-[n]",
+"right-{n}",
+"right-[n]",
+]}
+none={[
+"inset-auto",
+"inset-x-auto",
+"inset-y-auto",
+"top-auto",
+"bottom-auto",
+"left-auto",
+"right-auto",
+]}
+/>

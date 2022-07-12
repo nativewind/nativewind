@@ -1,10 +1,17 @@
+import Compatibility from "../\_compatibility.mdx"
+import Usage from "../\_usage.mdx"
+
 # Container
 
 :::caution
 NativeWind's default breakpoints are not yet designed for native devices and still uses the web defaults.
 :::
 
-`container` is fully supported by NativeWind. Please see [Tailwind CSS documentation for usuage](https://tailwindcss.com/docs/container)
+## Usage
+
+<Usage />
+
+## Example
 
 ```SnackPlayer name=Container
 import { Text, View } from 'react-native';
@@ -21,3 +28,11 @@ const App = () => {
   );
 }
 ```
+
+## Compatibility
+
+<Compatibility
+supported={[
+"container",
+]}
+/>

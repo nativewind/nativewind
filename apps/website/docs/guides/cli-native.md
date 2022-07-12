@@ -1,12 +1,39 @@
-import StartCoding from "../\_start-coding-components.md"
-
-# Tailwind CLI (Native)
+# Tailwind CLI
 
 The Tailwind CLI can be used to output pre-compiled RN StyleSheet objects.
 
-## Setup
+Before you start, please follow the [setup guide for Tailwind CLI](https://tailwindcss.com/docs/installation)
 
-### 1. Create a PostCSS config file
+## Web
+
+### Add the NativeWind plugin to your `tailwind.config.js`
+
+```diff
+// tailwind.config.js
++ const nativewind = require("nativewind/tailwind/css")
++
+module.exports = {
+  content: [
+    './App.{js,ts,jsx,tsx}',
+  ],
++ plugins: [nativewind()],
+};
+```
+
+## Native
+
+### Add NativeWind to your PostCSS config
+
+Add tailwindcss and to your `postcss.config.js`.
+
+```js
+// postcss.config.js
+module.exports = {
+  plugins: [require("tailwindcss"), require("nativewind/postcss")],
+};
+```
+
+### Create a PostCSS config file
 
 ```js
 // postcss.config.js
@@ -19,7 +46,7 @@ module.exports = {
 };
 ```
 
-### 2. Add the NativeWind plugin to your `tailwind.config.js`
+### Add the NativeWind plugin to your `tailwind.config.js`
 
 ```diff
 // tailwind.config.js
@@ -33,15 +60,7 @@ module.exports = {
 };
 ```
 
-### 2. Create a input file
-
-```css
-// input.css
-@tailwind components;
-@tailwind utilities;
-```
-
-### 3. Run Tailwind CLI
+### Run Tailwind CLI
 
 Running the Tailwind CLI will generate `nativewind-output.js`.
 
@@ -49,14 +68,12 @@ Running the Tailwind CLI will generate `nativewind-output.js`.
 npx tailwindcss -i input.css --postcss postcss.config.js
 ```
 
-### 4. Import your styles
+### Import your styles
 
 ```tsx
 // App.jsx
 + import "./nativewind-output"
 ```
-
-<StartCoding />
 
 ## Watching for changes
 

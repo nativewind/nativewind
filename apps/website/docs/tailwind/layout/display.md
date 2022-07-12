@@ -1,6 +1,13 @@
 import Compatibility from "../\_compatibility.mdx"
+import Usage from "../\_usage.mdx"
 
 # Display
+
+## Usage
+
+<Usage />
+
+## Compatibility
 
 <Compatibility
 supported={[ "flex", "none" ]}

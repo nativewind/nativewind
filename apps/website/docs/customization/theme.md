@@ -70,7 +70,7 @@ There are no quotes between the brackets in theme functions
 Theme functions can be combined to create complex theme values
 
 ```js
-const myFontSize = 16`roundToNearestPixel(fontScaleMultipler(${myFontSize}))`;
+const myFontSize = `roundToNearestPixel(fontScaleMultipler(${myFontSize}))`;
 
 // compiles to
 

@@ -1,6 +1,13 @@
+import Compatibility from "../_compatibility.mdx";
+import Usage from "../_usage.mdx";
+
 # Aspect Ratio
 
-Aspect ratio is fully supported by NativeWind. Please see [Tailwind CSS documentation for usuage](https://tailwindcss.com/docs/aspect-ratio)
+## Usage
+
+<Usage />
+
+## Example
 
 ```SnackPlayer name=Aspect Ratio
 import { View } from 'react-native';
@@ -17,3 +24,7 @@ const App = () => {
   );
 }
 ```
+
+## Compatibility
+
+<Compatibility supported={["aspect-auto", "aspect-video", "aspect-square"]} />

@@ -27,7 +27,7 @@ const sidebars = {
         "overview/overview",
         "overview/how-it-works",
         "guides/goals",
-        "overview/benchmarks",
+        // "overview/benchmarks",
       ],
     },
     {
@@ -35,24 +35,25 @@ const sidebars = {
       label: "Quick Starts",
       collapsed: false,
       items: [
+        "getting-started/typescript",
         "quick-starts/expo",
         "quick-starts/react-native-cli",
         "quick-starts/create-react-native-app",
+        "quick-starts/nextjs",
+        "quick-starts/solito",
+        "quick-starts/ignite",
       ],
     },
     {
       type: "category",
-      label: "Setup",
+      label: "Advanced Setup",
       collapsed: false,
       items: [
-        "getting-started/editor",
-        "getting-started/typescript",
         "guides/babel",
         "guides/babel-compile-only",
         "guides/babel-transform-only",
         "guides/postcss",
         "guides/cli-native",
-        "guides/postcss-native",
       ],
     },
     {
@@ -70,7 +71,6 @@ const sidebars = {
         "api/StyledComponent",
         "api/use-color-scheme",
         "api/native-wind-style-sheet",
-        "api/use-tailwind",
       ],
     },
     {
@@ -119,47 +119,15 @@ const sidebars = {
       collapsed: false,
       items: [
         "tailwind/flexbox/flex-basis",
-        {
-          type: "link",
-          label: "Flex Direction",
-          href: "https://tailwindcss.com/docs/flex-direction",
-        },
-        {
-          type: "link",
-          label: "Flex Wrap",
-          href: "https://tailwindcss.com/docs/flex-wrap",
-        },
-        {
-          type: "link",
-          label: "Flex Grow",
-          href: "https://tailwindcss.com/docs/flex-grow",
-        },
-        {
-          type: "link",
-          label: "Flex Shrink",
-          href: "https://tailwindcss.com/docs/flex-shrink",
-        },
+        "tailwind/flexbox/flex-direction",
+        "tailwind/flexbox/flex-wrap",
+        "tailwind/flexbox/flex-grow",
+        "tailwind/flexbox/flex-shrink",
         "tailwind/flexbox/gap",
-        {
-          type: "link",
-          label: "Justify Content",
-          href: "https://tailwindcss.com/docs/justify-content",
-        },
-        {
-          type: "link",
-          label: "Align Content",
-          href: "https://tailwindcss.com/docs/align-content",
-        },
-        {
-          type: "link",
-          label: "Align Items",
-          href: "https://tailwindcss.com/docs/align-items",
-        },
-        {
-          type: "link",
-          label: "Align Self",
-          href: "https://tailwindcss.com/docs/align-self",
-        },
+        "tailwind/flexbox/justify-content",
+        "tailwind/flexbox/align-content",
+        "tailwind/flexbox/align-items",
+        "tailwind/flexbox/align-self",
       ],
     },
     {
@@ -167,16 +135,8 @@ const sidebars = {
       label: "Spacing",
       collapsed: false,
       items: [
-        {
-          type: "link",
-          label: "Padding",
-          href: "https://tailwindcss.com/docs/padding",
-        },
-        {
-          type: "link",
-          label: "Margin",
-          href: "https://tailwindcss.com/docs/margin",
-        },
+        "tailwind/spacing/padding",
+        "tailwind/spacing/margin",
         "tailwind/spacing/space-between",
       ],
     },
@@ -185,36 +145,12 @@ const sidebars = {
       label: "Sizing",
       collapsed: false,
       items: [
-        {
-          type: "link",
-          label: "Width",
-          href: "https://tailwindcss.com/docs/width",
-        },
-        {
-          type: "link",
-          label: "Min-Width",
-          href: "https://tailwindcss.com/docs/min-width",
-        },
-        {
-          type: "link",
-          label: "Max-Width",
-          href: "https://tailwindcss.com/docs/max-width",
-        },
-        {
-          type: "link",
-          label: "Height",
-          href: "https://tailwindcss.com/docs/height",
-        },
-        {
-          type: "link",
-          label: "Min-height",
-          href: "https://tailwindcss.com/docs/min-height",
-        },
-        {
-          type: "link",
-          label: "Max-height",
-          href: "https://tailwindcss.com/docs/max-height",
-        },
+        "tailwind/sizing/width",
+        "tailwind/sizing/min-width",
+        "tailwind/sizing/max-width",
+        "tailwind/sizing/height",
+        "tailwind/sizing/min-height",
+        "tailwind/sizing/max-height",
       ],
     },
     {
@@ -222,46 +158,17 @@ const sidebars = {
       label: "Typography",
       collapsed: false,
       items: [
-        {
-          type: "link",
-          label: "Font Size",
-          href: "https://tailwindcss.com/docs/font-size",
-        },
-        {
-          type: "link",
-          label: "Font Style",
-          href: "https://tailwindcss.com/docs/font-style",
-        },
-        {
-          type: "link",
-          label: "Font Weight",
-          href: "https://tailwindcss.com/docs/font-weight",
-        },
-        {
-          type: "link",
-          label: "Letter spacing",
-          href: "https://tailwindcss.com/docs/letter-spacing",
-        },
+        "tailwind/typography/font-size",
+        "tailwind/typography/font-style",
+        "tailwind/typography/font-weight",
+        "tailwind/typography/letter-spacing",
         "tailwind/typography/line-height",
-        {
-          type: "link",
-          label: "Letter spacing",
-          href: "https://tailwindcss.com/docs/letter-spacing",
-        },
-        {
-          type: "link",
-          label: "Text Align",
-          href: "https://tailwindcss.com/docs/text-align",
-        },
+        "tailwind/typography/text-align",
         "tailwind/typography/text-color",
         "tailwind/typography/text-decoration",
         "tailwind/typography/text-decoration-color",
         "tailwind/typography/text-decoration-style",
-        {
-          type: "link",
-          label: "Text Transform",
-          href: "https://tailwindcss.com/docs/text-transform",
-        },
+        "tailwind/typography/text-transform",
       ],
     },
     {
@@ -275,16 +182,8 @@ const sidebars = {
       label: "Borders",
       collapsed: false,
       items: [
-        {
-          type: "link",
-          label: "Border Radius",
-          href: "https://tailwindcss.com/docs/border-radius",
-        },
-        {
-          type: "link",
-          label: "Border Width",
-          href: "https://tailwindcss.com/docs/border-width",
-        },
+        "tailwind/borders/border-radius",
+        "tailwind/borders/border-width",
         "tailwind/borders/border-color",
         "tailwind/borders/border-style",
         "tailwind/borders/divide-width",
@@ -296,46 +195,35 @@ const sidebars = {
       type: "category",
       label: "Effects",
       collapsed: false,
-      items: [
-        {
-          type: "link",
-          label: "Box Shadow",
-          href: "https://tailwindcss.com/docs/box-shadow",
-        },
-        {
-          type: "link",
-          label: "Opacity",
-          href: "https://tailwindcss.com/docs/opacity",
-        },
-      ],
+      items: ["tailwind/effects/box-shadow", "tailwind/effects/opacity"],
     },
-    {
-      type: "category",
-      label: "Transforms",
-      collapsed: false,
-      items: [
-        {
-          type: "link",
-          label: "Scale",
-          href: "https://tailwindcss.com/docs/scale",
-        },
-        {
-          type: "link",
-          label: "Rotate",
-          href: "https://tailwindcss.com/docs/rotate",
-        },
-        {
-          type: "link",
-          label: "Translate",
-          href: "https://tailwindcss.com/docs/translate",
-        },
-        {
-          type: "link",
-          label: "Skew",
-          href: "https://tailwindcss.com/docs/skew",
-        },
-      ],
-    },
+    // {
+    //   type: "category",
+    //   label: "Transforms",
+    //   collapsed: false,
+    //   items: [
+    //     {
+    //       type: "link",
+    //       label: "Scale",
+    //       href: "https://tailwindcss.com/docs/scale",
+    //     },
+    //     {
+    //       type: "link",
+    //       label: "Rotate",
+    //       href: "https://tailwindcss.com/docs/rotate",
+    //     },
+    //     {
+    //       type: "link",
+    //       label: "Translate",
+    //       href: "https://tailwindcss.com/docs/translate",
+    //     },
+    //     {
+    //       type: "link",
+    //       label: "Skew",
+    //       href: "https://tailwindcss.com/docs/skew",
+    //     },
+    //   ],
+    // },
     {
       type: "category",
       label: "SVG",

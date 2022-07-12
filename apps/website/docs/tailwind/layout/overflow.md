@@ -1,6 +1,13 @@
 import Compatibility from "../\_compatibility.mdx"
+import Usage from "../\_usage.mdx"
 
 # Overflow
+
+## Usage
+
+<Usage />
+
+## Compatibility
 
 <Compatibility
 supported={[ "visible", "hidden", "scroll" ]}

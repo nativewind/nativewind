@@ -77,9 +77,9 @@ module.exports = async function (env, argv) {
 };
 ```
 
-### React Native Web 0.17
+### Expo SDK <=45
 
-Expo SDK <=46 only supports React Native Web 0.17 which cannot output classNames. You need to change the NativeWindStyleSheet output to use `native` for all platforms.
+Expo SDK <=45 only supports React Native Web <=0.17 which cannot output classNames. You need to change the NativeWindStyleSheet output to use `native` for all platforms.
 
 ```tsx
 // App.js

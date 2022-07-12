@@ -1,9 +1,13 @@
----
-title: Gap
-sidebar_label: Gap ⭐
----
-
 import Compatibility from "../\_compatibility.mdx"
+import Usage from "../\_usage.mdx"
+
+# Gap
+
+## Usage
+
+<Usage />
+
+## How it works
 
 React Native does not have support for gap within flexbox, however we can provide a simplistic polyfill via margins. This is not a complete replacement for gap and should be used with caution.
 
@@ -23,11 +27,7 @@ React Native does not have support for gap within flexbox, however we can provid
 </View>
 ```
 
-:::caution
-
-This class only works if both the parent and it's children are transformed or wrapped in `styled`
-
-:::
+## Compatibility
 
 <Compatibility
 supported={[

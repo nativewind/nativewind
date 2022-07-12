@@ -22,7 +22,7 @@ body {
 main {
   .container {
     max-width: 100%;
-    padding: 0 !important;
+    padding: 0px;
 
     @include mobile-screen {
       padding-top: 20px !important;
@@ -218,5 +218,17 @@ html[data-theme="light"] {
     &::before {
       // background-image: url('/img/github-black.svg');
     }
+  }
+}
+
+@media (pointer: fine) {
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: var(--ifm-scrollbar-track-background-color);
+    border-radius: 10px;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar {
+    height: var(--ifm-scrollbar-size);
+    width: var(--ifm-scrollbar-size);
   }
 }

@@ -1,9 +1,13 @@
----
-title: Space between
-sidebar_label: Space between ⭐
----
-
 import Compatibility from "../\_compatibility.mdx"
+import Usage from "../\_usage.mdx"
+
+# Space between
+
+## Usage
+
+<Usage />
+
+## How it works
 
 React Native does not have support child selectors, however `styled` components are context aware and can pass down information.
 
@@ -23,11 +27,7 @@ React Native does not have support child selectors, however `styled` components 
 </View>
 ```
 
-:::caution
-
-This class only works if both the parent and it's children are transformed or wrapped in `styled`
-
-:::
+## Compatibility
 
 <Compatibility
 supported={[
