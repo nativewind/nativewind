@@ -30,23 +30,6 @@ NativeWind achieves this by pre-compiling your styles and uses a minimal runtime
 
 👪 **Parent state styles** automatically style children based upon parent pseudo classes [(docs)](../core-concepts/states#hover-focus-and-active#styling-based-on-parent-state)
 
-## What is a universal style system?
-
-A full featured style system should have
-
-- Static styles
-- UI state styles (active, hover, focus, etc)
-- Responsive styles (media queries, dynamic units)
-- Device state styles (orientation, color scheme)
-- Styling inheritance
-- Use the best rendering engine available
-
-React Native's StyleSheet system only provides static styles, with other features left for the user to implement. By using NativeWind you can focus on writing your system instead of building your own custom style system.
-
-On web, CSS already has all these features and is highly optimised. While on web NativeWind provides a compatibilty layer between React Native and CSS.
-
-This is what makes NativeWind a universal style system - it allows you to use the same components with rich styles on all React Native platforms.
-
 ## In action
 
 ```SnackPlayer name=Hello%20World
@@ -77,8 +60,26 @@ import { Text, View } from "react-native";
 const App = () => {
   return (
     <View className="flex-1 items-center justify-center">
-      <Text className="text-slate-800">Try editing me! 🎉</Text>
+      <Text className="text-slate-800">Styling just works! 🎉</Text>
     </View>
   );
 };
 ```
+
+## What is a universal style system?
+
+A full featured style system should have
+
+- Static styles
+- UI state styles (active, hover, focus, etc)
+- Responsive styles (media queries, dynamic units)
+- Device state styles (orientation, color scheme)
+- Styling inheritance
+- Use the best rendering engine available
+
+React Native's StyleSheet system only provides static styles, with other features left for the user to implement. By using NativeWind you can focus on writing your system instead of building your own custom style system.
+
+On web, CSS already has all these features and is highly optimised. While on web NativeWind provides a compatibilty layer between React Native and CSS.
+
+This is what makes NativeWind a universal style system - it allows you to use the same components with rich styles on all React Native platforms.
+
