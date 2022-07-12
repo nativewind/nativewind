@@ -8,6 +8,7 @@
     "example": "0.0.0"
   },
   "changesets": [
+    "brown-tables-learn",
     "lazy-bananas-deliver",
     "many-pants-whisper",
     "selfish-bees-develop"
