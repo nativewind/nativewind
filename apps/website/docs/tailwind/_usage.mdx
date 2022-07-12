@@ -1,9 +1,9 @@
+import {useLocation} from '@docusaurus/router';
+
 <p>
   Please refer to the{" "}
   <a
-    href={`https://tailwindcss.com/docs/${window.location.pathname
-      .split("/")
-      .pop()}`}
+    href={`https://tailwindcss.com/docs/${useLocation().pathname.split("/").pop()}`}
   >
     documentation on the Tailwind CSS website
   </a>
