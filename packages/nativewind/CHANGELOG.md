@@ -1,5 +1,7 @@
 # nativewind
 
+## 2.0.0-next.48
+
 ## 2.0.0-next.47
 
 ## 2.0.0-next.46
