@@ -38,4 +38,8 @@ supported={[
 "space-y-{n}",
 "space-y-[n]",
 ]}
+none={[
+"space-x-reverse",
+"space-y-reverse",
+]}
 />

@@ -1,0 +1,103 @@
+# Custom Components
+
+NativeWind strength really shines with writing your own custom components.
+
+## Merging styles
+
+NativeWind doesn't require you to merge or provide styles as an array. You can simply append the two classNames strings together
+
+```tsx
+function MyComponent() {
+  const classes = `text-black`;
+  return <Text className={`font-bold ${classes}`} />;
+}
+```
+
+This pattern is very useful for creating components with variants
+
+```tsx
+const variantStyles = {
+  default: "rounded",
+  primary: "bg-blue-500 text-white",
+  secondary: "bg-white-500 text-black",
+};
+
+function MyComponent({ variant }) {
+  return (
+    <Text
+      className={`
+      font-bold
+      ${variantStyles.default}
+      ${variantStyles[variant]}
+    `}
+    />
+  );
+}
+```
+
+## Merging with inline styles
+
+NativeWind will automatically merge with inline-styles. Inline styles have a higher priority.
+
+```tsx
+function MyComponent({ styles }) {
+  return <Text className={`font-bold`} styles={styles} />;
+}
+```
+
+## Passing styles to components
+
+When passing styles between components, they are compiled on the parent and passed as a styles object to the child.
+
+```tsx
+function A({ styles }) {
+  return <B className={`font-bold`} />;
+}
+
+function B({ styles }) {
+  // You need to use styles, className is not passed down!
+  return <Text styles={styles} />;
+}
+```
+
+If you want to pass the className as a string, simply use a different prop
+
+```tsx
+function A({ styles }) {
+  return <B textClassName="font-bold" />;
+}
+
+function B({ textClassName }) {
+  return <Text className={textClassName} />;
+}
+```
+
+Don't worry about inline-styles, they will be merged
+
+```tsx
+function A({ styles }) {
+  return <B className={`font-bold`} style={{ color: "black" }} />;
+}
+
+function B({ styles }) {
+  // Styles is { fontWeight: "bold", color: "black" }
+  return <Text styles={styles} />;
+}
+```
+
+## Complex logic
+
+If you have complex styling logic consider using a library the className merging like [clsx](https://www.npmjs.com/package/clsx).
+
+```tsx
+function A({ rounded, className }) {
+  const className = clsx(
+    "font-bold",
+    { rounded },
+    variant === "primary" && "bg-blue-500 text-white",
+    variant === "secondary" && "bg-blue-500 text-white",
+    className
+  );
+  return <B className={className} />;
+}
+```

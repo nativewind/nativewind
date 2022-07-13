@@ -1,32 +1,34 @@
 import Legend from "./_legend.md";
 
 <table>
-  <tr>
-    <th>Class</th>
-    <th>Native (StyleSheet)</th>
-    <th>Web (CSS)</th>
-  </tr>
-  {(props.supported || []).map((value, index) => (
-    <tr key={`supported-${index}`}>
-      <td>{value}</td>
-      <td>✅</td>
-      <td>✅</td>
+  <tbody>
+    <tr>
+      <th>Class</th>
+      <th>Native (StyleSheet)</th>
+      <th>Web (CSS)</th>
     </tr>
-  ))}
-  {(props.partial || []).map((value, index) => (
-    <tr key={`partial-${index}`}>
-      <td>{value}</td>
-      <td>✔️</td>
-      <td>✅</td>
-    </tr>
-  ))}
-  {(props.none || []).map((value, index) => (
-    <tr key={`partial-${index}`}>
-      <td>{value}</td>
-      <td>❌</td>
-      <td>✅</td>
-    </tr>
-  ))}
+    {(props.supported || []).map((value, index) => (
+      <tr key={`supported-${index}`}>
+        <td>{value}</td>
+        <td>✅</td>
+        <td>✅</td>
+      </tr>
+    ))}
+    {(props.partial || []).map((value, index) => (
+      <tr key={`partial-${index}`}>
+        <td>{value}</td>
+        <td>✔️</td>
+        <td>✅</td>
+      </tr>
+    ))}
+    {(props.none || []).map((value, index) => (
+      <tr key={`partial-${index}`}>
+        <td>{value}</td>
+        <td>❌</td>
+        <td>✅</td>
+      </tr>
+    ))}
+  </tbody>
 </table>
 
 <Legend />

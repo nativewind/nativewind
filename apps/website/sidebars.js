@@ -60,7 +60,11 @@ const sidebars = {
       type: "category",
       label: "Guides",
       collapsed: false,
-      items: ["guides/theme-values", "guides/tailwindcss-react-native"],
+      items: [
+        "guides/theme-values",
+        "guides/custom-components",
+        "guides/tailwindcss-react-native",
+      ],
     },
     {
       type: "category",

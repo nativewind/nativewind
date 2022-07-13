@@ -1,5 +1,5 @@
 :root {
-  --ifm-font-family-monospace: "Inter";
+  --ifm-font-family-monospace: "Fira Code";
   --ifm-font-family-base: "Inter";
   --ifm-footer-link-color: #ffffff;
   --ifm-code-font-size: 16px;
@@ -12,6 +12,7 @@
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;500&display=swap");
 
 body {
   font-family: "Inter", "Helvetica", "Arial", sans-serif;
