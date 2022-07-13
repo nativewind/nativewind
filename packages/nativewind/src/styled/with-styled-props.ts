@@ -43,7 +43,7 @@ export function withStyledProps<S, T extends string>({
         mask |= style.mask;
       }
 
-      Object.assign(styledProps, { [prop]: undefined }, style);
+      Object.assign(styledProps, { [prop]: undefined }, style[0]);
     }
   }
 
@@ -58,7 +58,7 @@ export function withStyledProps<S, T extends string>({
         mask |= style.mask;
       }
 
-      Object.assign(styledProps, { [prop]: undefined }, style);
+      Object.assign(styledProps, { [prop]: undefined }, style[0]);
     }
   }
 

@@ -71,9 +71,12 @@ export function useTailwind<T>({
     stylesArray.childClassNames = styles.childClassNames;
 
     if (flatten) {
-      return StyleSheet.flatten(stylesArray);
+      const flatStyles: StylesArray = [StyleSheet.flatten(stylesArray)];
+      flatStyles.mask = styles.mask;
+      return flatStyles;
     }
 
+    stylesArray.mask = styles.mask;
     return stylesArray;
   }, [styles, inlineStyles, additionalStyles, flatten]) as StylesArray<T>;
 }

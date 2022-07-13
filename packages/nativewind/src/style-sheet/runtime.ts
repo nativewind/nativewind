@@ -288,10 +288,15 @@ export class StyleSheetRuntime extends ColorSchemeStore {
           ...this.snapshot,
           [snapshotKey]: styleArray,
         };
-      } else {
+      } else if (styleArray.mask === 0) {
         this.snapshot = {
           ...this.snapshot,
           [snapshotKey]: emptyStyles,
+        };
+      } else {
+        this.snapshot = {
+          ...this.snapshot,
+          [snapshotKey]: styleArray,
         };
       }
     };

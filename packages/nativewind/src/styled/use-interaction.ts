@@ -39,7 +39,7 @@ export function useInteraction(
   const handlers = useMemo(() => {
     const handlers: InteractionProps = {};
 
-    if (matchesMask(mask, ACTIVE | PARENT | GROUP)) {
+    if (matchesMask(ACTIVE | PARENT | GROUP, mask)) {
       if (Platform.OS === "web") {
         handlers.onMouseDown = function (event: GestureResponderEvent) {
           if (ref.current.onMouseDown) {
@@ -52,7 +52,7 @@ export function useInteraction(
           if (ref.current.onMouseUp) {
             ref.current.onMouseUp(event);
           }
-          dispatch({ type: "active", value: true });
+          dispatch({ type: "active", value: false });
         };
       } else {
         handlers.onPressIn = function (event: GestureResponderEvent) {
@@ -66,12 +66,12 @@ export function useInteraction(
           if (ref.current.onPressOut) {
             ref.current.onPressOut(event);
           }
-          dispatch({ type: "active", value: true });
+          dispatch({ type: "active", value: false });
         };
       }
     }
 
-    if (matchesMask(mask, HOVER | PARENT | GROUP)) {
+    if (matchesMask(HOVER | PARENT | GROUP, mask)) {
       handlers.onHoverIn = function (event: MouseEvent) {
         if (ref.current.onHoverIn) {
           ref.current.onHoverIn(event);
@@ -87,7 +87,7 @@ export function useInteraction(
       };
     }
 
-    if (matchesMask(mask, FOCUS | PARENT | GROUP)) {
+    if (matchesMask(FOCUS | PARENT | GROUP, mask)) {
       handlers.onFocus = function (event: NativeSyntheticEvent<TargetedEvent>) {
         if (ref.current.onFocus) {
           ref.current.onFocus(event);
