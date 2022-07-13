@@ -5,9 +5,7 @@ exports[`Flexbox & Grid - Gap gap-0 1`] = `
   style={
     Array [
       Object {
-        "marginBottom": 0,
         "marginLeft": 0,
-        "marginRight": 0,
         "marginTop": 0,
       },
     ]
@@ -17,9 +15,7 @@ exports[`Flexbox & Grid - Gap gap-0 1`] = `
     style={
       Array [
         Object {
-          "marginBottom": 0,
           "marginLeft": 0,
-          "marginRight": 0,
           "marginTop": 0,
         },
       ]
@@ -31,9 +27,7 @@ exports[`Flexbox & Grid - Gap gap-0 1`] = `
     style={
       Array [
         Object {
-          "marginBottom": 0,
           "marginLeft": 0,
-          "marginRight": 0,
           "marginTop": 0,
         },
       ]
