@@ -9,9 +9,11 @@ export const gap: CustomPluginFunction = ({ matchUtilities, theme }) => {
 
         return {
           "&": {
-            margin: `calc(${value} / -2)`,
+            marginLeft: value,
+            marginTop: value,
             "@selector (> *)": {
-              margin: `calc(${value} / 2)`,
+              marginLeft: value,
+              marginTop: value,
             },
           },
         };
@@ -22,11 +24,9 @@ export const gap: CustomPluginFunction = ({ matchUtilities, theme }) => {
 
         return {
           "&": {
-            "margin-left": `calc(${value} / -2)`,
-            "margin-right": `calc(${value} / -2)`,
+            "margin-left": value,
             "@selector (> *)": {
-              "margin-left": `calc(${value} / 2)`,
-              "margin-right": `calc(${value} / 2)`,
+              "margin-left": value,
             },
           },
         };
@@ -37,11 +37,9 @@ export const gap: CustomPluginFunction = ({ matchUtilities, theme }) => {
 
         return {
           "&": {
-            "margin-top": `calc(${value} / -2)`,
-            "margin-bottom": `calc(${value} / -2)`,
+            "margin-top": value,
             "@selector (> *)": {
-              "margin-top": `calc(${value} / 2)`,
-              "margin-bottom": `calc(${value} / 2)`,
+              "margin-top": value,
             },
           },
         };
