@@ -27,6 +27,6 @@
   "dependencies": {
     "@eva-design/eva": "^2.1.1",
     "@ui-kitten/components": "^5.1.2",
-    "react-native-svg": "^12.3.0"
+    "react-native-svg": "12.4.0"
   }
 }
