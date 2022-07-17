@@ -135,3 +135,30 @@ exports[`Styled classProps on native 1`] = `
   }
 />
 `;
+
+exports[`Styled skip null in child styles 1`] = `
+<View>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 8,
+        },
+      ]
+    }
+  >
+    1
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 8,
+        },
+      ]
+    }
+  >
+    2
+  </Text>
+</View>
+`;

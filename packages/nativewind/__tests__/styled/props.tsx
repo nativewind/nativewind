@@ -3,8 +3,8 @@ import { View, ViewProps, ViewStyle, Text } from "react-native";
 import { styled } from "../../src";
 import { TestProvider } from "../tailwindcss/runner";
 
-const StyledView = styled(View);
 const Row = styled(View, "flex-row");
+const StyledView = styled(View);
 const StyledText = styled(Text);
 StyledText.defaultProps = {
   accessibilityRole: "header",
@@ -93,10 +93,28 @@ describe("Styled", () => {
     expect(tree).toMatchSnapshot();
   });
 
-  test.only("classProps on css", () => {
+  test("classProps on css", () => {
     const tree = render(
       <TestProvider preprocessed>
         <TestClassPropsComponent className="p-4" style2="m-1" />
+      </TestProvider>
+    ).toJSON();
+
+    expect(tree).toMatchSnapshot();
+  });
+
+  test("skip null in child styles", () => {
+    const tree = render(
+      <TestProvider>
+        <StyledView className="space-x-2">
+          {
+            // eslint-disable-next-line unicorn/no-null
+            null
+          }
+          <Text>1</Text>
+          {undefined}
+          <Text>2</Text>
+        </StyledView>
       </TestProvider>
     ).toJSON();
 

@@ -31,6 +31,10 @@ export function withStyledChildren({
     : componentChildren;
 
   return Children.map(children, (child, index) => {
+    if (!child || !child.props) {
+      return child;
+    }
+
     const style = store.getChildStyles(stylesArray, {
       nthChild: index + 1,
       parentHover: componentState.hover,

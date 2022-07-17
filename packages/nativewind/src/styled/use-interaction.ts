@@ -37,9 +37,12 @@ export function useInteraction(
   ref.current = props;
 
   const handlers = useMemo(() => {
+    const isParentOrGroup =
+      matchesMask(mask, PARENT) || matchesMask(mask, GROUP);
+
     const handlers: InteractionProps = {};
 
-    if (matchesMask(ACTIVE | PARENT | GROUP, mask)) {
+    if (isParentOrGroup || matchesMask(mask, ACTIVE)) {
       if (Platform.OS === "web") {
         handlers.onMouseDown = function (event: GestureResponderEvent) {
           if (ref.current.onMouseDown) {
@@ -71,7 +74,7 @@ export function useInteraction(
       }
     }
 
-    if (matchesMask(HOVER | PARENT | GROUP, mask)) {
+    if (isParentOrGroup || matchesMask(mask, HOVER | PARENT | GROUP)) {
       handlers.onHoverIn = function (event: MouseEvent) {
         if (ref.current.onHoverIn) {
           ref.current.onHoverIn(event);
@@ -87,7 +90,7 @@ export function useInteraction(
       };
     }
 
-    if (matchesMask(FOCUS | PARENT | GROUP, mask)) {
+    if (isParentOrGroup || matchesMask(mask, FOCUS | PARENT | GROUP)) {
       handlers.onFocus = function (event: NativeSyntheticEvent<TargetedEvent>) {
         if (ref.current.onFocus) {
           ref.current.onFocus(event);
