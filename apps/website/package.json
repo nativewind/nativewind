@@ -14,7 +14,7 @@
     "write-heading-ids": "docusaurus write-heading-ids"
   },
   "dependencies": {
-    "@babel/standalone": "7.18.8",
+    "@babel/standalone": "7.18.9",
     "@codemirror/lang-javascript": "6.0.1",
     "@docusaurus/core": "2.0.0-rc.1",
     "@docusaurus/preset-classic": "2.0.0-rc.1",

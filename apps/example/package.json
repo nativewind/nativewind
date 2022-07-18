@@ -20,7 +20,7 @@
     "nativewind": "2.0.0-next.49"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9"
+    "@babel/core": "7.18.9"
   },
   "private": true
 }
