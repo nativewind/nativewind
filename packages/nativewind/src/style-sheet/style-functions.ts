@@ -20,6 +20,8 @@ export function parseStyleFunction(
   switch (functionString) {
     case "hairlineWidth":
       return StyleSheet.hairlineWidth;
+    case "round":
+      return parseFloat(value, Math.round);
     case "roundToNearestPixel":
       return parseFloat(value, PixelRatio.roundToNearestPixel);
     case "getPixelSizeForLayoutSize":

@@ -7,6 +7,6 @@ declare module "nativewind" {
   export const NWRuntimeParser: (...arg: any[]) => any;
   export const NativeWindStyleSheet: {
     create: (obj: any) => void;
-    parse: (key: string, value: string) => void;
+    parse: (key: string, value: unknown) => void;
   };
 }

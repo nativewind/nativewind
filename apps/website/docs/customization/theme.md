@@ -44,7 +44,6 @@ React Native provides a number of utilities for creating styles based upon the d
 | Function                              | React Native equivalent                |
 | ------------------------------------- | -------------------------------------- |
 | `hairlineWidth()`                     | `StyleSheet.hairlinewidth`             |
-| `round()`                             | `Math.round`                           |
 | `roundToNearestPixel(<number>)`       | `PixelRatio.roundToNearestPixel`       |
 | `getPixelSizeForLayoutSize(<number>)` | `PixelRatio.getPixelSizeForLayoutSize` |
 | `pixelMultipler(<number>)`            | `PixelRatio.get() * <value>`           |
@@ -70,7 +69,7 @@ There are no quotes between the brackets in theme functions
 Theme functions can be combined to create complex theme values
 
 ```js
-const myFontSize = `roundToNearestPixel(fontScaleMultipler(${myFontSize}))`;
+const myFontSize = `roundToNearestPixel(fontScaleMultipler(16))`;
 
 // compiles to
 
