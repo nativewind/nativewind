@@ -16,6 +16,7 @@ import {
 } from "../../style-sheet/tests";
 import { parseString } from "../../../src/style-sheet/style-functions";
 import { isRuntimeFunction } from "../../../src/style-sheet/style-function-helpers";
+import { ThemeConfig } from "tailwindcss/types/config";
 
 export type Test = [string, TestValues] | [string, StyleRecord, true];
 
@@ -70,41 +71,52 @@ export function assertStyles(
   }
 }
 
-function dangerouslyCompileStyles(css: string, store: StyleSheetRuntime) {
-  const { raw } = extractStyles({
-    theme: {},
-    plugins: [cssPlugin, nativePlugin({})],
-    content: [{ raw: "", extension: "html" }],
-    safelist: [css],
-  });
+function dangerouslyCompileStyles(theme: Partial<ThemeConfig> = {}) {
+  return (css: string, store: StyleSheetRuntime) => {
+    const { raw } = extractStyles({
+      theme,
+      plugins: [cssPlugin, nativePlugin({})],
+      content: [{ raw: "", extension: "html" }],
+      safelist: [css],
+    });
 
-  const serializedStyles: Record<string, Record<string, unknown>> = {};
+    const serializedStyles: Record<string, Record<string, unknown>> = {};
 
-  for (const [key, style] of Object.entries(raw.styles || {})) {
-    serializedStyles[key] = {};
+    for (const [key, style] of Object.entries(raw.styles || {})) {
+      serializedStyles[key] = {};
 
-    for (const [k, v] of Object.entries(style)) {
-      if (isRuntimeFunction(v)) {
-        serializedStyles[key][k] = parseString(v, (x) => x);
-      } else {
-        serializedStyles[key][k] = v;
+      for (const [k, v] of Object.entries(style)) {
+        if (isRuntimeFunction(v)) {
+          serializedStyles[key][k] = parseString(v, (x) => x);
+        } else {
+          serializedStyles[key][k] = v;
+        }
       }
     }
-  }
 
-  store.create({
-    ...raw,
-    styles: serializedStyles,
-  });
+    store.create({
+      ...raw,
+      styles: serializedStyles,
+    });
+  };
+}
+
+export interface TestProviderProps extends TestStyleSheetStoreConstructor {
+  theme?: Partial<ThemeConfig>;
 }
 
 export function TestProvider({
   children,
+  theme,
   ...props
-}: PropsWithChildren<TestStyleSheetStoreConstructor>) {
+}: PropsWithChildren<TestProviderProps>) {
   const store = useMemo(
-    () => new TestStyleSheetRuntime({ ...props, dangerouslyCompileStyles }),
-    []
+    () =>
+      new TestStyleSheetRuntime({
+        ...props,
+        dangerouslyCompileStyles: dangerouslyCompileStyles(theme),
+      }),
+    [theme]
   );
   return (
     <StoreContext.Provider value={store}>{children}</StoreContext.Provider>

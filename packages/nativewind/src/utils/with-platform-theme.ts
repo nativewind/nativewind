@@ -1,18 +1,37 @@
 import { Config } from "tailwindcss";
 import resolveTailwindConfig from "tailwindcss/resolveConfig";
+import {
+  OptionalConfig,
+  RequiredConfig,
+  ThemeConfig,
+} from "tailwindcss/types/config";
 
-interface WithPlatformThemeOptions {
-  previewCss?: boolean;
+// These types are wrong, but they prevent typescript errors
+// while still keeping some types.
+type PlatformConfig =
+  | Config
+  | (RequiredConfig & Partial<PlatformOptionalConfig>);
+
+type PlatformOptionalConfig = Omit<OptionalConfig, "theme"> & {
+  theme: Partial<
+    PlatformThemeConfig & { extend: Partial<PlatformThemeConfig> }
+  >;
+};
+
+interface PlatformThemeConfig {
+  [k: keyof ThemeConfig]: ThemeConfig[keyof ThemeConfig];
 }
 
-export function withPlatformTheme(
-  tailwindConfig: Config,
-  { previewCss = false }: WithPlatformThemeOptions = {}
-) {
+export function withPlatformTheme(tailwindConfig: PlatformConfig) {
   const config: Config = resolveTailwindConfig(tailwindConfig);
 
   if (!config.theme) return config;
 
+  // This is set my the native tailwind plugin. If that plugin is loaded
+  // then its assumed that we are not outputting CSS
+  const isNative = process.env.NATIVEWIND_NATIVE_PLUGIN_ENABLED;
+
+  const theme: Record<string, unknown> = {};
   const extendTheme: Record<string, unknown> = {};
 
   function resolvePlatformThemes(
@@ -24,16 +43,16 @@ export function withPlatformTheme(
     if (value === null) return;
 
     if (hasPlatformKeys(value)) {
-      if (previewCss) {
-        root[key] =
-          (value as Record<string, unknown>).web ||
-          (value as Record<string, unknown>).default;
-      } else {
+      if (isNative) {
         const platformParameter = Object.entries(value)
           .map((entry) => entry.join(":"))
           .join(" ");
 
         root[key] = `platform(${platformParameter})`;
+      } else {
+        root[key] =
+          (value as Record<string, unknown>).web ||
+          (value as Record<string, unknown>).default;
       }
     } else {
       root[key] ??= {};
@@ -47,13 +66,27 @@ export function withPlatformTheme(
     }
   }
 
-  for (const [key, value] of Object.entries(config.theme) as Array<
-    [keyof Config["theme"], string | Record<string, unknown>]
-  >) {
-    resolvePlatformThemes(key, value);
+  for (const [key, value] of Object.entries(config.theme)) {
+    if (key === "extend") {
+      continue;
+    }
+
+    resolvePlatformThemes(key, value, theme);
   }
 
-  (config.theme as Record<string, unknown>).extend = extendTheme;
+  if (config.theme.extend) {
+    for (const [key, value] of Object.entries(config.theme.extend)) {
+      if (key === "extend") {
+        continue;
+      }
+
+      resolvePlatformThemes(key, value, extendTheme);
+      (config.theme as Record<string, unknown>).extend = extendTheme;
+    }
+    theme.extend = extendTheme;
+  }
+
+  config.theme = theme;
 
   return config;
 }
@@ -64,6 +97,8 @@ function hasPlatformKeys(themeObject: object) {
     "android" in themeObject ||
     "web" in themeObject ||
     "windows" in themeObject ||
+    "default" in themeObject ||
+    "DEFAULT" in themeObject ||
     "macos" in themeObject
   );
 }

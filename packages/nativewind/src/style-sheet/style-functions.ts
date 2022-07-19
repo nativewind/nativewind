@@ -20,16 +20,14 @@ export function parseStyleFunction(
   switch (functionString) {
     case "hairlineWidth":
       return StyleSheet.hairlineWidth;
-    case "round":
-      return parseFloat(value, Math.round);
     case "roundToNearestPixel":
       return parseFloat(value, PixelRatio.roundToNearestPixel);
     case "getPixelSizeForLayoutSize":
-      return parseFloat(value, PixelRatio.roundToNearestPixel);
+      return parseFloat(value, PixelRatio.getPixelSizeForLayoutSize);
     case "getFontSizeForLayoutSize":
       return parseFloat(value, getFontSizeForLayoutSize);
     case "roundToNearestFontScale":
-      return roundToNearestFontScale;
+      return parseFloat(value, roundToNearestFontScale);
     case "platformColor":
       return parseString(value, platformColor);
     case "platform":
@@ -41,7 +39,7 @@ export function parseStyleFunction(
 
 export function parseString<T extends (value: string) => S, S>(
   input: string,
-  callback: T
+  callback: T = ((n: string) => n) as unknown as T
 ) {
   return callback(
     isRuntimeFunction(input)
@@ -102,9 +100,7 @@ function platform(platformValues: string) {
         let value: any = tokens.join("");
         const numberValue = Number.parseFloat(value);
 
-        value = Number.isFinite(numberValue)
-          ? numberValue
-          : parseStyleFunction(value);
+        value = Number.isFinite(numberValue) ? numberValue : parseString(value);
 
         return [platform, value];
       })

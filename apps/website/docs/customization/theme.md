@@ -19,23 +19,13 @@ module.exports = withPlatformTheme({
           // Now you can provide platform specific values
           ios: "platformColor(systemRed)",
           android: "platformColor(?android:colorError)",
-          DEFAULT: "red",
+          default: "red",
         },
       },
     },
   },
 });
 ```
-
-### Manual style compilation
-
-:::note
-
-This is only for fringe setups where you are manually compiling and injecting your NativeWind styles.
-
-:::
-
-When manually compiling and injecting your styles, you will need to set the environment variable `NATIVEWIND_PLATFORM_THEME=1` before hand, otherwise `withPlatformTheme` will simply return the `DEFAULT` value.
 
 ## Per device theme values
 
@@ -51,12 +41,12 @@ React Native provides a number of utilities for creating styles based upon the d
 
 ### Scaling functions
 
-`PixelRatio.get()` and `PixelRatio.getFontScale()` are often used for non-linear scaling. As such you can explicity provide the values as scale/value pairs. If no DEFAULT key is set and no matching scale is found it will return 0.
+`PixelRatio.get()` and `PixelRatio.getFontScale()` are often used for non-linear scaling. As such you can explicity provide the values as scale/value pairs. If no `default` key is set and no matching scale is found it will return 0.
 
 | Function                                     |
 | -------------------------------------------- |
-| `pixel(<scale>:<value> DEFAULT:<value>)`     |
-| `fontScale(<scale>:<value> DEFAULT:<value>)` |
+| `pixel(<scale>:<value> default:<value>)`     |
+| `fontScale(<scale>:<value> default:<value>)` |
 
 :::note
 

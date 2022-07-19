@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Device functions theme functions 1`] = `
+<View>
+  <Text
+    style={
+      Array [
+        Object {
+          "fontSize": 0.5,
+        },
+      ]
+    }
+  >
+    Test
+  </Text>
+</View>
+`;
+
+exports[`Device functions withPlatformTheme 1`] = `
+<View>
+  <Text
+    style={
+      Array [
+        Object {
+          "fontSize": 16,
+        },
+        Object {
+          "fontSize": 15,
+        },
+      ]
+    }
+  >
+    Test
+  </Text>
+</View>
+`;
