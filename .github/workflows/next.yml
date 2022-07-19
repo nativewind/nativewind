@@ -27,6 +27,9 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Test project
+        run: npm test
+
       - name: Copy readme
         run: cp README.md packages/nativewind/
 
