@@ -21,6 +21,9 @@ export function useTailwind<T>({
   isolateGroupHover,
   isolateGroupFocus,
   isolateGroupActive,
+  groupHover,
+  groupFocus,
+  groupActive,
   flatten,
 }: UseTailwindOptions<T>): StylesArray<T> {
   const store = useContext(StoreContext);
@@ -33,6 +36,9 @@ export function useTailwind<T>({
       isolateGroupHover,
       isolateGroupFocus,
       isolateGroupActive,
+      groupHover,
+      groupFocus,
+      groupActive,
     });
 
     return [
@@ -49,6 +55,9 @@ export function useTailwind<T>({
     isolateGroupHover,
     isolateGroupFocus,
     isolateGroupActive,
+    groupHover,
+    groupFocus,
+    groupActive,
   ]);
 
   const styles = useSyncExternalStoreWithSelector(

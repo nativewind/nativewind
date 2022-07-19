@@ -17,9 +17,9 @@ import { withStyledProps } from "./with-styled-props";
 import { useTailwind } from "./use-tailwind";
 import { StyleProp } from "react-native";
 import { StoreContext } from "../style-sheet";
-import { IsolateGroupContext } from "./group-context";
+import { GroupContext, IsolateGroupContext } from "./group-context";
 import { useComponentState } from "./use-component-state";
-import { GROUP_ISO, matchesMask } from "../utils/selector";
+import { GROUP, GROUP_ISO, matchesMask } from "../utils/selector";
 
 export interface StyledOptions<P> {
   props?: Array<keyof P & string>;
@@ -110,6 +110,7 @@ export function styled<
     ref: ForwardedRef<unknown>
   ) {
     const store = useContext(StoreContext);
+    const groupContext = useContext(GroupContext);
     const isolateGroupContext = useContext(IsolateGroupContext);
 
     const classNameWithDefaults = baseClassName
@@ -144,6 +145,7 @@ export function styled<
       className,
       inlineStyles,
       ...componentState,
+      ...groupContext,
       ...isolateGroupContext,
     });
 
@@ -178,9 +180,22 @@ export function styled<
       ref,
     } as unknown as T);
 
+    let returnValue: ReactNode = element;
+
+    if (matchesMask(mask, GROUP)) {
+      returnValue = createElement(GroupContext.Provider, {
+        children: returnValue,
+        value: {
+          groupHover: groupContext.groupHover || componentState.hover,
+          groupFocus: groupContext.groupFocus || componentState.focus,
+          groupActive: groupContext.groupActive || componentState.active,
+        },
+      });
+    }
+
     if (matchesMask(mask, GROUP_ISO)) {
-      return createElement(IsolateGroupContext.Provider, {
-        children: element,
+      returnValue = createElement(IsolateGroupContext.Provider, {
+        children: returnValue,
         value: {
           isolateGroupHover: componentState.hover,
           isolateGroupFocus: componentState.focus,
@@ -189,7 +204,7 @@ export function styled<
       });
     }
 
-    return element;
+    return returnValue;
   }
 
   if (typeof Component !== "string") {

@@ -1,14 +1,16 @@
 # Hover, Focus and Other States
 
-NativeWind polyfills a subset of the Tailwind states for React Native by adding event listeners on your components. This documentation only applies when compiling for native or when `webOutput` is set to `native`.
+When compiling for React Native, NativeWind emulates CSS states .
 
-When using CSS on web, please refer to the [offical Tailwind CSS docs](https://tailwindcss.com/docs/hover-focus-and-other-states).
+Please refer to the [documentation on the Tailwind CSS website](https://tailwindcss.com/docs/hover-focus-and-other-states) for more information.
 
 ## Hover, focus, and active
 
-NativeWind implements a subset of the Tailwind psuedo-classes. Unlike CSS, NativeWind psuedo-classes only work on components which can accept listeners as props.
+:::note
+This documentation only applies when compiling for StyleSheet.create
+:::
 
-If you are using NativeWind you need to ensure these listeners are passed to the correct components
+NativeWind implements a subset of the Tailwind psuedo-classes by adding event listeners on your components, hence they will only work on components that can accept the listener.
 
 The supported psuedo-classes and their related listeners are:
 
@@ -47,11 +49,9 @@ const App = () => {
 
 ## Styling based on parent state
 
-NativeWind supports [`group` parent state](https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state), and a new `group-isolate` class.
+NativeWind supports the [`group` parent state](https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state) and a new `group-isolate` class.
 
-The difference between `group` and `group-isolate` is that components under a `group-isolate` tree will only use the state of the closest `group-isolate` parent, while components under `group` will use the state of any parent `group`.
-
-`group-isolate` helps apply state based styling on components that may not accept the psuedo-class listeners.
+The `group` classes creates an unbounded scope, while `group-isolate` creates a bounded scope. The primary purpose of `group-isolate` is for state styling on components which do not accept the needed state listeners.
 
 `group` and `group-isolate` both work with the `hover`/`active`/`focus` psuedo-classes.
 
