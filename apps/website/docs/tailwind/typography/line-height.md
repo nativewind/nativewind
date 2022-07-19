@@ -28,6 +28,8 @@ const App = () => {
 
 ## Compatibility
 
+React Native does not support the relative line height utilities due to lack of support for `em` units.
+
 <Compatibility
 supported={[
 "leading-{n}",
