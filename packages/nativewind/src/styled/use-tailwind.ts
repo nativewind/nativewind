@@ -59,7 +59,11 @@ export function useTailwind<T>({
   );
 
   return useMemo(() => {
-    const stylesArray: StylesArray = [...styles];
+    const stylesArray: StylesArray = [];
+
+    if (styles) {
+      stylesArray.push(...styles);
+    }
 
     if (additionalStyles) {
       stylesArray.push(...additionalStyles);
