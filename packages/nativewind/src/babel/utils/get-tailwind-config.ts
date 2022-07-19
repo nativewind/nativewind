@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { Config } from "tailwindcss";
+import resolveTailwindConfig from "tailwindcss/resolveConfig";
 
 import { nativePlugin, NativePluginOptions } from "../../tailwind/native";
 import { withPlatformTheme } from "../../utils/with-platform-theme";
@@ -28,5 +29,5 @@ export function getTailwindConfig(
     plugins: [nativePlugin(options), ...(userConfig.plugins ?? [])],
   } as Config;
 
-  return withPlatformTheme(mergedConfig);
+  return resolveTailwindConfig(withPlatformTheme(mergedConfig));
 }

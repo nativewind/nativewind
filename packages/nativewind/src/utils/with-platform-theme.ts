@@ -1,5 +1,4 @@
 import { Config } from "tailwindcss";
-import resolveTailwindConfig from "tailwindcss/resolveConfig";
 import {
   OptionalConfig,
   RequiredConfig,
@@ -22,17 +21,15 @@ interface PlatformThemeConfig {
   [k: keyof ThemeConfig]: ThemeConfig[keyof ThemeConfig];
 }
 
-export function withPlatformTheme(tailwindConfig: PlatformConfig) {
-  const config: Config = resolveTailwindConfig(tailwindConfig);
-
+export function withPlatformTheme(config: PlatformConfig) {
   if (!config.theme) return config;
 
   // This is set my the native tailwind plugin. If that plugin is loaded
   // then its assumed that we are not outputting CSS
   const isNative = process.env.NATIVEWIND_NATIVE_PLUGIN_ENABLED;
 
-  const theme: Record<string, unknown> = {};
-  const extendTheme: Record<string, unknown> = {};
+  const theme = config.theme;
+  const extendTheme = config.theme.extend || {};
 
   function resolvePlatformThemes(
     key: string,
