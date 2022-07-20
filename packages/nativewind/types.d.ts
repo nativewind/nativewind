@@ -1,9 +1,17 @@
-import type { ViewProps, TextProps, ImageProps } from "react-native";
-
 declare module "react-native" {
+  interface FlatListProps {
+    className?: string;
+    tw?: string;
+  }
+
+  interface ImagePropsBase {
+    className?: string;
+    tw?: string;
+  }
+
   interface ViewProps {
     className?: string;
-    rw?: string;
+    tw?: string;
   }
 
   interface TextProps {
@@ -11,7 +19,12 @@ declare module "react-native" {
     tw?: string;
   }
 
-  interface ImageProps {
+  interface SwitchProps {
+    className?: string;
+    tw?: string;
+  }
+
+  interface InputAccessoryViewProps {
     className?: string;
     tw?: string;
   }
