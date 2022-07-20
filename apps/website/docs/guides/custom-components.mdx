@@ -1,6 +1,6 @@
 # Custom Components
 
-NativeWind strength really shines with writing your own custom components.
+NativeWind's strength really shines with writing your own custom components.
 
 ## Merging styles
 
@@ -47,7 +47,7 @@ function MyComponent({ style }) {
 
 ## Passing styles to components
 
-When passing styles between components, they are compiled on the parent and passed as a styles object to the child.
+When passing styles between components, they are compiled on the parent and passed as a `style` prop to the child.
 
 ```tsx
 function A({ style }) {
@@ -60,7 +60,7 @@ function B({ style }) {
 }
 ```
 
-If you want to pass the className as a string, simply use a different prop
+If you want to pass the className as a string use a different prop.
 
 ```tsx
 function A({ style }) {
@@ -72,7 +72,7 @@ function B({ textClassName }) {
 }
 ```
 
-Don't worry about inline-styles, they will be merged
+Inline styles will be merged
 
 ```tsx
 function A({ style }) {
@@ -80,7 +80,7 @@ function A({ style }) {
 }
 
 function B({ style }) {
-  // style is { fontWeight: "bold", color: "black" }
+  // style is [{ fontWeight: "bold" }, { color: "black" }]
   return <Text style={style} />;
 }
 ```
