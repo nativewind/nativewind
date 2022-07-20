@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["benchmarks", "website", "example", "nativewind-demo-compiler"]
+  "ignore": ["benchmarks", "website", "example", "demo-compiler"]
 }
