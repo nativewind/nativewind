@@ -19,6 +19,7 @@ export function extractStyles(
     masks: {},
     atRules: {},
     units: {},
+    transforms: {},
     childClasses: {},
   };
 

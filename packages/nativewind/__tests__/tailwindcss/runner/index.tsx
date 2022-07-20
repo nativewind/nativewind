@@ -35,6 +35,7 @@ export interface TestValues {
   masks?: Record<string, number>;
   units?: StyleSheetRuntime["units"];
   atRules?: Record<string, Array<AtRuleTuple[]>>;
+  transforms?: Record<string, boolean>;
   childClasses?: Record<string, string[]>;
 }
 

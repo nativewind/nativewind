@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`transforms transforms 1`] = `
+<View>
+  <Text
+    style={
+      Array [
+        Object {
+          "fontWeight": "700",
+        },
+        Object {
+          "transform": Array [
+            Object {
+              "rotate": "45deg",
+            },
+            Object {
+              "translateY": 0,
+            },
+            Object {
+              "translateX": 1,
+            },
+          ],
+        },
+      ]
+    }
+  >
+    Test
+  </Text>
+</View>
+`;

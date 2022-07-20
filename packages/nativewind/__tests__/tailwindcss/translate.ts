@@ -11,6 +11,9 @@ tailwindRunner(
             transform: [{ translateY: 0 }, { translateX: 0 }],
           },
         },
+        transforms: {
+          "translate-x-0": true,
+        },
       },
     ],
     [
@@ -20,6 +23,9 @@ tailwindRunner(
           "translate-y-0": {
             transform: [{ translateY: 0 }, { translateX: 0 }],
           },
+        },
+        transforms: {
+          "translate-y-0": true,
         },
       },
     ],
@@ -31,6 +37,9 @@ tailwindRunner(
             transform: [{ translateY: 0 }, { translateX: 1 }],
           },
         },
+        transforms: {
+          "translate-x-px": true,
+        },
       },
     ],
     [
@@ -40,6 +49,9 @@ tailwindRunner(
           "translate-y-px": {
             transform: [{ translateY: 1 }, { translateX: 0 }],
           },
+        },
+        transforms: {
+          "translate-y-px": true,
         },
       },
     ],
@@ -51,6 +63,9 @@ tailwindRunner(
             transform: [{ translateY: 0 }, { translateX: 4 }],
           },
         },
+        transforms: {
+          "translate-x-1": true,
+        },
       },
     ],
     [
@@ -60,6 +75,9 @@ tailwindRunner(
           "translate-y-1": {
             transform: [{ translateY: 4 }, { translateX: 0 }],
           },
+        },
+        transforms: {
+          "translate-y-1": true,
         },
       },
     ],

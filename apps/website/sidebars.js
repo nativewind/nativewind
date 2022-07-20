@@ -201,33 +201,18 @@ const sidebars = {
       collapsed: false,
       items: ["tailwind/effects/box-shadow", "tailwind/effects/opacity"],
     },
-    // {
-    //   type: "category",
-    //   label: "Transforms",
-    //   collapsed: false,
-    //   items: [
-    //     {
-    //       type: "link",
-    //       label: "Scale",
-    //       href: "https://tailwindcss.com/docs/scale",
-    //     },
-    //     {
-    //       type: "link",
-    //       label: "Rotate",
-    //       href: "https://tailwindcss.com/docs/rotate",
-    //     },
-    //     {
-    //       type: "link",
-    //       label: "Translate",
-    //       href: "https://tailwindcss.com/docs/translate",
-    //     },
-    //     {
-    //       type: "link",
-    //       label: "Skew",
-    //       href: "https://tailwindcss.com/docs/skew",
-    //     },
-    //   ],
-    // },
+    {
+      type: "category",
+      label: "Transforms",
+      collapsed: false,
+      items: [
+        "tailwind/transforms/scale",
+        "tailwind/transforms/rotate",
+        "tailwind/transforms/translate",
+        "tailwind/transforms/skew",
+        "tailwind/transforms/transform-origin",
+      ],
+    },
     {
       type: "category",
       label: "SVG",

@@ -80,15 +80,6 @@ const units: Record<
  * If you are interested in helping me build a more robust store, please create an issue on Github.
  *
  */
-export interface AddOptions {
-  styles?: StyleSheetRuntime["styles"];
-  atRules?: StyleSheetRuntime["atRules"];
-  topics?: StyleSheetRuntime["topics"];
-  masks?: StyleSheetRuntime["masks"];
-  units?: StyleSheetRuntime["units"];
-  childClasses?: StyleSheetRuntime["childClasses"];
-}
-
 export class StyleSheetRuntime extends ColorSchemeStore {
   snapshot: Snapshot = { "": emptyStyles };
   listeners = new Set<() => void>();
@@ -103,6 +94,7 @@ export class StyleSheetRuntime extends ColorSchemeStore {
 
   styles: Record<string, Style> = {};
   atRules: MediaRecord = {};
+  transforms: Record<string, true> = {};
   topics: Record<string, Array<string>> = {};
   childClasses: Record<string, Array<string>> = {};
   masks: Record<string, number> = {};
@@ -256,6 +248,7 @@ export class StyleSheetRuntime extends ColorSchemeStore {
 
     const reEvaluate = () => {
       const styleArray: StylesArray = [];
+      const transformStyles: ViewStyle["transform"] = [];
       styleArray.mask = 0;
 
       const stateBit = getStateBit({
@@ -272,11 +265,27 @@ export class StyleSheetRuntime extends ColorSchemeStore {
         // If we match this class's state, then process it
         if (matchesMask(stateBit, mask)) {
           const classNameStyles = this.upsertAtomicStyle(className);
-          styleArray.push(...classNameStyles);
+
+          // Group transforms
+          if (this.transforms[className]) {
+            for (const a of classNameStyles) {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              transformStyles.push(...(a as unknown as ViewStyle).transform!);
+            }
+          } else {
+            styleArray.push(...classNameStyles);
+          }
+
           if (classNameStyles.childClassNames) {
             childStyles.push(...classNameStyles.childClassNames);
           }
         }
+      }
+
+      if (transformStyles.length > 0) {
+        styleArray.push({
+          transform: transformStyles,
+        });
       }
 
       if (styleArray.length > 0 || childStyles.length > 0) {
@@ -346,10 +355,22 @@ export class StyleSheetRuntime extends ColorSchemeStore {
   getStyleArray(className: string): StylesArray {
     let styles = this.styles[className];
 
+    /**
+     * Some RN platforms still use style ids. Unfortunately this means we cannot
+     * support transform or dynamic units.
+     *
+     * In these cases we need to call flatten on the style to return it to an object.
+     *
+     * This causes a minor performance issue for these styles, but it should only
+     * be a subset
+     */
+    if (this.units[className] || this.transforms[className]) {
+      styles = {
+        ...(typeof styles === "number" ? StyleSheet.flatten(styles) : styles),
+      };
+    }
+
     if (this.units[className]) {
-      // Having a dynamic unit forces us to switch away from StyleSheet.create
-      // to an inline-style
-      styles = { ...flattenIfStyleId(styles) };
       for (const [key, value] of Object.entries(styles)) {
         const unitFunction = this.units[className][key]
           ? units[this.units[className][key]]
@@ -482,12 +503,32 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     return this.snapshot[className];
   }
 
-  create({ styles, atRules, masks, topics, units, childClasses }: AddOptions) {
+  create({
+    styles,
+    atRules,
+    masks,
+    topics,
+    units,
+    childClasses,
+    transforms,
+  }: Partial<
+    Pick<
+      StyleSheetRuntime,
+      | "styles"
+      | "atRules"
+      | "masks"
+      | "topics"
+      | "units"
+      | "childClasses"
+      | "transforms"
+    >
+  >) {
     if (atRules) Object.assign(this.atRules, atRules);
     if (masks) Object.assign(this.masks, masks);
     if (topics) Object.assign(this.topics, topics);
     if (childClasses) Object.assign(this.childClasses, childClasses);
     if (units) Object.assign(this.units, units);
+    if (transforms) Object.assign(this.transforms, transforms);
 
     if (styles) {
       Object.assign(this.styles, StyleSheet.create(styles));
@@ -501,18 +542,3 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     return parseStyleFunction(functionString, value);
   }
 }
-
-/**
- * Some RN platforms still use style ids. Unfortunately this means we cannot
- * support transform or dynamic units.
- *
- * In these cases we need to call flatten on the style to return it to an object.
- *
- * This causes a minor performance issue for these styles, but it should only
- * be a subset
- */
-const flattenIfStyleId = <T extends Style>(style: T | number): T => {
-  return typeof style === "number"
-    ? (StyleSheet.flatten(style) as unknown as T)
-    : style;
-};

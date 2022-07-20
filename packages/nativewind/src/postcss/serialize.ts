@@ -27,6 +27,7 @@ export function serializer({
   units,
   topics,
   childClasses,
+  transforms,
 }: ExtractedValues) {
   const serializedStyles: Record<string, Record<string, unknown>> = {};
 
@@ -56,6 +57,16 @@ export function serializer({
     raw.atRules = atRules;
     objectProperties.push(
       objectProperty(identifier("atRules"), babelSerializeLiteral(atRules))
+    );
+  }
+
+  if (Object.keys(transforms).length > 0) {
+    raw.transforms = transforms;
+    objectProperties.push(
+      objectProperty(
+        identifier("transforms"),
+        babelSerializeLiteral(transforms)
+      )
     );
   }
 

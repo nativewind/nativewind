@@ -5,10 +5,13 @@ import {
   Platform,
   ScaledSize,
 } from "react-native";
-import { StyleSheetRuntime, AddOptions } from "../../src/style-sheet/runtime";
+import { StyleSheetRuntime } from "../../src/style-sheet/runtime";
 import { StateBitOptions } from "../../src/utils/selector";
 
-export interface TestStyleSheetStoreConstructor extends AddOptions {
+type StyleSheetRuntimeCreate = Parameters<StyleSheetRuntime["create"]>[0];
+
+export interface TestStyleSheetStoreConstructor
+  extends StyleSheetRuntimeCreate {
   dimensions?: Dimensions;
   appearance?: typeof Appearance;
   platform?: typeof Platform.OS;

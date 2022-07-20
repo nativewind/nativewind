@@ -27,6 +27,7 @@ export interface ExtractedValues {
   units: StyleSheetRuntime["units"];
   childClasses: Record<string, string[]>;
   atRules: Record<string, Array<AtRuleTuple[]>>;
+  transforms: Record<string, true>;
 }
 
 export interface DoneResult extends ExtractedValues {
@@ -48,6 +49,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
   const masks: DoneResult["masks"] = {};
   const units: DoneResult["units"] = {};
   const atRules: DoneResult["atRules"] = {};
+  const transforms: DoneResult["transforms"] = {};
   const errors: DoneResult["errors"] = [];
 
   return {
@@ -81,6 +83,8 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
             return;
           }
 
+          const hasTransformRules = Boolean(nativeDeclarations.transform);
+
           for (const s of node.selectors) {
             const mask = getSelectorMask(s, s.includes('[dir="rtl"]'));
             const rules = node.parent?.[atRuleSymbol];
@@ -92,6 +96,10 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
             } = getRuntime(s, nativeDeclarations, rules);
 
             let selector = normalizeCssSelector(s);
+
+            if (hasTransformRules) {
+              transforms[selector] = true;
+            }
 
             if (mask > 0) {
               masks[selector] ??= 0;
@@ -142,6 +150,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
           masks,
           atRules,
           childClasses,
+          transforms,
           topics: arrayTopics,
           units,
           errors,
@@ -154,6 +163,7 @@ export const plugin: PluginCreator<PostcssPluginOptions> = ({
           atRules,
           childClasses,
           units,
+          transforms,
           topics: arrayTopics,
         });
       }
