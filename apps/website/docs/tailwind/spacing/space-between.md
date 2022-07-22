@@ -20,7 +20,7 @@ React Native does not have support child selectors, however `styled` components 
 </View>
 
 // It will output as this
-<View style={{ margin: -2 }}>
+<View>
   <Text>0</Text>
   <Text style={{ marginLeft: 4 }}>1</Text>
   <Text style={{ marginLeft: 4 }}>2</Text>
