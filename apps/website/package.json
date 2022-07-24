@@ -23,7 +23,7 @@
     "@uiw/codemirror-theme-eclipse": "^4.9.4",
     "@uiw/react-codemirror": "^4.9.4",
     "benchmarks": "0.0.0",
-    "chart.js": "^3.8.0",
+    "chart.js": "3.8.2",
     "clsx": "1.2.1",
     "dedent": "^0.7.0",
     "docusaurus-plugin-sass": "^0.2.2",
