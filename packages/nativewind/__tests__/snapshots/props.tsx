@@ -20,7 +20,7 @@ const TestPropsComponent = styled(
     );
   },
   {
-    props: ["style2"],
+    props: { style2: true },
   }
 );
 

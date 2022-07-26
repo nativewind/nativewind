@@ -1,82 +1,67 @@
 import { useTailwind } from "./use-tailwind";
+import type { StyledOptions } from "./index";
 
-export interface WithStyledPropsOptions<T extends string> {
+export interface WithStyledPropsOptions<P> {
   preprocessed: boolean;
   className: string;
-  propsToTransform?: T[];
+  propsToTransform?: StyledOptions<P>["props"];
   componentProps: Record<string, unknown>;
-  spreadProps?: T[];
-  classProps?: T[];
+  classProps?: StyledOptions<P>["classProps"];
 }
 
-export function withStyledProps<S, T extends string>({
+export function withStyledProps<S, T>({
   propsToTransform,
   componentProps,
   classProps,
-  spreadProps,
   preprocessed,
   className,
 }: WithStyledPropsOptions<T>) {
-  const styledProps: Partial<Record<T, unknown>> = {};
+  const styledProps: Partial<Record<keyof T, unknown>> = {};
   let mask = 0;
 
-  if (preprocessed) {
-    if (classProps) {
-      const classPropsName = classProps.map((prop) => {
-        styledProps[prop] = undefined;
-        return componentProps[prop as keyof typeof componentProps] as string;
-      });
-      className = `${className} ${classPropsName.join(" ")}`;
-    }
-
-    return { styledProps, mask, className };
-  }
-
   if (classProps) {
-    for (const prop of classProps) {
-      const style = useTailwind<S>({
-        className: componentProps[prop] as string,
-        flatten: true,
-      });
-
-      if (style.mask) {
-        mask |= style.mask;
+    if (preprocessed) {
+      for (const prop of classProps) {
+        styledProps[prop] = undefined;
+        className += ` ${componentProps[prop as keyof typeof componentProps]}`;
       }
+    } else {
+      for (const prop of classProps) {
+        const style = useTailwind<S>({
+          className: componentProps[prop] as string,
+          flatten: true,
+        });
 
-      Object.assign(styledProps, { [prop]: undefined }, style[0]);
+        if (style.mask) {
+          mask |= style.mask;
+        }
+
+        Object.assign(styledProps, { [prop]: undefined }, style[0]);
+      }
     }
   }
 
-  if (spreadProps) {
-    for (const prop of spreadProps) {
-      const style = useTailwind<S>({
+  if (propsToTransform && !preprocessed) {
+    for (const [prop, styleKey] of Object.entries(propsToTransform)) {
+      const styleArray = useTailwind<S>({
         className: componentProps[prop] as string,
-        flatten: true,
+        flatten: styleKey !== true,
       });
 
-      if (style.mask) {
-        mask |= style.mask;
-      }
-
-      Object.assign(styledProps, { [prop]: undefined }, style[0]);
-    }
-  }
-
-  if (propsToTransform) {
-    for (const prop of propsToTransform) {
-      const style = useTailwind<S>({
-        className: componentProps[prop] as string,
-      });
-
-      if (style.length === 0) {
+      if (styleArray.length === 0) {
         continue;
       }
 
-      if (style.mask) {
-        mask |= style.mask;
+      if (styleArray.mask) {
+        mask |= styleArray.mask;
       }
 
-      styledProps[prop] = style;
+      if (typeof styleKey === "boolean") {
+        styledProps[prop as keyof T] = styleArray;
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        styledProps[prop as keyof T] = (styleArray[0] as any)[styleKey as any];
+      }
     }
   }
 

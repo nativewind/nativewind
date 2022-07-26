@@ -60,14 +60,18 @@ function Wrapper({ innerStyle, children, ...props }) {
   )
 }
 
-const StyledWrapper = styled(Wrapper, { props: ["innerStyle"] })
+const StyledWrapper = styled(Wrapper, {
+  props: {
+    innerStyle: true
+  }
+})
 
 <StyledWrapper className="h-4" innerStyle="p-4"><Text>Hello, World!</Text></StyledWrapper>
 ```
 
 ## Mixing between inline props and CSS classes
 
-Some components can either accept a value as a prop or be styled by CSS. An example is `react-native-svg` which provides as `fill` prop, but can also accept a class providing `fill` styling.
+Some components can either accept a value as a prop or be styled by CSS. An example is `react-native-svg` which provides as `fill` prop, but on web can also accept a class providing `fill` styling.
 
 You can flag a components props as `classProps` to ensure the best output is used.
 
@@ -75,7 +79,9 @@ You can flag a components props as `classProps` to ensure the best output is use
 import { styled } from "nativewind";
 import { Svg, Rect } from "react-native-svg";
 
-const StyledRect = styled(Rect, { classProps: ["fill", "stroke"] });
+const StyledRect = styled(Rect, {
+  classProps: ["fill", "stroke"],
+});
 
 function MyStyledSvg({ stroke, ...props }) {
   return (
@@ -95,17 +101,20 @@ function MyStyledSvg({ stroke, ...props }) {
 <MyStyledSvg fill="fill-black" stroke="stroke-2 stroke-blue-500" />;
 ```
 
-## Styling props that only accept values
+## Styling non-style properties
 
-Not all libraries use style objects, with many accepting single values as a props. You can use `spreadProps` to help style these components. At runtime, `spreadProps` will remove those props and replace them with the computed styles "spread" as props.
+::: warning
+
+This will not work when outputting CSS. If you need a theme value (e.g. color) consider importing [theme values](../guides/theme-values)
+
+:::
+
+`styled()` can also accept a object which maps style properties to component properties.
 
 ```tsx
-import { ActivityIndicator } from "react-native";
-import { styled } from "nativewind"
-
-const StyledActivityIndicator = styled(ActivityIndicator, {
-  spreadProps: ["color"]
-})
-
-<StyledActivityIndicator color="color-blue-500" />
+const StyledWrapper = styled(Wrapper, {
+  props: {
+    placeholderTextColor: "color",
+  },
+});
 ```

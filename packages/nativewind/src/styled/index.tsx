@@ -20,10 +20,10 @@ import { StoreContext } from "../style-sheet";
 import { GroupContext, IsolateGroupContext } from "./group-context";
 import { useComponentState } from "./use-component-state";
 import { GROUP, GROUP_ISO, matchesMask } from "../utils/selector";
+import { Style } from "../types/common";
 
 export interface StyledOptions<P> {
-  props?: Array<keyof P & string>;
-  spreadProps?: Array<keyof P & string>;
+  props?: Partial<Record<keyof P, keyof Style | true>>;
   classProps?: Array<keyof P & string>;
   baseClassName?: string;
 }
@@ -57,11 +57,7 @@ export function styled<T>(
 export function styled<T, K extends keyof T & string>(
   Component: ComponentType<T>,
   baseClassName: string,
-  options: StyledOptions<T> & {
-    props?: Array<K>;
-    spreadProps?: Array<K>;
-    classProps?: Array<K>;
-  }
+  options: StyledOptions<T>
 ): ForwardRef<InferRef<T>, StyledPropsWithKeys<T, K>>;
 
 /**
@@ -69,11 +65,7 @@ export function styled<T, K extends keyof T & string>(
  */
 export function styled<T, K extends keyof T & string>(
   Component: ComponentType<T>,
-  options: StyledOptions<T> & {
-    props?: Array<K>;
-    spreadProps?: Array<K>;
-    classProps?: Array<K>;
-  }
+  options: StyledOptions<T>
 ): ForwardRef<InferRef<T>, StyledPropsWithKeys<T, K>>;
 
 /**
@@ -86,13 +78,10 @@ export function styled<
   styledBaseClassNameOrOptions?: string | StyledOptions<T>,
   maybeOptions: StyledOptions<T> = {}
 ) {
-  const {
-    props: propsToTransform,
-    spreadProps,
-    classProps,
-  } = typeof styledBaseClassNameOrOptions === "object"
-    ? styledBaseClassNameOrOptions
-    : maybeOptions;
+  const { props: propsToTransform, classProps } =
+    typeof styledBaseClassNameOrOptions === "object"
+      ? styledBaseClassNameOrOptions
+      : maybeOptions;
 
   const baseClassName =
     typeof styledBaseClassNameOrOptions === "string"
@@ -135,7 +124,6 @@ export function styled<
       componentProps,
       propsToTransform,
       classProps,
-      spreadProps,
     });
 
     /**
