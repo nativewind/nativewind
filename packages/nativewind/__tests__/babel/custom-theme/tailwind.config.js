@@ -1,3 +1,5 @@
+import { platformSelect } from "../../../dist";
+
 module.exports = {
   content: [`./custom-theme/*.{js,ts,jsx,tsx}`],
   theme: {
@@ -7,11 +9,11 @@ module.exports = {
       },
       colors: {
         blue: {
-          500: {
+          500: platformSelect({
             ios: "platformColor(systemTealColor)",
             android: "platformColor(@android:color/holo_blue_bright)",
             default: "black",
-          },
+          }),
         },
       },
     },
