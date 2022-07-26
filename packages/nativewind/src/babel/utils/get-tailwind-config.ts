@@ -3,7 +3,6 @@ import { Config } from "tailwindcss";
 import resolveTailwindConfig from "tailwindcss/resolveConfig";
 
 import { nativePlugin, NativePluginOptions } from "../../tailwind/native";
-import { withPlatformTheme } from "../../utils/with-platform-theme";
 
 export interface GetTailwindConfigOptions extends NativePluginOptions {
   tailwindConfigPath?: string;
@@ -29,5 +28,5 @@ export function getTailwindConfig(
     plugins: [nativePlugin(options), ...(userConfig.plugins ?? [])],
   } as Config;
 
-  return resolveTailwindConfig(withPlatformTheme(mergedConfig));
+  return resolveTailwindConfig(mergedConfig);
 }

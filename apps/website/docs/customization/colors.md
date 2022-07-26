@@ -11,22 +11,22 @@ NativeWind allows you to use access PlatformColor via the special `platformColor
 ```js
 // tailwind.config.js
 
-const { withPlatformTheme } = require("nativewind");
+const { platformSelect } = require("nativewind");
 
-module.exports = withPlatformTheme({
+module.exports = {
   theme: {
     extend: {
       colors: {
-        error: {
+        error: platformSelect({
           // Now you can provide platform specific values
           ios: "platformColor(systemRed)",
           android: "platformColor(?android:colorError)",
-          DEFAULT: "red",
-        },
+          default: "red",
+        }),
       },
     },
   },
-});
+};
 ```
 
 :::note

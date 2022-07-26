@@ -24,7 +24,7 @@ export interface NativePluginOptions {
   onError?: (error: StyleError) => void;
 }
 
-// This is used by withPlatformTHeme to detect if we are in an
+// This is used by platformSelect to detect if we are in an
 // environment that can use Platform.select (ie not using CSS)
 // If we are in React Native, then this plugin should be loaded
 process.env.NATIVEWIND_NATIVE_PLUGIN_ENABLED = "1";

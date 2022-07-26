@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { render } from "@testing-library/react-native";
 
-import { styled, withPlatformTheme } from "../../src";
+import { styled, platformSelect } from "../../src";
 import { TestProvider } from "../tailwindcss/runner";
 
 // const StyledView = styled(View);
@@ -30,26 +30,23 @@ describe("Device functions", () => {
   });
 
   test("withPlatformTheme", () => {
-    const theme = withPlatformTheme({
-      content: [],
-      theme: {
+    const theme = {
+      fontSize: {
+        sm: platformSelect({
+          ios: "roundToNearestPixel(15)",
+          default: 10,
+        }),
+      },
+      extend: {
         fontSize: {
-          sm: {
-            ios: "roundToNearestPixel(15)",
-            default: 10,
-          },
-        },
-        extend: {
-          fontSize: {
-            custom: {
-              ios: 16,
-              android: 17,
-              default: 17,
-            },
-          },
+          custom: platformSelect({
+            ios: 16,
+            android: 17,
+            default: 17,
+          }),
         },
       },
-    }).theme;
+    };
 
     const tree = render(
       <TestProvider theme={theme}>

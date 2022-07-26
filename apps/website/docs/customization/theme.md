@@ -4,23 +4,23 @@ NativeWind uses the same theme values as as Tailwind CSS. You can read more abou
 
 ## Per platform theme values
 
-NativeWind exposes a function `withPlatformTheme` that can wrap your Tailwind configuration to provide platform specific theme values.
+NativeWind exposes a function `platformSelect` that allows you to provide platform specific theme values.
 
 ```js
 // tailwind.config.js
 
-const { withPlatformTheme } = require("nativewind");
+const { platformValue } = require("nativewind");
 
-module.exports = withPlatformTheme({
+module.exports = {
   theme: {
     extend: {
       colors: {
-        error: {
+        error: platformSelect({
           // Now you can provide platform specific values
           ios: "platformColor(systemRed)",
           android: "platformColor(?android:colorError)",
           default: "red",
-        },
+        }),
       },
     },
   },
