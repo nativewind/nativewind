@@ -404,17 +404,13 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     // To keep things consistent, even atomic styles are arrays
     const styleArray = this.getStyleArray(className);
 
-    if (this.childClasses[className]) {
-      styleArray.childClassNames = this.childClasses[className];
-    }
-
     const atRulesTuple = this.atRules[className];
 
     // If there are no atRules, this style is static.
     // We can add it to the snapshot and early exit.
     if (!atRulesTuple) {
       this.snapshot =
-        styleArray.length > 0
+        styleArray.length > 0 || styleArray.childClassNames?.length
           ? { ...this.snapshot, [className]: styleArray }
           : { ...this.snapshot, [className]: emptyStyles };
       return styleArray;
@@ -450,7 +446,7 @@ export class StyleSheetRuntime extends ColorSchemeStore {
       }
 
       this.snapshot =
-        newStyles.length > 0 || newStyles?.childClassNames?.length
+        newStyles.length > 0 || newStyles.childClassNames?.length
           ? { ...this.snapshot, [className]: newStyles }
           : { ...this.snapshot, [className]: emptyStyles };
 

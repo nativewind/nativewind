@@ -6,10 +6,28 @@ import { StyledComponent } from "../../src";
 
 tailwindRunner(
   "Layout - Space between",
-  expectError(["space-x-reverse", "space-y-reverse"])
+  expectError(["space-x-reverse", "space-y-reverse"]),
+  [
+    [
+      "space-x-2",
+      {
+        atRules: {
+          "space-x-2.children": [[["selector", "(> *:not(:first-child))"]]],
+        },
+        childClasses: {
+          "space-x-2": ["space-x-2.children"],
+        },
+        styles: {
+          "space-x-2.children@0": {
+            marginLeft: 8,
+          },
+        },
+      },
+    ],
+  ]
 );
 
-describe("Border - Divide Width", () => {
+describe("Layout - Space between", () => {
   test.each(spacingCases)("space-x-%s", (unit) => {
     const tree = render(
       <TestProvider>

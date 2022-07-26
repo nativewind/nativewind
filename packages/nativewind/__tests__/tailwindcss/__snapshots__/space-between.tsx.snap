@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Border - Divide Width space-x-0 1`] = `
+exports[`Layout - Space between space-x-0 1`] = `
 <View>
   <Text>
     A
@@ -19,7 +19,7 @@ exports[`Border - Divide Width space-x-0 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-x-0.5 1`] = `
+exports[`Layout - Space between space-x-0.5 1`] = `
 <View>
   <Text>
     A
@@ -38,7 +38,7 @@ exports[`Border - Divide Width space-x-0.5 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-x-1 1`] = `
+exports[`Layout - Space between space-x-1 1`] = `
 <View>
   <Text>
     A
@@ -57,7 +57,7 @@ exports[`Border - Divide Width space-x-1 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-x-1.5 1`] = `
+exports[`Layout - Space between space-x-1.5 1`] = `
 <View>
   <Text>
     A
@@ -76,7 +76,7 @@ exports[`Border - Divide Width space-x-1.5 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-x-96 1`] = `
+exports[`Layout - Space between space-x-96 1`] = `
 <View>
   <Text>
     A
@@ -95,7 +95,7 @@ exports[`Border - Divide Width space-x-96 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-x-px 1`] = `
+exports[`Layout - Space between space-x-px 1`] = `
 <View>
   <Text>
     A
@@ -114,7 +114,7 @@ exports[`Border - Divide Width space-x-px 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-y-0 1`] = `
+exports[`Layout - Space between space-y-0 1`] = `
 <View>
   <Text>
     A
@@ -133,7 +133,7 @@ exports[`Border - Divide Width space-y-0 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-y-0.5 1`] = `
+exports[`Layout - Space between space-y-0.5 1`] = `
 <View>
   <Text>
     A
@@ -152,7 +152,7 @@ exports[`Border - Divide Width space-y-0.5 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-y-1 1`] = `
+exports[`Layout - Space between space-y-1 1`] = `
 <View>
   <Text>
     A
@@ -171,7 +171,7 @@ exports[`Border - Divide Width space-y-1 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-y-1.5 1`] = `
+exports[`Layout - Space between space-y-1.5 1`] = `
 <View>
   <Text>
     A
@@ -190,7 +190,7 @@ exports[`Border - Divide Width space-y-1.5 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-y-96 1`] = `
+exports[`Layout - Space between space-y-96 1`] = `
 <View>
   <Text>
     A
@@ -209,7 +209,7 @@ exports[`Border - Divide Width space-y-96 1`] = `
 </View>
 `;
 
-exports[`Border - Divide Width space-y-px 1`] = `
+exports[`Layout - Space between space-y-px 1`] = `
 <View>
   <Text>
     A
