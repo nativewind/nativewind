@@ -103,9 +103,9 @@ function MyStyledSvg({ stroke, ...props }) {
 
 ## Styling non-style properties
 
-::: warning
+:::danger
 
-This will not work when outputting CSS. If you need a theme value (e.g. color) consider importing [theme values](../guides/theme-values)
+Mapping non-style props will not work when outputting CSS. If you need a theme value (e.g. color) consider importing [theme values instead](../guides/theme-values).
 
 :::
 
