@@ -11,7 +11,7 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@changesets/cli": "2.23.2",
+    "@changesets/cli": "2.24.1",
     "@commitlint/cli": "17.0.3",
     "@commitlint/config-conventional": "17.0.3",
     "@semantic-release/changelog": "6.0.1",
@@ -27,6 +27,6 @@
   "dependencies": {
     "@eva-design/eva": "^2.1.1",
     "@ui-kitten/components": "^5.1.2",
-    "react-native-svg": "12.4.0"
+    "react-native-svg": "12.4.1"
   }
 }
