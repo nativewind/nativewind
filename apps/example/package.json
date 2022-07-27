@@ -17,7 +17,7 @@
     "react-native": "0.69.3",
     "react-native-web": "0.18.7",
     "tailwindcss": "3.1.6",
-    "nativewind": "2.0.0-next.53"
+    "nativewind": "2.0.0-next.54"
   },
   "devDependencies": {
     "@babel/core": "7.18.9"
