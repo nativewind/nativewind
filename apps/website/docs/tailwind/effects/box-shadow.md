@@ -13,10 +13,10 @@ import Usage from "../\_usage.mdx"
 supported={[
 "shadow",
 "shadow-{n}",
-"shadow-[n]",
 "shadow-none",
 ]}
 none={[
+"shadow-[n]",
 "shadow-inner",
 ]}
 />
