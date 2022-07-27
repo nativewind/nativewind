@@ -72,6 +72,7 @@ export function useTailwind<T>({
 
     if (styles) {
       stylesArray.push(...styles);
+      stylesArray.childClassNames = styles.childClassNames;
     }
 
     if (additionalStyles) {
@@ -80,8 +81,6 @@ export function useTailwind<T>({
     if (inlineStyles) {
       stylesArray.push(inlineStyles);
     }
-
-    stylesArray.childClassNames = styles.childClassNames;
 
     if (flatten) {
       const flatStyles: StylesArray = [StyleSheet.flatten(stylesArray)];
