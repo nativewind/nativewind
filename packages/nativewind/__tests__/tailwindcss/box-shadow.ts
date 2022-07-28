@@ -9,16 +9,16 @@ tailwindRunner(
         styles: {
           "shadow-sm@0": {
             elevation: 1.5,
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
           },
           "shadow-sm@1": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 1, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 2,
           },
           "shadow-sm@2": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 1, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 2,
@@ -39,16 +39,16 @@ tailwindRunner(
         styles: {
           "shadow@0": {
             elevation: 3,
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
           },
           "shadow@1": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 2, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 6,
           },
           "shadow@2": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 2, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 6,
@@ -69,16 +69,16 @@ tailwindRunner(
         styles: {
           "shadow-md@0": {
             elevation: 6,
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
           },
           "shadow-md@1": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 6, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 10,
           },
           "shadow-md@2": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 6, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 10,
@@ -99,16 +99,16 @@ tailwindRunner(
         styles: {
           "shadow-lg@0": {
             elevation: 7.5,
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
           },
           "shadow-lg@1": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 10, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 15,
           },
           "shadow-lg@2": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 10, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 15,
@@ -129,16 +129,16 @@ tailwindRunner(
         styles: {
           "shadow-xl@0": {
             elevation: 12.5,
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
           },
           "shadow-xl@1": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 20, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 25,
           },
           "shadow-xl@2": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 20, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 25,
@@ -159,16 +159,16 @@ tailwindRunner(
         styles: {
           "shadow-2xl@0": {
             elevation: 25,
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
           },
           "shadow-2xl@1": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 25, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 50,
           },
           "shadow-2xl@2": {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 25, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 50,
