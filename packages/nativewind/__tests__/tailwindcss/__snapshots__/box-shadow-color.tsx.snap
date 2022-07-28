@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Effects - Box shadow Color works with shadow 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "shadowColor": "rgba(0, 0, 0, 1)",
+        "shadowOffset": Object {
+          "height": 10,
+          "width": 0,
+        },
+        "shadowOpacity": 1,
+        "shadowRadius": 15,
+      },
+      Object {
+        "shadowColor": "#3b82f6",
+      },
+    ]
+  }
+>
+  <Text>
+    A
+  </Text>
+</View>
+`;

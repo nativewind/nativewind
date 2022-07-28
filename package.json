@@ -8,6 +8,7 @@
     "test": "npm run test --workspace=nativewind",
     "benchmarks": "npm run test --workspace=benchmarks",
     "build": "npm run build --workspace=nativewind",
+    "example": "npm start --workspace=example --",
     "prepare": "husky install"
   },
   "devDependencies": {
@@ -27,6 +28,6 @@
   "dependencies": {
     "@eva-design/eva": "^2.1.1",
     "@ui-kitten/components": "^5.1.2",
-    "react-native-svg": "12.4.3"
+    "react-native-svg": "^12.4.3"
   }
 }

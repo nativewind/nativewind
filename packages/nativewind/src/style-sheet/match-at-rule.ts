@@ -1,4 +1,5 @@
 import { match } from "css-mediaquery";
+import { Platform } from "react-native";
 
 interface MatchAtRuleOptions {
   rule: string;
@@ -17,6 +18,7 @@ export function matchAtRule({
 }: MatchAtRuleOptions) {
   if (rule === "media" && params) {
     return match(params, {
+      type: Platform.OS,
       "aspect-ratio": width / height,
       "device-aspect-ratio": width / height,
       width,

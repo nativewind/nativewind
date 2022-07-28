@@ -7,6 +7,12 @@ import Usage from "../\_usage.mdx"
 
 <Usage />
 
+:::caution
+
+On native, shadows may not appear if a background color is not set
+
+:::
+
 ## Compatibility
 
 <Compatibility

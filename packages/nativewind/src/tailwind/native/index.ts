@@ -19,6 +19,7 @@ import { dark } from "./dark";
 import { DarkModeConfig } from "tailwindcss/types/config";
 import { pseudoClasses } from "./pseudo-classes";
 import { platforms, nativePlatforms } from "../../utils/platforms";
+import { boxShadowColor } from "./box-shadow-color";
 export interface NativePluginOptions {
   rem?: number;
   onError?: (error: StyleError) => void;
@@ -71,6 +72,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
       translate(helpers, notSupported);
       skew(helpers, notSupported);
       boxShadow(helpers, notSupported);
+      boxShadowColor(helpers, notSupported);
       groupIsolate(helpers, notSupported);
       parent(helpers, notSupported);
     };
@@ -217,13 +219,13 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
           none: "0",
         },
         boxShadow: {
-          sm: "0px 1px 2px rgba(0, 0, 0, 0.1)",
-          DEFAULT: "0px 2px 6px rgba(0, 0, 0, 0.1)",
-          md: "0px 6px 10px rgba(0, 0, 0, 0.1)",
-          lg: "0px 10px 15px rgba(0, 0, 0, 0.1)",
-          xl: "0px 20px 25px rgba(0, 0, 0, 0.1)",
-          "2xl": "0px 25px 50px rgba(0, 0, 0, 0.1)",
-          none: "0px 0px 0px rgba(0, 0, 0, 0)",
+          sm: "0px 1px 2px rgba(0, 0, 0, 1)",
+          DEFAULT: "0px 2px 6px rgba(0, 0, 0, 1)",
+          md: "0px 6px 10px rgba(0, 0, 0, 1)",
+          lg: "0px 10px 15px rgba(0, 0, 0, 1)",
+          xl: "0px 20px 25px rgba(0, 0, 0, 1)",
+          "2xl": "0px 25px 50px rgba(0, 0, 0, 1)",
+          none: "0px 0px 0px rgba(0, 0, 0, 1)",
         },
       },
       corePlugins: {
@@ -238,6 +240,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
 
         // These libraries are replaced with custom logic
         boxShadow: false,
+        boxShadowColor: false,
         divideColor: false,
         divideStyle: false,
         divideWidth: false,
