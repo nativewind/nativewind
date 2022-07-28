@@ -189,16 +189,16 @@ tailwindRunner(
         styles: {
           "shadow-none@0": {
             elevation: 0,
-            shadowColor: "rgba(0, 0, 0, 0)",
+            shadowColor: "rgba(0, 0, 0, 1)",
           },
           "shadow-none@1": {
-            shadowColor: "rgba(0, 0, 0, 0)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 0, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 0,
           },
           "shadow-none@2": {
-            shadowColor: "rgba(0, 0, 0, 0)",
+            shadowColor: "rgba(0, 0, 0, 1)",
             shadowOffset: { height: 0, width: 0 },
             shadowOpacity: 1,
             shadowRadius: 0,
