@@ -1,26 +1,24 @@
-import React, { ComponentType, PropsWithChildren, useEffect } from "react";
+import React, { ComponentType, PropsWithChildren } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { Config } from "tailwindcss";
 import { NativeWindStyleSheet, StyleSheetRuntime } from "./style-sheet";
 
 const fetched: Record<string, boolean> = {};
+const canUseCSS = typeof StyleSheet.create({ test: {} }).test !== "number";
 
 function ExpoSnackWrapper({ children }: PropsWithChildren<unknown>) {
-  useEffect(() => {
-    if (
-      Platform.OS === "web" &&
-      typeof StyleSheet.create({ test: {} }).test !== "number" &&
-      !document.querySelector("#tailwind-cdn")
-    ) {
-      const script = document.createElement("script");
-      script.id = "tailwind-cdn";
-      script.type = "text/javascript";
-      script.src = "https://cdn.tailwindcss.com";
-      document.querySelectorAll("head")[0].append(script);
-    }
-  }, []);
-
-  return <>{children}</>;
+  return Platform.OS === "web" && canUseCSS ? (
+    <>
+      <script
+        id="tailwind-cdn"
+        type="text/javascript"
+        src="https://cdn.tailwindcss.com"
+      />
+      {children}
+    </>
+  ) : (
+    <>{children}</>
+  );
 }
 
 export function withExpoSnack(
@@ -62,7 +60,9 @@ export function withExpoSnack(
       });
   }
 
-  NativeWindStyleSheet.setDangerouslyCompileStyles(dangerouslyCompileStyles);
+  if (canUseCSS) {
+    NativeWindStyleSheet.setDangerouslyCompileStyles(dangerouslyCompileStyles);
+  }
 
   return () => (
     <ExpoSnackWrapper>
