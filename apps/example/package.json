@@ -10,17 +10,17 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "expo": "~45.0.0",
-    "expo-status-bar": "~1.3.0",
+    "expo": "45.0.8",
+    "expo-status-bar": "1.4.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "0.68.1",
+    "react-native": "0.69.3",
     "react-native-web": "0.18.7",
-    "nativewind": "2.0.0-next.54"
+    "nativewind": "2.0.0-next.55"
   },
   "devDependencies": {
-    "@babel/core": "7.18.9",
-    "tailwindcss": "3.1.6"
+    "@babel/core": "7.18.10",
+    "tailwindcss": "3.1.7"
   },
   "private": true
 }

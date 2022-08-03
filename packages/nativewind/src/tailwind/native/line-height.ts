@@ -7,6 +7,9 @@ export const lineHeight: CustomPluginFunction = (
   matchUtilities(
     {
       leading(value: string) {
+        if(typeof value !== "string") {
+          return notSupported(`leading-${value}`)();
+        }
         if (value.endsWith("px")) {
           return { lineHeight: value };
         }

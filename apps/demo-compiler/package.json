@@ -13,12 +13,12 @@
   "dependencies": {
     "@babel/plugin-syntax-jsx": "^7.18.6",
     "@babel/preset-react": "^7.18.6",
-    "@babel/standalone": "7.18.9",
+    "@babel/standalone": "7.18.10",
     "@swc/plugin-transform-imports": "1.1.0",
-    "nativewind": "2.0.0-next.54",
-    "tailwindcss": "3.1.6"
+    "nativewind": "2.0.0-next.55",
+    "tailwindcss": "3.1.7"
   },
   "devDependencies": {
-    "vercel": "27.3.0"
+    "vercel": "27.3.4"
   }
 }
