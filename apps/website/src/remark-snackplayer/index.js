@@ -63,6 +63,7 @@ export default withExpoSnack(App);
             data-snack-theme="${theme}"
             data-snack-preview="${preview}"
             data-snack-loading="${loading}"
+            data-snack-sdkversion="45.0.0"
             data-snack-code="${encodeURIComponent(code)}"
           ></div>
           `,
