@@ -19,7 +19,6 @@ export function getTailwindConfig(
     // eslint-disable-next-line unicorn/prefer-module
     userConfig = require(fullConfigPath);
   } else if (tailwindConfigPath) {
-    // Throw an error if configPath was set but we were unable to find it
     throw new Error(`Unable to find config ${fullConfigPath}`);
   }
 

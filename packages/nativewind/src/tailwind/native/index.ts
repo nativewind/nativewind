@@ -20,15 +20,16 @@ import { DarkModeConfig } from "tailwindcss/types/config";
 import { pseudoClasses } from "./pseudo-classes";
 import { platforms, nativePlatforms } from "../../utils/platforms";
 import { boxShadowColor } from "./box-shadow-color";
-export interface NativePluginOptions {
-  rem?: number;
-  onError?: (error: StyleError) => void;
-}
 
 // This is used by platformSelect to detect if we are in an
 // environment that can use Platform.select (ie not using CSS)
 // If we are in React Native, then this plugin should be loaded
 process.env.NATIVEWIND_NATIVE_PLUGIN_ENABLED = "1";
+
+export interface NativePluginOptions {
+  rem?: number;
+  onError?: (error: StyleError) => void;
+}
 
 export const nativePlugin = plugin.withOptions<NativePluginOptions>(
   function ({
