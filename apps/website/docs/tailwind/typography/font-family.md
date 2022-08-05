@@ -15,7 +15,7 @@ React Native does not support fallback fonts. If an array of fonts are provided,
 
 :::info
 
-NativeWind will not load/link fonts into your app. If you have any issues with a font family/weights not rendering, please first verify it works with inline styles.
+NativeWind will not load/link fonts into your app. If you have any issues with the font family or weights not rendering, please first verify it works with inline styles.
 
 :::
 
