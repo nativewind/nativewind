@@ -63,6 +63,7 @@ const sidebars = {
       items: [
         "guides/theme-values",
         "guides/custom-components",
+        "guides/troubleshooting",
         "guides/tailwindcss-react-native",
       ],
     },
