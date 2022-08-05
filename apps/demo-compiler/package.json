@@ -16,7 +16,7 @@
     "@babel/standalone": "7.18.11",
     "@swc/plugin-transform-imports": "1.1.0",
     "nativewind": "2.0.0-next.56",
-    "tailwindcss": "3.1.7"
+    "tailwindcss": "3.1.8"
   },
   "devDependencies": {
     "vercel": "27.3.7"
