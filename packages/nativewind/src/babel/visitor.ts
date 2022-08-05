@@ -1,18 +1,33 @@
 import type { Visitor } from "@babel/traverse";
 
-import { getJSXElementName } from "./utils/get-jsx-element-name";
-import { hasNamedImport } from "./utils/has-named-import";
 import { getImportBlockedComponents } from "./utils/get-import-blocked-components";
 import { someAttributes } from "./utils/has-attribute";
-
-import { toStyledComponent } from "./transforms/to-component";
 
 import {
   AllowPathOptions,
   State,
   TailwindcssReactNativeBabelOptions,
 } from "./types";
-import type { Config } from "tailwindcss";
+
+import {
+  Expression,
+  identifier,
+  isJSXIdentifier,
+  isJSXMemberExpression,
+  jSXAttribute,
+  jsxClosingElement,
+  JSXElement,
+  jsxElement,
+  jsxExpressionContainer,
+  JSXIdentifier,
+  jSXIdentifier,
+  jsxIdentifier,
+  JSXMemberExpression,
+  JSXNamespacedName,
+  JSXOpeningElement,
+  jsxOpeningElement,
+  memberExpression,
+} from "@babel/types";
 
 export interface VisitorState
   extends State,
@@ -23,48 +38,96 @@ export interface VisitorState
   cwd: string;
   allowRelativeModules: AllowPathOptions;
   blockList: Set<string>;
-  hasStyledComponentImport: boolean;
-  hasNWStyleSheetImport: boolean;
-  tailwindConfig: Config;
   canCompile: boolean;
   canTransform: boolean;
   didTransform: boolean;
 }
 
-/**
- * Visitor that detects what
- * - components should be transformed
- * - what imports exist
- */
 export const visitor: Visitor<VisitorState> = {
   ImportDeclaration(path, state) {
     for (const component of getImportBlockedComponents(path, state)) {
       state.blockList.add(component);
     }
-
-    state.hasStyledComponentImport ||= hasNamedImport(
-      path,
-      "StyledComponent",
-      "nativewind"
-    );
-
-    state.hasNWStyleSheetImport ||= hasNamedImport(
-      path,
-      "NativeWindStyleSheet",
-      "nativewind"
-    );
   },
-  JSXElement(path, state) {
-    const { blockList, canTransform } = state;
-    const name = getJSXElementName(path.node.openingElement);
+  JSXElement: {
+    exit: (path, state) => {
+      const { blockList, canTransform } = state;
 
-    if (blockList.has(name) || name[0] !== name[0].toUpperCase()) {
-      return;
-    }
+      if (
+        isWrapper(path.node) ||
+        !canTransform ||
+        !someAttributes(path, ["className", "tw"])
+      ) {
+        return;
+      }
 
-    if (someAttributes(path, ["className", "tw"]) && canTransform) {
+      const name = getElementName(path.node.openingElement);
+
+      if (blockList.has(name) || name[0] !== name[0].toUpperCase()) {
+        return;
+      }
+
       state.didTransform ||= true;
-      toStyledComponent(path);
-    }
+
+      path.replaceWith(
+        jsxElement(
+          jsxOpeningElement(jsxIdentifier("_StyledComponent"), [
+            ...path.node.openingElement.attributes,
+            jSXAttribute(
+              jSXIdentifier("component"),
+              jsxExpressionContainer(
+                toExpression(path.node.openingElement.name)
+              )
+            ),
+          ]),
+          jsxClosingElement(jsxIdentifier("_StyledComponent")),
+          path.node.children
+        )
+      );
+    },
   },
 };
+
+function isWrapper(node: JSXElement) {
+  const nameNode = node.openingElement.name;
+  if (isJSXIdentifier(nameNode)) {
+    return (
+      nameNode.name === "_StyledComponent" ||
+      nameNode.name === "StyledComponent"
+    );
+  } else if (isJSXMemberExpression(nameNode)) {
+    return (
+      nameNode.property.name === "_StyledComponent" ||
+      nameNode.property.name === "StyledComponent"
+    );
+  } else {
+    return false;
+  }
+}
+
+function getElementName({ name }: JSXOpeningElement): string {
+  if (isJSXIdentifier(name)) {
+    return name.name;
+  } else if (isJSXMemberExpression(name)) {
+    return name.property.name;
+  } else {
+    // https://github.com/facebook/jsx/issues/13#issuecomment-54373080
+    throw new Error("JSXNamespacedName is not supported by React JSX");
+  }
+}
+
+function toExpression(
+  node: JSXIdentifier | JSXMemberExpression | JSXNamespacedName
+): Expression {
+  if (isJSXIdentifier(node)) {
+    return identifier(node.name);
+  } else if (isJSXMemberExpression(node)) {
+    return memberExpression(
+      toExpression(node.object),
+      toExpression(node.property)
+    );
+  } else {
+    // https://github.com/facebook/jsx/issues/13#issuecomment-54373080
+    throw new Error("JSXNamespacedName is not supported by React JSX");
+  }
+}

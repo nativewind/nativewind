@@ -1,16 +1,17 @@
-import { NativeWindStyleSheet } from "nativewind";
-import { StyledComponent } from "nativewind";
+import { NativeWindStyleSheet as _NativeWindStyleSheet } from "nativewind";
+import { StyledComponent as _StyledComponent } from "nativewind";
 import { Text, View } from "react-native";
 export function Test() {
   return (
-    <StyledComponent tw="container" component={View}>
-      <StyledComponent tw="font-bold" component={Text}>
+    <_StyledComponent tw="container" component={View}>
+      <_StyledComponent tw="font-bold" component={Text}>
         Hello world!
-      </StyledComponent>
-    </StyledComponent>
+      </_StyledComponent>
+    </_StyledComponent>
   );
 }
-NativeWindStyleSheet.create({
+
+_NativeWindStyleSheet.create({
   styles: {
     container: {
       width: "100%",

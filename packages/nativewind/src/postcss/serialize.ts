@@ -106,7 +106,7 @@ export function serializer({
     hasStyles: Object.keys(rawStyles).length > 0,
     stylesheetCreateExpression: callExpression(
       memberExpression(
-        identifier("NativeWindStyleSheet"),
+        identifier("_NativeWindStyleSheet"),
         identifier("create")
       ),
       [objectExpression(objectProperties)]
@@ -122,7 +122,7 @@ function functionReplacer(functionString: string): Expression {
   }
 
   return callExpression(
-    memberExpression(identifier("NativeWindStyleSheet"), identifier("parse")),
+    memberExpression(identifier("_NativeWindStyleSheet"), identifier("parse")),
     [
       stringLiteral(name),
       isRuntimeFunction(value)

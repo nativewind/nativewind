@@ -1,26 +1,27 @@
-import { NativeWindStyleSheet } from "nativewind";
-import { StyledComponent } from "nativewind";
+import { NativeWindStyleSheet as _NativeWindStyleSheet } from "nativewind";
+import { StyledComponent as _StyledComponent } from "nativewind";
 import { Text, View } from "react-native";
 export function Test() {
   return (
-    <StyledComponent className="divide-y" component={View}>
-      <StyledComponent className="font-bold" component={Text}>
+    <_StyledComponent className="divide-y" component={View}>
+      <_StyledComponent className="font-bold" component={Text}>
         Hello world!
-      </StyledComponent>
-      <StyledComponent className="font-bold" component={Text}>
+      </_StyledComponent>
+      <_StyledComponent className="font-bold" component={Text}>
         Hello world!
-      </StyledComponent>
-    </StyledComponent>
+      </_StyledComponent>
+    </_StyledComponent>
   );
 }
-NativeWindStyleSheet.create({
+
+_NativeWindStyleSheet.create({
   styles: {
     "font-bold": {
       fontWeight: "700",
     },
     "divide-y.children@0": {
       borderBottomWidth: 0,
-      borderTopWidth: NativeWindStyleSheet.parse("hairlineWidth", ""),
+      borderTopWidth: _NativeWindStyleSheet.parse("hairlineWidth", ""),
     },
   },
   atRules: {

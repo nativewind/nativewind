@@ -15,7 +15,7 @@ import {
 } from "@babel/types";
 import { NodePath, types } from "@babel/core";
 
-export function toStyledComponent(path: NodePath<types.JSXElement>): boolean {
+export function toStyledComponent(path: NodePath<types.JSXElement>) {
   const openingElement = path.node.openingElement;
 
   openingElement.attributes.push(
@@ -25,12 +25,10 @@ export function toStyledComponent(path: NodePath<types.JSXElement>): boolean {
     )
   );
 
-  openingElement.name = jsxIdentifier("StyledComponent");
+  openingElement.name = jsxIdentifier("_StyledComponent");
   if (path.node.closingElement) {
-    path.node.closingElement.name = jsxIdentifier("StyledComponent");
+    path.node.closingElement.name = jsxIdentifier("_StyledComponent");
   }
-
-  return true;
 }
 
 function jsxVariableToJsVariable(

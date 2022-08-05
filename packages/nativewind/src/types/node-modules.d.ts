@@ -7,6 +7,10 @@ declare module "postcss-color-rgb" {
   export default unknown;
 }
 
+declare module "@babel/helper-module-imports" {
+  export function addNamed(path: unknown, name: string, source: string);
+}
+
 /**
  * The types for MediaValues are missing 'type'
  */

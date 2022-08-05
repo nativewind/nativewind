@@ -1,9 +1,9 @@
 import { resolve } from "node:path";
 import { expressionStatement, Program } from "@babel/types";
 import { NodePath } from "@babel/traverse";
+import { addNamed } from "@babel/helper-module-imports";
 
 import { extractStyles } from "../postcss/extract-styles";
-import { prependImports } from "./transforms/append-import";
 import { TailwindcssReactNativeBabelOptions, State } from "./types";
 import { visitor, VisitorState } from "./visitor";
 import { getAllowedOptions, isAllowedProgramPath } from "./utils/allowed-paths";
@@ -75,8 +75,6 @@ export default function (
             mode: "compileAndTransform",
             didTransform: false,
             blockModuleTransform: [],
-            hasStyledComponentImport: false,
-            hasNWStyleSheetImport: false,
             canCompile,
             canTransform,
             ...state,
@@ -90,17 +88,12 @@ export default function (
           // Traverse the file
           path.traverse(visitor, visitorState);
 
-          const {
-            filename,
-            didTransform,
-            hasStyledComponentImport,
-            hasNWStyleSheetImport,
-          } = visitorState;
+          const { filename, didTransform } = visitorState;
 
           const bodyNode = path.node.body;
 
-          if (didTransform && !hasStyledComponentImport) {
-            prependImports(bodyNode, ["StyledComponent"], "nativewind");
+          if (didTransform) {
+            addNamed(path, "StyledComponent", "nativewind");
           }
 
           const content: Config["content"] = [filename];
@@ -121,9 +114,7 @@ export default function (
 
           bodyNode.push(expressionStatement(output.stylesheetCreateExpression));
 
-          if (!hasNWStyleSheetImport) {
-            prependImports(bodyNode, ["NativeWindStyleSheet"], "nativewind");
-          }
+          addNamed(path, "NativeWindStyleSheet", "nativewind");
         },
       },
     },

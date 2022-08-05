@@ -1,14 +1,15 @@
-import { NativeWindStyleSheet } from "nativewind";
-import { StyledComponent } from "nativewind";
+import { NativeWindStyleSheet as _NativeWindStyleSheet } from "nativewind";
+import { StyledComponent as _StyledComponent } from "nativewind";
 import { Text } from "react-native";
 export function Test() {
   return (
-    <StyledComponent className="w-screen" component={Text}>
+    <_StyledComponent className="w-screen" component={Text}>
       Hello world!
-    </StyledComponent>
+    </_StyledComponent>
   );
 }
-NativeWindStyleSheet.create({
+
+_NativeWindStyleSheet.create({
   styles: {
     "w-screen": {
       width: 100,

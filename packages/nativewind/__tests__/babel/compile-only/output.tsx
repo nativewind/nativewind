@@ -1,4 +1,4 @@
-import { NativeWindStyleSheet } from "nativewind";
+import { NativeWindStyleSheet as _NativeWindStyleSheet } from "nativewind";
 import { Text, View } from "react-native";
 export function Test() {
   return (
@@ -7,7 +7,8 @@ export function Test() {
     </View>
   );
 }
-NativeWindStyleSheet.create({
+
+_NativeWindStyleSheet.create({
   styles: {
     container: {
       width: "100%",

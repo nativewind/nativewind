@@ -1,24 +1,25 @@
-import { NativeWindStyleSheet } from "nativewind";
-import { StyledComponent } from "nativewind";
+import { NativeWindStyleSheet as _NativeWindStyleSheet } from "nativewind";
+import { StyledComponent as _StyledComponent } from "nativewind";
 import { Text, View } from "react-native";
 export function Test() {
   return (
     <View>
-      <StyledComponent className="text-hairline text-custom" component={Text}>
+      <_StyledComponent className="text-hairline text-custom" component={Text}>
         Hello world!
-      </StyledComponent>
+      </_StyledComponent>
     </View>
   );
 }
-NativeWindStyleSheet.create({
+
+_NativeWindStyleSheet.create({
   styles: {
     "text-hairline": {
-      fontSize: NativeWindStyleSheet.parse("hairlineWidth", ""),
+      fontSize: _NativeWindStyleSheet.parse("hairlineWidth", ""),
     },
     "text-custom": {
-      fontSize: NativeWindStyleSheet.parse(
+      fontSize: _NativeWindStyleSheet.parse(
         "roundToNearestPixel",
-        NativeWindStyleSheet.parse("hairlineWidth", "")
+        _NativeWindStyleSheet.parse("hairlineWidth", "")
       ),
     },
   },
