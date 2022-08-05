@@ -19,7 +19,7 @@
     "dripsy": "^3.6.0",
     "expo": "46.0.2",
     "jest": "28.1.3",
-    "native-base": "3.4.9",
+    "native-base": "3.4.11",
     "nativewind": "2.0.0-next.55",
     "react": "*",
     "react-dom": "*",
