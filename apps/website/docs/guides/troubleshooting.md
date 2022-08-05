@@ -2,7 +2,7 @@
 
 ## Styles randomly not working
 
-NativeWind adds code to your files which are then cached by Babel. As each file is cache individually, changes to your `tailwind.config.js` or other files may not be reflected across your project.
+NativeWind adds code to each file which is cached by Webpack/Metro. As each file is cache individually, changes to your `tailwind.config.js` or other files may not be reflected across your project.
 
 To fix this issue, simply clear your project's cache.
 
