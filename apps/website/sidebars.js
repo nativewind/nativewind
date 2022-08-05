@@ -162,6 +162,7 @@ const sidebars = {
       label: "Typography",
       collapsed: false,
       items: [
+        "tailwind/typography/font-family",
         "tailwind/typography/font-size",
         "tailwind/typography/font-style",
         "tailwind/typography/font-weight",
