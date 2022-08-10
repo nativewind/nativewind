@@ -10,13 +10,13 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "expo": "46.0.2",
+    "expo": "0.0.0",
     "expo-status-bar": "1.4.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.69.4",
     "react-native-web": "0.18.7",
-    "nativewind": "2.0.0-next.57"
+    "nativewind": "2.0.0-next.58"
   },
   "devDependencies": {
     "@babel/core": "7.18.10",
