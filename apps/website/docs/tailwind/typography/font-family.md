@@ -31,6 +31,10 @@ module.exports = {
 };
 ```
 
+### Handling different platforms
+
+On React Native, iOS and Android load fonts slightly differently. For an improved Tailwind experience, we recommend following a guide (such as [this one](https://github.com/jsamr/react-native-font-demo)) to correct setup your fonts to allow for a consistent experience.
+
 ## Compatibility
 
 <Compatibility
