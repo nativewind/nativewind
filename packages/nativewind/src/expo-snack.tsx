@@ -1,10 +1,11 @@
 import React, { ComponentType, PropsWithChildren } from "react";
-import { Platform, StyleSheet } from "react-native";
+import { Platform } from "react-native";
 import { Config } from "tailwindcss";
 import { NativeWindStyleSheet, StyleSheetRuntime } from "./style-sheet";
 
 const fetched: Record<string, boolean> = {};
-const canUseCSS = typeof StyleSheet.create({ test: {} }).test !== "number";
+const canUseCSS = false;
+// const canUseCSS = typeof StyleSheet.create({ test: {} }).test !== "number";
 
 function ExpoSnackWrapper({ children }: PropsWithChildren<unknown>) {
   return Platform.OS === "web" && canUseCSS ? (
@@ -60,8 +61,11 @@ export function withExpoSnack(
       });
   }
 
-  if (canUseCSS) {
+  if (!canUseCSS) {
     NativeWindStyleSheet.setDangerouslyCompileStyles(dangerouslyCompileStyles);
+    NativeWindStyleSheet.setOutput({
+      default: "native",
+    });
   }
 
   return () => (
