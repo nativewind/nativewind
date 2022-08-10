@@ -34,10 +34,10 @@ tailwindRunner(
       {
         styles: {
           border: {
-            borderBottomWidth: "hairlineWidth()",
-            borderTopWidth: "hairlineWidth()",
-            borderLeftWidth: "hairlineWidth()",
-            borderRightWidth: "hairlineWidth()",
+            borderBottomWidth: '__{"name":"hairlineWidth","args":[]}',
+            borderTopWidth: '__{"name":"hairlineWidth","args":[]}',
+            borderLeftWidth: '__{"name":"hairlineWidth","args":[]}',
+            borderRightWidth: '__{"name":"hairlineWidth","args":[]}',
           } as Style,
         },
       },
@@ -47,8 +47,8 @@ tailwindRunner(
       {
         styles: {
           "border-x": {
-            borderLeftWidth: "hairlineWidth()",
-            borderRightWidth: "hairlineWidth()",
+            borderLeftWidth: '__{"name":"hairlineWidth","args":[]}',
+            borderRightWidth: '__{"name":"hairlineWidth","args":[]}',
           } as Style,
         },
       },
@@ -58,8 +58,8 @@ tailwindRunner(
       {
         styles: {
           "border-y": {
-            borderTopWidth: "hairlineWidth()",
-            borderBottomWidth: "hairlineWidth()",
+            borderTopWidth: '__{"name":"hairlineWidth","args":[]}',
+            borderBottomWidth: '__{"name":"hairlineWidth","args":[]}',
           } as Style,
         },
       },
@@ -68,7 +68,9 @@ tailwindRunner(
       "border-t",
       {
         styles: {
-          "border-t": { borderTopWidth: "hairlineWidth()" } as Style,
+          "border-t": {
+            borderTopWidth: '__{"name":"hairlineWidth","args":[]}',
+          } as Style,
         },
       },
     ],
@@ -77,7 +79,7 @@ tailwindRunner(
       {
         styles: {
           "border-b": {
-            borderBottomWidth: "hairlineWidth()",
+            borderBottomWidth: '__{"name":"hairlineWidth","args":[]}',
           } as Style,
         },
       },
@@ -86,7 +88,9 @@ tailwindRunner(
       "border-l",
       {
         styles: {
-          "border-l": { borderLeftWidth: "hairlineWidth()" } as Style,
+          "border-l": {
+            borderLeftWidth: '__{"name":"hairlineWidth","args":[]}',
+          } as Style,
         },
       },
     ],
@@ -95,7 +99,7 @@ tailwindRunner(
       {
         styles: {
           "border-r": {
-            borderRightWidth: "hairlineWidth()",
+            borderRightWidth: '__{"name":"hairlineWidth","args":[]}',
           } as Style,
         },
       },

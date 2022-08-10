@@ -14,10 +14,7 @@ import {
   stringLiteral,
   unaryExpression,
 } from "@babel/types";
-import {
-  isRuntimeFunction,
-  matchRuntimeFunction,
-} from "../style-sheet/style-function-helpers";
+import { isRuntimeFunction } from "../style-sheet/style-function-helpers";
 import { ExtractedValues } from "./plugin";
 
 export function serializer({
@@ -35,11 +32,7 @@ export function serializer({
     serializedStyles[key] = {};
 
     for (const [k, v] of Object.entries(style)) {
-      if (isRuntimeFunction(v)) {
-        serializedStyles[key][k] = functionReplacer(v);
-      } else {
-        serializedStyles[key][k] = v;
-      }
+      serializedStyles[key][k] = v;
     }
   }
 
@@ -114,24 +107,6 @@ export function serializer({
   };
 }
 
-function functionReplacer(functionString: string): Expression {
-  const [name, value] = matchRuntimeFunction(functionString);
-
-  if (!name) {
-    return identifier("undefined");
-  }
-
-  return callExpression(
-    memberExpression(identifier("_NativeWindStyleSheet"), identifier("parse")),
-    [
-      stringLiteral(name),
-      isRuntimeFunction(value)
-        ? functionReplacer(value)
-        : babelSerializeLiteral(value),
-    ]
-  );
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function babelSerializeLiteral(literal: any): Expression {
   if (isExpression(literal)) {
@@ -146,7 +121,22 @@ function babelSerializeLiteral(literal: any): Expression {
     case "number":
       return numericLiteral(literal);
     case "string":
-      return stringLiteral(literal);
+      if (isRuntimeFunction(literal)) {
+        const { name, args } = JSON.parse(literal.slice(2)) as {
+          name: string;
+          args: unknown[];
+        };
+
+        return callExpression(
+          memberExpression(
+            identifier("_NativeWindStyleSheet"),
+            identifier(name)
+          ),
+          args.map((argument) => babelSerializeLiteral(argument))
+        );
+      } else {
+        return stringLiteral(literal);
+      }
     case "boolean":
       return booleanLiteral(literal);
     case "undefined":

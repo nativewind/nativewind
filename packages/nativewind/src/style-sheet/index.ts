@@ -13,7 +13,13 @@ export const NativeWindStyleSheet = {
   setPlatform: runtime.setPlatform.bind(runtime),
   setOutput: runtime.setOutput.bind(runtime),
   setColorScheme: runtime.setColorScheme.bind(runtime),
-  parse: runtime.parse.bind(runtime),
+  platformSelect: runtime.platformSelect.bind(runtime),
+  platformColor: runtime.platformColor.bind(runtime),
+  hairlineWidth: runtime.hairlineWidth.bind(runtime),
+  pixelRatio: runtime.pixelRatio.bind(runtime),
+  fontScale: runtime.fontScale.bind(runtime),
+  getPixelSizeForLayoutSize: runtime.getPixelSizeForLayoutSize.bind(runtime),
+  roundToNearestPixel: runtime.roundToNearestPixel.bind(runtime),
   setDangerouslyCompileStyles:
     runtime.setDangerouslyCompileStyles.bind(runtime),
 };

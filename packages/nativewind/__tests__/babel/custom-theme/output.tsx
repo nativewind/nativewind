@@ -12,16 +12,19 @@ export function Test() {
 _NativeWindStyleSheet.create({
   styles: {
     "p-px": {
-      paddingTop: _NativeWindStyleSheet.parse("roundToNearestPixel", "4"),
-      paddingRight: _NativeWindStyleSheet.parse("roundToNearestPixel", "4"),
-      paddingBottom: _NativeWindStyleSheet.parse("roundToNearestPixel", "4"),
-      paddingLeft: _NativeWindStyleSheet.parse("roundToNearestPixel", "4"),
+      paddingTop: _NativeWindStyleSheet.roundToNearestPixel(4),
+      paddingRight: _NativeWindStyleSheet.roundToNearestPixel(4),
+      paddingBottom: _NativeWindStyleSheet.roundToNearestPixel(4),
+      paddingLeft: _NativeWindStyleSheet.roundToNearestPixel(4),
     },
     "text-blue-500": {
-      color: _NativeWindStyleSheet.parse(
-        "platform",
-        "ios:platformColor(systemTealColor) android:platformColor(@android:color/holo_blue_bright) default:black"
-      ),
+      color: _NativeWindStyleSheet.platformSelect({
+        ios: _NativeWindStyleSheet.platformColor("systemTealColor"),
+        android: _NativeWindStyleSheet.platformColor(
+          "@android:color/holo_blue_bright"
+        ),
+        default: "black",
+      }),
     },
   },
 });

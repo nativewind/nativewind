@@ -21,7 +21,7 @@ _NativeWindStyleSheet.create({
     },
     "divide-y.children@0": {
       borderBottomWidth: 0,
-      borderTopWidth: _NativeWindStyleSheet.parse("hairlineWidth", ""),
+      borderTopWidth: _NativeWindStyleSheet.hairlineWidth(),
     },
   },
   atRules: {

@@ -6,7 +6,7 @@ exports[`Device functions theme functions 1`] = `
     style={
       Array [
         Object {
-          "fontSize": 0.5,
+          "fontSize": 1,
         },
       ]
     }
@@ -25,7 +25,7 @@ exports[`Device functions withPlatformTheme 1`] = `
           "fontSize": 16,
         },
         Object {
-          "fontSize": 15,
+          "fontSize": 30,
         },
       ]
     }

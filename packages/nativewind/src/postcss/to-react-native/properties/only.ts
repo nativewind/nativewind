@@ -134,5 +134,5 @@ export function only<
 }
 
 function isFunctionValue(value: string) {
-  return value.includes("(");
+  return value.startsWith("__{");
 }

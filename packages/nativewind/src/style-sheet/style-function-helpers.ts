@@ -3,24 +3,6 @@
  *
  * The main file imports 'react-native' which needs to be compiled
  */
-export function isRuntimeFunction(input: string | number) {
-  if (typeof input !== "string") return false;
-
-  return (
-    input === "hairlineWidth()" ||
-    input.startsWith("roundToNearestPixel(") ||
-    input.startsWith("getPixelSizeForLayoutSize(") ||
-    input.startsWith("getFontSizeForLayoutSize(") ||
-    input.startsWith("roundToNearestFontScale(") ||
-    input.startsWith("platformColor(") ||
-    input.startsWith("platform(")
-  );
-}
-
-export function matchRuntimeFunction(
-  input: string
-): [string, string] | [undefined, undefined] {
-  const matches = input.match(/(.+?)\((.*)\)/);
-  if (!matches) return [undefined, undefined];
-  return [matches[1], matches[2]];
+export function isRuntimeFunction(input: unknown): input is string {
+  return typeof input === "string" && input.startsWith("__{");
 }

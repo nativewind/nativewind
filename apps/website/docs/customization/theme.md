@@ -6,6 +6,8 @@ NativeWind uses the same theme values as as Tailwind CSS. You can read more abou
 
 NativeWind exposes a function `platformSelect` that allows you to provide platform specific theme values.
 
+platformSelect is the equivalent to `Platform.select()`
+
 ```js
 // tailwind.config.js
 
@@ -17,9 +19,9 @@ module.exports = {
       colors: {
         error: platformSelect({
           // Now you can provide platform specific values
-          ios: "platformColor(systemRed)",
-          android: "platformColor(?android:colorError)",
-          default: "red",
+          ios: "red"
+          android: "blue"
+          default: "green",
         }),
       },
     },
@@ -29,39 +31,152 @@ module.exports = {
 
 ## Per device theme values
 
-React Native provides a number of utilities for creating styles based upon the devices pixel ratio. These include the [PixelRatio](https://reactnative.dev/docs/pixelratio) helpers and [StyleSheet.hairlineWidth](https://reactnative.dev/docs/stylesheet#hairlinewidth)
+React Native provides a number of utilities for creating styles based upon physical attributes of the device. These include the [PixelRatio](https://reactnative.dev/docs/pixelratio) helpers and [StyleSheet.hairlineWidth](https://reactnative.dev/docs/stylesheet#hairlinewidth)
 
-| Function                              | React Native equivalent                |
-| ------------------------------------- | -------------------------------------- |
-| `hairlineWidth()`                     | `StyleSheet.hairlinewidth`             |
-| `roundToNearestPixel(<number>)`       | `PixelRatio.roundToNearestPixel`       |
-| `getPixelSizeForLayoutSize(<number>)` | `PixelRatio.getPixelSizeForLayoutSize` |
-| `pixelMultipler(<number>)`            | `PixelRatio.get() * <value>`           |
-| `fontScaleMultipler(<number>)`        | `PixelRatio.getFontScale() * <value>`  |
+NativeWind supports these though a set of exported helper functions that you can use in your `tailwind.config.js`
 
-### Scaling functions
+### platformColor()
 
-`PixelRatio.get()` and `PixelRatio.getFontScale()` are often used for non-linear scaling. As such you can explicity provide the values as scale/value pairs. If no `default` key is set and no matching scale is found it will return 0.
+Equivalent of `PlatformColor`
 
-| Function                                     |
-| -------------------------------------------- |
-| `pixel(<scale>:<value> default:<value>)`     |
-| `fontScale(<scale>:<value> default:<value>)` |
+:::caution
 
-:::note
+React Native Web does not support PlatformColor
 
-There are no quotes between the brackets in theme functions
+https://github.com/necolas/react-native-web/issues/2128
 
 :::
 
-## Combining theme functions
+```js
+// tailwind.config.js
 
-Theme functions can be combined to create complex theme values
+const { platformColor } = require("nativewind");
+
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        platformRed: platformColor("systemRed", "red")
+      },
+    },
+  },
+});
+```
+
+### hairlineWidth()
+
+Equivalent of `StyleSheet.hairlineWidth`
 
 ```js
-const myFontSize = `roundToNearestPixel(fontScaleMultipler(16))`;
+// tailwind.config.js
 
-// compiles to
+const { hairlineWidth } = require("nativewind");
 
-PixelRatio.roundToNearestPixel(PixelRatio.getFontScale() * 16);
+module.exports = {
+  theme: {
+    extend: {
+      borderWidth: {
+        hairline: hairlineWidth()
+      },
+    },
+  },
+});
+```
+
+### pixelRatio()
+
+Equivalent of `PixelRatio.get()`
+
+If a number is provided it returns `PixelRatio.get() * <value>`
+
+Otherwise it can accept an object and returns `object[PixelRatio.get()] ?? PixelRatio.get()`
+
+```js
+// tailwind.config.js
+
+const { pixelRatio } = require("nativewind");
+
+module.exports = {
+  theme: {
+    extend: {
+      borderWidth: {
+        number: pixelRatio(2)
+        object: pixelRatio({
+          1: 1
+          1.5: 2
+          2: 4
+        })
+      },
+    },
+  },
+});
+```
+
+### fontScale()
+
+Equivalent of `PixelRatio.getFontScale()`
+
+If a number is provided it returns `PixelRatio.getFontScale() * <value>`
+
+Otherwise it can accept an object and returns `object[PixelRatio.getFontScale()] ?? PixelRatio.getFontScale()`
+
+```js
+// tailwind.config.js
+
+const { getFontScale } = require("nativewind");
+
+module.exports = {
+  theme: {
+    extend: {
+      fontSize: {
+        number: fontScale(2)
+        object: fontScale({
+          1: 10
+          1.5: 15
+          2: 20
+        })
+      },
+    },
+  },
+});
+```
+
+### getPixelSizeForLayoutSize()
+
+Equivalent of `PixelRatio.getPixelSizeForLayoutSize()`
+
+```js
+// tailwind.config.js
+
+const { getPixelSizeForLayoutSize } = require("nativewind");
+
+module.exports = {
+  theme: {
+    extend: {
+      size: {
+        custom: getPixelSizeForLayoutSize(2)
+      },
+    },
+  },
+});
+```
+
+### roundToNearestPixel()
+
+Equivalent of `PixelRatio.roundToNearestPixel()`
+
+```js
+// tailwind.config.js
+
+const { roundToNearestPixel } = require("nativewind");
+
+module.exports = {
+  theme: {
+    extend: {
+      size: {
+        custom: roundToNearestPixel(8.4)
+      },
+    },
+  },
+});
 ```

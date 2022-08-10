@@ -12,7 +12,10 @@ import {
   StyleProp,
   I18nManager,
   PlatformOSType,
+  PlatformColor,
+  PixelRatio,
 } from "react-native";
+
 import {
   matchAtRule,
   matchChildAtRule,
@@ -28,7 +31,6 @@ import { MediaRecord } from "../types/common";
 import vh from "./units/vh";
 import vw from "./units/vw";
 import { ColorSchemeStore } from "./color-scheme";
-import { parseStyleFunction } from "./style-functions";
 
 export type { ColorSchemeSystem, ColorSchemeName } from "./color-scheme";
 export type Style = ViewStyle | ImageStyle | TextStyle;
@@ -534,7 +536,29 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     }
   }
 
-  parse(functionString: string, value: string) {
-    return parseStyleFunction(functionString, value);
+  platformSelect = Platform.select;
+
+  platformColor(color: string) {
+    // RWN does not implement PlatformColor
+    // https://github.com/necolas/react-native-web/issues/2128
+    return PlatformColor ? PlatformColor(color) : color;
   }
+
+  hairlineWidth() {
+    return StyleSheet.hairlineWidth;
+  }
+
+  pixelRatio(value: number | Record<string, number>) {
+    const ratio = PixelRatio.get();
+    return typeof value === "number" ? ratio * value : value[ratio] ?? ratio;
+  }
+
+  fontScale(value: number | Record<string, number>) {
+    const scale = PixelRatio.getFontScale();
+    return typeof value === "number" ? scale * value : value[scale] ?? scale;
+  }
+
+  getPixelSizeForLayoutSize = PixelRatio.getPixelSizeForLayoutSize;
+
+  roundToNearestPixel = PixelRatio.getPixelSizeForLayoutSize;
 }

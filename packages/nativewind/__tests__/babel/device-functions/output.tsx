@@ -4,7 +4,7 @@ import { Text, View } from "react-native";
 export function Test() {
   return (
     <View>
-      <_StyledComponent className="text-hairline text-custom" component={Text}>
+      <_StyledComponent className="border-hairline" component={Text}>
         Hello world!
       </_StyledComponent>
     </View>
@@ -13,14 +13,11 @@ export function Test() {
 
 _NativeWindStyleSheet.create({
   styles: {
-    "text-hairline": {
-      fontSize: _NativeWindStyleSheet.parse("hairlineWidth", ""),
-    },
-    "text-custom": {
-      fontSize: _NativeWindStyleSheet.parse(
-        "roundToNearestPixel",
-        _NativeWindStyleSheet.parse("hairlineWidth", "")
-      ),
+    "border-hairline": {
+      borderTopWidth: _NativeWindStyleSheet.hairlineWidth(),
+      borderRightWidth: _NativeWindStyleSheet.hairlineWidth(),
+      borderBottomWidth: _NativeWindStyleSheet.hairlineWidth(),
+      borderLeftWidth: _NativeWindStyleSheet.hairlineWidth(),
     },
   },
 });

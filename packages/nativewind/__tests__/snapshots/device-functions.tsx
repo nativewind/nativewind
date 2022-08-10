@@ -1,7 +1,12 @@
 import { View, Text } from "react-native";
 import { render } from "@testing-library/react-native";
 
-import { styled, platformSelect } from "../../src";
+import {
+  styled,
+  platformSelect,
+  roundToNearestPixel,
+  hairlineWidth,
+} from "../../src";
 import { TestProvider } from "../tailwindcss/runner";
 
 // const StyledView = styled(View);
@@ -12,8 +17,8 @@ describe("Device functions", () => {
     const theme = {
       extend: {
         fontSize: {
-          hairline: "hairlineWidth()",
-          custom: "roundToNearestPixel(hairlineWidth())",
+          hairline: hairlineWidth(),
+          custom: roundToNearestPixel(hairlineWidth()),
         },
       },
     };
@@ -33,7 +38,7 @@ describe("Device functions", () => {
     const theme = {
       fontSize: {
         sm: platformSelect({
-          ios: "roundToNearestPixel(15)",
+          ios: roundToNearestPixel(15),
           default: 10,
         }),
       },

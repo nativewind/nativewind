@@ -20,6 +20,7 @@ import { DarkModeConfig } from "tailwindcss/types/config";
 import { pseudoClasses } from "./pseudo-classes";
 import { platforms, nativePlatforms } from "../../utils/platforms";
 import { boxShadowColor } from "./box-shadow-color";
+import { hairlineWidth } from "../../theme-functions";
 
 // This is used by platformSelect to detect if we are in an
 // environment that can use Platform.select (ie not using CSS)
@@ -99,7 +100,7 @@ export const nativePlugin = plugin.withOptions<NativePluginOptions>(
           widest: "1px",
         },
         borderWidth: {
-          DEFAULT: "hairlineWidth()",
+          DEFAULT: hairlineWidth(),
           0: "0px",
           2: "2px",
           4: "4px",

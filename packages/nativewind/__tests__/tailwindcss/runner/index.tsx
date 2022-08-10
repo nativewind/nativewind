@@ -14,7 +14,6 @@ import {
   TestStyleSheetRuntime,
   TestStyleSheetStoreConstructor,
 } from "../../style-sheet/tests";
-import { parseString } from "../../../src/style-sheet/style-functions";
 import { isRuntimeFunction } from "../../../src/style-sheet/style-function-helpers";
 import { ThemeConfig } from "tailwindcss/types/config";
 
@@ -81,6 +80,33 @@ function dangerouslyCompileStyles(theme: Partial<ThemeConfig> = {}) {
       safelist: [css],
     });
 
+    function compileThemeFunction(v: string): unknown {
+      const { name, args } = JSON.parse(v.slice(2)) as {
+        name: string;
+        args: unknown[];
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fn: any = store[name as keyof StyleSheetRuntime];
+
+      return fn(
+        ...args.map((v) => {
+          if (typeof v === "object" && v) {
+            for (const [key, value] of Object.entries(v)) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (v as any)[key] = isRuntimeFunction(value)
+                ? compileThemeFunction(value)
+                : value;
+            }
+
+            return v;
+          } else {
+            return isRuntimeFunction(v) ? compileThemeFunction(v) : v;
+          }
+        })
+      );
+    }
+
     const serializedStyles: Record<string, Record<string, unknown>> = {};
 
     for (const [key, style] of Object.entries(raw.styles || {})) {
@@ -88,7 +114,7 @@ function dangerouslyCompileStyles(theme: Partial<ThemeConfig> = {}) {
 
       for (const [k, v] of Object.entries(style)) {
         if (isRuntimeFunction(v)) {
-          serializedStyles[key][k] = parseString(v, (x) => x);
+          serializedStyles[key][k] = compileThemeFunction(v);
         } else {
           serializedStyles[key][k] = v;
         }
