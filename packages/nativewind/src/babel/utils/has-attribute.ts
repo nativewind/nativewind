@@ -12,7 +12,12 @@ export function someAttributes(
   const openingElement = path.node.openingElement;
 
   return openingElement.attributes.some((attribute) => {
-    // Ignore spreads, we cannot process them
+    /**
+     * I think we should be able to process spread attributes
+     * by checking their binding, but I still learning how this works
+     *
+     * If your reading this and understand Babel bindings please send a PR
+     */
     if (isJSXSpreadAttribute(attribute)) {
       return false;
     }
