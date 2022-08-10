@@ -39,14 +39,6 @@ NativeWind supports these though a set of exported helper functions that you can
 
 Equivalent of `PlatformColor`
 
-:::caution
-
-React Native Web does not support PlatformColor
-
-https://github.com/necolas/react-native-web/issues/2128
-
-:::
-
 ```js
 // tailwind.config.js
 
