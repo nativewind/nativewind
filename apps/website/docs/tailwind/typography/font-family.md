@@ -7,7 +7,7 @@ import Usage from "../\_usage.mdx"
 
 <Usage />
 
-React Native loads fonts slightly differently between iOS and Android. For an improved Tailwind experience, we recommend following https://github.com/jsamr/react-native-font-demo to create a consistent experience.
+React Native loads fonts slightly differently between iOS and Android. We recommend following https://github.com/jsamr/react-native-font-demo to create a consistent experience that works better with Tailwind.
 
 ### Differences on Native
 
