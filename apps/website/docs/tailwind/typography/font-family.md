@@ -7,6 +7,8 @@ import Usage from "../\_usage.mdx"
 
 <Usage />
 
+On React Native, iOS and Android load fonts slightly differently. For an improved Tailwind experience, we recommend following a guide (such as [this one](https://github.com/jsamr/react-native-font-demo)) to correct setup your fonts to allow for a consistent experience.
+
 ### Differences on Native
 
 React Native does not support fallback fonts. If an array of fonts are provided, NativeWind will only use the first font.
@@ -30,10 +32,6 @@ module.exports = {
   },
 };
 ```
-
-### Handling different platforms
-
-On React Native, iOS and Android load fonts slightly differently. For an improved Tailwind experience, we recommend following a guide (such as [this one](https://github.com/jsamr/react-native-font-demo)) to correct setup your fonts to allow for a consistent experience.
 
 ## Compatibility
 
