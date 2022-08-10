@@ -4,7 +4,7 @@
 
 NativeWind adds code to each file which is cached by Webpack/Metro. As each file is cache individually, changes to your `tailwind.config.js` or other files may not be reflected across your project.
 
-To fix this issue, simply clear your project's cache.
+To fix this issue, simply clear your project's cache either by `expo start -c` or `react-native start --reset-cache`.
 
 ## Native styles not working at all
 
