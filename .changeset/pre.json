@@ -6,13 +6,15 @@
     "website": "0.0.0",
     "nativewind": "2.0.0-next.43",
     "example": "0.0.0",
-    "demo-compiler": "1.0.0"
+    "demo-compiler": "1.0.0",
+    "expo": "0.0.0"
   },
   "changesets": [
     "brown-tables-learn",
     "chilly-knives-wink",
     "gentle-badgers-clap",
     "good-numbers-think",
+    "good-toes-own",
     "gorgeous-mice-cheer",
     "gorgeous-turtles-know",
     "lazy-bananas-deliver",
