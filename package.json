@@ -2,7 +2,8 @@
   "name": "nativewind-monorepo",
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "examples/*"
   ],
   "scripts": {
     "test": "npm run test --workspace=nativewind",
