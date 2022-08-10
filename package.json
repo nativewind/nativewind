@@ -30,6 +30,6 @@
     "@babel/helper-module-imports": "^7.18.6",
     "@eva-design/eva": "^2.1.1",
     "@ui-kitten/components": "^5.1.2",
-    "react-native-svg": "^12.4.3"
+    "react-native-svg": "12.4.4"
   }
 }
