@@ -6,7 +6,23 @@ NativeWind can be used in a Next.js project that is already configured to use Ex
 
 Simply configure Next.js as per [the Tailwind CSS Next.js setup guide](https://tailwindcss.com/docs/guides/nextjs)
 
-## 2. Choose a compiler
+## 2. Add the NativeWind plugin
+
+NativeWind adds some extra Tailwind features such as platform variants. You will need to add the `nativewind/tailwind/css` if you use these features.
+
+```diff
+module.exports = {
+  content: [
+    './pages/**/*.{js,jsx,ts,tsx}',
+  ],
++ plugins: ['nativewind/tailwind/css'],
+  theme: {
+    extend: {},
+  },
+}
+```
+
+## 3. Choose a compiler
 
 ### Via SWC
 
@@ -22,4 +38,23 @@ module.exports = {
 - plugins: [],
 + plugins: ['nativewind/babel', { mode: 'transformOnly' }],
 };
+```
+
+## 4. Common issues
+
+A common issue with Next.js is your styles are imported, but are being overridden by React Native Wind. This is due to the order stylesheet imports.
+
+A simple fix is simply make the Tailwind styles a higher specificity.
+
+```diff
+module.exports = {
+  content: [
+    './pages/**/*.{js,jsx,ts,tsx}',
+  ],
+  plugins: ['nativewind/tailwind/css'],
++ important: 'html',
+  theme: {
+    extend: {},
+  },
+}
 ```
