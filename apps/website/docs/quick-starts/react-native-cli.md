@@ -4,7 +4,7 @@ import StartCoding from "../\_start-coding.md"
 
 ## 1. Create the project
 
-```
+```bash
 npx react-native init AwesomeProject
 cd AwesomeProject
 ```

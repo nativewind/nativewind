@@ -1,6 +1,6 @@
 # How it works
 
-This guide is not required to use NativeWind, it's simply an explaination of what is it does.
+This guide is not required to use NativeWind, it's simply an explanation of what is it does.
 
 ## Web
 
@@ -76,7 +76,7 @@ The TailwindCSS class [container](https://tailwindcss.com/docs/container) has a 
 
 ### Topics
 
-The `container` example also introducted topics. NativeWind works on a subscription model, where styles can subscribe to topics. Here the `container` style has subscribed to the `width` topic, so everytime the app's width changes the style is re-evaluated.
+The `container` example also introduced topics. NativeWind works on a subscription model, where styles can subscribe to topics. Here the `container` style has subscribed to the `width` topic, so each time the app's width changes the style is re-evaluated.
 
 ### Dynamic Units
 
@@ -120,7 +120,7 @@ NativeWindStyleSheet.create({
 });
 ```
 
-Styles can be conditional based upon a componet's or the app's state. The conditions can be UI state (active/hover), color scheme (light/dark), platform (ios/android/web), etc. These conditions are pre-computed into a bitmask for quick runtime evaluation.
+Styles can be conditional based upon a component's or the app's state. The conditions can be UI state (active/hover), color scheme (light/dark), platform (ios/android/web), etc. These conditions are pre-computed into a bitmask for quick runtime evaluation.
 
 ### Child Styles
 

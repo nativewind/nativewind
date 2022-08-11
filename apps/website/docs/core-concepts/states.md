@@ -10,9 +10,9 @@ Please refer to the [documentation on the Tailwind CSS website](https://tailwind
 This documentation only applies when compiling for StyleSheet.create
 :::
 
-NativeWind implements a subset of the Tailwind psuedo-classes by adding event listeners on your components, hence they will only work on components that can accept the listener.
+NativeWind implements a subset of the Tailwind pseudo-classes by adding event listeners on your components, hence they will only work on components that can accept the listener.
 
-The supported psuedo-classes and their related listeners are:
+The supported pseudo-classes and their related listeners are:
 
 | Variant  | Event Listeners           |
 | -------- | ------------------------- |
@@ -53,7 +53,7 @@ NativeWind supports the [`group` parent state](https://tailwindcss.com/docs/hove
 
 The `group` classes creates an unbounded scope, while `group-isolate` creates a bounded scope. The primary purpose of `group-isolate` is for state styling on components which do not accept the needed state listeners.
 
-`group` and `group-isolate` both work with the `hover`/`active`/`focus` psuedo-classes.
+`group` and `group-isolate` both work with the `hover`/`active`/`focus` pseudo-classes.
 
 ```SnackPlayer name=States
 import { Text, Pressable } from 'react-native';

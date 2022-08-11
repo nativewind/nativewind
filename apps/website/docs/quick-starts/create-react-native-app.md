@@ -4,7 +4,7 @@ import StartCoding from "../\_start-coding.md"
 
 ## 1. Create a new React Native application
 
-```
+```bash
 npx create-react-native-app my-nativewind-app
 ```
 
