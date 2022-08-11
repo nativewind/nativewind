@@ -52,7 +52,7 @@ export function MyButton(props) {
 
 You may argue that the vanilla example isn't that complex, but this is _basic example_ with only 1 component and 4 states. As you add more UI states (focus, hover) the vanilla example will grow in complexity. As your project grows you will also need more features like overriding single styles or styling based upon a different components state.
 
-NativeWind solves the state issues for you and allows you to simply focus on your components appearance. If you need to extends or override a compoents styles, its as simple as passing the className prop.
+NativeWind solves the state issues for you and allows you to simply focus on your components appearance. If you need to extends or override a components styles, its as simple as passing the className prop.
 
 ```tsx
 export function MyButton({ className, ...props }) {
@@ -71,4 +71,4 @@ export function MyButton({ className, ...props }) {
 }
 ```
 
-For web, this library simply provides a compatibilty layer for React Native Web. You use the Tailwind CLI/Postcss like
+For web, this library simply provides a compatibility layer for React Native Web. You use the Tailwind CLI/Postcss like

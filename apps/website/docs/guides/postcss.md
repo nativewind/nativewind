@@ -37,7 +37,7 @@ module.exports = {
 
 ### Start your build process
 
-Run your build process with npm run dev or whatever command is configured in your package.json file.
+Run your build process with `npm run dev` or whatever command is configured in your package.json file.
 
 This will create `nativewind-output.js`
 

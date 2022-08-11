@@ -26,14 +26,14 @@ module.exports = {
       },
     },
   },
-});
+};
 ```
 
 ## Per device theme values
 
 React Native provides a number of utilities for creating styles based upon physical attributes of the device. These include the [PixelRatio](https://reactnative.dev/docs/pixelratio) helpers and [StyleSheet.hairlineWidth](https://reactnative.dev/docs/stylesheet#hairlinewidth)
 
-NativeWind supports these though a set of exported helper functions that you can use in your `tailwind.config.js`
+NativeWind supports these through a set of exported helper functions that you can use in your `tailwind.config.js`
 
 ### platformColor()
 
@@ -52,7 +52,7 @@ module.exports = {
       },
     },
   },
-});
+};
 ```
 
 ### hairlineWidth()
@@ -72,7 +72,7 @@ module.exports = {
       },
     },
   },
-});
+};
 ```
 
 ### pixelRatio()
@@ -101,7 +101,7 @@ module.exports = {
       },
     },
   },
-});
+};
 ```
 
 ### fontScale()
@@ -130,7 +130,7 @@ module.exports = {
       },
     },
   },
-});
+};
 ```
 
 ### getPixelSizeForLayoutSize()
@@ -150,7 +150,7 @@ module.exports = {
       },
     },
   },
-});
+};
 ```
 
 ### roundToNearestPixel()

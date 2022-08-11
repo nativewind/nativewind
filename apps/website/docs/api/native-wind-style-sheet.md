@@ -8,7 +8,7 @@ A StyleSheet is an abstraction similar to CSS StyleSheets and React Native's Sty
 
 Set the style output per Platform
 
-```
+```js
 NativeWindStyleSheet.setOutput({
   web: 'css',
   default: 'native'

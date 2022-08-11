@@ -4,7 +4,7 @@ import Tailwind from "../\_tailwind.mdx"
 
 # Babel (transform only)
 
-Some frameworks (eg Next.js) provide an optimised pipeline for their CSS output and/or have first-class Tailwind support. In this case, you can use to framework to compile the styles and have Babel simply transform your components.
+Some frameworks (eg Next.js) provide an optimized pipeline for their CSS output and/or have first-class Tailwind support. In this case, you can use to framework to compile the styles and have Babel simply transform your components.
 
 ## Setup
 
