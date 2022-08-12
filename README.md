@@ -1,6 +1,6 @@
 <div align="center">
 <p align="center">
-  <a href="https://nativewind.vercel.app" target="_blank">
+  <a href="https://nativewind.dev" target="_blank">
     <img src="https://nativewind.dev/img/logo.svg" alt="Tailwind CSS" width="70" height="70">
     <h1 align="center" style="color:red;">NativeWind</h1>
   </a>
