@@ -10,6 +10,7 @@ import { getAllowedOptions, isAllowedProgramPath } from "./utils/allowed-paths";
 import { getTailwindConfig } from "./utils/get-tailwind-config";
 import { StyleError } from "../types/common";
 import type { Config } from "tailwindcss";
+import { SafelistConfig } from "tailwindcss/types/config";
 
 export default function (
   _: unknown,
@@ -102,12 +103,16 @@ export default function (
             content.push({ raw: options.rawContent, extension: "html" });
           }
 
+          const safelist = tailwindConfig.safelist
+            ? [...tailwindConfig.safelist, "babel-empty"]
+            : ["babel-empty"];
+
           const output = extractStyles({
             ...tailwindConfig,
             content,
             // If the file doesn't have any Tailwind styles, it will print a warning
             // We force an empty style to prevent this
-            safelist: [...tailwindConfig.safelist, "babel-empty"],
+            safelist: safelist as SafelistConfig,
           });
 
           if (!output.hasStyles) return;
