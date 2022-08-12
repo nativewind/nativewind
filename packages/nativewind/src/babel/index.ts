@@ -107,7 +107,7 @@ export default function (
             content,
             // If the file doesn't have any Tailwind styles, it will print a warning
             // We force an empty style to prevent this
-            safelist: ["babel-empty"],
+            safelist: [...tailwindConfig.safelist, "babel-empty"],
           });
 
           if (!output.hasStyles) return;
