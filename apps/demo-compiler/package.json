@@ -14,7 +14,7 @@
     "@babel/plugin-syntax-jsx": "^7.18.6",
     "@babel/preset-react": "^7.18.6",
     "@babel/standalone": "7.18.12",
-    "@swc/plugin-transform-imports": "1.2.3",
+    "@swc/plugin-transform-imports": "1.2.4",
     "nativewind": "2.0.0-next.59",
     "tailwindcss": "3.1.8"
   },
