@@ -13,7 +13,7 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@changesets/cli": "2.24.2",
+    "@changesets/cli": "2.24.3",
     "@commitlint/cli": "17.0.3",
     "@commitlint/config-conventional": "17.0.3",
     "@semantic-release/changelog": "6.0.1",
