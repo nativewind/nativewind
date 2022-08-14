@@ -74,7 +74,7 @@ export function useInteraction(
       }
     }
 
-    if (isParentOrGroup || matchesMask(mask, HOVER | PARENT | GROUP)) {
+    if (isParentOrGroup || matchesMask(mask, HOVER)) {
       handlers.onHoverIn = function (event: MouseEvent) {
         if (ref.current.onHoverIn) {
           ref.current.onHoverIn(event);
@@ -90,7 +90,7 @@ export function useInteraction(
       };
     }
 
-    if (isParentOrGroup || matchesMask(mask, FOCUS | PARENT | GROUP)) {
+    if (isParentOrGroup || matchesMask(mask, FOCUS)) {
       handlers.onFocus = function (event: NativeSyntheticEvent<TargetedEvent>) {
         if (ref.current.onFocus) {
           ref.current.onFocus(event);
