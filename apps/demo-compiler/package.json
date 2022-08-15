@@ -15,7 +15,7 @@
     "@babel/preset-react": "^7.18.6",
     "@babel/standalone": "7.18.12",
     "@swc/plugin-transform-imports": "1.2.4",
-    "nativewind": "2.0.0-next.59",
+    "nativewind": "2.0.0-next.60",
     "tailwindcss": "3.1.8"
   },
   "devDependencies": {
