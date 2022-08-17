@@ -63,7 +63,7 @@ export function useTailwind<T>({
   const styles = useSyncExternalStoreWithSelector(
     subscribe,
     getSnapshot,
-    undefined,
+    getSnapshot,
     selector
   );
 
