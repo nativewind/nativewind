@@ -13,7 +13,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "@tamagui/babel-plugin": "1.0.1-beta.147",
+    "@tamagui/babel-plugin": "1.0.1-beta.149",
     "chart.js": "3.9.1",
     "chartjs-chart-error-bars": "3.9.0",
     "dripsy": "3.6.0",
