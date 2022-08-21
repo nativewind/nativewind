@@ -40,9 +40,12 @@ function MyComponent({ variant }) {
 NativeWind will automatically merge with inline-styles. Inline styles have a higher priority.
 
 ```tsx
-function MyComponent({ style }) {
-  return <Text className={`font-bold`} style={style} />;
+function MyText({ style }) {
+  // style is [{ fontWeight: "bold" }, { color: "black" }]
+  return <Text style={style} />;
 }
+
+<MyText className={`font-bold`} style={{ color: "black" }} />;
 ```
 
 ## Passing styles to components
@@ -72,17 +75,33 @@ function B({ textClassName }) {
 }
 ```
 
-Inline styles will be merged
+## Typescript
+
+`styled()` handles the Typescript complexity for you. Simply write your components as normal.
 
 ```tsx
-function A({ style }) {
-  return <B className={`font-bold`} style={{ color: "black" }} />;
+interface MyButtonProps extends PressableProps {
+  textStyle: TextProps["style"]
 }
 
-function B({ style }) {
-  // style is [{ fontWeight: "bold" }, { color: "black" }]
-  return <Text style={style} />;
+function MyButton({ textStyle, children, ...props }: MyButtonProps) {
+  return (
+    <Pressable {...props}>
+      <Text style={textStyle}>{children}</Text>
+    </Pressable>
+  )
 }
+
+export default styled(MyButton, {
+  props: {
+    textStyle: true
+  }
+})
+
+<MyButton textStyle="font-bold">This text will be bold</MyButton>
+
+
+
 ```
 
 ## Complex logic
