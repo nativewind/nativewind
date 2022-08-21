@@ -21,15 +21,15 @@ exports[`Svg - Stroke Width stroke-0 1`] = `
 >
   <RNSVGGroup>
     <RNSVGCircle
-      cx={0}
-      cy={0}
+      cx="0"
+      cy="0"
       propList={
         Array [
           "strokeWidth",
         ]
       }
-      r={0}
-      strokeWidth={0}
+      r="0"
+      strokeWidth="0"
     />
   </RNSVGGroup>
 </RNSVGSvgView>
@@ -56,15 +56,15 @@ exports[`Svg - Stroke Width stroke-1 1`] = `
 >
   <RNSVGGroup>
     <RNSVGCircle
-      cx={0}
-      cy={0}
+      cx="0"
+      cy="0"
       propList={
         Array [
           "strokeWidth",
         ]
       }
-      r={0}
-      strokeWidth={1}
+      r="0"
+      strokeWidth="1"
     />
   </RNSVGGroup>
 </RNSVGSvgView>
@@ -91,15 +91,15 @@ exports[`Svg - Stroke Width stroke-2 1`] = `
 >
   <RNSVGGroup>
     <RNSVGCircle
-      cx={0}
-      cy={0}
+      cx="0"
+      cy="0"
       propList={
         Array [
           "strokeWidth",
         ]
       }
-      r={0}
-      strokeWidth={2}
+      r="0"
+      strokeWidth="2"
     />
   </RNSVGGroup>
 </RNSVGSvgView>
