@@ -7,9 +7,9 @@ import StartCoding from "../\_start-coding.md"
 Create the project with the Expo CLI
 
 ```bash
-expo init AwesomeProject
+npx create-expo-app my-app
 
-cd AwesomeProject
+cd my-app
 ```
 
 You will need to install `nativewind` and it's peer dependency `tailwindcss`.
@@ -30,7 +30,7 @@ Add the paths to all of your component files in your tailwind.config.js file.
 
 module.exports = {
 - content: [],
-+ content: ["./App.{js,jsx,ts,tsx}", "./src/**/*.{js,jsx,ts,tsx}"],
++ content: ["./App.{js,jsx,ts,tsx}", "./<custom directory>/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {},
   },
@@ -44,10 +44,14 @@ Modify your `babel.config.js`
 
 ```diff
 // babel.config.js
-module.exports = {
-- plugins: [],
-+ plugins: ["nativewind/babel"],
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ["babel-preset-expo"],
++   plugins: ["nativewind/babel"],
+  };
 };
+
 ```
 
 <StartCoding />
@@ -60,12 +64,21 @@ You will need follow a [Tailwind CSS installation guide](https://tailwindcss.com
 
 ### Example webpack setup
 
+:::caution
+
+Expo Web only supports Webpack 4, please ensure you are only installing webpack loaders that that support Webpack 4.
+
+https://github.com/expo/expo-cli/pull/3763
+
+:::
+
 Expo Web uses webpack, so one possible setup is adding `PostCSS` to your `webpack.config.js` and adding [Tailwind CSS as a PostCSS plugin](https://tailwindcss.com/docs/installation/using-postcss).
 
 You can also add `nativewind` to your transpilation list through the `@expo/webpack-config` babel options.
 
 ```tsx
 // webpack.config.js
+const path = require("path");
 const createExpoWebpackConfigAsync = require("@expo/webpack-config");
 
 module.exports = async function (env, argv) {

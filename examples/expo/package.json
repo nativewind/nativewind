@@ -1,26 +1,27 @@
 {
-  "name": "expo",
-  "version": "0.0.0",
-  "main": "index.js",
+  "name": "expo-example",
+  "version": "1.0.0",
+  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "eject": "expo eject"
+    "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "0.0.0",
+    "expo": "46.0.8",
     "expo-status-bar": "1.4.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-native": "0.69.4",
-    "react-native-web": "0.18.7",
-    "nativewind": "2.0.0-next.62"
+    "nativewind": "2.0.0-next.62",
+    "react": "18.0.0",
+    "react-dom": "18.0.0",
+    "react-native": "0.69.4"
   },
   "devDependencies": {
-    "@babel/core": "7.18.10",
-    "tailwindcss": "3.1.8"
+    "@babel/core": "7.12.9",
+    "@expo/webpack-config": "0.17.2",
+    "autoprefixer": "^10.4.8",
+    "babel-preset-expo": "^9.2.0",
+    "tailwindcss": "^3.1.8"
   },
   "private": true
 }
