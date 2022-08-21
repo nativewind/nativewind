@@ -4,7 +4,7 @@ import Tailwind from "../\_tailwind.mdx"
 
 # Babel (compile only)
 
-Babel helps reduce the projects boilerplate, but is not required for actual use. This version just compiles and injects the Tailwind CSS styles.
+NativeWind provides two methods to style components, the `className` prop (which requires a Babel transformation) and the `styled()` wrapper. If you are exclusively using the `styled()` wrapper you can improve your build time by changing to `compileOnly` mode which skips the transform step.
 
 ## Setup
 
