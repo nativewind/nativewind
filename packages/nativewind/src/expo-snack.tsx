@@ -31,6 +31,8 @@ export function withExpoSnack(
     css = css.replace(/\s+/g, " ").trim();
     const cacheKey = `${css}${themeString}`;
 
+    if (!css) return;
+
     if (fetched[cacheKey]) return;
     fetch(
       `https://nativewind-demo-compiler.vercel.app/api/compile?css=${css}&theme=${themeString}`
