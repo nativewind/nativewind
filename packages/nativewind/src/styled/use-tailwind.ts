@@ -44,7 +44,7 @@ export function useTailwind<T>({
     return [
       store.subscribe,
       store.getSnapshot,
-      (snapshot: Snapshot) => snapshot[selector],
+      (snapshot: Snapshot): StylesArray | undefined => snapshot[selector],
     ];
   }, [
     store,
@@ -84,11 +84,11 @@ export function useTailwind<T>({
 
     if (flatten) {
       const flatStyles: StylesArray = [StyleSheet.flatten(stylesArray)];
-      flatStyles.mask = styles.mask;
+      flatStyles.mask = styles?.mask;
       return flatStyles;
     }
 
-    stylesArray.mask = styles.mask;
+    stylesArray.mask = styles?.mask;
     return stylesArray;
   }, [styles, inlineStyles, additionalStyles, flatten]) as StylesArray<T>;
 }
