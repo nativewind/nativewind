@@ -10,7 +10,6 @@ import {
   PropsWithoutRef,
   useContext,
 } from "react";
-import { StyledProps, StyledPropsWithKeys } from "../utils/styled";
 import { InteractionProps, useInteraction } from "./use-interaction";
 import { withStyledChildren } from "./with-styled-children";
 import { withStyledProps } from "./with-styled-props";
@@ -22,11 +21,22 @@ import { useComponentState } from "./use-component-state";
 import { GROUP, GROUP_ISO, matchesMask } from "../utils/selector";
 import { Style } from "../types/common";
 
-export interface StyledOptions<P> {
-  props?: Partial<Record<keyof P, keyof Style | true>>;
-  classProps?: Array<keyof P & string>;
+export interface StyledOptions<
+  T,
+  P extends keyof T = never,
+  C extends keyof T = never
+> {
+  props?: Partial<Record<P, keyof Style | true>>;
+  classProps?: C[];
   baseClassName?: string;
 }
+
+export type StyledProps<P> = P & {
+  className?: string;
+  tw?: string;
+  baseClassName?: string;
+  baseTw?: string;
+};
 
 type ForwardRef<T, P> = ForwardRefExoticComponent<
   PropsWithoutRef<P> & RefAttributes<T>
@@ -52,31 +62,39 @@ export function styled<T>(
 ): ForwardRef<InferRef<T>, StyledProps<T>>;
 
 /**
- * Base className w/ options
- */
-export function styled<T, K extends keyof T & string>(
-  Component: ComponentType<T>,
-  baseClassName: string,
-  options: StyledOptions<T>
-): ForwardRef<InferRef<T>, StyledPropsWithKeys<T, K>>;
-
-/**
  * Only options
  */
-export function styled<T, K extends keyof T & string>(
+export function styled<T, P extends keyof T, C extends keyof T>(
   Component: ComponentType<T>,
-  options: StyledOptions<T>
-): ForwardRef<InferRef<T>, StyledPropsWithKeys<T, K>>;
+  options: StyledOptions<T, P, C>
+): ForwardRef<
+  InferRef<T>,
+  StyledProps<{ [key in keyof T]: key extends P ? T[key] | string : T[key] }>
+>;
+
+/**
+ * Base className w/ options
+ */
+export function styled<T, P extends keyof T, C extends keyof T>(
+  Component: ComponentType<T>,
+  baseClassName: string,
+  options: StyledOptions<T, P, C>
+): ForwardRef<
+  InferRef<T>,
+  StyledProps<{ [key in keyof T]: key extends P ? T[key] | string : T[key] }>
+>;
 
 /**
  * Actual implementation
  */
 export function styled<
-  T extends { style?: StyleProp<unknown>; children?: ReactNode | undefined }
+  T extends { style?: StyleProp<unknown>; children?: ReactNode | undefined },
+  P extends keyof T,
+  C extends keyof T
 >(
   Component: ComponentType<T>,
-  styledBaseClassNameOrOptions?: string | StyledOptions<T>,
-  maybeOptions: StyledOptions<T> = {}
+  styledBaseClassNameOrOptions?: string | StyledOptions<T, P, C>,
+  maybeOptions: StyledOptions<T, P, C> = {}
 ) {
   const { props: propsToTransform, classProps } =
     typeof styledBaseClassNameOrOptions === "object"
@@ -118,12 +136,15 @@ export function styled<
       styledProps,
       mask: propsMask,
       className,
-    } = withStyledProps({
+    } = withStyledProps<T, P, C>({
       className: classNameWithDefaults,
       preprocessed: store.preprocessed,
-      componentProps,
       propsToTransform,
       classProps,
+      componentProps: componentProps as unknown as Record<
+        P | C | string,
+        string
+      >,
     });
 
     /**

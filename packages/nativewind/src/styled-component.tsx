@@ -1,6 +1,5 @@
 import React, { ComponentProps, ComponentPropsWithRef } from "react";
-import { styled } from "./styled";
-import { StyledProps } from "./utils/styled";
+import { styled, StyledProps } from "./styled";
 
 export type StyledComponentProps<P> = StyledProps<P> & {
   component: React.ComponentType<P>;
