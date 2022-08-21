@@ -10,6 +10,7 @@
     "expo": "0.0.0"
   },
   "changesets": [
+    "bright-rice-drive",
     "brown-tables-learn",
     "chilly-knives-wink",
     "curly-comics-poke",
