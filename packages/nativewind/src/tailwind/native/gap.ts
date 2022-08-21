@@ -9,8 +9,8 @@ export const gap: CustomPluginFunction = ({ matchUtilities, theme }) => {
 
         return {
           "&": {
-            marginLeft: value,
-            marginTop: value,
+            marginLeft: `-${value}`,
+            marginTop: `-${value}`,
             "@selector (> *)": {
               marginLeft: value,
               marginTop: value,
@@ -24,7 +24,7 @@ export const gap: CustomPluginFunction = ({ matchUtilities, theme }) => {
 
         return {
           "&": {
-            "margin-left": value,
+            "margin-left": `-${value}`,
             "@selector (> *)": {
               "margin-left": value,
             },
@@ -37,7 +37,7 @@ export const gap: CustomPluginFunction = ({ matchUtilities, theme }) => {
 
         return {
           "&": {
-            "margin-top": value,
+            "margin-top": `-${value}`,
             "@selector (> *)": {
               "margin-top": value,
             },

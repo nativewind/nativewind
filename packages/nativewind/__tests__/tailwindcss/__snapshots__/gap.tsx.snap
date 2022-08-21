@@ -5,8 +5,8 @@ exports[`Flexbox & Grid - Gap gap-0 1`] = `
   style={
     Array [
       Object {
-        "marginLeft": 0,
-        "marginTop": 0,
+        "marginLeft": -0,
+        "marginTop": -0,
       },
     ]
   }
@@ -29,6 +29,400 @@ exports[`Flexbox & Grid - Gap gap-0 1`] = `
         Object {
           "marginLeft": 0,
           "marginTop": 0,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-0.5 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginLeft": -2,
+        "marginTop": -2,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 2,
+          "marginTop": 2,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 2,
+          "marginTop": 2,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-1 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginLeft": -4,
+        "marginTop": -4,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 4,
+          "marginTop": 4,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 4,
+          "marginTop": 4,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-px 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginLeft": -1,
+        "marginTop": -1,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 1,
+          "marginTop": 1,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 1,
+          "marginTop": 1,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-x-0 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginLeft": -0,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 0,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 0,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-x-0.5 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginLeft": -2,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 2,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 2,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-x-1 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginLeft": -4,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 4,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 4,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-x-px 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginLeft": -1,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 1,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginLeft": 1,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-y-0 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginTop": -0,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginTop": 0,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginTop": 0,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-y-0.5 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginTop": -2,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginTop": 2,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginTop": 2,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-y-1 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginTop": -4,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginTop": 4,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginTop": 4,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Flexbox & Grid - Gap gap-y-px 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "marginTop": -1,
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginTop": 1,
+        },
+      ]
+    }
+  >
+    A
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "marginTop": 1,
         },
       ]
     }
