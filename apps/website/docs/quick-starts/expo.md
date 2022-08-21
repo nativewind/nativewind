@@ -52,11 +52,17 @@ module.exports = {
 
 <StartCoding />
 
-## Additional setup for Expo Web
+## Expo Web
 
-### Webpack setup
+When running on web, NativeWind is a compatability layer between [Tailwind CSS](http://www.tailwindcss.com) and React Native.
 
-If you are using Expo Web without a framework, you will need to add a custom webpack configuration file.
+You will need follow a [Tailwind CSS installation guide](https://tailwindcss.com/docs/installation) and ensure NativeWind is transpiled.
+
+### Example webpack setup
+
+Expo Web uses webpack, so one possible setup is adding `PostCSS` to your `webpack.config.js` and adding [Tailwind CSS as a PostCSS plugin](https://tailwindcss.com/docs/installation/using-postcss).
+
+You can also add `nativewind` to your transpilation list through the `@expo/webpack-config` babel options.
 
 ```tsx
 // webpack.config.js
@@ -73,13 +79,19 @@ module.exports = async function (env, argv) {
     argv
   );
 
+  config.module.rules.push({
+    test: /\.css$/i,
+    include: path.resolve(__dirname, "src"),
+    use: ["style-loader", "css-loader", "postcss-loader"],
+  });
+
   return config;
 };
 ```
 
 ### Expo SDK <=45
 
-Expo SDK <=45 only supports React Native Web <=0.17 which cannot output classNames. You need to change the NativeWindStyleSheet output to use `native` for all platforms.
+Expo SDK <=45 supports React Native Web <=0.17 which cannot output classNames. You need to change the NativeWindStyleSheet output to use `native` for all platforms.
 
 ```tsx
 // App.js
