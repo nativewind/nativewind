@@ -2,7 +2,7 @@ import StartCoding from "../\_start-coding.md"
 
 # Expo
 
-::: tip
+:::tip
 
 A example of an Expo project can be found on [Github](https://github.com/marklawlor/nativewind/tree/next/examples/expo)
 
