@@ -2,6 +2,31 @@
 
 NativeWind's strength really shines with writing your own custom components.
 
+## Passing styles to components
+
+When passing styles between components, they are compiled on the parent and passed as a `style` prop to the child.
+
+```tsx
+function MyComponent({ style }) {
+  // You need to use style, className is not passed down!
+  return <Text style={style} />;
+}
+
+<MyComponent className="font-bold" />
+```
+
+If you want to pass the className as a string use a different prop.
+
+```tsx
+function A({ style }) {
+  return <B textClassName="font-bold" />;
+}
+
+function B({ textClassName }) {
+  return <Text className={textClassName} />;
+}
+```
+
 ## Merging styles
 
 NativeWind doesn't require you to merge or provide styles as an array. You can simply append the two classNames strings together
@@ -46,33 +71,6 @@ function MyText({ style }) {
 }
 
 <MyText className={`font-bold`} style={{ color: "black" }} />;
-```
-
-## Passing styles to components
-
-When passing styles between components, they are compiled on the parent and passed as a `style` prop to the child.
-
-```tsx
-function A({ style }) {
-  return <B className={`font-bold`} />;
-}
-
-function B({ style }) {
-  // You need to use style, className is not passed down!
-  return <Text style={style} />;
-}
-```
-
-If you want to pass the className as a string use a different prop.
-
-```tsx
-function A({ style }) {
-  return <B textClassName="font-bold" />;
-}
-
-function B({ textClassName }) {
-  return <Text className={textClassName} />;
-}
 ```
 
 ## Typescript
