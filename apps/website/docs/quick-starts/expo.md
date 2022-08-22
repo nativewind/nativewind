@@ -2,6 +2,12 @@ import StartCoding from "../\_start-coding.md"
 
 # Expo
 
+::: tip
+
+A example of an Expo project can be found on [Github](https://github.com/marklawlor/nativewind/tree/next/examples/expo)
+
+:::
+
 ## 1. Create the project
 
 Create the project with the Expo CLI
@@ -94,8 +100,7 @@ module.exports = async function (env, argv) {
 
   config.module.rules.push({
     test: /\.css$/i,
-    include: path.resolve(__dirname, "src"),
-    use: ["style-loader", "css-loader", "postcss-loader"],
+    use: ["postcss-loader"],
   });
 
   return config;
