@@ -11,7 +11,7 @@
   "dependencies": {
     "expo": "46.0.8",
     "expo-status-bar": "1.4.0",
-    "nativewind": "2.0.0-next.62",
+    "nativewind": "2.0.0-next.64",
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "react-native": "0.69.4"

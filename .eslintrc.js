@@ -55,6 +55,12 @@ module.exports = {
       },
     },
     {
+      files: ["examples/**/*.tsx"],
+      rules: {
+        "unicorn/filename-case": "off",
+      },
+    },
+    {
       files: ["packages/website/*.js"],
       rules: {
         "unicorn/prefer-module": "off",
