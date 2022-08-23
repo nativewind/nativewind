@@ -25,7 +25,7 @@ export function outputWriter(filename: string, values: ExtractedValues): void {
       objectPattern([
         objectProperty(
           identifier("NativeWindStyleSheet"),
-          identifier("NativeWindStyleSheet")
+          identifier("_NativeWindStyleSheet")
         ),
       ]),
       callExpression(identifier("require"), [stringLiteral("nativewind")])
