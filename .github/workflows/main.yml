@@ -3,6 +3,7 @@ name: Next
 on:
   push:
     branches:
+      - main
       - next
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -33,12 +34,16 @@ jobs:
       - name: Copy readme
         run: cp README.md packages/nativewind/
 
+      - name: Exit changeset pre-release
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: npx changeset pre exit
+        continue-on-error: true
+
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
           publish: npx changeset publish
-          createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
