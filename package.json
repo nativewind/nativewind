@@ -9,7 +9,8 @@
     "benchmarks": "npm run test --workspace=benchmarks",
     "build": "npm run build --workspace=nativewind",
     "example": "npm start --workspace=example --",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i"
   },
   "devDependencies": {
     "@changesets/cli": "2.24.3",

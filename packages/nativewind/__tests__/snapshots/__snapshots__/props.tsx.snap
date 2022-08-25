@@ -3,11 +3,11 @@
 exports[`Styled can add new classNames 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "flexDirection": "row",
       },
-      Object {
+      {
         "paddingBottom": 16,
         "paddingLeft": 16,
         "paddingRight": 16,
@@ -19,11 +19,11 @@ exports[`Styled can add new classNames 1`] = `
 `;
 
 exports[`Styled can render components 1`] = `
-Array [
+[
   <View
     style={
-      Array [
-        Object {
+      [
+        {
           "marginBottom": 4,
           "marginLeft": 4,
           "marginRight": 4,
@@ -34,8 +34,8 @@ Array [
   />,
   <View
     style={
-      Array [
-        Object {
+      [
+        {
           "paddingBottom": 8,
           "paddingLeft": 8,
           "paddingRight": 8,
@@ -51,8 +51,8 @@ exports[`Styled can render with default props 1`] = `
 <Text
   accessibilityRole="header"
   style={
-    Array [
-      Object {
+    [
+      {
         "paddingBottom": 16,
         "paddingLeft": 16,
         "paddingRight": 16,
@@ -66,8 +66,8 @@ exports[`Styled can render with default props 1`] = `
 exports[`Styled can set base classNames 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "flexDirection": "row",
       },
     ]
@@ -76,11 +76,11 @@ exports[`Styled can set base classNames 1`] = `
 `;
 
 exports[`Styled can style custom props 1`] = `
-Array [
+[
   <View
     style={
-      Array [
-        Object {
+      [
+        {
           "marginBottom": 4,
           "marginLeft": 4,
           "marginRight": 4,
@@ -91,8 +91,8 @@ Array [
   />,
   <View
     style={
-      Array [
-        Object {
+      [
+        {
           "paddingBottom": 8,
           "paddingLeft": 8,
           "paddingRight": 8,
@@ -107,8 +107,8 @@ Array [
 exports[`Styled classProps on css 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "$$css": true,
         "p-4 m-1": "p-4 m-1",
       },
@@ -124,8 +124,8 @@ exports[`Styled classProps on native 1`] = `
   marginRight={4}
   marginTop={4}
   style={
-    Array [
-      Object {
+    [
+      {
         "paddingBottom": 16,
         "paddingLeft": 16,
         "paddingRight": 16,
@@ -140,8 +140,8 @@ exports[`Styled skip null in child styles 1`] = `
 <View>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 8,
         },
       ]
@@ -151,8 +151,8 @@ exports[`Styled skip null in child styles 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 8,
         },
       ]

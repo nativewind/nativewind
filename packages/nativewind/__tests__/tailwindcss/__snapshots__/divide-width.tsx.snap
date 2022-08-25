@@ -7,8 +7,8 @@ exports[`Border - Divide Width divide-x 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderLeftWidth": 0.5,
           "borderRightWidth": 0,
         },
@@ -27,8 +27,8 @@ exports[`Border - Divide Width divide-x-0 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderLeftWidth": 0,
           "borderRightWidth": 0,
         },
@@ -47,8 +47,8 @@ exports[`Border - Divide Width divide-x-2 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderLeftWidth": 2,
           "borderRightWidth": 0,
         },
@@ -67,8 +67,8 @@ exports[`Border - Divide Width divide-x-4 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderLeftWidth": 4,
           "borderRightWidth": 0,
         },
@@ -87,8 +87,8 @@ exports[`Border - Divide Width divide-x-8 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderLeftWidth": 8,
           "borderRightWidth": 0,
         },
@@ -107,8 +107,8 @@ exports[`Border - Divide Width divide-y 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomWidth": 0,
           "borderTopWidth": 0.5,
         },
@@ -127,8 +127,8 @@ exports[`Border - Divide Width divide-y-0 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomWidth": 0,
           "borderTopWidth": 0,
         },
@@ -147,8 +147,8 @@ exports[`Border - Divide Width divide-y-2 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomWidth": 0,
           "borderTopWidth": 2,
         },
@@ -167,8 +167,8 @@ exports[`Border - Divide Width divide-y-4 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomWidth": 0,
           "borderTopWidth": 4,
         },
@@ -187,8 +187,8 @@ exports[`Border - Divide Width divide-y-8 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomWidth": 0,
           "borderTopWidth": 8,
         },

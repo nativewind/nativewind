@@ -6,12 +6,12 @@ exports[`Svg - Stroke stroke-amber-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -24,13 +24,13 @@ exports[`Svg - Stroke stroke-amber-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294966251,
         }
@@ -46,12 +46,12 @@ exports[`Svg - Stroke stroke-black 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -64,13 +64,13 @@ exports[`Svg - Stroke stroke-black 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4278190080,
         }
@@ -86,12 +86,12 @@ exports[`Svg - Stroke stroke-blue-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -104,13 +104,13 @@ exports[`Svg - Stroke stroke-blue-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4293916415,
         }
@@ -126,12 +126,12 @@ exports[`Svg - Stroke stroke-cyan-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -144,13 +144,13 @@ exports[`Svg - Stroke stroke-cyan-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4293721855,
         }
@@ -166,12 +166,12 @@ exports[`Svg - Stroke stroke-emerald-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -184,13 +184,13 @@ exports[`Svg - Stroke stroke-emerald-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4293721589,
         }
@@ -206,12 +206,12 @@ exports[`Svg - Stroke stroke-fuchsia-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -224,13 +224,13 @@ exports[`Svg - Stroke stroke-fuchsia-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294833407,
         }
@@ -246,12 +246,12 @@ exports[`Svg - Stroke stroke-gray-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -264,13 +264,13 @@ exports[`Svg - Stroke stroke-gray-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294572795,
         }
@@ -286,12 +286,12 @@ exports[`Svg - Stroke stroke-green-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -304,13 +304,13 @@ exports[`Svg - Stroke stroke-green-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4293983732,
         }
@@ -326,12 +326,12 @@ exports[`Svg - Stroke stroke-indigo-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -344,13 +344,13 @@ exports[`Svg - Stroke stroke-indigo-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4293849855,
         }
@@ -366,12 +366,12 @@ exports[`Svg - Stroke stroke-lime-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -384,13 +384,13 @@ exports[`Svg - Stroke stroke-lime-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294442727,
         }
@@ -406,12 +406,12 @@ exports[`Svg - Stroke stroke-neutral-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -424,13 +424,13 @@ exports[`Svg - Stroke stroke-neutral-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294638330,
         }
@@ -446,12 +446,12 @@ exports[`Svg - Stroke stroke-orange-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -464,13 +464,13 @@ exports[`Svg - Stroke stroke-orange-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294965229,
         }
@@ -486,12 +486,12 @@ exports[`Svg - Stroke stroke-pink-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -504,13 +504,13 @@ exports[`Svg - Stroke stroke-pink-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294832888,
         }
@@ -526,12 +526,12 @@ exports[`Svg - Stroke stroke-purple-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -544,13 +544,13 @@ exports[`Svg - Stroke stroke-purple-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294637055,
         }
@@ -566,12 +566,12 @@ exports[`Svg - Stroke stroke-red-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -584,13 +584,13 @@ exports[`Svg - Stroke stroke-red-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294898418,
         }
@@ -606,12 +606,12 @@ exports[`Svg - Stroke stroke-rose-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -624,13 +624,13 @@ exports[`Svg - Stroke stroke-rose-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294963698,
         }
@@ -646,12 +646,12 @@ exports[`Svg - Stroke stroke-sky-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -664,13 +664,13 @@ exports[`Svg - Stroke stroke-sky-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4293982719,
         }
@@ -686,12 +686,12 @@ exports[`Svg - Stroke stroke-slate-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -704,13 +704,13 @@ exports[`Svg - Stroke stroke-slate-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294507260,
         }
@@ -726,12 +726,12 @@ exports[`Svg - Stroke stroke-stone-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -744,13 +744,13 @@ exports[`Svg - Stroke stroke-stone-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294638329,
         }
@@ -766,12 +766,12 @@ exports[`Svg - Stroke stroke-teal-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -784,13 +784,13 @@ exports[`Svg - Stroke stroke-teal-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4293983738,
         }
@@ -806,12 +806,12 @@ exports[`Svg - Stroke stroke-transparent 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -824,13 +824,13 @@ exports[`Svg - Stroke stroke-transparent 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 0,
         }
@@ -846,12 +846,12 @@ exports[`Svg - Stroke stroke-violet-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -864,13 +864,13 @@ exports[`Svg - Stroke stroke-violet-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294308863,
         }
@@ -886,12 +886,12 @@ exports[`Svg - Stroke stroke-white 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -904,13 +904,13 @@ exports[`Svg - Stroke stroke-white 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294967295,
         }
@@ -926,12 +926,12 @@ exports[`Svg - Stroke stroke-yellow-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -944,13 +944,13 @@ exports[`Svg - Stroke stroke-yellow-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294900968,
         }
@@ -966,12 +966,12 @@ exports[`Svg - Stroke stroke-zinc-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -984,13 +984,13 @@ exports[`Svg - Stroke stroke-zinc-50 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294638330,
         }
@@ -1006,12 +1006,12 @@ exports[`Svg - Stroke works with stroke width 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -1024,14 +1024,14 @@ exports[`Svg - Stroke works with stroke width 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "stroke",
           "strokeWidth",
         ]
       }
       r="0"
       stroke={
-        Object {
+        {
           "type": 0,
           "value": 4294967295,
         }

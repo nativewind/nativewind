@@ -4,8 +4,8 @@ exports[`Custom - Parent Variant Snapshots parent:text-white 1`] = `
 <View>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "color": "#fff",
         },
       ]
@@ -15,8 +15,8 @@ exports[`Custom - Parent Variant Snapshots parent:text-white 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "color": "#fff",
         },
       ]

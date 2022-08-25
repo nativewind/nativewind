@@ -4,19 +4,19 @@ exports[`transforms transforms 1`] = `
 <View>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "fontWeight": "700",
         },
-        Object {
-          "transform": Array [
-            Object {
+        {
+          "transform": [
+            {
               "rotate": "45deg",
             },
-            Object {
+            {
               "translateY": 0,
             },
-            Object {
+            {
               "translateX": 1,
             },
           ],
