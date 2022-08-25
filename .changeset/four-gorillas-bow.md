@@ -1,5 +1,0 @@
----
-"nativewind": patch
----
-
-updated readme
