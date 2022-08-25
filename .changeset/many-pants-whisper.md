@@ -1,5 +1,0 @@
----
-"nativewind": major
----
-
-test release
