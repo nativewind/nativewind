@@ -4,8 +4,8 @@ exports[`Device functions theme functions 1`] = `
 <View>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "fontSize": 1,
         },
       ]
@@ -20,11 +20,11 @@ exports[`Device functions withPlatformTheme 1`] = `
 <View>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "fontSize": 16,
         },
-        Object {
+        {
           "fontSize": 30,
         },
       ]

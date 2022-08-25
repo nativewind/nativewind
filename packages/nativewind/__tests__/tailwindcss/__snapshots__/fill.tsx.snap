@@ -6,12 +6,12 @@ exports[`Svg - Fill fill-amber-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -24,13 +24,13 @@ exports[`Svg - Fill fill-amber-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294966251,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -46,12 +46,12 @@ exports[`Svg - Fill fill-black 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -64,13 +64,13 @@ exports[`Svg - Fill fill-black 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4278190080,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -86,12 +86,12 @@ exports[`Svg - Fill fill-blue-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -104,13 +104,13 @@ exports[`Svg - Fill fill-blue-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4293916415,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -126,12 +126,12 @@ exports[`Svg - Fill fill-cyan-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -144,13 +144,13 @@ exports[`Svg - Fill fill-cyan-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4293721855,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -166,12 +166,12 @@ exports[`Svg - Fill fill-emerald-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -184,13 +184,13 @@ exports[`Svg - Fill fill-emerald-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4293721589,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -206,12 +206,12 @@ exports[`Svg - Fill fill-fuchsia-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -224,13 +224,13 @@ exports[`Svg - Fill fill-fuchsia-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294833407,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -246,12 +246,12 @@ exports[`Svg - Fill fill-gray-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -264,13 +264,13 @@ exports[`Svg - Fill fill-gray-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294572795,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -286,12 +286,12 @@ exports[`Svg - Fill fill-green-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -304,13 +304,13 @@ exports[`Svg - Fill fill-green-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4293983732,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -326,12 +326,12 @@ exports[`Svg - Fill fill-indigo-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -344,13 +344,13 @@ exports[`Svg - Fill fill-indigo-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4293849855,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -366,12 +366,12 @@ exports[`Svg - Fill fill-lime-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -384,13 +384,13 @@ exports[`Svg - Fill fill-lime-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294442727,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -406,12 +406,12 @@ exports[`Svg - Fill fill-neutral-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -424,13 +424,13 @@ exports[`Svg - Fill fill-neutral-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294638330,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -446,12 +446,12 @@ exports[`Svg - Fill fill-orange-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -464,13 +464,13 @@ exports[`Svg - Fill fill-orange-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294965229,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -486,12 +486,12 @@ exports[`Svg - Fill fill-pink-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -504,13 +504,13 @@ exports[`Svg - Fill fill-pink-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294832888,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -526,12 +526,12 @@ exports[`Svg - Fill fill-purple-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -544,13 +544,13 @@ exports[`Svg - Fill fill-purple-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294637055,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -566,12 +566,12 @@ exports[`Svg - Fill fill-red-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -584,13 +584,13 @@ exports[`Svg - Fill fill-red-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294898418,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -606,12 +606,12 @@ exports[`Svg - Fill fill-rose-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -624,13 +624,13 @@ exports[`Svg - Fill fill-rose-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294963698,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -646,12 +646,12 @@ exports[`Svg - Fill fill-sky-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -664,13 +664,13 @@ exports[`Svg - Fill fill-sky-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4293982719,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -686,12 +686,12 @@ exports[`Svg - Fill fill-slate-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -704,13 +704,13 @@ exports[`Svg - Fill fill-slate-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294507260,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -726,12 +726,12 @@ exports[`Svg - Fill fill-stone-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -744,13 +744,13 @@ exports[`Svg - Fill fill-stone-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294638329,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -766,12 +766,12 @@ exports[`Svg - Fill fill-teal-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -784,13 +784,13 @@ exports[`Svg - Fill fill-teal-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4293983738,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -806,12 +806,12 @@ exports[`Svg - Fill fill-transparent 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -824,13 +824,13 @@ exports[`Svg - Fill fill-transparent 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 0,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -846,12 +846,12 @@ exports[`Svg - Fill fill-violet-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -864,13 +864,13 @@ exports[`Svg - Fill fill-violet-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294308863,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -886,12 +886,12 @@ exports[`Svg - Fill fill-white 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -904,13 +904,13 @@ exports[`Svg - Fill fill-white 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294967295,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -926,12 +926,12 @@ exports[`Svg - Fill fill-yellow-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -944,13 +944,13 @@ exports[`Svg - Fill fill-yellow-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294900968,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }
@@ -966,12 +966,12 @@ exports[`Svg - Fill fill-zinc-50 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -984,13 +984,13 @@ exports[`Svg - Fill fill-zinc-50 1`] = `
       cx="0"
       cy="0"
       fill={
-        Object {
+        {
           "type": 0,
           "value": 4294638330,
         }
       }
       propList={
-        Array [
+        [
           "fill",
         ]
       }

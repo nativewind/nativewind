@@ -3,8 +3,8 @@
 exports[`Flexbox & Grid - Gap gap-0 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginLeft": -0,
         "marginTop": -0,
       },
@@ -13,8 +13,8 @@ exports[`Flexbox & Grid - Gap gap-0 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 0,
           "marginTop": 0,
         },
@@ -25,8 +25,8 @@ exports[`Flexbox & Grid - Gap gap-0 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 0,
           "marginTop": 0,
         },
@@ -41,8 +41,8 @@ exports[`Flexbox & Grid - Gap gap-0 1`] = `
 exports[`Flexbox & Grid - Gap gap-0.5 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginLeft": -2,
         "marginTop": -2,
       },
@@ -51,8 +51,8 @@ exports[`Flexbox & Grid - Gap gap-0.5 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 2,
           "marginTop": 2,
         },
@@ -63,8 +63,8 @@ exports[`Flexbox & Grid - Gap gap-0.5 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 2,
           "marginTop": 2,
         },
@@ -79,8 +79,8 @@ exports[`Flexbox & Grid - Gap gap-0.5 1`] = `
 exports[`Flexbox & Grid - Gap gap-1 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginLeft": -4,
         "marginTop": -4,
       },
@@ -89,8 +89,8 @@ exports[`Flexbox & Grid - Gap gap-1 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 4,
           "marginTop": 4,
         },
@@ -101,8 +101,8 @@ exports[`Flexbox & Grid - Gap gap-1 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 4,
           "marginTop": 4,
         },
@@ -117,8 +117,8 @@ exports[`Flexbox & Grid - Gap gap-1 1`] = `
 exports[`Flexbox & Grid - Gap gap-px 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginLeft": -1,
         "marginTop": -1,
       },
@@ -127,8 +127,8 @@ exports[`Flexbox & Grid - Gap gap-px 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 1,
           "marginTop": 1,
         },
@@ -139,8 +139,8 @@ exports[`Flexbox & Grid - Gap gap-px 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 1,
           "marginTop": 1,
         },
@@ -155,8 +155,8 @@ exports[`Flexbox & Grid - Gap gap-px 1`] = `
 exports[`Flexbox & Grid - Gap gap-x-0 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginLeft": -0,
       },
     ]
@@ -164,8 +164,8 @@ exports[`Flexbox & Grid - Gap gap-x-0 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 0,
         },
       ]
@@ -175,8 +175,8 @@ exports[`Flexbox & Grid - Gap gap-x-0 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 0,
         },
       ]
@@ -190,8 +190,8 @@ exports[`Flexbox & Grid - Gap gap-x-0 1`] = `
 exports[`Flexbox & Grid - Gap gap-x-0.5 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginLeft": -2,
       },
     ]
@@ -199,8 +199,8 @@ exports[`Flexbox & Grid - Gap gap-x-0.5 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 2,
         },
       ]
@@ -210,8 +210,8 @@ exports[`Flexbox & Grid - Gap gap-x-0.5 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 2,
         },
       ]
@@ -225,8 +225,8 @@ exports[`Flexbox & Grid - Gap gap-x-0.5 1`] = `
 exports[`Flexbox & Grid - Gap gap-x-1 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginLeft": -4,
       },
     ]
@@ -234,8 +234,8 @@ exports[`Flexbox & Grid - Gap gap-x-1 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 4,
         },
       ]
@@ -245,8 +245,8 @@ exports[`Flexbox & Grid - Gap gap-x-1 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 4,
         },
       ]
@@ -260,8 +260,8 @@ exports[`Flexbox & Grid - Gap gap-x-1 1`] = `
 exports[`Flexbox & Grid - Gap gap-x-px 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginLeft": -1,
       },
     ]
@@ -269,8 +269,8 @@ exports[`Flexbox & Grid - Gap gap-x-px 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 1,
         },
       ]
@@ -280,8 +280,8 @@ exports[`Flexbox & Grid - Gap gap-x-px 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 1,
         },
       ]
@@ -295,8 +295,8 @@ exports[`Flexbox & Grid - Gap gap-x-px 1`] = `
 exports[`Flexbox & Grid - Gap gap-y-0 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginTop": -0,
       },
     ]
@@ -304,8 +304,8 @@ exports[`Flexbox & Grid - Gap gap-y-0 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 0,
         },
       ]
@@ -315,8 +315,8 @@ exports[`Flexbox & Grid - Gap gap-y-0 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 0,
         },
       ]
@@ -330,8 +330,8 @@ exports[`Flexbox & Grid - Gap gap-y-0 1`] = `
 exports[`Flexbox & Grid - Gap gap-y-0.5 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginTop": -2,
       },
     ]
@@ -339,8 +339,8 @@ exports[`Flexbox & Grid - Gap gap-y-0.5 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 2,
         },
       ]
@@ -350,8 +350,8 @@ exports[`Flexbox & Grid - Gap gap-y-0.5 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 2,
         },
       ]
@@ -365,8 +365,8 @@ exports[`Flexbox & Grid - Gap gap-y-0.5 1`] = `
 exports[`Flexbox & Grid - Gap gap-y-1 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginTop": -4,
       },
     ]
@@ -374,8 +374,8 @@ exports[`Flexbox & Grid - Gap gap-y-1 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 4,
         },
       ]
@@ -385,8 +385,8 @@ exports[`Flexbox & Grid - Gap gap-y-1 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 4,
         },
       ]
@@ -400,8 +400,8 @@ exports[`Flexbox & Grid - Gap gap-y-1 1`] = `
 exports[`Flexbox & Grid - Gap gap-y-px 1`] = `
 <View
   style={
-    Array [
-      Object {
+    [
+      {
         "marginTop": -1,
       },
     ]
@@ -409,8 +409,8 @@ exports[`Flexbox & Grid - Gap gap-y-px 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 1,
         },
       ]
@@ -420,8 +420,8 @@ exports[`Flexbox & Grid - Gap gap-y-px 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 1,
         },
       ]

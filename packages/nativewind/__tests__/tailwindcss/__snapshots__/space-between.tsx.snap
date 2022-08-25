@@ -7,8 +7,8 @@ exports[`Layout - Space between space-x-0 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 0,
         },
       ]
@@ -26,8 +26,8 @@ exports[`Layout - Space between space-x-0.5 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 2,
         },
       ]
@@ -45,8 +45,8 @@ exports[`Layout - Space between space-x-1 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 4,
         },
       ]
@@ -64,8 +64,8 @@ exports[`Layout - Space between space-x-1.5 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 6,
         },
       ]
@@ -83,8 +83,8 @@ exports[`Layout - Space between space-x-96 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 384,
         },
       ]
@@ -102,8 +102,8 @@ exports[`Layout - Space between space-x-px 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginLeft": 1,
         },
       ]
@@ -121,8 +121,8 @@ exports[`Layout - Space between space-y-0 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 0,
         },
       ]
@@ -140,8 +140,8 @@ exports[`Layout - Space between space-y-0.5 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 2,
         },
       ]
@@ -159,8 +159,8 @@ exports[`Layout - Space between space-y-1 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 4,
         },
       ]
@@ -178,8 +178,8 @@ exports[`Layout - Space between space-y-1.5 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 6,
         },
       ]
@@ -197,8 +197,8 @@ exports[`Layout - Space between space-y-96 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 384,
         },
       ]
@@ -216,8 +216,8 @@ exports[`Layout - Space between space-y-px 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "marginTop": 1,
         },
       ]

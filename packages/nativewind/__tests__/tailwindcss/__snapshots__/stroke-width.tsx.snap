@@ -6,12 +6,12 @@ exports[`Svg - Stroke Width stroke-0 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -24,7 +24,7 @@ exports[`Svg - Stroke Width stroke-0 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "strokeWidth",
         ]
       }
@@ -41,12 +41,12 @@ exports[`Svg - Stroke Width stroke-1 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -59,7 +59,7 @@ exports[`Svg - Stroke Width stroke-1 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "strokeWidth",
         ]
       }
@@ -76,12 +76,12 @@ exports[`Svg - Stroke Width stroke-2 1`] = `
   bbWidth="100%"
   focusable={false}
   style={
-    Array [
-      Object {
+    [
+      {
         "backgroundColor": "transparent",
         "borderWidth": 0,
       },
-      Object {
+      {
         "flex": 0,
         "height": "100%",
         "width": "100%",
@@ -94,7 +94,7 @@ exports[`Svg - Stroke Width stroke-2 1`] = `
       cx="0"
       cy="0"
       propList={
-        Array [
+        [
           "strokeWidth",
         ]
       }

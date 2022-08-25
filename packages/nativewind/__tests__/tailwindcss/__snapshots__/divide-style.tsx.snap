@@ -7,8 +7,8 @@ exports[`Border - Divide Style divide-dashed 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderStyle": "dashed",
         },
       ]
@@ -26,8 +26,8 @@ exports[`Border - Divide Style divide-dotted 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderStyle": "dotted",
         },
       ]
@@ -45,8 +45,8 @@ exports[`Border - Divide Style divide-solid 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderStyle": "solid",
         },
       ]

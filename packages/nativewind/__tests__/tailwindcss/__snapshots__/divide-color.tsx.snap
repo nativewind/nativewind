@@ -7,8 +7,8 @@ exports[`Border - Divide Color divide-amber-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fffbeb",
           "borderLeftColor": "#fffbeb",
           "borderRightColor": "#fffbeb",
@@ -29,8 +29,8 @@ exports[`Border - Divide Color divide-black 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#000",
           "borderLeftColor": "#000",
           "borderRightColor": "#000",
@@ -51,8 +51,8 @@ exports[`Border - Divide Color divide-blue-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#eff6ff",
           "borderLeftColor": "#eff6ff",
           "borderRightColor": "#eff6ff",
@@ -73,8 +73,8 @@ exports[`Border - Divide Color divide-cyan-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#ecfeff",
           "borderLeftColor": "#ecfeff",
           "borderRightColor": "#ecfeff",
@@ -95,8 +95,8 @@ exports[`Border - Divide Color divide-emerald-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#ecfdf5",
           "borderLeftColor": "#ecfdf5",
           "borderRightColor": "#ecfdf5",
@@ -117,8 +117,8 @@ exports[`Border - Divide Color divide-fuchsia-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fdf4ff",
           "borderLeftColor": "#fdf4ff",
           "borderRightColor": "#fdf4ff",
@@ -139,8 +139,8 @@ exports[`Border - Divide Color divide-gray-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#f9fafb",
           "borderLeftColor": "#f9fafb",
           "borderRightColor": "#f9fafb",
@@ -161,8 +161,8 @@ exports[`Border - Divide Color divide-green-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#f0fdf4",
           "borderLeftColor": "#f0fdf4",
           "borderRightColor": "#f0fdf4",
@@ -183,8 +183,8 @@ exports[`Border - Divide Color divide-indigo-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#eef2ff",
           "borderLeftColor": "#eef2ff",
           "borderRightColor": "#eef2ff",
@@ -205,8 +205,8 @@ exports[`Border - Divide Color divide-lime-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#f7fee7",
           "borderLeftColor": "#f7fee7",
           "borderRightColor": "#f7fee7",
@@ -227,8 +227,8 @@ exports[`Border - Divide Color divide-neutral-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fafafa",
           "borderLeftColor": "#fafafa",
           "borderRightColor": "#fafafa",
@@ -249,8 +249,8 @@ exports[`Border - Divide Color divide-orange-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fff7ed",
           "borderLeftColor": "#fff7ed",
           "borderRightColor": "#fff7ed",
@@ -271,8 +271,8 @@ exports[`Border - Divide Color divide-pink-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fdf2f8",
           "borderLeftColor": "#fdf2f8",
           "borderRightColor": "#fdf2f8",
@@ -293,8 +293,8 @@ exports[`Border - Divide Color divide-purple-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#faf5ff",
           "borderLeftColor": "#faf5ff",
           "borderRightColor": "#faf5ff",
@@ -315,8 +315,8 @@ exports[`Border - Divide Color divide-red-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fef2f2",
           "borderLeftColor": "#fef2f2",
           "borderRightColor": "#fef2f2",
@@ -337,8 +337,8 @@ exports[`Border - Divide Color divide-rose-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fff1f2",
           "borderLeftColor": "#fff1f2",
           "borderRightColor": "#fff1f2",
@@ -359,8 +359,8 @@ exports[`Border - Divide Color divide-sky-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#f0f9ff",
           "borderLeftColor": "#f0f9ff",
           "borderRightColor": "#f0f9ff",
@@ -381,8 +381,8 @@ exports[`Border - Divide Color divide-slate-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#f8fafc",
           "borderLeftColor": "#f8fafc",
           "borderRightColor": "#f8fafc",
@@ -403,8 +403,8 @@ exports[`Border - Divide Color divide-stone-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fafaf9",
           "borderLeftColor": "#fafaf9",
           "borderRightColor": "#fafaf9",
@@ -425,8 +425,8 @@ exports[`Border - Divide Color divide-teal-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#f0fdfa",
           "borderLeftColor": "#f0fdfa",
           "borderRightColor": "#f0fdfa",
@@ -447,8 +447,8 @@ exports[`Border - Divide Color divide-transparent 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "transparent",
           "borderLeftColor": "transparent",
           "borderRightColor": "transparent",
@@ -469,8 +469,8 @@ exports[`Border - Divide Color divide-violet-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#f5f3ff",
           "borderLeftColor": "#f5f3ff",
           "borderRightColor": "#f5f3ff",
@@ -491,8 +491,8 @@ exports[`Border - Divide Color divide-white 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fff",
           "borderLeftColor": "#fff",
           "borderRightColor": "#fff",
@@ -513,8 +513,8 @@ exports[`Border - Divide Color divide-yellow-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fefce8",
           "borderLeftColor": "#fefce8",
           "borderRightColor": "#fefce8",
@@ -535,8 +535,8 @@ exports[`Border - Divide Color divide-zinc-50 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
+      [
+        {
           "borderBottomColor": "#fafafa",
           "borderLeftColor": "#fafafa",
           "borderRightColor": "#fafafa",
