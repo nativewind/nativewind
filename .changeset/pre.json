@@ -7,5 +7,7 @@
     "website": "0.0.0",
     "nativewind": "2.0.1"
   },
-  "changesets": []
+  "changesets": [
+    "selfish-flowers-push"
+  ]
 }
