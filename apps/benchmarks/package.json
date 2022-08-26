@@ -20,7 +20,7 @@
     "expo": "46.0.9",
     "jest": "29.0.0",
     "native-base": "3.4.13",
-    "nativewind": "2.0.1",
+    "nativewind": "2.0.2",
     "react": "*",
     "react-dom": "*",
     "react-native": "0.69.5",
