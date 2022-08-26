@@ -5,7 +5,7 @@ exports[`Effects - Box shadow Color works with shadow 1`] = `
   style={
     [
       {
-        "shadowColor": "rgba(0, 0, 0, 1)",
+        "shadowColor": "rgba(0, 0, 0, 0.1)",
         "shadowOffset": {
           "height": 10,
           "width": 0,
