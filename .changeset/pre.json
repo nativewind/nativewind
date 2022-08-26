@@ -1,5 +1,5 @@
 {
-  "mode": "pre",
+  "mode": "exit",
   "tag": "next",
   "initialVersions": {
     "benchmarks": "0.0.0",
