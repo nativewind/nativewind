@@ -18,7 +18,7 @@
     "chartjs-chart-error-bars": "3.9.0",
     "dripsy": "3.6.0",
     "expo": "46.0.9",
-    "jest": "29.0.0",
+    "jest": "29.0.1",
     "native-base": "3.4.13",
     "nativewind": "2.0.4",
     "react": "*",
