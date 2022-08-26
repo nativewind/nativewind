@@ -1,0 +1,5 @@
+{
+  "tailwindConfig": {
+    "content": ["./transforms/code.{js,ts,jsx,tsx}"]
+  }
+}

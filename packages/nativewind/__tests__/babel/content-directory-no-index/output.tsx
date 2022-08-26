@@ -1,7 +1,7 @@
 import { NativeWindStyleSheet as _NativeWindStyleSheet } from "nativewind";
 import { StyledComponent as _StyledComponent } from "nativewind";
 import { Text } from "react-native";
-import { TestComponent } from "./test-directory";
+import { TestComponent } from "./test";
 export function Test() {
   return (
     <>

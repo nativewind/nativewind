@@ -6,12 +6,10 @@ export type AllowPathOptions = "*" | string[];
 export interface TailwindcssReactNativeBabelOptions {
   allowModuleTransform?: AllowPathOptions;
   blockModuleTransform?: string[];
-  platform?: "web" | "native";
   mode?: "compileAndTransform" | "compileOnly" | "transformOnly";
   rem?: number;
   tailwindConfigPath?: string;
   tailwindConfig?: Config | undefined;
-  rawContent?: string;
 }
 
 export type State = {

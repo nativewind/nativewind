@@ -1,5 +1,5 @@
 import { Text } from "react-native";
-import { TestComponent } from "./test-directory";
+import { TestComponent } from "./test";
 export function Test() {
   return (
     <>

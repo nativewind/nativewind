@@ -2,6 +2,10 @@
 
 Previously this project was called `tailwindcss-react-native`. If you are migrating from this project these are the breaking changes
 
+## tailwind.config.js is required
+
+NativeWind aligns with TailwindCSS and requires you have a `tailwind.config.js` file with a `content` glob.
+
 ## TailwindProvider has been removed
 
 `tailwindcss-react-native` used React context to push updates to components. Unfortunately this approach does not scale, as every styled component needed to revaluate when the context changed. NativeWind replaces the `TailwindProvider` and `useContext` with `NativeWindStyleSheet` and `useSyncExternalStore`, providing greater control over which components should re-render.

@@ -1,4 +1,12 @@
-import { resolve } from "node:path";
+import { resolve, sep, posix } from "node:path";
+
+import micromatch from "micromatch";
+
+import type { Config } from "tailwindcss";
+import resolveConfigPath from "tailwindcss/lib/util/resolveConfigPath";
+import resolveConfig from "tailwindcss/resolveConfig";
+import { validateConfig } from "tailwindcss/lib/util/validateConfig";
+
 import { expressionStatement, Program } from "@babel/types";
 import { NodePath } from "@babel/traverse";
 import { addNamed } from "@babel/helper-module-imports";
@@ -6,52 +14,69 @@ import { addNamed } from "@babel/helper-module-imports";
 import { extractStyles } from "../postcss/extract-styles";
 import { TailwindcssReactNativeBabelOptions, State } from "./types";
 import { visitor, VisitorState } from "./visitor";
-import { getAllowedOptions, isAllowedProgramPath } from "./utils/allowed-paths";
-import { getTailwindConfig } from "./utils/get-tailwind-config";
-import { StyleError } from "../types/common";
-import type { Config } from "tailwindcss";
-import { SafelistConfig } from "tailwindcss/types/config";
+
+import { nativePlugin } from "../tailwind/native";
 
 export default function (
   _: unknown,
   options: TailwindcssReactNativeBabelOptions,
   cwd: string
 ) {
-  const errors: StyleError[] = [];
+  /**
+   * Get the users config
+   */
+  const userConfigPath = resolveConfigPath(
+    options.tailwindConfig || options.tailwindConfigPath
+  );
+
   let tailwindConfig: Config;
 
-  if (options.tailwindConfig) {
-    tailwindConfig = options.tailwindConfig;
-  } else {
-    const tailwindConfigPath = resolve(
-      cwd,
-      options.tailwindConfigPath || "./tailwind.config.js"
-    );
-
-    tailwindConfig = getTailwindConfig(tailwindConfigPath, {
-      ...options,
-      onError(error) {
-        errors.push(error);
-      },
+  if (userConfigPath === null) {
+    tailwindConfig = resolveConfig({
+      ...options.tailwindConfig,
+      plugins: [
+        nativePlugin(options),
+        ...(options?.tailwindConfig?.plugins ?? []),
+      ],
     });
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires,unicorn/prefer-module
+    const userConfig = require(userConfigPath);
+    const newConfig = resolveConfig({
+      ...userConfig,
+      plugins: [nativePlugin(options), ...(userConfig?.plugins ?? [])],
+    });
+
+    tailwindConfig = validateConfig(newConfig);
   }
 
-  const { allowModuleTransform, allowRelativeModules } = getAllowedOptions(
-    tailwindConfig,
-    options
-  );
+  /**
+   * Resolve their content paths
+   */
+  const contentFilePaths = (
+    Array.isArray(tailwindConfig.content)
+      ? tailwindConfig.content.filter(
+          (filePath): filePath is string => typeof filePath === "string"
+        )
+      : tailwindConfig.content.files.filter(
+          (filePath): filePath is string => typeof filePath === "string"
+        )
+  ).map((contentFilePath) => normalizePath(resolve(cwd, contentFilePath)));
+
+  const allowModuleTransform = Array.isArray(options.allowModuleTransform)
+    ? ["react-native", "react-native-web", ...options.allowModuleTransform]
+    : "*";
 
   return {
     visitor: {
       Program: {
-        enter(path: NodePath<Program>, state: State) {
-          if (
-            !isAllowedProgramPath({
-              path: state.filename,
-              allowRelativeModules,
-              cwd,
-            })
-          ) {
+        enter(nodePath: NodePath<Program>, state: State) {
+          const isInContent = micromatch.isMatch(
+            normalizePath(state.filename),
+            contentFilePaths
+          );
+
+          if (!isInContent) {
             return;
           }
 
@@ -72,7 +97,6 @@ export default function (
           const visitorState: VisitorState = {
             cwd,
             rem: 16,
-            platform: "native",
             mode: "compileAndTransform",
             didTransform: false,
             blockModuleTransform: [],
@@ -81,47 +105,48 @@ export default function (
             ...state,
             ...state.opts,
             allowModuleTransform,
-            allowRelativeModules,
+            allowRelativeModules: contentFilePaths,
             blockList: new Set(),
             tailwindConfig: tailwindConfig,
           };
 
           // Traverse the file
-          path.traverse(visitor, visitorState);
+          nodePath.traverse(visitor, visitorState);
 
           const { filename, didTransform } = visitorState;
 
-          const bodyNode = path.node.body;
+          const bodyNode = nodePath.node.body;
 
           if (didTransform) {
-            addNamed(path, "StyledComponent", "nativewind");
+            addNamed(nodePath, "StyledComponent", "nativewind");
           }
-
-          const content: Config["content"] = [filename];
-
-          if (options.rawContent) {
-            content.push({ raw: options.rawContent, extension: "html" });
-          }
-
-          const safelist = tailwindConfig.safelist
-            ? [...tailwindConfig.safelist, "babel-empty"]
-            : ["babel-empty"];
 
           const output = extractStyles({
             ...tailwindConfig,
-            content,
+            content: [filename],
             // If the file doesn't have any Tailwind styles, it will print a warning
             // We force an empty style to prevent this
-            safelist: safelist as SafelistConfig,
+            safelist: tailwindConfig.safelist ?? ["babel-empty"],
           });
 
           if (!output.hasStyles) return;
 
           bodyNode.push(expressionStatement(output.stylesheetCreateExpression));
 
-          addNamed(path, "NativeWindStyleSheet", "nativewind");
+          addNamed(nodePath, "NativeWindStyleSheet", "nativewind");
         },
       },
     },
   };
+}
+
+function normalizePath(filePath: string) {
+  /**
+   * This is my naive way to get path matching working on Windows.
+   * Basically I turn it into a posix path which seems to work fine
+   *
+   * If you are a windows user and understand micromatch, can you please send a PR
+   * to do this the proper way
+   */
+  return filePath.split(sep).join(posix.sep);
 }

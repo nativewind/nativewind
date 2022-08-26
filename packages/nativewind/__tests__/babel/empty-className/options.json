@@ -1,0 +1,5 @@
+{
+  "tailwindConfig": {
+    "content": ["./empty-className/code.{js,ts,jsx,tsx}"]
+  }
+}

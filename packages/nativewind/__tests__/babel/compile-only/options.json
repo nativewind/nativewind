@@ -1,3 +1,6 @@
 {
-  "mode": "compileOnly"
+  "mode": "compileOnly",
+  "tailwindConfig": {
+    "content": ["./compile-only/code.{js,ts,jsx,tsx}"]
+  }
 }

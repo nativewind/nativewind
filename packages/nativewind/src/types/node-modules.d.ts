@@ -28,6 +28,14 @@ declare module "tailwindcss/resolveConfig" {
   export default function (options: unknown): any;
 }
 
+declare module "tailwindcss/lib/util/validateConfig" {
+  export function validateConfig(options: unknown): any;
+}
+
+declare module "tailwindcss/lib/util/resolveConfigPath" {
+  export default function (pathOrConfig?: unknown): string | null;
+}
+
 declare module "tailwindcss/lib/util/withAlphaVariable" {
   export default function (options: unknown): any;
 }

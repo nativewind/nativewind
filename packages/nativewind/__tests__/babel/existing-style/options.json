@@ -1,0 +1,5 @@
+{
+  "tailwindConfig": {
+    "content": ["./existing-style/code.{js,ts,jsx,tsx}"]
+  }
+}

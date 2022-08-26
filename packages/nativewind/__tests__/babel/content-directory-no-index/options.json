@@ -1,3 +1,9 @@
 {
-  "tailwindConfigPath": "./content-directory-no-index/tailwind.config.js"
+  "tailwindConfigPath": "./content-directory-no-index/tailwind.config.js",
+  "tailwindConfig": {
+    "content": [
+      "./content-directory-no-index/code.{js,ts,jsx,tsx}",
+      "./content-directory-no-index/test/*.{js,ts,jsx,tsx}"
+    ]
+  }
 }

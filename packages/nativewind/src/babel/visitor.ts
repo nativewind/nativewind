@@ -31,10 +31,7 @@ import {
 
 export interface VisitorState
   extends State,
-    Omit<
-      Required<TailwindcssReactNativeBabelOptions>,
-      "tailwindConfigPath" | "rawContent"
-    > {
+    Omit<Required<TailwindcssReactNativeBabelOptions>, "tailwindConfigPath"> {
   cwd: string;
   allowRelativeModules: AllowPathOptions;
   blockList: Set<string>;

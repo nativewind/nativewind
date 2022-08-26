@@ -9,9 +9,7 @@ export function someAttributes(
   path: NodePath<types.JSXElement>,
   names: string[]
 ) {
-  const openingElement = path.node.openingElement;
-
-  return openingElement.attributes.some((attribute) => {
+  return path.node.openingElement.attributes.some((attribute) => {
     /**
      * I think we should be able to process spread attributes
      * by checking their binding, but I still learning how this works

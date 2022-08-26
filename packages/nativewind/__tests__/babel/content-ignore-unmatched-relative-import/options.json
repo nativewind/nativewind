@@ -1,3 +1,8 @@
 {
-  "tailwindConfigPath": "./content-ignore-unmatched-relative-import/tailwind.config.js"
+  "tailwindConfigPath": "./content-ignore-unmatched-relative-import/tailwind.config.js",
+  "tailwindConfig": {
+    "content": [
+      "./content-ignore-unmatched-relative-import/code.{js,ts,jsx,tsx}"
+    ]
+  }
 }
