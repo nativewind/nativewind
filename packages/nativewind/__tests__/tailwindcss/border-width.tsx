@@ -1,4 +1,3 @@
-import { Style } from "css-to-react-native";
 import { render } from "@testing-library/react-native";
 import { Text, View, ViewStyle } from "react-native";
 import { createTests, tailwindRunner } from "./runner";
@@ -7,6 +6,9 @@ import { StyledComponent } from "../../src";
 
 const scenarios: Record<string, ViewStyle["borderWidth"]> = {
   0: 0,
+  "": 1,
+  "0.5":
+    '__{"name":"hairlineWidth","args":[]}' as unknown as ViewStyle["borderWidth"],
   2: 2,
   4: 4,
   8: 8,
@@ -28,83 +30,6 @@ describe("Border - Border Width", () => {
 
 tailwindRunner(
   "Border - Border Width",
-  [
-    [
-      "border",
-      {
-        styles: {
-          border: {
-            borderBottomWidth: '__{"name":"hairlineWidth","args":[]}',
-            borderTopWidth: '__{"name":"hairlineWidth","args":[]}',
-            borderLeftWidth: '__{"name":"hairlineWidth","args":[]}',
-            borderRightWidth: '__{"name":"hairlineWidth","args":[]}',
-          } as Style,
-        },
-      },
-    ],
-    [
-      "border-x",
-      {
-        styles: {
-          "border-x": {
-            borderLeftWidth: '__{"name":"hairlineWidth","args":[]}',
-            borderRightWidth: '__{"name":"hairlineWidth","args":[]}',
-          } as Style,
-        },
-      },
-    ],
-    [
-      "border-y",
-      {
-        styles: {
-          "border-y": {
-            borderTopWidth: '__{"name":"hairlineWidth","args":[]}',
-            borderBottomWidth: '__{"name":"hairlineWidth","args":[]}',
-          } as Style,
-        },
-      },
-    ],
-    [
-      "border-t",
-      {
-        styles: {
-          "border-t": {
-            borderTopWidth: '__{"name":"hairlineWidth","args":[]}',
-          } as Style,
-        },
-      },
-    ],
-    [
-      "border-b",
-      {
-        styles: {
-          "border-b": {
-            borderBottomWidth: '__{"name":"hairlineWidth","args":[]}',
-          } as Style,
-        },
-      },
-    ],
-    [
-      "border-l",
-      {
-        styles: {
-          "border-l": {
-            borderLeftWidth: '__{"name":"hairlineWidth","args":[]}',
-          } as Style,
-        },
-      },
-    ],
-    [
-      "border-r",
-      {
-        styles: {
-          "border-r": {
-            borderRightWidth: '__{"name":"hairlineWidth","args":[]}',
-          } as Style,
-        },
-      },
-    ],
-  ],
   createTests("border", scenarios, (n) => ({
     borderBottomWidth: n,
     borderRightWidth: n,

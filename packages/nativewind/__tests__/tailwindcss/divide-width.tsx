@@ -3,7 +3,7 @@ import { render } from "@testing-library/react-native";
 import { TestProvider } from "./runner";
 import { StyledComponent } from "../../src";
 
-const cases: Array<ViewStyle["borderWidth"][]> = [[0], [2], [4], [8]];
+const cases: Array<ViewStyle["borderWidth"][]> = [[0], [0.5], [2], [4], [8]];
 
 describe("Border - Divide Width", () => {
   test("divide-x", () => {

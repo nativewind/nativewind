@@ -5,10 +5,10 @@ exports[`Border - Border Width divide-x 1`] = `
   style={
     [
       {
-        "borderBottomWidth": 0.5,
-        "borderLeftWidth": 0.5,
-        "borderRightWidth": 0.5,
-        "borderTopWidth": 0.5,
+        "borderBottomWidth": 1,
+        "borderLeftWidth": 1,
+        "borderRightWidth": 1,
+        "borderTopWidth": 1,
       },
     ]
   }

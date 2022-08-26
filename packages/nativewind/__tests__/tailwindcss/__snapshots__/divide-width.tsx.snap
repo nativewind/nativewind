@@ -9,7 +9,7 @@ exports[`Border - Divide Width divide-x 1`] = `
     style={
       [
         {
-          "borderLeftWidth": 0.5,
+          "borderLeftWidth": 1,
           "borderRightWidth": 0,
         },
       ]
@@ -30,6 +30,26 @@ exports[`Border - Divide Width divide-x-0 1`] = `
       [
         {
           "borderLeftWidth": 0,
+          "borderRightWidth": 0,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Width divide-x-0.5 1`] = `
+<View>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      [
+        {
+          "borderLeftWidth": 0.5,
           "borderRightWidth": 0,
         },
       ]
@@ -110,7 +130,7 @@ exports[`Border - Divide Width divide-y 1`] = `
       [
         {
           "borderBottomWidth": 0,
-          "borderTopWidth": 0.5,
+          "borderTopWidth": 1,
         },
       ]
     }
@@ -131,6 +151,26 @@ exports[`Border - Divide Width divide-y-0 1`] = `
         {
           "borderBottomWidth": 0,
           "borderTopWidth": 0,
+        },
+      ]
+    }
+  >
+    B
+  </Text>
+</View>
+`;
+
+exports[`Border - Divide Width divide-y-0.5 1`] = `
+<View>
+  <Text>
+    A
+  </Text>
+  <Text
+    style={
+      [
+        {
+          "borderBottomWidth": 0,
+          "borderTopWidth": 0.5,
         },
       ]
     }
