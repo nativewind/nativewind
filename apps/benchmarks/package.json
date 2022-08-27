@@ -15,7 +15,7 @@
   "dependencies": {
     "@tamagui/babel-plugin": "1.0.1-beta.153",
     "chart.js": "3.9.1",
-    "chartjs-chart-error-bars": "3.9.0",
+    "chartjs-chart-error-bars": "3.9.1",
     "dripsy": "3.6.0",
     "expo": "46.0.9",
     "jest": "29.0.1",
