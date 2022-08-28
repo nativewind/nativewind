@@ -51,15 +51,6 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      announcementBar: {
-        id: "prerelease",
-        content:
-          "NativeWind is in pre-release. Documentation is a work-in-progress",
-        backgroundColor: "var(--ifm-navbar-background-color)",
-        textColor: "var(--ifm-heading-color)",
-        isCloseable: false,
-      },
-
       algolia: {
         appId: "G6PSHR6HYU",
         apiKey: "e179290d52cea5f4751ae76dd1f40b4f",
