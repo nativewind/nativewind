@@ -88,7 +88,7 @@ export function styled<T, P extends keyof T, C extends keyof T>(
  * Actual implementation
  */
 export function styled<
-  T extends { style?: StyleProp<unknown>; children?: ReactNode | undefined },
+  T extends { style?: StyleProp<any>; children?: ReactNode | undefined },
   P extends keyof T,
   C extends keyof T
 >(

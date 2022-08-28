@@ -47,7 +47,8 @@ export type Snapshot = Record<string, StylesArray>;
 
 const emptyStyles: StylesArray = Object.assign([], { mask: 0 });
 
-export interface StylesArray<T = Style> extends Array<EitherStyle<T>> {
+export interface StylesArray<T extends Style = Style>
+  extends Array<EitherStyle<T>> {
   childClassNames?: string[];
   mask?: number;
 }
@@ -467,7 +468,10 @@ export class StyleSheetRuntime extends ColorSchemeStore {
     return reEvaluate();
   }
 
-  getChildStyles<T>(parent: StylesArray<T>, options: MatchChildAtRuleOptions) {
+  getChildStyles<T extends Style>(
+    parent: StylesArray<T>,
+    options: MatchChildAtRuleOptions
+  ) {
     if (!parent.childClassNames) return;
 
     const styles: Style[] = [];

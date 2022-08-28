@@ -7,7 +7,7 @@ import { ComponentState } from "./use-component-state";
 export interface WithStyledChildrenOptions {
   componentChildren: ReactNode;
   store: StyleSheetRuntime;
-  stylesArray: StylesArray<unknown>;
+  stylesArray: StylesArray<any>;
   mask: number;
   componentState: ComponentState;
 }

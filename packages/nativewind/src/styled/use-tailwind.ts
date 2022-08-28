@@ -2,16 +2,17 @@ import { useContext, useMemo } from "react";
 import { StyleProp, StyleSheet } from "react-native";
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 import { Snapshot, StoreContext, StylesArray } from "../style-sheet";
+import { Style } from "../style-sheet/runtime";
 import { StateBitOptions } from "../utils/selector";
 
-export interface UseTailwindOptions<T> extends StateBitOptions {
+export interface UseTailwindOptions<T extends Style> extends StateBitOptions {
   className: string;
   inlineStyles?: StyleProp<T>;
   additionalStyles?: StylesArray<T>;
   flatten?: boolean;
 }
 
-export function useTailwind<T>({
+export function useTailwind<T extends Style>({
   className,
   inlineStyles,
   additionalStyles,
