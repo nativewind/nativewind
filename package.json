@@ -5,31 +5,18 @@
     "apps/*"
   ],
   "scripts": {
-    "test": "npm run test --workspace=nativewind",
-    "benchmarks": "npm run test --workspace=benchmarks",
-    "build": "npm run build --workspace=nativewind",
+    "test": "npm run test --workspace=nativewind --",
+    "benchmarks": "npm run test --workspace=benchmarks --",
+    "build": "npm run build --workspace=nativewind --",
     "example": "npm start --workspace=example --",
-    "prepare": "husky install",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i"
   },
   "devDependencies": {
     "@changesets/cli": "2.24.3",
-    "@commitlint/cli": "17.1.1",
-    "@commitlint/config-conventional": "17.1.0",
-    "@semantic-release/changelog": "6.0.1",
-    "@semantic-release/exec": "6.0.3",
-    "@semantic-release/git": "10.0.1",
     "eslint": "8.23.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-unicorn": "43.0.2",
-    "husky": "8.0.1",
     "prettier": "2.7.1",
     "typescript": "4.8.2"
-  },
-  "dependencies": {
-    "@babel/helper-module-imports": "7.18.6",
-    "@eva-design/eva": "2.1.1",
-    "@ui-kitten/components": "5.1.2",
-    "react-native-svg": "13.0.0"
   }
 }

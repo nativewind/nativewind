@@ -47,6 +47,7 @@
   ],
   "dependencies": {
     "@babel/generator": "^7.18.7",
+    "@babel/helper-module-imports": "7.18.6",
     "@babel/types": "7.18.13",
     "css-mediaquery": "^0.1.2",
     "css-to-react-native": "^3.0.0",
