@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - next
+      - changeset-release/next
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -28,6 +29,7 @@ jobs:
         run: npm run build
 
       - name: Test project
+        if: github.ref == 'refs/heads/master'
         run: npm test
 
       - name: Copy readme
@@ -38,6 +40,7 @@ jobs:
         uses: changesets/action@v1
         with:
           publish: npx changeset publish
+          createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
