@@ -21,7 +21,7 @@ jobs:
       - name: Merge next to main
         run: |
           git fetch --unshallow
-          git rebase next
+          git rebase origin/next
 
       - name: Install Dependencies
         run: npm install
