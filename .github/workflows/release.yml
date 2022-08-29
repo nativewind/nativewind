@@ -56,9 +56,9 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "Github Actions"
 
-      - name: Merge master back to next
+      - name: Merge main back to next
         run: |
           git checkout next
           git pull
-          git merge --no-ff master -m "Auto-merge master back to next"
+          git merge --no-ff main -m "Auto-merge main back to next"
           git push
