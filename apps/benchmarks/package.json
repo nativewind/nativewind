@@ -13,14 +13,14 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "@tamagui/babel-plugin": "1.0.1-beta.153",
+    "@tamagui/babel-plugin": "1.0.1-beta.155",
     "chart.js": "3.9.1",
     "chartjs-chart-error-bars": "3.9.1",
     "dripsy": "3.6.0",
     "expo": "46.0.9",
     "jest": "29.0.1",
     "native-base": "3.4.13",
-    "nativewind": "2.0.4",
+    "nativewind": "2.0.5-next.0",
     "react": "*",
     "react-dom": "*",
     "react-native": "0.69.5",
