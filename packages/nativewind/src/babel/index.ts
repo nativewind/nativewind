@@ -16,6 +16,7 @@ import { TailwindcssReactNativeBabelOptions } from "./types";
 import { visitor, VisitorState } from "./visitor";
 
 import { nativePlugin } from "../tailwind/native";
+import { expressionStatement } from "@babel/types";
 
 export default function (
   api: ConfigAPI,
@@ -40,7 +41,7 @@ export default function (
       ],
     });
   } else {
-    api.cache.invalidate(() => statSync(userConfigPath).mtimeMs);
+    api.cache.using(() => statSync(userConfigPath).mtimeMs);
     (api as any).addExternalDependency(userConfigPath);
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires,unicorn/prefer-module
@@ -136,7 +137,10 @@ export default function (
 
         if (!output.hasStyles) return;
 
-        projectPath.pushContainer("body", output.stylesheetCreateExpression);
+        projectPath.pushContainer(
+          "body",
+          expressionStatement(output.stylesheetCreateExpression)
+        );
 
         addNamed(projectPath, "NativeWindStyleSheet", "nativewind");
       },
