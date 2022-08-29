@@ -1,0 +1,11 @@
+{
+  "mode": "pre",
+  "tag": "next",
+  "initialVersions": {
+    "benchmarks": "0.0.0",
+    "demo-compiler": "1.0.0",
+    "website": "0.0.0",
+    "nativewind": "2.0.4"
+  },
+  "changesets": []
+}

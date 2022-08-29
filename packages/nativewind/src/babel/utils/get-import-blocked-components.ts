@@ -19,11 +19,11 @@ export function getImportBlockedComponents(
   state: VisitorState
 ): string[] {
   const {
-    allowModuleTransform,
-    allowRelativeModules,
-    blockModuleTransform,
     filename,
     cwd,
+    allowRelativeModules,
+    allowModuleTransform,
+    opts: { blockModuleTransform = [] },
   } = state;
 
   const require = createRequire(filename);

@@ -1,4 +1,5 @@
 import { resolve, sep, posix } from "node:path";
+import { statSync } from "node:fs";
 
 import micromatch from "micromatch";
 
@@ -7,18 +8,17 @@ import resolveConfigPath from "tailwindcss/lib/util/resolveConfigPath";
 import resolveConfig from "tailwindcss/resolveConfig";
 import { validateConfig } from "tailwindcss/lib/util/validateConfig";
 
-import { expressionStatement, Program } from "@babel/types";
-import { NodePath } from "@babel/traverse";
+import type { ConfigAPI, PluginPass, Visitor } from "@babel/core";
 import { addNamed } from "@babel/helper-module-imports";
 
 import { extractStyles } from "../postcss/extract-styles";
-import { TailwindcssReactNativeBabelOptions, State } from "./types";
+import { TailwindcssReactNativeBabelOptions } from "./types";
 import { visitor, VisitorState } from "./visitor";
 
 import { nativePlugin } from "../tailwind/native";
 
 export default function (
-  _: unknown,
+  api: ConfigAPI,
   options: TailwindcssReactNativeBabelOptions,
   cwd: string
 ) {
@@ -40,8 +40,12 @@ export default function (
       ],
     });
   } else {
+    api.cache.invalidate(() => statSync(userConfigPath).mtimeMs);
+    (api as any).addExternalDependency(userConfigPath);
+
     // eslint-disable-next-line @typescript-eslint/no-var-requires,unicorn/prefer-module
     const userConfig = require(userConfigPath);
+
     const newConfig = resolveConfig({
       ...userConfig,
       plugins: [nativePlugin(options), ...(userConfig?.plugins ?? [])],
@@ -67,76 +71,80 @@ export default function (
     ? ["react-native", "react-native-web", ...options.allowModuleTransform]
     : "*";
 
-  return {
-    visitor: {
-      Program: {
-        enter(nodePath: NodePath<Program>, state: State) {
-          const isInContent = micromatch.isMatch(
-            normalizePath(state.filename),
-            contentFilePaths
-          );
+  const programVisitor: Visitor<
+    PluginPass & {
+      opts: TailwindcssReactNativeBabelOptions;
+    }
+  > = {
+    Program: {
+      enter(projectPath, state) {
+        const filename = state.filename;
 
-          if (!isInContent) {
-            return;
+        if (!filename) return;
+
+        const isInContent = micromatch.isMatch(
+          normalizePath(filename),
+          contentFilePaths
+        );
+
+        if (!isInContent) {
+          return;
+        }
+
+        let canCompile = true;
+        let canTransform = true;
+
+        switch (state.opts.mode) {
+          case "compileOnly": {
+            canTransform = false;
+            break;
           }
-
-          let canCompile = true;
-          let canTransform = true;
-
-          switch (state.opts.mode) {
-            case "compileOnly": {
-              canTransform = false;
-              break;
-            }
-            case "transformOnly": {
-              canCompile = false;
-              break;
-            }
+          case "transformOnly": {
+            canCompile = false;
+            break;
           }
+        }
 
-          const visitorState: VisitorState = {
-            cwd,
-            rem: 16,
-            mode: "compileAndTransform",
-            didTransform: false,
-            blockModuleTransform: [],
-            canCompile,
-            canTransform,
-            ...state,
-            ...state.opts,
-            allowModuleTransform,
-            allowRelativeModules: contentFilePaths,
-            blockList: new Set(),
-            tailwindConfig: tailwindConfig,
-          };
+        const visitorState: VisitorState = {
+          ...state,
+          rem: 16,
+          didTransform: false,
+          canCompile,
+          canTransform,
+          filename,
+          allowModuleTransform,
+          allowRelativeModules: contentFilePaths,
+          blockList: new Set(),
+          tailwindConfig: tailwindConfig,
+        };
 
-          // Traverse the file
-          nodePath.traverse(visitor, visitorState);
+        projectPath.traverse(visitor, visitorState);
 
-          const { filename, didTransform } = visitorState;
+        const { didTransform } = visitorState;
 
-          const bodyNode = nodePath.node.body;
+        if (didTransform) {
+          addNamed(projectPath, "StyledComponent", "nativewind");
+        }
 
-          if (didTransform) {
-            addNamed(nodePath, "StyledComponent", "nativewind");
-          }
+        const output = extractStyles({
+          ...tailwindConfig,
+          content: [filename],
+          // If the file doesn't have any Tailwind styles, it will print a warning
+          // We force an empty style to prevent this
+          safelist: tailwindConfig.safelist ?? ["babel-empty"],
+        });
 
-          const output = extractStyles({
-            ...tailwindConfig,
-            content: [filename],
-            // If the file doesn't have any Tailwind styles, it will print a warning
-            // We force an empty style to prevent this
-            safelist: tailwindConfig.safelist ?? ["babel-empty"],
-          });
+        if (!output.hasStyles) return;
 
-          if (!output.hasStyles) return;
+        projectPath.pushContainer("body", output.stylesheetCreateExpression);
 
-          bodyNode.push(expressionStatement(output.stylesheetCreateExpression));
-
-          addNamed(nodePath, "NativeWindStyleSheet", "nativewind");
-        },
+        addNamed(projectPath, "NativeWindStyleSheet", "nativewind");
       },
     },
+  };
+
+  return {
+    visitor: programVisitor,
   };
 }
 

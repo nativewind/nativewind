@@ -3,11 +3,7 @@ import type { Visitor } from "@babel/traverse";
 import { getImportBlockedComponents } from "./utils/get-import-blocked-components";
 import { someAttributes } from "./utils/has-attribute";
 
-import {
-  AllowPathOptions,
-  State,
-  TailwindcssReactNativeBabelOptions,
-} from "./types";
+import { AllowPathOptions, TailwindcssReactNativeBabelOptions } from "./types";
 
 import {
   Expression,
@@ -28,11 +24,12 @@ import {
   jsxOpeningElement,
   memberExpression,
 } from "@babel/types";
+import { PluginPass } from "@babel/core";
 
-export interface VisitorState
-  extends State,
-    Omit<Required<TailwindcssReactNativeBabelOptions>, "tailwindConfigPath"> {
-  cwd: string;
+export interface VisitorState extends PluginPass {
+  opts: TailwindcssReactNativeBabelOptions;
+  filename: string;
+  allowModuleTransform: AllowPathOptions;
   allowRelativeModules: AllowPathOptions;
   blockList: Set<string>;
   canCompile: boolean;
