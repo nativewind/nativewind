@@ -8,6 +8,7 @@
     "nativewind": "2.0.4"
   },
   "changesets": [
-    "curly-tools-push"
+    "curly-tools-push",
+    "mighty-impalas-smash"
   ]
 }
