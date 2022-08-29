@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - next
-      - changeset-release/next
+      - "changeset-release/next"
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
