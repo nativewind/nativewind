@@ -1,17 +1,12 @@
-name: Next
+name: Release
 
-on:
-  push:
-    branches:
-      - main
-      - next
-      - "changeset-release/next"
+on: workflow_dispatch
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
-    name: Test & Release
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -23,6 +18,11 @@ jobs:
           node-version: "16"
           cache: "npm"
 
+      - name: Merge next to main
+        run: |
+          git fetch --unshallow
+          git rebase dev
+
       - name: Install Dependencies
         run: npm install
 
@@ -30,14 +30,12 @@ jobs:
         run: npm run build
 
       - name: Test project
-        if: github.ref == 'refs/heads/master'
         run: npm test
 
       - name: Copy readme
         run: cp README.md packages/nativewind/
 
       - name: Exit changeset pre-release
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: npx changeset pre exit
         continue-on-error: true
 
@@ -46,6 +44,19 @@ jobs:
         uses: changesets/action@v1
         with:
           publish: npx changeset publish
+          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Set Git config
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "Github Actions"
+
+      - name: Merge master back to dev
+        run: |
+          git checkout dev
+          git pull
+          git merge --no-ff master -m "Auto-merge master back to dev"
+          git push
