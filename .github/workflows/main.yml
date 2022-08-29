@@ -1,29 +1,25 @@
-name: Release
+name: Main
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - main
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
-    name: Release
+    name: Test & Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
-        with:
-          ref: "main"
 
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v3
         with:
           node-version: "16"
           cache: "npm"
-
-      - name: Merge next to main
-        run: |
-          git fetch --unshallow
-          git rebase origin/next
 
       - name: Install Dependencies
         run: npm install
@@ -37,28 +33,12 @@ jobs:
       - name: Copy readme
         run: cp README.md packages/nativewind/
 
-      - name: Exit changeset pre-release
-        run: npx changeset pre exit
-        continue-on-error: true
-
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
           publish: npx changeset publish
-          createGithubReleases: true
+          createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Set Git config
-        run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "Github Actions"
-
-      - name: Merge main back to next
-        run: |
-          git checkout next
-          git pull
-          git merge --no-ff main -m "Auto-merge main back to next"
-          git push
