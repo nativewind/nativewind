@@ -42,6 +42,7 @@ export default function (
     });
   } else {
     api.cache.using(() => statSync(userConfigPath).mtimeMs);
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     (api as any).addExternalDependency(userConfigPath);
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires,unicorn/prefer-module
