@@ -7,5 +7,7 @@
     "website": "0.0.0",
     "nativewind": "2.0.4"
   },
-  "changesets": []
+  "changesets": [
+    "curly-tools-push"
+  ]
 }
