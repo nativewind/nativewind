@@ -1,4 +1,5 @@
-import { ReactNode, Children, cloneElement } from "react";
+import { ReactNode, Children, cloneElement, isValidElement } from "react";
+import { StyleProp } from "react-native";
 import { isFragment } from "react-is";
 import { StylesArray, StyleSheetRuntime } from "../style-sheet";
 import { matchesMask, PARENT } from "../utils/selector";
@@ -31,7 +32,7 @@ export function withStyledChildren({
     : componentChildren;
 
   return Children.toArray(children).filter((child) => Boolean(child)).map((child, index) => {
-    if (!child || !child.props) {
+    if (!child || !isValidElement<{ style?: StyleProp<any> }>(child)) {
       return child;
     }
 
