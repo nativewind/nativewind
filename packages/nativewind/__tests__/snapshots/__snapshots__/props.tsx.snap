@@ -138,15 +138,7 @@ exports[`Styled classProps on native 1`] = `
 
 exports[`Styled skip null in child styles 1`] = `
 <View>
-  <Text
-    style={
-      [
-        {
-          "marginLeft": 8,
-        },
-      ]
-    }
-  >
+  <Text>
     1
   </Text>
   <Text

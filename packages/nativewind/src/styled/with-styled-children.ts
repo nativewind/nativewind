@@ -8,6 +8,7 @@ import { ComponentState } from "./use-component-state";
 export interface WithStyledChildrenOptions {
   componentChildren: ReactNode;
   store: StyleSheetRuntime;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stylesArray: StylesArray<any>;
   mask: number;
   componentState: ComponentState;
@@ -31,24 +32,26 @@ export function withStyledChildren({
       componentChildren.props.children
     : componentChildren;
 
-  return Children.toArray(children).filter((child) => Boolean(child)).map((child, index) => {
-    if (!child || !isValidElement<{ style?: StyleProp<any> }>(child)) {
-      return child;
-    }
+  return Children.toArray(children)
+    .filter(Boolean)
+    .map((child, index) => {
+      if (!isValidElement<{ style?: StyleProp<unknown> }>(child)) {
+        return child;
+      }
 
-    const style = store.getChildStyles(stylesArray, {
-      nthChild: index + 1,
-      parentHover: componentState.hover,
-      parentFocus: componentState.focus,
-      parentActive: componentState.active,
+      const style = store.getChildStyles(stylesArray, {
+        nthChild: index + 1,
+        parentHover: componentState.hover,
+        parentFocus: componentState.focus,
+        parentActive: componentState.active,
+      });
+
+      if (!style || style.length === 0) {
+        return child;
+      }
+
+      return child.props.style
+        ? cloneElement(child, { style: [child.props.style, style] })
+        : cloneElement(child, { style });
     });
-
-    if (!style || style.length === 0) {
-      return child;
-    }
-
-    return child.props.style
-      ? cloneElement(child, { style: [child.props.style, style] })
-      : cloneElement(child, { style });
-  });
 }
