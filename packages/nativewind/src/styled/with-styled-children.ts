@@ -30,7 +30,7 @@ export function withStyledChildren({
       componentChildren.props.children
     : componentChildren;
 
-  return Children.map(children, (child, index) => {
+  return Children.toArray(children).filter((child) => Boolean(child)).map((child, index) => {
     if (!child || !child.props) {
       return child;
     }
