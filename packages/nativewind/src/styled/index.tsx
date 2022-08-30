@@ -88,6 +88,7 @@ export function styled<T, P extends keyof T, C extends keyof T>(
  * Actual implementation
  */
 export function styled<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends { style?: StyleProp<any>; children?: ReactNode | undefined },
   P extends keyof T,
   C extends keyof T
