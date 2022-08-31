@@ -1,9 +1,10 @@
 name: Main
 
 on:
-  pull_request:
+  push:
     branches:
       - main
+
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
@@ -28,3 +29,16 @@ jobs:
 
       - name: Test project
         run: npm test
+
+      - name: Copy readme
+        run: cp README.md packages/nativewind/
+
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: npx changeset publish
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
