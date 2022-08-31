@@ -86,7 +86,7 @@
     "react-dom": "18.2.0",
     "react-native": "0.69.5",
     "react-native-svg": "13.1.0",
-    "react-native-web": "0.18.8",
+    "react-native-web": "0.18.9",
     "react-test-renderer": "18.2.0",
     "tailwindcss": "3.1.8",
     "ts-jest": "28.0.8",
