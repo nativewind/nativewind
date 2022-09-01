@@ -29,7 +29,7 @@
     "react-native-paper": "rc",
     "react-native-safe-area-context": "4.3.3",
     "reassure": "0.4.1",
-    "tamagui": "1.0.1-beta.159",
+    "tamagui": "1.0.1-beta.160",
     "ts-jest": "28.0.8",
     "twrnc": "3.4.0"
   },
