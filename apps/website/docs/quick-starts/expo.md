@@ -72,7 +72,7 @@ You will need follow a [Tailwind CSS installation guide](https://tailwindcss.com
 
 :::caution
 
-Expo Web only supports Webpack 4, please ensure you are only installing webpack loaders that that support Webpack 4.
+Expo Web only supports Webpack 4, please ensure you are only installing webpack loaders that that support Webpack 4. For example, The latest version of `postcss-loader` is not compatible with Webpack 4 and instead, `postcss-loader@4.2.0` should be used.
 
 https://github.com/expo/expo-cli/pull/3763
 
