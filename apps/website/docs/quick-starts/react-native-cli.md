@@ -126,11 +126,11 @@ const App: () => Node = () => {
 -       style={backgroundStyle}>
 +       className={backgroundStyle}>
         <Header />
-        <View
+-        <View
 -         style={{
 -           backgroundColor: isDarkMode ? Colors.black : Colors.white,
 -         }}>
-+         className="bg-white dark:bg-black"
++       <View className="bg-white dark:bg-black">
           <Section title="Step One">
 -           Edit <Text style={styles.highlight}>App.js</Text> to change this
 +           Edit <Text className="font-bold">App.js</Text> to change this
