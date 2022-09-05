@@ -4,6 +4,10 @@ NativeWind includes a `dark` variant that lets you style your site differently w
 
 By default this uses `Appearance.getColorScheme()` on native and `prefers-color-scheme` on web.
 
+:::caution
+Expo apps do not follow the system appearance unless `userInterfaceStyle` is set to automatic. [Please see the Expo docs for more information.](https://docs.expo.dev/guides/color-schemes/)
+:::
+
 ## Toggling dark mode manually
 
 The `dark:` variant is controlled by the [`useColorScheme()`](../../api/use-color-scheme) hook.
