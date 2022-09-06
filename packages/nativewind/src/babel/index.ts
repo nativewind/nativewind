@@ -44,6 +44,8 @@ export default function (
     api.cache.using(() => statSync(userConfigPath).mtimeMs);
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires,unicorn/prefer-module
+    delete require.cache[require.resolve(userConfigPath)];
+    // eslint-disable-next-line @typescript-eslint/no-var-requires,unicorn/prefer-module
     const userConfig = require(userConfigPath);
 
     const newConfig = resolveConfig({
