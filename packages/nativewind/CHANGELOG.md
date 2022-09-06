@@ -1,5 +1,11 @@
 # nativewind
 
+## 2.0.8
+
+### Patch Changes
+
+- 04a8f5c: fix: never cache user tailwind.config.js
+
 ## 2.0.7
 
 ### Patch Changes
