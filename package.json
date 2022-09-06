@@ -6,6 +6,7 @@
   ],
   "scripts": {
     "test": "npm run test --workspace=nativewind --",
+    "test:babel": "npm run test --workspace=nativewind -- __tests__/babel",
     "benchmarks": "npm run test --workspace=benchmarks --",
     "build": "npm run build --workspace=nativewind --",
     "example": "npm start --workspace=example --",

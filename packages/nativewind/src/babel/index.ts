@@ -128,6 +128,8 @@ export default function (
           addNamed(projectPath, "StyledComponent", "nativewind");
         }
 
+        if (!canCompile) return;
+
         const output = extractStyles({
           ...tailwindConfig,
           content: [filename],
