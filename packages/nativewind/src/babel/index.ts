@@ -130,13 +130,13 @@ export default function (
 
         if (!canCompile) return;
 
+        // If the file doesn't have any Tailwind styles, it will print a warning
+        // We force an empty style to prevent this
         const safelist = tailwindConfig.safelist.length > 0 ? tailwindConfig.safelist : ["babel-empty"]
         
         const output = extractStyles({
           ...tailwindConfig,
           content: [filename],
-          // If the file doesn't have any Tailwind styles, it will print a warning
-          // We force an empty style to prevent this
           safelist,
         });
 
