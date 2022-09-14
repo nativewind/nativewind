@@ -18,7 +18,7 @@
     "@ui-kitten/components": "5.1.2",
     "chart.js": "3.9.1",
     "chartjs-chart-error-bars": "3.9.2",
-    "dripsy": "3.6.0",
+    "dripsy": "3.7.4",
     "expo": "46.0.10",
     "jest": "29.0.3",
     "native-base": "3.4.15",
