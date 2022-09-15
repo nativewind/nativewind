@@ -35,7 +35,7 @@ const config = {
       ({
         docs: {
           breadcrumbs: false,
-          editUrl: `https://github.com/marklawlor/nativewind/edit/main/website/`,
+          editUrl: `https://github.com/marklawlor/nativewind/edit/main/apps/website/`,
           remarkPlugins: [require("./src/remark-snackplayer")],
           routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),

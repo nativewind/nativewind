@@ -11,7 +11,7 @@ platformSelect is the equivalent to `Platform.select()`
 ```js
 // tailwind.config.js
 
-const { platformValue } = require("nativewind");
+const { platformSelect } = require("nativewind");
 
 module.exports = {
   theme: {
@@ -48,7 +48,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        platformRed: platformColor("systemRed", "red")
+        platformRed: platformColor("systemRed", "red"),
       },
     },
   },
@@ -68,7 +68,7 @@ module.exports = {
   theme: {
     extend: {
       borderWidth: {
-        hairline: hairlineWidth()
+        hairline: hairlineWidth(),
       },
     },
   },
@@ -146,7 +146,7 @@ module.exports = {
   theme: {
     extend: {
       size: {
-        custom: getPixelSizeForLayoutSize(2)
+        custom: getPixelSizeForLayoutSize(2),
       },
     },
   },
