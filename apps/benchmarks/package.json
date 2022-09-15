@@ -18,23 +18,23 @@
     "@ui-kitten/components": "5.1.2",
     "chart.js": "3.9.1",
     "chartjs-chart-error-bars": "3.9.2",
-    "dripsy": "3.6.0",
+    "dripsy": "3.7.4",
     "expo": "46.0.10",
     "jest": "29.0.3",
     "native-base": "3.4.15",
-    "nativewind": "2.0.9",
+    "nativewind": "2.0.10",
     "react": "*",
     "react-dom": "*",
     "react-native": "0.70.0",
     "react-native-paper": "rc",
     "react-native-safe-area-context": "4.3.3",
     "reassure": "0.4.1",
-    "tamagui": "1.0.1-beta.164",
-    "ts-jest": "29.0.0",
+    "tamagui": "1.0.1-beta.165",
+    "ts-jest": "29.0.1",
     "twrnc": "3.4.0"
   },
   "devDependencies": {
-    "@babel/core": "7.19.0",
+    "@babel/core": "7.19.1",
     "patch-package": "6.4.7"
   },
   "private": true
