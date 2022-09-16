@@ -7,5 +7,5 @@ NativeWind extends the React Native types via declaration merging. The simplest 
 ```
 
 :::caution
-Do not call this file `nativewind.d.ts`, you will cause your Typescript module resolution to fail.
+Do not call this file `nativewind.d.ts`, it will cause your Typescript module resolution to fail.
 :::
