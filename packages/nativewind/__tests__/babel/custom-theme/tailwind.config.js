@@ -2,7 +2,7 @@ import {
   platformSelect,
   platformColor,
   roundToNearestPixel,
-} from "../../../dist";
+} from "../../../src";
 
 module.exports = {
   content: [`./custom-theme/*.{js,ts,jsx,tsx}`],

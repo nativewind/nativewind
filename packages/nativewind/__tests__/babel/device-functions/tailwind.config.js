@@ -1,4 +1,4 @@
-const { hairlineWidth } = require("../../../dist");
+import { hairlineWidth } from "../../../src";
 
 module.exports = {
   content: [`${__dirname}/code.{js,ts,jsx,tsx}`],
