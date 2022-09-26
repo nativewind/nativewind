@@ -2,7 +2,7 @@ import StartCoding from "../\_start-coding-components.md"
 
 # PostCSS
 
-You to use the PostCSS to generate CSS stylesheets. You can then use className to style your React Native Web components using CSS.
+You can use PostCSS to generate CSS stylesheets. This allows you to use className to style your React Native Web components using CSS.
 
 Before you start, please follow the [setup guide for Tailwind PostCSS](https://tailwindcss.com/docs/installation/using-postcss)
 
