@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "2.24.4",
+    "@types/node": "^18.7.23",
     "eslint": "8.24.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-unicorn": "43.0.2",
