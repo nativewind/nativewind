@@ -9,9 +9,6 @@ export interface WithClassNames {
   classProps?: string[];
 }
 
-// const isGroupIsolateRegex = /(?:^|\s)(group-isolate)(?:$|\s)/gi;
-// const isParentRegex = /(?:^|\s)(parent)(?:$|\s)/gi;
-
 export function withClassNames({
   className,
   componentProps,
@@ -19,9 +16,6 @@ export function withClassNames({
   spreadProps = [],
   classProps = [],
 }: WithClassNames) {
-  // const isGroupIsolate = isGroupIsolateRegex.test(className);
-  // const isParent = isParentRegex.test(className);
-
   const allClasses = [className];
 
   if (propsToTransform) {

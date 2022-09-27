@@ -7,14 +7,6 @@ import {
   TargetedEvent,
   MouseEvent,
 } from "react-native";
-import {
-  ACTIVE,
-  FOCUS,
-  GROUP,
-  HOVER,
-  matchesMask,
-  PARENT,
-} from "../utils/selector";
 import { Action } from "./use-component-state";
 
 declare module "react-native" {
@@ -31,19 +23,18 @@ export interface InteractionProps extends PressableProps {
 
 export function useInteraction(
   dispatch: Dispatch<Action>,
-  mask: number,
+  meta: Record<string, boolean>,
   props: InteractionProps
 ) {
   const ref = useRef<InteractionProps>(props);
   ref.current = props;
 
-  const handlers = useMemo(() => {
-    const isParentOrGroup =
-      matchesMask(mask, PARENT) || matchesMask(mask, GROUP);
+  return useMemo(() => {
+    const isParentOrGroup = meta.parent || meta.group;
 
     const handlers: InteractionProps = {};
 
-    if (isParentOrGroup || matchesMask(mask, ACTIVE)) {
+    if (isParentOrGroup || meta.active) {
       if (Platform.OS === "web") {
         handlers.onMouseDown = function (event: GestureResponderEvent) {
           if (ref.current.onMouseDown) {
@@ -75,7 +66,7 @@ export function useInteraction(
       }
     }
 
-    if (isParentOrGroup || matchesMask(mask, HOVER)) {
+    if (isParentOrGroup || meta.hover) {
       handlers.onHoverIn = function (event: MouseEvent) {
         if (ref.current.onHoverIn) {
           ref.current.onHoverIn(event);
@@ -91,7 +82,7 @@ export function useInteraction(
       };
     }
 
-    if (isParentOrGroup || matchesMask(mask, FOCUS)) {
+    if (isParentOrGroup || meta.focus) {
       handlers.onFocus = function (event: NativeSyntheticEvent<TargetedEvent>) {
         if (ref.current.onFocus) {
           ref.current.onFocus(event);
@@ -108,7 +99,5 @@ export function useInteraction(
     }
 
     return handlers;
-  }, [mask]);
-
-  return handlers;
+  }, [meta]);
 }

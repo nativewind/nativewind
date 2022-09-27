@@ -1,11 +1,16 @@
 import type { Declaration } from "postcss";
 import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
 
-export type Style = ViewStyle | TextStyle | ImageStyle;
+type RecursiveArray<T> = Array<T | ReadonlyArray<T> | RecursiveArray<T>>;
+
+export type Style = ViewStyle & TextStyle & ImageStyle;
+export type StyleArray = RecursiveArray<Style>;
+export type StyleProp = Style | RecursiveArray<Style>;
+
 export type StyleRecord = Record<string, Style>;
 export type MediaRecord = Record<string, Array<AtRuleTuple[]>>;
 
-export type AtRuleTuple = [string, string | undefined];
+export type AtRuleTuple = [string] | [string, string | number];
 
 export interface AtRuleRecord extends Style {
   atRules: AtRuleTuple[];

@@ -23,6 +23,7 @@ module.exports = {
       "error",
       {
         allowList: {
+          i: true,
           fn: true,
           prop: true,
           Prop: true,
@@ -48,6 +49,8 @@ module.exports = {
         "commitlint.config.js",
         "tailwind/css.js",
         "tailwind/native.js",
+        "packages/nativewind/__tests__/*",
+        "packages/nativewind/src/babel/index.ts",
       ],
       rules: {
         "unicorn/prefer-module": "off",

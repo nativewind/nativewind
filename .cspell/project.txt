@@ -8,3 +8,4 @@ nextjs
 nativewind
 snackplayer
 dripsy
+zustand

@@ -13,7 +13,7 @@ export type Action =
   | { type: "active"; value: boolean }
   | { type: "focus"; value: boolean };
 
-function reducer(state: ComponentState, action: Action) {
+function reducer(state: ComponentState, action: Action): ComponentState {
   switch (action.type) {
     case "hover":
       return { ...state, hover: action.value };

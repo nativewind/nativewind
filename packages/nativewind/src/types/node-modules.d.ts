@@ -1,24 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-declare module "postcss-css-variables" {
-  export default unknown;
-}
-
-declare module "postcss-color-rgb" {
-  export default unknown;
-}
-
 declare module "@babel/helper-module-imports" {
   export function addNamed(path: unknown, name: string, source: string);
-}
-
-/**
- * The types for MediaValues are missing 'type'
- */
-declare module "css-mediaquery" {
-  export function match(
-    query: string,
-    values: Partial<MediaValues> & { type: string }
-  ): boolean;
+  export function addSideEffect(path: unknown, source: string);
 }
 
 /**
@@ -46,4 +29,8 @@ declare module "tailwindcss/lib/util/flattenColorPalette" {
 
 declare module "tailwindcss/lib/util/toColorValue" {
   export default function (options: unknown): any;
+}
+
+declare module "tailwindcss/lib/util/isPlainObject" {
+  export default function (options: unknown): boolean;
 }

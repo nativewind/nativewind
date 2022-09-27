@@ -4,7 +4,7 @@
     // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
     "lib": ["esnext"],
     "module": "commonjs",
-    "target": "ES2019",
+    "target": "esnext",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
