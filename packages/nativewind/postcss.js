@@ -1,1 +1,1 @@
-module.exports = require("./dist/postcss").default;
+module.exports = require("./dist/postcss/plugin").default;

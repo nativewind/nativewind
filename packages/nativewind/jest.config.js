@@ -9,10 +9,7 @@ module.exports = {
     "^.+\\.tsx?$": [
       "ts-jest",
       {
-        tsconfig: "tsconfig.json",
-        babelConfig: {
-          presets: ["module:metro-react-native-babel-preset"],
-        },
+        babelConfig: true,
       },
     ],
   },

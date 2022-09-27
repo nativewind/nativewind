@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-lonely-if */
 import { Block, CssNode, Declaration, walk } from "css-tree";
 import { Atom, AtomStyle, StyleWithFunction } from "../style-sheet";
 import { validProperties } from "./valid-styles";
@@ -7,13 +8,13 @@ import { TransformsStyle } from "react-native";
 export type StylesAndTopics = Required<Pick<Atom, "styles" | "topics">>;
 
 type InferArray<T> = T extends Array<infer K> ? K : never;
-type Transforms = InferArray<NonNullable<TransformsStyle["transform"]>>;
+type Transform = InferArray<NonNullable<TransformsStyle["transform"]>>;
 
 type StyleValue =
   | string
   | number
   | string[]
-  | Transforms
+  | Transform
   | TransformsStyle["transform"]
   | StyleWithFunction
   | CssNode
@@ -28,7 +29,37 @@ export function getDeclarations(block: Block) {
   walk(block, {
     visit: "Declaration",
     enter(node) {
-      processDeclaration(atom, node);
+      switch (node.property) {
+        case "border":
+          return border(atom, node);
+        case "box-shadow":
+          return boxShadow(atom, node);
+        case "flex":
+          return flex(atom, node);
+        case "flex-flow":
+          return flexFlow(atom, node);
+        case "font":
+          return font(atom, node);
+        case "font-family":
+          return fontFamily(atom, node);
+        case "place-content":
+          return placeContent(atom, node);
+        case "text-decoration":
+          return textDecoration(atom, node);
+        case "text-decoration-line":
+          return textDecorationLine(atom, node);
+        case "text-shadow":
+          return textShadow(atom, node);
+        case "transform":
+          return transform(atom, node);
+        default:
+          if (node.value.type === "Raw") return;
+          return pushStyle(
+            atom,
+            node.property,
+            node.value.children.toArray()[0]
+          );
+      }
     },
   });
 
@@ -44,35 +75,6 @@ export function getDeclarations(block: Block) {
     styles,
     topics: atom.topics,
   };
-}
-
-function processDeclaration(atom: StylesAndTopics, node: Declaration) {
-  switch (node.property) {
-    case "border":
-      return border(atom, node);
-    case "box-shadow":
-      return boxShadow(atom, node);
-    case "flex":
-      return flex(atom, node);
-    case "flex-flow":
-      return flexFlow(atom, node);
-    case "font":
-      return font(atom, node);
-    case "font-family":
-      return fontFamily(atom, node);
-    case "place-content":
-      return placeContent(atom, node);
-    case "text-decoration":
-      return textDecoration(atom, node);
-    case "text-decoration-line":
-      return textDecorationLine(atom, node);
-    case "text-shadow":
-      return textShadow(atom, node);
-    case "transform":
-      transform(atom, node);
-    default:
-      return pushStyle(atom, node.property, node);
-  }
 }
 
 function pushStyle(
@@ -198,7 +200,7 @@ function parseStyleValue(
       Object.entries(node).map(([key, value]) => {
         return [key, parseStyleValue(value)];
       })
-    ) as unknown as Transforms,
+    ) as unknown as Transform,
     topics,
   ];
 }
@@ -593,8 +595,7 @@ function textDecoration(atom: StylesAndTopics, node: Declaration) {
             textDecorationLine = "";
             continue;
           case "double":
-          case "double":
-          case "dashs":
+          case "dashed":
             textDecorationLine = child.name;
             continue;
           case "line-through": {
@@ -690,8 +691,7 @@ function textDecorationLine(atom: StylesAndTopics, node: Declaration) {
         case "overline":
           break;
         case "double":
-        case "double":
-        case "dashs":
+        case "dashed":
           textDecorationLine = child.name;
           break;
         case "line-through": {
@@ -793,7 +793,7 @@ function transform(atom: StylesAndTopics, node: Declaration) {
     return;
   }
 
-  let children = node.value.children.toArray();
+  const children = node.value.children.toArray();
 
   if (children.length === 1 && children[0].type !== "Function") {
     return;
@@ -819,7 +819,7 @@ function transform(atom: StylesAndTopics, node: Declaration) {
       case "translateY":
       case "matrix": {
         const [value] = parseStyleValue(child.children.toArray()[0]);
-        transform.push({ [child.name]: value } as any);
+        transform.push({ [child.name]: value } as unknown as Transform);
       }
     }
   }

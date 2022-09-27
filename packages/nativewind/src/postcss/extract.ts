@@ -15,13 +15,14 @@ export function extractStyles(
   tailwindConfig: Config,
   cssInput = "@tailwind components;@tailwind utilities;"
 ) {
-  const tailwindOutput = postcss([tailwind(tailwindConfig)]).process(
-    cssInput
-  ).css;
+  const css = postcss([tailwind(tailwindConfig)]).process(cssInput).css;
+  return getCreateOptions(css);
+}
 
+export function getCreateOptions(css: string) {
   const createOptions: CreateOptions = {};
 
-  walkAst(parse(tailwindOutput), createOptions);
+  walkAst(parse(css), createOptions);
 
   return createOptions;
 }
