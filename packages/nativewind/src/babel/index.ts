@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { resolve, sep, posix, join, dirname, relative } from "node:path";
 
 import type { ConfigAPI, NodePath, PluginPass, Visitor } from "@babel/core";
-import template from "@babel/template";
+import { parseExpression } from "@babel/parser";
 
 import findCacheDir from "find-cache-dir";
 import chokidar from "chokidar";
@@ -28,7 +28,6 @@ import {
   JSXMemberExpression,
   JSXNamespacedName,
   jsxOpeningElement,
-  JSXOpeningElement,
   memberExpression,
 } from "@babel/types";
 
@@ -172,6 +171,32 @@ export default function (
 
   const isDevelopment = api.env("development");
 
+  function replaceCssImport(
+    path: NodePath,
+    source: string,
+    currentDirectory: string
+  ) {
+    const css = readFileSync(source, "utf8");
+
+    if (css.includes("@tailwind")) {
+      // Start watching this file as well
+      // watcher.add(filename);
+      // Write the css to disk, this will cause chokidar watchers to fire on all processes
+      writeFileSync(cssCacheFile, css);
+      // Write the new styles to disk
+      writeFileSync(
+        stylesFile,
+        `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${JSON.stringify(
+          extractStyles(tailwindConfig, css)
+        )});`
+      );
+      // Replace the .css import with the stylesFile
+      addSideEffect(path, `./${relative(currentDirectory, stylesFile)}`);
+      path.remove();
+      // After this has been completed, Babel will reevaluate the stylesFile, reloading the styles
+    }
+  }
+
   const programVisitor: Visitor<
     PluginPass & {
       opts: TailwindcssReactNativeBabelOptions;
@@ -181,6 +206,7 @@ export default function (
       enter(path, state) {
         const filename = state.filename;
         if (!filename) return;
+        const currentDirectory = dirname(filename);
 
         state.blockList = new Set();
         state.isInContent = micromatch.isMatch(
@@ -191,33 +217,27 @@ export default function (
         if (canCompile && state.isInContent) {
           path.traverse({
             ImportDeclaration(path) {
-              const currentDirectory = dirname(filename);
-
               const source = resolve(currentDirectory, path.node.source.value);
 
               if (source.endsWith(".css")) {
-                const css = readFileSync(source, "utf8");
+                replaceCssImport(path, source, currentDirectory);
+              }
+            },
+            CallExpression(path) {
+              const callee = path.get("callee");
+              if (!callee.isIdentifier() || !callee.equals("name", "require")) {
+                return;
+              }
 
-                if (css.includes("@tailwind")) {
-                  // Start watching this file as well
-                  // watcher.add(filename);
-                  // Write the css to disk, this will cause chokidar watchers to fire on all processes
-                  writeFileSync(cssCacheFile, css);
-                  // Write the new styles to disk
-                  writeFileSync(
-                    stylesFile,
-                    `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${JSON.stringify(
-                      extractStyles(tailwindConfig, css)
-                    )});`
-                  );
-                  // Replace the .css import with the stylesFile
-                  addSideEffect(
-                    path,
-                    `./${relative(currentDirectory, stylesFile)}`
-                  );
-                  path.remove();
-                  // After this has been completed, Babel will reevaluate the stylesFile, reloading the styles
-                }
+              const argument = path.get("arguments")[0];
+              if (!argument || !argument.isStringLiteral()) {
+                return;
+              }
+
+              const source = argument.node.value;
+
+              if (source.endsWith(".css")) {
+                replaceCssImport(path, source, currentDirectory);
               }
             },
           });
@@ -244,7 +264,7 @@ export default function (
           );
           path.pushContainer(
             "body",
-            template.ast(
+            parseExpression(
               `_NativeWindStyleSheet.create(${JSON.stringify(styles)});`
             )
           );
@@ -257,18 +277,25 @@ export default function (
 
       const blockList = state.blockList as Set<string>;
 
+      const namePath = path.get("openingElement").get("name");
+
+      const name = namePath.isJSXIdentifier()
+        ? namePath.node.name
+        : namePath.isJSXMemberExpression()
+        ? namePath.node.property.name
+        : undefined;
+
+      const isWrapper =
+        name === "_StyledComponent" || name === "StyledComponent";
+
       if (
-        !blockList ||
-        isWrapper(path.node) ||
         !canTransform ||
-        !someAttributes(path, ["className", "tw"])
+        !someAttributes(path, ["className", "tw"]) ||
+        !name ||
+        isWrapper ||
+        blockList?.has(name) ||
+        name[0] !== name[0].toUpperCase()
       ) {
-        return;
-      }
-
-      const name = getElementName(path.node.openingElement);
-
-      if (blockList.has(name) || name[0] !== name[0].toUpperCase()) {
         return;
       }
 
@@ -305,34 +332,6 @@ function normalizePath(filePath: string) {
    * to do this the proper way
    */
   return filePath.split(sep).join(posix.sep);
-}
-
-function isWrapper(node: JSXElement) {
-  const nameNode = node.openingElement.name;
-  if (isJSXIdentifier(nameNode)) {
-    return (
-      nameNode.name === "_StyledComponent" ||
-      nameNode.name === "StyledComponent"
-    );
-  } else if (isJSXMemberExpression(nameNode)) {
-    return (
-      nameNode.property.name === "_StyledComponent" ||
-      nameNode.property.name === "StyledComponent"
-    );
-  } else {
-    return false;
-  }
-}
-
-function getElementName({ name }: JSXOpeningElement): string {
-  if (isJSXIdentifier(name)) {
-    return name.name;
-  } else if (isJSXMemberExpression(name)) {
-    return name.property.name;
-  } else {
-    // https://github.com/facebook/jsx/issues/13#issuecomment-54373080
-    throw new Error("JSXNamespacedName is not supported by React JSX");
-  }
 }
 
 function toExpression(
