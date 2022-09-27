@@ -16,8 +16,6 @@ const expectStyle = (style: string, config?: Partial<Config>, css?: string) => {
     `@tailwind components;@tailwind utilities;${css ?? ""}`
   );
 
-  console.log(createOptions);
-
   return expect(createOptions);
 };
 
@@ -36,6 +34,68 @@ type OutputObject =
 type CaseOutput = Atom | CreateOptions | OutputObject;
 
 const cases: Record<string, CaseOutput> = {
+  "text-white": {
+    css: `:root { 
+      --number: 255; 
+      --string: string; 
+      --unit: 123vw; 
+      --rgb: rgb(255, 255, 255);
+      --default-value: var(--value, 2);
+      --rgb-var: rgb(255, 255, var(--number));
+      --inline-theme-value: var(--error-color,platformColor(ios__systemRed,android__colorError,default__red));
+      font-size: 16; 
+      padding: 1px; 
+    }`,
+    output: {
+      ":root": {
+        variables: [
+          {
+            "--number": 255,
+            "--string": "string",
+            "--rem": 16,
+            "--rgb": "rgb(255, 255, 255)",
+            "--unit": {
+              function: "vw",
+              values: [123],
+            },
+            "--rgb-var": {
+              function: "inbuilt",
+              values: [
+                "rgb",
+                255,
+                255,
+                {
+                  function: "var",
+                  values: ["--number"],
+                },
+              ],
+            },
+            "--default-value": {
+              function: "var",
+              values: ["--value", 2],
+            },
+            "--inline-theme-value": {
+              function: "var",
+              values: [
+                "--error-color",
+                {
+                  function: "platformColor",
+                  values: [
+                    "ios__systemRed",
+                    "android__colorError",
+                    "default__red",
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      },
+      "text-white": {
+        styles: [{ color: "#fff" }],
+      },
+    },
+  },
   // "text-apply": {
   //   config: {
   //     plugins: [
@@ -95,30 +155,30 @@ const cases: Record<string, CaseOutput> = {
   //     styles: [{ marginLeft: 8, marginTop: 8 }],
   //   },
   // },
-  "text-[color:hsl(var(--hue),var(--saturation),var(--lightness))]": {
-    css: `:root { --hue: 255; }`,
-    output: {
-      ":root": {
-        variables: [{ "--hue": 255 }],
-      },
-      "text-[color:hsl(var(--hue),var(--saturation),var(--lightness))]": {
-        styles: [
-          {
-            color: {
-              function: "inbuilt",
-              values: [
-                "hsl",
-                { function: "var", values: ["--hue"] },
-                { function: "var", values: ["--saturation"] },
-                { function: "var", values: ["--lightness"] },
-              ],
-            },
-          },
-        ],
-        topics: ["--hue", "--saturation", "--lightness"],
-      },
-    },
-  },
+  // "text-[color:hsl(var(--hue),var(--saturation),var(--lightness))]": {
+  //   css: `:root { --hue: 255; }`,
+  //   output: {
+  //     ":root": {
+  //       variables: [{ "--hue": 255 }],
+  //     },
+  //     "text-[color:hsl(var(--hue),var(--saturation),var(--lightness))]": {
+  //       styles: [
+  //         {
+  //           color: {
+  //             function: "inbuilt",
+  //             values: [
+  //               "hsl",
+  //               { function: "var", values: ["--hue"] },
+  //               { function: "var", values: ["--saturation"] },
+  //               { function: "var", values: ["--lightness"] },
+  //             ],
+  //           },
+  //         },
+  //       ],
+  //       topics: ["--hue", "--saturation", "--lightness"],
+  //     },
+  //   },
+  // },
   // "w-screen": {
   //   styles: [{ width: { function: "vw", values: [100] } }],
   // },

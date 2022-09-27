@@ -8,6 +8,7 @@ import { CreateOptions } from "../style-sheet";
 import { parseMediaQuery, MediaQueryMeta } from "./media-query";
 import { getDeclarations } from "./declarations";
 import { getSelector } from "./selector";
+import { flatten } from "./flatten";
 
 const skip = (walk as unknown as Record<string, unknown>).skip;
 
@@ -105,13 +106,11 @@ function addRule(
     // Invalid selector, skip it
     if (!selector) return;
 
-    if (selector === ":root") {
-      createOptions[selector] ??= { variables };
-      return;
-    }
-
-    if (selector === "dark") {
-      createOptions[selector] ??= { variables };
+    if (selector === ":root" || selector === "dark") {
+      if (styles.fontSize) {
+        variables.push({ "--rem": styles.fontSize });
+      }
+      createOptions[selector] ??= { variables: [flatten(variables)] };
       return;
     }
 

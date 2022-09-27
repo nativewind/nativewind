@@ -1,9 +1,10 @@
 /* eslint-disable unicorn/no-lonely-if */
-import { Block, CssNode, Declaration, walk } from "css-tree";
-import { Atom, AtomStyle, StyleWithFunction } from "../style-sheet";
+import { Block, CssNode, Declaration, walk, parse } from "css-tree";
+import { Atom, StyleWithFunction, VariableValue } from "../style-sheet";
 import { validProperties } from "./valid-styles";
 
 import { TransformsStyle } from "react-native";
+import { flatten } from "./flatten";
 
 export type StylesAndTopics = Required<
   Pick<Atom, "styles" | "topics" | "variables">
@@ -58,7 +59,20 @@ export function getDeclarations(block: Block) {
         default: {
           if (node.value.type === "Raw") {
             if (node.property.startsWith("--")) {
-              atom.variables.push({ [node.property]: node.value.value.trim() });
+              const ast = parse(node.value.value.trim(), { context: "value" });
+
+              if (ast.type !== "Value") {
+                return;
+              }
+
+              const value = parseStyleValue(ast.children.toArray()[0], []);
+              if (typeof value === "object" && !("function" in value)) {
+                return;
+              }
+
+              if (value !== undefined) {
+                atom.variables.push({ [node.property]: value });
+              }
             }
           } else {
             return pushStyle(
@@ -72,17 +86,9 @@ export function getDeclarations(block: Block) {
     },
   });
 
-  let styles: AtomStyle = {};
-
-  for (const style of atom.styles) {
-    for (const [key, value] of Object.entries(style)) {
-      styles = setValue(styles, key, value);
-    }
-  }
-
   return {
     ...atom,
-    styles,
+    styles: flatten(atom.styles),
   };
 }
 
@@ -116,10 +122,11 @@ function parseStyleValue(
   node: StyleValue | null | undefined,
   topics: string[]
 ): StyleValue | StyleValue[] | undefined {
-  if (!node) return [];
+  if (!node) return;
 
   if (typeof node === "string") {
-    return node;
+    const maybeNumber = Number.parseFloat(node);
+    return Number.isNaN(maybeNumber) ? node : maybeNumber;
   }
 
   if (typeof node === "number") {
@@ -163,16 +170,54 @@ function parseStyleValue(
         switch (node.name) {
           case "pixelRatio":
             return { function: "pixelRatio", values: [] };
+          case "platformColor": {
+            const children = node.children
+              .toArray()
+              .map((child) => parseStyleValue(child, topics))
+              .filter((child) => Boolean(child));
+
+            return {
+              function: "platformColor",
+              values: children as unknown as VariableValue[],
+            };
+          }
           case "var": {
-            const value = parseStyleValue(node.children.shift()?.data, topics);
+            const children = node.children.toArray();
+            const variableName = parseStyleValue(children[0], topics);
 
-            if (typeof value !== "string") return [];
+            if (typeof variableName !== "string") return [];
 
-            topics.push(value);
+            const values: StyleWithFunction["values"] = [variableName];
+            topics.push(variableName);
+
+            if (children.length === 3) {
+              const defaultChild = children[2];
+
+              if (defaultChild.type === "Raw") {
+                const ast = parse(defaultChild.value, {
+                  context: "value",
+                });
+
+                if (ast.type === "Value") {
+                  const defaultValue = parseStyleValue(
+                    ast.children.toArray()[0],
+                    []
+                  );
+
+                  if (typeof defaultValue === "object") {
+                    if ("function" in defaultValue) {
+                      values.push(defaultValue);
+                    }
+                  } else if (defaultValue) {
+                    values.push(defaultValue);
+                  }
+                }
+              }
+            }
 
             return {
               function: "var",
-              values: [value],
+              values,
             };
           }
           default: {
@@ -202,26 +247,6 @@ function parseStyleValue(
       return [key, parseStyleValue(value, topics)];
     })
   ) as unknown as Transform;
-}
-
-function setValue<T extends Record<string, unknown>>(
-  object: T,
-  is: string | string[],
-  value: unknown
-): T {
-  if (typeof is == "string") {
-    return setValue<T>(object, is.split("."), value);
-  } else if (is.length == 1) {
-    (object as Record<string, unknown>)[is[0]] = value;
-    return object;
-  } else {
-    (object as Record<string, unknown>)[is[0]] = setValue<T>(
-      (object[is[0]] || {}) as T,
-      is.slice(1),
-      value
-    );
-    return object;
-  }
 }
 
 function border(atom: StylesAndTopics, node: Declaration) {

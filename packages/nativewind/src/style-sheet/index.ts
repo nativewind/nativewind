@@ -24,7 +24,7 @@ export type AtomStyle = {
 
 export type StyleWithFunction = {
   function: string;
-  values: Array<StyleWithFunction | string | number>;
+  values: Array<VariableValue>;
 };
 
 export type VariableValue =
