@@ -2,14 +2,13 @@ name: Main
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release:
-    name: Test & Release
+  Test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
