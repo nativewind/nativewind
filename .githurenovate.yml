@@ -1,8 +1,8 @@
 name: Main
 
 on:
-  pull_request:
-    branches: [main]
+  push:
+    branches: [renovate/**]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
