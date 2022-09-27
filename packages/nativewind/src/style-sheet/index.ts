@@ -27,11 +27,17 @@ export type StyleWithFunction = {
   values: Array<StyleWithFunction | string | number>;
 };
 
+export type VariableValue =
+  | string
+  | number
+  | StyleWithFunction
+  | OpaqueColorValue;
+
 export interface Atom {
   styles?: AtomStyle[];
   atRules?: Record<number, Array<AtRuleTuple>>;
   conditions?: string[];
-  customProperties?: string[];
+  variables?: Array<Record<string, VariableValue>>;
   topics?: string[];
   topicSubscription?: () => void;
   childClasses?: string[];
@@ -63,8 +69,7 @@ const createSubscriber =
     return () => listeners.delete(listener);
   };
 
-// eslint-disable-next-line unicorn/no-useless-undefined
-let dimensionsListener: EmitterSubscription | undefined = undefined;
+let dimensionsListener: EmitterSubscription | undefined;
 
 const atoms: Map<string, Atom> = new Map();
 const childClasses: Map<string, string> = new Map();
@@ -92,9 +97,10 @@ const setStyles = createSetter(
 );
 const subscribeToStyles = createSubscriber(styleListeners);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let topicValues: Record<string, string | number> = {};
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let topicValues: Record<string, VariableValue> = {};
+let rootVariableValues: Record<string, VariableValue> = {};
+let darkRootVariableValues: Record<string, VariableValue> = {};
+
 const topicValueListeners = new Set<Listener<typeof topicValues>>();
 const setTopicValues = createSetter(
   () => topicValues,
@@ -165,12 +171,12 @@ export const NativeWindStyleSheet = {
   setColorScheme,
   setDirection,
   toggleColorScheme,
-  setCustomProperties,
+  setVariable: setVariables,
+  setCustomProperties: setVariables,
   setDimensions,
   setDangerouslyCompileStyles: (callback: typeof dangerouslyCompileStyles) =>
     (dangerouslyCompileStyles = callback),
 };
-NativeWindStyleSheet.reset();
 
 export type CreateOptions = Record<string, Atom>;
 
@@ -181,7 +187,35 @@ function create(options: CreateOptions) {
 
   let newStyles: Record<string, Style[] | undefined> = {};
 
+  const root = options[":root"];
+  if (root?.variables) {
+    rootVariableValues = { ...rootVariableValues, ...root.variables[0] };
+  }
+
+  const dark = options["dark"];
+  if (dark?.variables) {
+    darkRootVariableValues = {
+      ...rootVariableValues,
+      ...darkRootVariableValues,
+      ...dark.variables[0],
+    };
+  }
+
+  if (root || dark) {
+    setTopicValues(
+      getColorScheme() === "light" ? rootVariableValues : darkRootVariableValues
+    );
+  }
+
   for (const [atomName, atom] of Object.entries(options)) {
+    if (atomName === ":root") {
+      continue;
+    }
+
+    if (atomName === ".dark") {
+      continue;
+    }
+
     if (atom.topics) {
       atom.topicSubscription = subscribeToTopics((values, oldValues) => {
         const topicChanged = atom.topics?.some((topic) => {
@@ -218,7 +252,7 @@ function evaluate(name: string, atom: Atom) {
 
     for (const [key, value] of Object.entries(styles)) {
       if (typeof value === "object" && "function" in value) {
-        (styles as Record<string, unknown>)[key] = resolveFunction(value);
+        (styles as Record<string, unknown>)[key] = resolveVariableValue(value);
       }
     }
 
@@ -241,17 +275,31 @@ function evaluate(name: string, atom: Atom) {
           case "platform":
             return params === Platform.OS;
           case "width":
-            return params === topicValues["device-width"];
-          case "min-width":
-            return (params ?? 0) >= topicValues["device-width"];
-          case "max-width":
-            return (params ?? 0) <= topicValues["device-width"];
+            return params === resolveVariableValue(topicValues["device-width"]);
+          case "min-width": {
+            const value = resolveVariableValue(topicValues["device-width"]);
+            if (typeof value !== "number") return false;
+            return (params ?? 0) >= value;
+          }
+          case "max-width": {
+            const value = resolveVariableValue(topicValues["device-width"]);
+            if (typeof value !== "number") return false;
+            return (params ?? 0) <= value;
+          }
           case "height":
-            return params === topicValues["device-height"];
-          case "min-height":
-            return (params ?? 0) >= topicValues["device-height"];
-          case "max-height":
-            return (params ?? 0) <= topicValues["device-height"];
+            return (
+              params === resolveVariableValue(topicValues["device-height"])
+            );
+          case "min-height": {
+            const value = resolveVariableValue(topicValues["device-height"]);
+            if (typeof value !== "number") return false;
+            return (params ?? 0) >= value;
+          }
+          case "max-height": {
+            const value = resolveVariableValue(topicValues["device-height"]);
+            if (typeof value !== "number") return false;
+            return (params ?? 0) <= value;
+          }
           default:
             return true;
         }
@@ -284,14 +332,16 @@ function evaluate(name: string, atom: Atom) {
   return newStyles;
 }
 
-function resolveFunction(
-  style: StyleWithFunction | string | number
+function resolveVariableValue(
+  style: VariableValue
 ): string | number | OpaqueColorValue | undefined {
   if (typeof style !== "object" || !("function" in style)) {
     return style;
   }
 
-  const resolvedValues = style.values.map((value) => resolveFunction(value));
+  const resolvedValues = style.values.map((value) =>
+    resolveVariableValue(value)
+  );
 
   switch (style.function) {
     case "inbuilt": {
@@ -311,7 +361,10 @@ function resolveFunction(
     case "var": {
       const [variable, defaultValue] = resolvedValues;
       if (typeof variable !== "string") return;
-      return topicValues[variable] ?? defaultValue;
+      const value = topicValues[variable];
+      if (!value) return defaultValue;
+      if (typeof value === "object" && "function" in value) return defaultValue;
+      return value;
     }
     case "platformSelect": {
       const specifics = resolveSpecifics(resolvedValues);
@@ -363,7 +416,7 @@ function resolveSpecifics(
       .filter((value): value is string => typeof value === "string")
       .map((value) => {
         const [platform, other] = value.split("_");
-        return [platform, resolveFunction(other)];
+        return [platform, resolveVariableValue(other)];
       })
   );
 }
@@ -475,25 +528,16 @@ function getColorScheme() {
 }
 
 function setColorScheme(system?: ColorSchemeName | "system" | null) {
+  const colorScheme =
+    !system || system === "system"
+      ? Appearance.getColorScheme() || "light"
+      : system;
+
   setTopicValues({
     colorSchemeSystem: system ?? "system",
-    colorScheme:
-      !system || system === "system"
-        ? Appearance.getColorScheme() || "light"
-        : system,
+    colorScheme,
+    ...(colorScheme === "light" ? rootVariableValues : darkRootVariableValues),
   });
-}
-
-function setDirection(direction: "ltr" | "rtl") {
-  setTopicValues({
-    i18nDirection: direction,
-  });
-}
-
-function setCustomProperties(
-  properties: Record<`--${string}`, string | number>
-) {
-  setTopicValues(properties);
 }
 
 function toggleColorScheme() {
@@ -503,13 +547,26 @@ function toggleColorScheme() {
         ? Appearance.getColorScheme() || "light"
         : state["colorScheme"];
 
-    const newColor = currentColor === "light" ? "dark" : "light";
+    const colorScheme = currentColor === "light" ? "dark" : "light";
 
     return {
-      colorScheme: newColor,
-      colorSchemeSystem: newColor,
+      colorScheme,
+      colorSchemeSystem: colorScheme,
+      ...(colorScheme === "light"
+        ? rootVariableValues
+        : darkRootVariableValues),
     };
   });
+}
+
+function setDirection(direction: "ltr" | "rtl") {
+  setTopicValues({
+    i18nDirection: direction,
+  });
+}
+
+function setVariables(properties: Record<`--${string}`, string | number>) {
+  setTopicValues(properties);
 }
 
 topicValueListeners.add((topics) => {
@@ -565,3 +622,5 @@ function setDimensions(dimensions: Dimensions) {
     });
   });
 }
+
+NativeWindStyleSheet.reset();

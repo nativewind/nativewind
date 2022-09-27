@@ -5,7 +5,9 @@ import { validProperties } from "./valid-styles";
 
 import { TransformsStyle } from "react-native";
 
-export type StylesAndTopics = Required<Pick<Atom, "styles" | "topics">>;
+export type StylesAndTopics = Required<
+  Pick<Atom, "styles" | "topics" | "variables">
+>;
 
 type InferArray<T> = T extends Array<infer K> ? K : never;
 type Transform = InferArray<NonNullable<TransformsStyle["transform"]>>;
@@ -24,6 +26,7 @@ export function getDeclarations(block: Block) {
   const atom: StylesAndTopics = {
     styles: [],
     topics: [],
+    variables: [],
   };
 
   walk(block, {
@@ -52,13 +55,19 @@ export function getDeclarations(block: Block) {
           return textShadow(atom, node);
         case "transform":
           return transform(atom, node);
-        default:
-          if (node.value.type === "Raw") return;
-          return pushStyle(
-            atom,
-            node.property,
-            node.value.children.toArray()[0]
-          );
+        default: {
+          if (node.value.type === "Raw") {
+            if (node.property.startsWith("--")) {
+              atom.variables.push({ [node.property]: node.value.value.trim() });
+            }
+          } else {
+            return pushStyle(
+              atom,
+              node.property,
+              node.value.children.toArray()[0]
+            );
+          }
+        }
       }
     },
   });
@@ -72,8 +81,8 @@ export function getDeclarations(block: Block) {
   }
 
   return {
+    ...atom,
     styles,
-    topics: atom.topics,
   };
 }
 
@@ -84,7 +93,9 @@ function pushStyle(
 ) {
   if (!node) return;
 
-  const [value, topics = []] = parseStyleValue(node);
+  const topics: string[] = [];
+  // This mutates topics, theres probably a better way to write this
+  const value = parseStyleValue(node, topics);
 
   if (value === undefined || value === null) return;
 
@@ -102,59 +113,56 @@ function pushStyle(
 }
 
 function parseStyleValue(
-  node?: StyleValue | null,
-  topics: string[] = []
-): [StyleValue, string[]] | [] {
+  node: StyleValue | null | undefined,
+  topics: string[]
+): StyleValue | StyleValue[] | undefined {
   if (!node) return [];
 
   if (typeof node === "string") {
-    return [node, topics];
+    return node;
   }
 
   if (typeof node === "number") {
-    return [node, topics];
+    return node;
   }
 
   if (Array.isArray(node)) {
-    return [node.map((n) => parseStyleValue(n, topics)[0]) as string[], topics];
+    return node.map((n) => parseStyleValue(n, topics)) as StyleValue[];
   }
 
   if ("function" in node) {
-    return [node as StyleWithFunction, topics];
+    return node;
   }
 
   if ("type" in node) {
     switch (node.type) {
       case "Identifier":
-        return [node.name, topics];
+        return node.name;
       case "Number":
-        return [Number.parseFloat(node.value.toString()), topics];
+        return Number.parseFloat(node.value.toString());
       case "String":
-        return [node.value, topics];
+        return node.value;
       case "Hash":
-        return [`#${node.value}`, topics];
+        return `#${node.value}`;
       case "Percentage":
-        return [`${node.value}%`, topics];
+        return `${node.value}%`;
       case "Dimension":
         switch (node.unit) {
           case "px":
-            return [Number.parseFloat(node.value.toString()), topics];
+            return Number.parseFloat(node.value.toString());
           case "vw":
           case "vh":
-            return [
-              {
-                function: node.unit,
-                values: [Number.parseFloat(node.value.toString())],
-              },
-              topics,
-            ];
+            return {
+              function: node.unit,
+              values: [Number.parseFloat(node.value.toString())],
+            };
           default:
-            return [`${node.value}${node.unit}`, topics];
+            return `${node.value}${node.unit}`;
         }
       case "Function":
         switch (node.name) {
           case "pixelRatio":
-            return [{ function: "pixelRatio", values: [] }, topics];
+            return { function: "pixelRatio", values: [] };
           case "var": {
             const value = parseStyleValue(node.children.shift()?.data, topics);
 
@@ -162,13 +170,10 @@ function parseStyleValue(
 
             topics.push(value);
 
-            return [
-              {
-                function: "var",
-                values: [value],
-              },
-              topics,
-            ];
+            return {
+              function: "var",
+              values: [value],
+            };
           }
           default: {
             const values = node.children.toArray().flatMap((child) => {
@@ -179,30 +184,24 @@ function parseStyleValue(
               (value) => typeof value === "object"
             );
 
-            return [
-              hasDynamicValues
-                ? {
-                    function: "inbuilt",
-                    values: [node.name, ...(values as string[])],
-                  }
-                : `${node.name}(${values.join(", ")})`,
-              topics,
-            ];
+            return hasDynamicValues
+              ? {
+                  function: "inbuilt",
+                  values: [node.name, ...(values as string[])],
+                }
+              : `${node.name}(${values.join(", ")})`;
           }
         }
       default:
-        return [];
+        return;
     }
   }
 
-  return [
-    Object.fromEntries(
-      Object.entries(node).map(([key, value]) => {
-        return [key, parseStyleValue(value)];
-      })
-    ) as unknown as Transform,
-    topics,
-  ];
+  return Object.fromEntries(
+    Object.entries(node).map(([key, value]) => {
+      return [key, parseStyleValue(value, topics)];
+    })
+  ) as unknown as Transform;
 }
 
 function setValue<T extends Record<string, unknown>>(
@@ -818,7 +817,7 @@ function transform(atom: StylesAndTopics, node: Declaration) {
       case "translateX":
       case "translateY":
       case "matrix": {
-        const [value] = parseStyleValue(child.children.toArray()[0]);
+        const value = parseStyleValue(child.children.toArray()[0], []);
         transform.push({ [child.name]: value } as unknown as Transform);
       }
     }

@@ -25,6 +25,8 @@ export function getSelector(node: CssNode) {
         if (node.name === "children") {
           hasParent = true;
           tokens.push(`:${node.name}`);
+        } else if (node.name === "root") {
+          tokens.push(`:${node.name}`);
         } else {
           conditions.push(node.name);
         }

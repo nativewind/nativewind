@@ -92,7 +92,7 @@ function addRule(
   const selectorList = node.prelude;
   if (selectorList.type === "Raw") return skip;
 
-  const { styles, topics: ruleTopics } = getDeclarations(node.block);
+  const { styles, topics: ruleTopics, variables } = getDeclarations(node.block);
 
   // eslint-disable-next-line unicorn/no-array-for-each
   selectorList.children.forEach((selectorNode) => {
@@ -104,6 +104,17 @@ function addRule(
 
     // Invalid selector, skip it
     if (!selector) return;
+
+    if (selector === ":root") {
+      createOptions[selector] ??= { variables };
+      return;
+    }
+
+    if (selector === "dark") {
+      createOptions[selector] ??= { variables };
+      return;
+    }
+
     if (Object.keys(styles).length === 0) return;
 
     createOptions[selector] ??= { styles: [] };
