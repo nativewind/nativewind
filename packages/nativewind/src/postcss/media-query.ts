@@ -27,22 +27,21 @@ export function parseMediaQuery(
     } else if (child.type === "MediaFeature") {
       topicsAndAtRules.atRules ??= [];
 
-      switch (child.name) {
-        case "min-width":
-          topicsAndAtRules.topics.push("device-width");
-          break;
+      if (child.name.includes("width")) {
+        topicsAndAtRules.topics.push("device-width");
+      }
+
+      if (child.name.includes("height")) {
+        topicsAndAtRules.topics.push("device-width");
+      }
+
+      if (child.name.includes("prefers-color-scheme")) {
+        topicsAndAtRules.topics.push("--color-scheme");
       }
 
       switch (child.value?.type) {
         case "Identifier":
           topicsAndAtRules.atRules.push([child.name, child.value.name]);
-
-          switch (child.name) {
-            case "prefers-color-scheme":
-              topicsAndAtRules.topics.push("--color-scheme");
-              break;
-          }
-
           break;
         case "Dimension":
           switch (child.value.unit) {
