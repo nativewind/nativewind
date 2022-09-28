@@ -1,5 +1,5 @@
 import { MediaQuery } from "css-tree";
-import { AtRuleTuple } from "../types/common";
+import { AtRuleTuple } from "./types";
 
 const platforms = new Set([
   "native",

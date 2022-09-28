@@ -21,8 +21,8 @@ import { withStyledProps } from "./with-styled-props";
 import { StyleProp } from "react-native";
 import { GroupContext, IsolateGroupContext } from "./group-context";
 import { useComponentState } from "./use-component-state";
-import { Style } from "../types/common";
-import { isFragment, isValidElementType } from "react-is";
+import { isFragment } from "react-is";
+import { Style } from "../postcss/types";
 
 export interface StyledOptions<
   T,

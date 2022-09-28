@@ -13,36 +13,9 @@ import {
 } from "react-native";
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 
-import { AtRuleTuple, Style } from "../types/common";
-import themeFunctions from "./theme-functions";
+import { Atom, AtomRecord, Style, VariableValue } from "../postcss/types";
 
 type Listener<T> = (state: T, oldState: T) => void;
-
-export type AtomStyle = {
-  [T in keyof Style]: Style[T] | StyleWithFunction;
-};
-
-export type StyleWithFunction = {
-  function: string;
-  values: Array<VariableValue>;
-};
-
-export type VariableValue =
-  | string
-  | number
-  | StyleWithFunction
-  | OpaqueColorValue;
-
-export interface Atom {
-  styles?: AtomStyle[];
-  atRules?: Record<number, Array<AtRuleTuple>>;
-  conditions?: string[];
-  variables?: Array<Record<string, VariableValue>>;
-  topics?: string[];
-  topicSubscription?: () => void;
-  childClasses?: string[];
-  meta?: Record<string, true>;
-}
 
 const createSetter =
   <T extends Record<string, unknown | undefined>>(
@@ -119,54 +92,10 @@ let isPreprocessed = Platform.select({
 let dangerouslyCompileStyles: (css: string) => void | undefined;
 
 export const NativeWindStyleSheet = {
-  ...themeFunctions,
   create,
+  reset,
   warmCache,
   useSync,
-  reset: () => {
-    atoms.clear();
-    childClasses.clear();
-    styleSets = {};
-    styleSetsListeners.clear();
-    styles = {};
-    styleListeners.clear();
-    topicValues = {
-      platform: Platform.OS,
-    };
-    topicValueListeners.clear();
-    setDimensions(Dimensions);
-    setColorScheme("system");
-    setDirection(I18nManager.isRTL ? "rtl" : "ltr");
-
-    // Add some default atoms. These no do not compile
-
-    atoms.set("group", {
-      styles: [],
-      meta: {
-        group: true,
-      },
-    });
-
-    atoms.set("group-isolate", {
-      styles: [],
-      meta: {
-        groupIsolate: true,
-      },
-    });
-
-    atoms.set("parent", {
-      styles: [],
-      meta: {
-        parent: true,
-      },
-    });
-  },
-  isPreprocessed: () => isPreprocessed,
-  setOutput: (
-    specifics: { [platform in PlatformOSType]?: "native" | "css" } & {
-      default: "native" | "css";
-    }
-  ) => (isPreprocessed = Platform.select(specifics) === "css"),
   getColorScheme,
   setColorScheme,
   setDirection,
@@ -174,13 +103,18 @@ export const NativeWindStyleSheet = {
   setVariable: setVariables,
   setCustomProperties: setVariables,
   setDimensions,
-  setDangerouslyCompileStyles: (callback: typeof dangerouslyCompileStyles) =>
-    (dangerouslyCompileStyles = callback),
+  isPreprocessed: () => isPreprocessed,
+  setOutput: (
+    specifics: { [platform in PlatformOSType]?: "native" | "css" } & {
+      default: "native" | "css";
+    }
+  ) => (isPreprocessed = Platform.select(specifics) === "css"),
+  setDangerouslyCompileStyles: (callback: typeof dangerouslyCompileStyles) => {
+    dangerouslyCompileStyles = callback;
+  },
 };
 
-export type CreateOptions = Record<string, Atom>;
-
-function create(options: CreateOptions) {
+function create(options: AtomRecord) {
   if (isPreprocessed) {
     return;
   }
@@ -208,11 +142,7 @@ function create(options: CreateOptions) {
   }
 
   for (const [atomName, atom] of Object.entries(options)) {
-    if (atomName === ":root") {
-      continue;
-    }
-
-    if (atomName === ".dark") {
+    if (atomName === ":root" || atomName === "dark") {
       continue;
     }
 
@@ -237,6 +167,45 @@ function create(options: CreateOptions) {
   }
 
   setStyles(newStyles);
+}
+
+function reset() {
+  atoms.clear();
+  childClasses.clear();
+  styleSets = {};
+  styleSetsListeners.clear();
+  styles = {};
+  styleListeners.clear();
+  topicValues = {
+    platform: Platform.OS,
+  };
+  topicValueListeners.clear();
+  setDimensions(Dimensions);
+  setColorScheme("system");
+  setDirection(I18nManager.isRTL ? "rtl" : "ltr");
+
+  // Add some default atoms. These no do not compile
+
+  atoms.set("group", {
+    styles: [],
+    meta: {
+      group: true,
+    },
+  });
+
+  atoms.set("group-isolate", {
+    styles: [],
+    meta: {
+      groupIsolate: true,
+    },
+  });
+
+  atoms.set("parent", {
+    styles: [],
+    meta: {
+      parent: true,
+    },
+  });
 }
 
 function evaluate(name: string, atom: Atom) {

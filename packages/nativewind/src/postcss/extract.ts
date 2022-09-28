@@ -1,14 +1,23 @@
 import postcss from "postcss";
-import { walk, parse, CssNode, Rule, Atrule } from "css-tree";
+import { walk, parse, CssNode, Rule, Atrule, Block } from "css-tree";
 
 import tailwind, { Config } from "tailwindcss";
 
-import { CreateOptions } from "../style-sheet";
-
+import { AtomRecord, DeclarationAtom } from "./types";
 import { parseMediaQuery, MediaQueryMeta } from "./media-query";
-import { getDeclarations } from "./declarations";
-import { getSelector } from "./selector";
-import { flatten } from "./flatten";
+
+import { defaultDeclaration } from "./transforms/default";
+import { border } from "./transforms/border";
+import { boxShadow } from "./transforms/box-shadow";
+import { flex } from "./transforms/flex";
+import { flexFlow } from "./transforms/flex-flow";
+import { font } from "./transforms/font";
+import { fontFamily } from "./transforms/font-family";
+import { placeContent } from "./transforms/place-content";
+import { textDecoration } from "./transforms/text-decoration";
+import { textDecorationLine } from "./transforms/text-decoration-line";
+import { textShadow } from "./transforms/text-shadow";
+import { transform } from "./transforms/transform";
 
 const skip = (walk as unknown as Record<string, unknown>).skip;
 
@@ -21,7 +30,7 @@ export function extractStyles(
 }
 
 export function getCreateOptions(css: string) {
-  const createOptions: CreateOptions = {};
+  const createOptions: AtomRecord = {};
 
   walkAst(parse(css), createOptions);
 
@@ -30,7 +39,7 @@ export function getCreateOptions(css: string) {
 
 function walkAst(
   ast: CssNode,
-  createOptions: CreateOptions,
+  createOptions: AtomRecord,
   existingMeta?: MediaQueryMeta
 ) {
   walk(ast, {
@@ -59,7 +68,7 @@ function walkAst(
 
 export function addAtRule(
   node: Atrule,
-  createOptions: CreateOptions,
+  createOptions: AtomRecord,
   meta: MediaQueryMeta
 ) {
   if (node.name !== "media") return;
@@ -83,7 +92,7 @@ export function addAtRule(
 
 function addRule(
   node: Rule,
-  createOptions: CreateOptions,
+  createOptions: AtomRecord,
   {
     topics: atRuleTopics,
     conditions: atRuleConditions,
@@ -149,4 +158,132 @@ function addRule(
       }
     }
   });
+}
+
+function getDeclarations(block: Block) {
+  const atom: DeclarationAtom = {
+    styles: [],
+    topics: [],
+    variables: [],
+  };
+
+  walk(block, {
+    visit: "Declaration",
+    enter(node) {
+      switch (node.property) {
+        case "border":
+          return border(atom, node);
+        case "box-shadow":
+          return boxShadow(atom, node);
+        case "flex":
+          return flex(atom, node);
+        case "flex-flow":
+          return flexFlow(atom, node);
+        case "font":
+          return font(atom, node);
+        case "font-family":
+          return fontFamily(atom, node);
+        case "place-content":
+          return placeContent(atom, node);
+        case "text-decoration":
+          return textDecoration(atom, node);
+        case "text-decoration-line":
+          return textDecorationLine(atom, node);
+        case "text-shadow":
+          return textShadow(atom, node);
+        case "transform":
+          return transform(atom, node);
+        default: {
+          return defaultDeclaration(atom, node);
+        }
+      }
+    },
+  });
+
+  return {
+    ...atom,
+    styles: flatten(atom.styles),
+  };
+}
+
+function getSelector(node: CssNode) {
+  const tokens: string[] = [];
+
+  const conditions: string[] = [];
+
+  let hasParent = false;
+
+  walk(node, (node) => {
+    switch (node.type) {
+      case "TypeSelector":
+        // We don't support these, so bail early
+        return { selector: "", conditions };
+      case "Combinator":
+        tokens.push(node.name);
+        break;
+      case "IdSelector":
+        tokens.push(`#${node.name}`);
+        break;
+      case "ClassSelector":
+        tokens.push(`.${node.name}`);
+        break;
+      case "PseudoClassSelector": {
+        if (node.name === "children") {
+          hasParent = true;
+          tokens.push(`:${node.name}`);
+        } else if (node.name === "root") {
+          tokens.push(`:${node.name}`);
+        } else {
+          conditions.push(node.name);
+        }
+      }
+    }
+  });
+
+  const selector = tokens
+    .join("")
+    .replace(/^\./, "")
+    .replaceAll(/\\([\dA-Fa-f]{2}\s)/g, function (...args) {
+      // Replace hex-string with their actual value
+      // We need to do this before we remove slashes, otherwise we lose the hex values
+      return String.fromCodePoint(Number.parseInt(args[1], 16));
+    })
+    .replaceAll("\\", "");
+
+  const parentSelector = hasParent
+    ? selector.replaceAll(":children", "")
+    : undefined;
+
+  return { selector, conditions, parentSelector };
+}
+
+function flatten<T extends Record<string, unknown>>(objectArray: T[]): T {
+  let returnObject = {} as T;
+  for (const object of objectArray) {
+    for (const [key, value] of Object.entries(object)) {
+      returnObject = setValue(returnObject, key, value);
+    }
+  }
+
+  return returnObject;
+}
+
+function setValue<T extends Record<string, unknown>>(
+  object: T,
+  is: string | string[],
+  value: unknown
+): T {
+  if (typeof is == "string") {
+    return setValue<T>(object, is.split("."), value);
+  } else if (is.length == 1) {
+    (object as Record<string, unknown>)[is[0]] = value;
+    return object;
+  } else {
+    (object as Record<string, unknown>)[is[0]] = setValue<T>(
+      (object[is[0]] || {}) as T,
+      is.slice(1),
+      value
+    );
+    return object;
+  }
 }

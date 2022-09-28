@@ -2,7 +2,7 @@ import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 
 import { extractStyles } from "../src/postcss/extract";
-import { Atom, CreateOptions } from "../src/style-sheet";
+import { Atom, AtomRecord } from "../src/style-sheet";
 import nativePreset from "../src/tailwind";
 
 const expectStyle = (style: string, config?: Partial<Config>, css?: string) => {
@@ -23,15 +23,15 @@ type OutputObject =
   | {
       css: string;
       config?: Partial<Config>;
-      output: CreateOptions;
+      output: AtomRecord;
     }
   | {
       css?: string;
       config: Partial<Config>;
-      output: CreateOptions;
+      output: AtomRecord;
     };
 
-type CaseOutput = Atom | CreateOptions | OutputObject;
+type CaseOutput = Atom | AtomRecord | OutputObject;
 
 const cases: Record<string, CaseOutput> = {
   "text-white": {
