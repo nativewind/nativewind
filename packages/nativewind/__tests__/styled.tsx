@@ -37,7 +37,7 @@ test("should render", () => {
   );
 });
 
-test("color scheme variables", () => {
+test.only("color scheme variables", () => {
   create(
     "text-[color:var(--test)]",
     `:root { --test: red; } .dark { --test: blue; }`
@@ -72,7 +72,6 @@ test("color scheme variables", () => {
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      children: undefined,
       style: [[{ color: "red" }]],
     },
     {}

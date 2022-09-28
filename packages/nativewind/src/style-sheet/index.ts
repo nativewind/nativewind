@@ -125,9 +125,9 @@ function warmCache(tokenSets: Array<string[]>) {
     });
 
     context.subscribeToStyles((styles, oldStyles) => {
-      const hasChanged = keyTokens.some(
-        (token) => styles[token] !== oldStyles[token]
-      );
+      const hasChanged = keyTokens.some((token) => {
+        return styles[token] !== oldStyles[token];
+      });
 
       if (hasChanged) {
         context.setStyleSets({

@@ -1,9 +1,12 @@
 import { Appearance, ColorSchemeName } from "react-native";
 import context from "./context";
 
+const colorSchemeKey = "--color-scheme";
+const colorSchemeSystemKey = "--color-scheme-system";
+
 export function resetColorScheme() {
   try {
-    if (typeof localStorage !== "undefined") {
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
       const isDarkMode = window.matchMedia(
         "(prefers-color-scheme: dark)"
       ).matches;
@@ -19,10 +22,12 @@ export function resetColorScheme() {
       setColorScheme(colorScheme);
 
       context.topicListeners.add((topics) => {
-        if (topics["colorScheme"] !== localStorage.nativewind_theme) {
-          localStorage.nativewind_theme = topics["colorScheme"];
+        if (topics[colorSchemeKey] !== localStorage.nativewind_theme) {
+          localStorage.nativewind_theme = topics[colorSchemeKey];
         }
       });
+    } else {
+      setColorScheme("system");
     }
   } catch {
     // Do nothing
@@ -39,7 +44,7 @@ export function setColorScheme(system?: ColorSchemeName | "system" | null) {
       ? Appearance.getColorScheme() || "light"
       : system;
 
-  if (typeof window !== "undefined") {
+  if (typeof document !== "undefined") {
     if (colorScheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
@@ -50,8 +55,8 @@ export function setColorScheme(system?: ColorSchemeName | "system" | null) {
   }
 
   context.setTopics({
-    colorSchemeSystem: system ?? "system",
-    colorScheme,
+    [colorSchemeSystemKey]: system ?? "system",
+    [colorSchemeKey]: colorScheme,
     ...(colorScheme === "light"
       ? context.rootVariableValues
       : context.darkRootVariableValues),
@@ -59,21 +64,21 @@ export function setColorScheme(system?: ColorSchemeName | "system" | null) {
 }
 
 export function getColorScheme() {
-  return context.topics["colorScheme"] as "light" | "dark";
+  return context.topics[colorSchemeKey] as "light" | "dark";
 }
 
 export function toggleColorScheme() {
   return context.setTopics((state) => {
     const currentColor =
-      state["colorSchemeSystem"] === "system"
+      state[colorSchemeSystemKey] === "system"
         ? Appearance.getColorScheme() || "light"
-        : state["colorScheme"];
+        : state[colorSchemeKey];
 
     const colorScheme = currentColor === "light" ? "dark" : "light";
 
     return {
-      colorScheme,
-      colorSchemeSystem: colorScheme,
+      [colorSchemeKey]: colorScheme,
+      [colorSchemeSystemKey]: colorScheme,
       ...(colorScheme === "light"
         ? context.rootVariableValues
         : context.darkRootVariableValues),

@@ -66,10 +66,11 @@ const context: StyleSheetContext = {
   },
   setStyles(value) {
     if (!value) return;
-    const oldValue = { ...value };
+    const oldValue = { ...context.styles };
+    if (!value) return;
     context.styles =
       typeof value === "function"
-        ? { ...context.styles, ...value(oldValue) }
+        ? { ...context.styles, ...value(context.styles) }
         : { ...context.styles, ...value };
 
     for (const listener of context.styleListeners) {
@@ -85,13 +86,13 @@ const context: StyleSheetContext = {
   },
   setStyleSets(value) {
     if (!value) return;
-    const oldValue = { ...value };
+    const oldValue = { ...context.styleSets };
     context.styleSets =
       typeof value === "function"
-        ? { ...context.styleSets, ...value(oldValue) }
+        ? { ...context.styleSets, ...value(context.styleSets) }
         : { ...context.styleSets, ...value };
 
-    for (const listener of context.styleListeners) {
+    for (const listener of context.styleSetListeners) {
       listener(context.styleSets, oldValue);
     }
   },
@@ -104,10 +105,10 @@ const context: StyleSheetContext = {
   },
   setTopics(value) {
     if (!value) return;
-    const oldValue = { ...value };
+    const oldValue = { ...context.topics };
     context.topics =
       typeof value === "function"
-        ? { ...context.topics, ...value(oldValue) }
+        ? { ...context.topics, ...value(context.topics) }
         : { ...context.topics, ...value };
 
     for (const listener of context.topicListeners)
@@ -125,8 +126,7 @@ const context: StyleSheetContext = {
   },
 
   updateDarkRootVariableValues(value) {
-    context.rootVariableValues = {
-      ...context.rootVariableValues,
+    context.darkRootVariableValues = {
       ...context.darkRootVariableValues,
       ...value,
     };

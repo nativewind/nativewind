@@ -2,7 +2,7 @@ import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 
 import { extractStyles } from "../src/postcss/extract";
-import { Atom, AtomRecord } from "../src/style-sheet";
+import { Atom, AtomRecord } from "../src/postcss/types";
 import nativePreset from "../src/tailwind";
 
 const expectStyle = (style: string, config?: Partial<Config>, css?: string) => {
