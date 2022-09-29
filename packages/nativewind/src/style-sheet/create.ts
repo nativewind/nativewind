@@ -11,6 +11,9 @@ import { getColorScheme } from "./color-scheme";
 import context, { Styles } from "./context";
 
 export function create(options: AtomRecord) {
+  // Please keep this, is useful for debugging
+  // console.log(JSON.stringify(options, undefined, 2));
+
   if (context.preprocessed) {
     return;
   }
@@ -77,9 +80,7 @@ function evaluate(name: string, atom: Atom): Styles | undefined {
     const styles = { ...originalStyles } as Style;
 
     for (const [key, value] of Object.entries(styles)) {
-      if (typeof value === "object" && "function" in value) {
-        (styles as Record<string, unknown>)[key] = resolveVariableValue(value);
-      }
+      (styles as Record<string, unknown>)[key] = resolveVariableValue(value);
     }
 
     const atRules = atom.atRules?.[index];
@@ -102,29 +103,37 @@ function evaluate(name: string, atom: Atom): Styles | undefined {
             return params === Platform.OS;
           case "width":
             return (
-              params === resolveVariableValue(context.topics["device-width"])
+              params === resolveVariableValue(context.topics["--window-width"])
             );
           case "min-width": {
-            const value = resolveVariableValue(context.topics["device-width"]);
+            const value = resolveVariableValue(
+              context.topics["--window-width"]
+            );
             if (typeof value !== "number") return false;
             return (params ?? 0) >= value;
           }
           case "max-width": {
-            const value = resolveVariableValue(context.topics["device-width"]);
+            const value = resolveVariableValue(
+              context.topics["--window-width"]
+            );
             if (typeof value !== "number") return false;
             return (params ?? 0) <= value;
           }
           case "height":
             return (
-              params === resolveVariableValue(context.topics["device-height"])
+              params === resolveVariableValue(context.topics["--window-height"])
             );
           case "min-height": {
-            const value = resolveVariableValue(context.topics["device-height"]);
+            const value = resolveVariableValue(
+              context.topics["--window-height"]
+            );
             if (typeof value !== "number") return false;
             return (params ?? 0) >= value;
           }
           case "max-height": {
-            const value = resolveVariableValue(context.topics["device-height"]);
+            const value = resolveVariableValue(
+              context.topics["--window-height"]
+            );
             if (typeof value !== "number") return false;
             return (params ?? 0) <= value;
           }
@@ -168,6 +177,13 @@ function resolveVariableValue(
   style: VariableValue
 ): string | number | OpaqueColorValue | undefined {
   if (typeof style !== "object" || !("function" in style)) {
+    if (typeof style === "string") {
+      if (style.startsWith('{"')) {
+        return resolveVariableValue(JSON.parse(style));
+      }
+      const maybeNumber = Number.parseFloat(style);
+      return Number.isNaN(maybeNumber) ? style : maybeNumber;
+    }
     return style;
   }
 
@@ -183,12 +199,17 @@ function resolveVariableValue(
     case "vw": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
-      return value * (context.topics["device-width"] as number);
+      return (value / 100) * (context.topics["--window-width"] as number);
     }
     case "vh": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
-      return value * (context.topics["device-height"] as number);
+      return (value / 100) * (context.topics["--window-height"] as number);
+    }
+    case "rem": {
+      const [value] = resolvedValues;
+      if (typeof value !== "number") return;
+      return value * (context.topics["--rem"] as number);
     }
     case "var": {
       const [variable, defaultValue] = resolvedValues;
@@ -247,8 +268,8 @@ function resolveSpecifics(
     values
       .filter((value): value is string => typeof value === "string")
       .map((value) => {
-        const [platform, other] = value.split("_");
-        return [platform, resolveVariableValue(other)];
+        const [platform, ...other] = value.split("__");
+        return [platform, resolveVariableValue(other.join(""))];
       })
   );
 }

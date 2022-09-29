@@ -13,10 +13,6 @@ module.exports = {
       },
     ],
   },
-  haste: {
-    defaultPlatform: "android",
-    platforms: ["android", "ios", "native"],
-  },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   testPathIgnorePatterns: [
     "/node_modules/",

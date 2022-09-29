@@ -107,13 +107,22 @@ const context: StyleSheetContext = {
   setTopics(value) {
     if (!value) return;
     const oldValue = { ...context.topics };
-    context.topics =
-      typeof value === "function"
-        ? { ...context.topics, ...value(context.topics) }
-        : { ...context.topics, ...value };
+    const newValue =
+      typeof value === "function" ? value(context.topics) : value;
 
-    for (const listener of context.topicListeners)
-      listener(context.topics, oldValue);
+    let didUpdate = false;
+    for (const [key, value] of Object.entries(newValue)) {
+      if (oldValue[key] !== value) {
+        didUpdate = true;
+        context.topics[key] = value;
+      }
+    }
+
+    if (didUpdate) {
+      for (const listener of context.topicListeners) {
+        listener(context.topics, oldValue);
+      }
+    }
   },
 
   rootVariableValues: {},
@@ -154,7 +163,8 @@ function reset() {
   context.styles = {};
   context.styleListeners.clear();
   context.topics = {
-    platform: Platform.OS,
+    "--platform": Platform.OS,
+    "--rem": 16,
   };
   context.topicListeners.clear();
 

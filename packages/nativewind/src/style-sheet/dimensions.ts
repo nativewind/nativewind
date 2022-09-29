@@ -8,17 +8,17 @@ export function setDimensions(dimensions: Dimensions) {
 
   const window = dimensions.get("window");
   context.setTopics({
-    "device-width": window.width,
-    "device-height": window.height,
-    "device-orientation":
+    "--window-width": window.width,
+    "--window-height": window.height,
+    "--window-orientation":
       window.width > window.height ? "landscape" : "portrait",
   });
 
   dimensionsListener = dimensions.addEventListener("change", ({ window }) => {
     context.setTopics({
-      "device-width": window.width,
-      "device-height": window.height,
-      "device-orientation":
+      "--window-width": window.width,
+      "--window-height": window.height,
+      "--window-orientation":
         window.width > window.height ? "landscape" : "portrait",
     });
   });

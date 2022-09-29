@@ -1,5 +1,4 @@
-import { render, act, fireEvent, screen } from "@testing-library/react-native";
-import { Pressable } from "react-native";
+import { act, render } from "@testing-library/react-native";
 import { NativeWindStyleSheet, styled } from "../src";
 import { extractStyles } from "../src/postcss/extract";
 import nativePreset from "../src/tailwind";
@@ -22,22 +21,6 @@ function create(className: string, css?: string) {
   );
 }
 
-test("should render", () => {
-  create("text-red-500");
-
-  const MyComponent = jest.fn();
-  const StyledComponent = styled(MyComponent);
-
-  render(<StyledComponent className="text-red-500" />);
-
-  expect(MyComponent).toHaveBeenCalledWith(
-    {
-      style: [[{ color: "#ef4444" }]],
-    },
-    {}
-  );
-});
-
 test("color scheme variables", () => {
   create(
     "text-[color:var(--test)]",
@@ -51,7 +34,7 @@ test("color scheme variables", () => {
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: [[{ color: "red" }]],
+      style: { color: "red" },
     },
     {}
   );
@@ -62,7 +45,7 @@ test("color scheme variables", () => {
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: [[{ color: "blue" }]],
+      style: { color: "blue" },
     },
     {}
   );
@@ -71,39 +54,39 @@ test("color scheme variables", () => {
     NativeWindStyleSheet.toggleColorScheme();
   });
 
-  expect(MyComponent).toHaveBeenCalledWith(
+  expect(MyComponent).toHaveBeenLastCalledWith(
     {
-      style: [[{ color: "red" }]],
+      style: { color: "red" },
     },
     {}
   );
 });
 
-test.only("group-active", () => {
-  create("group-active:text-black");
+test("with input functions", () => {
+  create("text-[color:hsl(1,2,var(--custom))]", `:root { --custom: 3; }`);
 
   const MyComponent = jest.fn();
   const StyledComponent = styled(MyComponent);
-  const StyledPressable = styled(Pressable);
 
-  render(
-    <StyledPressable testID="button" className="group">
-      <StyledComponent className="group-active:text-black" />
-    </StyledPressable>
-  );
+  render(<StyledComponent className="text-[color:hsl(1,2,var(--custom))]" />);
 
-  expect(MyComponent).toHaveBeenCalledWith({}, {});
-
-  fireEvent(screen.getByTestId("button"), "pressIn");
-
-  expect(MyComponent).toHaveBeenLastCalledWith(
+  expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: [[{ color: "#000" }]],
+      style: { color: "hsl(1, 2, 3)" },
     },
     {}
   );
 
-  fireEvent(screen.getByTestId("button"), "pressOut");
+  act(() => {
+    NativeWindStyleSheet.setVariables({
+      "--custom": 4,
+    });
+  });
 
-  expect(MyComponent).toHaveBeenLastCalledWith({}, {});
+  expect(MyComponent).toHaveBeenLastCalledWith(
+    {
+      style: { color: "hsl(1, 2, 4)" },
+    },
+    {}
+  );
 });

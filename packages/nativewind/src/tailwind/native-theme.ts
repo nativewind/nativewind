@@ -1,5 +1,4 @@
 import { Config } from "tailwindcss/types/config";
-import { hairlineWidth } from "../theme-functions";
 
 const rem = 16;
 
@@ -20,7 +19,7 @@ const theme: Config["theme"] = {
   borderWidth: {
     DEFAULT: "1px",
     0: "0px",
-    0.5: hairlineWidth(),
+    // 0.5: hairlineWidth(),
     2: "2px",
     4: "4px",
     8: "8px",

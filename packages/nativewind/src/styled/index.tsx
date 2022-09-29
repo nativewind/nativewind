@@ -160,8 +160,17 @@ export function styled<
     });
 
     const style = useMemo(() => {
-      const style = [styles, inlineStyles].filter(Boolean);
-      return style.length > 0 ? style : undefined;
+      if (styles) {
+        if (styles.length > 0 && inlineStyles) {
+          return [...styles, inlineStyles];
+        } else if (styles.length > 1) {
+          return styles;
+        } else if (styles.length === 1) {
+          return styles[0];
+        }
+      } else if (inlineStyles) {
+        return inlineStyles;
+      }
     }, [styles, inlineStyles]);
 
     /**

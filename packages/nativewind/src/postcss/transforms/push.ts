@@ -68,8 +68,16 @@ export function parseStyleValue(
   }
 
   switch (node.type) {
-    case "Identifier":
+    case "Identifier": {
+      if (node.name.includes('__\\{\\"function')) {
+        const [platform, ...other] = node.name.split("__");
+        return `${platform}__${JSON.stringify(
+          JSON.parse(other.join("").replaceAll(/\\/g, ""))
+        )}`;
+      }
+
       return node.name;
+    }
     case "Number":
       return Number.parseFloat(node.value.toString());
     case "String":
@@ -84,8 +92,20 @@ export function parseStyleValue(
       switch (node.unit) {
         case "px":
           return Number.parseFloat(node.value.toString());
+        case "rem":
+          topics.push("--rem");
+          return {
+            function: node.unit,
+            values: [Number.parseFloat(node.value.toString())],
+          };
         case "vw":
+          topics.push("--window-width");
+          return {
+            function: node.unit,
+            values: [Number.parseFloat(node.value.toString())],
+          };
         case "vh":
+          topics.push("--window-height");
           return {
             function: node.unit,
             values: [Number.parseFloat(node.value.toString())],
@@ -99,6 +119,7 @@ export function parseStyleValue(
 function parseFunction(node: FunctionNode, topics: string[]) {
   switch (node.name) {
     case "pixelRatio":
+    case "platformSelect":
     case "platformColor": {
       const children = node.children
         .toArray()

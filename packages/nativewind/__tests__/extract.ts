@@ -5,6 +5,11 @@ import { extractStyles } from "../src/postcss/extract";
 import { Atom, AtomRecord } from "../src/postcss/types";
 import nativePreset from "../src/tailwind";
 
+/**
+ * These tests are not really needed, and are more a sanity checker
+ * that extraction is working as expected
+ */
+
 const expectStyle = (style: string, config?: Partial<Config>, css?: string) => {
   const createOptions = extractStyles(
     {
@@ -96,139 +101,129 @@ const cases: Record<string, CaseOutput> = {
       },
     },
   },
-  // "text-apply": {
-  //   config: {
-  //     plugins: [
-  //       plugin(function ({ addUtilities }) {
-  //         addUtilities({
-  //           ".text-apply": {
-  //             "@apply text-[black] dark:text-[white]": {},
-  //           },
-  //         });
-  //       }),
-  //     ],
-  //   },
-  //   output: {
-  //     "text-apply": {
-  //       styles: [{ color: "black" }, { color: "white" }],
-  //       atRules: {
-  //         1: [["prefers-color-scheme", "dark"]],
-  //       },
-  //       topics: ["--color-scheme"],
-  //     },
-  //   },
-  // },
-  // "text-media-query": {
-  //   config: {
-  //     plugins: [
-  //       plugin(function ({ addUtilities }) {
-  //         addUtilities({
-  //           ".text-media-query": {
-  //             color: "black",
-  //           },
-  //           "@media(prefers-color-scheme: dark)": {
-  //             ".text-media-query": {
-  //               color: "white",
-  //             },
-  //           },
-  //         });
-  //       }),
-  //     ],
-  //   },
-  //   output: {
-  //     "text-media-query": {
-  //       styles: [{ color: "black" }, { color: "white" }],
-  //       atRules: {
-  //         1: [["prefers-color-scheme", "dark"]],
-  //       },
-  //       topics: ["--color-scheme"],
-  //     },
-  //   },
-  // },
-
-  // "gap-2": {
-  //   "gap-2": {
-  //     styles: [{ marginLeft: -8, marginTop: -8 }],
-  //     childClasses: ["gap-2:children"],
-  //   },
-  //   "gap-2:children": {
-  //     styles: [{ marginLeft: 8, marginTop: 8 }],
-  //   },
-  // },
-  // "text-[color:hsl(var(--hue),var(--saturation),var(--lightness))]": {
-  //   css: `:root { --hue: 255; }`,
-  //   output: {
-  //     ":root": {
-  //       variables: [{ "--hue": 255 }],
-  //     },
-  //     "text-[color:hsl(var(--hue),var(--saturation),var(--lightness))]": {
-  //       styles: [
-  //         {
-  //           color: {
-  //             function: "inbuilt",
-  //             values: [
-  //               "hsl",
-  //               { function: "var", values: ["--hue"] },
-  //               { function: "var", values: ["--saturation"] },
-  //               { function: "var", values: ["--lightness"] },
-  //             ],
-  //           },
-  //         },
-  //       ],
-  //       topics: ["--hue", "--saturation", "--lightness"],
-  //     },
-  //   },
-  // },
-  // "w-screen": {
-  //   styles: [{ width: { function: "vw", values: [100] } }],
-  // },
-  // "text-red-500": {
-  //   styles: [{ color: "#ef4444" }],
-  // },
-  // "dark:text-red-500": {
-  //   styles: [{ color: "#ef4444" }],
-  //   atRules: { 0: [["prefers-color-scheme", "dark"]] },
-  //   topics: ["--color-scheme"],
-  // },
-  // "hover:text-red-500": {
-  //   styles: [{ color: "#ef4444" }],
-  //   conditions: ["hover"],
-  // },
-  // "flex-1": {
-  //   styles: [{ flexGrow: 1, flexShrink: 1, flexBasis: "0%" }],
-  // },
-  // "shadow-sm": {
-  //   atRules: {
-  //     0: [["platform", "android"]],
-  //     1: [["platform", "ios"]],
-  //   },
-  //   styles: [
-  //     { elevation: 1.5, shadowColor: "black" },
-  //     {
-  //       shadowOffset: { width: 0, height: 1 },
-  //       shadowRadius: 2,
-  //       shadowColor: "rgba(0, 0, 0, 0.1)",
-  //     },
-  //   ],
-  // },
-  // container: {
-  //   styles: [
-  //     { width: "100%" },
-  //     { maxWidth: 640 },
-  //     { maxWidth: 768 },
-  //     { maxWidth: 1024 },
-  //     { maxWidth: 1280 },
-  //     { maxWidth: 1536 },
-  //   ],
-  //   atRules: {
-  //     1: [["min-width", 640]],
-  //     2: [["min-width", 768]],
-  //     3: [["min-width", 1024]],
-  //     4: [["min-width", 1280]],
-  //     5: [["min-width", 1536]],
-  //   },
-  //   topics: ["device-width"],
-  // },
+  "text-apply": {
+    config: {
+      plugins: [
+        plugin(function ({ addUtilities }) {
+          addUtilities({
+            ".text-apply": {
+              "@apply text-[black] dark:text-[white]": {},
+            },
+          });
+        }),
+      ],
+    },
+    output: {
+      "text-apply": {
+        styles: [{ color: "black" }, { color: "white" }],
+        atRules: {
+          1: [["prefers-color-scheme", "dark"]],
+        },
+        topics: ["--color-scheme"],
+      },
+    },
+  },
+  "text-media-query": {
+    config: {
+      plugins: [
+        plugin(function ({ addUtilities }) {
+          addUtilities({
+            ".text-media-query": {
+              color: "black",
+            },
+            "@media(prefers-color-scheme: dark)": {
+              ".text-media-query": {
+                color: "white",
+              },
+            },
+          });
+        }),
+      ],
+    },
+    output: {
+      "text-media-query": {
+        styles: [{ color: "black" }, { color: "white" }],
+        atRules: {
+          1: [["prefers-color-scheme", "dark"]],
+        },
+        topics: ["--color-scheme"],
+      },
+    },
+  },
+  "gap-2": {
+    "gap-2": {
+      styles: [{ marginLeft: -8, marginTop: -8 }],
+      childClasses: ["gap-2:children"],
+    },
+    "gap-2:children": {
+      styles: [{ marginLeft: 8, marginTop: 8 }],
+    },
+  },
+  "text-[color:hsl(var(--hue),var(--saturation),var(--lightness))]": {
+    css: `:root { --hue: 255; }`,
+    output: {
+      ":root": {
+        variables: [{ "--hue": 255 }],
+      },
+      "text-[color:hsl(var(--hue),var(--saturation),var(--lightness))]": {
+        styles: [
+          {
+            color: {
+              function: "inbuilt",
+              values: [
+                "hsl",
+                { function: "var", values: ["--hue"] },
+                { function: "var", values: ["--saturation"] },
+                { function: "var", values: ["--lightness"] },
+              ],
+            },
+          },
+        ],
+        topics: ["--hue", "--saturation", "--lightness"],
+      },
+    },
+  },
+  "dark:text-red-500": {
+    styles: [{ color: "#ef4444" }],
+    atRules: { 0: [["prefers-color-scheme", "dark"]] },
+    topics: ["--color-scheme"],
+  },
+  "hover:text-red-500": {
+    styles: [{ color: "#ef4444" }],
+    conditions: ["hover"],
+  },
+  "shadow-sm": {
+    atRules: {
+      0: [["platform", "android"]],
+      1: [["platform", "ios"]],
+    },
+    styles: [
+      { elevation: 1.5, shadowColor: "black" },
+      {
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 2,
+        shadowColor: "rgba(0, 0, 0, 0.1)",
+      },
+    ],
+  },
+  container: {
+    styles: [
+      { width: "100%" },
+      { maxWidth: 640 },
+      { maxWidth: 768 },
+      { maxWidth: 1024 },
+      { maxWidth: 1280 },
+      { maxWidth: 1536 },
+    ],
+    atRules: {
+      1: [["min-width", 640]],
+      2: [["min-width", 768]],
+      3: [["min-width", 1024]],
+      4: [["min-width", 1280]],
+      5: [["min-width", 1536]],
+    },
+    topics: ["device-width"],
+  },
 };
 
 test.each(Object.entries(cases))("%s", (input, output) => {

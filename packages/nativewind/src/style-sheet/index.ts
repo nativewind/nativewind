@@ -159,7 +159,7 @@ function warmCache(classesToWarm: Array<string>) {
 function setVariables(properties: Record<`--${string}`, string | number>) {
   context.setTopics(properties);
 
-  if (typeof window !== "undefined") {
+  if (typeof document !== "undefined") {
     for (const [key, value] of Object.entries(properties)) {
       document.documentElement.style.setProperty(key, value.toString());
     }
