@@ -8,7 +8,7 @@ import {
 
 import { Atom, AtomRecord, Style, VariableValue } from "../postcss/types";
 import { getColorScheme } from "./color-scheme";
-import context from "./context";
+import context, { Styles } from "./context";
 
 export function create(options: AtomRecord) {
   if (context.preprocessed) {
@@ -33,7 +33,7 @@ export function create(options: AtomRecord) {
     );
   }
 
-  let newStyles: Record<string, Style[] | undefined> = {};
+  let newStyles: Styles = {};
 
   for (const [atomName, atom] of Object.entries(options)) {
     if (atomName === ":root" || atomName === "dark") {
@@ -65,9 +65,9 @@ export function create(options: AtomRecord) {
   context.setStyles(newStyles);
 }
 
-function evaluate(name: string, atom: Atom) {
+function evaluate(name: string, atom: Atom): Styles | undefined {
   const atomStyles: Style[] = [];
-  let newStyles: Record<string, Style[] | undefined> = {
+  let newStyles: Styles = {
     [name]: atomStyles,
   };
 
@@ -143,7 +143,7 @@ function evaluate(name: string, atom: Atom) {
         for (const child of atom.childClasses) {
           const childAtom = context.atoms.get(child);
           if (childAtom) {
-            newStyles = { ...newStyles, ...evaluate(child, childAtom) };
+            evaluate(child, childAtom);
           }
         }
       }
@@ -155,6 +155,10 @@ function evaluate(name: string, atom: Atom) {
         }
       }
     }
+  }
+
+  if (atom.meta) {
+    context.meta.set(name, atom.meta);
   }
 
   return newStyles;

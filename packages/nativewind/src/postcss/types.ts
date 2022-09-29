@@ -15,7 +15,7 @@ export interface Atom {
   topics?: string[];
   topicSubscription?: () => void;
   childClasses?: string[];
-  meta?: Record<string, true>;
+  meta?: Record<string, boolean>;
 }
 
 export type Style = ViewStyle & TextStyle & ImageStyle;

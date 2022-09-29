@@ -3,16 +3,17 @@ import { Atom, Style, VariableValue } from "../postcss/types";
 
 export type Listener<T> = (state: T, oldState: T) => void;
 
-type Styles = Record<string, Style[] | undefined>;
-type Topics = Record<string, VariableValue>;
-type StyleSet = Record<string, Style[]>;
+export type Styles = Record<string, Style[] | undefined>;
+export type Topics = Record<string, VariableValue>;
+export type StyleSet = Record<string, Style[]>;
+export type Meta = Record<string, boolean>;
 
-interface StyleSheetContext {
+export interface StyleSheetContext {
   reset: () => void;
 
   atoms: Map<string, Atom>;
   childClasses: Map<string, string>;
-  styleMeta: Map<string, Record<string, boolean>>;
+  meta: Map<string, Record<string, boolean>>;
 
   styles: Styles;
   setStyles: (value: Styles | ((value: Styles) => Styles) | undefined) => void;
@@ -56,7 +57,7 @@ const context: StyleSheetContext = {
 
   atoms: new Map(),
   childClasses: new Map(),
-  styleMeta: new Map(),
+  meta: new Map(),
 
   styles: {},
   styleListeners: new Set(),
@@ -146,6 +147,7 @@ const context: StyleSheetContext = {
 
 function reset() {
   context.atoms.clear();
+  context.meta.clear();
   context.childClasses.clear();
   context.styleSets = {};
   context.styleSetListeners.clear();
@@ -157,25 +159,16 @@ function reset() {
   context.topicListeners.clear();
 
   // Add some default atoms. These no do not compile
-  context.atoms.set("group", {
-    styles: [],
-    meta: {
-      group: true,
-    },
+  context.meta.set("group", {
+    group: true,
   });
 
-  context.atoms.set("group-isolate", {
-    styles: [],
-    meta: {
-      groupIsolate: true,
-    },
+  context.meta.set("scoped-group", {
+    scopedGroup: true,
   });
 
-  context.atoms.set("parent", {
-    styles: [],
-    meta: {
-      parent: true,
-    },
+  context.meta.set("parent", {
+    parent: true,
   });
 
   context.preprocessed = Platform.select({

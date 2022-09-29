@@ -8,7 +8,7 @@ import { elevation } from "./plugins/elevation";
 import { fontSize } from "./plugins/font-size";
 import { gap } from "./plugins/gap";
 import { group } from "./plugins/group";
-import { groupIsolate } from "./plugins/group-isolate";
+import { scopedGroup } from "./plugins/scoped-group";
 import { lineHeight } from "./plugins/line-height";
 import { parent } from "./plugins/parent";
 import { rotate } from "./plugins/rotate";
@@ -29,7 +29,7 @@ const preset: Config = {
     fontSize,
     gap,
     group,
-    groupIsolate,
+    scopedGroup,
     lineHeight,
     parent,
     rotate,

@@ -19,7 +19,7 @@ import { NativeWindStyleSheet } from "../style-sheet";
 import { InteractionProps, useInteraction } from "./use-interaction";
 import { withStyledProps } from "./with-styled-props";
 import { StyleProp } from "react-native";
-import { GroupContext, IsolateGroupContext } from "./group-context";
+import { GroupContext, ScopedGroupContext } from "./group-context";
 import { useComponentState } from "./use-component-state";
 import { isFragment } from "react-is";
 import { Style } from "../postcss/types";
@@ -121,7 +121,7 @@ export function styled<
     ref: ForwardedRef<unknown>
   ) {
     const groupContext = useContext(GroupContext);
-    const isolateGroupContext = useContext(IsolateGroupContext);
+    const scopeGroupContext = useContext(ScopedGroupContext);
 
     const classNameWithDefaults = baseClassName
       ? `${baseClassName} ${twClassName ?? propClassName}`
@@ -156,11 +156,12 @@ export function styled<
     } = NativeWindStyleSheet.useSync(className, {
       ...componentState,
       ...groupContext,
-      ...isolateGroupContext,
+      ...scopeGroupContext,
     });
 
     const style = useMemo(() => {
-      return [styles, inlineStyles].filter(Boolean) as Style;
+      const style = [styles, inlineStyles].filter(Boolean);
+      return style.length > 0 ? style : undefined;
     }, [styles, inlineStyles]);
 
     /**
@@ -211,20 +212,20 @@ export function styled<
       reactNode = createElement(GroupContext.Provider, {
         children: reactNode,
         value: {
-          groupHover: groupContext.groupHover || componentState.hover,
-          groupFocus: groupContext.groupFocus || componentState.focus,
-          groupActive: groupContext.groupActive || componentState.active,
+          "group-hover": groupContext["group-hover"] || componentState.hover,
+          "group-focus": groupContext["group-focus"] || componentState.focus,
+          "group-active": groupContext["group-active"] || componentState.active,
         },
       });
     }
 
-    if (meta.groupIsolated) {
-      reactNode = createElement(IsolateGroupContext.Provider, {
+    if (meta.scopedGroup) {
+      reactNode = createElement(ScopedGroupContext.Provider, {
         children: reactNode,
         value: {
-          isolateGroupHover: componentState.hover,
-          isolateGroupFocus: componentState.focus,
-          isolateGroupActive: componentState.active,
+          "scoped-group-hover": componentState.hover,
+          "scoped-group-focus": componentState.focus,
+          "scoped-group-active": componentState.active,
         },
       });
     }

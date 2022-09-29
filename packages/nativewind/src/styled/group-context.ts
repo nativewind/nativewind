@@ -1,13 +1,13 @@
 import { createContext } from "react";
 
 export const GroupContext = createContext({
-  groupHover: false,
-  groupFocus: false,
-  groupActive: false,
+  "group-hover": false,
+  "group-focus": false,
+  "group-active": false,
 });
 
-export const IsolateGroupContext = createContext({
-  isolateGroupHover: false,
-  isolateGroupFocus: false,
-  isolateGroupActive: false,
+export const ScopedGroupContext = createContext({
+  "scoped-group-hover": false,
+  "scoped-group-focus": false,
+  "scoped-group-active": false,
 });

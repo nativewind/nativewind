@@ -1,7 +1,7 @@
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 import { Dimensions, I18nManager } from "react-native";
 
-import context from "./context";
+import context, { Meta } from "./context";
 import { setDimensions } from "./dimensions";
 import { setDirection } from "./i18n";
 import {
@@ -51,11 +51,17 @@ function useSync(
 ) {
   const keyTokens: string[] = [];
   const conditions = new Set<string>();
+  let meta: Meta = {};
 
   for (const atomName of className.split(/\s+/)) {
     const atom = context.atoms.get(atomName);
 
-    if (!atom) continue;
+    if (!atom) {
+      if (context.meta.has(atomName)) {
+        meta = { ...meta, ...context.meta.get(atomName) };
+      }
+      continue;
+    }
 
     if (atom.conditions) {
       let conditionsPass = true;
@@ -79,24 +85,27 @@ function useSync(
                 typeof componentState["nthChild"] === "number" &&
                 componentState["nthChild"] % 2 === 0;
               break;
-            default:
-              conditionsPass = !!componentState[condition];
+            default: {
+              conditionsPass = Boolean(componentState[condition]);
+            }
           }
         }
       }
 
       if (conditionsPass) {
         keyTokens.push(atomName);
+        meta = { ...meta, ...context.meta.get(atomName) };
       }
     } else {
       keyTokens.push(atomName);
+      meta = { ...meta, ...context.meta.get(atomName) };
     }
   }
 
   const key = keyTokens.join(" ");
 
   if (!context.styleSets[key] && key.length > 0) {
-    warmCache([keyTokens]);
+    warmCache([key]);
   }
 
   const currentStyles = useSyncExternalStoreWithSelector(
@@ -109,14 +118,14 @@ function useSync(
   return {
     styles: currentStyles,
     childClasses: context.childClasses.get(key),
-    meta: context.styleMeta.get(key),
+    meta,
     conditions,
   };
 }
 
-function warmCache(tokenSets: Array<string[]>) {
-  for (const keyTokens of tokenSets) {
-    const key = keyTokens.join(" ");
+function warmCache(classesToWarm: Array<string>) {
+  for (const key of classesToWarm) {
+    const keyTokens = key.split(" ");
 
     context.setStyleSets({
       [key]: keyTokens.flatMap((token) => {

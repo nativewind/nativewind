@@ -30,7 +30,7 @@ export function useInteraction(
   ref.current = props;
 
   return useMemo(() => {
-    const isParentOrGroup = meta.parent || meta.group;
+    const isParentOrGroup = meta.parent || meta.group || meta.scopedGroup;
 
     const handlers: InteractionProps = {};
 
@@ -78,7 +78,7 @@ export function useInteraction(
         if (ref.current.onHoverIn) {
           ref.current.onHoverIn(event);
         }
-        dispatch({ type: "hover", value: true });
+        dispatch({ type: "hover", value: false });
       };
     }
 
