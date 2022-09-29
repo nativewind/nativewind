@@ -30,7 +30,7 @@
     "react-native-safe-area-context": "4.3.4",
     "reassure": "0.4.1",
     "tamagui": "1.0.1-beta.180",
-    "ts-jest": "29.0.2",
+    "ts-jest": "29.0.3",
     "twrnc": "3.4.0"
   },
   "devDependencies": {
