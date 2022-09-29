@@ -27,7 +27,7 @@
     "react-dom": "*",
     "react-native": "0.70.1",
     "react-native-paper": "rc",
-    "react-native-safe-area-context": "4.3.4",
+    "react-native-safe-area-context": "4.4.1",
     "reassure": "0.4.1",
     "tamagui": "1.0.1-beta.180",
     "ts-jest": "29.0.3",
