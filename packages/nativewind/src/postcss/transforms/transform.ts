@@ -1,6 +1,7 @@
 import { Declaration } from "css-tree";
+import { encodeValue } from "../encode-value";
 import { DeclarationAtom, Transform } from "../types";
-import { parseStyleValue, pushStyle } from "./push";
+import { pushStyle } from "./push";
 
 export function transform(atom: DeclarationAtom, node: Declaration) {
   if (node.value.type !== "Value") {
@@ -32,7 +33,7 @@ export function transform(atom: DeclarationAtom, node: Declaration) {
       case "translateX":
       case "translateY":
       case "matrix": {
-        const value = parseStyleValue(child.children.toArray()[0], []);
+        const value = encodeValue(child.children.toArray()[0], []);
         transform.push({ [child.name]: value } as unknown as Transform);
       }
     }

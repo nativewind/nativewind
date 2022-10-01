@@ -1,18 +1,13 @@
-import {
-  OpaqueColorValue,
-  PixelRatio,
-  Platform,
-  PlatformColor,
-  StyleSheet,
-} from "react-native";
+import { Platform } from "react-native";
 
-import { Atom, AtomRecord, Style, VariableValue } from "../postcss/types";
+import { Atom, AtomRecord, Style } from "../postcss/types";
 import { getColorScheme } from "./color-scheme";
 import context, { Styles } from "./context";
+import { resolve } from "./resolve";
 
 export function create(options: AtomRecord) {
   // Please keep this, is useful for debugging
-  // console.log(JSON.stringify(options, undefined, 2));
+  console.log(JSON.stringify(options, undefined, 2));
 
   if (context.preprocessed) {
     return;
@@ -80,7 +75,7 @@ function evaluate(name: string, atom: Atom): Styles | undefined {
     const styles = { ...originalStyles } as Style;
 
     for (const [key, value] of Object.entries(styles)) {
-      (styles as Record<string, unknown>)[key] = resolveVariableValue(value);
+      (styles as Record<string, unknown>)[key] = resolve(value);
     }
 
     const atRules = atom.atRules?.[index];
@@ -102,38 +97,26 @@ function evaluate(name: string, atom: Atom): Styles | undefined {
           case "platform":
             return params === Platform.OS;
           case "width":
-            return (
-              params === resolveVariableValue(context.topics["--window-width"])
-            );
+            return params === resolve(context.topics["--window-width"]);
           case "min-width": {
-            const value = resolveVariableValue(
-              context.topics["--window-width"]
-            );
+            const value = resolve(context.topics["--window-width"]);
             if (typeof value !== "number") return false;
             return (params ?? 0) >= value;
           }
           case "max-width": {
-            const value = resolveVariableValue(
-              context.topics["--window-width"]
-            );
+            const value = resolve(context.topics["--window-width"]);
             if (typeof value !== "number") return false;
             return (params ?? 0) <= value;
           }
           case "height":
-            return (
-              params === resolveVariableValue(context.topics["--window-height"])
-            );
+            return params === resolve(context.topics["--window-height"]);
           case "min-height": {
-            const value = resolveVariableValue(
-              context.topics["--window-height"]
-            );
+            const value = resolve(context.topics["--window-height"]);
             if (typeof value !== "number") return false;
             return (params ?? 0) >= value;
           }
           case "max-height": {
-            const value = resolveVariableValue(
-              context.topics["--window-height"]
-            );
+            const value = resolve(context.topics["--window-height"]);
             if (typeof value !== "number") return false;
             return (params ?? 0) <= value;
           }
@@ -171,105 +154,4 @@ function evaluate(name: string, atom: Atom): Styles | undefined {
   }
 
   return newStyles;
-}
-
-function resolveVariableValue(
-  style: VariableValue
-): string | number | OpaqueColorValue | undefined {
-  if (typeof style !== "object" || !("function" in style)) {
-    if (typeof style === "string") {
-      if (style.startsWith('{"')) {
-        return resolveVariableValue(JSON.parse(style));
-      }
-      const maybeNumber = Number.parseFloat(style);
-      return Number.isNaN(maybeNumber) ? style : maybeNumber;
-    }
-    return style;
-  }
-
-  const resolvedValues = style.values.map((value) =>
-    resolveVariableValue(value)
-  );
-
-  switch (style.function) {
-    case "inbuilt": {
-      const [name, ...values] = resolvedValues;
-      return [name, "(", values.join(", "), ")"].join("");
-    }
-    case "vw": {
-      const [value] = resolvedValues;
-      if (typeof value !== "number") return;
-      return (value / 100) * (context.topics["--window-width"] as number);
-    }
-    case "vh": {
-      const [value] = resolvedValues;
-      if (typeof value !== "number") return;
-      return (value / 100) * (context.topics["--window-height"] as number);
-    }
-    case "rem": {
-      const [value] = resolvedValues;
-      if (typeof value !== "number") return;
-      return value * (context.topics["--rem"] as number);
-    }
-    case "var": {
-      const [variable, defaultValue] = resolvedValues;
-      if (typeof variable !== "string") return;
-      const value = context.topics[variable];
-      if (!value) return defaultValue;
-      if (typeof value === "object" && "function" in value) return defaultValue;
-      return value;
-    }
-    case "platformSelect": {
-      const specifics = resolveSpecifics(resolvedValues);
-      return Platform.select(specifics);
-    }
-    case "platformColor": {
-      return PlatformColor(
-        ...resolvedValues.filter(
-          (value): value is string => typeof value === "string"
-        )
-      );
-    }
-    case "hairlineWidth":
-      return StyleSheet.hairlineWidth;
-    case "pixelRatio": {
-      if (resolvedValues.length > 0) {
-        const specifics = resolveSpecifics(resolvedValues);
-        return specifics[PixelRatio.get()];
-      } else {
-        return PixelRatio.get();
-      }
-    }
-    case "fontScale": {
-      if (resolvedValues.length > 0) {
-        const specifics = resolveSpecifics(resolvedValues);
-        return specifics[PixelRatio.getFontScale()];
-      } else {
-        return PixelRatio.getFontScale();
-      }
-    }
-    case "getPixelSizeForLayoutSize": {
-      const value = resolvedValues[0];
-      if (typeof value !== "number") return;
-      return PixelRatio.getPixelSizeForLayoutSize(value);
-    }
-    case "roundToNearestPixel": {
-      const value = resolvedValues[0];
-      if (typeof value !== "number") return;
-      return PixelRatio.roundToNearestPixel(value);
-    }
-  }
-}
-
-function resolveSpecifics(
-  values: (string | number | OpaqueColorValue | undefined)[]
-) {
-  return Object.fromEntries(
-    values
-      .filter((value): value is string => typeof value === "string")
-      .map((value) => {
-        const [platform, ...other] = value.split("__");
-        return [platform, resolveVariableValue(other.join(""))];
-      })
-  );
 }

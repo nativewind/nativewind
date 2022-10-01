@@ -1,6 +1,12 @@
 import { render } from "@testing-library/react-native";
 import { Config } from "tailwindcss";
-import { NativeWindStyleSheet, platformSelect, styled } from "../src";
+import {
+  hairlineWidth,
+  NativeWindStyleSheet,
+  pixelRatio,
+  platformSelect,
+  styled,
+} from "../src";
 import { extractStyles } from "../src/postcss/extract";
 import nativePreset from "../src/tailwind";
 
@@ -27,12 +33,17 @@ function create(
   );
 }
 
-test("platformSelect", () => {
+test.skip("nested", () => {
   create("text-test", "", {
     theme: {
       fontSize: {
+        // These tests run as ios with
+        // a pixelRatio of 2
         test: platformSelect({
-          ios: 1, // These tests run as ios
+          ios: pixelRatio({
+            1: "1rem",
+            2: `var(--empty-var, ${hairlineWidth()})`,
+          }),
           default: 2,
         }),
       },
@@ -46,13 +57,13 @@ test("platformSelect", () => {
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: { fontSize: 1 },
+      style: { fontSize: 32 },
     },
     {}
   );
 });
 
-test("platformSelect - units", () => {
+test.skip("platformSelect", () => {
   create("text-test", "", {
     theme: {
       fontSize: {
@@ -72,6 +83,76 @@ test("platformSelect - units", () => {
   expect(MyComponent).toHaveBeenCalledWith(
     {
       style: { fontSize: 16 },
+    },
+    {}
+  );
+});
+
+test.skip("hairlineWidth", () => {
+  create("text-test", "", {
+    theme: {
+      fontSize: {
+        test: hairlineWidth(),
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 0.5 },
+    },
+    {}
+  );
+});
+
+test.skip("pixelRatio - get", () => {
+  create("text-test", "", {
+    theme: {
+      fontSize: {
+        test: pixelRatio(),
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 2 },
+    },
+    {}
+  );
+});
+
+test.skip("pixelRatio - specifics", () => {
+  create("text-test", "", {
+    theme: {
+      fontSize: {
+        test: pixelRatio({
+          1: "1rem",
+          2: "2rem",
+          3: "3rem",
+        }),
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 32 },
     },
     {}
   );

@@ -1,6 +1,7 @@
 import { Declaration, parse } from "css-tree";
+import { encodeValue } from "../encode-value";
 import { DeclarationAtom } from "../types";
-import { parseStyleValue, pushStyle } from "./push";
+import { pushStyle } from "./push";
 
 export function defaultDeclaration(atom: DeclarationAtom, node: Declaration) {
   if (node.value.type === "Raw") {
@@ -12,7 +13,7 @@ export function defaultDeclaration(atom: DeclarationAtom, node: Declaration) {
         return;
       }
 
-      const value = parseStyleValue(ast.children.toArray()[0], []);
+      const value = encodeValue(ast.children.toArray()[0], []);
       if (typeof value === "object" && !("function" in value)) {
         return;
       }
