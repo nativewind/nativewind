@@ -1,3 +1,4 @@
+import "./styles";
 export * from "./styled";
 export * from "./theme-functions";
 export { NativeWindStyleSheet } from "./style-sheet";

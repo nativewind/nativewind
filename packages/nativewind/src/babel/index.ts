@@ -1,14 +1,12 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { resolve, sep, posix, join, dirname, relative } from "node:path";
-
-import type { ConfigAPI, NodePath, PluginPass, Visitor } from "@babel/core";
-import { parseExpression } from "@babel/parser";
+import { resolve, sep, posix, join, dirname } from "node:path";
 
 import findCacheDir from "find-cache-dir";
 import chokidar from "chokidar";
 import micromatch from "micromatch";
 
 import { addNamed, addSideEffect } from "@babel/helper-module-imports";
+import type { ConfigAPI, NodePath, PluginPass, Visitor } from "@babel/core";
 
 import {
   Expression,
@@ -38,7 +36,15 @@ import { validateConfig } from "tailwindcss/lib/util/validateConfig";
 
 // import { getImportBlockedComponents } from "./get-import-blocked-components";
 import { extractStyles } from "../postcss/extract";
+import { AtomRecord } from "../postcss/types";
+import { createHash } from "node:crypto";
 
+/**
+ * The Babel plugin has 3 functions
+ *  - component transformation
+ *  - style compilation
+ *  - handling .css imports
+ */
 export interface TailwindcssReactNativeBabelOptions {
   isInContent?: boolean;
   didTransform?: boolean;
@@ -50,11 +56,12 @@ export interface TailwindcssReactNativeBabelOptions {
   tailwindConfig?: Config | undefined;
 }
 
-const cacheDirectory = findCacheDir({ name: "nativewind", create: true });
+const cacheDirectory = findCacheDir({ name: "nativewind", create: true }) ?? "";
 if (!cacheDirectory) throw new Error("Unable to secure cache directory");
 
 const stylesFile = join(cacheDirectory, "styles.js");
 const cssCacheFile = join(cacheDirectory, "styles.css");
+const nativewindStylesFile = require.resolve("nativewind/dist/styles");
 
 const watcher =
   process.env.NODE_ENV === "development"
@@ -66,92 +73,9 @@ export default function (
   options: TailwindcssReactNativeBabelOptions,
   cwd: string
 ) {
-  /**
-   * Get the users config
-   */
-  const userConfigPath = resolveConfigPath(
-    options.tailwindConfig || options.tailwindConfigPath
-  );
-
-  let tailwindConfig: Config;
-
-  const bundler = api.caller((caller) => {
-    if (!caller) return;
-
-    if ("bundler" in caller) {
-      return caller["bundler"];
-    }
-
-    const { name } = caller;
-
-    switch (name) {
-      case "metro": {
-        return "metro";
-      }
-      case "next-babel-turbo-loader": {
-        return "webpack";
-      }
-      case "babel-loader": {
-        return "webpack";
-      }
-    }
-  });
-
-  const platform = api.caller((caller) => {
-    if (!caller) return;
-
-    if ("platform" in caller) {
-      return caller["platform"];
-    } else if (bundler === "webpack") {
-      return "web";
-    }
-  });
-
-  if (platform) {
-    process.env.NATIVEWIND_PLATFORM = platform;
-  }
-
-  if (userConfigPath === null) {
-    tailwindConfig = resolveConfig(options.tailwindConfig);
-  } else {
-    delete require.cache[require.resolve(userConfigPath)];
-    const newConfig = resolveConfig(require(userConfigPath));
-    tailwindConfig = validateConfig(newConfig);
-  }
-
-  const hasPreset = tailwindConfig.presets?.some((preset) => {
-    return (
-      preset &&
-      ("nativewind" in preset ||
-        ("default" in preset && "nativewind" in preset["default"]))
-    );
-  });
-
-  if (!hasPreset) {
-    throw new Error("NativeWind preset was not included");
-  }
-
-  const safelist =
-    tailwindConfig.safelist && tailwindConfig.safelist.length > 0
-      ? tailwindConfig.safelist
-      : ["babel-empty"];
-
-  /**
-   * Resolve their content paths
-   */
-  const contentFilePaths = (
-    Array.isArray(tailwindConfig.content)
-      ? tailwindConfig.content.filter(
-          (filePath): filePath is string => typeof filePath === "string"
-        )
-      : tailwindConfig.content.files.filter(
-          (filePath): filePath is string => typeof filePath === "string"
-        )
-  ).map((contentFilePath) => normalizePath(resolve(cwd, contentFilePath)));
-
-  // const allowModuleTransform = Array.isArray(options.allowModuleTransform)
-  //   ? ["react-native", "react-native-web", ...options.allowModuleTransform]
-  //   : "*";
+  const tailwindConfig = resolveTailwindConfig(options);
+  const platform = resolvePlatform(api);
+  const isDevelopment = api.env("development");
 
   let canCompile = true;
   let canTransform = true;
@@ -160,41 +84,76 @@ export default function (
     canTransform = false;
   } else if (options.mode === "transformOnly") {
     canCompile = false;
+  } else if (platform === "web") {
+    canCompile = false;
   }
 
-  let cssCache: string | undefined;
+  const safelist =
+    tailwindConfig.safelist && tailwindConfig.safelist.length > 0
+      ? tailwindConfig.safelist
+      : ["babel-empty"];
+
+  const content = Array.isArray(tailwindConfig.content)
+    ? tailwindConfig.content.filter(
+        (filePath): filePath is string => typeof filePath === "string"
+      )
+    : tailwindConfig.content.files.filter(
+        (filePath): filePath is string => typeof filePath === "string"
+      );
+
+  const contentFilePaths = content.map((contentFilePath) =>
+    normalizePath(resolve(cwd, contentFilePath))
+  );
+
+  // const allowModuleTransform = Array.isArray(options.allowModuleTransform)
+  //   ? ["react-native", "react-native-web", ...options.allowModuleTransform]
+  //   : "*";
+
+  if (canCompile) {
+    writeFileSync(
+      nativewindStylesFile,
+      `try { require("${stylesFile}") } catch {} // ${Date.now()}`
+    );
+  }
+
+  let cssCache = `@tailwind components;@tailwind utilities;`;
   watcher?.on("change", (path) => {
     if (path.endsWith(".css")) {
       cssCache = readFileSync(path, "utf8");
     }
   });
 
-  const isDevelopment = api.env("development");
+  function fullCompile() {
+    writeFileSync(
+      stylesFile,
+      `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${JSON.stringify(
+        extractStyles(tailwindConfig, cssCache)
+      )});`
+    );
+  }
 
-  function replaceCssImport(
-    path: NodePath,
-    source: string,
-    currentDirectory: string
-  ) {
+  function handleCssImport(source: string) {
     const css = readFileSync(source, "utf8");
 
     if (css.includes("@tailwind")) {
-      // Start watching this file as well
-      // watcher.add(filename);
-      // Write the css to disk, this will cause chokidar watchers to fire on all processes
-      writeFileSync(cssCacheFile, css);
-      // Write the new styles to disk
-      writeFileSync(
-        stylesFile,
-        `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${JSON.stringify(
-          extractStyles(tailwindConfig, css)
-        )});`
-      );
-      // Replace the .css import with the stylesFile
-      addSideEffect(path, `./${relative(currentDirectory, stylesFile)}`);
-      path.remove();
-      // After this has been completed, Babel will reevaluate the stylesFile, reloading the styles
+      cssCache = css;
+      writeFileSync(cssCacheFile, cssCache);
+      fullCompile();
     }
+  }
+
+  function hotReloadStyles(filename: string, styles: AtomRecord) {
+    const hash = createHash("sha1").update(filename).digest("hex");
+    const cacheFilename = join(cacheDirectory, hash, ".js");
+    writeFileSync(
+      cacheFilename,
+      `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${JSON.stringify(
+        styles
+      )}`
+    );
+    writeFileSync(stylesFile, `try { require("./${filename}"); } catch {}`, {
+      flag: "a",
+    });
   }
 
   const programVisitor: Visitor<
@@ -206,7 +165,6 @@ export default function (
       enter(path, state) {
         const filename = state.filename;
         if (!filename) return;
-        const currentDirectory = dirname(filename);
 
         state.blockList = new Set();
         state.isInContent = micromatch.isMatch(
@@ -217,10 +175,13 @@ export default function (
         if (canCompile && state.isInContent) {
           path.traverse({
             ImportDeclaration(path) {
-              const source = resolve(currentDirectory, path.node.source.value);
-
-              if (source.endsWith(".css")) {
-                replaceCssImport(path, source, currentDirectory);
+              if (path.node.source.value.endsWith(".css")) {
+                const currentDirectory = dirname(filename);
+                handleCssImport(
+                  resolve(currentDirectory, path.node.source.value)
+                );
+                addSideEffect(path, `nativewind/styles`);
+                path.remove();
               }
             },
             CallExpression(path) {
@@ -234,10 +195,11 @@ export default function (
                 return;
               }
 
-              const source = argument.node.value;
-
-              if (source.endsWith(".css")) {
-                replaceCssImport(path, source, currentDirectory);
+              if (argument.node.value.endsWith(".css")) {
+                const currentDirectory = dirname(filename);
+                handleCssImport(resolve(currentDirectory, argument.node.value));
+                addSideEffect(path, `nativewind/styles`);
+                path.remove();
               }
             },
           });
@@ -248,7 +210,9 @@ export default function (
           addNamed(path, "StyledComponent", "nativewind");
         }
 
-        if (
+        if (state.filename === nativewindStylesFile) {
+          fullCompile();
+        } else if (
           isDevelopment &&
           canCompile &&
           state.filename &&
@@ -262,13 +226,7 @@ export default function (
             },
             cssCache
           );
-          path.pushContainer(
-            "body",
-            parseExpression(
-              `_NativeWindStyleSheet.create(${JSON.stringify(styles)});`
-            )
-          );
-          addNamed(path, "NativeWindStyleSheet", "nativewind");
+          hotReloadStyles(state.filename, styles);
         }
       },
     },
@@ -368,4 +326,74 @@ function someAttributes(path: NodePath<JSXElement>, names: string[]) {
       );
     });
   });
+}
+
+function resolveTailwindConfig(
+  options: TailwindcssReactNativeBabelOptions
+): Config {
+  let tailwindConfig: Config;
+
+  const userConfigPath = resolveConfigPath(
+    options.tailwindConfig || options.tailwindConfigPath
+  );
+
+  if (userConfigPath === null) {
+    tailwindConfig = resolveConfig(options.tailwindConfig);
+  } else {
+    delete require.cache[require.resolve(userConfigPath)];
+    const newConfig = resolveConfig(require(userConfigPath));
+    tailwindConfig = validateConfig(newConfig);
+  }
+
+  const hasPreset = tailwindConfig.presets?.some((preset) => {
+    return (
+      preset &&
+      ("nativewind" in preset ||
+        ("default" in preset && "nativewind" in preset["default"]))
+    );
+  });
+
+  if (!hasPreset) {
+    throw new Error("NativeWind preset was not included");
+  }
+
+  return tailwindConfig;
+}
+
+function resolvePlatform(api: ConfigAPI) {
+  const bundler = api.caller((caller) => {
+    if (!caller) return;
+
+    if ("bundler" in caller) {
+      return caller["bundler"];
+    }
+
+    const { name } = caller;
+
+    switch (name) {
+      case "metro": {
+        return "metro";
+      }
+      case "next-babel-turbo-loader": {
+        return "webpack";
+      }
+      case "babel-loader": {
+        return "webpack";
+      }
+    }
+  });
+
+  const platform = api.caller((caller) => {
+    if (!caller) return;
+
+    if ("platform" in caller) {
+      return caller["platform"];
+    } else if (bundler === "webpack") {
+      return "web";
+    }
+  });
+
+  process.env.NATIVEWIND_PLATFORM = platform;
+
+  return platform;
 }
