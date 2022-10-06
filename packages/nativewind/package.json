@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0-experiment.1",
+  "version": "3.0.0-next.1-1-g7ed7965",
   "name": "nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "main": "dist/index.js",
@@ -36,7 +36,7 @@
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
-    "experiment": "npm version $(git describe --tags) --no-git-tag-version;npm publish"
+    "experiment": "npm run build;npm version $(git describe --tags) --no-git-tag-version;npm publish --tag experiment"
   },
   "files": [
     "dist/",

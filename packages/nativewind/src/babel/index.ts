@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, statSync } from "node:fs";
 import { resolve, sep, posix, join, dirname } from "node:path";
 
 import findCacheDir from "find-cache-dir";
@@ -73,7 +73,7 @@ export default function (
   options: TailwindcssReactNativeBabelOptions,
   cwd: string
 ) {
-  const tailwindConfig = resolveTailwindConfig(options);
+  const tailwindConfig = resolveTailwindConfig(api, options);
   const platform = resolvePlatform(api);
   const isDevelopment = api.env("development");
 
@@ -151,7 +151,7 @@ export default function (
         styles
       )}`
     );
-    writeFileSync(stylesFile, `try { require("./${filename}"); } catch {}`, {
+    writeFileSync(stylesFile, `try { require("${cacheFilename}"); } catch {}`, {
       flag: "a",
     });
   }
@@ -329,6 +329,7 @@ function someAttributes(path: NodePath<JSXElement>, names: string[]) {
 }
 
 function resolveTailwindConfig(
+  api: ConfigAPI,
   options: TailwindcssReactNativeBabelOptions
 ): Config {
   let tailwindConfig: Config;
@@ -340,6 +341,7 @@ function resolveTailwindConfig(
   if (userConfigPath === null) {
     tailwindConfig = resolveConfig(options.tailwindConfig);
   } else {
+    api.cache.using(() => statSync(userConfigPath).mtimeMs);
     delete require.cache[require.resolve(userConfigPath)];
     const newConfig = resolveConfig(require(userConfigPath));
     tailwindConfig = validateConfig(newConfig);
@@ -347,7 +349,7 @@ function resolveTailwindConfig(
 
   const hasPreset = tailwindConfig.presets?.some((preset) => {
     return (
-      preset &&
+      typeof preset === "object" &&
       ("nativewind" in preset ||
         ("default" in preset && "nativewind" in preset["default"]))
     );
