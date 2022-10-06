@@ -68,7 +68,14 @@ const watcher =
     ? chokidar.watch(cacheDirectory)
     : undefined;
 
-export default function (
+export default function (...args: unknown[]) {
+  console.log(...args);
+  return {
+    plugins: [plugin],
+  };
+}
+
+function plugin(
   api: ConfigAPI,
   options: TailwindcssReactNativeBabelOptions,
   cwd: string
@@ -144,7 +151,7 @@ export default function (
 
   function hotReloadStyles(filename: string, styles: AtomRecord) {
     const hash = createHash("sha1").update(filename).digest("hex");
-    const cacheFilename = join(cacheDirectory, hash, ".js");
+    const cacheFilename = join(cacheDirectory, `${hash}.js`);
     writeFileSync(
       cacheFilename,
       `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${JSON.stringify(
