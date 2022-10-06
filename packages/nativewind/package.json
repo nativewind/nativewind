@@ -36,7 +36,7 @@
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
-    "experiment": "npm config set git-tag-version=false;npm version $(git describe --tags);npm publish"
+    "experiment": "npm version $(git describe --tags) --no-git-tag-version;npm publish"
   },
   "files": [
     "dist/",
