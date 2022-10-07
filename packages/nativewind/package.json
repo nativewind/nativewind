@@ -56,7 +56,7 @@
     "postcss-calc": "^8.2.4",
     "postcss-color-functional-notation": "^4.2.2",
     "postcss-css-variables": "^0.18.0",
-    "postcss-nested": "^5.0.6",
+    "postcss-nested": "^6.0.0",
     "react-is": "^18.1.0",
     "use-sync-external-store": "^1.1.0"
   },
