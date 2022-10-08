@@ -1,33 +1,10 @@
 import { readFileSync, writeFileSync, statSync } from "node:fs";
-import { resolve, sep, posix, join, dirname } from "node:path";
+import { resolve, join } from "node:path";
 
 import findCacheDir from "find-cache-dir";
 import chokidar from "chokidar";
-import micromatch from "micromatch";
 
-import { addNamed, addSideEffect } from "@babel/helper-module-imports";
-import type { ConfigAPI, NodePath, PluginPass, Visitor } from "@babel/core";
-
-import {
-  Expression,
-  identifier,
-  isJSXAttribute,
-  isJSXIdentifier,
-  isJSXMemberExpression,
-  isJSXSpreadAttribute,
-  jSXAttribute,
-  jsxClosingElement,
-  jsxElement,
-  JSXElement,
-  jsxExpressionContainer,
-  jsxIdentifier,
-  jSXIdentifier,
-  JSXIdentifier,
-  JSXMemberExpression,
-  JSXNamespacedName,
-  jsxOpeningElement,
-  memberExpression,
-} from "@babel/types";
+import type { ConfigAPI } from "@babel/core";
 
 import type { Config } from "tailwindcss";
 import resolveConfig from "tailwindcss/resolveConfig";
@@ -36,15 +13,10 @@ import { validateConfig } from "tailwindcss/lib/util/validateConfig";
 
 // import { getImportBlockedComponents } from "./get-import-blocked-components";
 import { extractStyles } from "../postcss/extract";
-import { AtomRecord } from "../postcss/types";
 import { createHash } from "node:crypto";
+import { plugin } from "./plugin";
+import { normalizePath } from "./normalize-path";
 
-/**
- * The Babel plugin has 3 functions
- *  - component transformation
- *  - style compilation
- *  - handling .css imports
- */
 export interface TailwindcssReactNativeBabelOptions {
   isInContent?: boolean;
   didTransform?: boolean;
@@ -63,24 +35,22 @@ const stylesFile = join(cacheDirectory, "styles.js");
 const cssCacheFile = join(cacheDirectory, "styles.css");
 const nativewindStylesFile = require.resolve("nativewind/dist/styles");
 
-const watcher =
-  process.env.NODE_ENV === "development"
-    ? chokidar.watch(cacheDirectory)
-    : undefined;
+let initialized = true;
 
-export default function (...args: unknown[]) {
-  console.log(...args);
-  return {
-    plugins: [plugin],
-  };
-}
-
-function plugin(
+export default function (
   api: ConfigAPI,
   options: TailwindcssReactNativeBabelOptions,
   cwd: string
 ) {
-  const tailwindConfig = resolveTailwindConfig(api, options);
+  api.cache.never();
+
+  const [newTailwindConfig, tailwindConfigPath] = resolveTailwindConfig(
+    api,
+    options
+  );
+
+  let tailwindConfig = newTailwindConfig;
+
   const platform = resolvePlatform(api);
   const isDevelopment = api.env("development");
 
@@ -112,23 +82,30 @@ function plugin(
     normalizePath(resolve(cwd, contentFilePath))
   );
 
-  // const allowModuleTransform = Array.isArray(options.allowModuleTransform)
-  //   ? ["react-native", "react-native-web", ...options.allowModuleTransform]
-  //   : "*";
-
-  if (canCompile) {
-    writeFileSync(
-      nativewindStylesFile,
-      `try { require("${stylesFile}") } catch {} // ${Date.now()}`
-    );
-  }
-
   let cssCache = `@tailwind components;@tailwind utilities;`;
-  watcher?.on("change", (path) => {
-    if (path.endsWith(".css")) {
-      cssCache = readFileSync(path, "utf8");
-    }
-  });
+
+  function hotReloadStyles(filename: string) {
+    const styles = extractStyles(
+      {
+        ...tailwindConfig,
+        content: [filename],
+        safelist,
+      },
+      cssCache
+    );
+
+    const hash = createHash("sha1").update(filename).digest("hex");
+    const cacheFilename = join(cacheDirectory, `${hash}.js`);
+    writeFileSync(
+      cacheFilename,
+      `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${JSON.stringify(
+        styles
+      )}`
+    );
+    writeFileSync(stylesFile, `try { require("${cacheFilename}"); } catch {}`, {
+      flag: "a",
+    });
+  }
 
   function fullCompile() {
     writeFileSync(
@@ -149,196 +126,58 @@ function plugin(
     }
   }
 
-  function hotReloadStyles(filename: string, styles: AtomRecord) {
-    const hash = createHash("sha1").update(filename).digest("hex");
-    const cacheFilename = join(cacheDirectory, `${hash}.js`);
+  if (!initialized && canCompile) {
+    initialized = true;
+
+    if (process.env.NODE_ENV === "development") {
+      const watcher = chokidar.watch(cacheDirectory).on("change", (path) => {
+        if (path.endsWith(".css")) {
+          cssCache = readFileSync(path, "utf8");
+        } else if (path === tailwindConfigPath) {
+          // Reload the Tailwind Config
+          tailwindConfig = resolveTailwindConfig(api, options)[0];
+          fullCompile();
+        }
+      });
+
+      if (tailwindConfigPath) {
+        watcher.add(tailwindConfigPath);
+      }
+    }
+
     writeFileSync(
-      cacheFilename,
-      `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${JSON.stringify(
-        styles
-      )}`
+      nativewindStylesFile,
+      `try { require("${stylesFile}") } catch {} // ${Date.now()}`
     );
-    writeFileSync(stylesFile, `try { require("${cacheFilename}"); } catch {}`, {
-      flag: "a",
-    });
+    fullCompile();
   }
 
-  const programVisitor: Visitor<
-    PluginPass & {
-      opts: TailwindcssReactNativeBabelOptions;
-    }
-  > = {
-    Program: {
-      enter(path, state) {
-        const filename = state.filename;
-        if (!filename) return;
-
-        state.blockList = new Set();
-        state.isInContent = micromatch.isMatch(
-          normalizePath(filename),
-          contentFilePaths
-        );
-
-        if (canCompile && state.isInContent) {
-          path.traverse({
-            ImportDeclaration(path) {
-              if (path.node.source.value.endsWith(".css")) {
-                const currentDirectory = dirname(filename);
-                handleCssImport(
-                  resolve(currentDirectory, path.node.source.value)
-                );
-                addSideEffect(path, `nativewind/styles`);
-                path.remove();
-              }
-            },
-            CallExpression(path) {
-              const callee = path.get("callee");
-              if (!callee.isIdentifier() || !callee.equals("name", "require")) {
-                return;
-              }
-
-              const argument = path.get("arguments")[0];
-              if (!argument || !argument.isStringLiteral()) {
-                return;
-              }
-
-              if (argument.node.value.endsWith(".css")) {
-                const currentDirectory = dirname(filename);
-                handleCssImport(resolve(currentDirectory, argument.node.value));
-                addSideEffect(path, `nativewind/styles`);
-                path.remove();
-              }
-            },
-          });
-        }
-      },
-      exit(path, state) {
-        if (state.didTransform) {
-          addNamed(path, "StyledComponent", "nativewind");
-        }
-
-        if (state.filename === nativewindStylesFile) {
-          fullCompile();
-        } else if (
-          isDevelopment &&
-          canCompile &&
-          state.filename &&
-          state.isInContent
-        ) {
-          const styles = extractStyles(
-            {
-              ...tailwindConfig,
-              content: [state.filename],
-              safelist,
-            },
-            cssCache
-          );
-          hotReloadStyles(state.filename, styles);
-        }
-      },
-    },
-    JSXElement(path, state) {
-      if (!state.isInContent || !state.filename) return;
-
-      const blockList = state.blockList as Set<string>;
-
-      const namePath = path.get("openingElement").get("name");
-
-      const name = namePath.isJSXIdentifier()
-        ? namePath.node.name
-        : namePath.isJSXMemberExpression()
-        ? namePath.node.property.name
-        : undefined;
-
-      const isWrapper =
-        name === "_StyledComponent" || name === "StyledComponent";
-
-      if (
-        !canTransform ||
-        !someAttributes(path, ["className", "tw"]) ||
-        !name ||
-        isWrapper ||
-        blockList?.has(name) ||
-        name[0] !== name[0].toUpperCase()
-      ) {
-        return;
-      }
-
-      path.replaceWith(
-        jsxElement(
-          jsxOpeningElement(jsxIdentifier("_StyledComponent"), [
-            ...path.node.openingElement.attributes,
-            jSXAttribute(
-              jSXIdentifier("component"),
-              jsxExpressionContainer(
-                toExpression(path.node.openingElement.name)
-              )
-            ),
-          ]),
-          jsxClosingElement(jsxIdentifier("_StyledComponent")),
-          path.node.children
-        )
-      );
-      state.didTransform = true;
-    },
-  };
+  // const allowModuleTransform = Array.isArray(options.allowModuleTransform)
+  //   ? ["react-native", "react-native-web", ...options.allowModuleTransform]
+  //   : "*";
 
   return {
-    visitor: programVisitor,
+    plugins: [
+      [
+        plugin,
+        {
+          canCompile,
+          canTransform,
+          contentFilePaths,
+          fullCompile,
+          handleCssImport,
+          hotReloadStyles,
+          isDevelopment,
+        },
+      ],
+    ],
   };
-}
-
-function normalizePath(filePath: string) {
-  /**
-   * This is my naive way to get path matching working on Windows.
-   * Basically I turn it into a posix path which seems to work fine
-   *
-   * If you are a windows user and understand micromatch, can you please send a PR
-   * to do this the proper way
-   */
-  return filePath.split(sep).join(posix.sep);
-}
-
-function toExpression(
-  node: JSXIdentifier | JSXMemberExpression | JSXNamespacedName
-): Expression {
-  if (isJSXIdentifier(node)) {
-    return identifier(node.name);
-  } else if (isJSXMemberExpression(node)) {
-    return memberExpression(
-      toExpression(node.object),
-      toExpression(node.property)
-    );
-  } else {
-    // https://github.com/facebook/jsx/issues/13#issuecomment-54373080
-    throw new Error("JSXNamespacedName is not supported by React JSX");
-  }
-}
-
-function someAttributes(path: NodePath<JSXElement>, names: string[]) {
-  return path.node.openingElement.attributes.some((attribute) => {
-    /**
-     * I think we should be able to process spread attributes
-     * by checking their binding, but I still learning how this works
-     *
-     * If your reading this and understand Babel bindings please send a PR
-     */
-    if (isJSXSpreadAttribute(attribute)) {
-      return false;
-    }
-
-    return names.some((name) => {
-      return (
-        isJSXAttribute(attribute) && isJSXIdentifier(attribute.name, { name })
-      );
-    });
-  });
 }
 
 function resolveTailwindConfig(
   api: ConfigAPI,
   options: TailwindcssReactNativeBabelOptions
-): Config {
+): [Config, string | null] {
   let tailwindConfig: Config;
 
   const userConfigPath = resolveConfigPath(
@@ -366,7 +205,7 @@ function resolveTailwindConfig(
     throw new Error("NativeWind preset was not included");
   }
 
-  return tailwindConfig;
+  return [tailwindConfig, userConfigPath];
 }
 
 function resolvePlatform(api: ConfigAPI) {
@@ -393,12 +232,14 @@ function resolvePlatform(api: ConfigAPI) {
   });
 
   const platform = api.caller((caller) => {
-    if (!caller) return;
+    if (!caller) return "unknown";
 
     if ("platform" in caller) {
       return caller["platform"];
     } else if (bundler === "webpack") {
       return "web";
+    } else {
+      return "unknown";
     }
   });
 
