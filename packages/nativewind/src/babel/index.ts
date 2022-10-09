@@ -1,4 +1,11 @@
-import { readFileSync, writeFileSync, statSync } from "node:fs";
+import {
+  readFileSync,
+  writeFileSync,
+  statSync,
+  openSync,
+  rmSync,
+} from "node:fs";
+import process from "node:process";
 import { resolve, join } from "node:path";
 
 import findCacheDir from "find-cache-dir";
@@ -33,22 +40,18 @@ if (!cacheDirectory) throw new Error("Unable to secure cache directory");
 
 const stylesFile = join(cacheDirectory, "styles.js");
 const cssCacheFile = join(cacheDirectory, "styles.css");
+const masterProcessLock = join(cacheDirectory, process.ppid.toString());
 const nativewindStylesFile = require.resolve("nativewind/dist/styles");
-
-let initialized = true;
 
 export default function (
   api: ConfigAPI,
   options: TailwindcssReactNativeBabelOptions,
   cwd: string
 ) {
-  api.cache.never();
-
   const [newTailwindConfig, tailwindConfigPath] = resolveTailwindConfig(
     api,
     options
   );
-
   let tailwindConfig = newTailwindConfig;
 
   const platform = resolvePlatform(api);
@@ -64,6 +67,53 @@ export default function (
   } else if (platform === "web") {
     canCompile = false;
   }
+
+  api.cache.using(() => {
+    if (!canCompile) return true;
+
+    try {
+      openSync(masterProcessLock, "wx");
+
+      for (const eventType of [
+        `exit`,
+        `SIGINT`,
+        `SIGUSR1`,
+        `SIGUSR2`,
+        `uncaughtException`,
+        `SIGTERM`,
+      ]) {
+        process.on(eventType, () => {
+          rmSync(masterProcessLock, { force: true });
+        });
+      }
+
+      if (process.env.NODE_ENV === "development") {
+        const watcher = chokidar.watch(cacheDirectory).on("change", (path) => {
+          if (path.endsWith(".css")) {
+            cssCache = readFileSync(path, "utf8");
+          } else if (path === tailwindConfigPath) {
+            // Reload the Tailwind Config
+            tailwindConfig = resolveTailwindConfig(api, options)[0];
+            fullCompile();
+          }
+        });
+
+        if (tailwindConfigPath) {
+          watcher.add(tailwindConfigPath);
+        }
+      }
+
+      writeFileSync(
+        nativewindStylesFile,
+        `try { require("${stylesFile}") } catch {} // ${Date.now()}`
+      );
+
+      fullCompile();
+    } catch {
+      /* ignore */
+    }
+    return true;
+  });
 
   const safelist =
     tailwindConfig.safelist && tailwindConfig.safelist.length > 0
@@ -96,11 +146,10 @@ export default function (
 
     const hash = createHash("sha1").update(filename).digest("hex");
     const cacheFilename = join(cacheDirectory, `${hash}.js`);
+    const styleString = JSON.stringify(styles);
     writeFileSync(
       cacheFilename,
-      `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${JSON.stringify(
-        styles
-      )}`
+      `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${styleString})`
     );
     writeFileSync(stylesFile, `try { require("${cacheFilename}"); } catch {}`, {
       flag: "a",
@@ -108,11 +157,10 @@ export default function (
   }
 
   function fullCompile() {
+    const styleString = JSON.stringify(extractStyles(tailwindConfig, cssCache));
     writeFileSync(
       stylesFile,
-      `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${JSON.stringify(
-        extractStyles(tailwindConfig, cssCache)
-      )});`
+      `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${styleString});`
     );
   }
 
@@ -124,32 +172,6 @@ export default function (
       writeFileSync(cssCacheFile, cssCache);
       fullCompile();
     }
-  }
-
-  if (!initialized && canCompile) {
-    initialized = true;
-
-    if (process.env.NODE_ENV === "development") {
-      const watcher = chokidar.watch(cacheDirectory).on("change", (path) => {
-        if (path.endsWith(".css")) {
-          cssCache = readFileSync(path, "utf8");
-        } else if (path === tailwindConfigPath) {
-          // Reload the Tailwind Config
-          tailwindConfig = resolveTailwindConfig(api, options)[0];
-          fullCompile();
-        }
-      });
-
-      if (tailwindConfigPath) {
-        watcher.add(tailwindConfigPath);
-      }
-    }
-
-    writeFileSync(
-      nativewindStylesFile,
-      `try { require("${stylesFile}") } catch {} // ${Date.now()}`
-    );
-    fullCompile();
   }
 
   // const allowModuleTransform = Array.isArray(options.allowModuleTransform)
