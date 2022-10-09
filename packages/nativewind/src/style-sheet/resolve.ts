@@ -2,10 +2,9 @@ import {
   StyleSheet,
   OpaqueColorValue,
   Platform,
-  PlatformColor,
   PixelRatio,
 } from "react-native";
-import { VariableValue } from "../postcss/types";
+import { VariableValue } from "../transform-css/types";
 import context from "./context";
 
 export function resolve(

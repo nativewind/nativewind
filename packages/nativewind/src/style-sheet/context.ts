@@ -1,5 +1,5 @@
 import { StyleSheet, Platform, PlatformOSType } from "react-native";
-import { Atom, Style, VariableValue } from "../postcss/types";
+import { Style, VariableValue, Atom } from "../transform-css/types";
 
 export type Listener<T> = (state: T, oldState: T) => void;
 

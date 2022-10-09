@@ -1,7 +1,4 @@
-import postcss from "postcss";
 import { walk, parse, CssNode, Rule, Atrule, Block } from "css-tree";
-
-import tailwind, { Config } from "tailwindcss";
 
 import { AtomRecord, DeclarationAtom } from "./types";
 import { parseMediaQuery, MediaQueryMeta } from "./media-query";
@@ -21,12 +18,9 @@ import { transform } from "./transforms/transform";
 
 const skip = (walk as unknown as Record<string, unknown>).skip;
 
-export function extractStyles(
-  tailwindConfig: Config,
-  cssInput = "@tailwind components;@tailwind utilities;"
-) {
-  const css = postcss([tailwind(tailwindConfig)]).process(cssInput).css;
-  return getCreateOptions(css);
+export function getStylesFileContent(css: string) {
+  const createOptions = JSON.stringify(getCreateOptions(css));
+  return `const {NativeWindStyleSheet}=require("nativewind/dist/style-sheet");\nNativeWindStyleSheet.create(${createOptions});`;
 }
 
 export function getCreateOptions(css: string) {

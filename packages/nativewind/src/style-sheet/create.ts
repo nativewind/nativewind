@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
+import { AtomRecord, Atom, Style } from "../transform-css/types";
 
-import { Atom, AtomRecord, Style } from "../postcss/types";
 import { getColorScheme } from "./color-scheme";
 import context, { Styles } from "./context";
 import { resolve } from "./resolve";

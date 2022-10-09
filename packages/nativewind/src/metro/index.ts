@@ -1,12 +1,11 @@
 /* eslint-disable unicorn/prefer-module, @typescript-eslint/no-var-requires */
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { cwd } from "node:process";
 import { spawn, spawnSync } from "node:child_process";
 
-import { resolveEntryPoint } from "@expo/config/paths";
 import findCacheDir from "find-cache-dir";
-
-import { getCreateOptions } from "../postcss/extract";
+import { getStylesFileContent } from "../transform-css";
 
 export interface WithNativeWindOptions {
   inputPath?: string;
@@ -14,7 +13,6 @@ export interface WithNativeWindOptions {
 }
 
 // We actually don't do anything to the Metro config,
-// this is simply here to future proof incase we need to
 export default function withNativeWind(
   config: unknown,
   { inputPath, postcssPath }: WithNativeWindOptions = {}
@@ -24,13 +22,14 @@ export default function withNativeWind(
 
   const outputFile = join(cacheDirectory, "output.js");
   process.env.NATIVEWIND_OUTPUT = outputFile;
+  process.env.NATIVEWIND_PLATFORM = "native";
 
   if (!inputPath) {
     try {
-      let { main } = require("package.json");
+      let { main } = require(`${cwd()}/package.json`);
 
       if (main && main === "node_modules/expo/AppEntry.js") {
-        main = resolveEntryPoint(__dirname, { platform: "ios" });
+        main = `${cwd()}/App.js`;
       }
 
       if (main) {
@@ -41,8 +40,10 @@ export default function withNativeWind(
         }
       }
     } finally {
-      inputPath ??= join(cacheDirectory, "input.css");
-      writeFileSync(inputPath, "@tailwind components;@tailwind utilities;");
+      if (!inputPath) {
+        inputPath = join(cacheDirectory, "input.css");
+        writeFileSync(inputPath, "@tailwind components;@tailwind utilities;");
+      }
     }
   }
 
@@ -60,12 +61,7 @@ export default function withNativeWind(
     const cli = spawn("npx", spawnCommands);
 
     cli.stdout.on("data", (data) => {
-      const output = data.toString().trim();
-      const createOptions = JSON.stringify(getCreateOptions(output));
-      writeFileSync(
-        outputFile,
-        `const {NativeWindStyleSheet}=require("nativewind/dist/style-sheet");\nNativeWindStyleSheet.create(${createOptions});`
-      );
+      writeFileSync(outputFile, getStylesFileContent(data.toString().trim()));
     });
 
     cli.stderr.on("data", (data) => {

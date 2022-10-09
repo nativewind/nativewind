@@ -21,5 +21,6 @@ module.exports = {
     "/__tests__/tailwindcss/runner/",
     "/__tests__/style-sheet/tests",
     "/__tests__/types.d.ts",
+    "/__tests__/utilities.ts",
   ],
 };

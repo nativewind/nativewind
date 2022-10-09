@@ -22,7 +22,7 @@ import { StyleProp } from "react-native";
 import { GroupContext, ScopedGroupContext } from "./group-context";
 import { useComponentState } from "./use-component-state";
 import { isFragment } from "react-is";
-import { Style } from "../postcss/types";
+import { Style } from "../transform-css/types";
 
 export interface StyledOptions<
   T,
