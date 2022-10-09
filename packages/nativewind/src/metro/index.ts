@@ -45,7 +45,7 @@ export default function withNativeWind(
       const createOptions = JSON.stringify(getCreateOptions(output));
       writeFileSync(
         outputFile,
-        `const { NativeWindStyleSheet } from "nativewind/dist/style-sheet";\nNativeWindStyleSheet.create(${createOptions});`
+        `const {NativeWindStyleSheet}=require("nativewind/dist/style-sheet");\nNativeWindStyleSheet.create(${createOptions});`
       );
     });
 
