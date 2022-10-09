@@ -1,8 +1,11 @@
-import { writeFileSync } from "node:fs";
+/* eslint-disable unicorn/prefer-module, @typescript-eslint/no-var-requires */
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-
-import findCacheDir from "find-cache-dir";
 import { spawn, spawnSync } from "node:child_process";
+
+import { resolveEntryPoint } from "@expo/config/paths";
+import findCacheDir from "find-cache-dir";
+
 import { getCreateOptions } from "../postcss/extract";
 
 export interface WithNativeWindOptions {
@@ -23,8 +26,24 @@ export default function withNativeWind(
   process.env.NATIVEWIND_OUTPUT = outputFile;
 
   if (!inputPath) {
-    inputPath = join(cacheDirectory, "input.css");
-    writeFileSync(inputPath, "@tailwind components;@tailwind utilities;");
+    try {
+      let { main } = require("package.json");
+
+      if (main && main === "node_modules/expo/AppEntry.js") {
+        main = resolveEntryPoint(__dirname, { platform: "ios" });
+      }
+
+      if (main) {
+        const cssImport = readFileSync(main, "utf8").match(/(\w+\.css)/);
+
+        if (cssImport) {
+          inputPath = cssImport[0];
+        }
+      }
+    } finally {
+      inputPath ??= join(cacheDirectory, "input.css");
+      writeFileSync(inputPath, "@tailwind components;@tailwind utilities;");
+    }
   }
 
   const spawnCommands = ["tailwind", "-i", inputPath];
