@@ -25,7 +25,6 @@ import {
   memberExpression,
 } from "@babel/types";
 import { normalizePath } from "./normalize-path";
-import { relative } from "node:path";
 
 export interface PluginOptions {
   contentFilePaths: string[];
@@ -80,10 +79,7 @@ export function plugin(_: ConfigAPI, { contentFilePaths }: PluginOptions) {
           state.filename?.endsWith("nativewind/dist/index.js") &&
           process.env.NATIVEWIND_OUTPUT
         ) {
-          addSideEffect(
-            path,
-            relative(state.filename, process.env.NATIVEWIND_OUTPUT)
-          );
+          addSideEffect(path, process.env.NATIVEWIND_OUTPUT);
         }
       },
     },

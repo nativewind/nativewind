@@ -2,7 +2,7 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import findCacheDir from "find-cache-dir";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { getCreateOptions } from "../postcss/extract";
 
 export interface WithNativeWindOptions {
@@ -33,25 +33,29 @@ export default function withNativeWind(
     spawnCommands.push("--postcss", postcssPath);
   }
 
-  if (process.env.NODE_ENV !== "production") {
+  const isDevelopment = process.env.NODE_ENV !== "production";
+
+  if (isDevelopment) {
     spawnCommands.push("--watch");
+
+    const cli = spawn("npx", spawnCommands);
+
+    cli.stdout.on("data", (data) => {
+      const output = data.toString().trim();
+      const createOptions = JSON.stringify(getCreateOptions(output));
+      writeFileSync(
+        outputFile,
+        `const { NativeWindStyleSheet } from "nativewind/dist/style-sheet";\nNativeWindStyleSheet.create(${createOptions});`
+      );
+    });
+
+    cli.stderr.on("data", (data) => {
+      const output = data.toString().trim();
+      if (output) console.error(`NativeWind: ${output}`);
+    });
+  } else {
+    spawnSync("npx", spawnCommands);
   }
-
-  const cli = spawn("npx", spawnCommands);
-
-  cli.stdout.on("data", (data) => {
-    const output = data.toString().trim();
-    const createOptions = JSON.stringify(getCreateOptions(output));
-    writeFileSync(
-      outputFile,
-      `const { NativeWindStyleSheet } from "nativewind/dist/style-sheet";\nNativeWindStyleSheet.create(${createOptions});`
-    );
-  });
-
-  cli.stderr.on("data", (data) => {
-    const output = data.toString().trim();
-    if (output) console.error(`NativeWind: ${output}`);
-  });
 
   return config;
 }
