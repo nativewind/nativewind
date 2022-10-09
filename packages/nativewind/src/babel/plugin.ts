@@ -1,8 +1,6 @@
-import { resolve, dirname } from "node:path";
-
 import type { ConfigAPI, NodePath, PluginPass, Visitor } from "@babel/core";
 import micromatch from "micromatch";
-import { addNamed, addSideEffect } from "@babel/helper-module-imports";
+import { addNamed } from "@babel/helper-module-imports";
 
 import { TailwindcssReactNativeBabelOptions } from ".";
 
@@ -29,29 +27,10 @@ import {
 import { normalizePath } from "./normalize-path";
 
 export interface PluginOptions {
-  canCompile: boolean;
-  canTransform: boolean;
   contentFilePaths: string[];
-  handleCssImport: (source: string) => void;
-  fullCompile: () => void;
-  isDevelopment: boolean;
-  nativewindStylesFile: string;
-  hotReloadStyles: (filename: string) => void;
 }
 
-export function plugin(
-  _: ConfigAPI,
-  {
-    contentFilePaths,
-    canCompile,
-    canTransform,
-    handleCssImport,
-    fullCompile,
-    isDevelopment,
-    hotReloadStyles,
-    nativewindStylesFile,
-  }: PluginOptions
-) {
+export function plugin(_: ConfigAPI, { contentFilePaths }: PluginOptions) {
   const programVisitor: Visitor<
     PluginPass & {
       opts: TailwindcssReactNativeBabelOptions;
@@ -68,53 +47,32 @@ export function plugin(
           contentFilePaths
         );
 
-        if (canCompile && state.isInContent) {
-          path.traverse({
-            ImportDeclaration(path) {
-              if (path.node.source.value.endsWith(".css")) {
-                const currentDirectory = dirname(filename);
-                handleCssImport(
-                  resolve(currentDirectory, path.node.source.value)
-                );
-                addSideEffect(path, `nativewind/styles`);
-                path.remove();
-              }
-            },
-            CallExpression(path) {
-              const callee = path.get("callee");
-              if (!callee.isIdentifier() || !callee.equals("name", "require")) {
-                return;
-              }
+        path.traverse({
+          ImportDeclaration(path) {
+            if (path.node.source.value.endsWith(".css")) {
+              path.remove();
+            }
+          },
+          CallExpression(path) {
+            const callee = path.get("callee");
+            if (!callee.isIdentifier() || !callee.equals("name", "require")) {
+              return;
+            }
 
-              const argument = path.get("arguments")[0];
-              if (!argument || !argument.isStringLiteral()) {
-                return;
-              }
+            const argument = path.get("arguments")[0];
+            if (!argument || !argument.isStringLiteral()) {
+              return;
+            }
 
-              if (argument.node.value.endsWith(".css")) {
-                const currentDirectory = dirname(filename);
-                handleCssImport(resolve(currentDirectory, argument.node.value));
-                addSideEffect(path, `nativewind/styles`);
-                path.remove();
-              }
-            },
-          });
-        }
+            if (argument.node.value.endsWith(".css")) {
+              path.remove();
+            }
+          },
+        });
       },
       exit(path, state) {
         if (state.didTransform) {
           addNamed(path, "StyledComponent", "nativewind");
-        }
-
-        if (state.filename === nativewindStylesFile) {
-          fullCompile();
-        } else if (
-          isDevelopment &&
-          canCompile &&
-          state.filename &&
-          state.isInContent
-        ) {
-          hotReloadStyles(state.filename);
         }
       },
     },
@@ -135,7 +93,6 @@ export function plugin(
         name === "_StyledComponent" || name === "StyledComponent";
 
       if (
-        !canTransform ||
         !someAttributes(path, ["className", "tw"]) ||
         !name ||
         isWrapper ||
