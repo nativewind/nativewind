@@ -1,6 +1,6 @@
 import type { ConfigAPI, NodePath, PluginPass, Visitor } from "@babel/core";
 import micromatch from "micromatch";
-import { addNamed } from "@babel/helper-module-imports";
+import { addNamed, addSideEffect } from "@babel/helper-module-imports";
 
 import { TailwindcssReactNativeBabelOptions } from ".";
 
@@ -73,6 +73,13 @@ export function plugin(_: ConfigAPI, { contentFilePaths }: PluginOptions) {
       exit(path, state) {
         if (state.didTransform) {
           addNamed(path, "StyledComponent", "nativewind");
+        }
+
+        if (
+          state.filename?.endsWith("nativewind/dist/index.js") &&
+          process.env.NATIVEWIND_OUTPUT
+        ) {
+          addSideEffect(path, process.env.NATIVEWIND_OUTPUT);
         }
       },
     },
