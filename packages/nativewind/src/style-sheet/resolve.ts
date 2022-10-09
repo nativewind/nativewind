@@ -1,15 +1,10 @@
-import {
-  StyleSheet,
-  OpaqueColorValue,
-  Platform,
-  PixelRatio,
-} from "react-native";
+import { StyleSheet, Platform, PixelRatio, ColorValue } from "react-native";
 import { VariableValue } from "../transform-css/types";
 import context from "./context";
 
 export function resolve(
   style: VariableValue
-): string | number | OpaqueColorValue | undefined {
+): string | number | ColorValue | undefined {
   if (typeof style === "string" || typeof style === "number") {
     if (typeof style === "string") {
       const maybeNumber = Number.parseFloat(style);
@@ -93,9 +88,9 @@ export function resolve(
 }
 
 function toObject(values: unknown[]) {
-  const obj: Record<string, unknown> = {};
+  const object: Record<string, unknown> = {};
   for (let i = 0; i < values.length; i = i + 2) {
-    obj[values[i] as string] = values[i + 1];
+    object[values[i] as string] = values[i + 1];
   }
-  return obj;
+  return object;
 }

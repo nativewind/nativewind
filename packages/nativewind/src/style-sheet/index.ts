@@ -17,7 +17,6 @@ export const NativeWindStyleSheet = {
   reset,
   warmCache,
   useSync,
-  useVariable,
   getColorScheme,
   setColorScheme,
   setDirection,
@@ -34,15 +33,6 @@ function reset() {
   resetColorScheme();
   setDimensions(Dimensions);
   setDirection(I18nManager.isRTL ? "rtl" : "ltr");
-}
-
-function useVariable(variable: string) {
-  return useSyncExternalStoreWithSelector(
-    context.subscribeToTopics,
-    () => context.topics,
-    () => context.topics,
-    (topics) => topics[variable]
-  );
 }
 
 function useSync(
