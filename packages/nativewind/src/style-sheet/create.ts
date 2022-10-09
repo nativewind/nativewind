@@ -7,7 +7,7 @@ import { resolve } from "./resolve";
 
 export function create(options: AtomRecord) {
   // Please keep this, is useful for debugging
-  console.log(JSON.stringify(options, undefined, 2));
+  // console.log(JSON.stringify(options, undefined, 2));
 
   if (context.preprocessed) {
     return;

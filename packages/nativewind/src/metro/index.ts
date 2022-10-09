@@ -38,12 +38,13 @@ export default function withNativeWind(
   }
 
   const cli = spawn("npx", spawnCommands);
+
   cli.stdout.on("data", (data) => {
     const output = data.toString().trim();
     const createOptions = JSON.stringify(getCreateOptions(output));
     writeFileSync(
       outputFile,
-      `import { NativeWindStyleSheet } from "nativewind";\nNativeWindStyleSheet.create(${createOptions});`
+      `const { NativeWindStyleSheet } from "nativewind/dist/style-sheet";\nNativeWindStyleSheet.create(${createOptions});`
     );
   });
 

@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-next.1-7-g28e789c",
+  "version": "3.0.0-next.1-7-gbfd48cf",
   "name": "nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "main": "dist/index.js",
@@ -39,12 +39,13 @@
     "experiment": "npm run build;npm version $(git describe --tags) --no-git-tag-version;npm publish --tag experiment"
   },
   "files": [
-    "dist/",
-    "tailwind/",
     "babel.js",
+    "dist/",
+    "metro.js",
     "plugin.js",
     "postcss.js",
     "tailwind.js",
+    "tailwind/",
     "types.d.ts"
   ],
   "dependencies": {
