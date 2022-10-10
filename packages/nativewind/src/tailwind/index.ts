@@ -1,46 +1,50 @@
 import { Config } from "tailwindcss";
-import theme from "./native-theme";
 
-import { boxShadow } from "./plugins/box-shadow";
-import { boxShadowColor } from "./plugins/box-shadow-color";
 import { divide } from "./plugins/divide";
 import { elevation } from "./plugins/elevation";
-import { fontSize } from "./plugins/font-size";
 import { gap } from "./plugins/gap";
 import { group } from "./plugins/group";
 import { scopedGroup } from "./plugins/scoped-group";
-import { lineHeight } from "./plugins/line-height";
 import { parent } from "./plugins/parent";
-import { rotate } from "./plugins/rotate";
-import { scale } from "./plugins/scale";
-import { skew } from "./plugins/skew";
 import { space } from "./plugins/space";
-import { translate } from "./plugins/translate";
+import nativewind from "./plugins/nativewind";
+import variables from "./plugins/variables";
 
-const preset: Config = {
+const preset: Config & { safelist: string[] } = {
   nativewind: true,
   content: [],
-  theme,
+  safelist: [".dark"],
+  theme: {
+    extend: {
+      aspectRatio: {
+        auto: "0",
+        square: "1",
+        video: "1.777777778",
+      },
+      elevation: {
+        sm: "1.5",
+        DEFAULT: "3",
+        md: "6",
+        lg: "7.5",
+        xl: "12.5",
+        "2xl": "25",
+        none: "0",
+      },
+    },
+  },
   plugins: [
-    boxShadow,
-    boxShadowColor,
     divide,
     elevation,
-    fontSize,
     gap,
     group,
-    scopedGroup,
-    lineHeight,
+    nativewind,
+    variables,
     parent,
-    rotate,
-    scale,
-    skew,
+    scopedGroup,
     space,
-    translate,
   ],
   corePlugins: {
-    // These are v2 plugins that don't work well with this library
-    // we only support v3, so its safe to disable them
+    // We do not support scoped variables
     divideOpacity: false,
     borderOpacity: false,
     placeholderOpacity: false,
@@ -48,20 +52,9 @@ const preset: Config = {
     backgroundOpacity: false,
     textOpacity: false,
     // These libraries are replaced with custom logic
-    boxShadow: false,
-    boxShadowColor: false,
-    divideColor: false,
-    divideStyle: false,
-    divideWidth: false,
-    fontSize: false,
     gap: false,
-    lineHeight: false,
-    rotate: false,
-    scale: false,
-    skew: false,
     space: false,
-    transform: false,
-    translate: false,
+    divideWidth: false,
   },
 };
 

@@ -1,26 +1,13 @@
+/* eslint-disable unicorn/no-useless-undefined */
 import { act, render } from "@testing-library/react-native";
 import { EmitterSubscription } from "react-native";
 import { NativeWindStyleSheet, styled } from "../src";
-import { extractStyles } from "../src/postcss/extract";
-import nativePreset from "../src/tailwind";
+import { create } from "./utilities";
 
 afterEach(() => {
   NativeWindStyleSheet.reset();
   jest.clearAllMocks();
 });
-
-function create(className: string, css?: string) {
-  return NativeWindStyleSheet.create(
-    extractStyles(
-      {
-        content: [],
-        safelist: [className],
-        presets: [nativePreset],
-      },
-      `@tailwind components;@tailwind utilities;${css ?? ""}`
-    )
-  );
-}
 
 test("px", () => {
   create("w-[1px]");

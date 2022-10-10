@@ -1,31 +1,63 @@
 import { act, render } from "@testing-library/react-native";
 import { NativeWindStyleSheet, styled } from "../src";
-import { extractStyles } from "../src/postcss/extract";
-import nativePreset from "../src/tailwind";
+import { create } from "./utilities";
 
 afterEach(() => {
   NativeWindStyleSheet.reset();
   jest.clearAllMocks();
 });
 
-function create(className: string, css?: string) {
-  return NativeWindStyleSheet.create(
-    extractStyles(
-      {
-        content: [],
-        safelist: [className],
-        presets: [nativePreset],
+test.only("set via theme", () => {
+  create("text-[color:var(--my-nested-variable)]", {
+    theme: {
+      variables: {
+        my: {
+          nested: {
+            variable: "red",
+          },
+        },
       },
-      `@tailwind components;@tailwind utilities;${css ?? ""}`
-    )
+      darkVariables: {
+        my: {
+          nested: {
+            variable: "blue",
+          },
+        },
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(
+    <StyledComponent className="text-[color:var(--my-nested-variable)]" />
   );
-}
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { color: "red" },
+    },
+    {}
+  );
+
+  act(() => {
+    MyComponent.mockReset();
+    NativeWindStyleSheet.toggleColorScheme();
+  });
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { color: "blue" },
+    },
+    {}
+  );
+});
 
 test("color scheme variables", () => {
-  create(
-    "text-[color:var(--test)]",
-    `:root { --test: red; } .dark { --test: blue; }`
-  );
+  create("text-[color:var(--test)]", {
+    css: `:root { --test: red; } .dark { --test: blue; }`,
+  });
 
   const MyComponent = jest.fn();
   const StyledComponent = styled(MyComponent);
@@ -63,7 +95,9 @@ test("color scheme variables", () => {
 });
 
 test("with input functions", () => {
-  create("text-[color:hsl(1,2,var(--custom))]", `:root { --custom: 3; }`);
+  create("text-[color:hsl(1,2,var(--custom))]", {
+    css: `:root { --custom: 3; }`,
+  });
 
   const MyComponent = jest.fn();
   const StyledComponent = styled(MyComponent);

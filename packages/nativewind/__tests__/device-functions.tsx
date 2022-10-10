@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react-native";
-import { Config } from "tailwindcss";
+import { create } from "./utilities";
 import {
   hairlineWidth,
   NativeWindStyleSheet,
@@ -7,34 +7,14 @@ import {
   platformSelect,
   styled,
 } from "../src";
-import { extractStyles } from "../src/postcss/extract";
-import nativePreset from "../src/tailwind";
 
 afterEach(() => {
   NativeWindStyleSheet.reset();
   jest.clearAllMocks();
 });
 
-function create(
-  className: string,
-  css: string | undefined = undefined,
-  config?: Partial<Config>
-) {
-  return NativeWindStyleSheet.create(
-    extractStyles(
-      {
-        content: [],
-        safelist: [className],
-        presets: [nativePreset],
-        ...config,
-      },
-      `@tailwind components;@tailwind utilities;${css ?? ""}`
-    )
-  );
-}
-
 test.skip("nested", () => {
-  create("text-test", "", {
+  create("text-test", {
     theme: {
       fontSize: {
         // These tests run as ios with
@@ -64,7 +44,7 @@ test.skip("nested", () => {
 });
 
 test.skip("platformSelect", () => {
-  create("text-test", "", {
+  create("text-test", {
     theme: {
       fontSize: {
         test: platformSelect({
@@ -89,7 +69,7 @@ test.skip("platformSelect", () => {
 });
 
 test.skip("hairlineWidth", () => {
-  create("text-test", "", {
+  create("text-test", {
     theme: {
       fontSize: {
         test: hairlineWidth(),
@@ -111,7 +91,7 @@ test.skip("hairlineWidth", () => {
 });
 
 test.skip("pixelRatio - get", () => {
-  create("text-test", "", {
+  create("text-test", {
     theme: {
       fontSize: {
         test: pixelRatio(),
@@ -133,7 +113,7 @@ test.skip("pixelRatio - get", () => {
 });
 
 test.skip("pixelRatio - specifics", () => {
-  create("text-test", "", {
+  create("text-test", {
     theme: {
       fontSize: {
         test: pixelRatio({

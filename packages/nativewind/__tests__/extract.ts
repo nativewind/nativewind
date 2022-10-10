@@ -1,9 +1,9 @@
 import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 
-import { extractStyles } from "../src/postcss/extract";
-import { Atom, AtomRecord } from "../src/postcss/types";
 import nativePreset from "../src/tailwind";
+import { Atom, AtomRecord } from "../src/transform-css/types";
+import { extractStyles } from "./utilities";
 
 /**
  * These tests are not really needed, and are more a sanity checker

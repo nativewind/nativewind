@@ -1,26 +1,12 @@
 import { render, fireEvent, screen } from "@testing-library/react-native";
 import { Pressable } from "react-native";
 import { NativeWindStyleSheet, styled } from "../src";
-import { extractStyles } from "../src/postcss/extract";
-import nativePreset from "../src/tailwind";
+import { create } from "./utilities";
 
 afterEach(() => {
   NativeWindStyleSheet.reset();
   jest.clearAllMocks();
 });
-
-function create(className: string, css?: string) {
-  return NativeWindStyleSheet.create(
-    extractStyles(
-      {
-        content: [],
-        safelist: [className],
-        presets: [nativePreset],
-      },
-      `@tailwind components;@tailwind utilities;${css ?? ""}`
-    )
-  );
-}
 
 test("group-active", () => {
   create("group-active:text-black");
