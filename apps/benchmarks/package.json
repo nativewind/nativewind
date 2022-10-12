@@ -25,7 +25,7 @@
     "nativewind": "2.0.11",
     "react": "*",
     "react-dom": "*",
-    "react-native": "0.70.2",
+    "react-native": "0.70.3",
     "react-native-paper": "rc",
     "react-native-safe-area-context": "4.4.1",
     "reassure": "0.6.0",
