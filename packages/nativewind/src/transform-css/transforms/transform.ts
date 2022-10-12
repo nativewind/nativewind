@@ -1,23 +1,21 @@
 import { Declaration } from "css-tree";
 import { encodeValue } from "../encode-value";
-import { DeclarationAtom, Transform } from "../types";
+import { AtomStyle, SelectorMeta, Transform } from "../types";
 import { pushStyle } from "./push";
 
-export function transform(atom: DeclarationAtom, node: Declaration) {
+export function transform(node: Declaration, meta: SelectorMeta) {
+  const styles: AtomStyle[] = [];
+
   if (node.value.type !== "Value") {
-    return;
+    return styles;
   }
 
   const children = node.value.children.toArray();
 
-  if (children.length === 1 && children[0].type !== "Function") {
-    return;
-  }
-
   const transform: Transform[] = [];
 
   for (const child of children) {
-    if (child.type !== "Function") return;
+    if (child.type !== "Function") return styles;
 
     switch (child.name) {
       case "rotate":
@@ -33,11 +31,13 @@ export function transform(atom: DeclarationAtom, node: Declaration) {
       case "translateX":
       case "translateY":
       case "matrix": {
-        const value = encodeValue(child.children.toArray()[0], []);
+        const value = encodeValue(child.children.toArray()[0], meta.topics);
         transform.push({ [child.name]: value } as unknown as Transform);
       }
     }
   }
 
-  pushStyle(atom, "transform", transform);
+  pushStyle(styles, "transform", meta, transform);
+
+  return styles;
 }

@@ -1,10 +1,12 @@
 import { Declaration } from "css-tree";
-import { DeclarationAtom } from "../types";
+import { AtomStyle, SelectorMeta } from "../types";
 import { pushStyle } from "./push";
 
-export function font(atom: DeclarationAtom, node: Declaration) {
+export function font(node: Declaration, meta: SelectorMeta) {
+  const styles: AtomStyle[] = [];
+
   if (node.value.type !== "Value") {
-    return;
+    return styles;
   }
 
   const children = node.value.children.toArray();
@@ -78,12 +80,14 @@ export function font(atom: DeclarationAtom, node: Declaration) {
     }
   }
 
-  if (fontStyle !== "normal") pushStyle(atom, "fontStyle", fontStyle);
+  if (fontStyle !== "normal") pushStyle(styles, "fontStyle", meta, fontStyle);
   if (fontVariant && fontVariant?.length > 0) {
-    pushStyle(atom, "fontVariant", fontVariant);
+    pushStyle(styles, "fontVariant", meta, fontVariant);
   }
-  if (fontWeight) pushStyle(atom, "fontWeight", fontWeight);
-  if (fontSize) pushStyle(atom, "fontSize", fontSize);
-  if (lineHeight) pushStyle(atom, "lineHeight", lineHeight);
-  if (fontFamily) pushStyle(atom, "fontFamily", fontFamily);
+  if (fontWeight) pushStyle(styles, "fontWeight", meta, fontWeight);
+  if (fontSize) pushStyle(styles, "fontSize", meta, fontSize);
+  if (lineHeight) pushStyle(styles, "lineHeight", meta, lineHeight);
+  if (fontFamily) pushStyle(styles, "fontFamily", meta, fontFamily);
+
+  return styles;
 }

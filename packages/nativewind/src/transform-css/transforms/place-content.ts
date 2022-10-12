@@ -1,10 +1,13 @@
+/* eslint-disable unicorn/no-lonely-if */
 import { Declaration } from "css-tree";
-import { DeclarationAtom } from "../types";
+import { AtomStyle, SelectorMeta } from "../types";
 import { pushStyle } from "./push";
 
-export function placeContent(atom: DeclarationAtom, node: Declaration) {
+export function placeContent(node: Declaration, meta: SelectorMeta) {
+  const styles: AtomStyle[] = [];
+
   if (node.value.type !== "Value") {
-    return;
+    return styles;
   }
 
   const children = node.value.children.toArray();
@@ -66,6 +69,8 @@ export function placeContent(atom: DeclarationAtom, node: Declaration) {
     }
   }
 
-  if (alignContent) pushStyle(atom, "alignContent", alignContent);
-  if (justifyContent) pushStyle(atom, "justifyContent", justifyContent);
+  if (alignContent) pushStyle(styles, "alignContent", meta, alignContent);
+  if (justifyContent) pushStyle(styles, "justifyContent", meta, justifyContent);
+
+  return styles;
 }

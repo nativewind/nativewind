@@ -18,15 +18,18 @@ export interface Atom {
   meta?: Record<string, boolean>;
 }
 
+export interface SelectorMeta {
+  topics: string[];
+  conditions: string[];
+  atRules: AtRuleTuple[];
+  variables: Array<Record<string, VariableValue>>;
+}
+
 export type Style = ViewStyle & TextStyle & ImageStyle;
 export type AtRuleTuple = [string] | [string, string | number];
 
 type InferArray<T> = T extends Array<infer K> ? K : never;
 export type Transform = InferArray<NonNullable<TransformsStyle["transform"]>>;
-
-export type DeclarationAtom = Required<
-  Pick<Atom, "styles" | "topics" | "variables">
->;
 
 export type StyleValue =
   | string

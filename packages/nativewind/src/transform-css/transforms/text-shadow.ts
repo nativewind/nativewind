@@ -1,10 +1,12 @@
 import { Declaration } from "css-tree";
-import { DeclarationAtom } from "../types";
+import { AtomStyle, SelectorMeta } from "../types";
 import { pushStyle } from "./push";
 
-export function textShadow(atom: DeclarationAtom, node: Declaration) {
+export function textShadow(node: Declaration, meta: SelectorMeta) {
+  const styles: AtomStyle[] = [];
+
   if (node.value.type !== "Value") {
-    return;
+    return styles;
   }
 
   let children = node.value.children.toArray();
@@ -21,45 +23,44 @@ export function textShadow(atom: DeclarationAtom, node: Declaration) {
 
   /* Keyword values */
   if (children.length === 1) {
-    return;
+    // Do nothing
   }
 
   /* offset-x | offset-y */
   if (children.length === 2) {
-    pushStyle(atom, "textShadowOffset.width", children[0]);
-    pushStyle(atom, "textShadowOffset.height", children[1]);
-    return;
+    pushStyle(styles, "textShadowOffset.width", meta, children[0]);
+    pushStyle(styles, "textShadowOffset.height", meta, children[1]);
   }
 
   if (children.length === 3) {
     if (firstChild.type === "Dimension") {
       /* offset-x | offset-y | color */
-      pushStyle(atom, "textShadowOffset.width", children[0]);
-      pushStyle(atom, "textShadowOffset.height", children[1]);
-      pushStyle(atom, "textShadowColor", children[2]);
+      pushStyle(styles, "textShadowOffset.width", meta, children[0]);
+      pushStyle(styles, "textShadowOffset.height", meta, children[1]);
+      pushStyle(styles, "textShadowColor", meta, children[2]);
     } else {
       /* color | offset-x | offset-y */
-      pushStyle(atom, "textShadowColor", children[0]);
-      pushStyle(atom, "textShadowOffset.width", children[1]);
-      pushStyle(atom, "textShadowOffset.height", children[2]);
+      pushStyle(styles, "textShadowColor", meta, children[0]);
+      pushStyle(styles, "textShadowOffset.width", meta, children[1]);
+      pushStyle(styles, "textShadowOffset.height", meta, children[2]);
     }
-    return;
   }
 
   if (children.length === 4) {
     if (firstChild.type === "Dimension") {
       /* offset-x | offset-y | blur-radius | color */
-      pushStyle(atom, "textShadowOffset.width", children[0]);
-      pushStyle(atom, "textShadowOffset.height", children[1]);
-      pushStyle(atom, "textShadowRadius", children[2]);
-      pushStyle(atom, "textShadowColor", children[3]);
+      pushStyle(styles, "textShadowOffset.width", meta, children[0]);
+      pushStyle(styles, "textShadowOffset.height", meta, children[1]);
+      pushStyle(styles, "textShadowRadius", meta, children[2]);
+      pushStyle(styles, "textShadowColor", meta, children[3]);
     } else {
       /* color | offset-x | offset-y | blur-radius */
-      pushStyle(atom, "textShadowColor", children[0]);
-      pushStyle(atom, "textShadowOffset.width", children[1]);
-      pushStyle(atom, "textShadowOffset.height", children[2]);
-      pushStyle(atom, "textShadowRadius", children[3]);
+      pushStyle(styles, "textShadowColor", meta, children[0]);
+      pushStyle(styles, "textShadowOffset.width", meta, children[1]);
+      pushStyle(styles, "textShadowOffset.height", meta, children[2]);
+      pushStyle(styles, "textShadowRadius", meta, children[3]);
     }
-    return;
   }
+
+  return styles;
 }

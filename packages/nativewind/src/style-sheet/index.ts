@@ -6,7 +6,6 @@ import { setDimensions } from "./dimensions";
 import { setDirection } from "./i18n";
 import {
   getColorScheme,
-  resetColorScheme,
   setColorScheme,
   toggleColorScheme,
 } from "./color-scheme";
@@ -30,7 +29,6 @@ export const NativeWindStyleSheet = {
 
 function reset() {
   context.reset();
-  resetColorScheme();
   setDimensions(Dimensions);
   setDirection(I18nManager.isRTL ? "rtl" : "ltr");
 }

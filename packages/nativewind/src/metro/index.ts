@@ -5,7 +5,7 @@ import { cwd } from "node:process";
 import { spawn, spawnSync } from "node:child_process";
 
 import findCacheDir from "find-cache-dir";
-import { getStylesFileContent } from "../transform-css";
+import { getCreateOptions } from "../transform-css";
 
 export interface WithNativeWindOptions {
   inputPath?: string;
@@ -61,7 +61,13 @@ export default function withNativeWind(
     const cli = spawn("npx", spawnCommands);
 
     cli.stdout.on("data", (data) => {
-      writeFileSync(outputFile, getStylesFileContent(data.toString().trim()));
+      const createOptions = JSON.stringify(
+        getCreateOptions(data.toString().trim())
+      );
+      writeFileSync(
+        outputFile,
+        `const {NativeWindStyleSheet}=require("nativewind/dist/style-sheet");\nNativeWindStyleSheet.create(${createOptions});`
+      );
     });
 
     cli.stderr.on("data", (data) => {

@@ -9,11 +9,12 @@ import { parent } from "./plugins/parent";
 import { space } from "./plugins/space";
 import nativewind from "./plugins/nativewind";
 import variables from "./plugins/variables";
+import { boxShadow } from "./plugins/box-shadow";
+import { darkMode } from "./plugins/dark-mode";
 
-const preset: Config & { safelist: string[] } = {
+const preset: Config = {
   nativewind: true,
   content: [],
-  safelist: [".dark"],
   theme: {
     extend: {
       aspectRatio: {
@@ -30,11 +31,22 @@ const preset: Config & { safelist: string[] } = {
         "2xl": "25",
         none: "0",
       },
+      boxShadow: {
+        sm: "0px 1px 2px rgba(0, 0, 0, 0.1)",
+        DEFAULT: "0px 2px 6px rgba(0, 0, 0, 0.1)",
+        md: "0px 6px 10px rgba(0, 0, 0, 0.1)",
+        lg: "0px 10px 15px rgba(0, 0, 0, 0.1)",
+        xl: "0px 20px 25px rgba(0, 0, 0, 0.1)",
+        "2xl": "0px 25px 50px rgba(0, 0, 0, 0.1)",
+        none: "0px 0px 0px rgba(0, 0, 0, 0)",
+      },
     },
   },
   plugins: [
+    darkMode,
     divide,
     elevation,
+    boxShadow,
     gap,
     group,
     nativewind,
@@ -51,6 +63,8 @@ const preset: Config & { safelist: string[] } = {
     ringOpacity: false,
     backgroundOpacity: false,
     textOpacity: false,
+    boxShadowColor: false,
+    boxShadow: false,
     // These libraries are replaced with custom logic
     gap: false,
     space: false,

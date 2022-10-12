@@ -1,5 +1,5 @@
 import { MediaQuery } from "css-tree";
-import { AtRuleTuple } from "./types";
+import { SelectorMeta } from "./types";
 
 const platforms = new Set([
   "native",
@@ -10,15 +10,9 @@ const platforms = new Set([
   "web",
 ]);
 
-export interface MediaQueryMeta {
-  topics: string[];
-  conditions: string[];
-  atRules: AtRuleTuple[];
-}
-
 export function parseMediaQuery(
   node: MediaQuery,
-  topicsAndAtRules: MediaQueryMeta
+  topicsAndAtRules: SelectorMeta
 ) {
   // eslint-disable-next-line unicorn/no-array-for-each
   node.children.forEach((child) => {
@@ -27,16 +21,18 @@ export function parseMediaQuery(
     } else if (child.type === "MediaFeature") {
       topicsAndAtRules.atRules ??= [];
 
+      if (child.name.includes("prefers-color-scheme")) {
+        topicsAndAtRules.topics.push("--color-scheme");
+        topicsAndAtRules.atRules.push(["--color-scheme", "dark"]);
+        return;
+      }
+
       if (child.name.includes("width")) {
         topicsAndAtRules.topics.push("device-width");
       }
 
       if (child.name.includes("height")) {
         topicsAndAtRules.topics.push("device-width");
-      }
-
-      if (child.name.includes("prefers-color-scheme")) {
-        topicsAndAtRules.topics.push("--color-scheme");
       }
 
       switch (child.value?.type) {

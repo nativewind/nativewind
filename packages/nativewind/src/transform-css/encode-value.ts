@@ -102,7 +102,7 @@ function parseFunction(node: FunctionNode, topics: string[]) {
       const children = node.children
         .toArray()
         .map((child) => encodeValue(child, topics))
-        .filter((child) => Boolean(child));
+        .filter(Boolean);
 
       return {
         function: node.name,

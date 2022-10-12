@@ -1,10 +1,12 @@
 import { Declaration } from "css-tree";
-import { DeclarationAtom } from "../types";
+import { AtomStyle, SelectorMeta } from "../types";
 import { pushStyle } from "./push";
 
-export function boxShadow(atom: DeclarationAtom, node: Declaration) {
+export function boxShadow(node: Declaration, meta: SelectorMeta) {
+  const styles: AtomStyle[] = [];
+
   if (node.value.type !== "Value") {
-    return;
+    return styles;
   }
 
   let children = node.value.children.toArray();
@@ -23,37 +25,39 @@ export function boxShadow(atom: DeclarationAtom, node: Declaration) {
 
     switch (child?.type) {
       case "Identifier":
-        return;
+        return styles;
       default:
-        pushStyle(atom, "borderStyle", children[0]);
+        pushStyle(styles, "borderStyle", meta, children[0]);
     }
   }
 
   /* offset-x | offset-y | color */
   if (children.length === 3) {
-    pushStyle(atom, "shadowOffset.width", children[0]);
-    pushStyle(atom, "shadowOffset.height", children[1]);
-    pushStyle(atom, "shadowColor", children[2]);
+    pushStyle(styles, "shadowOffset.width", meta, children[0]);
+    pushStyle(styles, "shadowOffset.height", meta, children[1]);
+    pushStyle(styles, "shadowColor", meta, children[2]);
   }
 
   if (children.length === 4) {
     /* inset | offset-x | offset-y | color */
     if (children[0].type === "Identifier" && children[0].name === "inset") {
-      return;
+      return styles;
     }
 
     /* offset-x | offset-y | blur-radius | color */
-    pushStyle(atom, "shadowOffset.width", children[0]);
-    pushStyle(atom, "shadowOffset.height", children[1]);
-    pushStyle(atom, "shadowRadius", children[2]);
-    pushStyle(atom, "shadowColor", children[3]);
+    pushStyle(styles, "shadowOffset.width", meta, children[0]);
+    pushStyle(styles, "shadowOffset.height", meta, children[1]);
+    pushStyle(styles, "shadowRadius", meta, children[2]);
+    pushStyle(styles, "shadowColor", meta, children[3]);
   }
 
   /* offset-x | offset-y | blur-radius | spread-radius | color */
   if (children.length === 5) {
-    pushStyle(atom, "shadowOffset.width", children[0]);
-    pushStyle(atom, "shadowOffset.height", children[1]);
-    pushStyle(atom, "shadowRadius", children[3]);
-    pushStyle(atom, "shadowColor", children[4]);
+    pushStyle(styles, "shadowOffset.width", meta, children[0]);
+    pushStyle(styles, "shadowOffset.height", meta, children[1]);
+    pushStyle(styles, "shadowRadius", meta, children[3]);
+    pushStyle(styles, "shadowColor", meta, children[4]);
   }
+
+  return styles;
 }

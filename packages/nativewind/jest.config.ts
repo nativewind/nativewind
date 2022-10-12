@@ -1,7 +1,7 @@
-const { defaults: tsjPreset } = require("ts-jest/presets");
+import type { Config } from "jest";
+import { defaults as tsjPreset } from "ts-jest/presets";
 
-/** @type {import('ts-jest').JestConfigWithTsJest} */
-module.exports = {
+const config: Config = {
   ...tsjPreset,
   preset: "react-native",
   transform: {
@@ -16,6 +16,7 @@ module.exports = {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   testPathIgnorePatterns: [
     "/node_modules/",
+    "/__tests__/setup/",
     "/__tests__/babel/",
     "/__tests__/archive/",
     "/__tests__/tailwindcss/runner/",
@@ -24,3 +25,5 @@ module.exports = {
     "/__tests__/utilities.ts",
   ],
 };
+
+export default config;

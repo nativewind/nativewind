@@ -1,30 +1,67 @@
 import postcss from "postcss";
 import tailwind, { Config } from "tailwindcss";
-import { NativeWindStyleSheet } from "../src";
 import { getCreateOptions } from "../src/transform-css";
 import nativePreset from "../src/tailwind";
+import { AtomRecord } from "../src/transform-css/types";
 
-export function extractStyles(tailwindConfig: Config, cssInput: string) {
-  const css = postcss([tailwind(tailwindConfig)]).process(cssInput).css;
-  // console.log(css);
-  return getCreateOptions(css);
-}
-
-export interface CreateOptions {
+interface NativewindCompileOptions {
   css?: string;
-  theme?: Config["theme"];
+  config?: Partial<Config>;
+  name?: string;
 }
 
-export function create(className: string, { css, theme }: CreateOptions = {}) {
-  return NativeWindStyleSheet.create(
-    extractStyles(
-      {
-        content: [],
-        safelist: [className, ...nativePreset.safelist],
-        presets: [nativePreset],
-        theme,
-      },
-      `@tailwind base;@tailwind components;@tailwind utilities;${css ?? ""}`
-    )
-  );
+export function compile(
+  classNames: string,
+  { css, config }: NativewindCompileOptions = {}
+) {
+  const output = postcss([
+    tailwind({
+      content: [],
+      safelist: classNames.split(" "),
+      presets: [nativePreset],
+      ...config,
+    }),
+  ]).process(`@tailwind components;@tailwind utilities;${css ?? ""}`).css;
+
+  // Put a console.log here to see the CSS output
+  // console.log(output);
+
+  return output;
 }
+
+export function c(classNames: string, options?: NativewindCompileOptions) {
+  return getCreateOptions(compile(classNames, options));
+}
+
+interface TestCompile extends jest.It {
+  (
+    name: string,
+    options: NativewindCompileOptions | ((record: AtomRecord) => void),
+    fn?: (record: AtomRecord) => void,
+    timeout?: number
+  ): void;
+
+  only: TestCompile;
+  skip: TestCompile;
+}
+
+const createTestCompileProxy = <T extends jest.It>(object: T): T =>
+  new Proxy(object, {
+    apply(target, _, [classNames, options, fn]) {
+      const compileOptions =
+        typeof options === "function" ? undefined : options;
+      fn = typeof options === "function" ? options : fn;
+      if (fn) {
+        target([classNames, options.name].filter(Boolean).join(" - "), () =>
+          fn(c(classNames, compileOptions))
+        );
+      }
+    },
+    get(target, attribute) {
+      return createTestCompileProxy(
+        (target as unknown as Record<string | symbol, T>)[attribute]
+      );
+    },
+  });
+
+export const testCompile = createTestCompileProxy(test as TestCompile);

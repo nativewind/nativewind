@@ -1,7 +1,7 @@
 import { walk, parse, CssNode, Rule, Atrule, Block } from "css-tree";
 
-import { AtomRecord, DeclarationAtom } from "./types";
-import { parseMediaQuery, MediaQueryMeta } from "./media-query";
+import { AtomRecord, AtomStyle, SelectorMeta } from "./types";
+import { parseMediaQuery } from "./media-query";
 
 import { defaultDeclaration } from "./transforms/default";
 import { border } from "./transforms/border";
@@ -18,23 +18,21 @@ import { transform } from "./transforms/transform";
 
 const skip = (walk as unknown as Record<string, unknown>).skip;
 
-export function getStylesFileContent(css: string) {
-  const createOptions = JSON.stringify(getCreateOptions(css));
-  return `const {NativeWindStyleSheet}=require("nativewind/dist/style-sheet");\nNativeWindStyleSheet.create(${createOptions});`;
-}
-
 export function getCreateOptions(css: string) {
   const createOptions: AtomRecord = {};
-
   walkAst(parse(css), createOptions);
-
   return createOptions;
 }
 
+/**
+ * Recursively walk down the tree, collecting meta information
+ * When a leaf is reached, mutate createOptions with a new rule
+ * Each top level branch (atRule/rule) should have its own meta object
+ */
 function walkAst(
   ast: CssNode,
   createOptions: AtomRecord,
-  existingMeta?: MediaQueryMeta
+  existingMeta?: SelectorMeta
 ) {
   walk(ast, {
     enter(node: CssNode) {
@@ -43,7 +41,12 @@ function walkAst(
           addAtRule(
             node,
             createOptions,
-            existingMeta ?? { topics: [], atRules: [], conditions: [] }
+            existingMeta ?? {
+              topics: [],
+              atRules: [],
+              conditions: [],
+              variables: [],
+            }
           );
           return skip;
         }
@@ -51,7 +54,12 @@ function walkAst(
           addRule(
             node,
             createOptions,
-            existingMeta ?? { topics: [], atRules: [], conditions: [] }
+            existingMeta ?? {
+              topics: [],
+              atRules: [],
+              conditions: [],
+              variables: [],
+            }
           );
           return skip;
         }
@@ -63,7 +71,7 @@ function walkAst(
 export function addAtRule(
   node: Atrule,
   createOptions: AtomRecord,
-  meta: MediaQueryMeta
+  meta: SelectorMeta
 ) {
   if (node.name !== "media") return;
   if (!node.prelude || node.prelude.type === "Raw") return;
@@ -84,36 +92,32 @@ export function addAtRule(
   });
 }
 
-function addRule(
-  node: Rule,
-  createOptions: AtomRecord,
-  {
-    topics: atRuleTopics,
-    conditions: atRuleConditions,
-    atRules,
-  }: MediaQueryMeta
-) {
+function addRule(node: Rule, createOptions: AtomRecord, meta: SelectorMeta) {
   const selectorList = node.prelude;
   if (selectorList.type === "Raw") return skip;
 
-  const { styles, topics: ruleTopics, variables } = getDeclarations(node.block);
+  const styles = getDeclarations(node.block, meta);
 
   // eslint-disable-next-line unicorn/no-array-for-each
   selectorList.children.forEach((selectorNode) => {
-    const {
-      selector,
-      conditions: selectorConditions,
-      parentSelector,
-    } = getSelector(selectorNode);
+    // Duplicate the meta, as selectors may add their own topics/atRules (eg .dark)
+    const selectorMeta = { ...meta, topics: [...meta.topics] };
+
+    const { selector, parentSelector } = getSelector(
+      selectorNode,
+      selectorMeta
+    );
 
     // Invalid selector, skip it
     if (!selector) return;
 
     if (selector === ":root" || selector === "dark") {
       if (styles.fontSize) {
-        variables.push({ "--rem": styles.fontSize });
+        selectorMeta.variables.push({ "--rem": styles.fontSize });
       }
-      createOptions[selector] ??= { variables: [flatten(variables)] };
+      createOptions[selector] ??= {
+        variables: [flatten(selectorMeta.variables)],
+      };
       return;
     }
 
@@ -129,8 +133,8 @@ function addRule(
       ];
     }
 
-    const conditionSet = new Set([...atRuleConditions, ...selectorConditions]);
-    const topicSet = new Set([...atRuleTopics, ...ruleTopics]);
+    const conditionSet = new Set(selectorMeta.conditions);
+    const topicSet = new Set(selectorMeta.topics);
 
     if (topicSet.size > 0) {
       createOptions[selector].topics = [...topicSet];
@@ -146,64 +150,54 @@ function addRule(
 
       selectorOptions.styles.push(styles);
 
-      if (atRules.length > 0) {
+      if (selectorMeta.atRules.length > 0) {
         selectorOptions.atRules ??= {};
-        selectorOptions.atRules[currentStyleIndex] = atRules;
+        selectorOptions.atRules[currentStyleIndex] = selectorMeta.atRules;
       }
     }
   });
 }
 
-function getDeclarations(block: Block) {
-  const atom: DeclarationAtom = {
-    styles: [],
-    topics: [],
-    variables: [],
-  };
+function getDeclarations(block: Block, meta: SelectorMeta) {
+  let styles: AtomStyle[] = [];
 
   walk(block, {
     visit: "Declaration",
     enter(node) {
       switch (node.property) {
         case "border":
-          return border(atom, node);
+          styles = border(node, meta);
         case "box-shadow":
-          return boxShadow(atom, node);
+          styles = boxShadow(node, meta);
         case "flex":
-          return flex(atom, node);
+          styles = flex(node, meta);
         case "flex-flow":
-          return flexFlow(atom, node);
+          styles = flexFlow(node, meta);
         case "font":
-          return font(atom, node);
+          styles = font(node, meta);
         case "font-family":
-          return fontFamily(atom, node);
+          styles = fontFamily(node, meta);
         case "place-content":
-          return placeContent(atom, node);
+          styles = placeContent(node, meta);
         case "text-decoration":
-          return textDecoration(atom, node);
+          styles = textDecoration(node, meta);
         case "text-decoration-line":
-          return textDecorationLine(atom, node);
+          styles = textDecorationLine(node, meta);
         case "text-shadow":
-          return textShadow(atom, node);
+          styles = textShadow(node, meta);
         case "transform":
-          return transform(atom, node);
-        default: {
-          return defaultDeclaration(atom, node);
-        }
+          styles = transform(node, meta);
+        default:
+          styles = defaultDeclaration(node, meta);
       }
     },
   });
 
-  return {
-    ...atom,
-    styles: flatten(atom.styles),
-  };
+  return flatten(styles);
 }
 
-function getSelector(node: CssNode) {
+function getSelector(node: CssNode, meta: SelectorMeta) {
   const tokens: string[] = [];
-
-  const conditions: string[] = [];
 
   let hasParent = false;
 
@@ -211,7 +205,7 @@ function getSelector(node: CssNode) {
     switch (node.type) {
       case "TypeSelector":
         // We don't support these, so bail early
-        return { selector: "", conditions };
+        return { selector: "" };
       case "Combinator":
         tokens.push(node.name);
         break;
@@ -219,7 +213,12 @@ function getSelector(node: CssNode) {
         tokens.push(`#${node.name}`);
         break;
       case "ClassSelector":
-        tokens.push(`.${node.name}`);
+        if (node.name === "dark") {
+          meta.topics.push("--color-scheme");
+          meta.atRules.push(["--color-scheme", "dark"]);
+        } else {
+          tokens.push(`.${node.name}`);
+        }
         break;
       case "PseudoClassSelector": {
         if (node.name === "children") {
@@ -228,7 +227,7 @@ function getSelector(node: CssNode) {
         } else if (node.name === "root") {
           tokens.push(`:${node.name}`);
         } else {
-          conditions.push(node.name);
+          meta.conditions.push(node.name);
         }
       }
     }
@@ -236,6 +235,7 @@ function getSelector(node: CssNode) {
 
   const selector = tokens
     .join("")
+    .trimStart()
     .replace(/^\./, "")
     .replaceAll(/\\([\dA-Fa-f]{2}\s)/g, function (...args) {
       // Replace hex-string with their actual value
@@ -248,7 +248,7 @@ function getSelector(node: CssNode) {
     ? selector.replaceAll(":children", "")
     : undefined;
 
-  return { selector, conditions, parentSelector };
+  return { selector, parentSelector };
 }
 
 function flatten<T extends Record<string, unknown>>(objectArray: T[]): T {

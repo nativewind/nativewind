@@ -1,11 +1,23 @@
 import plugin from "tailwindcss/plugin";
 
 export default plugin(function ({ addUtilities, theme }) {
-  addUtilities({
-    ":root": Object.fromEntries(reduceVariables(theme("variables"))),
-    ".dark": Object.fromEntries(reduceVariables(theme("darkVariables"))),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+  const rootVariables = reduceVariables(theme("variables"));
+
+  if (rootVariables.length > 0) {
+    addUtilities({
+      ":root": Object.fromEntries(rootVariables),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+  }
+
+  const darkVariables = reduceVariables(theme("darkVariables"));
+
+  if (darkVariables.length > 0) {
+    addUtilities({
+      ".dark": Object.fromEntries(darkVariables),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+  }
 });
 
 type VariableRecord = { [key: string]: VariableRecord | string | number };

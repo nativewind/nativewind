@@ -4,6 +4,12 @@ export type StyleProperty =
   | keyof TextStyle
   | keyof ViewStyle
   | keyof ImageStyle
+
+  /**
+   * Custom props
+   */
+  | "shadowOffset.width"
+  | "shadowOffset.height"
   /**
    * These are special SVG properties that we support
    */
@@ -120,6 +126,9 @@ const styleProperties: Record<StyleProperty, true> = {
   width: true,
   writingDirection: true,
   zIndex: true,
+
+  "shadowOffset.width": true,
+  "shadowOffset.height": true,
 
   /* SVG Props */
   fill: true,

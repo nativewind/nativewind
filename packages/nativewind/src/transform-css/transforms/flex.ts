@@ -1,10 +1,12 @@
 import { Declaration } from "css-tree";
-import { DeclarationAtom } from "../types";
+import { AtomStyle, SelectorMeta } from "../types";
 import { pushStyle } from "./push";
 
-export function flex(atom: DeclarationAtom, node: Declaration) {
+export function flex(node: Declaration, meta: SelectorMeta) {
+  const styles: AtomStyle[] = [];
+
   if (node.value.type !== "Value") {
-    return;
+    return styles;
   }
 
   const children = node.value.children.toArray();
@@ -15,21 +17,21 @@ export function flex(atom: DeclarationAtom, node: Declaration) {
     if (firstChild.type === "Identifier") {
       /* Keyword values */
       if (firstChild.name === "none") {
-        pushStyle(atom, "flexGrow", 0);
-        pushStyle(atom, "flexShrink", 0);
-        pushStyle(atom, "flexBasis", "auto");
+        pushStyle(styles, "flexGrow", meta, 0);
+        pushStyle(styles, "flexShrink", meta, 0);
+        pushStyle(styles, "flexBasis", meta, "auto");
       } else if (firstChild.name === "auto" || firstChild.name === "initial") {
-        pushStyle(atom, "flexGrow", 1);
-        pushStyle(atom, "flexShrink", 1);
-        pushStyle(atom, "flexBasis", "auto");
+        pushStyle(styles, "flexGrow", meta, 1);
+        pushStyle(styles, "flexShrink", meta, 1);
+        pushStyle(styles, "flexBasis", meta, "auto");
       } else {
-        return;
+        return styles;
       }
     } else if (firstChild.type === "Number") {
       /* One value, unit-less number: flex-grow */
-      pushStyle(atom, "flexGrow", children[0]);
+      pushStyle(styles, "flexGrow", meta, children[0]);
     } else {
-      pushStyle(atom, "flexBasis", children[0]);
+      pushStyle(styles, "flexBasis", meta, children[0]);
     }
   }
 
@@ -38,19 +40,21 @@ export function flex(atom: DeclarationAtom, node: Declaration) {
 
     if (secondChild.type === "Number") {
       /* flex-grow | flex-shrink */
-      pushStyle(atom, "flexGrow", children[0]);
-      pushStyle(atom, "flexShrink", children[1]);
+      pushStyle(styles, "flexGrow", meta, children[0]);
+      pushStyle(styles, "flexShrink", meta, children[1]);
     } else {
       /* flex-grow | flex-basis */
-      pushStyle(atom, "flexGrow", children[0]);
-      pushStyle(atom, "flexBasis", children[1]);
+      pushStyle(styles, "flexGrow", meta, children[0]);
+      pushStyle(styles, "flexBasis", meta, children[1]);
     }
   }
 
   /* flex-grow | flex-shrink | flex-basis */
   if (children.length === 3) {
-    pushStyle(atom, "flexGrow", children[0]);
-    pushStyle(atom, "flexShrink", children[1]);
-    pushStyle(atom, "flexBasis", children[2]);
+    pushStyle(styles, "flexGrow", meta, children[0]);
+    pushStyle(styles, "flexShrink", meta, children[1]);
+    pushStyle(styles, "flexBasis", meta, children[2]);
   }
+
+  return styles;
 }

@@ -1,10 +1,12 @@
 import { Declaration } from "css-tree";
-import { DeclarationAtom } from "../types";
+import { AtomStyle, SelectorMeta } from "../types";
 import { pushStyle } from "./push";
 
-export function flexFlow(atom: DeclarationAtom, node: Declaration) {
+export function flexFlow(node: Declaration, meta: SelectorMeta) {
+  const styles: AtomStyle[] = [];
+
   if (node.value.type !== "Value") {
-    return;
+    return styles;
   }
 
   const children = node.value.children.toArray();
@@ -19,17 +21,19 @@ export function flexFlow(atom: DeclarationAtom, node: Declaration) {
         firstChild.name === "row-reverse" ||
         firstChild.name === "column-reverse"
       ) {
-        pushStyle(atom, "flexDirection", children[0]);
+        pushStyle(styles, "flexDirection", meta, children[0]);
       } else if (
         firstChild.name === "wrap" ||
         firstChild.name === "nowrap" ||
         firstChild.name === "wrap-reverse"
       ) {
-        pushStyle(atom, "flexWrap", children[0]);
+        pushStyle(styles, "flexWrap", meta, children[0]);
       }
     }
   } else if (children.length === 2) {
-    pushStyle(atom, "flexDirection", children[0]);
-    pushStyle(atom, "flexWrap", children[1]);
+    pushStyle(styles, "flexDirection", meta, children[0]);
+    pushStyle(styles, "flexWrap", meta, children[1]);
   }
+
+  return styles;
 }

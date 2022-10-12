@@ -1,10 +1,12 @@
 import { Declaration } from "css-tree";
-import { DeclarationAtom } from "../types";
+import { AtomStyle, SelectorMeta } from "../types";
 import { pushStyle } from "./push";
 
-export function textDecorationLine(atom: DeclarationAtom, node: Declaration) {
+export function textDecorationLine(node: Declaration, meta: SelectorMeta) {
+  const styles: AtomStyle[] = [];
+
   if (node.value.type !== "Value") {
-    return;
+    return styles;
   }
 
   const children = node.value.children.toArray();
@@ -58,6 +60,8 @@ export function textDecorationLine(atom: DeclarationAtom, node: Declaration) {
   }
 
   if (textDecorationLine) {
-    pushStyle(atom, "textDecorationLine", textDecorationLine);
+    pushStyle(styles, "textDecorationLine", meta, textDecorationLine);
   }
+
+  return styles;
 }

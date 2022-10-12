@@ -7,6 +7,7 @@ export function resolve(
 ): string | number | ColorValue | undefined {
   if (typeof style === "string" || typeof style === "number") {
     if (typeof style === "string") {
+      if (style.endsWith("%")) return style;
       const maybeNumber = Number.parseFloat(style);
       return Number.isNaN(maybeNumber) ? style : maybeNumber;
     }

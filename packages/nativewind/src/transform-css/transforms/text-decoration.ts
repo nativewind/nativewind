@@ -1,10 +1,13 @@
+/* eslint-disable unicorn/no-lonely-if */
 import { Declaration } from "css-tree";
-import { DeclarationAtom } from "../types";
+import { AtomStyle, SelectorMeta } from "../types";
 import { pushStyle } from "./push";
 
-export function textDecoration(atom: DeclarationAtom, node: Declaration) {
+export function textDecoration(node: Declaration, meta: SelectorMeta) {
+  const styles: AtomStyle[] = [];
+
   if (node.value.type !== "Value") {
-    return;
+    return styles;
   }
 
   let textDecorationLine: string | undefined;
@@ -94,12 +97,14 @@ export function textDecoration(atom: DeclarationAtom, node: Declaration) {
   }
 
   if (textDecorationStyle) {
-    pushStyle(atom, "textDecorationStyle", textDecorationStyle);
+    pushStyle(styles, "textDecorationStyle", meta, textDecorationStyle);
   }
   if (textDecorationLine) {
-    pushStyle(atom, "textDecorationLine", textDecorationLine);
+    pushStyle(styles, "textDecorationLine", meta, textDecorationLine);
   }
   if (textDecorationColor) {
-    pushStyle(atom, "textDecorationColor", textDecorationColor);
+    pushStyle(styles, "textDecorationColor", meta, textDecorationColor);
   }
+
+  return styles;
 }
