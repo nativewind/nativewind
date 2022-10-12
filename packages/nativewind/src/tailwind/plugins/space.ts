@@ -4,22 +4,16 @@ export const space = plugin(function ({ matchUtilities, theme }) {
   matchUtilities(
     {
       "space-x": (value: string) => {
-        value = value === "0" ? "0px" : value;
-
         return {
-          "&:merge(:parent)": {},
-          ":merge(.children)&:not-first-child": {
+          "&:children:not-first-child": {
             "margin-left": value,
           },
         };
       },
       "space-y": (value: string) => {
-        value = value === "0" ? "0px" : value;
-
         return {
-          "&:merge(:parent)": {},
-          "&:merge(:children):not-first-child": {
-            "margin-top": value,
+          "&:children:not-first-child": {
+            "margin-right": value,
           },
         };
       },

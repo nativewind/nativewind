@@ -7,20 +7,16 @@ export const divide = plugin(function ({ matchUtilities, theme }) {
   matchUtilities(
     {
       "divide-x": (value) => {
-        value = value === "0" ? "0px" : value;
         return {
-          "&:merge(:parent)": {},
-          ":merge(.children)&:not-first-child": {
+          "&:children:not-first-child": {
             "border-left-width": value,
             "border-right-width": 0,
           },
         } as any;
       },
       "divide-y": (value: string) => {
-        value = value === "0" ? "0px" : value;
-
         return {
-          "&:merge(:children):not-first-child": {
+          "&:children:not-first-child": {
             "border-bottom-width": 0,
             "border-top-width": value,
           },

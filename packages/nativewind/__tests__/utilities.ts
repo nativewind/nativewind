@@ -7,6 +7,7 @@ import { AtomRecord } from "../src/transform-css/types";
 interface NativewindCompileOptions {
   css?: string;
   config?: Partial<Config>;
+  nameSuffix?: string;
   name?: string;
 }
 
@@ -30,7 +31,9 @@ export function compile(
 }
 
 export function c(classNames: string, options?: NativewindCompileOptions) {
-  return getCreateOptions(compile(classNames, options));
+  const compiled = getCreateOptions(compile(classNames, options));
+  // console.log(compiled);
+  return compiled;
 }
 
 interface TestCompile extends jest.It {
@@ -52,8 +55,10 @@ const createTestCompileProxy = <T extends jest.It>(object: T): T =>
         typeof options === "function" ? undefined : options;
       fn = typeof options === "function" ? options : fn;
       if (fn) {
-        target([classNames, options.name].filter(Boolean).join(" - "), () =>
-          fn(c(classNames, compileOptions))
+        target(
+          options.name ||
+            [classNames, options.name].filter(Boolean).join(" - "),
+          () => fn(c(classNames, compileOptions))
         );
       }
     },

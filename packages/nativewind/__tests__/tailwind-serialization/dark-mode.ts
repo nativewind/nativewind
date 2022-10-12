@@ -10,10 +10,10 @@ testCompile("dark:text-red-500", (output) => {
   });
 });
 
-testCompile.only(
+testCompile(
   "dark:text-red-500",
   {
-    name: "using darkMode:class",
+    nameSuffix: "using darkMode:class",
     config: {
       darkMode: "class",
     },

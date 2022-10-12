@@ -23,18 +23,27 @@ testCompile("container", (output) => {
   });
 });
 
-//   "hover:text-red-500": {
-//     styles: [{ color: "#ef4444" }],
-//     conditions: ["hover"],
-//   },
-//   "dark:group-hover:hover:text-red-500": {
-//     styles: [{ color: "#ef4444" }],
-//     conditions: ["hover", "group-hover"],
-//     topics: ["colorScheme"],
-//     atRules: {
-//       "0": [["colorScheme", "dark"]],
-//     },
-//   },
+testCompile("hover:text-red-500", (output) => {
+  expect(output).toStrictEqual({
+    "hover:text-red-500": {
+      styles: [{ color: "#ef4444" }],
+      conditions: ["hover"],
+    },
+  });
+});
+
+testCompile("dark:group-hover:hover:text-red-500", (output) => {
+  expect(output).toStrictEqual({
+    "dark:group-hover:hover:text-red-500": {
+      styles: [{ color: "#ef4444" }],
+      conditions: ["hover", "group-hover"],
+      topics: ["--color-scheme"],
+      atRules: {
+        "0": [["--color-scheme", "dark"]],
+      },
+    },
+  });
+});
 //   "scale-50": {
 //     styles: [{ transform: [{ scaleY: 0.5 }, { scaleX: 0.5 }] }],
 //   },

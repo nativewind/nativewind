@@ -1,4 +1,4 @@
-import { validProperties } from "./valid-styles";
+import { StyleProperty, validProperties } from "./valid-styles";
 import { AtomStyle, SelectorMeta, StyleValue } from "../types";
 import { encodeValue } from "../encode-value";
 
@@ -15,9 +15,20 @@ export function pushStyle(
   if (value === undefined || value === null) return;
 
   // To camelCase
-  const styleProperty = property.replace(/-./g, (x) => x[1].toUpperCase());
+  const styleProperty = property.replace(/-./g, (x) =>
+    x[1].toUpperCase()
+  ) as StyleProperty;
 
-  if (validProperties.has(styleProperty)) {
+  let isValid = false;
+  const styleProperties = validProperties[styleProperty];
+
+  if (styleProperties === true) {
+    isValid = true;
+  } else if (Array.isArray(styleProperties) && typeof value === "string") {
+    isValid = styleProperties.includes(value);
+  }
+
+  if (isValid) {
     styles.push({
       [styleProperty]: value,
     });

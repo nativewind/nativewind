@@ -159,36 +159,47 @@ function addRule(node: Rule, createOptions: AtomRecord, meta: SelectorMeta) {
 }
 
 function getDeclarations(block: Block, meta: SelectorMeta) {
-  let styles: AtomStyle[] = [];
+  const styles: AtomStyle[] = [];
 
   walk(block, {
     visit: "Declaration",
     enter(node) {
       switch (node.property) {
         case "border":
-          styles = border(node, meta);
+          styles.push(...border(node, meta));
+          break;
         case "box-shadow":
-          styles = boxShadow(node, meta);
+          styles.push(...boxShadow(node, meta));
+          break;
         case "flex":
-          styles = flex(node, meta);
+          styles.push(...flex(node, meta));
+          break;
         case "flex-flow":
-          styles = flexFlow(node, meta);
+          styles.push(...flexFlow(node, meta));
+          break;
         case "font":
-          styles = font(node, meta);
+          styles.push(...font(node, meta));
+          break;
         case "font-family":
-          styles = fontFamily(node, meta);
+          styles.push(...fontFamily(node, meta));
+          break;
         case "place-content":
-          styles = placeContent(node, meta);
+          styles.push(...placeContent(node, meta));
+          break;
         case "text-decoration":
-          styles = textDecoration(node, meta);
+          styles.push(...textDecoration(node, meta));
+          break;
         case "text-decoration-line":
-          styles = textDecorationLine(node, meta);
+          styles.push(...textDecorationLine(node, meta));
+          break;
         case "text-shadow":
-          styles = textShadow(node, meta);
+          styles.push(...textShadow(node, meta));
+          break;
         case "transform":
-          styles = transform(node, meta);
+          styles.push(...transform(node, meta));
+          break;
         default:
-          styles = defaultDeclaration(node, meta);
+          styles.push(...defaultDeclaration(node, meta));
       }
     },
   });

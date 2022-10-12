@@ -17,10 +17,17 @@ export type StyleProperty =
   | "stroke"
   | "strokeWidth";
 
-const styleProperties: Record<StyleProperty, true> = {
-  alignContent: true,
-  alignItems: true,
-  alignSelf: true,
+export const validProperties: Record<StyleProperty, true | string[]> = {
+  alignContent: [
+    "flex-start",
+    "flex-end",
+    "stretch",
+    "center",
+    "space-between",
+    "space-around",
+  ],
+  alignItems: ["stretch", "flex-start", "flex-end", "center", "baseline"],
+  alignSelf: ["stretch", "flex-start", "flex-end", "center", "baseline"],
   aspectRatio: true,
   backfaceVisibility: true,
   backgroundColor: true,
@@ -135,5 +142,3 @@ const styleProperties: Record<StyleProperty, true> = {
   stroke: true,
   strokeWidth: true,
 };
-
-export const validProperties = new Set(Object.keys(styleProperties));
