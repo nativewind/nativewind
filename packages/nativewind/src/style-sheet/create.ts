@@ -6,9 +6,6 @@ import context, { Styles } from "./context";
 import { resolve } from "./resolve";
 
 export function create(options: AtomRecord) {
-  // Please keep this, is useful for debugging
-  // console.log(JSON.stringify(options, undefined, 2));
-
   if (context.preprocessed) {
     return;
   }
@@ -65,7 +62,7 @@ export function create(options: AtomRecord) {
 
 function evaluate(name: string, atom: Atom): Styles | undefined {
   const atomStyles: Style[] = [];
-  let newStyles: Styles = {
+  const newStyles: Styles = {
     [name]: atomStyles,
   };
 

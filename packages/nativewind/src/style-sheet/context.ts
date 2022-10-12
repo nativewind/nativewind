@@ -1,4 +1,4 @@
-import { StyleSheet, Platform, PlatformOSType } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { Style, VariableValue, Atom } from "../transform-css/types";
 
 export type Listener<T> = (state: T, oldState: T) => void;
@@ -16,38 +16,26 @@ export interface StyleSheetContext {
   meta: Map<string, Record<string, boolean>>;
 
   styles: Styles;
-  setStyles: (value: Styles | ((value: Styles) => Styles) | undefined) => void;
+  setStyles: (value: Styles | undefined) => void;
   subscribeToStyles: (listener: Listener<Styles>) => () => boolean;
   styleListeners: Set<Listener<Styles>>;
 
   styleSets: StyleSet;
-  setStyleSets: (
-    value: StyleSet | ((value: StyleSet) => StyleSet) | undefined
-  ) => void;
+  setStyleSets: (value: StyleSet) => void;
   subscribeToStyleSets: (listener: Listener<StyleSet>) => () => boolean;
   styleSetListeners: Set<Listener<StyleSet>>;
 
   topics: Topics;
-  setTopics: (value: Topics | ((value: Topics) => Topics) | undefined) => void;
+  setTopics: (value: Topics) => void;
   subscribeToTopics: (listener: Listener<Topics>) => () => boolean;
   topicListeners: Set<Listener<Topics>>;
 
   rootVariableValues: Record<string, VariableValue>;
   darkRootVariableValues: Record<string, VariableValue>;
-  updateRootVariableValues: (
-    value: Record<string, VariableValue> | undefined
-  ) => void;
-  updateDarkRootVariableValues: (
-    value: Record<string, VariableValue> | undefined
-  ) => void;
+  updateRootVariableValues: (value: Record<string, VariableValue>) => void;
+  updateDarkRootVariableValues: (value: Record<string, VariableValue>) => void;
 
   preprocessed: boolean;
-  setOutput: (
-    specifics: { [platform in PlatformOSType]?: "native" | "css" } & {
-      default: "native" | "css";
-    }
-  ) => void;
-
   dangerouslyCompileStyles?: (css: string) => void;
   setDangerouslyCompileStyles: (callback: (css: string) => void) => void;
 }
@@ -68,12 +56,7 @@ const context: StyleSheetContext = {
   setStyles(value) {
     if (!value) return;
     const oldValue = { ...context.styles };
-    if (!value) return;
-    context.styles =
-      typeof value === "function"
-        ? { ...context.styles, ...value(context.styles) }
-        : { ...context.styles, ...value };
-
+    context.styles = { ...context.styles, ...value };
     for (const listener of context.styleListeners) {
       listener(context.styles, oldValue);
     }
@@ -86,12 +69,8 @@ const context: StyleSheetContext = {
     return () => context.styleSetListeners.delete(listener);
   },
   setStyleSets(value) {
-    if (!value) return;
     const oldValue = { ...context.styleSets };
-    context.styleSets =
-      typeof value === "function"
-        ? { ...context.styleSets, ...value(context.styleSets) }
-        : { ...context.styleSets, ...value };
+    context.styleSets = { ...context.styleSets, ...value };
 
     for (const listener of context.styleSetListeners) {
       listener(context.styleSets, oldValue);
@@ -104,14 +83,11 @@ const context: StyleSheetContext = {
     context.topicListeners.add(listener);
     return () => context.topicListeners.delete(listener);
   },
-  setTopics(value) {
-    if (!value) return;
+  setTopics(newValues) {
     const oldValue = { ...context.topics };
-    const newValue =
-      typeof value === "function" ? value(context.topics) : value;
 
     let didUpdate = false;
-    for (const [key, value] of Object.entries(newValue)) {
+    for (const [key, value] of Object.entries(newValues)) {
       if (oldValue[key] !== value) {
         didUpdate = true;
         context.topics[key] = value;
@@ -143,11 +119,6 @@ const context: StyleSheetContext = {
   },
 
   preprocessed: false,
-  setOutput: (
-    specifics: { [platform in PlatformOSType]?: "native" | "css" } & {
-      default: "native" | "css";
-    }
-  ) => (context.preprocessed = Platform.select(specifics) === "css"),
 
   setDangerouslyCompileStyles(callback) {
     context.dangerouslyCompileStyles = callback;
@@ -183,7 +154,7 @@ function reset() {
 
   context.preprocessed = Platform.select({
     default: false,
-    web: typeof StyleSheet.create({ test: {} }).test !== "number",
+    web: true,
   });
   context.dangerouslyCompileStyles = undefined;
 }
