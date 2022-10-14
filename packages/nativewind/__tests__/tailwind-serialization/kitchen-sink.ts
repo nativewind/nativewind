@@ -30,11 +30,55 @@ testCompile(
   animate-ping
   animate-pulse
   animate-bounce
-  // Appearance 
+  // Appearance
   appearance-none
-  // Aspect Ratio 
+  // Aspect Ratio
   aspect-square
   aspect-video
+  // Backgrounds - Background Attachment
+  bg-fixed
+  // Backgrounds - Background Clip
+  bg-clip-border
+  // Backgrounds - Background Image
+  bg-gradient-to-t
+  // Backgrounds - Background Origin
+  bg-origin-border
+  // Backgrounds - Background Position
+  bg-center
+  // Backgrounds - Background Repeat
+  bg-repeat-x
+  // Backgrounds - Background Size
+  bg-cover
+  // Border - Border Color
+  border-black
+  // Border - Border Radius
+  rounded
+  // Filters - Backdrop Blur
+  backdrop-blur
+  // Filters - Backdrop Brightness
+  backdrop-brightness-50
+  // Filters - Backdrop Brightness
+  backdrop-contrast-50
+  // Filters - Backdrop Grayscale
+  backdrop-grayscale
+  // Filters - Backdrop Hue Rotate
+  backdrop-hue-rotate-15
+  // Filters - Backdrop Invert
+  backdrop-invert-0
+  // Filters - Backdrop Opacity
+  backdrop-opacity-5
+  // Filters - Backdrop Saturate
+  backdrop-saturate-50
+  // Filters - Backdrop Saturate
+  backdrop-sepia
+  // Filters - Blur
+  blur
+  // Effects - Background Blend Mode
+  bg-blend-normal
+  // Tables - Border Collapse
+  border-collapse
+  // Typography - Background Color
+  bg-black
   `,
   {
     name: "Kitchen sink",
@@ -140,6 +184,31 @@ testCompile(
             aspectRatio: 1.777777778,
           },
         ],
+      },
+      "bg-black": {
+        styles: [
+          {
+            backgroundColor: "#000",
+          },
+        ],
+      },
+      "border-black": {
+        styles: [
+          {
+            borderColor: "#000",
+          },
+        ],
+      },
+      rounded: {
+        styles: [
+          {
+            borderRadius: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
       },
     });
   }
