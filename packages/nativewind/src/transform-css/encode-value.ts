@@ -9,22 +9,16 @@ import {
   FunctionValue,
 } from "./types";
 
+export interface EncodeValueOptions {
+  forceString?: boolean;
+}
+
 export function encodeValue(
   node: StyleValue | null | undefined,
   topics: string[],
-  maybeAst = false
+  { forceString = false }: EncodeValueOptions = {}
 ): StyleValue | StyleValue[] | undefined {
   if (!node) return;
-
-  if (maybeAst) {
-    const ast = parse(node.toString(), { context: "value" });
-
-    if (ast.type !== "Value") {
-      return "";
-    }
-
-    return encodeValue(ast.children.toArray()[0], topics);
-  }
 
   if (typeof node === "string") {
     const maybeNumber = Number.parseFloat(node);
@@ -32,7 +26,7 @@ export function encodeValue(
   }
 
   if (typeof node === "number") {
-    return node;
+    return forceString ? node : node.toString();
   }
 
   if (Array.isArray(node)) {

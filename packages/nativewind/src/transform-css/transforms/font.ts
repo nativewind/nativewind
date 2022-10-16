@@ -41,7 +41,8 @@ export function font(node: Declaration, meta: SelectorMeta) {
 
     if (!fontWeight) {
       if (child.type === "Number") {
-        fontWeight = child.value;
+        // React Native doesn't support Number font values just yet
+        fontWeight = child.value.toString();
         continue;
       } else if (child.type === "Identifier" && child.name === "bold") {
         fontWeight = child.name;

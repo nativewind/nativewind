@@ -23,7 +23,6 @@ export const NativeWindStyleSheet = {
   setVariables,
   setDimensions,
   isPreprocessed: () => context.preprocessed,
-  setOutput: context.setOutput,
   setDangerouslyCompileStyles: context.setDangerouslyCompileStyles,
 };
 

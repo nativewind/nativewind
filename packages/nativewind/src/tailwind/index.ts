@@ -43,17 +43,17 @@ const preset: Config = {
     },
   },
   plugins: [
+    boxShadow,
     darkMode,
     divide,
     elevation,
-    boxShadow,
     gap,
     group,
     nativewind,
-    variables,
     parent,
     scopedGroup,
     space,
+    variables,
   ],
   corePlugins: {
     // We do not support scoped variables
@@ -69,6 +69,8 @@ const preset: Config = {
     gap: false,
     space: false,
     divideWidth: false,
+    divideColor: false,
+    divideStyle: false,
   },
 };
 

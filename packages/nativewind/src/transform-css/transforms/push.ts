@@ -1,16 +1,17 @@
 import { StyleProperty, validProperties } from "./valid-styles";
 import { AtomStyle, SelectorMeta, StyleValue } from "../types";
-import { encodeValue } from "../encode-value";
+import { encodeValue, EncodeValueOptions } from "../encode-value";
 
 export function pushStyle(
   styles: AtomStyle[],
   property: string,
   meta: SelectorMeta,
-  node?: StyleValue | null
+  node: StyleValue | null | undefined,
+  options?: EncodeValueOptions
 ) {
   if (!node) return;
 
-  const value = encodeValue(node, meta.topics);
+  const value = encodeValue(node, meta.topics, options);
 
   if (value === undefined || value === null) return;
 
