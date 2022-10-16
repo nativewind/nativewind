@@ -154,7 +154,7 @@ function reset() {
 
   context.preprocessed = Platform.select({
     default: false,
-    web: true,
+    web: typeof StyleSheet.create({ test: {} }).test !== "number",
   });
   context.dangerouslyCompileStyles = undefined;
 }

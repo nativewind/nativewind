@@ -14,8 +14,14 @@ import {
   isValidElement,
   ComponentPropsWithRef,
   ComponentProps,
+  useSyncExternalStore,
 } from "react";
-import { NativeWindStyleSheet } from "../style-sheet";
+import {
+  NativeWindStyleSheet,
+  styleRecord,
+  stylesChanged,
+  subscribe,
+} from "../style-sheet";
 import { InteractionProps, useInteraction } from "./use-interaction";
 import { withStyledProps } from "./with-styled-props";
 import { StyleProp } from "react-native";
@@ -23,6 +29,7 @@ import { GroupContext, ScopedGroupContext } from "./group-context";
 import { useComponentState } from "./use-component-state";
 import { isFragment } from "react-is";
 import { Style } from "../transform-css/types";
+import { withConditionals } from "./conditionals";
 
 export interface StyledOptions<
   T,
@@ -146,18 +153,20 @@ export function styled<
       >,
     });
 
-    /**
-     * Resolve the className->style
-     */
-    const {
-      styles,
-      meta = {},
-      childClasses,
-    } = NativeWindStyleSheet.useSync(className, {
+    const { className: actualClassName, meta } = withConditionals(className, {
       ...componentState,
       ...groupContext,
       ...scopeGroupContext,
     });
+
+    /**
+     * Resolve the className->style
+     */
+    const { styles, childClasses } = useSyncExternalStore(
+      stylesChanged,
+      () => styleRecord[actualClassName],
+      () => styleRecord[actualClassName]
+    );
 
     const style = useMemo(() => {
       if (styles) {

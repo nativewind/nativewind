@@ -1,7 +1,7 @@
-import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
+/* eslint-disable unicorn/no-array-for-each */
 import { Dimensions, I18nManager } from "react-native";
 
-import context, { Meta } from "./context";
+import context from "./context";
 import { setDimensions } from "./dimensions";
 import { setDirection } from "./i18n";
 import {
@@ -10,12 +10,11 @@ import {
   toggleColorScheme,
 } from "./color-scheme";
 import { create } from "./create";
+import { Atom } from "../transform-css/types";
 
 export const NativeWindStyleSheet = {
   create,
   reset,
-  warmCache,
-  useSync,
   getColorScheme,
   setColorScheme,
   setDirection,
@@ -32,115 +31,59 @@ function reset() {
   setDirection(I18nManager.isRTL ? "rtl" : "ltr");
 }
 
-function useSync(
-  className: string,
-  componentState: Record<string, boolean | number> = {}
+const componentListeners = new Set<() => void>();
+const styleSet = new Map<string, Set<string>>();
+
+function createStyleSet(
+  target: Record<string | symbol, Atom>,
+  property: string
 ) {
-  const keyTokens: string[] = [];
-  const conditions = new Set<string>();
-  let meta: Meta = {};
-
-  for (const atomName of className.split(/\s+/)) {
-    const atom = context.atoms.get(atomName);
-
-    if (!atom) {
-      if (context.meta.has(atomName)) {
-        meta = { ...meta, ...context.meta.get(atomName) };
-      }
-      continue;
-    }
-
-    if (atom.conditions) {
-      let conditionsPass = true;
-      for (const condition of atom.conditions) {
-        conditions.add(condition);
-
-        if (conditionsPass) {
-          switch (condition) {
-            case "not-first-child":
-              conditionsPass =
-                typeof componentState["nthChild"] === "number" &&
-                componentState["nthChild"] > 0;
-              break;
-            case "odd":
-              conditionsPass =
-                typeof componentState["nthChild"] === "number" &&
-                componentState["nthChild"] % 2 === 1;
-              break;
-            case "even":
-              conditionsPass =
-                typeof componentState["nthChild"] === "number" &&
-                componentState["nthChild"] % 2 === 0;
-              break;
-            default: {
-              conditionsPass = Boolean(componentState[condition]);
-            }
-          }
-        }
-      }
-
-      if (conditionsPass) {
-        keyTokens.push(atomName);
-        meta = { ...meta, ...context.meta.get(atomName) };
-      }
-    } else {
-      keyTokens.push(atomName);
-      meta = { ...meta, ...context.meta.get(atomName) };
-    }
+  target[property] = {};
+  for (const prop of property.split(/\w+/)) {
+    Object.assign(target[property], styleRecord[prop]);
   }
-
-  const key = keyTokens.join(" ");
-
-  if (!context.styleSets[key] && key.length > 0) {
-    warmCache([key]);
-  }
-
-  const currentStyles = useSyncExternalStoreWithSelector(
-    context.subscribeToStyleSets,
-    () => context.styleSets,
-    () => context.styleSets,
-    (styles) => styles[key]
-  );
-
-  return {
-    styles: currentStyles,
-    childClasses: context.childClasses.get(key),
-    meta,
-    conditions,
-  };
 }
 
-function warmCache(classesToWarm: Array<string>) {
-  for (const key of classesToWarm) {
-    const keyTokens = key.split(" ");
+export const styleRecord = new Proxy<Record<string | symbol, Atom>>(
+  {},
+  {
+    get(target, property) {
+      if (target[property] || typeof property === "symbol") {
+        return target[property];
+      }
 
-    context.setStyleSets({
-      [key]: keyTokens.flatMap((token) => {
-        return context.styles[token] ?? [];
-      }),
-    });
+      if (property.includes(" ")) {
+        createStyleSet(target, property);
 
-    context.subscribeToStyles((styles, oldStyles) => {
-      const hasChanged = keyTokens.some((token) => {
-        return styles[token] !== oldStyles[token];
+        for (const prop of property.split(/\w+/)) {
+          let existing = styleSet.get(prop);
+          if (!existing) {
+            existing = new Set();
+            styleSet.set(prop, existing);
+          }
+          existing.add(property);
+        }
+      }
+    },
+    set(target, property, newValue) {
+      target[property] = newValue;
+
+      if (typeof property === "symbol") return true;
+
+      componentListeners.forEach((l) => l());
+
+      styleSet.get(property)?.forEach((styleSet) => {
+        createStyleSet(target, styleSet);
       });
 
-      if (hasChanged) {
-        context.setStyleSets({
-          [key]: keyTokens.flatMap((token) => styles[token] ?? []),
-        });
-      }
-    });
-
-    const children = keyTokens.flatMap((token) => {
-      const childClasses = context.atoms.get(token)?.childClasses;
-      return childClasses ?? [];
-    });
-
-    if (children.length > 0) {
-      context.childClasses.set(key, children.join(" "));
-    }
+      return true;
+    },
   }
+);
+
+export function stylesChanged(onStoreChange: () => void) {
+  componentListeners.add(onStoreChange);
+  return () => componentListeners.delete(onStoreChange);
 }
 
 function setVariables(properties: Record<`--${string}`, string | number>) {
