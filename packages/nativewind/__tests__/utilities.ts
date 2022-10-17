@@ -3,6 +3,7 @@ import tailwind, { Config } from "tailwindcss";
 import { getCreateOptions } from "../src/transform-css";
 import nativePreset from "../src/tailwind";
 import { AtomRecord } from "../src/transform-css/types";
+import { NativeWindStyleSheet } from "../src";
 
 interface NativewindCompileOptions {
   css?: string;
@@ -11,29 +12,30 @@ interface NativewindCompileOptions {
   name?: string;
 }
 
-export function compile(
+function compile(
   classNames: string,
   { css, config }: NativewindCompileOptions = {}
 ) {
   const output = postcss([
     tailwind({
-      content: [],
-      safelist: classNames.split(" "),
-      presets: [nativePreset],
       ...config,
+      content: [],
+      presets: [nativePreset],
+      safelist: [
+        ...classNames.split(" "),
+        ...(config?.safelist ?? []),
+      ] as string[],
     }),
   ]).process(`@tailwind components;@tailwind utilities;${css ?? ""}`).css;
 
-  // Put a console.log here to see the CSS output
   // console.log(output);
-
-  return output;
-}
-
-export function c(classNames: string, options?: NativewindCompileOptions) {
-  const compiled = getCreateOptions(compile(classNames, options));
+  const compiled = getCreateOptions(output);
   // console.log(compiled);
   return compiled;
+}
+
+export function create(classNames: string, options?: NativewindCompileOptions) {
+  NativeWindStyleSheet.create(compile(classNames, options));
 }
 
 interface TestCompile extends jest.It {
@@ -58,7 +60,7 @@ const createTestCompileProxy = <T extends jest.It>(object: T): T =>
         target(
           options.name ||
             [classNames, options.name].filter(Boolean).join(" - "),
-          () => fn(c(classNames, compileOptions))
+          () => fn(compile(classNames, compileOptions))
         );
       }
     },

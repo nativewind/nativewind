@@ -1,5 +1,7 @@
+import { useSyncExternalStore } from "use-sync-external-store/shim";
 import type { StyledOptions } from ".";
-import { NativeWindStyleSheet } from "../style-sheet";
+import { getStyleSet, subscribeToStyleSheet } from "../style-sheet/runtime";
+import { withConditionals } from "./conditionals";
 import { ComponentState } from "./use-component-state";
 
 export interface WithStyledPropsOptions<
@@ -23,7 +25,7 @@ export function withStyledProps<T, P extends keyof T, C extends keyof T>({
 }: WithStyledPropsOptions<T, P, C>) {
   const styledProps: Partial<Record<P | C, unknown>> = {};
 
-  const isPreprocessed = NativeWindStyleSheet.isPreprocessed();
+  const isPreprocessed = false; // NativeWindStyleSheet.isPreprocessed();
 
   if (classProps) {
     if (isPreprocessed) {
@@ -33,11 +35,16 @@ export function withStyledProps<T, P extends keyof T, C extends keyof T>({
       }
     } else {
       for (const prop of classProps) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { styles } = NativeWindStyleSheet.useSync(componentProps[prop], {
-          ...componentState,
-          flatten: true,
-        });
+        const { className: actualClassName } = withConditionals(
+          componentProps[prop],
+          { ...componentState }
+        );
+
+        const styles = useSyncExternalStore(
+          subscribeToStyleSheet,
+          () => getStyleSet(actualClassName),
+          () => getStyleSet(actualClassName)
+        );
 
         Object.assign(
           styledProps,
@@ -50,17 +57,22 @@ export function withStyledProps<T, P extends keyof T, C extends keyof T>({
 
   if (propsToTransform && !isPreprocessed) {
     for (const [prop, styleKey] of Object.entries(propsToTransform)) {
-      const { styles } = NativeWindStyleSheet.useSync(componentProps[prop], {
-        ...componentState,
-        flatten: styleKey !== true,
-      });
+      const { className: actualClassName } = withConditionals(
+        componentProps[prop],
+        { ...componentState }
+      );
+
+      const styles = useSyncExternalStore(
+        subscribeToStyleSheet,
+        () => getStyleSet(actualClassName),
+        () => getStyleSet(actualClassName)
+      );
 
       if (typeof styleKey === "boolean") {
         styledProps[prop as P | C] = styles;
       } else {
-        const firstStyle = Array.isArray(styles) ? styles[0] : styles;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        styledProps[prop as P | C] = (firstStyle as any)[styleKey as any];
+        styledProps[prop as P | C] = (styles as any)[styleKey as any];
       }
     }
   }

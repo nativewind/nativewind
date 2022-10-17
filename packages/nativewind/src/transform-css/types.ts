@@ -11,10 +11,11 @@ export interface Atom {
   styles?: AtomStyle[];
   atRules?: Record<number, Array<AtRuleTuple>>;
   conditions?: string[];
-  variables?: Array<Record<string, VariableValue>>;
+  variables?: Array<Record<`--${string}`, VariableValue>>;
   topics?: string[];
   topicSubscription?: () => void;
   childClasses?: string[];
+  parent?: string;
   meta?: Record<string, boolean>;
 }
 

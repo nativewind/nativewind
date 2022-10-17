@@ -14,14 +14,8 @@ import {
   isValidElement,
   ComponentPropsWithRef,
   ComponentProps,
-  useSyncExternalStore,
 } from "react";
-import {
-  NativeWindStyleSheet,
-  styleRecord,
-  stylesChanged,
-  subscribe,
-} from "../style-sheet";
+import { useSyncExternalStore } from "use-sync-external-store/shim";
 import { InteractionProps, useInteraction } from "./use-interaction";
 import { withStyledProps } from "./with-styled-props";
 import { StyleProp } from "react-native";
@@ -30,6 +24,11 @@ import { useComponentState } from "./use-component-state";
 import { isFragment } from "react-is";
 import { Style } from "../transform-css/types";
 import { withConditionals } from "./conditionals";
+import {
+  getChildClasses,
+  getStyleSet,
+  subscribeToStyleSheet,
+} from "../style-sheet/runtime";
 
 export interface StyledOptions<
   T,
@@ -162,23 +161,20 @@ export function styled<
     /**
      * Resolve the className->style
      */
-    const { styles, childClasses } = useSyncExternalStore(
-      stylesChanged,
-      () => styleRecord[actualClassName],
-      () => styleRecord[actualClassName]
+    const styles = useSyncExternalStore(
+      subscribeToStyleSheet,
+      () => getStyleSet(actualClassName),
+      () => getStyleSet(actualClassName)
     );
 
+    const childClasses = getChildClasses(actualClassName);
+
     const style = useMemo(() => {
-      if (styles) {
-        if (styles.length > 0 && inlineStyles) {
-          return [...styles, inlineStyles];
-        } else if (styles.length > 1) {
-          return styles;
-        } else if (styles.length === 1) {
-          return styles[0];
-        }
-      } else if (inlineStyles) {
-        return inlineStyles;
+      const keys = Object.keys(styles).length;
+      if (keys > 0 && inlineStyles) {
+        return [styles, inlineStyles];
+      } else if (keys > 0) {
+        return styles;
       }
     }, [styles, inlineStyles]);
 
@@ -214,14 +210,15 @@ export function styled<
     /**
      * Pass the styles to the element
      */
-    let reactNode: ReactNode = createElement(Component, {
+    const props = {
       ...componentProps,
       ...handlers,
       ...styledProps,
       style,
-      children,
       ref,
-    } as unknown as T);
+    } as unknown as T;
+    if (children) props.children = children;
+    let reactNode: ReactNode = createElement(Component, props);
 
     /**
      * Determine if we need to wrap element in Providers

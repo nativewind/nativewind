@@ -20,6 +20,7 @@ test("px", () => {
   expect(MyComponent).toHaveBeenCalledWith(
     {
       style: { width: 1 },
+      children: undefined,
     },
     {}
   );
@@ -95,6 +96,7 @@ test("vh", () => {
 
   render(<StyledComponent className="h-[1vh]" />);
 
+  expect(MyComponent).toHaveBeenCalledTimes(1);
   expect(MyComponent).toHaveBeenCalledWith(
     {
       style: { height: 1 },
@@ -103,6 +105,7 @@ test("vh", () => {
   );
 
   act(() => {
+    MyComponent.mockReset();
     NativeWindStyleSheet.setDimensions({
       get: jest.fn().mockReturnValue({ width: 100, height: 50 }),
       set: () => undefined,
@@ -111,6 +114,7 @@ test("vh", () => {
     });
   });
 
+  expect(MyComponent).toHaveBeenCalledTimes(1);
   expect(MyComponent).toHaveBeenCalledWith(
     {
       style: { height: 0.5 },
@@ -139,11 +143,13 @@ test("rem", () => {
   );
 
   act(() => {
+    MyComponent.mockReset();
     NativeWindStyleSheet.setVariables({
       "--rem": 50,
     });
   });
 
+  expect(MyComponent).toHaveBeenCalledTimes(1);
   expect(MyComponent).toHaveBeenCalledWith(
     {
       style: { fontSize: 50 },

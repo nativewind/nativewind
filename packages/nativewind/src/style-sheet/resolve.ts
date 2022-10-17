@@ -1,10 +1,12 @@
 import { StyleSheet, Platform, PixelRatio, ColorValue } from "react-native";
 import { VariableValue } from "../transform-css/types";
-import context from "./context";
+import { variables } from "./runtime";
 
 export function resolve(
-  style: VariableValue
+  style?: VariableValue
 ): string | number | ColorValue | undefined {
+  if (!style) return;
+
   if (typeof style === "string" || typeof style === "number") {
     if (typeof style === "string") {
       if (style.endsWith("%")) return style;
@@ -26,22 +28,22 @@ export function resolve(
     case "vw": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
-      return (value / 100) * (context.topics["--window-width"] as number);
+      return (value / 100) * (variables.get("--window-width") as number);
     }
     case "vh": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
-      return (value / 100) * (context.topics["--window-height"] as number);
+      return (value / 100) * (variables.get("--window-height") as number);
     }
     case "rem": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
-      return value * (context.topics["--rem"] as number);
+      return value * (variables.get("--rem") as number);
     }
     case "var": {
       const [variable, defaultValue] = resolvedValues;
       if (typeof variable !== "string") return;
-      const value = context.topics[variable];
+      const value = variables.get(variable);
       if (!value) return defaultValue;
       if (typeof value === "object" && "function" in value) return defaultValue;
       return value;

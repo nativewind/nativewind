@@ -14,7 +14,7 @@ export default plugin(function ({ addUtilities, theme }) {
 
   if (darkVariables.length > 0) {
     addUtilities({
-      ".dark": Object.fromEntries(darkVariables),
+      ":root[dark]": Object.fromEntries(darkVariables),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
   }

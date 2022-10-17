@@ -1,5 +1,5 @@
 import { Dimensions, EmitterSubscription } from "react-native";
-import context from "./context";
+import { setVariables } from "./runtime";
 
 let dimensionsListener: EmitterSubscription | undefined;
 
@@ -7,7 +7,7 @@ export function setDimensions(dimensions: Dimensions) {
   dimensionsListener?.remove();
 
   const window = dimensions.get("window");
-  context.setTopics({
+  setVariables({
     "--window-width": window.width,
     "--window-height": window.height,
     "--window-orientation":
@@ -15,7 +15,7 @@ export function setDimensions(dimensions: Dimensions) {
   });
 
   dimensionsListener = dimensions.addEventListener("change", ({ window }) => {
-    context.setTopics({
+    setVariables({
       "--window-width": window.width,
       "--window-height": window.height,
       "--window-orientation":

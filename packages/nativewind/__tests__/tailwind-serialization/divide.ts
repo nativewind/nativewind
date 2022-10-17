@@ -17,3 +17,25 @@ testCompile("divide-x-2", (output) => {
     },
   });
 });
+
+testCompile("sm:divide-x-2", (output) => {
+  expect(output).toStrictEqual({
+    "sm:divide-x-2": {
+      styles: [],
+      childClasses: ["sm:divide-x-2:children"],
+    },
+    "sm:divide-x-2:children": {
+      conditions: ["not-first-child"],
+      topics: ["--device-width"],
+      atRules: {
+        "0": [["min-width", 640]],
+      },
+      styles: [
+        {
+          borderLeftWidth: 2,
+          borderRightWidth: 0,
+        },
+      ],
+    },
+  });
+});

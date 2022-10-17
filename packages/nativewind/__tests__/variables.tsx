@@ -7,20 +7,23 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test.only("set via theme", () => {
+test("set via theme", () => {
   create("text-[color:var(--my-nested-variable)]", {
-    theme: {
-      variables: {
-        my: {
-          nested: {
-            variable: "red",
+    config: {
+      darkMode: "class",
+      theme: {
+        variables: {
+          my: {
+            nested: {
+              variable: "red",
+            },
           },
         },
-      },
-      darkVariables: {
-        my: {
-          nested: {
-            variable: "blue",
+        darkVariables: {
+          my: {
+            nested: {
+              variable: "blue",
+            },
           },
         },
       },
@@ -57,6 +60,9 @@ test.only("set via theme", () => {
 test("color scheme variables", () => {
   create("text-[color:var(--test)]", {
     css: `:root { --test: red; } .dark { --test: blue; }`,
+    config: {
+      darkMode: "class",
+    },
   });
 
   const MyComponent = jest.fn();

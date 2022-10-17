@@ -111,7 +111,11 @@ function addRule(node: Rule, createOptions: AtomRecord, meta: SelectorMeta) {
     // Invalid selector, skip it
     if (!selector) return;
 
-    if (selector === ":root" || selector === "dark") {
+    if (
+      selector === ":root" ||
+      selector === ":root[dark]" ||
+      selector === "dark"
+    ) {
       if (styles.fontSize) {
         selectorMeta.variables.push({ "--rem": styles.fontSize });
       }
@@ -126,6 +130,7 @@ function addRule(node: Rule, createOptions: AtomRecord, meta: SelectorMeta) {
     createOptions[selector] ??= { styles: [] };
 
     if (parentSelector) {
+      createOptions[selector] ??= { styles: [] };
       createOptions[parentSelector] ??= { styles: [], childClasses: [] };
       createOptions[parentSelector].childClasses = [
         ...(createOptions[parentSelector].childClasses ?? []),
@@ -223,13 +228,17 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
       case "IdSelector":
         tokens.push(`#${node.name}`);
         break;
+      case "AttributeSelector":
+        if (node.name.name === "dark") {
+          tokens.push(`[${node.name.name}]`);
+        }
+        break;
       case "ClassSelector":
         if (node.name === "dark") {
           meta.topics.push("--color-scheme");
           meta.atRules.push(["--color-scheme", "dark"]);
-        } else {
-          tokens.push(`.${node.name}`);
         }
+        tokens.push(`.${node.name}`);
         break;
       case "PseudoClassSelector": {
         if (node.name === "children") {
@@ -248,6 +257,7 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
     .join("")
     .trimStart()
     .replace(/^\./, "")
+    .replace(/^dark\s/, "")
     .replaceAll(/\\([\dA-Fa-f]{2}\s)/g, function (...args) {
       // Replace hex-string with their actual value
       // We need to do this before we remove slashes, otherwise we lose the hex values

@@ -1,4 +1,4 @@
-import React, { ComponentType, PropsWithChildren } from "react";
+import { ComponentType, PropsWithChildren } from "react";
 import { Platform } from "react-native";
 import { Config } from "tailwindcss";
 import { NativeWindStyleSheet } from "./style-sheet";
@@ -45,12 +45,12 @@ export function withExpoSnack(
   theme: Config["theme"] = {}
 ) {
   if (!canUseCSS) {
-    NativeWindStyleSheet.setDangerouslyCompileStyles(
-      dangerouslyCompileStyles(theme)
-    );
-    NativeWindStyleSheet.setOutput({
-      default: "native",
-    });
+    // NativeWindStyleSheet.setDangerouslyCompileStyles(
+    //   dangerouslyCompileStyles(theme)
+    // );
+    // NativeWindStyleSheet.setOutput({
+    //   default: "native",
+    // });
   }
 
   return () => (

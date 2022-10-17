@@ -1,23 +1,21 @@
 import { useRef } from "react";
-import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector";
+import { useSyncExternalStore } from "use-sync-external-store/shim";
 
 import { NativeWindStyleSheet } from "./style-sheet";
-import context from "./style-sheet/context";
 import { resolve } from "./style-sheet/resolve";
+import { subscribeToVariable, variables } from "./style-sheet/runtime";
 
 export function useVariable(
-  variable: `--${string}`
+  name: `--${string}`
 ): [ReturnType<typeof resolve>, (value: string | number) => void] {
   const setVariable = useRef((value: string | number) =>
-    NativeWindStyleSheet.setVariables({ [variable]: value })
+    NativeWindStyleSheet.setVariables({ [name]: value })
+  );
+  const value = useSyncExternalStore(
+    subscribeToVariable(name),
+    () => resolve(variables.get(name)),
+    () => resolve(variables.get(name))
   );
 
-  const value = useSyncExternalStoreWithSelector(
-    context.subscribeToTopics,
-    () => context.topics,
-    () => context.topics,
-    (topics) => topics[variable]
-  );
-
-  return [resolve(value), setVariable.current];
+  return [value, setVariable.current];
 }

@@ -28,11 +28,11 @@ export function parseMediaQuery(
       }
 
       if (child.name.includes("width")) {
-        topicsAndAtRules.topics.push("device-width");
+        topicsAndAtRules.topics.push("--device-width");
       }
 
       if (child.name.includes("height")) {
-        topicsAndAtRules.topics.push("device-width");
+        topicsAndAtRules.topics.push("--device-height");
       }
 
       switch (child.value?.type) {
