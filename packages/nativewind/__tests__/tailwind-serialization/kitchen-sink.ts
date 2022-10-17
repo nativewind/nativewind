@@ -73,6 +73,8 @@ testCompile(
   shadow-red-500
   // Effects - Mix Blend Mode
   mix-blend-normal
+  // Effects - Opacity
+  opacity-5
   // Filters - Backdrop Blur
   backdrop-blur
   // Filters - Backdrop Brightness
@@ -103,6 +105,8 @@ testCompile(
   hue-rotate-15
   // Filters - Invert
   invert
+  // Layout - Position
+  absolute
   // Filters - Saturate
   saturate-50
   // Filters - Sepia
@@ -128,6 +132,8 @@ testCompile(
   // Layout - Display
   flex
   hidden
+  // Layout -  Fit
+  object-contain
   // Layout - Flex Basis
   basis-1
   // Layout - Flex Direction
@@ -159,14 +165,34 @@ testCompile(
   grid-cols-1
   // Layout - Grid Template Row
   grid-rows-1
-  // Layout - Object Fit
-  object-contain
-  // Layout - Object Position
+  // Layout - Justify Content
+  Justify-center
+  // Layout - Justify Items
+  justify-items-start
+  // Layout - Justify Items
+  justify-self-start
+  // Layout - Margin
+  m-1
+  // Layout - Padding
+  p-1
+  // Layout - Place Items
+  place-items-start
+  // Layout - Place Self
+  place-self-start
+  // Layout -  Position
   object-bottom
   // Layout - Order
   order-1
+  // Layout - Overflow
+  overflow-hidden
   // Layout - Overscroll Behavior
   overscroll-contain
+  // Layout - Top Right Bottom Left
+  inset-1
+  // Layout - Visibility
+  invisible
+  // Layout - Z-Index
+  z-10
   // Interactivity - Caret Color
   caret-black
   // Interactivity - Cursor
@@ -185,15 +211,23 @@ testCompile(
   snap-start
   // Interactivity - Scroll Snap Stop
   snap-normal
-  // Interactivity - Scroll Snap Type
+  // Interactivity - Scroll Snap TTypography - Whitespaceype
   snap-x
   snap-mandatory
   // Interactivity - Touch Action
   touch-pan-x
   // Interactivity - Touch Action
   select-text
+  // Interactivity - Will Change
+  will-change-scroll
   // Sizing - Height
   h-1
+  // Sizing - Max-Width
+  max-w-full
+  // Sizing - Min-Width
+  min-w-full
+  // Sizing - Width
+  w-screen
   // Tables - Border Collapse
   border-collapse
   // Tables - Table Layout
@@ -219,12 +253,37 @@ testCompile(
   // Typography - Font Style
   italic
   not-italic
+  // Typography - Line Height
+  leading-3
+  leading-tight
+  // Typography - List Style Position
+  list-inside
+  // Typography - List Style Type
+  list-disc
+  // Typography - Text Align
+  text-center
+  // Typography - Text Color
+  text-black
+  // Typography - Text Decoration Color
+  decoration-black
+  // Typography - Text Decoration Style
+  decoration-solid
+  // Typography - Text Decoration Thickness
+  decoration-0
   // Typography - Text Indent
   indent-px
   // Typography - Text Overflow
   text-ellipsis
+  // Typography - Text Transform
+  uppercase
   // Typography - Text Underline Offset
   underline-offset-1
+  // Typography - Vertical Alignment
+  align-baseline
+  // Typography - Whitespace
+  whitespace-normal
+  // Typography - Word Break
+  break-normal
   `,
   {
     name: "Kitchen sink",
@@ -578,6 +637,14 @@ testCompile(
           },
         ],
       },
+
+      "overflow-hidden": {
+        styles: [
+          {
+            overflow: "hidden",
+          },
+        ],
+      },
       "h-1": {
         styles: [
           {
@@ -588,6 +655,165 @@ testCompile(
           },
         ],
         topics: ["--rem"],
+      },
+
+      "z-10": {
+        styles: [
+          {
+            zIndex: 10,
+          },
+        ],
+      },
+
+      "opacity-5": {
+        styles: [
+          {
+            opacity: 0.05,
+          },
+        ],
+      },
+
+      "text-center": {
+        styles: [
+          {
+            textAlign: "center",
+          },
+        ],
+      },
+
+      "leading-3": {
+        styles: [
+          {
+            lineHeight: {
+              function: "rem",
+              values: [0.75],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+      "leading-tight": {
+        styles: [
+          {
+            lineHeight: 1.25,
+          },
+        ],
+      },
+
+      "m-1": {
+        styles: [
+          {
+            margin: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+
+      "max-w-full": {
+        styles: [
+          {
+            maxWidth: "100%",
+          },
+        ],
+      },
+
+      "min-w-full": {
+        styles: [
+          {
+            minWidth: "100%",
+          },
+        ],
+      },
+
+      "p-1": {
+        styles: [
+          {
+            padding: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+
+      "text-black": {
+        styles: [
+          {
+            color: "#000",
+          },
+        ],
+      },
+
+      "decoration-black": {
+        styles: [
+          {
+            textDecorationColor: "#000",
+          },
+        ],
+      },
+
+      "decoration-solid": {
+        styles: [
+          {
+            textDecorationStyle: "solid",
+          },
+        ],
+      },
+
+      uppercase: {
+        styles: [
+          {
+            textTransform: "uppercase",
+          },
+        ],
+      },
+
+      "inset-1": {
+        styles: [
+          {
+            bottom: {
+              function: "rem",
+              values: [0.25],
+            },
+            left: {
+              function: "rem",
+              values: [0.25],
+            },
+            right: {
+              function: "rem",
+              values: [0.25],
+            },
+            top: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+
+      "w-screen": {
+        styles: [
+          {
+            width: {
+              function: "vw",
+              values: [100],
+            },
+          },
+        ],
+        topics: ["--window-width"],
+      },
+
+      absolute: {
+        styles: [
+          {
+            position: "absolute",
+          },
+        ],
       },
     });
   }
