@@ -39,6 +39,8 @@ testCompile(
   bg-fixed
   // Backgrounds - Background Clip
   bg-clip-border
+  // Backgrounds - Gradient Color Stops
+  bg-gradient-to-r from-transparent
   // Backgrounds - Background Image
   bg-gradient-to-t
   // Backgrounds - Background Origin
@@ -69,6 +71,8 @@ testCompile(
   shadow
   // Effects - Box shadow Color
   shadow-red-500
+  // Effects - Mix Blend Mode
+  mix-blend-normal
   // Filters - Backdrop Blur
   backdrop-blur
   // Filters - Backdrop Brightness
@@ -93,6 +97,18 @@ testCompile(
   brightness-50
   // Filters - Drop Shadow
   drop-shadow
+  // Filters - Grayscale
+  grayscale
+  // Filters - Hue Rotate
+  hue-rotate-15
+  // Filters - Invert
+  invert
+  // Filters - Saturate
+  saturate-50
+  // Filters - Sepia
+  sepia
+  // Layout - Isolation
+  isolate
   // Layout - Box Decoration Break
   box-decoration-clone
   // Layout - Box Sizing
@@ -129,12 +145,69 @@ testCompile(
   flex-none
   // Layout - Float
   float-right
+  // Layout - Grid Auto Columns
+  auto-cols-min
+  // Layout - Grid Auto Flow
+  grid-flow-row
+  // Layout - Grid Auto Row
+  auto-rows-auto
+  // Layout - Grid Column Start / End
+  col-span-1
+  // Layout - Grid Row Start / End
+  row-span-1
+  // Layout - Grid Template Columns
+  grid-cols-1
+  // Layout - Grid Template Row
+  grid-rows-1
+  // Layout - Object Fit
+  object-contain
+  // Layout - Object Position
+  object-bottom
+  // Layout - Order
+  order-1
+  // Layout - Overscroll Behavior
+  overscroll-contain
   // Interactivity - Caret Color
   caret-black
   // Interactivity - Cursor
   cursor-pointer
+  // Interactivity - Pointer Events
+  Interactivity - Pointer Events
+  // Interactivity - Resize
+  resize
+  // Interactivity - Scroll Behavior
+  scroll-smooth
+  // Interactivity - Scroll Margin
+  scroll-m-1
+  // Interactivity - Scroll Padding
+  scroll-p-1
+  // Interactivity - Scroll Snap Align
+  snap-start
+  // Interactivity - Scroll Snap Stop
+  snap-normal
+  // Interactivity - Scroll Snap Type
+  snap-x
+  snap-mandatory
+  // Interactivity - Touch Action
+  touch-pan-x
+  // Interactivity - Touch Action
+  select-text
+  // Sizing - Height
+  h-1
   // Tables - Border Collapse
   border-collapse
+  // Tables - Table Layout
+  table-fixed
+  // Transforms - Transform Origin
+  origin-top
+  // Transitions & Animation - Transition Delay
+  delay-75
+  // Transitions & Animation - Transition Duration
+  duration-75
+  // Transitions & Animation - Transition Property
+  transition-all
+  // Transitions & Animation - Transition Timing Function
+  ease-linear
   // Typography - Background Color
   bg-black
   // Typography - Content
@@ -146,8 +219,12 @@ testCompile(
   // Typography - Font Style
   italic
   not-italic
-  // Typography - Font Weight
-  font-bold
+  // Typography - Text Indent
+  indent-px
+  // Typography - Text Overflow
+  text-ellipsis
+  // Typography - Text Underline Offset
+  underline-offset-1
   `,
   {
     name: "Kitchen sink",
@@ -363,7 +440,7 @@ testCompile(
             maxWidth: 1536,
           },
         ],
-        topics: ["device-width"],
+        topics: ["--device-width"],
       },
 
       "divide-black": {
@@ -500,6 +577,17 @@ testCompile(
             fontStyle: "normal",
           },
         ],
+      },
+      "h-1": {
+        styles: [
+          {
+            height: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
       },
     });
   }
