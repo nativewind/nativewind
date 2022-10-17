@@ -159,9 +159,17 @@ testCompile(
   grid-cols-1
   // Layout - Grid Template Row
   grid-rows-1
-  // Layout -  Fit
+  // Layout - Fit
   object-contain
-  // Layout -  Position
+  // Layout - Justify Content
+  justify-center
+  // Layout - Justify Items
+  justify-items-center
+  // Layout - Justify Items
+  justify-self-start
+  // Layout - Margin
+  m-px
+  // Layout - Position
   object-bottom
   // Layout - Order
   order-1
@@ -203,6 +211,9 @@ testCompile(
 
   // Sizing - Height
   h-1
+  // Sizing - Max-Width
+  max-w-0
+  max-w-full
   // Sizing - Width
   w-1
   // Tables - Border Collapse
@@ -230,6 +241,15 @@ testCompile(
   // Typography - Font Style
   italic
   not-italic
+  // Typography - Letter Spacing
+  tracking-normal
+  // Typography - Line Height
+  leading-3
+  leading-tight
+  // Typography - List Style Position
+  list-inside
+  // Typography - List Style Type
+  list-disc
   // Typography - Text Indent
   indent-px
   // Typography - Text Overflow
@@ -634,6 +654,67 @@ testCompile(
         styles: [
           {
             textTransform: "uppercase",
+          },
+        ],
+      },
+      "justify-center": {
+        styles: [
+          {
+            justifyContent: "center",
+          },
+        ],
+      },
+
+      "leading-3": {
+        styles: [
+          {
+            lineHeight: {
+              function: "rem",
+              values: [0.75],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+      "leading-tight": {
+        styles: [
+          {
+            lineHeight: 1.25,
+          },
+        ],
+      },
+
+      "max-w-0": {
+        styles: [
+          {
+            maxWidth: {
+              function: "rem",
+              values: [0],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+      "max-w-full": {
+        styles: [
+          {
+            maxWidth: "100%",
+          },
+        ],
+      },
+
+      "m-px": {
+        styles: [
+          {
+            margin: 1,
+          },
+        ],
+      },
+
+      "tracking-normal": {
+        styles: [
+          {
+            letterSpacing: 0,
           },
         ],
       },
