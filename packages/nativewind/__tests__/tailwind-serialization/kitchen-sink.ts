@@ -159,14 +159,20 @@ testCompile(
   grid-cols-1
   // Layout - Grid Template Row
   grid-rows-1
-  // Layout - Object Fit
+  // Layout -  Fit
   object-contain
-  // Layout - Object Position
+  // Layout -  Position
   object-bottom
   // Layout - Order
   order-1
   // Layout - Overscroll Behavior
   overscroll-contain
+  // Layout - Top Right Bottom Left
+  inset-1
+  // Layout - Visibility
+  invisible
+  // Layout - Z-Index 
+  z-10
   // Interactivity - Caret Color
   caret-black
   // Interactivity - Cursor
@@ -192,8 +198,13 @@ testCompile(
   touch-pan-x
   // Interactivity - Touch Action
   select-text
+  // Interactivity - Will Change
+  will-change-scroll
+
   // Sizing - Height
   h-1
+  // Sizing - Width
+  w-1
   // Tables - Border Collapse
   border-collapse
   // Tables - Table Layout
@@ -225,6 +236,16 @@ testCompile(
   text-ellipsis
   // Typography - Text Underline Offset
   underline-offset-1
+  // Typography - Text Decoration Thickness
+  decoration-1
+  // Typography - Text Transform
+  uppercase
+  // Typography - Vertical Alignment
+  align-baseline
+  // Typography - Whitespace
+  whitespace-normal
+  // Typography - Work Break
+  break-normal
   `,
   {
     name: "Kitchen sink",
@@ -582,6 +603,57 @@ testCompile(
         styles: [
           {
             height: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+      "z-10": {
+        styles: [
+          {
+            zIndex: 10,
+          },
+        ],
+      },
+
+      "w-1": {
+        styles: [
+          {
+            width: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+
+      uppercase: {
+        styles: [
+          {
+            textTransform: "uppercase",
+          },
+        ],
+      },
+
+      "inset-1": {
+        styles: [
+          {
+            bottom: {
+              function: "rem",
+              values: [0.25],
+            },
+            left: {
+              function: "rem",
+              values: [0.25],
+            },
+            right: {
+              function: "rem",
+              values: [0.25],
+            },
+            top: {
               function: "rem",
               values: [0.25],
             },
