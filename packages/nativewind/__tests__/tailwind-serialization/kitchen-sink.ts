@@ -73,6 +73,8 @@ testCompile(
   shadow-red-500
   // Effects - Mix Blend Mode
   mix-blend-normal
+  // Effects - Opacity
+  opacity-5
   // Filters - Backdrop Blur
   backdrop-blur
   // Filters - Backdrop Brightness
@@ -103,6 +105,8 @@ testCompile(
   hue-rotate-15
   // Filters - Invert
   invert
+  // Layout - Position
+  absolute
   // Filters - Saturate
   saturate-50
   // Filters - Sepia
@@ -128,6 +132,8 @@ testCompile(
   // Layout - Display
   flex
   hidden
+  // Layout -  Fit
+  object-contain
   // Layout - Flex Basis
   basis-1
   // Layout - Flex Direction
@@ -159,27 +165,33 @@ testCompile(
   grid-cols-1
   // Layout - Grid Template Row
   grid-rows-1
-  // Layout - Fit
-  object-contain
   // Layout - Justify Content
-  justify-center
+  Justify-center
   // Layout - Justify Items
-  justify-items-center
+  justify-items-start
   // Layout - Justify Items
   justify-self-start
   // Layout - Margin
-  m-px
-  // Layout - Position
+  m-1
+  // Layout - Padding
+  p-1
+  // Layout - Place Items
+  place-items-start
+  // Layout - Place Self
+  place-self-start
+  // Layout -  Position
   object-bottom
   // Layout - Order
   order-1
+  // Layout - Overflow
+  overflow-hidden
   // Layout - Overscroll Behavior
   overscroll-contain
   // Layout - Top Right Bottom Left
   inset-1
   // Layout - Visibility
   invisible
-  // Layout - Z-Index 
+  // Layout - Z-Index
   z-10
   // Interactivity - Caret Color
   caret-black
@@ -199,7 +211,7 @@ testCompile(
   snap-start
   // Interactivity - Scroll Snap Stop
   snap-normal
-  // Interactivity - Scroll Snap Type
+  // Interactivity - Scroll Snap TTypography - Whitespace
   snap-x
   snap-mandatory
   // Interactivity - Touch Action
@@ -208,14 +220,14 @@ testCompile(
   select-text
   // Interactivity - Will Change
   will-change-scroll
-
   // Sizing - Height
   h-1
   // Sizing - Max-Width
-  max-w-0
   max-w-full
+  // Sizing - Min-Width
+  min-w-full
   // Sizing - Width
-  w-1
+  w-screen
   // Tables - Border Collapse
   border-collapse
   // Tables - Table Layout
@@ -241,8 +253,6 @@ testCompile(
   // Typography - Font Style
   italic
   not-italic
-  // Typography - Letter Spacing
-  tracking-normal
   // Typography - Line Height
   leading-3
   leading-tight
@@ -250,21 +260,31 @@ testCompile(
   list-inside
   // Typography - List Style Type
   list-disc
+  // Typography - Text Align
+  text-center
+  // Typography - Text Color
+  text-black
+  // Typography - Text Decoration Color
+  decoration-black
+  // Typography - Text Decoration Style
+  decoration-solid
+  // Typography - Text Decoration Thickness
+  decoration-0
   // Typography - Text Indent
   indent-px
   // Typography - Text Overflow
   text-ellipsis
+  // Typography - Text Transform
+  uppercase
   // Typography - Text Underline Offset
   underline-offset-1
   // Typography - Text Decoration Thickness
   decoration-1
-  // Typography - Text Transform
-  uppercase
   // Typography - Vertical Alignment
   align-baseline
   // Typography - Whitespace
   whitespace-normal
-  // Typography - Work Break
+  // Typography - Word Break
   break-normal
   `,
   {
@@ -272,89 +292,10 @@ testCompile(
   },
   (output) => {
     expect(output).toStrictEqual({
-      "content-around": {
-        styles: [{ alignContent: "space-around" }],
-      },
-      "content-between": {
-        styles: [{ alignContent: "space-between" }],
-      },
-      "content-center": {
-        styles: [{ alignContent: "center" }],
-      },
-      "content-end": {
-        styles: [{ alignContent: "flex-end" }],
-      },
-      "content-start": {
-        styles: [{ alignContent: "flex-start" }],
-      },
-      "items-baseline": {
+      absolute: {
         styles: [
           {
-            alignItems: "baseline",
-          },
-        ],
-      },
-      "items-center": {
-        styles: [
-          {
-            alignItems: "center",
-          },
-        ],
-      },
-      "items-end": {
-        styles: [
-          {
-            alignItems: "flex-end",
-          },
-        ],
-      },
-      "items-start": {
-        styles: [
-          {
-            alignItems: "flex-start",
-          },
-        ],
-      },
-      "items-stretch": {
-        styles: [
-          {
-            alignItems: "stretch",
-          },
-        ],
-      },
-
-      "self-baseline": {
-        styles: [
-          {
-            alignSelf: "baseline",
-          },
-        ],
-      },
-      "self-center": {
-        styles: [
-          {
-            alignSelf: "center",
-          },
-        ],
-      },
-      "self-end": {
-        styles: [
-          {
-            alignSelf: "flex-end",
-          },
-        ],
-      },
-      "self-start": {
-        styles: [
-          {
-            alignSelf: "flex-start",
-          },
-        ],
-      },
-      "self-stretch": {
-        styles: [
-          {
-            alignSelf: "stretch",
+            position: "absolute",
           },
         ],
       },
@@ -372,10 +313,28 @@ testCompile(
           },
         ],
       },
+      "basis-1": {
+        styles: [
+          {
+            flexBasis: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
       "bg-black": {
         styles: [
           {
             backgroundColor: "#000",
+          },
+        ],
+      },
+      "border-2": {
+        styles: [
+          {
+            borderWidth: 2,
           },
         ],
       },
@@ -393,66 +352,6 @@ testCompile(
           },
         ],
       },
-
-      shadow: {
-        atRules: {
-          "0": [["platform", "android"]],
-          "1": [["platform", "ios"]],
-        },
-        styles: [
-          {
-            elevation: 3,
-            shadowColor: "rgba(0, 0, 0, 0.1)",
-            shadowOffset: {
-              height: 2,
-              width: 0,
-            },
-            shadowRadius: 6,
-          },
-          {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
-            shadowOffset: {
-              height: 2,
-              width: 0,
-            },
-            shadowRadius: 6,
-          },
-        ],
-      },
-      "border-2": {
-        styles: [
-          {
-            borderWidth: 2,
-          },
-        ],
-      },
-      rounded: {
-        styles: [
-          {
-            borderRadius: {
-              function: "rem",
-              values: [0.25],
-            },
-          },
-        ],
-        topics: ["--rem"],
-      },
-
-      flex: {
-        styles: [
-          {
-            display: "flex",
-          },
-        ],
-      },
-      hidden: {
-        styles: [
-          {
-            display: "none",
-          },
-        ],
-      },
-
       container: {
         atRules: {
           "1": [["min-width", 640]],
@@ -483,7 +382,55 @@ testCompile(
         ],
         topics: ["--device-width"],
       },
-
+      "content-around": {
+        styles: [
+          {
+            alignContent: "space-around",
+          },
+        ],
+      },
+      "content-between": {
+        styles: [
+          {
+            alignContent: "space-between",
+          },
+        ],
+      },
+      "content-center": {
+        styles: [
+          {
+            alignContent: "center",
+          },
+        ],
+      },
+      "content-end": {
+        styles: [
+          {
+            alignContent: "flex-end",
+          },
+        ],
+      },
+      "content-start": {
+        styles: [
+          {
+            alignContent: "flex-start",
+          },
+        ],
+      },
+      "decoration-black": {
+        styles: [
+          {
+            textDecorationColor: "#000",
+          },
+        ],
+      },
+      "decoration-solid": {
+        styles: [
+          {
+            textDecorationStyle: "solid",
+          },
+        ],
+      },
       "divide-black": {
         childClasses: ["divide-black:children"],
         styles: [],
@@ -521,45 +468,10 @@ testCompile(
           },
         ],
       },
-
-      "basis-1": {
+      flex: {
         styles: [
           {
-            flexBasis: {
-              function: "rem",
-              values: [0.25],
-            },
-          },
-        ],
-        topics: ["--rem"],
-      },
-
-      "flex-row": {
-        styles: [
-          {
-            flexDirection: "row",
-          },
-        ],
-      },
-      "flex-wrap": {
-        styles: [
-          {
-            flexWrap: "wrap",
-          },
-        ],
-      },
-
-      grow: {
-        styles: [
-          {
-            flexGrow: 1,
-          },
-        ],
-      },
-      shrink: {
-        styles: [
-          {
-            flexShrink: 1,
+            display: "flex",
           },
         ],
       },
@@ -588,34 +500,24 @@ testCompile(
           },
         ],
       },
-
-      "text-base": {
+      "flex-row": {
         styles: [
           {
-            fontSize: {
-              function: "rem",
-              values: [1],
-            },
-            lineHeight: {
-              function: "rem",
-              values: [1.5],
-            },
-          },
-        ],
-        topics: ["--rem"],
-      },
-
-      italic: {
-        styles: [
-          {
-            fontStyle: "italic",
+            flexDirection: "row",
           },
         ],
       },
-      "not-italic": {
+      "flex-wrap": {
         styles: [
           {
-            fontStyle: "normal",
+            flexWrap: "wrap",
+          },
+        ],
+      },
+      grow: {
+        styles: [
+          {
+            flexGrow: 1,
           },
         ],
       },
@@ -630,95 +532,13 @@ testCompile(
         ],
         topics: ["--rem"],
       },
-      "z-10": {
+      hidden: {
         styles: [
           {
-            zIndex: 10,
+            display: "none",
           },
         ],
       },
-
-      "w-1": {
-        styles: [
-          {
-            width: {
-              function: "rem",
-              values: [0.25],
-            },
-          },
-        ],
-        topics: ["--rem"],
-      },
-
-      uppercase: {
-        styles: [
-          {
-            textTransform: "uppercase",
-          },
-        ],
-      },
-      "justify-center": {
-        styles: [
-          {
-            justifyContent: "center",
-          },
-        ],
-      },
-
-      "leading-3": {
-        styles: [
-          {
-            lineHeight: {
-              function: "rem",
-              values: [0.75],
-            },
-          },
-        ],
-        topics: ["--rem"],
-      },
-      "leading-tight": {
-        styles: [
-          {
-            lineHeight: 1.25,
-          },
-        ],
-      },
-
-      "max-w-0": {
-        styles: [
-          {
-            maxWidth: {
-              function: "rem",
-              values: [0],
-            },
-          },
-        ],
-        topics: ["--rem"],
-      },
-      "max-w-full": {
-        styles: [
-          {
-            maxWidth: "100%",
-          },
-        ],
-      },
-
-      "m-px": {
-        styles: [
-          {
-            margin: 1,
-          },
-        ],
-      },
-
-      "tracking-normal": {
-        styles: [
-          {
-            letterSpacing: 0,
-          },
-        ],
-      },
-
       "inset-1": {
         styles: [
           {
@@ -741,6 +561,255 @@ testCompile(
           },
         ],
         topics: ["--rem"],
+      },
+      italic: {
+        styles: [
+          {
+            fontStyle: "italic",
+          },
+        ],
+      },
+      "items-baseline": {
+        styles: [
+          {
+            alignItems: "baseline",
+          },
+        ],
+      },
+      "items-center": {
+        styles: [
+          {
+            alignItems: "center",
+          },
+        ],
+      },
+      "items-end": {
+        styles: [
+          {
+            alignItems: "flex-end",
+          },
+        ],
+      },
+      "items-start": {
+        styles: [
+          {
+            alignItems: "flex-start",
+          },
+        ],
+      },
+      "items-stretch": {
+        styles: [
+          {
+            alignItems: "stretch",
+          },
+        ],
+      },
+      "leading-3": {
+        styles: [
+          {
+            lineHeight: {
+              function: "rem",
+              values: [0.75],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+      "leading-tight": {
+        styles: [
+          {
+            lineHeight: 1.25,
+          },
+        ],
+      },
+      "m-1": {
+        styles: [
+          {
+            margin: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+      "max-w-full": {
+        styles: [
+          {
+            maxWidth: "100%",
+          },
+        ],
+      },
+      "min-w-full": {
+        styles: [
+          {
+            minWidth: "100%",
+          },
+        ],
+      },
+      "not-italic": {
+        styles: [
+          {
+            fontStyle: "normal",
+          },
+        ],
+      },
+      "opacity-5": {
+        styles: [
+          {
+            opacity: 0.05,
+          },
+        ],
+      },
+      "overflow-hidden": {
+        styles: [
+          {
+            overflow: "hidden",
+          },
+        ],
+      },
+      "p-1": {
+        styles: [
+          {
+            padding: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+      rounded: {
+        styles: [
+          {
+            borderRadius: {
+              function: "rem",
+              values: [0.25],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+      "self-baseline": {
+        styles: [
+          {
+            alignSelf: "baseline",
+          },
+        ],
+      },
+      "self-center": {
+        styles: [
+          {
+            alignSelf: "center",
+          },
+        ],
+      },
+      "self-end": {
+        styles: [
+          {
+            alignSelf: "flex-end",
+          },
+        ],
+      },
+      "self-start": {
+        styles: [
+          {
+            alignSelf: "flex-start",
+          },
+        ],
+      },
+      "self-stretch": {
+        styles: [
+          {
+            alignSelf: "stretch",
+          },
+        ],
+      },
+      shadow: {
+        atRules: {
+          "0": [["platform", "android"]],
+          "1": [["platform", "ios"]],
+        },
+        styles: [
+          {
+            elevation: 3,
+            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowOffset: {
+              height: 2,
+              width: 0,
+            },
+            shadowRadius: 6,
+          },
+          {
+            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowOffset: {
+              height: 2,
+              width: 0,
+            },
+            shadowRadius: 6,
+          },
+        ],
+      },
+      shrink: {
+        styles: [
+          {
+            flexShrink: 1,
+          },
+        ],
+      },
+      "text-base": {
+        styles: [
+          {
+            fontSize: {
+              function: "rem",
+              values: [1],
+            },
+            lineHeight: {
+              function: "rem",
+              values: [1.5],
+            },
+          },
+        ],
+        topics: ["--rem"],
+      },
+      "text-black": {
+        styles: [
+          {
+            color: "#000",
+          },
+        ],
+      },
+      "text-center": {
+        styles: [
+          {
+            textAlign: "center",
+          },
+        ],
+      },
+      uppercase: {
+        styles: [
+          {
+            textTransform: "uppercase",
+          },
+        ],
+      },
+      "w-screen": {
+        styles: [
+          {
+            width: {
+              function: "vw",
+              values: [100],
+            },
+          },
+        ],
+        topics: ["--window-width"],
+      },
+      "z-10": {
+        styles: [
+          {
+            zIndex: 10,
+          },
+        ],
       },
     });
   }

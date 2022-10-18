@@ -11,6 +11,10 @@ import nativewind from "./plugins/nativewind";
 import variables from "./plugins/variables";
 import { boxShadow } from "./plugins/box-shadow";
 import { darkMode } from "./plugins/dark-mode";
+import { scale } from "./plugins/scale";
+import { skew } from "./plugins/skew";
+import { rotate } from "./plugins/rotate";
+import { translate } from "./plugins/translate";
 
 const preset: Config = {
   nativewind: true,
@@ -62,6 +66,10 @@ const preset: Config = {
     scopedGroup,
     space,
     variables,
+    scale,
+    skew,
+    rotate,
+    translate
   ],
   corePlugins: {
     // We do not support scoped variables
