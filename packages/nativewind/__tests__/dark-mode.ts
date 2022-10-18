@@ -1,4 +1,4 @@
-import { testCompile } from "../utilities";
+import { testCompile } from "./utilities";
 
 testCompile("dark:text-red-500", (output) => {
   expect(output).toStrictEqual({

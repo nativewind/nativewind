@@ -1,4 +1,4 @@
-import { testCompile } from "../utilities";
+import { testCompile } from "./utilities";
 
 testCompile("divide-x-2", (output) => {
   expect(output).toStrictEqual({

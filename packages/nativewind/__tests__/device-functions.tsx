@@ -15,17 +15,19 @@ afterEach(() => {
 
 test.skip("nested", () => {
   create("text-test", {
-    theme: {
-      fontSize: {
-        // These tests run as ios with
-        // a pixelRatio of 2
-        test: platformSelect({
-          ios: pixelRatio({
-            1: "1rem",
-            2: `var(--empty-var, ${hairlineWidth()})`,
+    config: {
+      theme: {
+        fontSize: {
+          // These tests run as ios with
+          // a pixelRatio of 2
+          test: platformSelect({
+            ios: pixelRatio({
+              1: "1rem",
+              2: `var(--empty-var, ${hairlineWidth()})`,
+            }),
+            default: 2,
           }),
-          default: 2,
-        }),
+        },
       },
     },
   });
@@ -45,12 +47,14 @@ test.skip("nested", () => {
 
 test.skip("platformSelect", () => {
   create("text-test", {
-    theme: {
-      fontSize: {
-        test: platformSelect({
-          ios: "1rem", // These tests run as ios
-          default: 2,
-        }),
+    config: {
+      theme: {
+        fontSize: {
+          test: platformSelect({
+            ios: "1rem", // These tests run as ios
+            default: 2,
+          }),
+        },
       },
     },
   });
@@ -70,9 +74,11 @@ test.skip("platformSelect", () => {
 
 test.skip("hairlineWidth", () => {
   create("text-test", {
-    theme: {
-      fontSize: {
-        test: hairlineWidth(),
+    config: {
+      theme: {
+        fontSize: {
+          test: hairlineWidth(),
+        },
       },
     },
   });
@@ -92,9 +98,11 @@ test.skip("hairlineWidth", () => {
 
 test.skip("pixelRatio - get", () => {
   create("text-test", {
-    theme: {
-      fontSize: {
-        test: pixelRatio(),
+    config: {
+      theme: {
+        fontSize: {
+          test: pixelRatio(),
+        },
       },
     },
   });
@@ -114,13 +122,15 @@ test.skip("pixelRatio - get", () => {
 
 test.skip("pixelRatio - specifics", () => {
   create("text-test", {
-    theme: {
-      fontSize: {
-        test: pixelRatio({
-          1: "1rem",
-          2: "2rem",
-          3: "3rem",
-        }),
+    config: {
+      theme: {
+        fontSize: {
+          test: pixelRatio({
+            1: "1rem",
+            2: "2rem",
+            3: "3rem",
+          }),
+        },
       },
     },
   });

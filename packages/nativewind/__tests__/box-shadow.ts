@@ -1,4 +1,4 @@
-import { testCompile } from "../utilities";
+import { testCompile } from "./utilities";
 
 testCompile("shadow", (output) => {
   expect(output).toStrictEqual({
