@@ -7,12 +7,11 @@ export function resolve(
 ): string | number | ColorValue | undefined {
   if (!style) return;
 
-  if (typeof style === "string" || typeof style === "number") {
-    if (typeof style === "string") {
-      if (style.endsWith("%")) return style;
-      const maybeNumber = Number.parseFloat(style);
-      return Number.isNaN(maybeNumber) ? style : maybeNumber;
-    }
+  if (typeof style === "string") {
+    return style;
+  }
+
+  if (typeof style === "number") {
     return style;
   }
 

@@ -253,6 +253,8 @@ testCompile(
   // Typography - Font Style
   italic
   not-italic
+  // Typography - Font Weight
+  font-bold
   // Typography - Line Height
   leading-3
   leading-tight
@@ -803,6 +805,14 @@ testCompile(
           },
         ],
         topics: ["--window-width"],
+      },
+
+      "font-bold": {
+        styles: [
+          {
+            fontWeight: "700",
+          },
+        ],
       },
       "z-10": {
         styles: [

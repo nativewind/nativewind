@@ -2,7 +2,8 @@ import { Declaration } from "css-tree";
 import { AtomStyle, SelectorMeta } from "../types";
 import { pushStyle } from "./push";
 
-export function fontFamily(node: Declaration, meta: SelectorMeta) {
+// This only exists to force fontWeight into a string :(
+export function fontWeight(node: Declaration, meta: SelectorMeta) {
   const styles: AtomStyle[] = [];
 
   if (node.value.type !== "Value") {

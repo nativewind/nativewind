@@ -9,14 +9,9 @@ import {
   FunctionValue,
 } from "./types";
 
-export interface EncodeValueOptions {
-  forceString?: boolean;
-}
-
 export function encodeValue(
   node: StyleValue | null | undefined,
-  topics: string[],
-  { forceString = false }: EncodeValueOptions = {}
+  topics: string[]
 ): StyleValue | StyleValue[] | undefined {
   if (!node) return;
 
@@ -26,7 +21,7 @@ export function encodeValue(
   }
 
   if (typeof node === "number") {
-    return forceString ? node : node.toString();
+    return node;
   }
 
   if (Array.isArray(node)) {

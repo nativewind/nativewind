@@ -1,17 +1,23 @@
 import { StyleProperty, validProperties } from "./valid-styles";
 import { AtomStyle, SelectorMeta, StyleValue } from "../types";
-import { encodeValue, EncodeValueOptions } from "../encode-value";
+import { encodeValue } from "../encode-value";
+
+export interface PushStyleOptions {
+  // This only exists to force fontWeight into a string :(
+  forceString?: boolean;
+}
 
 export function pushStyle(
   styles: AtomStyle[],
   property: string,
   meta: SelectorMeta,
   node: StyleValue | null | undefined,
-  options?: EncodeValueOptions
+  { forceString = false }: PushStyleOptions = {}
 ) {
   if (!node) return;
 
-  const value = encodeValue(node, meta.topics, options);
+  let value = encodeValue(node, meta.topics);
+  if (forceString) value = value?.toString();
 
   if (value === undefined || value === null) return;
 

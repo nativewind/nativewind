@@ -15,6 +15,7 @@ import { textDecoration } from "./transforms/text-decoration";
 import { textDecorationLine } from "./transforms/text-decoration-line";
 import { textShadow } from "./transforms/text-shadow";
 import { transform } from "./transforms/transform";
+import { fontWeight } from "./transforms/font-weight";
 
 const skip = (walk as unknown as Record<string, unknown>).skip;
 
@@ -187,6 +188,9 @@ function getDeclarations(block: Block, meta: SelectorMeta) {
           break;
         case "font-family":
           styles.push(...fontFamily(node, meta));
+          break;
+        case "font-weight":
+          styles.push(...fontWeight(node, meta));
           break;
         case "place-content":
           styles.push(...placeContent(node, meta));
