@@ -69,24 +69,26 @@ const preset: Config = {
     scale,
     skew,
     rotate,
-    translate
+    translate,
   ],
   corePlugins: {
-    // We do not support scoped variables
-    divideOpacity: false,
+    backgroundOpacity: false,
     borderOpacity: false,
+    boxShadow: false,
+    boxShadowColor: false,
+    divideColor: false,
+    divideOpacity: false,
+    divideStyle: false,
+    divideWidth: false,
+    gap: false,
     placeholderOpacity: false,
     ringOpacity: false,
-    backgroundOpacity: false,
-    textOpacity: false,
-    boxShadowColor: false,
-    boxShadow: false,
-    // These libraries are replaced with custom logic
-    gap: false,
     space: false,
-    divideWidth: false,
-    divideColor: false,
-    divideStyle: false,
+    textOpacity: false,
+    scale: false,
+    skew: false,
+    rotate: false,
+    translate: false,
   },
 };
 

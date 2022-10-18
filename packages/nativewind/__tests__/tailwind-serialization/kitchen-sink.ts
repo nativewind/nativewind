@@ -232,6 +232,14 @@ testCompile(
   border-collapse
   // Tables - Table Layout
   table-fixed
+  // Transforms - Rotate
+  rotate-45
+  // Transforms - Scale
+  scale-50
+  // Transforms - Skew
+  skew-x-1
+  // Transforms - Translate
+  translate-x-px
   // Transforms - Transform Origin
   origin-top
   // Transitions & Animation - Transition Delay
@@ -811,6 +819,54 @@ testCompile(
         styles: [
           {
             fontWeight: "700",
+          },
+        ],
+      },
+
+      "rotate-45": {
+        styles: [
+          {
+            transform: [
+              {
+                rotate: 45,
+              },
+            ],
+          },
+        ],
+      },
+
+      "scale-50": {
+        styles: [
+          {
+            transform: [
+              {
+                scale: 0.5,
+              },
+            ],
+          },
+        ],
+      },
+
+      "skew-x-1": {
+        styles: [
+          {
+            transform: [
+              {
+                skewX: 1,
+              },
+            ],
+          },
+        ],
+      },
+
+      "translate-x-px": {
+        styles: [
+          {
+            transform: [
+              {
+                translate: 1,
+              },
+            ],
           },
         ],
       },

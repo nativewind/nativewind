@@ -28,6 +28,7 @@ export function transform(node: Declaration, meta: SelectorMeta) {
       case "scale":
       case "scaleX":
       case "scaleY":
+      case "translate":
       case "translateX":
       case "translateY":
       case "matrix": {
