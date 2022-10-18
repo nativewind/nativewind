@@ -274,6 +274,8 @@ testCompile(
   text-center
   // Typography - Text Color
   text-black
+  // Typography - Text Decoration
+  underline
   // Typography - Text Decoration Color
   decoration-black
   // Typography - Text Decoration Style
@@ -867,6 +869,22 @@ testCompile(
                 translate: 1,
               },
             ],
+          },
+        ],
+      },
+
+      "shadow-red-500": {
+        styles: [
+          {
+            shadowColor: "#ef4444",
+          },
+        ],
+      },
+
+      underline: {
+        styles: [
+          {
+            textDecorationLine: "underline",
           },
         ],
       },

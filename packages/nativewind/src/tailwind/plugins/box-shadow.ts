@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
+import toColorValue from "tailwindcss/lib/util/toColorValue";
 import plugin from "tailwindcss/plugin";
 import { CSSRuleObject } from "tailwindcss/types/config";
 
-export const boxShadow = plugin(function ({ addComponents, theme }) {
+export const boxShadow = plugin(function ({
+  addComponents,
+  theme,
+  matchUtilities,
+}) {
   const themeValues = Object.entries(
     theme("boxShadow") as Record<string, string>
   );
@@ -28,6 +34,20 @@ export const boxShadow = plugin(function ({ addComponents, theme }) {
   }
 
   addComponents(components);
+
+  matchUtilities(
+    {
+      shadow: (value) => {
+        return {
+          shadowColor: toColorValue(value),
+        };
+      },
+    },
+    {
+      values: flattenColorPalette(theme("boxShadowColor")),
+      type: ["color", "any"],
+    }
+  );
 });
 
 function key(size: string) {

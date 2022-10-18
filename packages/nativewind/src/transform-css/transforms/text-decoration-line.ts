@@ -11,6 +11,8 @@ export function textDecorationLine(node: Declaration, meta: SelectorMeta) {
 
   const children = node.value.children.toArray();
 
+  console.log(children);
+
   let textDecorationLine: string | undefined;
 
   for (let i = 0; i < children.length; i++) {
@@ -35,6 +37,7 @@ export function textDecorationLine(node: Declaration, meta: SelectorMeta) {
         case "line-through": {
           textDecorationLine = child.name;
           if (
+            nextChild &&
             nextChild.type === "Identifier" &&
             nextChild.name === "underline"
           ) {
@@ -46,6 +49,7 @@ export function textDecorationLine(node: Declaration, meta: SelectorMeta) {
         case "underline": {
           textDecorationLine = child.name;
           if (
+            nextChild &&
             nextChild.type === "Identifier" &&
             nextChild.name === "line-through"
           ) {
