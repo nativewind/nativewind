@@ -6,21 +6,20 @@ export interface ComponentState {
   focus: boolean;
 }
 
-const initialState = { hover: false, active: false, focus: false };
+const initialState: ComponentState = {
+  hover: false,
+  active: false,
+  focus: false,
+};
 
-export type Action =
-  | { type: "hover"; value: boolean }
-  | { type: "active"; value: boolean }
-  | { type: "focus"; value: boolean };
+export type Action = { type: keyof ComputedKeyframe; value: boolean };
 
-function reducer(state: ComponentState, action: Action): ComponentState {
+function reducer(state: ComponentState, action: Action) {
   switch (action.type) {
     case "hover":
-      return { ...state, hover: action.value };
     case "active":
-      return { ...state, active: action.value };
     case "focus":
-      return { ...state, focus: action.value };
+      return { ...state, [action.type]: action.value };
     default:
       throw new Error("Unknown action");
   }
