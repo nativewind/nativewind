@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render } from "@testing-library/react-native";
-import { NativeWindStyleSheet, styled, StyledComponent } from "../../src";
+import { PropsWithChildren } from "react";
+import { NativeWindStyleSheet, styled } from "../../src";
 import { create, testCompile } from "../test-utils";
 
 afterEach(() => {
@@ -62,10 +62,10 @@ testCompile("sm:gap-2", (output) => {
   });
 });
 
-test.only("gap", () => {
+test("gap", () => {
   create("gap-2");
 
-  const Parent = jest.fn(({ children }: any) => {
+  const Parent = jest.fn(({ children }: PropsWithChildren) => {
     return <>{children}</>;
   });
   const Child1 = jest.fn();

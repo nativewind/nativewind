@@ -12,6 +12,8 @@ import {
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 import { isFragment } from "react-is";
 
+import type { StyledOptions } from "../index";
+
 import { InteractionProps, useInteraction } from "./use-interaction";
 import { withStyledProps } from "./with-styled-props";
 import { GroupContext } from "./group-context";
@@ -22,8 +24,6 @@ import {
   getStyleSet,
   subscribeToStyleSheet,
 } from "../../style-sheet/native/runtime";
-import type { StyledOptions } from "../index";
-import { View } from "react-native";
 
 export function styled(
   component: ComponentType,
@@ -73,6 +73,7 @@ export const StyledComponent = forwardRef(
       propsToTransform,
       classProps,
       children,
+      nthChild,
       style: inlineStyles,
       ...componentProps
     }: any,
@@ -103,6 +104,7 @@ export const StyledComponent = forwardRef(
     const { className: actualClassName, meta } = withConditionals(className, {
       ...componentState,
       ...groupContext,
+      nthChild,
     });
 
     /**
@@ -128,20 +130,23 @@ export const StyledComponent = forwardRef(
      */
     const childClasses = getChildClasses(actualClassName);
     if (childClasses && children) {
-      children = flattenChildren(children)?.map((child) => {
-        if (isValidElement(child)) {
-          return createElement(StyledComponent, {
-            key: child.key,
-            component: child.type,
-            ...child.props,
-            className: [childClasses, child.props.className ?? child.props.tw]
-              .filter(Boolean)
-              .join(" "),
-          });
-        }
+      children = flattenChildren(children)
+        ?.filter(Boolean)
+        .map((child, nthChild) => {
+          if (isValidElement(child)) {
+            return createElement(StyledComponent, {
+              key: child.key,
+              component: child.type,
+              nthChild,
+              ...child.props,
+              className: [childClasses, child.props.className ?? child.props.tw]
+                .filter(Boolean)
+                .join(" "),
+            });
+          }
 
-        return child;
-      });
+          return child;
+        });
     }
 
     const style = useMemo(() => {
