@@ -1,4 +1,12 @@
-import { testCompile } from "./utilities";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { render } from "@testing-library/react-native";
+import { NativeWindStyleSheet, styled, StyledComponent } from "../../src";
+import { create, testCompile } from "../test-utils";
+
+afterEach(() => {
+  NativeWindStyleSheet.__reset();
+  jest.clearAllMocks();
+});
 
 testCompile("gap-2", (output) => {
   expect(output).toStrictEqual({
@@ -52,4 +60,52 @@ testCompile("sm:gap-2", (output) => {
       ],
     },
   });
+});
+
+test.only("gap", () => {
+  create("gap-2");
+
+  const Parent = jest.fn(({ children }: any) => {
+    return <>{children}</>;
+  });
+  const Child1 = jest.fn();
+  const Child2 = jest.fn();
+  const StyledParent = styled(Parent);
+
+  render(
+    <StyledParent className="gap-2">
+      <Child1 />
+      <Child2 />
+    </StyledParent>
+  );
+
+  expect(Parent).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: {
+        marginLeft: -8,
+        marginTop: -8,
+      },
+    }),
+    {}
+  );
+
+  expect(Child1).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: {
+        marginLeft: 8,
+        marginTop: 8,
+      },
+    }),
+    {}
+  );
+
+  expect(Child2).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: {
+        marginLeft: 8,
+        marginTop: 8,
+      },
+    }),
+    {}
+  );
 });

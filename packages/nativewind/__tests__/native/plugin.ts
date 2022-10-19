@@ -1,8 +1,9 @@
 import plugin from "tailwindcss/plugin";
-import { CaseOutput, testSerialization } from "./__runner__";
+import { testCompile } from "../test-utils";
 
-const cases: Record<string, CaseOutput> = {
-  "text-apply": {
+testCompile(
+  "text-apply",
+  {
     config: {
       plugins: [
         plugin(function ({ addUtilities }) {
@@ -14,17 +15,23 @@ const cases: Record<string, CaseOutput> = {
         }),
       ],
     },
-    output: {
+  },
+  (output) => {
+    expect(output).toStrictEqual({
       "text-apply": {
         styles: [{ color: "black" }, { color: "white" }],
         atRules: {
-          1: [["prefers-color-scheme", "dark"]],
+          1: [["--color-scheme", "dark"]],
         },
         topics: ["--color-scheme"],
       },
-    },
-  },
-  "text-media-query": {
+    });
+  }
+);
+
+testCompile(
+  "text-apply",
+  {
     config: {
       plugins: [
         plugin(function ({ addUtilities }) {
@@ -41,16 +48,16 @@ const cases: Record<string, CaseOutput> = {
         }),
       ],
     },
-    output: {
+  },
+  (output) => {
+    expect(output).toStrictEqual({
       "text-media-query": {
         styles: [{ color: "black" }, { color: "white" }],
         atRules: {
-          1: [["prefers-color-scheme", "dark"]],
+          1: [["--color-scheme", "dark"]],
         },
         topics: ["--color-scheme"],
       },
-    },
-  },
-};
-
-testEachCase(cases);
+    });
+  }
+);

@@ -1,7 +1,7 @@
 import { atoms } from "../../style-sheet/native/runtime";
 
 export function withConditionals(
-  className: string,
+  className = "",
   componentState: Record<string, boolean | number> = {}
 ) {
   const keyTokens: string[] = [];

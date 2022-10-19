@@ -11,8 +11,6 @@ export function textDecorationLine(node: Declaration, meta: SelectorMeta) {
 
   const children = node.value.children.toArray();
 
-  console.log(children);
-
   let textDecorationLine: string | undefined;
 
   for (let i = 0; i < children.length; i++) {

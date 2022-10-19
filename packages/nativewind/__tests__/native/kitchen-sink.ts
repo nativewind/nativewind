@@ -1,4 +1,4 @@
-import { testCompile } from "./utilities";
+import { testCompile } from "../test-utils";
 
 testCompile(
   `

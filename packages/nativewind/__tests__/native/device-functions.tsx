@@ -1,15 +1,15 @@
 import { render } from "@testing-library/react-native";
-import { create } from "./utilities";
+import { create } from "../test-utils";
 import {
   hairlineWidth,
   NativeWindStyleSheet,
   pixelRatio,
   platformSelect,
   styled,
-} from "../src";
+} from "../../src";
 
 afterEach(() => {
-  NativeWindStyleSheet.reset();
+  NativeWindStyleSheet.__reset();
   jest.clearAllMocks();
 });
 

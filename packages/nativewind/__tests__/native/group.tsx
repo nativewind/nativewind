@@ -1,23 +1,23 @@
 import { render, fireEvent, screen } from "@testing-library/react-native";
 import { Pressable } from "react-native";
-import { NativeWindStyleSheet, styled } from "../src";
-import { create } from "./utilities";
+import { NativeWindStyleSheet, styled } from "../../src";
+import { create } from "../test-utils";
 
 afterEach(() => {
-  NativeWindStyleSheet.reset();
+  NativeWindStyleSheet.__reset();
   jest.clearAllMocks();
 });
 
-test("scoped-group-active", () => {
-  create("scoped-group-active:text-black");
+test("group-active", () => {
+  create("group-active:text-black");
 
   const MyComponent = jest.fn();
   const StyledComponent = styled(MyComponent);
   const StyledPressable = styled(Pressable);
 
   render(
-    <StyledPressable testID="button" className="scoped-group">
-      <StyledComponent className="scoped-group-active:text-black" />
+    <StyledPressable testID="button" className="group">
+      <StyledComponent className="group-active:text-black" />
     </StyledPressable>
   );
 
@@ -37,16 +37,16 @@ test("scoped-group-active", () => {
   expect(MyComponent).toHaveBeenLastCalledWith({}, {});
 });
 
-test("scoped-group-hover", () => {
-  create("scoped-group-hover:text-black");
+test("group-hover", () => {
+  create("group-hover:text-black");
 
   const MyComponent = jest.fn();
   const StyledComponent = styled(MyComponent);
   const StyledPressable = styled(Pressable);
 
   render(
-    <StyledPressable testID="button" className="scoped-group">
-      <StyledComponent className="scoped-group-hover:text-black" />
+    <StyledPressable testID="button" className="group">
+      <StyledComponent className="group-hover:text-black" />
     </StyledPressable>
   );
 
@@ -66,19 +66,23 @@ test("scoped-group-hover", () => {
   expect(MyComponent).toHaveBeenLastCalledWith({}, {});
 });
 
-test.skip("scoped-group-focus", () => {
+test.skip("group-focus", () => {
   /*
    * Skipping this test as onFocus doesn't work on React Native
    */
-  create("scoped-group-focus:text-black");
+  create("group-focus:text-black");
 
   const MyComponent = jest.fn();
   const StyledComponent = styled(MyComponent);
   const StyledPressable = styled(Pressable);
 
   render(
-    <StyledPressable testID="button" className="scoped-group">
-      <StyledComponent className="scoped-group-focus:text-black" />
+    <StyledPressable
+      testID="button"
+      className="group"
+      onFocus={() => console.log(3)}
+    >
+      <StyledComponent className="group-focus:text-black" />
     </StyledPressable>
   );
 

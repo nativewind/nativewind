@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   createElement,
   ReactNode,
   ComponentType,
   forwardRef,
+  ForwardedRef,
   useContext,
   useMemo,
   Children,
@@ -14,7 +14,8 @@ import { isFragment } from "react-is";
 
 import { InteractionProps, useInteraction } from "./use-interaction";
 import { withStyledProps } from "./with-styled-props";
-import { GroupContext } from "./group-context";
+import { StyleProp, View } from "react-native";
+import { GroupContext, ScopedGroupContext } from "./group-context";
 import { useComponentState } from "./use-component-state";
 import { withConditionals } from "./conditionals";
 import {
@@ -22,15 +23,16 @@ import {
   getStyleSet,
   subscribeToStyleSheet,
 } from "../../style-sheet/native/runtime";
-import type { StyledOptions } from "../index";
-import { View } from "react-native";
+import type { PropsWithClassName, StyledOptions } from "../index";
 
-export function styled(
-  component: ComponentType,
-  styledBaseClassNameOrOptions?:
-    | string
-    | StyledOptions<Record<string, unknown>, string>,
-  maybeOptions: StyledOptions<Record<string, unknown>, string> = {}
+export function styled<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends { style?: StyleProp<any>; children?: ReactNode | undefined },
+  P extends keyof T
+>(
+  Component: ComponentType<T>,
+  styledBaseClassNameOrOptions?: string | StyledOptions<T, P>,
+  maybeOptions: StyledOptions<T, P> = {}
 ) {
   const { props: propsToTransform, classProps } =
     typeof styledBaseClassNameOrOptions === "object"
@@ -42,52 +44,27 @@ export function styled(
       ? styledBaseClassNameOrOptions
       : maybeOptions?.baseClassName;
 
-  const Styled = forwardRef((props, ref) => {
-    return (
-      <StyledComponent
-        ref={ref}
-        component={component}
-        propsToTransform={propsToTransform}
-        classProps={classProps}
-        baseClassName={baseClassName}
-        {...props}
-      />
-    );
-  });
-  if (typeof component !== "string") {
-    Styled.displayName = `NativeWind.${
-      component.displayName || component.name || "NoName"
-    }`;
-  }
-
-  return Styled;
-}
-
-export const StyledComponent = forwardRef(
-  (
+  function Styled(
     {
-      component: Component,
-      baseClassName,
+      className: propClassName = "",
       tw: twClassName,
-      className: propClassName,
-      propsToTransform,
-      classProps,
-      children,
       style: inlineStyles,
+      children,
       ...componentProps
-    }: any,
-    ref
-  ) => {
+    }: PropsWithClassName<T>,
+    ref: ForwardedRef<unknown>
+  ) {
     const groupContext = useContext(GroupContext);
+    const scopeGroupContext = useContext(ScopedGroupContext);
+
+    const classNameWithDefaults = baseClassName
+      ? `${baseClassName} ${twClassName ?? propClassName}`
+      : twClassName ?? propClassName;
 
     /**
      * Get the hover/focus/active state of this component
      */
     const [componentState, dispatch] = useComponentState();
-
-    const classNameWithDefaults = [baseClassName, twClassName ?? propClassName]
-      .filter(Boolean)
-      .join(" ");
 
     /**
      * Resolve the props/classProps/spreadProps options
@@ -103,6 +80,7 @@ export const StyledComponent = forwardRef(
     const { className: actualClassName, meta } = withConditionals(className, {
       ...componentState,
       ...groupContext,
+      ...scopeGroupContext,
     });
 
     /**
@@ -113,6 +91,17 @@ export const StyledComponent = forwardRef(
       () => getStyleSet(actualClassName),
       () => getStyleSet(actualClassName)
     );
+
+    const childClasses = getChildClasses(actualClassName);
+
+    const style = useMemo(() => {
+      const keys = Object.keys(styles).length;
+      if (keys > 0 && inlineStyles) {
+        return [styles, inlineStyles];
+      } else if (keys > 0) {
+        return styles;
+      }
+    }, [styles, inlineStyles]);
 
     /**
      * Determine if we need event handlers for our styles
@@ -126,32 +115,26 @@ export const StyledComponent = forwardRef(
     /**
      * Resolve the child styles
      */
-    const childClasses = getChildClasses(actualClassName);
     if (childClasses && children) {
       children = flattenChildren(children)?.map((child) => {
         if (isValidElement(child)) {
           return createElement(StyledComponent, {
             key: child.key,
-            component: child.type,
-            ...child.props,
-            className: [childClasses, child.props.className ?? child.props.tw]
-              .filter(Boolean)
-              .join(" "),
+            component: View,
           });
+          // return createElement(StyledComponent, {
+          //   component: child,
+          //   key: child.key,
+          //   ...child.props,
+          //   className: [childClasses, child.props.className ?? child.props.tw]
+          //     .filter(Boolean)
+          //     .join(" "),
+          // });
         }
 
         return child;
       });
     }
-
-    const style = useMemo(() => {
-      const keys = Object.keys(styles).length;
-      if (keys > 0 && inlineStyles) {
-        return [styles, inlineStyles];
-      } else if (keys > 0) {
-        return styles;
-      }
-    }, [styles, inlineStyles]);
 
     /**
      * Pass the styles to the element
@@ -162,7 +145,7 @@ export const StyledComponent = forwardRef(
       ...styledProps,
       style,
       ref,
-    };
+    } as unknown as T;
     if (children) props.children = children;
     let reactNode: ReactNode = createElement(Component, props);
 
@@ -180,7 +163,34 @@ export const StyledComponent = forwardRef(
       });
     }
 
+    if (meta.scopedGroup) {
+      reactNode = createElement(ScopedGroupContext.Provider, {
+        children: reactNode,
+        value: {
+          "scoped-group-hover": componentState.hover,
+          "scoped-group-focus": componentState.focus,
+          "scoped-group-active": componentState.active,
+        },
+      });
+    }
+
     return reactNode;
+  }
+
+  if (typeof Component !== "string") {
+    Styled.displayName = `NativeWind.${
+      Component.displayName || Component.name || "NoName"
+    }`;
+  }
+
+  return forwardRef(Styled);
+}
+
+export const StyledComponent = forwardRef(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ({ component, ...options }: any, ref) => {
+    const Component = useMemo(() => styled(component), [component]);
+    return <Component {...options} ref={ref} />;
   }
 );
 

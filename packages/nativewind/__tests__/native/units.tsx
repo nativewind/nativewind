@@ -1,11 +1,11 @@
 /* eslint-disable unicorn/no-useless-undefined */
 import { act, render } from "@testing-library/react-native";
 import { EmitterSubscription } from "react-native";
-import { NativeWindStyleSheet, styled } from "../src";
-import { create } from "./utilities";
+import { NativeWindStyleSheet, styled } from "../../src";
+import { create } from "../test-utils";
 
 afterEach(() => {
-  NativeWindStyleSheet.reset();
+  NativeWindStyleSheet.__reset();
   jest.clearAllMocks();
 });
 

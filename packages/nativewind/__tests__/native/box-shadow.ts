@@ -1,10 +1,11 @@
-import { testCompile } from "./utilities";
+import { testCompile } from "../test-utils";
 
 testCompile("shadow", (output) => {
   expect(output).toStrictEqual({
     shadow: {
       styles: [
         {
+          elevation: 3,
           shadowColor: "rgba(0, 0, 0, 0.1)",
           shadowOffset: { width: 0, height: 2 },
           shadowRadius: 6,

@@ -1,7 +1,7 @@
 import postcss from "postcss";
 import tailwind, { Config } from "tailwindcss";
 import { getCreateOptions } from "../src/transform-css";
-import nativePreset from "../src/tailwind";
+import nativePreset from "../src/tailwind/native";
 import { AtomRecord } from "../src/transform-css/types";
 import { NativeWindStyleSheet } from "../src";
 
@@ -59,7 +59,9 @@ const createTestCompileProxy = <T extends jest.It>(object: T): T =>
       if (fn) {
         target(
           options.name ||
-            [classNames, options.name].filter(Boolean).join(" - "),
+            `compile - ${[classNames, options.name]
+              .filter(Boolean)
+              .join(" - ")}`,
           () => fn(compile(classNames, compileOptions))
         );
       }
