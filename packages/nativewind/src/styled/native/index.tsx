@@ -3,108 +3,36 @@ import {
   ReactNode,
   ComponentType,
   forwardRef,
-  RefAttributes,
   ForwardedRef,
-  ClassAttributes,
-  ForwardRefExoticComponent,
-  PropsWithoutRef,
   useContext,
   useMemo,
   Children,
   isValidElement,
-  ComponentPropsWithRef,
-  ComponentProps,
 } from "react";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
+import { isFragment } from "react-is";
+
 import { InteractionProps, useInteraction } from "./use-interaction";
 import { withStyledProps } from "./with-styled-props";
 import { StyleProp } from "react-native";
 import { GroupContext, ScopedGroupContext } from "./group-context";
 import { useComponentState } from "./use-component-state";
-import { isFragment } from "react-is";
-import { Style } from "../transform-css/types";
 import { withConditionals } from "./conditionals";
 import {
   getChildClasses,
   getStyleSet,
   subscribeToStyleSheet,
-} from "../style-sheet/runtime";
+} from "../../style-sheet/native/runtime";
+import type { PropsWithClassName, StyledOptions } from "../index";
 
-export interface StyledOptions<
-  T,
-  P extends keyof T = never,
-  C extends keyof T = never
-> {
-  props?: Partial<Record<P, keyof Style | true>>;
-  classProps?: C[];
-  baseClassName?: string;
-}
-
-export type StyledProps<P> = P & {
-  className?: string;
-  tw?: string;
-  baseClassName?: string;
-  baseTw?: string;
-};
-
-type ForwardRef<T, P> = ForwardRefExoticComponent<
-  PropsWithoutRef<P> & RefAttributes<T>
->;
-
-type InferRef<T> = T extends RefAttributes<infer R> | ClassAttributes<infer R>
-  ? R
-  : unknown;
-
-/**
- * Default
- */
-export function styled<T>(
-  Component: ComponentType<T>
-): ForwardRef<InferRef<T>, StyledProps<T>>;
-
-/**
- * Base className
- */
-export function styled<T>(
-  Component: ComponentType<T>,
-  baseClassName: string
-): ForwardRef<InferRef<T>, StyledProps<T>>;
-
-/**
- * Only options
- */
-export function styled<T, P extends keyof T, C extends keyof T>(
-  Component: ComponentType<T>,
-  options: StyledOptions<T, P, C>
-): ForwardRef<
-  InferRef<T>,
-  StyledProps<{ [key in keyof T]: key extends P ? T[key] | string : T[key] }>
->;
-
-/**
- * Base className w/ options
- */
-export function styled<T, P extends keyof T, C extends keyof T>(
-  Component: ComponentType<T>,
-  baseClassName: string,
-  options: StyledOptions<T, P, C>
-): ForwardRef<
-  InferRef<T>,
-  StyledProps<{ [key in keyof T]: key extends P ? T[key] | string : T[key] }>
->;
-
-/**
- * Actual implementation
- */
 export function styled<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends { style?: StyleProp<any>; children?: ReactNode | undefined },
-  P extends keyof T,
-  C extends keyof T
+  P extends keyof T
 >(
   Component: ComponentType<T>,
-  styledBaseClassNameOrOptions?: string | StyledOptions<T, P, C>,
-  maybeOptions: StyledOptions<T, P, C> = {}
+  styledBaseClassNameOrOptions?: string | StyledOptions<T, P>,
+  maybeOptions: StyledOptions<T, P> = {}
 ) {
   const { props: propsToTransform, classProps } =
     typeof styledBaseClassNameOrOptions === "object"
@@ -123,7 +51,7 @@ export function styled<
       style: inlineStyles,
       children: componentChildren,
       ...componentProps
-    }: StyledProps<T>,
+    }: PropsWithClassName<T>,
     ref: ForwardedRef<unknown>
   ) {
     const groupContext = useContext(GroupContext);
@@ -141,15 +69,12 @@ export function styled<
     /**
      * Resolve the props/classProps/spreadProps options
      */
-    const { styledProps, className } = withStyledProps<T, P, C>({
+    const { styledProps, className } = withStyledProps({
       className: classNameWithDefaults,
       propsToTransform,
       classProps,
       componentState,
-      componentProps: componentProps as unknown as Record<
-        P | C | string,
-        string
-      >,
+      componentProps,
     });
 
     const { className: actualClassName, meta } = withConditionals(className, {
@@ -257,21 +182,13 @@ export function styled<
   return forwardRef(Styled);
 }
 
-export type StyledComponentProps<P> = StyledProps<P> & {
-  component: React.ComponentType<P>;
-};
-
-export const StyledComponent = forwardRef(({ component, ...options }, ref) => {
-  const Component = useMemo(() => styled(component), [component]);
-  return (
-    <Component
-      {...(options as unknown as ComponentProps<typeof Component>)}
-      ref={ref as ComponentPropsWithRef<typeof Component>["ref"]}
-    />
-  );
-}) as <T, P>(
-  props: StyledComponentProps<P> & React.RefAttributes<T>
-) => React.ReactElement | null;
+export const StyledComponent = forwardRef(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ({ component, ...options }: any, ref) => {
+    const Component = useMemo(() => styled(component), [component]);
+    return <Component {...options} ref={ref} />;
+  }
+);
 
 function flattenChildren(
   children: ReactNode | ReactNode[]

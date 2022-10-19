@@ -1,5 +1,5 @@
 import { StyleSheet, Platform, PixelRatio, ColorValue } from "react-native";
-import { VariableValue } from "../transform-css/types";
+import { VariableValue } from "../../transform-css/types";
 import { variables } from "./runtime";
 
 export function resolve(

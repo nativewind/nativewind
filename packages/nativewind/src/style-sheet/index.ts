@@ -1,36 +1,24 @@
-import { Dimensions, I18nManager } from "react-native";
+import { ColorSchemeName, ColorValue, Dimensions } from "react-native";
+import type { AtomRecord, VariableValue } from "../transform-css/types";
 
-import { setDimensions } from "./dimensions";
-import { create, resetRuntime, setVariables } from "./runtime";
-import {
-  getColorScheme,
-  setColorScheme,
-  toggleColorScheme,
-} from "./color-scheme";
+export * from "./web";
 
-export const NativeWindStyleSheet = {
-  create,
-  reset,
-  getColorScheme,
-  setColorScheme,
-  toggleColorScheme,
-  setVariables,
-  setDimensions,
-  // isPreprocessed: () => context.preprocessed,
+export declare function useVariable<
+  T extends string | number | ColorValue | undefined
+>(name: `--${string}`): [T, (value: T) => void];
+
+export interface NativeWindStyleSheet {
+  create: (atomRecord: AtomRecord) => void;
+  __reset: () => void;
+  getColorScheme: () => NonNullable<ColorSchemeName>;
+  setColorScheme: (system?: ColorSchemeName | "system") => void;
+  toggleColorScheme: () => void;
+  setVariables: (properties: Record<`--${string}`, VariableValue>) => void;
+  setDimensions: (dimensions: Dimensions) => void;
+  useVariable: <T extends VariableValue>(
+    name: `--${string}`
+  ) => [T, (value: T) => void];
   // setDangerouslyCompileStyles: context.setDangerouslyCompileStyles,
-};
-
-function reset() {
-  resetRuntime();
-  setDimensions(Dimensions);
-  setVariables({
-    "--i18n-direction": I18nManager.isRTL ? "rtl" : "ltr",
-  });
-
-  // context.preprocessed = Platform.select({
-  //   default: false,
-  //   web: typeof StyleSheet.create({ test: {} }).test !== "number",
-  // });
-  // context.dangerouslyCompileStyles = undefined;
 }
-reset();
+
+export declare const NativeWindStyleSheet: NativeWindStyleSheet;

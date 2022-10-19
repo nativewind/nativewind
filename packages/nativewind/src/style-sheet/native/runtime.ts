@@ -1,6 +1,11 @@
 /* eslint-disable unicorn/no-array-for-each */
 import { Appearance, ColorSchemeName, Platform } from "react-native";
-import { Atom, AtomRecord, Style, VariableValue } from "../transform-css/types";
+import {
+  Atom,
+  AtomRecord,
+  Style,
+  VariableValue,
+} from "../../transform-css/types";
 import { resolve } from "./resolve";
 
 type ComputedAtom = Atom & { computedStyle: Style; recompute: () => Style };
@@ -198,10 +203,6 @@ export function setVariables(properties: Record<`--${string}`, VariableValue>) {
     variableSubscriptions.get(name)?.forEach((callback) => {
       subscriptions.add(callback);
     });
-
-    if (typeof document !== "undefined") {
-      document.documentElement.style.setProperty(name, value.toString());
-    }
   }
 
   subscriptions.forEach((callback) => callback());
@@ -212,24 +213,6 @@ export function getVariablesForColorScheme(
   colorScheme: NonNullable<ColorSchemeName>
 ) {
   return colorScheme === "light" ? rootVariableValues : darkRootVariableValues;
-}
-
-export function recomputeWebVariables() {
-  if (typeof document !== "undefined") {
-    const style = getComputedStyle(document.documentElement);
-    // eslint-disable-next-line unicorn/prefer-spread
-    const variableKeys = Array.from(style).filter((key) =>
-      key.startsWith("--")
-    );
-
-    const documentVariables = Object.fromEntries(
-      variableKeys.map((key) => {
-        return [key, style.getPropertyValue(key)];
-      })
-    );
-
-    setVariables(documentVariables);
-  }
 }
 
 export function subscribeToStyleSheet(callback: () => void) {

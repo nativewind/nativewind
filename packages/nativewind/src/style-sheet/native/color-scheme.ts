@@ -1,14 +1,6 @@
 import { Appearance, ColorSchemeName } from "react-native";
-import {
-  getVariablesForColorScheme,
-  recomputeWebVariables,
-  setVariables,
-  variables,
-} from "./runtime";
-
-const darkModeKey = "--dark-mode";
-const colorSchemeKey = "--color-scheme";
-const colorSchemeSystemKey = "--color-scheme-system";
+import { colorSchemeKey, colorSchemeSystemKey, darkModeKey } from "../common";
+import { getVariablesForColorScheme, setVariables, variables } from "./runtime";
 
 Appearance.addChangeListener(({ colorScheme }) => {
   if (variables.get(darkModeKey) === "class") {
@@ -23,16 +15,6 @@ function internalSetColorScheme(system?: ColorSchemeName | "system" | null) {
     !system || system === "system"
       ? Appearance.getColorScheme() || "light"
       : system;
-
-  if (typeof document !== "undefined") {
-    if (colorScheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-
-    recomputeWebVariables();
-  }
 
   setVariables({
     [colorSchemeSystemKey]: system ?? "system",

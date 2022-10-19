@@ -1,7 +1,7 @@
 import { CssNode } from "css-tree";
 import {
+  ColorValue,
   ImageStyle,
-  OpaqueColorValue,
   TextStyle,
   TransformsStyle,
   ViewStyle,
@@ -53,7 +53,7 @@ export type FunctionValue = {
   values: Array<VariableValue>;
 };
 
-export type VariableValue = string | number | FunctionValue | OpaqueColorValue;
+export type VariableValue = string | number | FunctionValue | ColorValue;
 
 export function isFunctionValue(value: StyleValue): value is FunctionValue {
   return typeof value === "object" && "function" in value;

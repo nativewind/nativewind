@@ -1,4 +1,4 @@
-import { atoms } from "../style-sheet/runtime";
+import { atoms } from "../../style-sheet/native/runtime";
 
 export function withConditionals(
   className: string,
