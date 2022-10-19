@@ -1,12 +1,12 @@
 /* eslint-disable unicorn/no-array-for-each */
 import { Appearance, ColorSchemeName, Platform } from "react-native";
+import { resolve } from "../../style-sheet/native/resolve";
 import {
   Atom,
   AtomRecord,
   Style,
   VariableValue,
 } from "../../transform-css/types";
-import { resolve } from "./resolve";
 
 type ComputedAtom = Atom & { computedStyle: Style; recompute: () => Style };
 
