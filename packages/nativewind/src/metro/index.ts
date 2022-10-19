@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-module, @typescript-eslint/no-var-requires */
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { cwd } from "node:process";
@@ -26,6 +25,7 @@ export default function withNativeWind(
 
   if (!inputPath) {
     try {
+      // eslint-disable-next-line unicorn/prefer-module, @typescript-eslint/no-var-requires
       let { main } = require(`${cwd()}/package.json`);
 
       if (main && main === "node_modules/expo/AppEntry.js") {
