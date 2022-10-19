@@ -1,5 +1,12 @@
 # nativewind
 
+## 2.0.11
+
+### Patch Changes
+
+- 671897b: fix: useInteraction types
+- ca00130: fix: add missing flexBasis from flex-1
+
 ## 2.0.10
 
 ### Patch Changes

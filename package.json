@@ -13,15 +13,15 @@
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i"
   },
   "devDependencies": {
-    "@changesets/cli": "2.24.4",
+    "@changesets/cli": "2.25.0",
     "@cspell/eslint-plugin": "6.10.1",
-    "@types/node": "^18.7.23",
+    "@types/node": "18.7.23",
+    "eslint": "8.25.0",
     "@typescript-eslint/eslint-plugin": "^5.39.0",
     "@typescript-eslint/parser": "^5.39.0",
-    "eslint": "^8.24.0",
     "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-unicorn": "43.0.2",
+    "eslint-plugin-unicorn": "44.0.2",
     "prettier": "2.7.1",
-    "typescript": "^4.8.3"
+    "typescript": "4.8.4"
   }
 }
