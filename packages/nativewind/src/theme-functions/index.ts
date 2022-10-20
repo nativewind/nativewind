@@ -11,8 +11,8 @@ const {
   roundToNearestPixel,
 } =
   process.env.NATIVEWIND_PLATFORM === "native"
-    ? require("./native")
-    : require("./web");
+    ? require("./index.native")
+    : require("./index.web");
 
 export {
   hairlineWidth,

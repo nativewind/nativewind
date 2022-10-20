@@ -181,44 +181,57 @@ function getDeclarations(block: Block, meta: SelectorMeta) {
     visit: "Declaration",
     enter(node) {
       switch (node.property) {
-        case "border":
+        case "border": {
           styles.push(...border(node, meta));
           break;
-        case "box-shadow":
+        }
+        case "box-shadow": {
           styles.push(...boxShadow(node, meta));
           break;
-        case "flex":
+        }
+        case "flex": {
           styles.push(...flex(node, meta));
           break;
-        case "flex-flow":
+        }
+        case "flex-flow": {
           styles.push(...flexFlow(node, meta));
           break;
-        case "font":
+        }
+        case "font": {
           styles.push(...font(node, meta));
           break;
-        case "font-family":
+        }
+        case "font-family": {
           styles.push(...fontFamily(node, meta));
           break;
-        case "font-weight":
+        }
+        case "font-weight": {
           styles.push(...fontWeight(node, meta));
           break;
-        case "place-content":
+        }
+        case "place-content": {
           styles.push(...placeContent(node, meta));
           break;
-        case "text-decoration":
+        }
+        case "text-decoration": {
           styles.push(...textDecoration(node, meta));
           break;
-        case "text-decoration-line":
+        }
+        case "text-decoration-line": {
           styles.push(...textDecorationLine(node, meta));
           break;
-        case "text-shadow":
+        }
+        case "text-shadow": {
           styles.push(...textShadow(node, meta));
           break;
-        case "transform":
+        }
+        case "transform": {
           styles.push(...transform(node, meta));
           break;
-        default:
+        }
+        default: {
           styles.push(...defaultDeclaration(node, meta));
+        }
       }
     },
   });
@@ -236,19 +249,22 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
   walk(node, (node) => {
     switch (node.type) {
       case "TypeSelector":
-      case "IdSelector":
+      case "IdSelector": {
         // We don't support these, so bail early
         return { selector: "" };
-      case "Combinator":
+      }
+      case "Combinator": {
         groupName = undefined;
         // Ignore these
         break;
-      case "AttributeSelector":
+      }
+      case "AttributeSelector": {
         if (node.name.name === "dark") {
           tokens.push(`[${node.name.name}]`);
         }
         break;
-      case "ClassSelector":
+      }
+      case "ClassSelector": {
         if (node.name === "group") {
           groupName = "group";
           groups.push(groupName);
@@ -267,6 +283,7 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
         }
         tokens.push(`.${node.name}`);
         break;
+      }
       case "PseudoClassSelector": {
         if (node.name === "children") {
           hasParent = true;
@@ -283,9 +300,9 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
   });
 
   const selector = tokens
-    .filter((token) => token !== ".dark")
     .join("")
     .trimStart()
+    .replace(/^\.dark\./, "")
     .replace(/^\./, "")
     .replaceAll(/\\([\dA-Fa-f]{2}\s)/g, function (...args) {
       // Replace hex-string with their actual value

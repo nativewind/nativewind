@@ -44,46 +44,63 @@ export function encodeValue(
     case "Identifier": {
       return node.name;
     }
-    case "Number":
+    case "Number": {
       return Number.parseFloat(node.value.toString());
-    case "String":
+    }
+    case "String": {
       return node.value;
-    case "Hash":
+    }
+    case "Hash": {
       return `#${node.value}`;
-    case "Percentage":
+    }
+    case "Percentage": {
       return `${node.value}%`;
-    case "Function":
+    }
+    case "Function": {
       return parseFunction(node, topics);
-    case "Dimension":
+    }
+    case "Dimension": {
       switch (node.unit) {
-        case "px":
+        case "px": {
           return Number.parseFloat(node.value.toString());
-        case "rem":
+        }
+        case "rem": {
           topics.push("--rem");
           return {
             function: node.unit,
             values: [Number.parseFloat(node.value.toString())],
           };
-        case "vw":
+        }
+        case "vw": {
           topics.push("--window-width");
           return {
             function: node.unit,
             values: [Number.parseFloat(node.value.toString())],
           };
-        case "vh":
+        }
+        case "vh": {
           topics.push("--window-height");
           return {
             function: node.unit,
             values: [Number.parseFloat(node.value.toString())],
           };
-        default:
+        }
+        default: {
           return `${node.value}${node.unit}`;
+        }
       }
+    }
   }
 }
 
 function parseFunction(node: FunctionNode, topics: string[]) {
   switch (node.name) {
+    case "ios":
+    case "android":
+    case "windows":
+    case "macos":
+    case "web":
+    case "default":
     case "pixelRatio":
     case "platformSelect":
     case "platformColor":

@@ -13,20 +13,12 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test.skip("nested", () => {
+test("hairlineWidth", () => {
   create("text-test", {
     config: {
       theme: {
         fontSize: {
-          // These tests run as ios with
-          // a pixelRatio of 2
-          test: platformSelect({
-            ios: pixelRatio({
-              1: "1rem",
-              2: `var(--empty-var, ${hairlineWidth()})`,
-            }),
-            default: 2,
-          }),
+          test: hairlineWidth(),
         },
       },
     },
@@ -39,13 +31,13 @@ test.skip("nested", () => {
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: { fontSize: 32 },
+      style: { fontSize: 0.5 },
     },
     {}
   );
 });
 
-test.skip("platformSelect", () => {
+test("platformSelect", () => {
   create("text-test", {
     config: {
       theme: {
@@ -67,30 +59,6 @@ test.skip("platformSelect", () => {
   expect(MyComponent).toHaveBeenCalledWith(
     {
       style: { fontSize: 16 },
-    },
-    {}
-  );
-});
-
-test.skip("hairlineWidth", () => {
-  create("text-test", {
-    config: {
-      theme: {
-        fontSize: {
-          test: hairlineWidth(),
-        },
-      },
-    },
-  });
-
-  const MyComponent = jest.fn();
-  const StyledComponent = styled(MyComponent);
-
-  render(<StyledComponent className="text-test" />);
-
-  expect(MyComponent).toHaveBeenCalledWith(
-    {
-      style: { fontSize: 0.5 },
     },
     {}
   );
@@ -129,6 +97,38 @@ test.skip("pixelRatio - specifics", () => {
             1: "1rem",
             2: "2rem",
             3: "3rem",
+          }),
+        },
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 32 },
+    },
+    {}
+  );
+});
+
+test.skip("nested", () => {
+  create("text-test", {
+    config: {
+      theme: {
+        fontSize: {
+          // These tests run as ios with
+          // a pixelRatio of 2
+          test: platformSelect({
+            ios: pixelRatio({
+              1: "1rem",
+              2: `var(--empty-var, ${hairlineWidth()})`,
+            }),
+            default: 2,
           }),
         },
       },

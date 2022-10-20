@@ -2,7 +2,7 @@ import type { PlatformOSType } from "react-native";
 
 function specificsToString(specifics: Record<string, unknown>) {
   return Object.entries(specifics)
-    .map(([key, value]) => `${key}:${value}`)
+    .map(([key, value]) => `${key}(${value})`)
     .join(", ");
 }
 

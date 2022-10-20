@@ -137,12 +137,15 @@ export function setAtom(name: string, atom: Atom) {
       if (atRules && atRules.length === 0) {
         atRuleConditionsMet = atRules.every(([rule, params]) => {
           switch (rule) {
-            case "colorScheme":
+            case "colorScheme": {
               return variables.get("colorScheme") === params;
-            case "platform":
+            }
+            case "platform": {
               return params === Platform.OS;
-            case "width":
+            }
+            case "width": {
               return params === resolve(variables.get("--window-width"));
+            }
             case "min-width": {
               const value = resolve(variables.get("--window-width"));
               if (typeof value !== "number") return false;
@@ -153,8 +156,9 @@ export function setAtom(name: string, atom: Atom) {
               if (typeof value !== "number") return false;
               return (params ?? 0) <= value;
             }
-            case "height":
+            case "height": {
               return params === resolve(variables.get("--window-height"));
+            }
             case "min-height": {
               const value = resolve(variables.get("--window-height"));
               if (typeof value !== "number") return false;
@@ -165,8 +169,9 @@ export function setAtom(name: string, atom: Atom) {
               if (typeof value !== "number") return false;
               return (params ?? 0) <= value;
             }
-            default:
+            default: {
               return true;
+            }
           }
         });
       }

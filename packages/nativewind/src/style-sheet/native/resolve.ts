@@ -2,9 +2,19 @@ import { StyleSheet, Platform, PixelRatio, ColorValue } from "react-native";
 import { VariableValue } from "../../transform-css/types";
 import { variables } from "./runtime";
 
-export function resolve(
-  style?: VariableValue
-): string | number | ColorValue | undefined {
+interface ObjectAttribute {
+  key: string;
+  value: unknown;
+}
+
+export type ResolvedValue =
+  | string
+  | number
+  | ColorValue
+  | ObjectAttribute
+  | undefined;
+
+export function resolve(style?: VariableValue): ResolvedValue {
   if (!style) return;
 
   if (typeof style === "string") {
@@ -47,8 +57,9 @@ export function resolve(
       if (typeof value === "object" && "function" in value) return defaultValue;
       return value;
     }
-    case "hairlineWidth":
+    case "hairlineWidth": {
       return StyleSheet.hairlineWidth;
+    }
     case "platformSelect": {
       const specifics = toObject(resolvedValues);
       return Platform.select(specifics);
@@ -86,13 +97,26 @@ export function resolve(
       if (typeof value !== "number") return;
       return PixelRatio.roundToNearestPixel(value);
     }
+    case "ios":
+    case "android":
+    case "windows":
+    case "macos":
+    case "web":
+    case "default": {
+      return {
+        key: style.function,
+        value: resolvedValues[0],
+      };
+    }
   }
 }
 
-function toObject(values: unknown[]) {
+function toObject(values: ResolvedValue[]) {
   const object: Record<string, unknown> = {};
-  for (let i = 0; i < values.length; i = i + 2) {
-    object[values[i] as string] = values[i + 1];
+  for (const entry of values) {
+    if (typeof entry === "object") {
+      object[entry.key] = entry.value;
+    }
   }
   return object;
 }
