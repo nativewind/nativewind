@@ -4,6 +4,7 @@ import {
   hairlineWidth,
   NativeWindStyleSheet,
   pixelRatio,
+  platformColor,
   platformSelect,
   styled,
 } from "../../src";
@@ -46,6 +47,30 @@ test("platformSelect", () => {
             ios: "1rem", // These tests run as ios
             default: 2,
           }),
+        },
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 16 },
+    },
+    {}
+  );
+});
+
+test("platformColor", () => {
+  create("text-test", {
+    config: {
+      theme: {
+        colors: {
+          test: platformColor(),
         },
       },
     },
