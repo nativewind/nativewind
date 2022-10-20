@@ -47,6 +47,7 @@ function walkAst(
               atRules: [],
               conditions: [],
               variables: [],
+              groups: [],
             }
           );
           return skip;
@@ -60,6 +61,7 @@ function walkAst(
               atRules: [],
               conditions: [],
               variables: [],
+              groups: [],
             }
           );
           return skip;
@@ -156,6 +158,19 @@ function addRule(node: Rule, createOptions: AtomRecord, meta: SelectorMeta) {
 
       selectorOptions.styles.push(styles);
 
+      if (selectorMeta.groups.length > 0) {
+        selectorOptions.meta ??= {};
+        selectorOptions.meta.groups = selectorMeta.groups;
+
+        for (const group of selectorMeta.groups) {
+          createOptions[group] ??= {};
+          createOptions[group].meta = {
+            ...createOptions[group].meta,
+            group,
+          };
+        }
+      }
+
       if (selectorMeta.atRules.length > 0) {
         selectorOptions.atRules ??= {};
         selectorOptions.atRules[currentStyleIndex] = selectorMeta.atRules;
@@ -220,17 +235,17 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
   const tokens: string[] = [];
 
   let hasParent = false;
+  let groupName: string | undefined;
 
   walk(node, (node) => {
     switch (node.type) {
       case "TypeSelector":
+      case "IdSelector":
         // We don't support these, so bail early
         return { selector: "" };
       case "Combinator":
-        tokens.push(node.name);
-        break;
-      case "IdSelector":
-        tokens.push(`#${node.name}`);
+        groupName = undefined;
+        // Ignore these
         break;
       case "AttributeSelector":
         if (node.name.name === "dark") {
@@ -238,6 +253,22 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
         }
         break;
       case "ClassSelector":
+        if (node.name === "group") {
+          groupName = "group";
+          meta.groups ??= [];
+          meta.groups.push(groupName);
+          break;
+        }
+
+        if (node.name.startsWith("group\\/")) {
+          meta.groups ??= [];
+          if (Array.isArray(meta.groups)) {
+            groupName = `group/${node.name.split("\\/")[1]}`;
+            meta.groups.push(groupName);
+          }
+          break;
+        }
+
         if (node.name === "dark") {
           meta.topics.push("--color-scheme");
           meta.atRules.push(["--color-scheme", "dark"]);
@@ -251,7 +282,9 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
         } else if (node.name === "root") {
           tokens.push(`:${node.name}`);
         } else {
-          meta.conditions.push(node.name);
+          groupName
+            ? meta.conditions.push(`${groupName}:${node.name}`)
+            : meta.conditions.push(node.name);
         }
       }
     }

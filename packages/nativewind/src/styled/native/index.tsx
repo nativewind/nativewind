@@ -8,6 +8,7 @@ import {
   useMemo,
   Children,
   isValidElement,
+  createContext,
 } from "react";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 import { isFragment } from "react-is";
@@ -16,14 +17,15 @@ import type { StyledOptions } from "../index";
 
 import { InteractionProps, useInteraction } from "./use-interaction";
 import { withStyledProps } from "./with-styled-props";
-import { GroupContext } from "./group-context";
 import { useComponentState } from "./use-component-state";
-import { withConditionals } from "./conditionals";
+import { ConditionalStateRecord, withConditionals } from "./with-conditionals";
 import {
   getChildClasses,
   getStyleSet,
   subscribeToStyleSheet,
 } from "../../style-sheet/native/runtime";
+
+const stateInheritanceContent = createContext<ConditionalStateRecord>({});
 
 export function styled(
   component: ComponentType,
@@ -79,12 +81,12 @@ export const StyledComponent = forwardRef(
     }: any,
     ref
   ) => {
-    const groupContext = useContext(GroupContext);
+    const stateInheritance = useContext(stateInheritanceContent);
 
     /**
      * Get the hover/focus/active state of this component
      */
-    const [componentState, dispatch] = useComponentState();
+    const [componentState, componentStateDispatch] = useComponentState();
 
     const classNameWithDefaults = [baseClassName, twClassName ?? propClassName]
       .filter(Boolean)
@@ -103,7 +105,7 @@ export const StyledComponent = forwardRef(
 
     const { className: actualClassName, meta } = withConditionals(className, {
       ...componentState,
-      ...groupContext,
+      ...stateInheritance,
       nthChild,
     });
 
@@ -120,7 +122,7 @@ export const StyledComponent = forwardRef(
      * Determine if we need event handlers for our styles
      */
     const handlers = useInteraction(
-      dispatch,
+      componentStateDispatch,
       meta,
       componentProps as InteractionProps
     );
@@ -169,18 +171,18 @@ export const StyledComponent = forwardRef(
       ref,
     };
     if (children) props.children = children;
+
     let reactNode: ReactNode = createElement(Component, props);
 
     /**
      * Determine if we need to wrap element in Providers
      */
-    if (meta.group) {
-      reactNode = createElement(GroupContext.Provider, {
+    if (typeof meta.group === "string") {
+      reactNode = createElement(stateInheritanceContent.Provider, {
         children: reactNode,
         value: {
-          "group-hover": groupContext["group-hover"] || componentState.hover,
-          "group-focus": groupContext["group-focus"] || componentState.focus,
-          "group-active": groupContext["group-active"] || componentState.active,
+          ...stateInheritance,
+          [meta.group]: componentState,
         },
       });
     }

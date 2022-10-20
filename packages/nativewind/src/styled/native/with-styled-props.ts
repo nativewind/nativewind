@@ -3,7 +3,7 @@ import {
   getStyleSet,
   subscribeToStyleSheet,
 } from "../../style-sheet/native/runtime";
-import { withConditionals } from "./conditionals";
+import { withConditionals } from "./with-conditionals";
 import { ComponentState } from "./use-component-state";
 
 export interface WithStyledPropsOptions {

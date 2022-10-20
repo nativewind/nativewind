@@ -3,8 +3,6 @@ import { Config } from "tailwindcss";
 import { divide } from "./plugins/divide";
 import { elevation } from "./plugins/elevation";
 import { gap } from "./plugins/gap";
-import { group } from "./plugins/group";
-import { scopedGroup } from "./plugins/scoped-group";
 import { parent } from "./plugins/parent";
 import { space } from "./plugins/space";
 import nativewind from "./plugins/nativewind";
@@ -60,10 +58,8 @@ const preset: Config = {
     divide,
     elevation,
     gap,
-    group,
     nativewind,
     parent,
-    scopedGroup,
     space,
     variables,
     scale,

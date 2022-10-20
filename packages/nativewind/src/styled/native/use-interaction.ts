@@ -7,6 +7,7 @@ import {
   TargetedEvent,
   MouseEvent,
 } from "react-native";
+import { Atom } from "../../transform-css/types";
 import { Action } from "./use-component-state";
 
 declare module "react-native" {
@@ -23,18 +24,18 @@ export interface InteractionProps extends PressableProps {
 
 export function useInteraction(
   dispatch: Dispatch<Action>,
-  meta: Record<string, boolean>,
+  meta: Atom["meta"],
   props: InteractionProps
 ) {
   const ref = useRef<InteractionProps>(props);
   ref.current = props;
 
   return useMemo(() => {
-    const isParentOrGroup = meta.parent || meta.group || meta.scopedGroup;
+    const isParentOrGroup = meta?.parent || meta?.group || meta?.scopedGroup;
 
     const handlers: InteractionProps = {};
 
-    if (isParentOrGroup || meta.active) {
+    if (isParentOrGroup || meta?.active) {
       if (Platform.OS === "web") {
         handlers.onMouseDown = function (event: GestureResponderEvent) {
           if (ref.current.onMouseDown) {
@@ -66,7 +67,7 @@ export function useInteraction(
       }
     }
 
-    if (isParentOrGroup || meta.hover) {
+    if (isParentOrGroup || meta?.hover) {
       handlers.onHoverIn = function (event: MouseEvent) {
         if (ref.current.onHoverIn) {
           ref.current.onHoverIn(event);
@@ -82,7 +83,7 @@ export function useInteraction(
       };
     }
 
-    if (isParentOrGroup || meta.focus) {
+    if (isParentOrGroup || meta?.focus) {
       handlers.onFocus = function (event: NativeSyntheticEvent<TargetedEvent>) {
         if (ref.current.onFocus) {
           ref.current.onFocus(event);
