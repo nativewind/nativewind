@@ -47,7 +47,6 @@ function walkAst(
               atRules: [],
               conditions: [],
               variables: [],
-              groups: [],
             }
           );
           return skip;
@@ -61,7 +60,6 @@ function walkAst(
               atRules: [],
               conditions: [],
               variables: [],
-              groups: [],
             }
           );
           return skip;
@@ -106,7 +104,7 @@ function addRule(node: Rule, createOptions: AtomRecord, meta: SelectorMeta) {
     // Duplicate the meta, as selectors may add their own topics/atRules (eg .dark)
     const selectorMeta = { ...meta, topics: [...meta.topics] };
 
-    const { selector, parentSelector } = getSelector(
+    const { selector, parentSelector, groups } = getSelector(
       selectorNode,
       selectorMeta
     );
@@ -158,11 +156,8 @@ function addRule(node: Rule, createOptions: AtomRecord, meta: SelectorMeta) {
 
       selectorOptions.styles.push(styles);
 
-      if (selectorMeta.groups.length > 0) {
-        selectorOptions.meta ??= {};
-        selectorOptions.meta.groups = selectorMeta.groups;
-
-        for (const group of selectorMeta.groups) {
+      if (groups.length > 0) {
+        for (const group of groups) {
           createOptions[group] ??= {};
           createOptions[group].meta = {
             ...createOptions[group].meta,
@@ -236,6 +231,7 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
 
   let hasParent = false;
   let groupName: string | undefined;
+  const groups: string[] = [];
 
   walk(node, (node) => {
     switch (node.type) {
@@ -255,17 +251,13 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
       case "ClassSelector":
         if (node.name === "group") {
           groupName = "group";
-          meta.groups ??= [];
-          meta.groups.push(groupName);
+          groups.push(groupName);
           break;
         }
 
         if (node.name.startsWith("group\\/")) {
-          meta.groups ??= [];
-          if (Array.isArray(meta.groups)) {
-            groupName = `group/${node.name.split("\\/")[1]}`;
-            meta.groups.push(groupName);
-          }
+          groupName = `group/${node.name.split("\\/")[1]}`;
+          groups.push(groupName);
           break;
         }
 
@@ -306,7 +298,7 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
     ? selector.replaceAll(":children", "")
     : undefined;
 
-  return { selector, parentSelector };
+  return { selector, parentSelector, groups };
 }
 
 function flatten<T extends Record<string, unknown>>(objectArray: T[]): T {

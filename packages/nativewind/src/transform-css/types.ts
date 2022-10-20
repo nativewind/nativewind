@@ -16,7 +16,7 @@ export interface Atom {
   topicSubscription?: () => void;
   childClasses?: string[];
   parent?: string;
-  meta?: Record<string, boolean | string | string[]>;
+  meta?: Record<string, boolean | string>;
 }
 
 export interface SelectorMeta {
@@ -24,7 +24,6 @@ export interface SelectorMeta {
   conditions: string[];
   atRules: AtRuleTuple[];
   variables: Array<Record<string, VariableValue>>;
-  groups: string[];
 }
 
 export type Style = ViewStyle & TextStyle & ImageStyle;

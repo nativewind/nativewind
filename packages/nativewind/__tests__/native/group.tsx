@@ -17,9 +17,6 @@ testCompile("group-hover:text-black", (output) => {
     },
     "group-hover:text-black": {
       conditions: ["group:hover"],
-      meta: {
-        groups: ["group"],
-      },
       styles: [
         {
           color: "#000",
@@ -38,9 +35,6 @@ testCompile("group-hover/named:text-black", (output) => {
     },
     "group-hover/named:text-black": {
       conditions: ["group/named:hover"],
-      meta: {
-        groups: ["group/named"],
-      },
       styles: [
         {
           color: "#000",
