@@ -1,5 +1,0 @@
-{
-  "tailwindConfig": {
-    "content": ["./viewport-units/code.{js,ts,jsx,tsx}"]
-  }
-}

@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable unicorn/prefer-module */
 import { resolve } from "node:path";
-import resolveConfig from "tailwindcss/resolveConfig";
-import resolveConfigPath from "tailwindcss/lib/util/resolveConfigPath";
-import { validateConfig } from "tailwindcss/lib/util/validateConfig";
-import { normalizePath } from "./normalize-path";
+import { sep, posix } from "node:path";
 
 import type { ConfigAPI, NodePath, PluginPass, Visitor } from "@babel/core";
 import micromatch from "micromatch";
-import { addNamed, addSideEffect } from "@babel/helper-module-imports";
+import { addNamed } from "@babel/helper-module-imports";
 
 // import { getImportBlockedComponents } from "./get-import-blocked-components";
 // const allowModuleTransform = Array.isArray(options.allowModuleTransform)
@@ -37,20 +34,19 @@ import {
 } from "@babel/types";
 import { Config } from "tailwindcss";
 
-export interface PluginOptions {
-  isInContent?: boolean;
-  didTransform?: boolean;
+export interface StyledComponentTransformOptions {
   allowModuleTransform?: "*" | string[];
   blockModuleTransform?: string[];
   mode?: "compileAndTransform" | "compileOnly" | "transformOnly";
-  tailwindConfigPath?: string;
-  tailwindConfig?: Config | undefined;
   cwd: string;
+  tailwindConfig: Config;
 }
 
-export function plugin(api: ConfigAPI, options: PluginOptions) {
-  const { cwd = process.cwd() } = options;
-  const tailwindConfig = resolveTailwindConfig(api, options);
+export function styledComponentTransform(
+  _: ConfigAPI,
+  options: StyledComponentTransformOptions
+) {
+  const { cwd = process.cwd(), tailwindConfig } = options;
 
   const content = Array.isArray(tailwindConfig.content)
     ? tailwindConfig.content.filter(
@@ -66,57 +62,30 @@ export function plugin(api: ConfigAPI, options: PluginOptions) {
 
   const programVisitor: Visitor<
     PluginPass & {
-      opts: PluginOptions;
+      opts: StyledComponentTransformOptions;
+      isInContent?: boolean;
+      didTransform?: boolean;
     }
   > = {
     Program: {
-      enter(path, state) {
-        const filename = state.filename;
-        if (!filename) return;
-
+      enter(_, state) {
         state.blockList = new Set();
-        state.isInContent = micromatch.isMatch(
-          normalizePath(filename),
-          contentFilePaths
-        );
-
-        path.traverse({
-          ImportDeclaration(path) {
-            if (path.node.source.value.endsWith(".css")) {
-              path.remove();
-            }
-          },
-          CallExpression(path) {
-            const callee = path.get("callee");
-            if (!callee.isIdentifier() || !callee.equals("name", "require")) {
-              return;
-            }
-
-            const argument = path.get("arguments")[0];
-            if (!argument || !argument.isStringLiteral()) {
-              return;
-            }
-
-            if (argument.node.value.endsWith(".css")) {
-              path.remove();
-            }
-          },
-        });
       },
       exit(path, state) {
         if (state.didTransform) {
           addNamed(path, "StyledComponent", "nativewind");
         }
-
-        if (
-          state.filename?.endsWith("nativewind/dist/index.js") &&
-          process.env.NATIVEWIND_OUTPUT
-        ) {
-          addSideEffect(path, process.env.NATIVEWIND_OUTPUT);
-        }
       },
     },
     JSXElement(path, state) {
+      const filename = state.filename;
+      if (!filename) return;
+
+      state.isInContent ??= micromatch.isMatch(
+        normalizePath(filename),
+        contentFilePaths
+      );
+
       if (!state.isInContent || !state.filename) return;
 
       const blockList = state.blockList as Set<string>;
@@ -202,32 +171,13 @@ function someAttributes(path: NodePath<JSXElement>, names: string[]) {
   });
 }
 
-function resolveTailwindConfig(_: ConfigAPI, options: PluginOptions): Config {
-  let tailwindConfig: Config;
-
-  const userConfigPath = resolveConfigPath(
-    options.tailwindConfig || options.tailwindConfigPath
-  );
-
-  if (userConfigPath === null) {
-    tailwindConfig = resolveConfig(options.tailwindConfig);
-  } else {
-    delete require.cache[require.resolve(userConfigPath)];
-    const newConfig = resolveConfig(require(userConfigPath));
-    tailwindConfig = validateConfig(newConfig);
-  }
-
-  const hasPreset = tailwindConfig.presets?.some((preset) => {
-    return (
-      (typeof preset === "object" || typeof preset === "function") &&
-      ("nativewind" in preset ||
-        ("default" in preset && "nativewind" in preset["default"]))
-    );
-  });
-
-  if (!hasPreset) {
-    throw new Error("NativeWind preset was not included");
-  }
-
-  return tailwindConfig;
+export function normalizePath(filePath: string) {
+  /**
+   * This is my naive way to get path matching working on Windows.
+   * Basically I turn it into a posix path which seems to work fine
+   *
+   * If you are a windows user and understand micromatch, can you please send a PR
+   * to do this the proper way
+   */
+  return filePath.split(sep).join(posix.sep);
 }

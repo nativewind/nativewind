@@ -1,5 +1,0 @@
-{
-  "tailwindConfig": {
-    "content": ["./__tests__/babel/basic-require/code.{js,ts,jsx,tsx}"]
-  }
-}

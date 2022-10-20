@@ -16,7 +16,6 @@ const config: Config = {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   testPathIgnorePatterns: [
     "/node_modules/",
-    "/__tests__/babel/",
     "/__tests__/archive/",
     "/__tests__/test-utils.ts",
   ],
