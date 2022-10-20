@@ -1,9 +1,9 @@
-import { ComponentType, useEffect, useReducer } from "react";
+import { ComponentType, useEffect, useState } from "react";
 import { Platform } from "react-native";
 
 export function withExpoSnack(Component: ComponentType) {
   return () => {
-    const [, forceUpdate] = useReducer((x) => x + 1, 0);
+    const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
       if (Platform.OS === "web") {
@@ -11,10 +11,10 @@ export function withExpoSnack(Component: ComponentType) {
         const script = document.createElement("script");
         script.type = "text/javascript";
         script.src = "https://cdn.tailwindcss.com";
-        script.addEventListener("load", forceUpdate);
+        script.addEventListener("load", () => setLoaded(true));
         head.append(script);
       }
     }, []);
-    return <Component />;
+    return loaded ? <Component /> : undefined;
   };
 }
