@@ -1,8 +1,19 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable unicorn/prefer-module */
+import { resolve } from "node:path";
+import resolveConfig from "tailwindcss/resolveConfig";
+import resolveConfigPath from "tailwindcss/lib/util/resolveConfigPath";
+import { validateConfig } from "tailwindcss/lib/util/validateConfig";
+import { normalizePath } from "./normalize-path";
+
 import type { ConfigAPI, NodePath, PluginPass, Visitor } from "@babel/core";
 import micromatch from "micromatch";
 import { addNamed, addSideEffect } from "@babel/helper-module-imports";
 
-import { TailwindcssReactNativeBabelOptions } from ".";
+// import { getImportBlockedComponents } from "./get-import-blocked-components";
+// const allowModuleTransform = Array.isArray(options.allowModuleTransform)
+//   ? ["react-native", "react-native-web", ...options.allowModuleTransform]
+//   : "*";
 
 import {
   Expression,
@@ -24,16 +35,38 @@ import {
   jsxOpeningElement,
   memberExpression,
 } from "@babel/types";
-import { normalizePath } from "./normalize-path";
+import { Config } from "tailwindcss";
 
 export interface PluginOptions {
-  contentFilePaths: string[];
+  isInContent?: boolean;
+  didTransform?: boolean;
+  allowModuleTransform?: "*" | string[];
+  blockModuleTransform?: string[];
+  mode?: "compileAndTransform" | "compileOnly" | "transformOnly";
+  tailwindConfigPath?: string;
+  tailwindConfig?: Config | undefined;
+  cwd: string;
 }
 
-export function plugin(_: ConfigAPI, { contentFilePaths }: PluginOptions) {
+export function plugin(api: ConfigAPI, options: PluginOptions) {
+  const { cwd = process.cwd() } = options;
+  const tailwindConfig = resolveTailwindConfig(api, options);
+
+  const content = Array.isArray(tailwindConfig.content)
+    ? tailwindConfig.content.filter(
+        (filePath): filePath is string => typeof filePath === "string"
+      )
+    : tailwindConfig.content.files.filter(
+        (filePath): filePath is string => typeof filePath === "string"
+      );
+
+  const contentFilePaths = content.map((contentFilePath) =>
+    normalizePath(resolve(cwd, contentFilePath))
+  );
+
   const programVisitor: Visitor<
     PluginPass & {
-      opts: TailwindcssReactNativeBabelOptions;
+      opts: PluginOptions;
     }
   > = {
     Program: {
@@ -167,4 +200,34 @@ function someAttributes(path: NodePath<JSXElement>, names: string[]) {
       );
     });
   });
+}
+
+function resolveTailwindConfig(_: ConfigAPI, options: PluginOptions): Config {
+  let tailwindConfig: Config;
+
+  const userConfigPath = resolveConfigPath(
+    options.tailwindConfig || options.tailwindConfigPath
+  );
+
+  if (userConfigPath === null) {
+    tailwindConfig = resolveConfig(options.tailwindConfig);
+  } else {
+    delete require.cache[require.resolve(userConfigPath)];
+    const newConfig = resolveConfig(require(userConfigPath));
+    tailwindConfig = validateConfig(newConfig);
+  }
+
+  const hasPreset = tailwindConfig.presets?.some((preset) => {
+    return (
+      (typeof preset === "object" || typeof preset === "function") &&
+      ("nativewind" in preset ||
+        ("default" in preset && "nativewind" in preset["default"]))
+    );
+  });
+
+  if (!hasPreset) {
+    throw new Error("NativeWind preset was not included");
+  }
+
+  return tailwindConfig;
 }

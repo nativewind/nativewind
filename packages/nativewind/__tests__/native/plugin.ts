@@ -30,7 +30,7 @@ testCompile(
 );
 
 testCompile(
-  "text-apply",
+  "text-media-query",
   {
     config: {
       plugins: [
@@ -57,6 +57,24 @@ testCompile(
           1: [["--color-scheme", "dark"]],
         },
         topics: ["--color-scheme"],
+      },
+    });
+  }
+);
+
+testCompile(
+  "css-apply",
+  {
+    css: `
+    .css-apply {
+      @apply text-black
+    }
+    `,
+  },
+  (output) => {
+    expect(output).toStrictEqual({
+      "css-apply": {
+        styles: [{ color: "#000" }],
       },
     });
   }

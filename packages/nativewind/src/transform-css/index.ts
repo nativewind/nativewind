@@ -283,10 +283,10 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
   });
 
   const selector = tokens
+    .filter((token) => token !== ".dark")
     .join("")
     .trimStart()
     .replace(/^\./, "")
-    .replace(/^dark\s/, "")
     .replaceAll(/\\([\dA-Fa-f]{2}\s)/g, function (...args) {
       // Replace hex-string with their actual value
       // We need to do this before we remove slashes, otherwise we lose the hex values

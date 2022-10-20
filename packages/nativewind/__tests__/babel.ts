@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import pluginTester from "babel-plugin-tester";
-import plugin from "../src/babel";
+import { plugin } from "../src/babel/plugin";
 
 const fixtures = join(__dirname, "babel");
 
