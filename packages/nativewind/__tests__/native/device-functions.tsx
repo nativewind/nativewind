@@ -3,12 +3,14 @@ import { create } from "../test-utils";
 import {
   fontScale,
   fontScaleSelect,
+  getPixelSizeForLayoutSize,
   hairlineWidth,
   NativeWindStyleSheet,
   pixelRatio,
   pixelRatioSelect,
   platformColor,
   platformSelect,
+  roundToNearestPixel,
   styled,
 } from "../../src";
 
@@ -229,6 +231,81 @@ test("fontScaleSelect", () => {
             1: "1rem",
             2: "2rem",
             3: "3rem",
+          }),
+        },
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 32 },
+    },
+    {}
+  );
+});
+
+test("getPixelSizeForLayoutSize", () => {
+  create("text-test", {
+    config: {
+      theme: {
+        fontSize: {
+          test: getPixelSizeForLayoutSize(4),
+        },
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 8 },
+    },
+    {}
+  );
+});
+
+test("roundToNearestPixel", () => {
+  create("text-test", {
+    config: {
+      theme: {
+        fontSize: {
+          test: roundToNearestPixel(4.2),
+        },
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 4 },
+    },
+    {}
+  );
+});
+
+test("nested", () => {
+  create("text-test", {
+    config: {
+      theme: {
+        fontSize: {
+          test: platformSelect({
+            ios: roundToNearestPixel("var(--empty, 2rem)"),
+            default: 2,
           }),
         },
       },

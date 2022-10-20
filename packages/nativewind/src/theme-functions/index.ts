@@ -9,12 +9,12 @@ interface DeviceFunctions {
     specifics: Partial<Record<PlatformOSType | "default", string | number>>
   ) => any;
   platformColor: (...colors: string[]) => any;
-  pixelRatio: (value?: number) => any;
+  pixelRatio: (value?: number | string) => any;
   pixelRatioSelect: (values: Record<number, number | string>) => any;
-  fontScale: (value?: number) => any;
+  fontScale: (value?: number | string) => any;
   fontScaleSelect: (values: Record<number, number | string>) => any;
-  getPixelSizeForLayoutSize: (value: number) => any;
-  roundToNearestPixel: (value: number) => any;
+  getPixelSizeForLayoutSize: (value: number | string) => any;
+  roundToNearestPixel: (value: number | string) => any;
 }
 
 const {

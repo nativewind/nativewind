@@ -119,7 +119,9 @@ function parseFunction(node: FunctionNode, topics: string[]) {
     case "pixelRatio":
     case "pixelRatioSelect":
     case "fontScale":
-    case "fontScaleSelect": {
+    case "fontScaleSelect":
+    case "getPixelSizeForLayoutSize":
+    case "roundToNearestPixel": {
       const children = node.children
         .toArray()
         .map((child) => encodeValue(child, topics))

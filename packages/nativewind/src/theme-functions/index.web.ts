@@ -28,17 +28,17 @@ export function pixelRatioSelect(specifics: Record<string, number | string>) {
 
 export function fontScale(value?: number) {
   if (!value) return fontScaleValue;
-  return value * fontScaleValue;
+  return `calc(${value} * ${fontScaleValue})`;
 }
 
 export function fontScaleSelect(specifics: Record<string, number>) {
   return specifics["web"] ?? specifics["default"];
 }
 
-export function getPixelSizeForLayoutSize(n: number) {
-  return n * pixelScaleValue;
+export function getPixelSizeForLayoutSize(value: number) {
+  return `calc(${value} * ${pixelScaleValue})`;
 }
 
 export function roundToNearestPixel(n: number) {
-  return Math.round(n);
+  return n;
 }
