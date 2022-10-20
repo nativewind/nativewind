@@ -14,7 +14,7 @@ const noop = () => {
 
 if (typeof StyleSheet.create({ test: {} }).test !== "object") {
   // eslint-disable-next-line unicorn/prefer-type-error
-  throw new Error("NativeWind on web only supports React Native Web >=0.18");
+  throw new Error("NativeWind only supports React Native Web >=0.18");
 }
 
 export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
