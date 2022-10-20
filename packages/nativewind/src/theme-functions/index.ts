@@ -10,9 +10,9 @@ interface DeviceFunctions {
   ) => any;
   platformColor: (...colors: string[]) => any;
   pixelRatio: (value?: number) => any;
-  pixelRatioSelect: (values: Record<number, number>) => any;
+  pixelRatioSelect: (values: Record<number, number | string>) => any;
   fontScale: (value?: number) => any;
-  fontScaleSelect: (values: Record<number, number>) => any;
+  fontScaleSelect: (values: Record<number, number | string>) => any;
   getPixelSizeForLayoutSize: (value: number) => any;
   roundToNearestPixel: (value: number) => any;
 }

@@ -1,4 +1,10 @@
-import { StyleSheet, Platform, PixelRatio, ColorValue } from "react-native";
+import {
+  StyleSheet,
+  Platform,
+  PixelRatio,
+  ColorValue,
+  PlatformColor,
+} from "react-native";
 import { VariableValue } from "../../transform-css/types";
 import { variables } from "./runtime";
 
@@ -28,6 +34,13 @@ export function resolve(style?: VariableValue): ResolvedValue {
   if ("__TYPE__" in style) return style;
 
   const resolvedValues = style.values.map((value) => resolve(value));
+
+  if (style.function.startsWith("_")) {
+    return {
+      key: style.function.slice(1),
+      value: resolvedValues[0],
+    };
+  }
 
   switch (style.function) {
     case "inbuilt": {
@@ -64,29 +77,39 @@ export function resolve(style?: VariableValue): ResolvedValue {
       const specifics = toObject(resolvedValues);
       return Platform.select(specifics);
     }
-    // case "platformColor": {
-    //   return PlatformColor(
-    //     ...resolvedValues.filter(
-    //       (value): value is string => typeof value === "string"
-    //     )
-    //   );
-    // }
-    // case "pixelRatio": {
-    //   if (resolvedValues.length > 0) {
-    //     const specifics = resolveSpecifics(resolvedValues);
-    //     return specifics[PixelRatio.get()];
-    //   } else {
-    //     return PixelRatio.get();
-    //   }
-    // }
-    // case "fontScale": {
-    // if (resolvedValues.length > 0) {
-    //   const specifics = resolveSpecifics(resolvedValues);
-    //   return specifics[PixelRatio.getFontScale()];
-    // } else {
-    //   return PixelRatio.getFontScale();
-    // }
-    // }
+    case "platformColor": {
+      return PlatformColor(
+        ...resolvedValues.filter(
+          (value): value is string => typeof value === "string"
+        )
+      );
+    }
+    case "pixelRatio": {
+      const value = resolvedValues[0];
+      return typeof value === "number"
+        ? PixelRatio.get() * value
+        : PixelRatio.get();
+    }
+    case "pixelRatioSelect": {
+      const specifics = toObject(resolvedValues) as Record<
+        number,
+        ResolvedValue
+      >;
+      return specifics[PixelRatio.get()];
+    }
+    case "fontScale": {
+      const value = resolvedValues[0];
+      return typeof value === "number"
+        ? PixelRatio.getFontScale() * value
+        : PixelRatio.getFontScale();
+    }
+    case "fontScaleSelect": {
+      const specifics = toObject(resolvedValues) as Record<
+        number,
+        ResolvedValue
+      >;
+      return specifics[PixelRatio.getFontScale()];
+    }
     case "getPixelSizeForLayoutSize": {
       const value = resolvedValues[0];
       if (typeof value !== "number") return;

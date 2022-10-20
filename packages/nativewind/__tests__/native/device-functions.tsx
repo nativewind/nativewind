@@ -1,9 +1,12 @@
 import { render } from "@testing-library/react-native";
 import { create } from "../test-utils";
 import {
+  fontScale,
+  fontScaleSelect,
   hairlineWidth,
   NativeWindStyleSheet,
   pixelRatio,
+  pixelRatioSelect,
   platformColor,
   platformSelect,
   styled,
@@ -70,7 +73,7 @@ test("platformColor", () => {
     config: {
       theme: {
         colors: {
-          test: platformColor(),
+          test: platformColor("red", "blue"),
         },
       },
     },
@@ -83,13 +86,17 @@ test("platformColor", () => {
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: { fontSize: 16 },
+      style: {
+        color: {
+          semantic: ["red", "blue"],
+        },
+      },
     },
     {}
   );
 });
 
-test.skip("pixelRatio - get", () => {
+test("pixelRatio()", () => {
   create("text-test", {
     config: {
       theme: {
@@ -113,12 +120,36 @@ test.skip("pixelRatio - get", () => {
   );
 });
 
-test.skip("pixelRatio - specifics", () => {
+test("pixelRatio(2)", () => {
   create("text-test", {
     config: {
       theme: {
         fontSize: {
-          test: pixelRatio({
+          test: pixelRatio(2),
+        },
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 4 },
+    },
+    {}
+  );
+});
+
+test("pixelRatioSelect", () => {
+  create("text-test", {
+    config: {
+      theme: {
+        fontSize: {
+          test: pixelRatioSelect({
             1: "1rem",
             2: "2rem",
             3: "3rem",
@@ -141,19 +172,63 @@ test.skip("pixelRatio - specifics", () => {
   );
 });
 
-test.skip("nested", () => {
+test("fontScale()", () => {
   create("text-test", {
     config: {
       theme: {
         fontSize: {
-          // These tests run as ios with
-          // a pixelRatio of 2
-          test: platformSelect({
-            ios: pixelRatio({
-              1: "1rem",
-              2: `var(--empty-var, ${hairlineWidth()})`,
-            }),
-            default: 2,
+          test: fontScale(),
+        },
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 2 },
+    },
+    {}
+  );
+});
+
+test("fontScale(2)", () => {
+  create("text-test", {
+    config: {
+      theme: {
+        fontSize: {
+          test: fontScale(2),
+        },
+      },
+    },
+  });
+
+  const MyComponent = jest.fn();
+  const StyledComponent = styled(MyComponent);
+
+  render(<StyledComponent className="text-test" />);
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: { fontSize: 4 },
+    },
+    {}
+  );
+});
+
+test("fontScaleSelect", () => {
+  create("text-test", {
+    config: {
+      theme: {
+        fontSize: {
+          test: fontScaleSelect({
+            1: "1rem",
+            2: "2rem",
+            3: "3rem",
           }),
         },
       },

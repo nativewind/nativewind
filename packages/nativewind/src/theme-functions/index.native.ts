@@ -2,7 +2,11 @@ import type { PlatformOSType } from "react-native";
 
 function specificsToString(specifics: Record<string, unknown>) {
   return Object.entries(specifics)
-    .map(([key, value]) => `${key}(${value})`)
+    .map(([key, value]) => {
+      return Number.parseInt(key, 10)
+        ? `_${key}(${value})`
+        : `${key}(${value})`;
+    })
     .join(", ");
 }
 
@@ -16,16 +20,16 @@ export const platformSelect = (
   return `platformSelect(${specificsToString(specifics)})`;
 };
 
+export function platformColor(...colors: string[]) {
+  return `platformColor(${colors.join(", ")})`;
+}
+
 export function pixelRatio(value?: number) {
-  return `pixelRatio(${value})`;
+  return `pixelRatio(${value ?? ""})`;
 }
 
 export function pixelRatioSelect(specifics: Record<string, number | string>) {
-  return `fontScaleSelect(${specificsToString(specifics)})`;
-}
-
-export function platformColor(colors: string[]) {
-  return `platformColor(${colors.join(", ")})`;
+  return `pixelRatioSelect(${specificsToString(specifics)})`;
 }
 
 export function fontScale(value?: number) {

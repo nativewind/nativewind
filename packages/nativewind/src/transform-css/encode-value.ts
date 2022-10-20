@@ -94,6 +94,18 @@ export function encodeValue(
 }
 
 function parseFunction(node: FunctionNode, topics: string[]) {
+  if (node.name.startsWith("_")) {
+    const children = node.children
+      .toArray()
+      .map((child) => encodeValue(child, topics))
+      .filter(Boolean);
+
+    return {
+      function: node.name,
+      values: children as unknown as VariableValue[],
+    };
+  }
+
   switch (node.name) {
     case "ios":
     case "android":
@@ -101,10 +113,13 @@ function parseFunction(node: FunctionNode, topics: string[]) {
     case "macos":
     case "web":
     case "default":
-    case "pixelRatio":
+    case "hairlineWidth":
     case "platformSelect":
     case "platformColor":
-    case "hairlineWidth": {
+    case "pixelRatio":
+    case "pixelRatioSelect":
+    case "fontScale":
+    case "fontScaleSelect": {
       const children = node.children
         .toArray()
         .map((child) => encodeValue(child, topics))
