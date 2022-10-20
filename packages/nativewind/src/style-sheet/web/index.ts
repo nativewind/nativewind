@@ -1,3 +1,4 @@
+import { StyleSheet } from "react-native";
 import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../index";
 import { setVariables } from "./runtime";
 import {
@@ -10,6 +11,11 @@ import { useVariable } from "./use-variable";
 const noop = () => {
   return;
 };
+
+if (typeof StyleSheet.create({ test: {} }).test !== "object") {
+  // eslint-disable-next-line unicorn/prefer-type-error
+  throw new Error("NativeWind on web only supports React Native Web >=0.18");
+}
 
 export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   create: noop,
