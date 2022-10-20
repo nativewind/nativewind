@@ -29,17 +29,17 @@ testCompile("group-hover:text-black", (output) => {
   });
 });
 
-testCompile("group-hover/sidebar:text-black", (output) => {
+testCompile("group-hover/named:text-black", (output) => {
   expect(output).toStrictEqual({
-    "group/sidebar": {
+    "group/named": {
       meta: {
-        group: "group/sidebar",
+        group: "group/named",
       },
     },
-    "group-hover/sidebar:text-black": {
-      conditions: ["group/sidebar:hover"],
+    "group-hover/named:text-black": {
+      conditions: ["group/named:hover"],
       meta: {
-        groups: ["group/sidebar"],
+        groups: ["group/named"],
       },
       styles: [
         {
