@@ -16,13 +16,22 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
-      - name: Snack body
+      - name: Generate files
+        id: files
+        run: |
+          echo "files=$(echo '{
+            "App.tsx": {
+              type: "CODE",
+              contents: "console.log('hello world!');"
+            },
+          }' | jq -sRr @uri)" >> $GITHUB_OUTPUT
+      - name: Comment
         id: body
         working-directory: ./packages/nativewind
         run: |
           echo "MY_STRING=$(cat << EOF
           Version: $(jq -r .version package.json)
-          Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=
+          Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=${{ steps.files.output.files }} 
           EOF
           )"
 
