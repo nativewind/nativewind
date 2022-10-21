@@ -21,10 +21,10 @@ jobs:
         run: |
           echo "files=$(echo '{
             "App.tsx": {
-              type: "CODE",
-              contents: "console.log('hello world!');"
-            },
-          }' | jq -sRr @uri)" >> $GITHUB_OUTPUT
+              "type": "CODE",
+              "contents": "console.log('hello world!');"
+            }
+          }' | tr --delete '\n' | jq -sRr @uri)" >> $GITHUB_OUTPUT
       - name: Comment
         id: body
         working-directory: ./packages/nativewind
