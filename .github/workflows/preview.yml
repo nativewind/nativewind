@@ -75,7 +75,6 @@ jobs:
           }' | tr --delete '\n' | jq -sRr @uri)" >> $GITHUB_OUTPUT
       - name: Create comment body
         id: body
-        working-directory: ./packages/nativewind
         run: |
           echo "body=$(cat << EOF
           Version: ${{ needs.Publish-Preview.outputs.version }}
