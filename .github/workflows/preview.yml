@@ -54,7 +54,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Snackager
-        run: sleep 45 && curl "https://snackager.expo.io/bundle/nativewind@$(npm pkg get version)?platforms=ios,android,web&version_snackager=true&bypassCache=true" --retry 5
+        run: sleep 45 && curl "https://snackager.expo.io/bundle/nativewind@$(jq -r .version package.json)?platforms=ios,android,web&version_snackager=true&bypassCache=true" --retry 5
 
   Expo-Snack:
     runs-on: ubuntu-latest
