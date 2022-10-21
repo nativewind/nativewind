@@ -11,64 +11,97 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  Deploy-Preview:
-    runs-on: ubuntu-latest
-    outputs:
-      vercel_url: ${{ steps.deploy.outputs.vercel_url }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Build Project Artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Deploy Project Artifacts to Vercel
-        id: deploy
-        run: echo "vercel_url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
-
-  Publish-Preview:
+  Expo-Snack2:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-      - name: Setup Node.js 16.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-          cache: "npm"
-          registry-url: "https://registry.npmjs.org"
-      - name: Install Dependencies
-        run: npm install
-      - name: Build project
-        run: npm run build
-      - name: Test project
-        run: npm test
-      - name: Copy readme
-        run: cp README.md packages/nativewind/
-      - name: Version
+      - name: Snack body
+        id: body
         working-directory: ./packages/nativewind
-        run: npm version prerelease --preid $(git describe --tags --always) --no-git-tag-version
-      - name: Publish
-        working-directory: ./packages/nativewind
-        run: npm publish --tag preview
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Snackager
-        run: sleep 45 && curl "https://snackager.expo.io/bundle/nativewind@$(jq -r .version package.json)?platforms=ios,android,web&version_snackager=true&bypassCache=true" --retry 5
+        run: |
+          echo "MY_STRING=$(cat << EOF
+          Version: $(jq -r .version package.json)
+          Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=
+          EOF
+          )"
 
-  Expo-Snack:
-    runs-on: ubuntu-latest
-    needs: [Deploy-Preview, Publish-Preview]
-    steps:
-      - name:
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.rest.repos.createCommitComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: "${{ github.sha }}",
-              body: "${{ needs.Deploy-Preview.outputs.vercel_url }}"
-            })
+  # Deploy-Preview:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     vercel_url: ${{ steps.deploy.outputs.vercel_url }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Install Vercel CLI
+  #       run: npm install --global vercel@latest
+  #     - name: Pull Vercel Environment Information
+  #       run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+  #     - name: Build Project Artifacts
+  #       run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+  #     - name: Deploy Project Artifacts to Vercel
+  #       id: deploy
+  #       run: echo "vercel_url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+
+  # Publish-Preview:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v3
+  #     - name: Setup Node.js 16.x
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: "16"
+  #         cache: "npm"
+  #         registry-url: "https://registry.npmjs.org"
+  #     - name: Install Dependencies
+  #       run: npm install
+  #     - name: Build project
+  #       run: npm run build
+  #     - name: Test project
+  #       run: npm test
+  #     - name: Copy readme
+  #       run: cp README.md packages/nativewind/
+  #     - name: Version
+  #       working-directory: ./packages/nativewind
+  #       run: npm version prerelease --preid $(git describe --tags --always) --no-git-tag-version
+  #     - name: Publish
+  #       working-directory: ./packages/nativewind
+  #       run: npm publish --tag preview
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  #     - name: Snackager
+  #       run: sleep 45 && curl "https://snackager.expo.io/bundle/nativewind@$(jq -r .version package.json)?platforms=ios,android,web&version_snackager=true&bypassCache=true" --retry 5
+
+  # Expo-Snack:
+  #   runs-on: ubuntu-latest
+  #   needs: [Deploy-Preview, Publish-Preview]
+  #   steps:
+  #     - name: Snack body
+  #       id: body
+  #       working-directory: ./packages/nativewind
+  #       run: |
+  #         echo "MY_STRING=$(cat << EOF
+  #         Version: $(jq -r .version package.json)
+  #         Docs: ${{ needs.Deploy-Preview.outputs.vercel_url }}
+  #         Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=
+  #         EOF
+  #         )" >> $GITHUB_OUTPUT
+  #     - name: Create comment body
+  #       id: body
+  #       working-directory: ./packages/nativewind
+  #       run: |
+  #         echo "MY_STRING=$(cat << EOF
+  #         Version: $(jq -r .version package.json)
+  #         Docs: ${{ needs.Deploy-Preview.outputs.vercel_url }}
+  #         Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=
+  #         EOF
+  #         )" >> $GITHUB_OUTPUT
+  #     - name: Create comment
+  #       uses: actions/github-script@v6
+  #       with:
+  #         github-token: ${{secrets.GITHUB_TOKEN}}
+  #         script: |
+  #           github.rest.repos.createCommitComment({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             commit_sha: "${{ github.sha }}",
+  #             body: ""
+  #           })
