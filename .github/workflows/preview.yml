@@ -44,6 +44,8 @@ jobs:
         run: npm test
       - name: Copy readme
         run: cp README.md packages/nativewind/
+      - name: Change directory
+        run: cd packages/nativewind
       - name: Version
         run: npm version prerelease --preid $(git describe --tags --always) --no-git-tag-version
       - name: Publish
