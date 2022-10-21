@@ -53,6 +53,49 @@ export function withExpoSnack(
       }
     }, [loaded, css]);
 
+    useEffect(() => {
+      if (Platform.OS !== "web") {
+        // NativeWindStyleSheet.__dangerouslyCompileStyles(
+        //   (className, callback) => {
+        //     return styleFetcher(className, config, css, callback);
+        //   }
+        // );
+      }
+    }, []);
+
     return loaded ? <Component /> : undefined;
   };
 }
+
+// const styleFetcher = debounce(
+//   (className: string, config: Config, css: string, callback: () => void) => {
+//     const url = new URL(
+//       (global as any).NATIVEWIND_COMPILE_URL ??
+//         "https://nativewind-demo-compiler.vercel.app/api/compile"
+//     );
+//     url.searchParams.set("className", className);
+//     if (css) url.searchParams.set("css", css);
+//     if (config) url.searchParams.set("config", JSON.stringify(config));
+
+//     fetch(url)
+//       .then((response) => response.json())
+//       .then(({ body }) => {
+//         NativeWindStyleSheet.create(body);
+//         callback();
+//       })
+//       .catch((error) => {
+//         console.error(error);
+//       });
+//   }
+// );
+
+// // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// function debounce(callback: (...args: any[]) => void, timeout = 300) {
+//   let timer: NodeJS.Timeout;
+//   return (...args: unknown[]) => {
+//     clearTimeout(timer);
+//     timer = setTimeout(() => {
+//       callback(...args);
+//     }, timeout);
+//   };
+// }

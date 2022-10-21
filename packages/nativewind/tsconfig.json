@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "noEmit": true
+    "noEmit": true,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*", "__tests__/**/*", "types.d.ts"],
   "exclude": ["__tests__/babel/**/output.tsx"]
