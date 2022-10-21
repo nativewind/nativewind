@@ -81,17 +81,19 @@ jobs:
       - name: Create comment body
         id: body
         run: |
-          echo "body=$(echo "Version: ${{ needs.Publish-Preview.outputs.version }}
-          Docs: ${{ needs.Deploy-Preview.outputs.vercel_url }}
-          Snack: https://snack.expo.dev?dependencies=nativewind%40${{ needs.Publish-Preview.outputs.version }}&files=${{ steps.files.outputs.files }}")" >> $GITHUB_OUTPUT
       - name: Create comment
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            const body = `
+              Version: ${{ needs.Publish-Preview.outputs.version }}
+              Docs: ${{ needs.Deploy-Preview.outputs.vercel_url }}
+              Snack: https://snack.expo.dev?dependencies=nativewind%40${{ needs.Publish-Preview.outputs.version }}&files=${{ steps.files.outputs.files }}
+            `;
             github.rest.repos.createCommitComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               commit_sha: "${{ github.sha }}",
-              body: "${{ steps.body.outputs.body }}"
+              body
             })
