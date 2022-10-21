@@ -36,6 +36,7 @@ jobs:
         with:
           node-version: "16"
           cache: "npm"
+          registry-url: "https://registry.npmjs.org"
       - name: Install Dependencies
         run: npm install
       - name: Build project
