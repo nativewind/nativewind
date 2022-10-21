@@ -32,22 +32,22 @@ export function withExpoSnack(
     }, []);
 
     useEffect(() => {
-      if (Platform.OS === "web" && config) {
+      if (loaded && Platform.OS === "web" && config) {
         const configScript = document.querySelectorAll(
           "#nativewind_config"
         )[0] as HTMLScriptElement;
         configScript.text = `tailwind.config = ${JSON.stringify(config)}`;
       }
-    }, [config]);
+    }, [loaded, config]);
 
     useEffect(() => {
-      if (Platform.OS === "web" && css) {
+      if (loaded && Platform.OS === "web" && css) {
         const cssStyle = document.querySelectorAll(
           "#nativewind_css"
         )[0] as HTMLStyleElement;
         cssStyle.replaceChildren(document.createTextNode(css));
       }
-    }, [css]);
+    }, [loaded, css]);
 
     return loaded ? <Component /> : undefined;
   };
