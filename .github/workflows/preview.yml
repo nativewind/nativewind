@@ -31,7 +31,7 @@ jobs:
         run: |
           echo "MY_STRING=$(cat << EOF
           Version: $(jq -r .version package.json)
-          Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=${{ steps.files.output.files }} 
+          Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=${{ steps.files.outputs.files }} 
           EOF
           )"
 
