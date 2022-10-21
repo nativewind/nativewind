@@ -13,6 +13,7 @@ export function withExpoSnack(
     useEffect(() => {
       if (Platform.OS === "web") {
         if (document.querySelectorAll("#nativewind_cdn").length > 0) {
+          setLoaded(true);
           return;
         }
 
