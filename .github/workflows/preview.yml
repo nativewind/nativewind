@@ -14,7 +14,7 @@ jobs:
   Deploy-Preview:
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.deploy.outputs.vercel_url }}
+      vercel_url: ${{ steps.deploy.outputs.vercel_url }}
     steps:
       - uses: actions/checkout@v2
       - name: Install Vercel CLI
