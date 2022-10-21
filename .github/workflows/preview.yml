@@ -45,9 +45,9 @@ jobs:
         run: npm test
       - name: Copy readme
         run: cp README.md packages/nativewind/
-      - run: echo "$(git describe --tags)"
+      - run: echo "$(git describe --tags --always)"
       - name: Version
-        run: npm version $(git describe --tags) --no-git-tag-version
+        run: npm version $(git describe --tags --always) --no-git-tag-version
       # - name: Publish
       #   run: npm publish --tag preview
       #   env:
@@ -67,6 +67,6 @@ jobs:
             github.rest.repos.createCommitComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              commit_sha: $GITHUB_SHA,
+              commit_sha: ${{ GITHUB_SHA }},
               body: "${{ needs.Deploy-Preview.outputs.vercel_url }}"
             })
