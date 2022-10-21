@@ -67,6 +67,6 @@ jobs:
             github.rest.repos.createCommitComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              commit_sha: ${{ GITHUB_SHA }},
+              commit_sha: "$GITHUB_SHA",
               body: "${{ needs.Deploy-Preview.outputs.vercel_url }}"
             })
