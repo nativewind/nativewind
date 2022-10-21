@@ -11,45 +11,45 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  Expo-Snack2:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-      - name: Generate files
-        id: files
-        run: |
-          echo "files=$(echo '{
-            "App.tsx": {
-              "type": "CODE",
-              "contents": "console.log('hello world!');"
-            }
-          }' | tr --delete '\n' | jq -sRr @uri)" >> $GITHUB_OUTPUT
-      - name: Comment
-        id: body
-        working-directory: ./packages/nativewind
-        run: |
-          echo "MY_STRING=$(cat << EOF
-          Version: $(jq -r .version package.json)
-          Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=${{ steps.files.outputs.files }} 
-          EOF
-          )"
-
-  # Deploy-Preview:
+  # Expo-Snack2:
   #   runs-on: ubuntu-latest
-  #   outputs:
-  #     vercel_url: ${{ steps.deploy.outputs.vercel_url }}
   #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Install Vercel CLI
-  #       run: npm install --global vercel@latest
-  #     - name: Pull Vercel Environment Information
-  #       run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-  #     - name: Build Project Artifacts
-  #       run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-  #     - name: Deploy Project Artifacts to Vercel
-  #       id: deploy
-  #       run: echo "vercel_url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v3
+  #     - name: Generate files
+  #       id: files
+  #       run: |
+  #         echo "files=$(echo '{
+  #           "App.tsx": {
+  #             "type": "CODE",
+  #             "url": "https://mysite/data.json"
+  #           }
+  #         }' | tr --delete '\n' | jq -sRr @uri)" >> $GITHUB_OUTPUT
+  #     - name: Comment
+  #       id: body
+  #       working-directory: ./packages/nativewind
+  #       run: |
+  #         echo "MY_STRING=$(cat << EOF
+  #         Version: $(jq -r .version package.json)
+  #         Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=${{ steps.files.outputs.files }}
+  #         EOF
+  #         )"
+
+  Deploy-Preview:
+    runs-on: ubuntu-latest
+    outputs:
+      vercel_url: ${{ steps.deploy.outputs.vercel_url }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        id: deploy
+        run: echo "vercel_url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
 
   # Publish-Preview:
   #   runs-on: ubuntu-latest
