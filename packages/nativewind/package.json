@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-next.1-156-g7b485ec",
+  "version": "3.0.0-next.1-157-g6af2ae7",
   "name": "nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "main": "dist/index.js",

@@ -12,8 +12,13 @@ export function withExpoSnack(
 
     useEffect(() => {
       if (Platform.OS === "web") {
+        if (document.querySelectorAll("#nativewind_cdn").length > 0) {
+          return;
+        }
+
         const head = document.querySelectorAll("head")[0];
         const playCDN = document.createElement("script");
+        playCDN.id = "nativewind_cdn";
         playCDN.type = "text/javascript";
         playCDN.src = "https://cdn.tailwindcss.com";
         playCDN.addEventListener("load", () => setLoaded(true));
@@ -33,10 +38,8 @@ export function withExpoSnack(
 
     useEffect(() => {
       if (loaded && Platform.OS === "web" && config) {
-        const configScript = document.querySelectorAll(
-          "#nativewind_config"
-        )[0] as HTMLScriptElement;
-        configScript.text = `tailwind.config = ${JSON.stringify(config)}`;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (window as any).tailwind.config = config;
       }
     }, [loaded, config]);
 
