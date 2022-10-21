@@ -70,7 +70,7 @@ jobs:
           echo "files=$(echo '{
             "App.tsx": {
               "type": "CODE",
-              "url": "https://mysite/data.json"
+              "url": "${{ needs.Deploy-Preview.outputs.vercel_url }}/expo-snack-template.ts"
             }
           }' | tr --delete '\n' | jq -sRr @uri)" >> $GITHUB_OUTPUT
       - name: Create comment body
