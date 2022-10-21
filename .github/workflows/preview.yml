@@ -7,6 +7,9 @@ on:
     branches-ignore:
       - main
       - renovate/*
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   Deploy-Preview:
     runs-on: ubuntu-latest
@@ -42,12 +45,15 @@ jobs:
         run: npm test
       - name: Copy readme
         run: cp README.md packages/nativewind/
+      - run: echo "$(git describe --tags)"
       - name: Version
         run: npm version $(git describe --tags) --no-git-tag-version
-      - name: Publish
-        run: npm publish --tag preview
-      - name: Snackager
-        run: sleep 45 && curl "https://snackager.expo.io/bundle/nativewind@$(git describe --tags)?platforms=ios,android,web&version_snackager=true&bypassCache=true" --retry 5
+      # - name: Publish
+      #   run: npm publish --tag preview
+      #   env:
+      # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # - name: Snackager
+      #   run: sleep 45 && curl "https://snackager.expo.io/bundle/nativewind@$(git describe --tags)?platforms=ios,android,web&version_snackager=true&bypassCache=true" --retry 5
 
   Expo-Snack:
     runs-on: ubuntu-latest
