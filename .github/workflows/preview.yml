@@ -24,7 +24,6 @@ jobs:
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
-        id: deploy
         run: echo "vercel_url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
 
   Publish-Preview:
@@ -45,15 +44,14 @@ jobs:
         run: npm test
       - name: Copy readme
         run: cp README.md packages/nativewind/
-      - run: echo "$(git describe --tags --always)"
       - name: Version
-        run: npm version $(git describe --tags --always) --no-git-tag-version
-      # - name: Publish
-      #   run: npm publish --tag preview
-      #   env:
-      # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      # - name: Snackager
-      #   run: sleep 45 && curl "https://snackager.expo.io/bundle/nativewind@$(git describe --tags)?platforms=ios,android,web&version_snackager=true&bypassCache=true" --retry 5
+        run: npm version prerelease --preid $(git describe --tags --always) --no-git-tag-version
+      - name: Publish
+        run: npm publish --tag preview
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Snackager
+        run: sleep 45 && curl "https://snackager.expo.io/bundle/nativewind@$(npm pkg get version)?platforms=ios,android,web&version_snackager=true&bypassCache=true" --retry 5
 
   Expo-Snack:
     runs-on: ubuntu-latest
