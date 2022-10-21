@@ -2,8 +2,7 @@
 const postcss = require("postcss");
 const tailwind = require("tailwindcss");
 const nativewindPreset = require("nativewind/dist/tailwind/native");
-
-const { getCreateOptions } = require("../dist/transform-css");
+const { getCreateOptions } = require("nativewind/dist/transform-css");
 
 export default async function handler(request, response) {
   try {
