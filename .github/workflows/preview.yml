@@ -44,11 +44,11 @@ jobs:
         run: npm test
       - name: Copy readme
         run: cp README.md packages/nativewind/
-      - name: Change directory
-        run: cd packages/nativewind
       - name: Version
+        working-directory: ./packages/nativewind
         run: npm version prerelease --preid $(git describe --tags --always) --no-git-tag-version
       - name: Publish
+        working-directory: ./packages/nativewind
         run: npm publish --tag preview
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
