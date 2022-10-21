@@ -22,7 +22,6 @@ jobs:
         id: deploy
         run: echo "vercel_url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
       - name:
-        if: always() && (steps.prettier.outcome == 'failure')
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
