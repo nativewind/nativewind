@@ -16,7 +16,6 @@ jobs:
     steps:
       - name: Snack body
         id: body
-        working-directory: ./packages/nativewind
         run: |
           echo "MY_STRING=$(cat << EOF
           Version: $(jq -r .version package.json)
