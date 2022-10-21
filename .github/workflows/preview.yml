@@ -11,30 +11,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  # Expo-Snack2:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Repo
-  #       uses: actions/checkout@v3
-  #     - name: Generate files
-  #       id: files
-  #       run: |
-  #         echo "files=$(echo '{
-  #           "App.tsx": {
-  #             "type": "CODE",
-  #             "url": "https://mysite/data.json"
-  #           }
-  #         }' | tr --delete '\n' | jq -sRr @uri)" >> $GITHUB_OUTPUT
-  #     - name: Comment
-  #       id: body
-  #       working-directory: ./packages/nativewind
-  #       run: |
-  #         echo "MY_STRING=$(cat << EOF
-  #         Version: $(jq -r .version package.json)
-  #         Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=${{ steps.files.outputs.files }}
-  #         EOF
-  #         )"
-
   Deploy-Preview:
     runs-on: ubuntu-latest
     outputs:
@@ -80,39 +56,39 @@ jobs:
   #         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   #     - name: Snackager
   #       run: sleep 45 && curl "https://snackager.expo.io/bundle/nativewind@$(jq -r .version package.json)?platforms=ios,android,web&version_snackager=true&bypassCache=true" --retry 5
-
-  # Expo-Snack:
-  #   runs-on: ubuntu-latest
-  #   needs: [Deploy-Preview, Publish-Preview]
-  #   steps:
-  #     - name: Snack body
-  #       id: body
-  #       working-directory: ./packages/nativewind
-  #       run: |
-  #         echo "MY_STRING=$(cat << EOF
-  #         Version: $(jq -r .version package.json)
-  #         Docs: ${{ needs.Deploy-Preview.outputs.vercel_url }}
-  #         Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=
-  #         EOF
-  #         )" >> $GITHUB_OUTPUT
-  #     - name: Create comment body
-  #       id: body
-  #       working-directory: ./packages/nativewind
-  #       run: |
-  #         echo "MY_STRING=$(cat << EOF
-  #         Version: $(jq -r .version package.json)
-  #         Docs: ${{ needs.Deploy-Preview.outputs.vercel_url }}
-  #         Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=
-  #         EOF
-  #         )" >> $GITHUB_OUTPUT
-  #     - name: Create comment
-  #       uses: actions/github-script@v6
-  #       with:
-  #         github-token: ${{secrets.GITHUB_TOKEN}}
-  #         script: |
-  #           github.rest.repos.createCommitComment({
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             commit_sha: "${{ github.sha }}",
-  #             body: ""
-  #           })
+  #
+  Expo-Snack:
+    runs-on: ubuntu-latest
+    # needs: [Deploy-Preview, Publish-Preview]
+    needs: [Deploy-Preview]
+    steps:
+      - name: Generate files
+        id: files
+        run: |
+          echo "files=$(echo '{
+            "App.tsx": {
+              "type": "CODE",
+              "url": "https://mysite/data.json"
+            }
+          }' | tr --delete '\n' | jq -sRr @uri)" >> $GITHUB_OUTPUT
+      - name: Create comment body
+        id: body
+        working-directory: ./packages/nativewind
+        run: |
+          echo "body=$(cat << EOF
+          Version: $(jq -r .version package.json)
+          Docs: ${{ needs.Deploy-Preview.outputs.vercel_url }}
+          Snack: https://snack.expo.dev?dependencies=nativewind%40$(jq -r .version package.json)&files=${{ steps.files.outputs.files }}
+          EOF
+          )" >> $GITHUB_OUTPUT
+      - name: Create comment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: "${{ github.sha }}",
+              body: "${{ steps.body.outputs.body }}"
+            })
