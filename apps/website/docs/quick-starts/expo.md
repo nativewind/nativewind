@@ -68,7 +68,10 @@ When running on web, NativeWind is a compatability layer between [Tailwind CSS](
 
 You will need follow a [Tailwind CSS installation guide](https://tailwindcss.com/docs/installation) and ensure NativeWind is transpiled.
 
+
 ### Example webpack setup
+
+A complete setup can be found on the [Expo project example](https://github.com/marklawlor/nativewind/tree/next/examples/expo) 
 
 :::caution
 
