@@ -9,6 +9,8 @@ export default async function handler(request, response) {
     const classNames = request.query.classNames ?? "";
     const config = request.query.config ? JSON.parse(request.query.config) : {};
 
+    console.log(nativewindPreset);
+
     const output = postcss([
       tailwind({
         ...config,
