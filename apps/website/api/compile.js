@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/prefer-module, @typescript-eslint/no-var-requires */
 const postcss = require("postcss");
 const tailwind = require("tailwindcss");
-const nativePreset = require("nativewind/dist/tailwind/native");
+const nativePreset = require("nativewind/dist/tailwind/native").default;
 const nativewindJSON = require("nativewind/package.json");
 const { getCreateOptions } = require("nativewind/dist/transform-css");
 
