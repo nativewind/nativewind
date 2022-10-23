@@ -7,8 +7,8 @@ const preset =
 function presetFactory({
   platform = process.env.NATIVEWIND_PLATFORM,
 }: Record<string, unknown> = {}) {
-  if (platform === "native") return require("./native");
-  return require("./web");
+  if (platform === "native") return require("./native").default;
+  return require("./web").default;
 }
 
 export default Object.assign(presetFactory, preset);
