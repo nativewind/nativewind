@@ -9,6 +9,7 @@ import {
   toggleColorScheme,
 } from "./color-scheme";
 import { useVariable } from "./use-variable";
+import { __dangerouslyCompileStyles } from "../../styled/native/runtime";
 
 export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   create,
@@ -19,7 +20,7 @@ export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   setVariables,
   setDimensions,
   useVariable,
-  // setDangerouslyCompileStyles: context.setDangerouslyCompileStyles,
+  __dangerouslyCompileStyles,
 };
 
 function __reset() {

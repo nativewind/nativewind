@@ -28,9 +28,7 @@ export default async function handler(request, response) {
     const compiled = getCreateOptions(output);
     console.log(compiled);
 
-    response.status(200).json({
-      body: compiled,
-    });
+    response.status(200).json(compiled);
   } catch (error) {
     response.status(400).json({
       body: { error: error.message },

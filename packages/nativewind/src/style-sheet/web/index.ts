@@ -26,4 +26,5 @@ export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   setVariables,
   setDimensions: noop,
   useVariable,
+  __dangerouslyCompileStyles: noop,
 };

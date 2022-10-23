@@ -18,7 +18,7 @@ export interface NativeWindStyleSheet {
   useVariable: <T extends VariableValue>(
     name: `--${string}`
   ) => [T, (value: T) => void];
-  // setDangerouslyCompileStyles: context.setDangerouslyCompileStyles,
+  __dangerouslyCompileStyles: (callback: (className: string) => void) => void;
 }
 
 export declare const NativeWindStyleSheet: NativeWindStyleSheet;
