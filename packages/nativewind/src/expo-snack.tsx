@@ -13,7 +13,7 @@ export function withExpoSnack(
   css?: string
 ) {
   return () => {
-    const [loaded, setLoaded] = useState(false);
+    const [loaded, setLoaded] = useState(Platform.OS !== "web");
 
     useEffect(() => {
       if (Platform.OS === "web") {
