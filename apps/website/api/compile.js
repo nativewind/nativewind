@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/prefer-module, @typescript-eslint/no-var-requires */
 const postcss = require("postcss");
 const tailwind = require("tailwindcss");
-const { nativePlugin } = require("nativewind/dist/tailwind/native");
+const nativePreset = require("nativewind/dist/tailwind/native");
 const nativewindJSON = require("nativewind/package.json");
 const { getCreateOptions } = require("nativewind/dist/transform-css");
 
@@ -11,13 +11,13 @@ export default async function handler(request, response) {
     const config = request.query.config ? JSON.parse(request.query.config) : {};
 
     console.log(nativewindJSON);
-    console.log(nativePlugin);
+    console.log(nativePreset);
 
     const output = postcss([
       tailwind({
         ...config,
         content: [],
-        presets: [nativePlugin],
+        presets: [nativePreset],
         safelist: [...classNames.split(" "), ...(config?.safelist ?? [])],
       }),
     ]).process(
