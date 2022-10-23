@@ -1,8 +1,8 @@
-/* eslint-disable unicorn/prefer-module */
+/* eslint-disable unicorn/prefer-module,@typescript-eslint/no-var-requires */
 const preset =
   process.env.NATIVEWIND_PLATFORM === "native"
-    ? require("./native")
-    : require("./web");
+    ? require("./native").default
+    : require("./web").default;
 
 function presetFactory({
   platform = process.env.NATIVEWIND_PLATFORM,
