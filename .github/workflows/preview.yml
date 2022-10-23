@@ -26,14 +26,6 @@ jobs:
       - name: Deploy Project Artifacts to Vercel
         id: deploy
         run: echo "vercel_url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
-      - name: Test
-        run: pwd
-      - name: Test
-        run: cat ./node_modules/nativewind/package.json
-      - name: Test
-        working-directory: ./apps/website
-        run: cat ./node_modules/nativewind/package.json
-
   Publish-Preview:
     runs-on: ubuntu-latest
     outputs:
