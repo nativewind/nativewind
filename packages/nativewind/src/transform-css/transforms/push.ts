@@ -16,7 +16,7 @@ export function pushStyle(
 ) {
   if (!node) return;
 
-  let value = encodeValue(node, meta.topics);
+  let value = encodeValue(node, meta.subscriptions);
   if (forceString) value = value?.toString();
 
   if (value === undefined || value === null) return;

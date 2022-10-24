@@ -334,7 +334,7 @@ testCompile(
             },
           },
         ],
-        topics: ["--rem"],
+        subscriptions: ["--rem"],
       },
       "bg-black": {
         styles: [
@@ -392,7 +392,7 @@ testCompile(
             maxWidth: 1536,
           },
         ],
-        topics: ["--device-width"],
+        subscriptions: ["--device-width"],
       },
       "content-around": {
         styles: [
@@ -542,7 +542,7 @@ testCompile(
             },
           },
         ],
-        topics: ["--rem"],
+        subscriptions: ["--rem"],
       },
       hidden: {
         styles: [
@@ -572,7 +572,7 @@ testCompile(
             },
           },
         ],
-        topics: ["--rem"],
+        subscriptions: ["--rem"],
       },
       italic: {
         styles: [
@@ -625,7 +625,7 @@ testCompile(
             },
           },
         ],
-        topics: ["--rem"],
+        subscriptions: ["--rem"],
       },
       "leading-tight": {
         styles: [
@@ -643,7 +643,7 @@ testCompile(
             },
           },
         ],
-        topics: ["--rem"],
+        subscriptions: ["--rem"],
       },
       "max-w-full": {
         styles: [
@@ -689,7 +689,7 @@ testCompile(
             },
           },
         ],
-        topics: ["--rem"],
+        subscriptions: ["--rem"],
       },
       rounded: {
         styles: [
@@ -700,7 +700,7 @@ testCompile(
             },
           },
         ],
-        topics: ["--rem"],
+        subscriptions: ["--rem"],
       },
       "self-baseline": {
         styles: [
@@ -782,7 +782,7 @@ testCompile(
             },
           },
         ],
-        topics: ["--rem"],
+        subscriptions: ["--rem"],
       },
       "text-black": {
         styles: [
@@ -814,7 +814,7 @@ testCompile(
             },
           },
         ],
-        topics: ["--window-width"],
+        subscriptions: ["--window-width"],
       },
 
       "font-bold": {

@@ -43,7 +43,7 @@ function walkAst(
             node,
             createOptions,
             existingMeta ?? {
-              topics: [],
+              subscriptions: [],
               atRules: [],
               conditions: [],
               variables: [],
@@ -56,7 +56,7 @@ function walkAst(
             node,
             createOptions,
             existingMeta ?? {
-              topics: [],
+              subscriptions: [],
               atRules: [],
               conditions: [],
               variables: [],
@@ -101,8 +101,8 @@ function addRule(node: Rule, createOptions: AtomRecord, meta: SelectorMeta) {
 
   // eslint-disable-next-line unicorn/no-array-for-each
   selectorList.children.forEach((selectorNode) => {
-    // Duplicate the meta, as selectors may add their own topics/atRules (eg .dark)
-    const selectorMeta = { ...meta, topics: [...meta.topics] };
+    // Duplicate the meta, as selectors may add their own subscriptions/atRules (eg .dark)
+    const selectorMeta = { ...meta, subscriptions: [...meta.subscriptions] };
 
     const { selector, parentSelector, groups } = getSelector(
       selectorNode,
@@ -140,10 +140,10 @@ function addRule(node: Rule, createOptions: AtomRecord, meta: SelectorMeta) {
     }
 
     const conditionSet = new Set(selectorMeta.conditions);
-    const topicSet = new Set(selectorMeta.topics);
+    const subscriptionSet = new Set(selectorMeta.subscriptions);
 
-    if (topicSet.size > 0) {
-      createOptions[selector].topics = [...topicSet];
+    if (subscriptionSet.size > 0) {
+      createOptions[selector].subscriptions = [...subscriptionSet];
     }
 
     if (conditionSet.size > 0) {
@@ -278,7 +278,7 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
         }
 
         if (node.name === "dark") {
-          meta.topics.push("--color-scheme");
+          meta.subscriptions.push("--color-scheme");
           meta.atRules.push(["--color-scheme", "dark"]);
         }
         tokens.push(`.${node.name}`);

@@ -12,15 +12,14 @@ export interface Atom {
   atRules?: Record<number, Array<AtRuleTuple>>;
   conditions?: string[];
   variables?: Array<Record<`--${string}`, VariableValue>>;
-  topics?: string[];
-  topicSubscription?: () => void;
+  subscriptions?: string[];
   childClasses?: string[];
   parent?: string;
   meta?: Record<string, boolean | string>;
 }
 
 export interface SelectorMeta {
-  topics: string[];
+  subscriptions: string[];
   conditions: string[];
   atRules: AtRuleTuple[];
   variables: Array<Record<string, VariableValue>>;

@@ -11,7 +11,7 @@ testCompile("space-x-2", (output) => {
     },
     "space-x-2:children": {
       conditions: ["not-first-child"],
-      topics: ["--rem"],
+      subscriptions: ["--rem"],
       styles: [
         {
           marginLeft: { function: "rem", values: [0.5] },

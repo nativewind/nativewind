@@ -32,7 +32,10 @@ export function transform(node: Declaration, meta: SelectorMeta) {
       case "translateX":
       case "translateY":
       case "matrix": {
-        const value = encodeValue(child.children.toArray()[0], meta.topics);
+        const value = encodeValue(
+          child.children.toArray()[0],
+          meta.subscriptions
+        );
         transform.push({ [child.name]: value } as unknown as Transform);
       }
     }

@@ -11,7 +11,7 @@ import {
 
 export function encodeValue(
   node: StyleValue | null | undefined,
-  topics: string[]
+  subscriptions: string[]
 ): StyleValue | StyleValue[] | undefined {
   if (!node) return;
 
@@ -25,7 +25,7 @@ export function encodeValue(
   }
 
   if (Array.isArray(node)) {
-    return node.map((n) => encodeValue(n, topics)) as StyleValue[];
+    return node.map((n) => encodeValue(n, subscriptions)) as StyleValue[];
   }
 
   if (isFunctionValue(node)) {
@@ -35,7 +35,7 @@ export function encodeValue(
   if (!isCssNode(node)) {
     return Object.fromEntries(
       Object.entries(node).map(([key, value]) => {
-        return [key, encodeValue(value, topics)];
+        return [key, encodeValue(value, subscriptions)];
       })
     ) as unknown as Transform;
   }
@@ -57,7 +57,7 @@ export function encodeValue(
       return `${node.value}%`;
     }
     case "Function": {
-      return parseFunction(node, topics);
+      return parseFunction(node, subscriptions);
     }
     case "Dimension": {
       switch (node.unit) {
@@ -65,21 +65,21 @@ export function encodeValue(
           return Number.parseFloat(node.value.toString());
         }
         case "rem": {
-          topics.push("--rem");
+          subscriptions.push("--rem");
           return {
             function: node.unit,
             values: [Number.parseFloat(node.value.toString())],
           };
         }
         case "vw": {
-          topics.push("--window-width");
+          subscriptions.push("--window-width");
           return {
             function: node.unit,
             values: [Number.parseFloat(node.value.toString())],
           };
         }
         case "vh": {
-          topics.push("--window-height");
+          subscriptions.push("--window-height");
           return {
             function: node.unit,
             values: [Number.parseFloat(node.value.toString())],
@@ -93,11 +93,11 @@ export function encodeValue(
   }
 }
 
-function parseFunction(node: FunctionNode, topics: string[]) {
+function parseFunction(node: FunctionNode, subscriptions: string[]) {
   if (node.name.startsWith("_")) {
     const children = node.children
       .toArray()
-      .map((child) => encodeValue(child, topics))
+      .map((child) => encodeValue(child, subscriptions))
       .filter(Boolean);
 
     return {
@@ -124,7 +124,7 @@ function parseFunction(node: FunctionNode, topics: string[]) {
     case "roundToNearestPixel": {
       const children = node.children
         .toArray()
-        .map((child) => encodeValue(child, topics))
+        .map((child) => encodeValue(child, subscriptions))
         .filter(Boolean);
 
       return {
@@ -134,12 +134,12 @@ function parseFunction(node: FunctionNode, topics: string[]) {
     }
     case "var": {
       const children = node.children.toArray();
-      const variableName = encodeValue(children[0], topics);
+      const variableName = encodeValue(children[0], subscriptions);
 
       if (typeof variableName !== "string") return [];
 
       const values: FunctionValue["values"] = [variableName];
-      topics.push(variableName);
+      subscriptions.push(variableName);
 
       if (children.length === 3) {
         const defaultChild = children[2];
@@ -170,7 +170,7 @@ function parseFunction(node: FunctionNode, topics: string[]) {
     }
     default: {
       const values = node.children.toArray().flatMap((child) => {
-        return encodeValue(child, topics) ?? [];
+        return encodeValue(child, subscriptions) ?? [];
       });
 
       const hasVariableValues = values.some(

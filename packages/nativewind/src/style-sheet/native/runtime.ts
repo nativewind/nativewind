@@ -127,8 +127,8 @@ export function setAtom(name: string, atom: Atom) {
     }
 
     // First time setup
-    if (!computedAtom.computedStyle && atom.topics) {
-      for (const topic of atom.topics) {
+    if (!computedAtom.computedStyle && atom.subscriptions) {
+      for (const topic of atom.subscriptions) {
         let set = variableSubscriptions.get(topic);
         if (!set) {
           set = new Set();
