@@ -30,6 +30,14 @@ export function withConditionals(
         }
 
         switch (key) {
+          case "first-child": {
+            return (
+              typeof source["nthChild"] === "number" && source["nthChild"] === 0
+            );
+          }
+          case "last-child": {
+            return source["lastChild"];
+          }
           case "not-first-child": {
             return (
               typeof source["nthChild"] === "number" && source["nthChild"] > 0

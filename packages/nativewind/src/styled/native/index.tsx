@@ -9,6 +9,7 @@ import {
   Children,
   isValidElement,
   createContext,
+  cloneElement,
 } from "react";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 import { isFragment } from "react-is";
@@ -65,136 +66,155 @@ export function styled(
   return Styled;
 }
 
-export const StyledComponent = forwardRef(
-  (
-    {
-      component: Component,
-      baseClassName,
-      tw: twClassName,
-      className: propClassName,
-      propsToTransform,
-      classProps,
-      children,
-      nthChild,
-      style: inlineStyles,
-      ...componentProps
-    }: any,
-    ref
-  ) => {
-    const stateInheritance = useContext(stateInheritanceContent);
+export const StyledComponent = forwardRef(function NativeWindStyledComponent(
+  {
+    component: Component,
+    baseClassName,
+    tw: twClassName,
+    className: propClassName,
+    propsToTransform,
+    classProps,
+    children,
+    nthChild,
+    lastChild,
+    style: inlineStyles,
+    ...componentProps
+  }: any,
+  ref
+) {
+  const stateInheritance = useContext(stateInheritanceContent);
 
-    /**
-     * Get the hover/focus/active state of this component
-     */
-    const [componentState, componentStateDispatch] = useComponentState();
+  /**
+   * Get the hover/focus/active state of this component
+   */
+  const [componentState, componentStateDispatch] = useComponentState();
 
-    const classNameWithDefaults = [baseClassName, twClassName ?? propClassName]
-      .filter(Boolean)
-      .join(" ");
+  const classNameWithDefaults = [baseClassName, twClassName ?? propClassName]
+    .filter(Boolean)
+    .join(" ");
 
-    /**
-     * Resolve the props/classProps/spreadProps options
-     */
-    const { styledProps, className } = withStyledProps({
-      className: classNameWithDefaults,
-      propsToTransform,
-      classProps,
-      componentState,
-      componentProps,
-    });
+  /**
+   * Resolve the props/classProps/spreadProps options
+   */
+  const { styledProps, className } = withStyledProps({
+    className: classNameWithDefaults,
+    propsToTransform,
+    classProps,
+    componentState,
+    componentProps,
+  });
 
-    const { className: actualClassName, meta } = withConditionals(className, {
-      ...componentState,
-      ...stateInheritance,
-      nthChild,
-    });
+  const { className: actualClassName, meta } = withConditionals(className, {
+    ...componentState,
+    ...stateInheritance,
+    nthChild,
+    lastChild,
+  });
 
-    /**
-     * Resolve the className->style
-     */
-    const styles = useSyncExternalStore(
-      subscribeToStyleSheet,
-      () => getStyleSet(actualClassName),
-      () => getStyleSet(actualClassName)
-    );
+  /**
+   * Resolve the className->style
+   */
+  const styles = useSyncExternalStore(
+    subscribeToStyleSheet,
+    () => getStyleSet(actualClassName),
+    () => getStyleSet(actualClassName)
+  );
 
-    /**
-     * Determine if we need event handlers for our styles
-     */
-    const handlers = useInteraction(
-      componentStateDispatch,
-      meta,
-      componentProps as InteractionProps
-    );
+  /**
+   * Determine if we need event handlers for our styles
+   */
+  const handlers = useInteraction(
+    componentStateDispatch,
+    meta,
+    componentProps as InteractionProps
+  );
 
-    /**
-     * Resolve the child styles
-     */
-    const childClasses = getChildClasses(actualClassName);
-    if (childClasses && children) {
-      children = flattenChildren(children)
-        ?.filter(Boolean)
-        .map((child, nthChild) => {
-          if (isValidElement(child)) {
-            return createElement(StyledComponent, {
+  /**
+   * Resolve the child styles
+   */
+  const childClasses = getChildClasses(actualClassName);
+  if (childClasses && children) {
+    children = flattenChildren(children).map((child, nthChild, children) => {
+      if (isValidElement(child)) {
+        const mergedClassName = [
+          childClasses,
+          child.props.className ?? child.props.tw,
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        return isNativeWindComponent(child)
+          ? cloneElement(child, {
+              nthChild,
+              lastChild: children.length - 1 === nthChild,
+              className: mergedClassName,
+            } as Record<string, unknown>)
+          : createElement(StyledComponent, {
               key: child.key,
               component: child.type,
               nthChild,
+              lastChild: children.length - 1 === nthChild,
               ...child.props,
-              className: [childClasses, child.props.className ?? child.props.tw]
-                .filter(Boolean)
-                .join(" "),
+              className: mergedClassName,
             });
-          }
-
-          return child;
-        });
-    }
-
-    const style = useMemo(() => {
-      const keys = Object.keys(styles).length;
-      if (keys > 0 && inlineStyles) {
-        return [styles, inlineStyles];
-      } else if (keys > 0) {
-        return styles;
+      } else {
+        return child;
       }
-    }, [styles, inlineStyles]);
-
-    /**
-     * Pass the styles to the element
-     */
-    const props = {
-      ...componentProps,
-      ...handlers,
-      ...styledProps,
-      style,
-      ref,
-    };
-
-    let reactNode: ReactNode = Array.isArray(children)
-      ? createElement(Component, props, ...children)
-      : createElement(Component, props, children);
-
-    /**
-     * Determine if we need to wrap element in Providers
-     */
-    if (typeof meta.group === "string") {
-      reactNode = createElement(stateInheritanceContent.Provider, {
-        children: reactNode,
-        value: {
-          ...stateInheritance,
-          [meta.group]: componentState,
-        },
-      });
-    }
-
-    return reactNode;
+    });
   }
-);
 
-function flattenChildren(
-  children: ReactNode | ReactNode[]
-): ReactNode[] | undefined | null {
+  const style = useMemo(() => {
+    const keys = Object.keys(styles).length;
+    if (keys > 0 && inlineStyles) {
+      return [styles, inlineStyles];
+    } else if (keys > 0) {
+      return styles;
+    }
+  }, [styles, inlineStyles]);
+
+  /**
+   * Pass the styles to the element
+   */
+  const props = {
+    ...componentProps,
+    ...handlers,
+    ...styledProps,
+    style,
+    ref,
+  };
+
+  let reactNode: ReactNode = Array.isArray(children)
+    ? createElement(Component, props, ...children)
+    : createElement(Component, props, children);
+
+  /**
+   * Determine if we need to wrap element in Providers
+   */
+  if (typeof meta.group === "string") {
+    reactNode = createElement(stateInheritanceContent.Provider, {
+      children: reactNode,
+      value: {
+        ...stateInheritance,
+        [meta.group]: componentState,
+      },
+    });
+  }
+
+  return reactNode;
+});
+
+function isNativeWindComponent(node: ReactNode) {
+  return (
+    typeof node === "object" &&
+    node &&
+    "type" in node &&
+    (node.type as unknown as Record<string, string>).displayName.startsWith(
+      "NativeWind"
+    )
+  );
+}
+
+function flattenChildren(children: ReactNode | ReactNode[]): ReactNode[] {
   return Children.toArray(children).flatMap((child) => {
     if (isFragment(child)) return flattenChildren(child.props.children);
     if (typeof child === "string" || typeof child === "number") {
