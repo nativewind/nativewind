@@ -21,7 +21,7 @@ testCompile("space-x-2", (output) => {
   });
 });
 
-test.only("space-x-", () => {
+test("space-x-2", () => {
   create("space-x-2");
 
   const Parent = jest.fn(({ children }: PropsWithChildren) => {
@@ -49,6 +49,41 @@ test.only("space-x-", () => {
     expect.objectContaining({
       style: {
         marginLeft: 8,
+      },
+    }),
+    {}
+  );
+});
+
+test("preserve children", () => {
+  create("space-x-2 text-black");
+
+  const Parent = jest.fn(({ children }: PropsWithChildren) => {
+    return <>{children}</>;
+  });
+
+  const Child1 = jest.fn();
+  const Child2 = jest.fn();
+
+  render(
+    <StyledComponent component={Parent} className="space-x-2">
+      <Child1 />
+      <StyledComponent component={Child2} className="text-black" />
+    </StyledComponent>
+  );
+
+  expect(Child1).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: undefined,
+    }),
+    {}
+  );
+
+  expect(Child2).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: {
+        marginLeft: 8,
+        color: "#000",
       },
     }),
     {}
