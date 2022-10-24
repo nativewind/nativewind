@@ -88,7 +88,7 @@ jobs:
             const StyledView = styled(View);
             const StyledText = styled(Text);
 
-            const App = () => {
+            function App () {
               return (
                 <StyledView className="flex-1 items-center justify-center">
                   <StyledText className="text-slate-800">Try editing me! 🎉</StyledText>
@@ -99,7 +99,9 @@ jobs:
             // This demo is using a external compiler that will only work in Expo Snacks.
             // You may see flashes of unstyled content, this will not occur under normal use!
             // Please see the documentation to setup your application
-            export default withExpoSnack(App);`
+            export default withExpoSnack(App, {
+              compileUrl: "${{ needs.Deploy-Preview.outputs.vercel_url }}/api/compile"
+            });`
               }
             }));
             const body = `

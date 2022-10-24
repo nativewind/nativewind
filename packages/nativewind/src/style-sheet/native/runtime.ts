@@ -1,5 +1,6 @@
 /* eslint-disable unicorn/no-array-for-each */
 import { Appearance, ColorSchemeName, Platform } from "react-native";
+import { callbackify } from "util";
 import {
   Atom,
   AtomRecord,
@@ -22,6 +23,8 @@ export const variables = new Map<string, VariableValue>();
 const variableSubscriptions = new Map<string, Set<() => void>>();
 let rootVariableValues: Record<string, VariableValue> = {};
 let darkRootVariableValues: Record<string, VariableValue> = {};
+
+let dangerouslyCompileStyles: ((classNames: string) => void) | undefined;
 
 export function create(atomRecord: AtomRecord) {
   for (const [name, atom] of Object.entries(atomRecord)) {
@@ -48,6 +51,8 @@ export function create(atomRecord: AtomRecord) {
       setAtom(name, atom);
     }
   }
+
+  componentListeners.forEach((l) => l());
 }
 
 export function getStyleSet(styleSet: string) {
@@ -55,6 +60,10 @@ export function getStyleSet(styleSet: string) {
 
   if (style) {
     return style;
+  }
+
+  if (dangerouslyCompileStyles) {
+    dangerouslyCompileStyles(styleSet);
   }
 
   const childClasses = [];
@@ -195,6 +204,10 @@ export function setAtom(name: string, atom: Atom) {
   };
 
   atoms.set(name, computedAtom);
+
+  atomDependents.get(name)?.forEach((dependent) => {
+    updateStyleSet(dependent);
+  });
 }
 
 export function setVariables(properties: Record<`--${string}`, VariableValue>) {
@@ -237,6 +250,12 @@ export function subscribeToVariable(name: string) {
   };
 }
 
+export function __dangerouslyCompileStyles(
+  callback: typeof dangerouslyCompileStyles
+) {
+  dangerouslyCompileStyles = callback;
+}
+
 export function resetRuntime() {
   componentListeners.clear();
   variableSubscriptions.clear();
@@ -247,6 +266,7 @@ export function resetRuntime() {
   variables.clear();
   rootVariableValues = {};
   darkRootVariableValues = {};
+  dangerouslyCompileStyles = undefined;
 
   setVariables({
     "--platform": Platform.OS,

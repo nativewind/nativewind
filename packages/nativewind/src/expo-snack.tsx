@@ -12,7 +12,7 @@ export function withExpoSnack(
   config?: ExpoSnackConfig,
   css?: string
 ) {
-  return () => {
+  return function ExpoSnackWrapper() {
     const [loaded, setLoaded] = useState(Platform.OS !== "web");
 
     useEffect(() => {
@@ -58,53 +58,53 @@ export function withExpoSnack(
       }
     }, [loaded, css]);
 
-    useEffect(() => {
-      if (Platform.OS !== "web") {
-        NativeWindStyleSheet.__dangerouslyCompileStyles((className) => {
-          return styleFetcher(className, config, css);
-        });
-      }
-    }, []);
+    if (Platform.OS !== "web") {
+      NativeWindStyleSheet.__dangerouslyCompileStyles((className) => {
+        return styleFetcher(className, config, css);
+      });
+    }
 
     return loaded ? <Component /> : undefined;
   };
 }
 
-const styleFetcher = debounce(
-  (
-    className: string,
-    config: ExpoSnackConfig,
-    css: string,
-    callback: () => void
-  ) => {
-    const url = new URL(
-      config.compileUrl ??
-        "https://nativewind-demo-compiler.vercel.app/api/compile"
-    );
-    url.searchParams.set("className", className);
-    if (css) url.searchParams.set("css", css);
-    if (config) url.searchParams.set("config", JSON.stringify(config));
+let styleFetcherTimer: NodeJS.Timeout;
+const pendingClassNames = new Set();
+const styleFetcher = (
+  classNames = "",
+  { compileUrl, ...config }: Partial<ExpoSnackConfig> = {},
+  css = "",
+  timeout = 300
+) => {
+  clearTimeout(styleFetcherTimer);
+
+  for (const className of classNames.split(/\s+/)) {
+    pendingClassNames.add(className);
+  }
+
+  styleFetcherTimer = setTimeout(() => {
+    if (pendingClassNames.size === 0) return;
+
+    let url =
+      compileUrl ?? `https://nativewind-demo-compiler.vercel.app/api/compile`;
+
+    url = `${url}?classNames=${encodeURIComponent(
+      [...pendingClassNames].join(" ")
+    )}`;
+    pendingClassNames.clear();
+
+    if (css) url = `${url}&css=${css}`;
+    if (config) {
+      url = `${url}&config=${encodeURIComponent(JSON.stringify(config))}`;
+    }
 
     fetch(url)
       .then((response) => response.json())
       .then((response) => {
-        console.log(response);
         NativeWindStyleSheet.create(response);
-        callback();
       })
       .catch((error) => {
         console.error(error);
       });
-  }
-);
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function debounce(callback: (...args: any[]) => void, timeout = 300) {
-  let timer: NodeJS.Timeout;
-  return (...args: unknown[]) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      callback(...args);
-    }, timeout);
-  };
-}
+  }, timeout);
+};
