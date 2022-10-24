@@ -12,7 +12,7 @@ export function withExpoSnack(
   config?: ExpoSnackConfig,
   css?: string
 ) {
-  return () => {
+  return function ExpoSnackWrapper() {
     const [loaded, setLoaded] = useState(Platform.OS !== "web");
 
     useEffect(() => {
