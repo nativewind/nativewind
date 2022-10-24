@@ -2,14 +2,18 @@ import { Dimensions, I18nManager } from "react-native";
 import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../index";
 
 import { setDimensions } from "./dimensions";
-import { create, resetRuntime, setVariables } from "./runtime";
+import {
+  create,
+  resetRuntime,
+  setVariables,
+  __dangerouslyCompileStyles,
+} from "./runtime";
 import {
   getColorScheme,
   setColorScheme,
   toggleColorScheme,
 } from "./color-scheme";
 import { useVariable } from "./use-variable";
-import { __dangerouslyCompileStyles } from "../../styled/native/runtime";
 
 export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   create,
