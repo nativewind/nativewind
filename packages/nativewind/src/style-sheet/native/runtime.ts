@@ -51,6 +51,8 @@ export function create(atomRecord: AtomRecord) {
       setAtom(name, atom);
     }
   }
+
+  componentListeners.forEach((l) => l());
 }
 
 export function getStyleSet(styleSet: string) {
