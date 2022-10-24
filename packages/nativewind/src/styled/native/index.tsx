@@ -171,9 +171,9 @@ export const StyledComponent = forwardRef(
       ref,
     };
 
-    let reactNode: ReactNode = createElement(Component, props, [
-      ...(Array.isArray(children) ? children : []),
-    ]);
+    let reactNode: ReactNode = Array.isArray(children)
+      ? createElement(Component, props, ...children)
+      : createElement(Component, props, children);
 
     /**
      * Determine if we need to wrap element in Providers
