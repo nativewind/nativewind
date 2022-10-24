@@ -30,20 +30,23 @@ export function withConditionals(
         }
 
         switch (key) {
-          case "not-first-child":
+          case "not-first-child": {
             return (
               typeof source["nthChild"] === "number" && source["nthChild"] > 0
             );
-          case "odd":
+          }
+          case "odd": {
             return (
               typeof source["nthChild"] === "number" &&
               source["nthChild"] % 2 === 1
             );
-          case "even":
+          }
+          case "even": {
             return (
               typeof source["nthChild"] === "number" &&
               source["nthChild"] % 2 === 0
             );
+          }
           default: {
             return Boolean(source[key]);
           }
@@ -57,6 +60,8 @@ export function withConditionals(
     } else if (atom) {
       keyTokens.push(atomName);
       meta = { ...meta, ...atom.meta };
+    } else {
+      keyTokens.push(atomName);
     }
   }
 

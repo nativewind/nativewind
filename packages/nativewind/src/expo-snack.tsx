@@ -69,25 +69,29 @@ export function withExpoSnack(
 }
 
 let styleFetcherTimer: NodeJS.Timeout;
-let pendingClassNames = "";
+const pendingClassNames = new Set();
 const styleFetcher = (
-  className: string,
+  classNames = "",
   { compileUrl, ...config }: Partial<ExpoSnackConfig> = {},
   css = "",
   timeout = 300
 ) => {
   clearTimeout(styleFetcherTimer);
 
-  pendingClassNames = pendingClassNames
-    ? `${pendingClassNames} ${className}`
-    : className;
+  for (const className of classNames.split(/\s+/)) {
+    pendingClassNames.add(className);
+  }
 
   styleFetcherTimer = setTimeout(() => {
-    let url =
-      compileUrl ??
-      `https://nativewind-demo-compiler.vercel.app/api/compile?className=${pendingClassNames}`;
+    if (pendingClassNames.size === 0) return;
 
-    pendingClassNames = "";
+    let url =
+      compileUrl ?? `https://nativewind-demo-compiler.vercel.app/api/compile`;
+
+    url = `${url}?classNames=${encodeURIComponent(
+      [...pendingClassNames].join(" ")
+    )}`;
+    pendingClassNames.clear();
 
     if (css) url = `${url}&css=${css}`;
     if (config) {
