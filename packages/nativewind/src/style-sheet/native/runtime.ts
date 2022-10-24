@@ -81,7 +81,9 @@ export function getStyleSet(styleSet: string) {
     dependentSet.add(styleSet);
   }
 
-  childClassMap.set(styleSet, childClasses);
+  if (childClasses.length > 0) {
+    childClassMap.set(styleSet, childClasses);
+  }
   style = updateStyleSet(styleSet);
 
   return style;
@@ -98,7 +100,7 @@ function updateStyleSet(styleSet: string) {
   return newStyle;
 }
 export function getChildClasses(styleSet: string) {
-  return childClassMap.get(styleSet) ?? [];
+  return childClassMap.get(styleSet);
 }
 
 function getAtomStyle(atomName: string) {
