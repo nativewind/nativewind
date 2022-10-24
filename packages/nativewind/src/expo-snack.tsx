@@ -58,53 +58,50 @@ export function withExpoSnack(
       }
     }, [loaded, css]);
 
-    useEffect(() => {
-      if (Platform.OS !== "web") {
-        NativeWindStyleSheet.__dangerouslyCompileStyles((className) => {
-          return styleFetcher(className, config, css);
-        });
-      }
-    }, []);
+    if (Platform.OS !== "web") {
+      NativeWindStyleSheet.__dangerouslyCompileStyles((className) => {
+        return styleFetcher(className, config, css);
+      });
+    }
 
     return loaded ? <Component /> : undefined;
   };
 }
 
-const styleFetcher = debounce(
-  (
-    className: string,
-    config: ExpoSnackConfig,
-    css: string,
-    callback: () => void
-  ) => {
-    const url = new URL(
-      config.compileUrl ??
-        "https://nativewind-demo-compiler.vercel.app/api/compile"
-    );
-    url.searchParams.set("className", className);
-    if (css) url.searchParams.set("css", css);
-    if (config) url.searchParams.set("config", JSON.stringify(config));
+let styleFetcherTimer: NodeJS.Timeout;
+let pendingClassNames = "";
+const styleFetcher = (
+  className: string,
+  { compileUrl, ...config }: Partial<ExpoSnackConfig> = {},
+  css = "",
+  timeout = 300
+) => {
+  clearTimeout(styleFetcherTimer);
+
+  pendingClassNames = pendingClassNames
+    ? `${pendingClassNames} ${className}`
+    : className;
+
+  styleFetcherTimer = setTimeout(() => {
+    let url =
+      compileUrl ??
+      `https://nativewind-demo-compiler.vercel.app/api/compile?className=${pendingClassNames}`;
+
+    pendingClassNames = "";
+
+    if (css) url = `${url}&css=${css}`;
+    if (config) {
+      url = `${url}&config=${encodeURIComponent(JSON.stringify(config))}`;
+    }
 
     fetch(url)
       .then((response) => response.json())
       .then((response) => {
         console.log(response);
         NativeWindStyleSheet.create(response);
-        callback();
       })
       .catch((error) => {
         console.error(error);
       });
-  }
-);
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function debounce(callback: (...args: any[]) => void, timeout = 300) {
-  let timer: NodeJS.Timeout;
-  return (...args: unknown[]) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      callback(...args);
-    }, timeout);
-  };
-}
+  }, timeout);
+};
