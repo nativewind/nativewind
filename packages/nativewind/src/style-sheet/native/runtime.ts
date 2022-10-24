@@ -54,14 +54,14 @@ export function create(atomRecord: AtomRecord) {
 }
 
 export function getStyleSet(styleSet: string) {
-  if (dangerouslyCompileStyles) {
-    dangerouslyCompileStyles(styleSet);
-  }
-
   let style = styleSets.get(styleSet);
 
   if (style) {
     return style;
+  }
+
+  if (dangerouslyCompileStyles) {
+    dangerouslyCompileStyles(styleSet);
   }
 
   const childClasses = [];
