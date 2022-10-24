@@ -101,7 +101,6 @@ const styleFetcher = (
     fetch(url)
       .then((response) => response.json())
       .then((response) => {
-        console.log(response);
         NativeWindStyleSheet.create(response);
       })
       .catch((error) => {
