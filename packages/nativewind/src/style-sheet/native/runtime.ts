@@ -202,6 +202,10 @@ export function setAtom(name: string, atom: Atom) {
   };
 
   atoms.set(name, computedAtom);
+
+  atomDependents.get(name)?.forEach((dependent) => {
+    updateStyleSet(dependent);
+  });
 }
 
 export function setVariables(properties: Record<`--${string}`, VariableValue>) {
