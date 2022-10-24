@@ -18,65 +18,33 @@ yarn add --dev tailwindcss
 
 ## 2. Setup Tailwind CSS
 
-:::caution
-
-Do not set your content to `./**/*`! This will cause Tailwind CLI to scan every file in your `node_modules`.
-For the fastest builds, be as specific as possible.
-
-:::
-
-Run `npx tailwindcss init` to create a `tailwind.config.js` file
+Run `npx tailwindcss init` to create a `tailwind.config.ts` file
 
 Add the paths to all of your component files in your tailwind.config.js file.
 
 ```diff
 // tailwind.config.js
-+ const nativewind = require("nativewind/tailwind")
 
 module.exports = {
 - content: [],
-+ content: ["./App.{js,jsx,ts,tsx}", "./screens/**/*.{js,jsx,ts,tsx}"],
++ content: ["./App.{js,jsx,ts,tsx}", "./<custom-folder>/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {},
   },
   plugins: [],
-+ presets: [nativewind]
 }
 ```
 
-## 3. Add the Babel preset
+## 3. Add the Babel plugin
 
 Modify your `babel.config.js`
 
 ```diff
 // babel.config.js
 module.exports = {
-- presets: ['module:metro-react-native-babel-preset'],
-+ presets: ["module:metro-react-native-babel-preset", "nativewind/babel"],
+  presets: ['module:metro-react-native-babel-preset'],
++ plugins: ["nativewind/babel"],
 };
-```
-
-## 4. Modify the Metro config
-
-```diff
-/**
- * Metro configuration for React Native
- * https://github.com/facebook/react-native
- *
- * @format
- */
-+ const withNativewind = require("nativewind/metro")
-
-module.exports = withNativewind({
-  transformer: {
-    getTransformOptions: async () => ({
-      transform: {
-        experimentalImportSupport: false,
-        inlineRequires: true,
-      },
-    }),
-  },
-});
 ```
 
 ## Thats it 🎉
