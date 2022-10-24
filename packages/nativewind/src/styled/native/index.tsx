@@ -208,7 +208,7 @@ function isNativeWindComponent(node: ReactNode) {
     typeof node === "object" &&
     node &&
     "type" in node &&
-    (node.type as unknown as Record<string, string>).displayName.startsWith(
+    (node.type as unknown as Record<string, string>)?.displayName.startsWith(
       "NativeWind"
     )
   );
