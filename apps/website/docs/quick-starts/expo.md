@@ -29,7 +29,7 @@ yarn add --dev tailwindcss
 
 Run `npx tailwindcss init` to create a `tailwind.config.ts` file
 
-Add the paths to all of your component files in your tailwind.config.js file.
+Add the paths to all of your component files in your tailwind.config.js file. Remember to replace `<custom directory>` with the actual name of your directory e.g. `screens`.
 
 ```diff
 // tailwind.config.js
