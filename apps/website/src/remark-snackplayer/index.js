@@ -8,6 +8,7 @@
 const visit = require("unist-util-visit-parents");
 const u = require("unist-builder");
 const dedent = require("dedent");
+const fm = require("front-matter");
 
 const parseParams = (paramString = "") => {
   const params = Object.fromEntries(new URLSearchParams(paramString));
@@ -24,21 +25,39 @@ const processNode = (node, parent) => {
     try {
       const params = parseParams(node.meta);
 
-      // Gather necessary Params
-      const name = params.name ? decodeURIComponent(params.name) : "Example";
-      const description = params.description
-        ? decodeURIComponent(params.description)
-        : "Example usage";
-      const sampleCode = node.value;
+      const { body, attributes } = fm(node.value);
+      let { name = "Example", description, config, css } = attributes;
+
+      const isPreview = window.location.origin.endsWith("vercel.app");
+
+      if (isPreview) {
+        config ??= {};
+        config.compileUrl = `${window.location.origin}/api/compile`;
+      }
+
+      let withExpoSnack = "withExpoSnack(App)";
+
+      if (config && css) {
+        withExpoSnack = `withExpoSnack(App, ${JSON.stringify(
+          config,
+          null,
+          2
+        )}, "${css}")`;
+      } else if (config) {
+        withExpoSnack = `withExpoSnack(App, ${JSON.stringify(config, null, 2)}`;
+      } else if (css) {
+        withExpoSnack = `withExpoSnack(App, {}, "${css}"}`;
+      }
+
       const code = `import React from 'react';
 import { withExpoSnack } from 'nativewind';
 
-${sampleCode}
+${body}
 
 // This demo is using a external compiler that will only work in Expo Snacks.
 // You may see flashes of unstyled content, this will not occur under normal use!
 // Please see the documentation to setup your application
-export default withExpoSnack(App);
+export default ${withExpoSnack};
 `;
 
       const platform = params.platform || "web";
