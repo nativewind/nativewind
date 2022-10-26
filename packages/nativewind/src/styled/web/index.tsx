@@ -23,7 +23,10 @@ export function styled(
       ? styledBaseClassNameOrOptions
       : baseClassName;
 
-  const classGenerator = cva(`${classProps} ${defaultClassName} `, cvaOptions);
+  const classGenerator = cva(
+    [classProps, defaultClassName].filter(Boolean).join(" "),
+    cvaOptions
+  );
 
   const Styled = forwardRef<unknown, any>(function (
     { className, tw, ...props },
