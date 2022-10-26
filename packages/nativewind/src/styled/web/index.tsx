@@ -6,7 +6,7 @@ import { Style } from "../../transform-css/types";
 import type { StyledOptions } from "../index";
 
 export function styled(
-  Component: ComponentType<{
+  component: ComponentType<{
     style: StyleProp<Style>;
     ref: ForwardedRef<unknown>;
   }>,
@@ -25,30 +25,48 @@ export function styled(
 
   const classGenerator = cva(`${classProps} ${defaultClassName} `, cvaOptions);
 
-  return forwardRef<unknown, any>(
-    ({ tw, className, style: inlineStyle, ...props }, ref) => {
-      const generatedClassName = classGenerator({
-        class: tw ?? className,
-        ...props,
-      });
+  const Styled = forwardRef<unknown, any>(function (
+    { className, tw, ...props },
+    ref
+  ) {
+    const generatedClassName = classGenerator({
+      class: tw ?? className,
+      ...props,
+    });
 
-      const style = useMemo(() => {
-        return generatedClassName
-          ? [
-              { $$css: true, tailwind: generatedClassName } as Style,
-              inlineStyle,
-            ]
-          : inlineStyle;
-      }, [inlineStyle, generatedClassName]);
+    return (
+      <StyledComponent
+        ref={ref}
+        component={component}
+        className={generatedClassName}
+        {...props}
+      />
+    );
+  });
 
-      return <Component ref={ref} {...props} style={style} />;
-    }
-  );
+  if (typeof component !== "string") {
+    Styled.displayName = `NativeWind.${
+      component.displayName || component.name || "NoName"
+    }`;
+  }
+
+  return Styled;
 }
 
-export const StyledComponent = forwardRef(
-  ({ component, ...options }: any, ref) => {
-    const Component = useMemo(() => styled(component), [component]);
-    return <Component {...options} ref={ref} />;
-  }
-);
+export const StyledComponent = forwardRef(function StyledComponent(
+  { component: Component, className, style: inlineStyle, ...props }: any,
+  ref
+) {
+  const style = useMemo(() => {
+    if (className && inlineStyle) {
+      return [{ $$css: true, tailwind: className } as Style, inlineStyle];
+    } else if (className) {
+      return { $$css: true, tailwind: className } as Style;
+    }
+    if (inlineStyle) {
+      return inlineStyle;
+    }
+  }, [inlineStyle, className]);
+
+  return <Component ref={ref} {...props} style={style} />;
+});
