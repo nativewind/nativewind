@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentType, ForwardedRef, forwardRef, useMemo } from "react";
 import { StyleProp } from "react-native";
+import { cva } from "class-variance-authority";
 import { Style } from "../../transform-css/types";
 import type { PropsWithClassName, StyledOptions } from "../index";
 
@@ -10,17 +11,19 @@ export function styled(
     ref: ForwardedRef<unknown>;
   }>,
   styledBaseClassNameOrOptions?: string | StyledOptions<unknown, never>,
-  maybeOptions: StyledOptions<unknown, never> = {}
+  maybeOptions: StyledOptions<any, any> = {}
 ) {
-  const { classProps } =
+  const { classProps, baseClassName, props, ...cvaOptions } =
     typeof styledBaseClassNameOrOptions === "object"
       ? styledBaseClassNameOrOptions
       : maybeOptions;
 
-  const baseClassName =
+  const defaultClassName =
     typeof styledBaseClassNameOrOptions === "string"
       ? styledBaseClassNameOrOptions
-      : maybeOptions?.baseClassName;
+      : baseClassName;
+
+  const classGenerator = cva(`${classProps} ${defaultClassName} `, cvaOptions);
 
   return forwardRef(
     (
@@ -32,17 +35,19 @@ export function styled(
       }: PropsWithClassName<{ style: Style }>,
       ref
     ) => {
-      let actualClassName = tw ?? className;
-
-      if (classProps) actualClassName = `${classProps} ${actualClassName}`;
-      if (baseClassName)
-        actualClassName = `${baseClassName} ${actualClassName}`;
+      const generatedClassName = classGenerator({
+        class: tw ?? className,
+        ...props,
+      });
 
       const style = useMemo(() => {
-        return actualClassName
-          ? [{ $$css: true, tailwind: actualClassName } as Style, inlineStyle]
+        return generatedClassName
+          ? [
+              { $$css: true, tailwind: generatedClassName } as Style,
+              inlineStyle,
+            ]
           : inlineStyle;
-      }, [inlineStyle, actualClassName]);
+      }, [inlineStyle, generatedClassName]);
 
       return <Component ref={ref} {...props} style={style} />;
     }

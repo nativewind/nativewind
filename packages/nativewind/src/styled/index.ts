@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import type { Style } from "../transform-css/types";
+import { CVAConfig } from "./cva";
 
 export type PropsWithClassName<T> = T & {
   className?: string;
@@ -8,11 +9,11 @@ export type PropsWithClassName<T> = T & {
   baseTw?: string;
 };
 
-export interface StyledOptions<T, P extends keyof T> {
+export type StyledOptions<T, P extends keyof T> = CVAConfig<T> & {
   props?: Partial<Record<P, keyof Style | true>>;
   classProps?: (keyof T & string)[];
   baseClassName?: string;
-}
+};
 
 /**
  * Default

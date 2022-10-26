@@ -25,6 +25,7 @@ import {
   getStyleSet,
   subscribeToStyleSheet,
 } from "../../style-sheet/native/runtime";
+import { cva } from "class-variance-authority";
 
 const stateInheritanceContent = createContext<ConditionalStateRecord>({});
 
@@ -33,30 +34,42 @@ export function styled(
   styledBaseClassNameOrOptions?:
     | string
     | StyledOptions<Record<string, unknown>, string>,
-  maybeOptions: StyledOptions<Record<string, unknown>, string> = {}
+  maybeOptions: StyledOptions<any, any> = {}
 ) {
-  const { props: propsToTransform, classProps } =
-    typeof styledBaseClassNameOrOptions === "object"
-      ? styledBaseClassNameOrOptions
-      : maybeOptions;
+  const {
+    classProps,
+    baseClassName = "",
+    props: propsToTransform,
+    ...cvaOptions
+  } = typeof styledBaseClassNameOrOptions === "object"
+    ? styledBaseClassNameOrOptions
+    : maybeOptions;
 
-  const baseClassName =
+  const defaultClassName =
     typeof styledBaseClassNameOrOptions === "string"
       ? styledBaseClassNameOrOptions
-      : maybeOptions?.baseClassName;
+      : baseClassName;
 
-  const Styled = forwardRef((props, ref) => {
-    return (
-      <StyledComponent
-        ref={ref}
-        component={component}
-        propsToTransform={propsToTransform}
-        classProps={classProps}
-        baseClassName={baseClassName}
-        {...props}
-      />
-    );
-  });
+  const classGenerator = cva(defaultClassName, cvaOptions);
+
+  const Styled = forwardRef<unknown, any>(
+    ({ className, tw, ...props }, ref) => {
+      const generatedClassName = classGenerator({
+        class: tw ?? className,
+        ...props,
+      });
+
+      return (
+        <StyledComponent
+          ref={ref}
+          component={component}
+          propsToTransform={propsToTransform}
+          className={generatedClassName}
+          {...props}
+        />
+      );
+    }
+  );
   if (typeof component !== "string") {
     Styled.displayName = `NativeWind.${
       component.displayName || component.name || "NoName"
@@ -69,8 +82,7 @@ export function styled(
 export const StyledComponent = forwardRef(function NativeWindStyledComponent(
   {
     component: Component,
-    baseClassName,
-    tw: twClassName,
+    tw,
     className: propClassName,
     propsToTransform,
     classProps,
@@ -89,15 +101,11 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
    */
   const [componentState, componentStateDispatch] = useComponentState();
 
-  const classNameWithDefaults = [baseClassName, twClassName ?? propClassName]
-    .filter(Boolean)
-    .join(" ");
-
   /**
    * Resolve the props/classProps/spreadProps options
    */
   const { styledProps, className } = withStyledProps({
-    className: classNameWithDefaults,
+    className: tw ?? propClassName,
     propsToTransform,
     classProps,
     componentState,
