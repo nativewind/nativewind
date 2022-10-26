@@ -12,11 +12,11 @@
 </div>
 <br />
 
-`NativeWind` allows you to use [Tailwind CSS](https://tailwindcss.com) on all React Native platforms using the best style engine for that platform (e.g. CSS StyleSheet or StyleSheet.create). It aims to provide a consistent styling experience and brings the development and maintenance benefits of Tailwind to React Native.
+`NativeWind` is a complete tooling solution to use [Tailwind CSS](https://tailwindcss.com) on all React Native platforms (ios/android/web/window/macos/etc). It can be used either as a utility styling library or for building your own component library.
 
-On native devices, it prebuilts your styles and uses a minimal runtime to provide a web-like styling experience. While on platforms that support CSS, it is simply a compatibility layer between React Native and the browser.
+On native devices, `NativeWind` pre-builts your styles and uses a minimal runtime for dynamic styles. While in your browser, it provides a compatibility layer between React Native and your CSS.
 
-`NativeWind` provides an optional Babel plugin to keep the visual appearance consistent. It also provides helper functions to help write your own or convert existing components into `NativeWind` compatible components.
+In addition to styling, `NativeWind` provides optional Babel plugins to create a consistent developer experience, such as supporting a `className` prop on any component.
 
 ## In Action
 
@@ -29,15 +29,31 @@ Click the picture to go to a live example!
   </picture>
 </a>
 
-## Features
+## Highlights
 
 - Works on all RN platforms, uses the best style system for each platform.
-- Uses the Tailwind CSS compiler
+- Uses the Tailwind CSS compiler (always get up-to-date features)
 - Native styles are computed at build time
 - Babel plugin for simple setup and improving intellisense support
 - Respects all tailwind.config.js settings, including themes, custom values, plugins
-- Supports dark mode / arbitrary classes / media queries
+
+## Styling Features
+
+- Supports `px`/`%`/`rem`/`vw`/`vh`
 - Polyfills pseudo classes - hover / focus / active are available on compatible components
+- Supports arbitrary classes / media queries
+- Supports `clamp()`
+- Platform only variants eg. `android:text-black`
+- Group and named groups allow styling based upon parent state
+- Create simple layouts with `gap`/`space`/`divide`
+
+## Built your own multi-platform component library
+
+- Create complex components with the `styled()` helper
+- Supports dynamic theme values via CSS variables (which work on Native!)
+- Supports light / dark mode
+-
+
 - Supports group and named groups allowing styling based upon parent state
 
 ## Documentation
