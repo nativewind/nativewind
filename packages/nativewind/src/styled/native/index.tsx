@@ -31,9 +31,7 @@ const stateInheritanceContent = createContext<ConditionalStateRecord>({});
 
 export function styled(
   component: ComponentType,
-  styledBaseClassNameOrOptions?:
-    | string
-    | StyledOptions<Record<string, unknown>, string>,
+  styledBaseClassNameOrOptions?: string | StyledOptions<any, any>,
   maybeOptions: StyledOptions<any, any> = {}
 ) {
   const {
