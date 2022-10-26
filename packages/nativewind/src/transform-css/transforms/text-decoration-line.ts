@@ -26,12 +26,14 @@ export function textDecorationLine(node: Declaration, meta: SelectorMeta) {
         case "revert":
         case "revert-layer":
         case "unset":
-        case "overline":
+        case "overline": {
           break;
+        }
         case "double":
-        case "dashed":
+        case "dashed": {
           textDecorationLine = child.name;
           break;
+        }
         case "line-through": {
           textDecorationLine = child.name;
           if (

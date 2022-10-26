@@ -52,9 +52,7 @@ Click the picture to go to a live example!
 - Create complex components with the `styled()` helper
 - Supports dynamic theme values via CSS variables (which work on Native!)
 - Supports light / dark mode
--
-
-- Supports group and named groups allowing styling based upon parent state
+- Supports variants and compound-variants
 
 ## Documentation
 

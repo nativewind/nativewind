@@ -32,13 +32,15 @@ export function textDecoration(node: Declaration, meta: SelectorMeta) {
           case "revert":
           case "revert-layer":
           case "unset":
-          case "overline":
+          case "overline": {
             textDecorationLine = "";
             continue;
+          }
           case "double":
-          case "dashed":
+          case "dashed": {
             textDecorationLine = child.name;
             continue;
+          }
           case "line-through": {
             textDecorationLine = child.name;
             if (
@@ -76,15 +78,17 @@ export function textDecoration(node: Declaration, meta: SelectorMeta) {
           case "initial":
           case "revert":
           case "revert-layer":
-          case "unset":
+          case "unset": {
             textDecorationStyle = "";
             continue;
+          }
           case "solid":
           case "double":
           case "dotted":
-          case "dashed":
+          case "dashed": {
             textDecorationStyle = child.name;
             continue;
+          }
         }
       }
     }

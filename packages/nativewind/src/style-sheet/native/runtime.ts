@@ -1,6 +1,5 @@
 /* eslint-disable unicorn/no-array-for-each */
 import { Appearance, ColorSchemeName, Platform } from "react-native";
-import { callbackify } from "util";
 import {
   Atom,
   AtomRecord,
