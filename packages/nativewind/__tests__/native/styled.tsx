@@ -88,17 +88,4 @@ test("with props & variant", () => {
     }),
     {}
   );
-
-  // fireEvent(screen.getByTestId("button"), "pressIn");
-
-  // expect(MyComponent).toHaveBeenLastCalledWith(
-  //   {
-  //     style: { color: "#000" },
-  //   },
-  //   {}
-  // );
-
-  // fireEvent(screen.getByTestId("button"), "pressOut");
-
-  // expect(MyComponent).toHaveBeenLastCalledWith({}, {});
 });
