@@ -3,7 +3,7 @@ import { ComponentType, ForwardedRef, forwardRef, useMemo } from "react";
 import { StyleProp } from "react-native";
 import { cva } from "class-variance-authority";
 import { Style } from "../../transform-css/types";
-import type { PropsWithClassName, StyledOptions } from "../index";
+import type { StyledOptions } from "../index";
 
 export function styled(
   Component: ComponentType<{
@@ -25,16 +25,8 @@ export function styled(
 
   const classGenerator = cva(`${classProps} ${defaultClassName} `, cvaOptions);
 
-  return forwardRef(
-    (
-      {
-        tw,
-        className,
-        style: inlineStyle,
-        ...props
-      }: PropsWithClassName<{ style: Style }>,
-      ref
-    ) => {
+  return forwardRef<unknown, any>(
+    ({ tw, className, style: inlineStyle, ...props }, ref) => {
       const generatedClassName = classGenerator({
         class: tw ?? className,
         ...props,
