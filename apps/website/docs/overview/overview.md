@@ -7,13 +7,17 @@ NativeWind uses [Tailwind CSS](https://tailwindcss.com) as scripting language to
 NativeWind processes your styles during your application's build and uses a minimal runtime to selectively apply responsive styles (eg changes to device orientation, color scheme).
 
 ```SnackPlayer name=Hello%20World
+---
+name: Hello World
+description: Example usuage
+---
 import { Text, View } from 'react-native';
 import { styled } from 'nativewind';
 
 const StyledView = styled(View)
 const StyledText = styled(Text)
 
-const App = () => {
+function App () {
   return (
     <StyledView className="flex-1 items-center justify-center">
       <StyledText className="text-slate-800">Try editing me! 🎉</StyledText>

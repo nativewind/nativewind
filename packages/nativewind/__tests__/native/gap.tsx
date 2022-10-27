@@ -12,7 +12,7 @@ testCompile("gap-2", (output) => {
   expect(output).toStrictEqual({
     "gap-2": {
       childClasses: ["gap-2:children"],
-      topics: ["--rem"],
+      subscriptions: ["--rem"],
       styles: [
         {
           marginTop: { function: "rem", values: [-0.5] },
@@ -21,7 +21,7 @@ testCompile("gap-2", (output) => {
       ],
     },
     "gap-2:children": {
-      topics: ["--rem"],
+      subscriptions: ["--rem"],
       styles: [
         {
           marginTop: { function: "rem", values: [0.5] },
@@ -36,7 +36,7 @@ testCompile("sm:gap-2", (output) => {
   expect(output).toStrictEqual({
     "sm:gap-2": {
       childClasses: ["sm:gap-2:children"],
-      topics: ["--device-width", "--rem"],
+      subscriptions: ["--device-width", "--rem"],
       atRules: {
         0: [["min-width", 640]],
       },
@@ -48,7 +48,7 @@ testCompile("sm:gap-2", (output) => {
       ],
     },
     "sm:gap-2:children": {
-      topics: ["--device-width", "--rem"],
+      subscriptions: ["--device-width", "--rem"],
       atRules: {
         0: [["min-width", 640]],
       },

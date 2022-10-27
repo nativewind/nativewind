@@ -1,6 +1,5 @@
 /* eslint-disable unicorn/no-array-for-each */
 import { Appearance, ColorSchemeName, Platform } from "react-native";
-import { callbackify } from "util";
 import {
   Atom,
   AtomRecord,
@@ -127,8 +126,8 @@ export function setAtom(name: string, atom: Atom) {
     }
 
     // First time setup
-    if (!computedAtom.computedStyle && atom.topics) {
-      for (const topic of atom.topics) {
+    if (!computedAtom.computedStyle && atom.subscriptions) {
+      for (const topic of atom.subscriptions) {
         let set = variableSubscriptions.get(topic);
         if (!set) {
           set = new Set();
@@ -275,26 +274,5 @@ export function resetRuntime() {
     "--rem": 16,
     "--color-scheme": Appearance.getColorScheme() ?? "light",
     "--color-scheme-system": "system",
-  });
-  atoms.set("group", {
-    computedStyle: emptyStyles,
-    recompute: () => emptyStyles,
-    meta: {
-      group: true,
-    },
-  });
-  atoms.set("scoped-group", {
-    computedStyle: emptyStyles,
-    recompute: () => emptyStyles,
-    meta: {
-      group: true,
-    },
-  });
-  atoms.set("parent", {
-    computedStyle: emptyStyles,
-    recompute: () => emptyStyles,
-    meta: {
-      group: true,
-    },
   });
 }

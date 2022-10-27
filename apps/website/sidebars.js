@@ -25,7 +25,6 @@ const sidebars = {
       collapsed: false,
       items: [
         "overview/overview",
-        "overview/how-it-works",
         "guides/goals",
         // "overview/benchmarks",
       ],
@@ -37,23 +36,12 @@ const sidebars = {
       items: [
         "getting-started/typescript",
         "quick-starts/expo",
+        "quick-starts/expo-web",
         "quick-starts/react-native-cli",
         "quick-starts/create-react-native-app",
         "quick-starts/nextjs",
         "quick-starts/solito",
         "quick-starts/ignite",
-      ],
-    },
-    {
-      type: "category",
-      label: "Advanced Setup",
-      collapsed: false,
-      items: [
-        "guides/babel",
-        "guides/babel-compile-only",
-        "guides/babel-transform-only",
-        "guides/postcss",
-        "guides/cli-native",
       ],
     },
     {

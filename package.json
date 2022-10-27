@@ -21,6 +21,7 @@
     "eslint": "8.25.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-unicorn": "44.0.2",
+    "jest-runner-eslint": "^1.1.0",
     "prettier": "2.7.1",
     "typescript": "4.8.4"
   },

@@ -15,7 +15,7 @@ export function defaultDeclaration(node: Declaration, meta: SelectorMeta) {
         return styles;
       }
 
-      const value = encodeValue(ast.children.toArray()[0], meta.topics);
+      const value = encodeValue(ast.children.toArray()[0], meta.subscriptions);
       if (typeof value === "object" && !("function" in value)) {
         return styles;
       }

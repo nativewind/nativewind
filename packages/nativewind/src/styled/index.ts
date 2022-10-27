@@ -1,64 +1,80 @@
-import type { ComponentType } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ComponentType, FunctionComponent, ReactElement } from "react";
 import type { Style } from "../transform-css/types";
+import type {
+  StringToBoolean,
+  ClassValue,
+  ClassProp,
+} from "class-variance-authority/dist/types";
 
-export type PropsWithClassName<T> = T & {
-  className?: string;
-  tw?: string;
-  baseClassName?: string;
-  baseTw?: string;
+// Taken from CVA
+type ConfigSchema = Record<string, Record<string, ClassValue>>;
+type ConfigVariants<T extends ConfigSchema> = {
+  [Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | null;
+};
+type CVAProps<T> = T extends ConfigSchema
+  ? ConfigVariants<T> & ClassProp
+  : ClassProp;
+
+type AdditionalStyledProps<T, P extends keyof T = never> = {
+  [key in P]: T[key] | string;
 };
 
-export interface StyledOptions<T, P extends keyof T> {
+export type FunctionComponentWithClassName<T> = FunctionComponent<
+  T & {
+    className?: string;
+    tw?: string;
+  }
+>;
+
+export type StyledOptions<
+  T,
+  V extends ConfigSchema,
+  P extends keyof T = never
+> = {
   props?: Partial<Record<P, keyof Style | true>>;
   classProps?: (keyof T & string)[];
   baseClassName?: string;
-}
+
+  // From CVA types
+  variants?: V;
+  defaultVariants?: ConfigVariants<V>;
+  compoundVariants?: (V extends ConfigSchema
+    ? ConfigVariants<V> & ClassProp
+    : ClassProp)[];
+};
 
 /**
  * Default
  */
 export declare function styled<T>(
-  Component: ComponentType<T>
-): ComponentType<PropsWithClassName<T>>;
-/**
- * Base className
- */
-export declare function styled<T>(
   Component: ComponentType<T>,
-  baseClassName: string
-): ComponentType<PropsWithClassName<T>>;
-/**
- * Only options
- */
-export declare function styled<T, P extends keyof T>(
+  defaultClassName?: string
+): FunctionComponentWithClassName<T>;
+export declare function styled<
+  T,
+  V extends ConfigSchema,
+  P extends keyof T = never
+>(
   Component: ComponentType<T>,
-  options: StyledOptions<T, P>
-): ComponentType<
-  PropsWithClassName<
-    T & {
-      [key in P]: T[key] | string;
-    }
-  >
+  defaultClassName?: string,
+  options?: StyledOptions<T, V, P>
+): FunctionComponentWithClassName<
+  Omit<T, P> & CVAProps<V> & AdditionalStyledProps<T, P>
 >;
-/**
- * Base className w/ options
- */
-export declare function styled<T, P extends keyof T>(
+export declare function styled<T, V extends ConfigSchema, P extends keyof T>(
   Component: ComponentType<T>,
-  baseClassName: string,
-  options: StyledOptions<T, P>
-): ComponentType<
-  PropsWithClassName<
-    T & {
-      [key in P]: T[key] | string;
-    }
-  >
+  options: StyledOptions<T, V, P>
+): FunctionComponentWithClassName<
+  Omit<T, P> & CVAProps<V> & AdditionalStyledProps<T, P>
 >;
 
 export declare function StyledComponent<P>(
-  props: PropsWithClassName<P> & {
+  props: P & {
     component: React.ComponentType<P>;
+    className?: string;
+    tw?: string;
   }
-): React.ReactElement;
+): ReactElement<any, any> | null;
 
 export * from "./web";

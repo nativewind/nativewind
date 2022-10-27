@@ -39,6 +39,8 @@ const config = {
           remarkPlugins: [require("./src/remark-snackplayer")],
           routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),
+          includeCurrentVersion: true,
+          lastVersion: "current",
         },
         blog: false,
         theme: {
@@ -72,6 +74,11 @@ const config = {
           src: "img/logo.svg",
         },
         items: [
+          {
+            type: "docsVersionDropdown",
+            position: "left",
+            dropdownActiveClassDisabled: true,
+          },
           {
             href: "https://github.com/marklawlor/nativewind",
             label: "GitHub",

@@ -22,21 +22,26 @@ export function placeContent(node: Declaration, meta: SelectorMeta) {
           case "first":
           case "last":
           case "safe":
-          case "unsafe":
+          case "unsafe": {
             continue;
+          }
           case "baseline":
           case "space-evenly":
-          case "stretch":
+          case "stretch": {
             alignContent = "";
             continue;
-          case "start":
+          }
+          case "start": {
             alignContent = "flex-start";
             continue;
-          case "end":
+          }
+          case "end": {
             alignContent = "flex-end";
             continue;
-          default:
+          }
+          default: {
             alignContent = child.name;
+          }
         }
       }
     }
@@ -54,16 +59,20 @@ export function placeContent(node: Declaration, meta: SelectorMeta) {
           case "initial":
           case "revert":
           case "revert-layer":
-          case "unset":
+          case "unset": {
             continue;
-          case "start":
+          }
+          case "start": {
             justifyContent = "flex-start";
             continue;
-          case "end":
+          }
+          case "end": {
             justifyContent = "flex-end";
             continue;
-          default:
+          }
+          default: {
             justifyContent = child.name;
+          }
         }
       }
     }

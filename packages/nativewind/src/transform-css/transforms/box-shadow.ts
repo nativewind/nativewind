@@ -24,10 +24,12 @@ export function boxShadow(node: Declaration, meta: SelectorMeta) {
     const child = node.value.children.shift()?.data;
 
     switch (child?.type) {
-      case "Identifier":
+      case "Identifier": {
         return styles;
-      default:
+      }
+      default: {
         pushStyle(styles, "borderStyle", meta, children[0]);
+      }
     }
   }
 

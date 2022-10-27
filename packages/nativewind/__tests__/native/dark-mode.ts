@@ -5,7 +5,7 @@ testCompile("dark:text-red-500", (output) => {
     "dark:text-red-500": {
       styles: [{ color: "#ef4444" }],
       atRules: { 0: [["--color-scheme", "dark"]] },
-      topics: ["--color-scheme"],
+      subscriptions: ["--color-scheme"],
     },
   });
 });
@@ -26,7 +26,7 @@ testCompile(
       "dark:text-red-500": {
         styles: [{ color: "#ef4444" }],
         atRules: { 0: [["--color-scheme", "dark"]] },
-        topics: ["--color-scheme"],
+        subscriptions: ["--color-scheme"],
       },
     });
   }

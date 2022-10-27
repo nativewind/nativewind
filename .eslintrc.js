@@ -12,7 +12,7 @@ module.exports = {
   env: {
     node: true,
   },
-  ignorePatterns: ["dist/*", "types.d.ts", "coverage/*", "website/build/*"],
+  ignorePatterns: ["dist/**/*", "types.d.ts", "coverage/*", "website/build/*"],
   rules: {
     "@typescript-eslint/no-unused-vars": [
       "error",

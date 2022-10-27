@@ -26,7 +26,7 @@ testCompile("sm:divide-x-2", (output) => {
     },
     "sm:divide-x-2:children": {
       conditions: ["not-first-child"],
-      topics: ["--device-width"],
+      subscriptions: ["--device-width"],
       atRules: {
         "0": [["min-width", 640]],
       },

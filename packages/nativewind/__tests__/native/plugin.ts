@@ -23,7 +23,7 @@ testCompile(
         atRules: {
           1: [["--color-scheme", "dark"]],
         },
-        topics: ["--color-scheme"],
+        subscriptions: ["--color-scheme"],
       },
     });
   }
@@ -56,7 +56,7 @@ testCompile(
         atRules: {
           1: [["--color-scheme", "dark"]],
         },
-        topics: ["--color-scheme"],
+        subscriptions: ["--color-scheme"],
       },
     });
   }

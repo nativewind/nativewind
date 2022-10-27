@@ -18,10 +18,12 @@ function reducer(state: ComponentState, action: Action) {
   switch (action.type) {
     case "hover":
     case "active":
-    case "focus":
+    case "focus": {
       return { ...state, [action.type]: action.value };
-    default:
+    }
+    default: {
       throw new Error("Unknown action");
+    }
   }
 }
 

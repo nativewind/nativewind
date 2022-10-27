@@ -1,57 +1,76 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentType, ForwardedRef, forwardRef, useMemo } from "react";
 import { StyleProp } from "react-native";
+import { cva } from "class-variance-authority";
+import { twMerge } from "tailwind-merge";
+
 import { Style } from "../../transform-css/types";
-import type { PropsWithClassName, StyledOptions } from "../index";
+import type { StyledOptions } from "../index";
 
 export function styled(
-  Component: ComponentType<{
+  component: ComponentType<{
     style: StyleProp<Style>;
     ref: ForwardedRef<unknown>;
   }>,
   styledBaseClassNameOrOptions?: string | StyledOptions<unknown, never>,
-  maybeOptions: StyledOptions<unknown, never> = {}
+  maybeOptions: StyledOptions<any, any> = {}
 ) {
-  const { classProps } =
+  const { classProps, baseClassName, props, ...cvaOptions } =
     typeof styledBaseClassNameOrOptions === "object"
       ? styledBaseClassNameOrOptions
       : maybeOptions;
 
-  const baseClassName =
+  const defaultClassName =
     typeof styledBaseClassNameOrOptions === "string"
       ? styledBaseClassNameOrOptions
-      : maybeOptions?.baseClassName;
+      : baseClassName;
 
-  return forwardRef(
-    (
-      {
-        tw,
-        className,
-        style: inlineStyle,
-        ...props
-      }: PropsWithClassName<{ style: Style }>,
-      ref
-    ) => {
-      let actualClassName = tw ?? className;
+  const classGenerator = cva([classProps, defaultClassName], cvaOptions);
 
-      if (classProps) actualClassName = `${classProps} ${actualClassName}`;
-      if (baseClassName)
-        actualClassName = `${baseClassName} ${actualClassName}`;
+  const Styled = forwardRef<unknown, any>(function (
+    { className, tw, ...props },
+    ref
+  ) {
+    const generatedClassName = twMerge(
+      classGenerator({
+        class: tw ?? className,
+        ...props,
+      })
+    );
 
-      const style = useMemo(() => {
-        return actualClassName
-          ? [{ $$css: true, tailwind: actualClassName } as Style, inlineStyle]
-          : inlineStyle;
-      }, [inlineStyle, actualClassName]);
+    return (
+      <StyledComponent
+        ref={ref}
+        component={component}
+        className={generatedClassName}
+        {...props}
+      />
+    );
+  });
 
-      return <Component ref={ref} {...props} style={style} />;
-    }
-  );
+  if (typeof component !== "string") {
+    Styled.displayName = `NativeWind.${
+      component.displayName || component.name || "NoName"
+    }`;
+  }
+
+  return Styled;
 }
 
-export const StyledComponent = forwardRef(
-  ({ component, ...options }: any, ref) => {
-    const Component = useMemo(() => styled(component), [component]);
-    return <Component {...options} ref={ref} />;
-  }
-);
+export const StyledComponent = forwardRef(function StyledComponent(
+  { component: Component, className, style: inlineStyle, ...props }: any,
+  ref
+) {
+  const style = useMemo(() => {
+    if (className && inlineStyle) {
+      return [{ $$css: true, tailwind: className } as Style, inlineStyle];
+    } else if (className) {
+      return { $$css: true, tailwind: className } as Style;
+    }
+    if (inlineStyle) {
+      return inlineStyle;
+    }
+  }, [inlineStyle, className]);
+
+  return <Component ref={ref} {...props} style={style} />;
+});

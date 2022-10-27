@@ -10,48 +10,49 @@ const platforms = new Set([
   "web",
 ]);
 
-export function parseMediaQuery(
-  node: MediaQuery,
-  topicsAndAtRules: SelectorMeta
-) {
+export function parseMediaQuery(node: MediaQuery, selectorMeta: SelectorMeta) {
   // eslint-disable-next-line unicorn/no-array-for-each
   node.children.forEach((child) => {
     if (child.type === "Identifier" && platforms.has(child.name)) {
-      topicsAndAtRules.conditions.push(child.name);
+      selectorMeta.conditions.push(child.name);
     } else if (child.type === "MediaFeature") {
-      topicsAndAtRules.atRules ??= [];
+      selectorMeta.atRules ??= [];
 
       if (child.name.includes("prefers-color-scheme")) {
-        topicsAndAtRules.topics.push("--color-scheme");
-        topicsAndAtRules.atRules.push(["--color-scheme", "dark"]);
+        selectorMeta.subscriptions.push("--color-scheme");
+        selectorMeta.atRules.push(["--color-scheme", "dark"]);
         return;
       }
 
       if (child.name.includes("width")) {
-        topicsAndAtRules.topics.push("--device-width");
+        selectorMeta.subscriptions.push("--device-width");
       }
 
       if (child.name.includes("height")) {
-        topicsAndAtRules.topics.push("--device-height");
+        selectorMeta.subscriptions.push("--device-height");
       }
 
       switch (child.value?.type) {
-        case "Identifier":
-          topicsAndAtRules.atRules.push([child.name, child.value.name]);
+        case "Identifier": {
+          selectorMeta.atRules.push([child.name, child.value.name]);
           break;
-        case "Dimension":
+        }
+        case "Dimension": {
           switch (child.value.unit) {
-            case "px":
-              topicsAndAtRules.atRules.push([
+            case "px": {
+              selectorMeta.atRules.push([
                 child.name,
                 Number.parseFloat(child.value.value),
               ]);
               break;
-            default:
-              topicsAndAtRules.atRules.push([child.name, child.value.value]);
+            }
+            default: {
+              selectorMeta.atRules.push([child.name, child.value.value]);
               break;
+            }
           }
           break;
+        }
       }
     }
   });
