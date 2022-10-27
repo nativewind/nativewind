@@ -32,7 +32,7 @@ const processNode = (node, parent) => {
       const isPreview = version.includes("-");
 
       if (isPreview) {
-        config.compileUrl = `${version}/api/compile`;
+        config.compileUrl = `${process.env.VERCEL_URL}/api/compile`;
       }
 
       let withExpoSnack = "withExpoSnack(App)";
