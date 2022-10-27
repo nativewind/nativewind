@@ -9,6 +9,7 @@ const visit = require("unist-util-visit-parents");
 const u = require("unist-builder");
 const dedent = require("dedent");
 const fm = require("front-matter");
+const { version } = require("../../package.json");
 
 const parseParams = (paramString = "") => {
   const params = Object.fromEntries(new URLSearchParams(paramString));
@@ -26,13 +27,12 @@ const processNode = (node, parent) => {
       const params = parseParams(node.meta);
 
       const { body, attributes } = fm(node.value);
-      let { name = "Example", description, config, css } = attributes;
+      let { name = "Example", description, config = {}, css } = attributes;
 
-      const isPreview = !!process.env.NATIVEWIND_VERSION;
+      const isPreview = version.includes("-");
 
       if (isPreview) {
-        config ??= {};
-        config.compileUrl = `${process.env.VERCEL_URL}/api/compile`;
+        config.compileUrl = `${version}/api/compile`;
       }
 
       let withExpoSnack = "withExpoSnack(App)";
