@@ -28,11 +28,11 @@ const processNode = (node, parent) => {
       const { body, attributes } = fm(node.value);
       let { name = "Example", description, config, css } = attributes;
 
-      const isPreview = window.location.origin.endsWith("vercel.app");
+      const isPreview = !!process.env.NATIVEWIND_VERSION;
 
       if (isPreview) {
         config ??= {};
-        config.compileUrl = `${window.location.origin}/api/compile`;
+        config.compileUrl = `${process.env.VERCEL_URL}/api/compile`;
       }
 
       let withExpoSnack = "withExpoSnack(App)";

@@ -1,17 +1,8 @@
 name: GitHub Actions Vercel Preview Deployment
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-on:
-  push:
-    branches-ignore:
-      - main
-      - renovate/*
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+
 jobs:
   Publish-Preview:
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -42,76 +33,9 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  Deploy-Preview:
-    runs-on: ubuntu-latest
-    needs: [Publish-Preview]
-    outputs:
-      vercel_url: ${{ steps.deploy.outputs.vercel_url }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Install Preview Nativewind
-        run: npm install nativewind@${{ needs.Publish-Preview.outputs.version }} -w website
-      - name: Build Project Artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Deploy Project Artifacts to Vercel
-        id: deploy
-        run: echo "vercel_url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
-
   Snackager:
     runs-on: ubuntu-latest
     needs: [Publish-Preview]
     steps:
       - name: Update Snackager
         run: sleep 45 && curl "https://snackager.expo.io/bundle/nativewind@${{ needs.Publish-Preview.outputs.version }}?platforms=ios,android,web&version_snackager=true&bypassCache=true" --retry 5
-
-  Expo-Snack:
-    runs-on: ubuntu-latest
-    needs: [Deploy-Preview, Publish-Preview]
-    steps:
-      - name: Create comment
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const files = encodeURIComponent(JSON.stringify({
-              "App.tsx": {
-                "type": "CODE",
-                "contents": `import React from "react";
-            import { withExpoSnack } from "nativewind";
-            import { Text, View } from "react-native";
-            import { styled } from "nativewind";
-
-            const StyledView = styled(View);
-            const StyledText = styled(Text);
-
-            function App () {
-              return (
-                <StyledView className="flex-1 items-center justify-center">
-                  <StyledText className="text-slate-800">Try editing me! 🎉</StyledText>
-                </StyledView>
-              );
-            };
-
-            // This demo is using a external compiler that will only work in Expo Snacks.
-            // You may see flashes of unstyled content, this will not occur under normal use!
-            // Please see the documentation to setup your application
-            export default withExpoSnack(App, {
-              compileUrl: "${{ needs.Deploy-Preview.outputs.vercel_url }}/api/compile"
-            });`
-              }
-            }));
-            const body = `
-              Version: ${{ needs.Publish-Preview.outputs.version }}
-              Docs: ${{ needs.Deploy-Preview.outputs.vercel_url }}
-              Snack: https://snack.expo.dev?dependencies=nativewind%40${{ needs.Publish-Preview.outputs.version }}&files=${files}
-            `;
-            github.rest.repos.createCommitComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: "${{ github.sha }}",
-              body
-            })
