@@ -9,7 +9,7 @@ const visit = require("unist-util-visit-parents");
 const u = require("unist-builder");
 const dedent = require("dedent");
 const fm = require("front-matter");
-const { version } = require("../../package.json");
+const { version } = require("nativewind/package.json");
 
 const parseParams = (paramString = "") => {
   const params = Object.fromEntries(new URLSearchParams(paramString));
@@ -29,6 +29,7 @@ const processNode = (node, parent) => {
       const { body, attributes } = fm(node.value);
       let { name = "Example", description, config = {}, css } = attributes;
 
+      console.log(version);
       const isPreview = version.includes("-");
 
       if (isPreview) {
