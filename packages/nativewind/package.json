@@ -56,6 +56,7 @@
     "jest-expo": "^46.0.1",
     "micromatch": "^4.0.5",
     "react-is": "^18.1.0",
+    "tailwind-merge": "^1.7.0",
     "use-sync-external-store": "^1.1.0"
   },
   "devDependencies": {

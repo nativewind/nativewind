@@ -2,6 +2,8 @@
 import { ComponentType, ForwardedRef, forwardRef, useMemo } from "react";
 import { StyleProp } from "react-native";
 import { cva } from "class-variance-authority";
+import { twMerge } from "tailwind-merge";
+
 import { Style } from "../../transform-css/types";
 import type { StyledOptions } from "../index";
 
@@ -23,19 +25,18 @@ export function styled(
       ? styledBaseClassNameOrOptions
       : baseClassName;
 
-  const classGenerator = cva(
-    [classProps, defaultClassName].filter(Boolean).join(" "),
-    cvaOptions
-  );
+  const classGenerator = cva([classProps, defaultClassName], cvaOptions);
 
   const Styled = forwardRef<unknown, any>(function (
     { className, tw, ...props },
     ref
   ) {
-    const generatedClassName = classGenerator({
-      class: tw ?? className,
-      ...props,
-    });
+    const generatedClassName = twMerge(
+      classGenerator({
+        class: tw ?? className,
+        ...props,
+      })
+    );
 
     return (
       <StyledComponent
