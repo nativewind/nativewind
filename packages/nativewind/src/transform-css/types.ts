@@ -1,4 +1,4 @@
-import { CssNode } from "css-tree";
+import { walk, CssNode, CssNodeCommon, Raw } from "css-tree";
 import {
   ColorValue,
   ImageStyle,
@@ -54,10 +54,18 @@ export type FunctionValue = {
 
 export type VariableValue = string | number | FunctionValue | ColorValue;
 
+export const skip = (walk as unknown as Record<string, unknown>).skip;
+
 export function isFunctionValue(value: StyleValue): value is FunctionValue {
   return typeof value === "object" && "function" in value;
 }
 
 export function isCssNode(value: StyleValue): value is CssNode {
   return typeof value === "object" && "type" in value;
+}
+
+export function isRaw(
+  node?: CssNodeCommon | null
+): node is Raw | null | undefined {
+  return node?.type === "Raw";
 }
