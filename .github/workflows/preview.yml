@@ -1,11 +1,13 @@
 name: GitHub Actions Vercel Preview Deployment
 
 on:
-  deployment_status:
+  push:
+    branches-ignore:
+      - main
+      - renovate/*
 
 jobs:
   Publish-Preview:
-    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}

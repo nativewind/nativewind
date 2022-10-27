@@ -45,9 +45,13 @@ const processNode = (node, parent) => {
           2
         )}, "${css}")`;
       } else if (config) {
-        withExpoSnack = `withExpoSnack(App, ${JSON.stringify(config, null, 2)}`;
+        withExpoSnack = `withExpoSnack(App, ${JSON.stringify(
+          config,
+          null,
+          2
+        )})`;
       } else if (css) {
-        withExpoSnack = `withExpoSnack(App, {}, "${css}"}`;
+        withExpoSnack = `withExpoSnack(App, {}, "${css}")`;
       }
 
       const code = `import React from 'react';
