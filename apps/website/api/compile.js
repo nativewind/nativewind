@@ -34,3 +34,7 @@ export default async function handler(request, response) {
     });
   }
 }
+
+export const config = {
+  runtime: "experimental-edge",
+};
