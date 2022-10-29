@@ -4,7 +4,7 @@ import { PropertyFunction } from "./only";
 export const aspectRatio: PropertyFunction<"aspectRatio"> = (value) => {
   if (value === "0") {
     return {};
-  } else if (typeof value === "string" && value.includes("/")) {
+  } else if (value.includes("/")) {
     const [left, right] = value.split("/").map((n) => {
       return Number.parseInt(n, 10);
     });

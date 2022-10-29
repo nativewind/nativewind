@@ -1,11 +1,6 @@
 import { getStylesForProperty, Style } from "css-to-react-native";
 import { ImageStyle, TextStyle, ViewStyle } from "react-native";
 
-export type PropertyGuard<T extends string> = (
-  value: string,
-  name: string
-) => PropertyFunction<T>;
-
 export interface PropertyFunction<T extends string> {
   prop?: T;
   (value: string, name: string): Style;
