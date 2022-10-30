@@ -8,7 +8,7 @@ import { Style } from "../../transform-css/types";
 import type { StyledOptions } from "../index";
 
 export function styled(
-  component: ComponentType<{
+  Component: ComponentType<{
     style: StyleProp<Style>;
     ref: ForwardedRef<unknown>;
   }>,
@@ -38,19 +38,23 @@ export function styled(
       })
     );
 
+    if (!generatedClassName) {
+      return <Component ref={ref} {...props} />;
+    }
+
     return (
       <StyledComponent
         ref={ref}
-        component={component}
+        component={Component}
         className={generatedClassName}
         {...props}
       />
     );
   });
 
-  if (typeof component !== "string") {
+  if (typeof Component !== "string") {
     Styled.displayName = `NativeWind.${
-      component.displayName || component.name || "NoName"
+      Component.displayName || Component.name || "NoName"
     }`;
   }
 

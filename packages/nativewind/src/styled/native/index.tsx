@@ -30,7 +30,7 @@ import { cva } from "class-variance-authority";
 const stateInheritanceContent = createContext<ConditionalStateRecord>({});
 
 export function styled(
-  component: ComponentType,
+  Component: ComponentType,
   styledBaseClassNameOrOptions?: string | StyledOptions<any, any>,
   maybeOptions: StyledOptions<any, any> = {}
 ) {
@@ -57,10 +57,14 @@ export function styled(
         ...props,
       });
 
+      if (!generatedClassName) {
+        return <Component ref={ref} {...props} />;
+      }
+
       return (
         <StyledComponent
           ref={ref}
-          component={component}
+          component={Component}
           propsToTransform={propsToTransform}
           className={generatedClassName}
           {...props}
@@ -68,9 +72,9 @@ export function styled(
       );
     }
   );
-  if (typeof component !== "string") {
+  if (typeof Component !== "string") {
     Styled.displayName = `NativeWind.${
-      component.displayName || component.name || "NoName"
+      Component.displayName || Component.name || "NoName"
     }`;
   }
 
