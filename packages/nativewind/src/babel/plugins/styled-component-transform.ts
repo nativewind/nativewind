@@ -64,17 +64,12 @@ export function styledComponentTransform(
     PluginPass & {
       opts: StyledComponentTransformOptions;
       isInContent?: boolean;
-      didTransform?: boolean;
+      addedNativeWindImport?: boolean;
     }
   > = {
     Program: {
       enter(_, state) {
         state.blockList = new Set();
-      },
-      exit(path, state) {
-        if (state.didTransform) {
-          addNamed(path, "StyledComponent", "nativewind");
-        }
       },
     },
     JSXElement(path, state) {
@@ -126,7 +121,11 @@ export function styledComponentTransform(
           path.node.children
         )
       );
-      state.didTransform = true;
+
+      if (!state.addedNativeWindImport) {
+        state.addedNativeWindImport = true;
+        addNamed(path, "StyledComponent", "nativewind");
+      }
     },
   };
 
