@@ -175,6 +175,8 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
       return [styles, inlineStyles];
     } else if (keys > 0) {
       return styles;
+    } else if (inlineStyles) {
+      return inlineStyles;
     }
   }, [styles, inlineStyles]);
 

@@ -33,7 +33,5 @@ function __reset() {
   setVariables({
     "--i18n-direction": I18nManager.isRTL ? "rtl" : "ltr",
   });
-
-  // context.dangerouslyCompileStyles = undefined;
 }
 __reset();
