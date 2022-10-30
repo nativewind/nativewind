@@ -9,6 +9,7 @@ const visit = require("unist-util-visit-parents");
 const u = require("unist-builder");
 const dedent = require("dedent");
 const fm = require("front-matter");
+const { version } = require("nativewind/package.json");
 
 const parseParams = (paramString = "") => {
   const params = Object.fromEntries(new URLSearchParams(paramString));
@@ -26,13 +27,12 @@ const processNode = (node, parent) => {
       const params = parseParams(node.meta);
 
       const { body, attributes } = fm(node.value);
-      let { name = "Example", description, config, css } = attributes;
+      let { name = "Example", description, config = {}, css } = attributes;
 
-      const isPreview = window.location.origin.endsWith("vercel.app");
+      const isPreview = version.includes("-");
 
       if (isPreview) {
-        config ??= {};
-        config.compileUrl = `${window.location.origin}/api/compile`;
+        config.compileUrl = `https://${process.env.VERCEL_URL}/api/compile`;
       }
 
       let withExpoSnack = "withExpoSnack(App)";
@@ -44,9 +44,13 @@ const processNode = (node, parent) => {
           2
         )}, "${css}")`;
       } else if (config) {
-        withExpoSnack = `withExpoSnack(App, ${JSON.stringify(config, null, 2)}`;
+        withExpoSnack = `withExpoSnack(App, ${JSON.stringify(
+          config,
+          null,
+          2
+        )})`;
       } else if (css) {
-        withExpoSnack = `withExpoSnack(App, {}, "${css}"}`;
+        withExpoSnack = `withExpoSnack(App, {}, "${css}")`;
       }
 
       const code = `import React from 'react';
@@ -66,7 +70,8 @@ export default ${withExpoSnack};
       const preview = params.preview || "true";
       const loading = params.loading || "lazy";
       const dependencies =
-        params.dependencies || "react,react-native,nativewind@latest";
+        params.dependencies ||
+        `react,react-native,nativewind@${isPreview ? version : "latest"}`;
 
       // Generate Node for SnackPlayer
       // See https://github.com/expo/snack/blob/main/docs/embedding-snacks.md
@@ -82,7 +87,7 @@ export default ${withExpoSnack};
             data-snack-theme="${theme}"
             data-snack-preview="${preview}"
             data-snack-loading="${loading}"
-            data-snack-sdkversion="45.0.0"
+            data-snack-sdkversion="46.0.0"
             data-snack-code="${encodeURIComponent(code)}"
           ></div>
           `,
