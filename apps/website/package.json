@@ -15,9 +15,9 @@
   },
   "dependencies": {
     "@babel/standalone": "7.19.5",
-    "@codemirror/lang-javascript": "6.1.0",
-    "@docusaurus/core": "2.1.0",
-    "@docusaurus/preset-classic": "2.1.0",
+    "@codemirror/lang-javascript": "6.1.1",
+    "@docusaurus/core": "2.2.0",
+    "@docusaurus/preset-classic": "2.2.0",
     "@mdx-js/react": "1.6.22",
     "@uiw/codemirror-theme-dracula": "4.12.4",
     "@uiw/codemirror-theme-eclipse": "4.12.4",
@@ -36,7 +36,7 @@
     "react-dom": "18.2.0",
     "react-twitter-embed": "4.0.4",
     "sass": "1.55.0",
-    "tailwindcss": "3.2.0",
+    "tailwindcss": "3.2.1",
     "unist-builder": "2.0.3",
     "unist-util-visit-parents": "3.1.1"
   },
