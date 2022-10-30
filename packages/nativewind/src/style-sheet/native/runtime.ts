@@ -145,7 +145,7 @@ export function setAtom(name: string, atom: Atom) {
 
       let atRuleConditionsMet = true;
 
-      if (atRules && atRules.length === 0) {
+      if (atRules && atRules.length >= 0) {
         atRuleConditionsMet = atRules.every(([rule, params]) => {
           switch (rule) {
             case colorSchemeKey: {
