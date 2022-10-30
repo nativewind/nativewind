@@ -6,6 +6,7 @@ import {
   Style,
   VariableValue,
 } from "../../transform-css/types";
+import { colorSchemeKey } from "../common";
 import { resolve } from "./resolve";
 
 type ComputedAtom = Atom & { computedStyle: Style; recompute: () => Style };
@@ -147,35 +148,35 @@ export function setAtom(name: string, atom: Atom) {
       if (atRules && atRules.length === 0) {
         atRuleConditionsMet = atRules.every(([rule, params]) => {
           switch (rule) {
-            case "colorScheme": {
-              return variables.get("colorScheme") === params;
+            case colorSchemeKey: {
+              return variables.get(colorSchemeKey) === params;
             }
             case "platform": {
               return params === Platform.OS;
             }
             case "width": {
-              return params === resolve(variables.get("--window-width"));
+              return params === resolve(variables.get("--device-width"));
             }
             case "min-width": {
-              const value = resolve(variables.get("--window-width"));
+              const value = resolve(variables.get("--device-width"));
               if (typeof value !== "number") return false;
               return (params ?? 0) >= value;
             }
             case "max-width": {
-              const value = resolve(variables.get("--window-width"));
+              const value = resolve(variables.get("--device-width"));
               if (typeof value !== "number") return false;
               return (params ?? 0) <= value;
             }
             case "height": {
-              return params === resolve(variables.get("--window-height"));
+              return params === resolve(variables.get("--device-height"));
             }
             case "min-height": {
-              const value = resolve(variables.get("--window-height"));
+              const value = resolve(variables.get("--device-height"));
               if (typeof value !== "number") return false;
               return (params ?? 0) >= value;
             }
             case "max-height": {
-              const value = resolve(variables.get("--window-height"));
+              const value = resolve(variables.get("--device-height"));
               if (typeof value !== "number") return false;
               return (params ?? 0) <= value;
             }
