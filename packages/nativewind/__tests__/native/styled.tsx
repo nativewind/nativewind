@@ -1,12 +1,51 @@
 import { render } from "@testing-library/react-native";
 import { FunctionComponent } from "react";
 import { StyleProp, ViewProps, ViewStyle } from "react-native";
+import * as nativewind from "../../src/styled/native";
 import { NativeWindStyleSheet, styled } from "../../src";
 import { create } from "../test-utils";
 
 afterEach(() => {
   NativeWindStyleSheet.__reset();
   jest.clearAllMocks();
+});
+
+test("StyledComponent wrapping styled()", () => {
+  /**
+   * When using styled() & the babel plugin, it will convert the styled()
+   * component into <StyledComponent component={styled(component) } />
+   *
+   * This test ensures that StyledComponent is only called once, and the
+   * styled(component) doesn't call StyledComponent again
+   *
+   */
+  create("p-4");
+
+  const renderSpy = jest.spyOn(
+    nativewind.StyledComponent as unknown as Record<string, () => void>,
+    "render"
+  );
+
+  const Component = jest.fn(
+    (props) => props.children
+  ) as FunctionComponent<ViewProps>;
+
+  const MyStyledComponent = styled(Component);
+
+  render(
+    <nativewind.StyledComponent component={MyStyledComponent} className="p-4" />
+  );
+
+  expect(Component).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: {
+        padding: 16,
+      },
+    }),
+    {}
+  );
+
+  expect(renderSpy).toHaveBeenCalledTimes(1);
 });
 
 test("default variant", () => {
@@ -16,7 +55,7 @@ test("default variant", () => {
     (props) => props.children
   ) as FunctionComponent<ViewProps>;
 
-  const StyledComponent = styled(Component, "bg-white", {
+  const MyStyledComponent = styled(Component, "bg-white", {
     variants: {
       size: {
         large: "p-4",
@@ -27,7 +66,7 @@ test("default variant", () => {
     },
   });
 
-  render(<StyledComponent />);
+  render(<MyStyledComponent />);
 
   expect(Component).toHaveBeenCalledWith(
     expect.objectContaining({
