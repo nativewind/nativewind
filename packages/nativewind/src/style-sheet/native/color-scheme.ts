@@ -26,7 +26,7 @@ function internalSetColorScheme(system?: ColorSchemeName | "system" | null) {
 export function setColorScheme(system?: ColorSchemeName | "system" | null) {
   if (variables.get(darkModeKey) !== "class") {
     console.error(
-      "Cannot manually control color scheme. Please set 'darkMode' to 'class' in your 'tailwind.config.js'"
+      `Cannot manually control color scheme. Please set "darkMode: 'class'" in your 'tailwind.config.js'`
     );
     return;
   }
@@ -41,7 +41,7 @@ export function getColorScheme() {
 export function toggleColorScheme() {
   if (variables.get(darkModeKey) !== "class") {
     console.error(
-      "Cannot manually control color scheme. Please set 'darkMode' to 'class' in your 'tailwind.config.js'"
+      `Cannot manually control color scheme. Please set "darkMode: 'class'" in your 'tailwind.config.js'`
     );
     return;
   }

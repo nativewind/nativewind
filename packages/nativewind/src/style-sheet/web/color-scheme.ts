@@ -2,8 +2,6 @@ import { Appearance, ColorSchemeName } from "react-native";
 import { colorSchemeKey, colorSchemeSystemKey, darkModeKey } from "../common";
 import { getVariable } from "./runtime";
 
-const rootStyle = getComputedStyle(document.documentElement);
-
 Appearance.addChangeListener(({ colorScheme }) => {
   if (getVariable(darkModeKey) === "class") {
     return;
@@ -25,9 +23,9 @@ function internalSetColorScheme(system?: ColorSchemeName | "system" | null) {
 }
 
 export function setColorScheme(system?: ColorSchemeName | "system" | null) {
-  if (rootStyle.getPropertyValue(darkModeKey) !== "class") {
+  if (getVariable(darkModeKey) !== "class") {
     console.error(
-      "Cannot manually control color scheme. Please set 'darkMode' to 'class' in your 'tailwind.config.js'"
+      `Cannot manually control color scheme. Please set "darkMode: 'class'" in your 'tailwind.config.js'`
     );
     return;
   }
@@ -42,7 +40,7 @@ export function getColorScheme() {
 export function toggleColorScheme() {
   if (getVariable(darkModeKey) !== "class") {
     console.error(
-      "Cannot manually control color scheme. Please set 'darkMode' to 'class' in your 'tailwind.config.js'"
+      `Cannot manually control color scheme. Please set "darkMode: 'class'" in your 'tailwind.config.js'`
     );
     return;
   }
