@@ -68,11 +68,14 @@ Expo Web only supports Webpack 4, please ensure you are only installing webpack 
 
 https://github.com/expo/expo-cli/pull/3763
 
+Hot reloading with `postcss` & `@expo/webpack-config` has known issues on some systems.
+We are open to PRs if you know how to fix this issue.
+
 :::
 
 `npm i -D postcss-loader@4.2.0`
 
-```tsx
+```diff
 // webpack.config.js
 const path = require("path");
 const createExpoWebpackConfigAsync = require("@expo/webpack-config");
@@ -81,17 +84,17 @@ module.exports = async function (env, argv) {
   const config = await createExpoWebpackConfigAsync(
     {
       ...env,
-      babel: {
-        dangerouslyAddModulePathsToTranspile: ["nativewind"],
-      },
++     babel: {
++       dangerouslyAddModulePathsToTranspile: ["nativewind"],
++     },
     },
     argv
   );
 
-  config.module.rules.push({
-    test: /\.css$/i,
-    use: ["postcss-loader"],
-  });
++ config.module.rules.push({
++   test: /\.css$/i,
++   use: ["postcss-loader"],
++ });
 
   return config;
 };
