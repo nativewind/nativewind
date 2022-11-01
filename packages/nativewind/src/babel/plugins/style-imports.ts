@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import type { ConfigAPI, PluginPass, Visitor } from "@babel/core";
 import { addSideEffect } from "@babel/helper-module-imports";
 
@@ -16,7 +17,7 @@ export function styleImports(api: ConfigAPI) {
   const visitor: Visitor<PluginPass> = {
     Program(path, state) {
       if (
-        state.filename?.endsWith("nativewind/dist/index.js") &&
+        state.filename?.endsWith(join("nativewind", "dist", "index.js")) &&
         process.env.NATIVEWIND_OUTPUT
       ) {
         addSideEffect(path, process.env.NATIVEWIND_OUTPUT);

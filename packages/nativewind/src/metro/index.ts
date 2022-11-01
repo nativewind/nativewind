@@ -29,7 +29,7 @@ export default function withNativeWind(
       let { main } = require(`${cwd()}/package.json`);
 
       if (main && main === "node_modules/expo/AppEntry.js") {
-        main = `${cwd()}/App.js`;
+        main = join(cwd(), "App.js");
       }
 
       if (main) {
@@ -58,7 +58,9 @@ export default function withNativeWind(
   if (isDevelopment) {
     spawnCommands.push("--watch", "--poll");
 
-    const cli = spawn("npx", spawnCommands);
+    const cli = spawn("npx", spawnCommands, {
+      shell: true,
+    });
 
     cli.stdout.on("data", (data) => {
       const createOptions = JSON.stringify(
@@ -75,7 +77,7 @@ export default function withNativeWind(
       if (output) console.error(`NativeWind: ${output}`);
     });
   } else {
-    spawnSync("npx", spawnCommands);
+    spawnSync("npx", spawnCommands, { shell: true });
   }
 
   return config;
