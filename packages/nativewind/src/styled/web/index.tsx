@@ -15,17 +15,24 @@ export function styled(
   styledBaseClassNameOrOptions?: string | StyledOptions<unknown, never>,
   maybeOptions: StyledOptions<any, any> = {}
 ) {
-  const { classProps, baseClassName, props, ...cvaOptions } =
-    typeof styledBaseClassNameOrOptions === "object"
-      ? styledBaseClassNameOrOptions
-      : maybeOptions;
+  const {
+    classProps,
+    class: baseClassName,
+    props,
+    ...cvaOptions
+  } = typeof styledBaseClassNameOrOptions === "object"
+    ? styledBaseClassNameOrOptions
+    : maybeOptions;
 
-  const defaultClassName =
-    typeof styledBaseClassNameOrOptions === "string"
-      ? styledBaseClassNameOrOptions
-      : baseClassName;
-
-  const classGenerator = cva([classProps, defaultClassName], cvaOptions);
+  const classGenerator = cva(
+    [
+      typeof styledBaseClassNameOrOptions === "string"
+        ? styledBaseClassNameOrOptions
+        : baseClassName,
+      classProps,
+    ],
+    cvaOptions
+  );
 
   const Styled = forwardRef<unknown, any>(function (
     { className, tw, ...props },

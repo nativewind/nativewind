@@ -34,7 +34,7 @@ export type StyledOptions<
 > = {
   props?: Partial<Record<P, keyof Style | true>>;
   classProps?: (keyof T & string)[];
-  baseClassName?: string;
+  class?: string;
 
   // From CVA types
   variants?: V;

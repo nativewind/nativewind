@@ -36,19 +36,19 @@ export function styled(
 ) {
   const {
     classProps,
-    baseClassName = "",
+    class: baseClassName = "",
     props: propsToTransform,
     ...cvaOptions
   } = typeof styledBaseClassNameOrOptions === "object"
     ? styledBaseClassNameOrOptions
     : maybeOptions;
 
-  const defaultClassName =
+  const classGenerator = cva(
     typeof styledBaseClassNameOrOptions === "string"
       ? styledBaseClassNameOrOptions
-      : baseClassName;
-
-  const classGenerator = cva(defaultClassName, cvaOptions);
+      : baseClassName,
+    cvaOptions
+  );
 
   const Styled = forwardRef<unknown, any>(
     ({ className, tw, ...props }, ref) => {
