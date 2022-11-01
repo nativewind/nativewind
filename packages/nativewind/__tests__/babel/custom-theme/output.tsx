@@ -8,7 +8,6 @@ export function Test() {
     </_StyledComponent>
   );
 }
-
 _NativeWindStyleSheet.create({
   styles: {
     "p-px": {

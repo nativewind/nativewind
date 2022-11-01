@@ -10,7 +10,6 @@ export function Test() {
     </View>
   );
 }
-
 _NativeWindStyleSheet.create({
   styles: {
     "border-hairline": {
