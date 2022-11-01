@@ -11,7 +11,6 @@ export function Test({ isBold, isUnderline }) {
     </_StyledComponent>
   );
 }
-
 _NativeWindStyleSheet.create({
   styles: {
     "font-bold": {

@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
     color: "blue",
   },
 });
-
 _NativeWindStyleSheet.create({
   styles: {
     "font-bold": {

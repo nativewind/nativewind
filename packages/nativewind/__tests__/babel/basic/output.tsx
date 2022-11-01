@@ -10,7 +10,6 @@ export function Test() {
     </_StyledComponent>
   );
 }
-
 _NativeWindStyleSheet.create({
   styles: {
     container: {
