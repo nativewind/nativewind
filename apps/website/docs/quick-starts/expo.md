@@ -71,28 +71,7 @@ module.exports = function (api) {
 
 ```
 
-<<<<<<< HEAD
-
 ## 4. Add the Metro config
-
-=======
-<StartCoding />
-
-## Expo Web
-
-When running on web, NativeWind is a compatability layer between [Tailwind CSS](http://www.tailwindcss.com) and React Native.
-
-You will need follow a [Tailwind CSS installation guide](https://tailwindcss.com/docs/installation) and ensure NativeWind is transpiled.
-
-### Example webpack setup
-
-A complete setup can be found on the [Expo project example](https://github.com/marklawlor/nativewind/tree/next/examples/expo)
-
-:::caution
-
-Expo Web only supports Webpack 4, please ensure you are only installing webpack loaders that that support Webpack 4. For example, The latest version of `postcss-loader` is not compatible with Webpack 4 and instead, `postcss-loader@4.2.0` should be used.
-
-> > > > > > > main
 
 Run `npx expo customize metro.config.js` to create a `metro.config.js` file.
 

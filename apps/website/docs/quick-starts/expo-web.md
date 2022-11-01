@@ -2,13 +2,23 @@ import StartCoding from "../\_start-coding.md"
 
 # Expo Web
 
-When running on web, NativeWind is a compatability layer between [Tailwind CSS](http://www.tailwindcss.com) and React Native.
+:::caution
+
+NativeWind does not support:
+
+- SDK <=45: NativeWind requires React Native Web 0.18 which was added in SDK 46.
+- Expo Metro: As it [does not support bundling CSS](https://docs.expo.dev/guides/customizing-metro/#expo-webpack-vs-expo-metro)
+- Expo Router: It requires Expo Metro
+
+:::
+
+When running on web, NativeWind is a compatability layer between the generated CSS from [Tailwind](http://www.tailwindcss.com) and React Native Web.
 
 ## Follow the Expo setup
 
 Please complete the [Expo Quick Start](./expo.md)
 
-## Create a css file
+## 1. Create a css file
 
 ```diff
 // main.css
@@ -17,7 +27,13 @@ Please complete the [Expo Quick Start](./expo.md)
 + @tailwind utilities;
 ```
 
-## Import it into your App.js
+## 2. Import it into your App.js
+
+:::info
+
+NativeWind's babel plugin will ensure this works for your native builds as well!
+
+:::
 
 ```diff
 import { StatusBar } from 'expo-status-bar';
@@ -44,15 +60,17 @@ const styles = StyleSheet.create({
 });
 ```
 
-## Update your Webpack config
+## 3. Update your Webpack config
 
 :::caution
 
-Expo Web only supports Webpack 4, please ensure you are only installing webpack loaders that that support Webpack 4. For example, The latest version of `postcss-loader` is not compatible with Webpack 4 and instead, `postcss-loader@4.2.0` should be used.
+Expo Web only supports Webpack 4, please ensure you are only installing webpack loaders that that support Webpack 4.
 
 https://github.com/expo/expo-cli/pull/3763
 
 :::
+
+`npm i -D postcss-loader@4.2.0`
 
 ```tsx
 // webpack.config.js
@@ -78,7 +96,3 @@ module.exports = async function (env, argv) {
   return config;
 };
 ```
-
-## Expo SDK <=45
-
-NativeWind does not support Expo Web on SDK <=45.
