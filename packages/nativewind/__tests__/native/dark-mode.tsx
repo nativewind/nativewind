@@ -2,6 +2,11 @@ import { act, render } from "@testing-library/react-native";
 import { NativeWindStyleSheet, styled } from "../../src";
 import { create, testCompile } from "../test-utils";
 
+afterEach(() => {
+  NativeWindStyleSheet.__reset();
+  jest.clearAllMocks();
+});
+
 testCompile("dark:text-red-500", (output) => {
   expect(output).toStrictEqual({
     "dark:text-red-500": {
@@ -34,7 +39,7 @@ testCompile(
   }
 );
 
-test.only("switch dark mode", () => {
+test("switch dark mode", () => {
   create("text-black dark:text-white", {
     config: {
       darkMode: "class",
