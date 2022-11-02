@@ -6,7 +6,6 @@ import {
   setColorScheme,
   toggleColorScheme,
 } from "./color-scheme";
-import { useVariable } from "./use-variable";
 
 const noop = () => {
   return;
@@ -25,6 +24,7 @@ export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   toggleColorScheme,
   setVariables,
   setDimensions: noop,
-  useVariable,
   __dangerouslyCompileStyles: noop,
 };
+
+export { useUnsafeVariable } from "./use-unsafe-variable";

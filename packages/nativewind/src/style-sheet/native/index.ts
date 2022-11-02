@@ -13,7 +13,6 @@ import {
   setColorScheme,
   toggleColorScheme,
 } from "./color-scheme";
-import { useVariable } from "./use-variable";
 
 export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   create,
@@ -23,9 +22,10 @@ export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   toggleColorScheme,
   setVariables,
   setDimensions,
-  useVariable,
   __dangerouslyCompileStyles,
 };
+
+export { useUnsafeVariable } from "./use-unsafe-variable";
 
 function __reset() {
   resetRuntime();

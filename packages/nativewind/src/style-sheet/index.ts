@@ -3,9 +3,9 @@ import type { AtomRecord, VariableValue } from "../transform-css/types";
 
 export * from "./web";
 
-export declare function useVariable<
+export declare function useUnsafeVariable<
   T extends string | number | ColorValue | undefined
->(name: `--${string}`): [T, (value: T) => void];
+>(name: `--${string}`): [T | undefined, (value: T) => void];
 
 export interface NativeWindStyleSheet {
   create: (atomRecord: AtomRecord) => void;
@@ -15,9 +15,6 @@ export interface NativeWindStyleSheet {
   toggleColorScheme: () => void;
   setVariables: (properties: Record<`--${string}`, VariableValue>) => void;
   setDimensions: (dimensions: Dimensions) => void;
-  useVariable: <T extends VariableValue>(
-    name: `--${string}`
-  ) => [T, (value: T) => void];
   __dangerouslyCompileStyles: (callback: (className: string) => void) => void;
 }
 
