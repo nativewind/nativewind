@@ -24,6 +24,7 @@ export type FunctionComponentWithClassName<T> = FunctionComponent<
   T & {
     className?: string;
     tw?: string;
+    ref?: any;
   }
 >;
 
