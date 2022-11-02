@@ -9,7 +9,9 @@ export function boxShadow(node: Declaration, meta: SelectorMeta) {
     return styles;
   }
 
-  let children = node.value.children.toArray();
+  let children = node.value.children.toArray().filter((child) => {
+    return child.type !== "WhiteSpace";
+  });
 
   const operatorIndex = children.findIndex(
     (child) => child.type === "Operator"
