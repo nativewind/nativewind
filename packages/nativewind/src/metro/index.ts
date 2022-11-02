@@ -28,7 +28,7 @@ export default function withNativeWind(
       // eslint-disable-next-line unicorn/prefer-module, @typescript-eslint/no-var-requires
       let { main } = require(`${cwd()}/package.json`);
 
-      if (main && main === "node_modules/expo/AppEntry.js") {
+      if (!main || main === "node_modules/expo/AppEntry.js") {
         const file = readdirSync(cwd()).find((file) =>
           file.match(/app.(ts|tsx|cjs|mjs|js)/gi)
         );
@@ -39,9 +39,9 @@ export default function withNativeWind(
       }
 
       if (main) {
-        const cssImport = readFileSync(main, "utf8").match(/(\w+\.css)/);
+        const cssImport = readFileSync(main, "utf8").match(/["'](.+\.css)["']/);
 
-        if (cssImport) {
+        if (cssImport && typeof cssImport[0] === "string") {
           inputPath = cssImport[0];
         }
       }
