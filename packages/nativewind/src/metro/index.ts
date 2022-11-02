@@ -66,6 +66,7 @@ export default function withNativeWind(
 
     const cli = spawn("npx", spawnCommands, {
       shell: true,
+      cwd: cwd(),
     });
 
     cli.stdout.on("data", (data) => {

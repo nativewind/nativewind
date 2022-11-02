@@ -10,3 +10,4 @@ snackplayer
 dripsy
 noop
 nullable
+stdout
