@@ -20,6 +20,9 @@ export default function withNativeWind(
   if (!cacheDirectory) throw new Error("Unable to secure cache directory");
 
   const nativewindOutput = join(cacheDirectory, "output");
+  const nativewindOutputJS = `${nativewindOutput}.js`;
+  writeFileSync(nativewindOutputJS, "");
+
   process.env.NATIVEWIND_OUTPUT = nativewindOutput;
   process.env.NATIVEWIND_PLATFORM = "native";
 
@@ -73,7 +76,7 @@ export default function withNativeWind(
         getCreateOptions(data.toString().trim())
       );
       writeFileSync(
-        nativewindOutput + ".js",
+        nativewindOutputJS,
         `const {NativeWindStyleSheet}=require("nativewind/dist/style-sheet");\nNativeWindStyleSheet.create(${createOptions});`
       );
     });
