@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { cwd } from "node:process";
 import { spawn, spawnSync } from "node:child_process";
@@ -29,7 +29,13 @@ export default function withNativeWind(
       let { main } = require(`${cwd()}/package.json`);
 
       if (main && main === "node_modules/expo/AppEntry.js") {
-        main = join(cwd(), "App.js");
+        const file = readdirSync(cwd()).find((file) =>
+          file.match(/app.(ts|tsx|cjs|mjs|js)/gi)
+        );
+
+        if (file) {
+          main = join(cwd(), file);
+        }
       }
 
       if (main) {
