@@ -66,7 +66,6 @@ export default function withNativeWind(
 
     const cli = spawn("npx", spawnCommands, {
       shell: true,
-      cwd: cwd(),
     });
 
     cli.stdout.on("data", (data) => {
@@ -79,8 +78,14 @@ export default function withNativeWind(
       );
     });
 
-    cli.stderr.on("data", (data) => {
+    cli.stderr.on("data", (data: Buffer) => {
       const output = data.toString().trim();
+
+      // Ignore this, RN projects won't have Browserslist setup anyway.
+      if (output.startsWith("[Browserslist] Could not parse")) {
+        return;
+      }
+
       if (output) console.error(`NativeWind: ${output}`);
     });
   } else {
