@@ -17,14 +17,32 @@ export interface GetTransformOptionsOptions {
   platform: string | null | undefined;
 }
 
-export type WithTailwindOptions = WithNativeWindOptions &
-  GetTransformOptionsOptions;
+export interface WithTailwindOptions
+  extends WithNativeWindOptions,
+    GetTransformOptionsOptions {
+  cacheDirectory: string;
+  output: string;
+}
 
 // We actually don't do anything to the Metro config,
 export default function withNativeWind(
   config: Record<string, any> = {},
   options: WithNativeWindOptions = {}
 ) {
+  /**
+   * NATIVEWIND_OUTPUT needs to be set before this is returned, otherwise
+   * it won't be passed to Babel
+   */
+  const cacheDirectory = findCacheDir({ name: "nativewind", create: true });
+  if (!cacheDirectory)
+    throw new Error("[NativeWind] Unable to secure cache directory");
+
+  const filename = join(cacheDirectory, "output");
+  const output = `${filename}.js`;
+  writeFileSync(output, "");
+
+  process.env.NATIVEWIND_OUTPUT = filename;
+
   return {
     ...config,
     transformer: {
@@ -33,7 +51,12 @@ export default function withNativeWind(
         const entry: string = args[0][0];
         const transformOptions: GetTransformOptionsOptions = args[1];
 
-        startTailwind(entry, { ...options, ...transformOptions });
+        startTailwind(entry, {
+          ...options,
+          ...transformOptions,
+          cacheDirectory,
+          output,
+        });
 
         return config.transformer?.getTransformOptions(...args);
       },
@@ -43,16 +66,8 @@ export default function withNativeWind(
 
 function startTailwind(
   main: string,
-  { postcss, platform }: WithTailwindOptions
+  { postcss, platform, cacheDirectory, output }: WithTailwindOptions
 ) {
-  const cacheDirectory = findCacheDir({ name: "nativewind", create: true });
-  if (!cacheDirectory) throw new Error("Unable to secure cache directory");
-
-  const nativewindOutput = join(cacheDirectory, "output");
-  const nativewindOutputJS = `${nativewindOutput}.js`;
-  writeFileSync(nativewindOutputJS, "");
-
-  process.env.NATIVEWIND_OUTPUT = nativewindOutput;
   process.env.NATIVEWIND_NATIVE = platform !== "web" ? "true" : undefined;
 
   let inputPath: string | undefined;
@@ -101,7 +116,7 @@ function startTailwind(
         getCreateOptions(data.toString().trim())
       );
       writeFileSync(
-        nativewindOutputJS,
+        output,
         `const {NativeWindStyleSheet}=require("nativewind/dist/style-sheet");\nNativeWindStyleSheet.create(${createOptions});`
       );
     });

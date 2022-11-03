@@ -1,13 +1,6 @@
 /* eslint-disable unicorn/prefer-module,@typescript-eslint/no-var-requires */
-const preset = process.env.NATIVEWIND_NATIVE
-  ? require("./native").default
-  : require("./web").default;
-
-function presetFactory({
+export default function preset({
   isNative = process.env.NATIVEWIND_NATIVE,
 }: Record<string, unknown> = {}) {
-  if (isNative === "native") return require("./native").default;
-  return require("./web").default;
+  return isNative ? require("./native").default : require("./web").default;
 }
-
-export default Object.assign(presetFactory, preset);
