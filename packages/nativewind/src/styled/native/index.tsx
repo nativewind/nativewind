@@ -28,7 +28,7 @@ import {
   subscribeToStyleSheet,
 } from "../../style-sheet/native/runtime";
 
-const stateInheritanceContent = createContext<ConditionalStateRecord>({});
+const groupContent = createContext<ConditionalStateRecord>({});
 
 export function styled(
   Component: ComponentType,
@@ -100,7 +100,7 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
   /**
    * Inherit state from a parent group
    */
-  const stateInheritance = useContext(stateInheritanceContent);
+  const stateInheritance = useContext(groupContent);
 
   /**
    * Get the hover/focus/active state of this component
@@ -209,7 +209,7 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
    * Determine if we need to wrap element in Providers
    */
   if (typeof interactionMeta.group === "string") {
-    reactNode = createElement(stateInheritanceContent.Provider, {
+    reactNode = createElement(groupContent.Provider, {
       children: reactNode,
       value: {
         ...stateInheritance,
