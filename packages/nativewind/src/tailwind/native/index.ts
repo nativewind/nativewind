@@ -15,7 +15,6 @@ import { rotate } from "./plugins/rotate";
 import { translate } from "./plugins/translate";
 
 const preset: Config = {
-  nativewind: true,
   content: [],
   theme: {
     extend: {

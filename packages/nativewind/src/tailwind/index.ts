@@ -4,3 +4,4 @@ export default function preset({
 }: Record<string, unknown> = {}) {
   return isNative ? require("./native").default : require("./web").default;
 }
+preset.nativewind = true;
