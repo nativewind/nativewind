@@ -13,6 +13,7 @@ import { textDecoration } from "./transforms/text-decoration";
 import { textDecorationLine } from "./transforms/text-decoration-line";
 import { textShadow } from "./transforms/text-shadow";
 import { AtomRecord, SelectorMeta, AtomStyle, skip } from "./types";
+import { borderStyle } from "./transforms/border-style";
 
 export function addRule(
   node: Rule,
@@ -115,6 +116,10 @@ export function getDeclarations(block: Block, meta: SelectorMeta) {
       switch (node.property) {
         case "border": {
           styles.push(...border(node, meta));
+          break;
+        }
+        case "border-style": {
+          styles.push(...borderStyle(node, meta));
           break;
         }
         case "box-shadow": {

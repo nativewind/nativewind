@@ -57,6 +57,7 @@ testCompile(
   rounded
   // Border - Border Style
   border-solid
+  border-none
   // Border - Border Width
   border-2
   // Border - Divide Color
@@ -361,6 +362,13 @@ testCompile(
         styles: [
           {
             borderStyle: "solid",
+          },
+        ],
+      },
+      "border-none": {
+        styles: [
+          {
+            borderWidth: 0,
           },
         ],
       },
