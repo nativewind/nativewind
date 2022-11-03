@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { cwd } from "node:process";
@@ -7,14 +8,42 @@ import findCacheDir from "find-cache-dir";
 import { getCreateOptions } from "../transform-css";
 
 export interface WithNativeWindOptions {
-  inputPath?: string;
-  postcssPath?: string;
+  postcss?: string;
 }
+
+export interface GetTransformOptionsOptions {
+  dev: boolean;
+  hot: boolean;
+  platform: string | null | undefined;
+}
+
+export type WithTailwindOptions = WithNativeWindOptions &
+  GetTransformOptionsOptions;
 
 // We actually don't do anything to the Metro config,
 export default function withNativeWind(
-  config: unknown,
-  { inputPath, postcssPath }: WithNativeWindOptions = {}
+  config: Record<string, any> = {},
+  options: WithNativeWindOptions = {}
+) {
+  return {
+    ...config,
+    transformer: {
+      ...config.transformer,
+      getTransformOptions: async (...args: any[]) => {
+        const entry: string = args[0][0];
+        const transformOptions: GetTransformOptionsOptions = args[1];
+
+        startTailwind(entry, { ...options, ...transformOptions });
+
+        return config.transformer?.getTransformOptions(...args);
+      },
+    },
+  };
+}
+
+function startTailwind(
+  main: string,
+  { postcss, platform }: WithTailwindOptions
 ) {
   const cacheDirectory = findCacheDir({ name: "nativewind", create: true });
   if (!cacheDirectory) throw new Error("Unable to secure cache directory");
@@ -24,42 +53,38 @@ export default function withNativeWind(
   writeFileSync(nativewindOutputJS, "");
 
   process.env.NATIVEWIND_OUTPUT = nativewindOutput;
-  process.env.NATIVEWIND_PLATFORM = "native";
+  process.env.NATIVEWIND_PLATFORM = platform || "native";
 
-  if (!inputPath) {
-    try {
-      // eslint-disable-next-line unicorn/prefer-module, @typescript-eslint/no-var-requires
-      let { main } = require(`${cwd()}/package.json`);
+  let inputPath: string | undefined;
+  try {
+    if (main === "node_modules/expo/AppEntry.js") {
+      const file = readdirSync(cwd()).find((file) =>
+        file.match(/app.(ts|tsx|cjs|mjs|js)/gi)
+      );
 
-      if (!main || main === "node_modules/expo/AppEntry.js") {
-        const file = readdirSync(cwd()).find((file) =>
-          file.match(/app.(ts|tsx|cjs|mjs|js)/gi)
-        );
-
-        if (file) {
-          main = join(cwd(), file);
-        }
+      if (file) {
+        main = join(cwd(), file);
       }
+    }
 
-      if (main) {
-        const cssImport = readFileSync(main, "utf8").match(/["'](.+\.css)["']/);
+    if (main) {
+      const cssImport = readFileSync(main, "utf8").match(/["'](.+\.css)["']/);
 
-        if (cssImport && typeof cssImport[0] === "string") {
-          inputPath = cssImport[0];
-        }
+      if (cssImport && typeof cssImport[0] === "string") {
+        inputPath = cssImport[0];
       }
-    } finally {
-      if (!inputPath) {
-        inputPath = join(cacheDirectory, "input.css");
-        writeFileSync(inputPath, "@tailwind components;@tailwind utilities;");
-      }
+    }
+  } finally {
+    if (!inputPath) {
+      inputPath = join(cacheDirectory, "input.css");
+      writeFileSync(inputPath, "@tailwind components;@tailwind utilities;");
     }
   }
 
   const spawnCommands = ["tailwind", "-i", inputPath];
 
-  if (postcssPath) {
-    spawnCommands.push("--postcss", postcssPath);
+  if (postcss) {
+    spawnCommands.push("--postcss", postcss);
   }
 
   const isDevelopment = process.env.NODE_ENV !== "production";
@@ -94,6 +119,4 @@ export default function withNativeWind(
   } else {
     spawnSync("npx", spawnCommands, { shell: true });
   }
-
-  return config;
 }
