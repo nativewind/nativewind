@@ -1,38 +1,22 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable unicorn/prefer-module */
 import { resolve } from "node:path";
 import { sep, posix } from "node:path";
 
-import type { ConfigAPI, NodePath, PluginPass, Visitor } from "@babel/core";
-import micromatch from "micromatch";
 import { addNamed } from "@babel/helper-module-imports";
+import micromatch from "micromatch";
+import { Config } from "tailwindcss";
+
+import {
+  ConfigAPI,
+  NodePath,
+  PluginPass,
+  Visitor,
+  types as t,
+} from "@babel/core";
 
 // import { getImportBlockedComponents } from "./get-import-blocked-components";
 // const allowModuleTransform = Array.isArray(options.allowModuleTransform)
 //   ? ["react-native", "react-native-web", ...options.allowModuleTransform]
 //   : "*";
-
-import {
-  Expression,
-  identifier,
-  isJSXAttribute,
-  isJSXIdentifier,
-  isJSXMemberExpression,
-  isJSXSpreadAttribute,
-  jSXAttribute,
-  jsxClosingElement,
-  jsxElement,
-  JSXElement,
-  jsxExpressionContainer,
-  jsxIdentifier,
-  jSXIdentifier,
-  JSXIdentifier,
-  JSXMemberExpression,
-  JSXNamespacedName,
-  jsxOpeningElement,
-  memberExpression,
-} from "@babel/types";
-import { Config } from "tailwindcss";
 
 export interface StyledComponentTransformOptions {
   allowModuleTransform?: "*" | string[];
@@ -107,17 +91,17 @@ export function styledComponentTransform(
       }
 
       path.replaceWith(
-        jsxElement(
-          jsxOpeningElement(jsxIdentifier("_StyledComponent"), [
+        t.jsxElement(
+          t.jsxOpeningElement(t.jsxIdentifier("_StyledComponent"), [
             ...path.node.openingElement.attributes,
-            jSXAttribute(
-              jSXIdentifier("component"),
-              jsxExpressionContainer(
+            t.jSXAttribute(
+              t.jSXIdentifier("component"),
+              t.jsxExpressionContainer(
                 toExpression(path.node.openingElement.name)
               )
             ),
           ]),
-          jsxClosingElement(jsxIdentifier("_StyledComponent")),
+          t.jsxClosingElement(t.jsxIdentifier("_StyledComponent")),
           path.node.children
         )
       );
@@ -135,12 +119,12 @@ export function styledComponentTransform(
 }
 
 function toExpression(
-  node: JSXIdentifier | JSXMemberExpression | JSXNamespacedName
-): Expression {
-  if (isJSXIdentifier(node)) {
-    return identifier(node.name);
-  } else if (isJSXMemberExpression(node)) {
-    return memberExpression(
+  node: t.JSXIdentifier | t.JSXMemberExpression | t.JSXNamespacedName
+): t.Expression {
+  if (t.isJSXIdentifier(node)) {
+    return t.identifier(node.name);
+  } else if (t.isJSXMemberExpression(node)) {
+    return t.memberExpression(
       toExpression(node.object),
       toExpression(node.property)
     );
@@ -150,7 +134,7 @@ function toExpression(
   }
 }
 
-function someAttributes(path: NodePath<JSXElement>, names: string[]) {
+function someAttributes(path: NodePath<t.JSXElement>, names: string[]) {
   return path.node.openingElement.attributes.some((attribute) => {
     /**
      * I think we should be able to process spread attributes
@@ -158,13 +142,14 @@ function someAttributes(path: NodePath<JSXElement>, names: string[]) {
      *
      * If your reading this and understand Babel bindings please send a PR
      */
-    if (isJSXSpreadAttribute(attribute)) {
+    if (t.isJSXSpreadAttribute(attribute)) {
       return false;
     }
 
     return names.some((name) => {
       return (
-        isJSXAttribute(attribute) && isJSXIdentifier(attribute.name, { name })
+        t.isJSXAttribute(attribute) &&
+        t.isJSXIdentifier(attribute.name, { name })
       );
     });
   });
