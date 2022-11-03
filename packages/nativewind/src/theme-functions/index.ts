@@ -28,7 +28,7 @@ const {
   getPixelSizeForLayoutSize,
   roundToNearestPixel,
 } = (
-  process.env.NATIVEWIND_PLATFORM === "native"
+  process.env.NATIVEWIND_NATIVE
     ? require("./index.native")
     : require("./index.web")
 ) as DeviceFunctions;

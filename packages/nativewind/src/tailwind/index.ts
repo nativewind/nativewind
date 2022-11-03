@@ -1,13 +1,12 @@
 /* eslint-disable unicorn/prefer-module,@typescript-eslint/no-var-requires */
-const preset =
-  process.env.NATIVEWIND_PLATFORM === "native"
-    ? require("./native").default
-    : require("./web").default;
+const preset = process.env.NATIVEWIND_NATIVE
+  ? require("./native").default
+  : require("./web").default;
 
 function presetFactory({
-  platform = process.env.NATIVEWIND_PLATFORM,
+  isNative = process.env.NATIVEWIND_NATIVE,
 }: Record<string, unknown> = {}) {
-  if (platform === "native") return require("./native").default;
+  if (isNative === "native") return require("./native").default;
   return require("./web").default;
 }
 

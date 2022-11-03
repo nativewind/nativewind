@@ -53,7 +53,7 @@ function startTailwind(
   writeFileSync(nativewindOutputJS, "");
 
   process.env.NATIVEWIND_OUTPUT = nativewindOutput;
-  process.env.NATIVEWIND_PLATFORM = platform || "native";
+  process.env.NATIVEWIND_NATIVE = platform !== "web" ? "true" : undefined;
 
   let inputPath: string | undefined;
   try {
