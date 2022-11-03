@@ -148,22 +148,20 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
   /**
    * Resolve the child styles
    */
-  const childClasses = getChildClasses(className);
-  if (childClasses && children) {
+  const classesToInherit = getChildClasses(className);
+  if (classesToInherit && children) {
     children = flattenChildren(children).map((child, nthChild, children) => {
       if (isValidElement(child)) {
-        const mergedClassName = [
-          childClasses,
-          child.props.className ?? child.props.tw,
-        ]
-          .filter(Boolean)
-          .join(" ");
+        const childPropClassName = child.props.className ?? child.props.tw;
+        const childClassName = childPropClassName
+          ? `${classesToInherit} ${childPropClassName}`
+          : classesToInherit;
 
         return isNativeWindComponent(child)
           ? cloneElement(child, {
               nthChild,
               lastChild: children.length - 1 === nthChild,
-              className: mergedClassName,
+              className: childClassName,
             } as Record<string, unknown>)
           : createElement(StyledComponent, {
               key: child.key,
@@ -171,7 +169,7 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
               nthChild,
               lastChild: children.length - 1 === nthChild,
               ...child.props,
-              className: mergedClassName,
+              className: childClassName,
             });
       } else {
         return child;

@@ -12,7 +12,7 @@ import { resolve } from "./resolve";
 type ComputedAtom = Atom & { computedStyle: Style; recompute: () => Style };
 
 const styleSets = new Map<string, Style>();
-const childClassMap = new Map<string, string[]>();
+const childClassMap = new Map<string, string>();
 const componentListeners = new Set<() => void>();
 
 const emptyStyles = {};
@@ -82,7 +82,7 @@ export function getStyleSet(styleSet: string) {
   }
 
   if (childClasses.length > 0) {
-    childClassMap.set(styleSet, childClasses);
+    childClassMap.set(styleSet, childClasses.join(" "));
   }
   style = updateStyleSet(styleSet);
 
