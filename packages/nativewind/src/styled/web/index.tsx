@@ -74,9 +74,9 @@ export const StyledComponent = forwardRef(function StyledComponent(
 ) {
   const style = useMemo(() => {
     if (className && inlineStyle) {
-      return [{ $$css: true, tailwind: className } as Style, inlineStyle];
+      return [{ $$css: true, [className]: className } as Style, inlineStyle];
     } else if (className) {
-      return { $$css: true, tailwind: className } as Style;
+      return { $$css: true, [className]: className } as Style;
     }
     if (inlineStyle) {
       return inlineStyle;

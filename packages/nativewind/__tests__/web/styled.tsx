@@ -20,7 +20,7 @@ test("styled", () => {
     {
       style: {
         $$css: true,
-        tailwind: "text-black",
+        "text-black": "text-black",
       },
     },
     {}
@@ -36,7 +36,7 @@ test("default styles", () => {
     {
       style: {
         $$css: true,
-        tailwind: "bg-white text-black",
+        "bg-white text-black": "bg-white text-black",
       },
     },
     {}
@@ -59,7 +59,7 @@ test("cva options", () => {
       size: "large",
       style: {
         $$css: true,
-        tailwind: "bg-white p-4 text-black",
+        "bg-white p-4 text-black": "bg-white p-4 text-black",
       },
     },
     {}
