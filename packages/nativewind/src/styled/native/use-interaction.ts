@@ -31,11 +31,11 @@ export function useInteraction(
   ref.current = props;
 
   return useMemo(() => {
-    const isParentOrGroup = meta?.parent || meta?.group || meta?.scopedGroup;
+    const isGroup = meta?.group;
 
     const handlers: InteractionProps = {};
 
-    if (isParentOrGroup || meta?.active) {
+    if (isGroup || meta?.active) {
       if (Platform.OS === "web") {
         handlers.onMouseDown = function (event: GestureResponderEvent) {
           if (ref.current.onMouseDown) {
@@ -67,7 +67,7 @@ export function useInteraction(
       }
     }
 
-    if (isParentOrGroup || meta?.hover) {
+    if (isGroup || meta?.hover) {
       handlers.onHoverIn = function (event: MouseEvent) {
         if (ref.current.onHoverIn) {
           ref.current.onHoverIn(event);
@@ -83,7 +83,7 @@ export function useInteraction(
       };
     }
 
-    if (isParentOrGroup || meta?.focus) {
+    if (isGroup || meta?.focus) {
       handlers.onFocus = function (event: NativeSyntheticEvent<TargetedEvent>) {
         if (ref.current.onFocus) {
           ref.current.onFocus(event);

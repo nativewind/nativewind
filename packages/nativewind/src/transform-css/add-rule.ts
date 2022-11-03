@@ -29,7 +29,7 @@ export function addRule(
     // Duplicate the meta, as selectors may add their own subscriptions/atRules (eg .dark)
     const selectorMeta = { ...meta, subscriptions: [...meta.subscriptions] };
 
-    const { selector, parentSelector, groups } = getSelector(
+    const { selector, parentSelector, groups, interactionMeta } = getSelector(
       selectorNode,
       selectorMeta
     );
@@ -73,6 +73,13 @@ export function addRule(
 
     if (conditionSet.size > 0) {
       createOptions[selector].conditions = [...conditionSet];
+    }
+
+    if (Object.keys(interactionMeta).length > 0) {
+      createOptions[selector].meta = {
+        ...createOptions[selector].meta,
+        ...interactionMeta,
+      };
     }
 
     const selectorOptions = createOptions[selector];
@@ -170,6 +177,7 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
   let hasParent = false;
   let groupName: string | undefined;
   const groups: string[] = [];
+  const interactionMeta: Record<string, boolean> = {};
 
   walk(node, (node) => {
     switch (node.type) {
@@ -216,6 +224,16 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
         } else if (node.name === "root") {
           tokens.push(`:${node.name}`);
         } else {
+          switch (node.name) {
+            case "active":
+            case "hover":
+            case "focus": {
+              if (!groupName) {
+                interactionMeta[node.name] = true;
+              }
+            }
+          }
+
           groupName
             ? meta.conditions.push(`${groupName}:${node.name}`)
             : meta.conditions.push(node.name);
@@ -240,7 +258,7 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
     ? selector.replaceAll(":children", "")
     : undefined;
 
-  return { selector, parentSelector, groups };
+  return { selector, parentSelector, groups, interactionMeta };
 }
 
 function flatten<T extends Record<string, unknown>>(objectArray: T[]): T {
