@@ -14,6 +14,10 @@ import {
   toggleColorScheme,
 } from "./color-scheme";
 
+const noop = () => {
+  return;
+};
+
 export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   create,
   __reset,
@@ -22,6 +26,7 @@ export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   toggleColorScheme,
   setVariables,
   setDimensions,
+  setWebClassNameMergeStrategy: noop,
   __dangerouslyCompileStyles,
 };
 

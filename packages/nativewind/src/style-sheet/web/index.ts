@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { twMerge } from "tailwind-merge";
 import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../index";
 import { setVariables } from "./runtime";
 import {
@@ -16,6 +17,8 @@ if (typeof StyleSheet.create({ test: {} }).test !== "object") {
   throw new Error("NativeWind only supports React Native Web >=0.18");
 }
 
+let webMergeStrategy: (classes: string) => string = twMerge;
+
 export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   create: noop,
   __reset: noop,
@@ -24,7 +27,14 @@ export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   toggleColorScheme,
   setVariables,
   setDimensions: noop,
+  setWebClassNameMergeStrategy: (callback) => {
+    webMergeStrategy = callback;
+  },
   __dangerouslyCompileStyles: noop,
 };
+
+export function mergeClassNames(className: string) {
+  return webMergeStrategy(className);
+}
 
 export { useUnsafeVariable } from "./use-unsafe-variable";

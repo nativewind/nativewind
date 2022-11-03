@@ -2,10 +2,10 @@
 import { ComponentType, ForwardedRef, forwardRef, useMemo } from "react";
 import { StyleProp } from "react-native";
 import { cva } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
 
 import { Style } from "../../transform-css/types";
 import type { StyledOptions } from "../index";
+import { mergeClassNames } from "../../style-sheet";
 
 export function styled(
   Component: ComponentType<{
@@ -38,12 +38,10 @@ export function styled(
     { className, tw, ...props },
     ref
   ) {
-    const generatedClassName = twMerge(
-      classGenerator({
-        class: tw ?? className,
-        ...props,
-      })
-    );
+    const generatedClassName = classGenerator({
+      class: tw ?? className,
+      ...props,
+    });
 
     if (!generatedClassName) {
       return <Component ref={ref} {...props} />;
@@ -73,10 +71,15 @@ export const StyledComponent = forwardRef(function StyledComponent(
   ref
 ) {
   const style = useMemo(() => {
-    if (className && inlineStyle) {
-      return [{ $$css: true, [className]: className } as Style, inlineStyle];
-    } else if (className) {
-      return { $$css: true, [className]: className } as Style;
+    const mergedClassName = className ? mergeClassNames(className) : undefined;
+
+    if (mergedClassName && inlineStyle) {
+      return [
+        { $$css: true, [mergedClassName]: mergedClassName } as Style,
+        inlineStyle,
+      ];
+    } else if (mergedClassName) {
+      return { $$css: true, [mergedClassName]: mergedClassName } as Style;
     }
     if (inlineStyle) {
       return inlineStyle;

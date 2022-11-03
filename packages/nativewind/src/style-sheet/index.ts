@@ -15,6 +15,7 @@ export interface NativeWindStyleSheet {
   toggleColorScheme: () => void;
   setVariables: (properties: Record<`--${string}`, VariableValue>) => void;
   setDimensions: (dimensions: Dimensions) => void;
+  setWebClassNameMergeStrategy: (callback: (classes: string) => string) => void;
   __dangerouslyCompileStyles: (callback: (className: string) => void) => void;
 }
 
