@@ -1,10 +1,10 @@
 import { useSyncExternalStore } from "use-sync-external-store/shim";
+import type { ComponentState } from ".";
 import {
   getStyleSet,
   subscribeToStyleSheet,
 } from "../../style-sheet/native/runtime";
 import { withConditionals } from "./with-conditionals";
-import { ComponentState } from "./use-component-state";
 
 export interface WithStyledPropsOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,7 +26,7 @@ export function withStyledProps({
     for (const prop of classProps) {
       const { className: actualClassName } = withConditionals(
         componentProps[prop],
-        { ...componentState }
+        componentState
       );
 
       const styles = useSyncExternalStore(
@@ -47,7 +47,7 @@ export function withStyledProps({
     for (const [prop, styleKey] of Object.entries(propsToTransform)) {
       const { className: actualClassName } = withConditionals(
         componentProps[prop],
-        { ...componentState }
+        componentState
       );
 
       const styles = useSyncExternalStore(

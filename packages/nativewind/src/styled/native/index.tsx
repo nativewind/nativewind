@@ -1,4 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useSyncExternalStore } from "use-sync-external-store/shim";
+import { isFragment } from "react-is";
+import { cva } from "class-variance-authority";
+
 import {
   createElement,
   ReactNode,
@@ -10,16 +14,13 @@ import {
   isValidElement,
   createContext,
   cloneElement,
+  useReducer,
 } from "react";
-import { useSyncExternalStore } from "use-sync-external-store/shim";
-import { isFragment } from "react-is";
-import { cva } from "class-variance-authority";
 
 import type { StyledOptions } from "../index";
 
 import { useInteraction } from "./use-interaction";
 import { withStyledProps } from "./with-styled-props";
-import { useComponentState } from "./use-component-state";
 import { ConditionalStateRecord, withConditionals } from "./with-conditionals";
 
 import {
@@ -82,6 +83,17 @@ export function styled(
   return Styled;
 }
 
+const initialComponentState = {
+  hover: false,
+  active: false,
+  focus: false,
+};
+export type ComponentState = typeof initialComponentState;
+export type ComponentStateAction = {
+  type: keyof ComponentState;
+  value: boolean;
+};
+
 export const StyledComponent = forwardRef(function NativeWindStyledComponent(
   {
     component: Component,
@@ -105,7 +117,21 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
   /**
    * Get the hover/focus/active state of this component
    */
-  const [componentState, componentStateDispatch] = useComponentState();
+  const [componentState, componentStateDispatch] = useReducer(
+    (state: ComponentState, action: ComponentStateAction) => {
+      switch (action.type) {
+        case "hover":
+        case "active":
+        case "focus": {
+          return { ...state, [action.type]: action.value };
+        }
+        default: {
+          throw new Error("Unknown action");
+        }
+      }
+    },
+    initialComponentState
+  );
 
   /**
    * Resolve the props/classProps/spreadProps options

@@ -2,13 +2,11 @@ import { Dispatch, useMemo, useRef } from "react";
 import {
   GestureResponderEvent,
   NativeSyntheticEvent,
-  Platform,
   PressableProps,
   TargetedEvent,
   MouseEvent,
 } from "react-native";
-import { Atom } from "../../transform-css/types";
-import { Action } from "./use-component-state";
+import type { ComponentStateAction } from ".";
 
 declare module "react-native" {
   interface PressableProps {
@@ -23,59 +21,46 @@ export interface InteractionProps extends PressableProps {
 }
 
 export function useInteraction(
-  dispatch: Dispatch<Action>,
-  meta: Atom["meta"],
+  dispatch: Dispatch<ComponentStateAction>,
+  meta: Record<string, boolean | string>,
   props: InteractionProps
 ) {
   const ref = useRef<InteractionProps>(props);
   ref.current = props;
 
-  return useMemo(() => {
-    const isGroup = meta?.group;
+  const isGroup = meta?.group;
+  const active = isGroup || meta?.active;
+  const focus = isGroup || meta?.focus;
+  const hover = isGroup || meta?.hover;
 
+  return useMemo(() => {
     const handlers: InteractionProps = {};
 
-    if (isGroup || meta?.active) {
-      if (Platform.OS === "web") {
-        handlers.onMouseDown = function (event: GestureResponderEvent) {
-          if (ref.current.onMouseDown) {
-            ref.current.onMouseDown(event);
-          }
-          dispatch({ type: "active", value: true });
-        };
+    if (active) {
+      handlers.onPressIn = (event: GestureResponderEvent) => {
+        if (ref.current.onPressIn) {
+          ref.current.onPressIn(event);
+        }
+        dispatch({ type: "active", value: true });
+      };
 
-        handlers.onMouseUp = function (event: GestureResponderEvent) {
-          if (ref.current.onMouseUp) {
-            ref.current.onMouseUp(event);
-          }
-          dispatch({ type: "active", value: false });
-        };
-      } else {
-        handlers.onPressIn = function (event: GestureResponderEvent) {
-          if (ref.current.onPressIn) {
-            ref.current.onPressIn(event);
-          }
-          dispatch({ type: "active", value: true });
-        };
-
-        handlers.onPressOut = function (event: GestureResponderEvent) {
-          if (ref.current.onPressOut) {
-            ref.current.onPressOut(event);
-          }
-          dispatch({ type: "active", value: false });
-        };
-      }
+      handlers.onPressOut = (event: GestureResponderEvent) => {
+        if (ref.current.onPressOut) {
+          ref.current.onPressOut(event);
+        }
+        dispatch({ type: "active", value: false });
+      };
     }
 
-    if (isGroup || meta?.hover) {
-      handlers.onHoverIn = function (event: MouseEvent) {
+    if (hover) {
+      handlers.onHoverIn = (event: MouseEvent) => {
         if (ref.current.onHoverIn) {
           ref.current.onHoverIn(event);
         }
         dispatch({ type: "hover", value: true });
       };
 
-      handlers.onHoverOut = function (event: MouseEvent) {
+      handlers.onHoverOut = (event: MouseEvent) => {
         if (ref.current.onHoverIn) {
           ref.current.onHoverIn(event);
         }
@@ -83,15 +68,15 @@ export function useInteraction(
       };
     }
 
-    if (isGroup || meta?.focus) {
-      handlers.onFocus = function (event: NativeSyntheticEvent<TargetedEvent>) {
+    if (focus) {
+      handlers.onFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
         if (ref.current.onFocus) {
           ref.current.onFocus(event);
         }
         dispatch({ type: "focus", value: true });
       };
 
-      handlers.onBlur = function (event: NativeSyntheticEvent<TargetedEvent>) {
+      handlers.onBlur = (event: NativeSyntheticEvent<TargetedEvent>) => {
         if (ref.current.onBlur) {
           ref.current.onBlur(event);
         }
@@ -100,5 +85,5 @@ export function useInteraction(
     }
 
     return handlers;
-  }, [meta]);
+  }, [active, hover, focus]);
 }
