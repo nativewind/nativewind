@@ -13,19 +13,20 @@ import {
 } from "react";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 import { isFragment } from "react-is";
+import { cva } from "class-variance-authority";
 
 import type { StyledOptions } from "../index";
 
-import { InteractionProps, useInteraction } from "./use-interaction";
+import { useInteraction } from "./use-interaction";
 import { withStyledProps } from "./with-styled-props";
 import { useComponentState } from "./use-component-state";
 import { ConditionalStateRecord, withConditionals } from "./with-conditionals";
+
 import {
   getChildClasses,
   getStyleSet,
   subscribeToStyleSheet,
 } from "../../style-sheet/native/runtime";
-import { cva } from "class-variance-authority";
 
 const stateInheritanceContent = createContext<ConditionalStateRecord>({});
 
@@ -96,6 +97,9 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
   }: any,
   ref
 ) {
+  /**
+   * Inherit state from a parent group
+   */
   const stateInheritance = useContext(stateInheritanceContent);
 
   /**
@@ -106,15 +110,17 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
   /**
    * Resolve the props/classProps/spreadProps options
    */
-  const { styledProps, className } = withStyledProps({
-    className: tw ?? propClassName,
+  const styledProps = withStyledProps({
     propsToTransform,
     classProps,
     componentState,
     componentProps,
   });
 
-  const { className: actualClassName, meta } = withConditionals(className, {
+  /**
+   * Filter classes that don't apply (eg hover classes)
+   */
+  const { className, interactionMeta } = withConditionals(propClassName, {
     ...componentState,
     ...stateInheritance,
     nthChild,
@@ -126,8 +132,8 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
    */
   const styles = useSyncExternalStore(
     subscribeToStyleSheet,
-    () => getStyleSet(actualClassName),
-    () => getStyleSet(actualClassName)
+    () => getStyleSet(className),
+    () => getStyleSet(className)
   );
 
   /**
@@ -135,14 +141,14 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
    */
   const handlers = useInteraction(
     componentStateDispatch,
-    meta,
-    componentProps as InteractionProps
+    interactionMeta,
+    componentProps
   );
 
   /**
    * Resolve the child styles
    */
-  const childClasses = getChildClasses(actualClassName);
+  const childClasses = getChildClasses(className);
   if (childClasses && children) {
     children = flattenChildren(children).map((child, nthChild, children) => {
       if (isValidElement(child)) {
@@ -202,12 +208,12 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
   /**
    * Determine if we need to wrap element in Providers
    */
-  if (typeof meta.group === "string") {
+  if (typeof interactionMeta.group === "string") {
     reactNode = createElement(stateInheritanceContent.Provider, {
       children: reactNode,
       value: {
         ...stateInheritance,
-        [meta.group]: componentState,
+        [interactionMeta.group]: componentState,
       },
     });
   }

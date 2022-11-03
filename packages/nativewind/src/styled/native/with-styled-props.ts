@@ -7,10 +7,9 @@ import { withConditionals } from "./with-conditionals";
 import { ComponentState } from "./use-component-state";
 
 export interface WithStyledPropsOptions {
-  className: string;
-  propsToTransform?: Record<string, unknown>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   componentProps: Record<string, any>;
+  propsToTransform?: Record<string, unknown>;
   componentState: ComponentState;
   classProps?: string[];
 }
@@ -20,7 +19,6 @@ export function withStyledProps({
   componentProps,
   componentState,
   classProps,
-  className,
 }: WithStyledPropsOptions) {
   const styledProps: Record<string, unknown> = {};
 
@@ -67,5 +65,5 @@ export function withStyledProps({
     }
   }
 
-  return { styledProps, className };
+  return styledProps;
 }

@@ -10,7 +10,7 @@ export function withConditionals(
   componentState: ConditionalStateRecord = {}
 ) {
   const keyTokens: string[] = [];
-  let meta: Atom["meta"] = {};
+  let interactionMeta: Atom["meta"] = {};
 
   for (const atomName of className.split(/\s+/)) {
     const atom = atoms.get(atomName);
@@ -61,14 +61,14 @@ export function withConditionals(
         }
       });
 
-      meta = { ...meta, ...atom.meta };
+      interactionMeta = { ...interactionMeta, ...atom.meta };
 
       if (conditionsPass) {
         keyTokens.push(atomName);
       }
     } else if (atom) {
       keyTokens.push(atomName);
-      meta = { ...meta, ...atom.meta };
+      interactionMeta = { ...interactionMeta, ...atom.meta };
     } else {
       keyTokens.push(atomName);
     }
@@ -76,6 +76,6 @@ export function withConditionals(
 
   return {
     className: keyTokens.join(" "),
-    meta,
+    interactionMeta,
   };
 }
