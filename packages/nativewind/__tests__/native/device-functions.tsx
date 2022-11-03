@@ -5,14 +5,13 @@ import {
   fontScaleSelect,
   getPixelSizeForLayoutSize,
   hairlineWidth,
-  NativeWindStyleSheet,
   pixelRatio,
   pixelRatioSelect,
   platformColor,
   platformSelect,
   roundToNearestPixel,
-  styled,
-} from "../../src";
+} from "../../src/theme-functions/index.native";
+import { NativeWindStyleSheet, styled } from "../../src";
 
 afterEach(() => {
   NativeWindStyleSheet.__reset();

@@ -3,7 +3,7 @@
 
 import { PlatformOSType } from "react-native";
 
-interface DeviceFunctions {
+export interface DeviceFunctions {
   hairlineWidth: () => any;
   platformSelect: (
     specifics: Partial<Record<PlatformOSType | "default", string | number>>
@@ -12,7 +12,7 @@ interface DeviceFunctions {
   pixelRatio: (value?: number | string) => any;
   pixelRatioSelect: (values: Record<number, number | string>) => any;
   fontScale: (value?: number | string) => any;
-  fontScaleSelect: (values: Record<number, number | string>) => any;
+  fontScaleSelect: (values: Record<string, number | string>) => any;
   getPixelSizeForLayoutSize: (value: number | string) => any;
   roundToNearestPixel: (value: number | string) => any;
 }

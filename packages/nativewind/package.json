@@ -45,6 +45,7 @@
     "plugin.js",
     "tailwind.js",
     "tailwind/",
+    "theme.js",
     "types.d.ts"
   ],
   "dependencies": {

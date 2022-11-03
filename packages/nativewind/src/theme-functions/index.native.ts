@@ -1,4 +1,5 @@
 import type { PlatformOSType } from "react-native";
+import type { DeviceFunctions } from ".";
 
 function specificsToString(specifics: Record<string, unknown>) {
   return Object.entries(specifics)
@@ -36,14 +37,19 @@ export function fontScale(value?: number) {
   return `fontScale(${value ?? ""})`;
 }
 
-export function fontScaleSelect(specifics: Record<string, number>) {
+export const fontScaleSelect: DeviceFunctions["fontScaleSelect"] = (
+  specifics
+) => {
   return `fontScaleSelect(${specificsToString(specifics)})`;
-}
+};
 
-export function getPixelSizeForLayoutSize(n: number) {
-  return `getPixelSizeForLayoutSize(${n})`;
-}
+export const getPixelSizeForLayoutSize: DeviceFunctions["getPixelSizeForLayoutSize"] =
+  (n) => {
+    return `getPixelSizeForLayoutSize(${n})`;
+  };
 
-export function roundToNearestPixel(n: number) {
+export const roundToNearestPixel: DeviceFunctions["roundToNearestPixel"] = (
+  n
+) => {
   return `roundToNearestPixel(${n})`;
-}
+};
