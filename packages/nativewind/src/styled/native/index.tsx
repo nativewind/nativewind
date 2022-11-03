@@ -232,13 +232,23 @@ function isNativeWindComponent(node: ReactNode) {
   );
 }
 
-function flattenChildren(children: ReactNode | ReactNode[]): ReactNode[] {
-  return Children.toArray(children).flatMap((child) => {
-    if (isFragment(child)) return flattenChildren(child.props.children);
-    if (typeof child === "string" || typeof child === "number") {
-      return child;
+function flattenChildren(
+  children: ReactNode | ReactNode[],
+  keys: Array<string | number> = []
+): ReactNode[] {
+  return Children.toArray(children).flatMap((node, index) => {
+    if (isFragment(node)) {
+      return flattenChildren(node.props.children, [...keys, node.key || index]);
+    } else if (typeof node === "string" || typeof node === "number") {
+      return [node];
+    } else if (isValidElement(node)) {
+      return [
+        cloneElement(node, {
+          key: `${keys.join(".")}.${node.key?.toString()}`,
+        }),
+      ];
+    } else {
+      return [];
     }
-    if (!child || !isValidElement(child)) return [];
-    return child;
   });
 }
