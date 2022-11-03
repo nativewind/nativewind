@@ -15,7 +15,6 @@ export function Test() {
     </>
   );
 }
-
 _NativeWindStyleSheet.create({
   styles: {
     "font-bold": {
