@@ -61,9 +61,10 @@ export function withConditionals(
         }
       });
 
+      meta = { ...meta, ...atom.meta };
+
       if (conditionsPass) {
         keyTokens.push(atomName);
-        meta = { ...meta, ...atom.meta };
       }
     } else if (atom) {
       keyTokens.push(atomName);
