@@ -111,7 +111,7 @@ NativeWindStyleSheet.create({
       color: "#000",
     },
     "ios:text-blue-500": {
-      width: "rgb(59 130 246)",
+      color: "rgb(59 130 246)",
     },
   },
   masks: {
