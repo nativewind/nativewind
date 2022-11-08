@@ -5,7 +5,7 @@ import {
   ColorValue,
   PlatformColor,
 } from "react-native";
-import { VariableValue } from "../../transform-css/types";
+import { ShadowValue, VariableValue } from "../../transform-css/types";
 import { variables } from "./runtime";
 
 interface ObjectAttribute {
@@ -18,6 +18,7 @@ export type ResolvedValue =
   | number
   | ColorValue
   | ObjectAttribute
+  | ShadowValue
   | undefined;
 
 export function resolve(style?: VariableValue): ResolvedValue {
@@ -32,6 +33,8 @@ export function resolve(style?: VariableValue): ResolvedValue {
   }
 
   if ("__TYPE__" in style) return style;
+
+  if (!("values" in style)) return style;
 
   const resolvedValues = style.values.map((value) => resolve(value));
 
@@ -137,7 +140,7 @@ export function resolve(style?: VariableValue): ResolvedValue {
 function toObject(values: ResolvedValue[]) {
   const object: Record<string, unknown> = {};
   for (const entry of values) {
-    if (typeof entry === "object") {
+    if (typeof entry === "object" && "value" in entry) {
       object[entry.key] = entry.value;
     }
   }

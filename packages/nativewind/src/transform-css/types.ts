@@ -2,6 +2,7 @@ import { walk, CssNode, CssNodeCommon, Raw } from "css-tree";
 import {
   ColorValue,
   ImageStyle,
+  ShadowStyleIOS,
   TextStyle,
   TransformsStyle,
   ViewStyle,
@@ -52,7 +53,14 @@ export type FunctionValue = {
   values: Array<VariableValue>;
 };
 
-export type VariableValue = string | number | FunctionValue | ColorValue;
+export type ShadowValue = NonNullable<ShadowStyleIOS["shadowOffset"]>;
+
+export type VariableValue =
+  | string
+  | number
+  | FunctionValue
+  | ColorValue
+  | ShadowValue;
 
 export const skip = (walk as unknown as Record<string, unknown>).skip;
 
