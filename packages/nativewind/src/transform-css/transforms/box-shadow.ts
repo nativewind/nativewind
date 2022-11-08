@@ -39,7 +39,12 @@ export function boxShadow(node: Declaration, meta: SelectorMeta) {
   if (children.length === 3) {
     pushStyle(styles, "shadowOffset.width", meta, children[0]);
     pushStyle(styles, "shadowOffset.height", meta, children[1]);
-    pushStyle(styles, "shadowColor", meta, children[2]);
+    pushStyle(styles, "shadowColor", meta, children[2], {
+      forceFunction: "toRGB",
+    });
+    pushStyle(styles, "shadowOpacity", meta, children[2], {
+      forceFunction: "rgbOpacity",
+    });
   }
 
   if (children.length === 4) {
@@ -52,7 +57,12 @@ export function boxShadow(node: Declaration, meta: SelectorMeta) {
     pushStyle(styles, "shadowOffset.width", meta, children[0]);
     pushStyle(styles, "shadowOffset.height", meta, children[1]);
     pushStyle(styles, "shadowRadius", meta, children[2]);
-    pushStyle(styles, "shadowColor", meta, children[3]);
+    pushStyle(styles, "shadowColor", meta, children[3], {
+      forceFunction: "toRGB",
+    });
+    pushStyle(styles, "shadowOpacity", meta, children[3], {
+      forceFunction: "rgbOpacity",
+    });
   }
 
   /* offset-x | offset-y | blur-radius | spread-radius | color */
@@ -60,7 +70,12 @@ export function boxShadow(node: Declaration, meta: SelectorMeta) {
     pushStyle(styles, "shadowOffset.width", meta, children[0]);
     pushStyle(styles, "shadowOffset.height", meta, children[1]);
     pushStyle(styles, "shadowRadius", meta, children[3]);
-    pushStyle(styles, "shadowColor", meta, children[4]);
+    pushStyle(styles, "shadowColor", meta, children[4], {
+      forceFunction: "toRGB",
+    });
+    pushStyle(styles, "shadowOpacity", meta, children[4], {
+      forceFunction: "rgbOpacity",
+    });
   }
 
   return styles;

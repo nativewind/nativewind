@@ -46,6 +46,24 @@ export function resolve(style?: VariableValue): ResolvedValue {
   }
 
   switch (style.function) {
+    case "toRGB": {
+      const [value] = resolvedValues;
+      if (typeof value === "string" && value.startsWith("rgba")) {
+        const rgba = value.match(/\d+/g) ?? [];
+        return `rgb(${rgba[0]}, ${rgba[1]}, ${rgba[2]})`;
+      } else {
+        return value;
+      }
+    }
+    case "rgbOpacity": {
+      const [value] = resolvedValues;
+      if (typeof value === "string" && value.startsWith("rgba")) {
+        const rgba = value.match(/(\d*\.?\d+)/g) ?? [];
+        return Number.parseFloat(rgba[3]);
+      } else {
+        return value;
+      }
+    }
     case "inbuilt": {
       const [name, ...values] = resolvedValues;
       return [name, "(", values.join(", "), ")"].join("");

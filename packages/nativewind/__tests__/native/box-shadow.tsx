@@ -8,14 +8,28 @@ testCompile("shadow", (output) => {
       styles: [
         {
           elevation: 3,
-          shadowColor: "rgba(0, 0, 0, 0.1)",
+          shadowColor: {
+            function: "toRGB",
+            values: ["rgba(0, 0, 0, 0.1)"],
+          },
           shadowOffset: { width: 0, height: 2 },
           shadowRadius: 6,
+          shadowOpacity: {
+            function: "rgbOpacity",
+            values: ["rgba(0, 0, 0, 0.1)"],
+          },
         },
         {
-          shadowColor: "rgba(0, 0, 0, 0.1)",
+          shadowColor: {
+            function: "toRGB",
+            values: ["rgba(0, 0, 0, 0.1)"],
+          },
           shadowOffset: { width: 0, height: 2 },
           shadowRadius: 6,
+          shadowOpacity: {
+            function: "rgbOpacity",
+            values: ["rgba(0, 0, 0, 0.1)"],
+          },
         },
       ],
       atRules: {
@@ -37,9 +51,10 @@ test("shadow", () => {
   expect(Component).toHaveBeenCalledWith(
     expect.objectContaining({
       style: {
-        shadowColor: "rgba(0, 0, 0, 0.1)",
+        shadowColor: "rgb(0, 0, 0)",
         shadowOffset: { height: 2, width: 0 },
         shadowRadius: 6,
+        shadowOpacity: 0.1,
       },
     }),
     {}

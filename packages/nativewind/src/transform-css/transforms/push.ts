@@ -5,6 +5,8 @@ import { encodeValue } from "../encode-value";
 export interface PushStyleOptions {
   // This only exists to force fontWeight into a string :(
   forceString?: boolean;
+  // This only exists for shadow
+  forceFunction?: string;
 }
 
 export function pushStyle(
@@ -12,12 +14,15 @@ export function pushStyle(
   property: string,
   meta: SelectorMeta,
   node: StyleValue | null | undefined,
-  { forceString = false }: PushStyleOptions = {}
+  { forceString = false, forceFunction }: PushStyleOptions = {}
 ) {
   if (!node) return;
 
   let value = encodeValue(node, meta.subscriptions);
   if (forceString) value = value?.toString();
+  if (forceFunction) {
+    value = { function: forceFunction, values: [value] } as StyleValue;
+  }
 
   if (value === undefined || value === null) return;
 
