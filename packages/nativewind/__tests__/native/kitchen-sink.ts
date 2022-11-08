@@ -746,27 +746,22 @@ testCompile(
         ],
       },
       shadow: {
-        atRules: {
-          "0": [["platform", "android"]],
-          "1": [["platform", "ios"]],
-        },
         styles: [
           {
             elevation: 3,
-            shadowColor: "rgba(0, 0, 0, 0.1)",
+            shadowColor: {
+              function: "toRGB",
+              values: ["rgba(0, 0, 0, 0.1)"],
+            },
             shadowOffset: {
               height: 2,
               width: 0,
             },
             shadowRadius: 6,
-          },
-          {
-            shadowColor: "rgba(0, 0, 0, 0.1)",
-            shadowOffset: {
-              height: 2,
-              width: 0,
+            shadowOpacity: {
+              function: "rgbOpacity",
+              values: ["rgba(0, 0, 0, 0.1)"],
             },
-            shadowRadius: 6,
           },
         ],
       },

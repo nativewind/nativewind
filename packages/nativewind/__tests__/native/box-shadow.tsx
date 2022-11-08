@@ -19,23 +19,7 @@ testCompile("shadow", (output) => {
             values: ["rgba(0, 0, 0, 0.1)"],
           },
         },
-        {
-          shadowColor: {
-            function: "toRGB",
-            values: ["rgba(0, 0, 0, 0.1)"],
-          },
-          shadowOffset: { width: 0, height: 2 },
-          shadowRadius: 6,
-          shadowOpacity: {
-            function: "rgbOpacity",
-            values: ["rgba(0, 0, 0, 0.1)"],
-          },
-        },
       ],
-      atRules: {
-        0: [["platform", "android"]],
-        1: [["platform", "ios"]],
-      },
     },
   });
 });
@@ -51,6 +35,7 @@ test("shadow", () => {
   expect(Component).toHaveBeenCalledWith(
     expect.objectContaining({
       style: {
+        elevation: 3,
         shadowColor: "rgb(0, 0, 0)",
         shadowOffset: { height: 2, width: 0 },
         shadowRadius: 6,

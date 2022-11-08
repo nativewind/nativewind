@@ -19,16 +19,9 @@ export const boxShadow = plugin(function ({
 
   for (const [size, value] of themeValues) {
     components.push({
-      "@media (platform: android)": {
-        [key(size)]: {
-          elevation: elevation[size] as any,
-          boxShadow: value,
-        },
-      } as CSSRuleObject,
-      "@media (platform: ios)": {
-        [key(size)]: {
-          boxShadow: value,
-        },
+      [key(size)]: {
+        elevation: elevation[size] as any,
+        boxShadow: value,
       } as CSSRuleObject,
     });
   }
