@@ -272,7 +272,7 @@ export function resetRuntime() {
 
   setVariables({
     "--platform": Platform.OS,
-    "--rem": 16,
+    "--rem": 14, // RN appears to use fontSize: 14 as a default for <Text />
     "--color-scheme": Appearance.getColorScheme() ?? "light",
     "--color-scheme-system": "system",
   });
