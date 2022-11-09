@@ -48,7 +48,7 @@ test("space-x-2", () => {
   expect(Child2).toHaveBeenCalledWith(
     expect.objectContaining({
       style: {
-        marginLeft: 8,
+        marginLeft: 7,
       },
     }),
     {}
@@ -82,7 +82,7 @@ test("preserve children", () => {
   expect(Child2).toHaveBeenCalledWith(
     expect.objectContaining({
       style: {
-        marginLeft: 8,
+        marginLeft: 7,
         color: "#000",
       },
     }),

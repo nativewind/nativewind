@@ -1,8 +1,8 @@
 import { render } from "@testing-library/react-native";
 import { FunctionComponent } from "react";
-import { StyleProp, ViewProps, ViewStyle } from "react-native";
+import { StyleProp, ViewProps, ViewStyle, StyleSheet } from "react-native";
 import * as nativewind from "../../src/styled/native";
-import { NativeWindStyleSheet, styled } from "../../src";
+import { NativeWindStyleSheet, styled, StyledComponent } from "../../src";
 import { create } from "../test-utils";
 
 afterEach(() => {
@@ -39,7 +39,7 @@ test("StyledComponent wrapping styled()", () => {
   expect(Component).toHaveBeenCalledWith(
     expect.objectContaining({
       style: {
-        padding: 16,
+        padding: 14,
       },
     }),
     {}
@@ -72,7 +72,7 @@ test("default variant", () => {
     expect.objectContaining({
       style: {
         backgroundColor: "#fff",
-        padding: 16,
+        padding: 14,
       },
     }),
     {}
@@ -113,7 +113,7 @@ test("with props & variant", () => {
     expect.objectContaining({
       style: {
         backgroundColor: "#fff",
-        padding: 16,
+        padding: 14,
       },
     }),
     {}
@@ -122,8 +122,47 @@ test("with props & variant", () => {
   expect(InnerView).toHaveBeenCalledWith(
     expect.objectContaining({
       style: {
-        margin: 8,
+        margin: 7,
       },
+    }),
+    {}
+  );
+});
+
+test("with Stylesheet.create", () => {
+  create("m-2");
+
+  const Component = jest.fn();
+  const MyComponent = styled(Component);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 24,
+      justifyContent: "center",
+    },
+  });
+
+  render(
+    <StyledComponent
+      component={MyComponent}
+      className="m-2"
+      style={styles.container}
+    />
+  );
+
+  expect(Component).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: [
+        {
+          margin: 7,
+        },
+        {
+          flex: 1,
+          padding: 24,
+          justifyContent: "center",
+        },
+      ],
     }),
     {}
   );

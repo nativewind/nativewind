@@ -82,8 +82,8 @@ test("gap", () => {
   expect(Parent).toHaveBeenCalledWith(
     expect.objectContaining({
       style: {
-        marginLeft: -8,
-        marginTop: -8,
+        marginLeft: -7,
+        marginTop: -7,
       },
     }),
     {}
@@ -92,8 +92,8 @@ test("gap", () => {
   expect(Child1).toHaveBeenCalledWith(
     expect.objectContaining({
       style: {
-        marginLeft: 8,
-        marginTop: 8,
+        marginLeft: 7,
+        marginTop: 7,
       },
     }),
     {}
@@ -102,8 +102,8 @@ test("gap", () => {
   expect(Child2).toHaveBeenCalledWith(
     expect.objectContaining({
       style: {
-        marginLeft: 8,
-        marginTop: 8,
+        marginLeft: 7,
+        marginTop: 7,
       },
     }),
     {}

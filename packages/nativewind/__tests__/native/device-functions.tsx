@@ -63,7 +63,7 @@ test("platformSelect", () => {
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: { fontSize: 16 },
+      style: { fontSize: 14 },
     },
     {}
   );
@@ -167,7 +167,7 @@ test("pixelRatioSelect", () => {
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: { fontSize: 32 },
+      style: { fontSize: 28 },
     },
     {}
   );
@@ -243,7 +243,7 @@ test("fontScaleSelect", () => {
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: { fontSize: 32 },
+      style: { fontSize: 28 },
     },
     {}
   );
@@ -318,7 +318,7 @@ test("nested", () => {
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: { fontSize: 32 },
+      style: { fontSize: 28 },
     },
     {}
   );
