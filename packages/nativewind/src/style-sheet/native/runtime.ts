@@ -53,6 +53,7 @@ export function create(atomRecord: AtomRecord) {
   }
 
   componentListeners.forEach((l) => l());
+  styleSets.clear();
 }
 
 export function getStyleSet(styleSet: string) {

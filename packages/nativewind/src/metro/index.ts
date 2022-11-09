@@ -102,9 +102,29 @@ function startTailwind(
     spawnCommands.push("--postcss", postcss);
   }
 
+  process.stdout.clearLine(0); // clear current text
+  process.stdout.cursorTo(0); // move cursor to beginning of line
+
+  console.log("NativeWind: Rebuilding...");
+  const { stdout, stderr } = spawnSync("npx", spawnCommands, { shell: true });
+  console.log(
+    `NativeWind: ${stderr.toString().replace("\nRebuilding...\n\n", "").trim()}`
+  );
+
+  const createOptions = JSON.stringify(
+    getCreateOptions(stdout.toString().trim())
+  );
+  writeFileSync(
+    output,
+    `const {NativeWindStyleSheet}=require("nativewind/dist/style-sheet");\nNativeWindStyleSheet.create(${createOptions});`
+  );
+
   const isDevelopment = process.env.NODE_ENV !== "production";
 
   if (isDevelopment) {
+    let doneFirstOutput = true;
+    let doneFirstLogging = true;
+
     spawnCommands.push("--watch", "--poll");
 
     const cli = spawn("npx", spawnCommands, {
@@ -112,6 +132,10 @@ function startTailwind(
     });
 
     cli.stdout.on("data", (data) => {
+      if (!doneFirstOutput) {
+        doneFirstOutput = true;
+        return;
+      }
       const createOptions = JSON.stringify(
         getCreateOptions(data.toString().trim())
       );
@@ -123,6 +147,10 @@ function startTailwind(
 
     cli.stderr.on("data", (data: Buffer) => {
       const output = data.toString().trim();
+      if (!doneFirstLogging) {
+        doneFirstLogging = data.includes("Done");
+        return;
+      }
 
       // Ignore this, RN projects won't have Browserslist setup anyway.
       if (output.startsWith("[Browserslist] Could not parse")) {
@@ -131,7 +159,5 @@ function startTailwind(
 
       if (output) console.error(`NativeWind: ${output}`);
     });
-  } else {
-    spawnSync("npx", spawnCommands, { shell: true });
   }
 }
