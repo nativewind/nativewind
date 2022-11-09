@@ -1,4 +1,9 @@
-import { StyleProperty, validProperties } from "./valid-styles";
+import {
+  invalidGlobalValues,
+  invalidKeywordValues,
+  StyleProperty,
+  validProperties,
+} from "./valid-styles";
 import { AtomStyle, SelectorMeta, StyleValue } from "../types";
 import { encodeValue } from "../encode-value";
 
@@ -31,13 +36,21 @@ export function pushStyle(
     x[1].toUpperCase()
   ) as StyleProperty;
 
-  let isValid = false;
   const styleProperties = validProperties[styleProperty];
 
-  if (styleProperties === true) {
-    isValid = true;
-  } else if (Array.isArray(styleProperties) && typeof value === "string") {
-    isValid = styleProperties.includes(value);
+  let isValid = styleProperties === true;
+
+  if (typeof value === "string") {
+    if (styleProperty === "flexBasis" && value === "auto") {
+      // This is the only exception to the global values
+      isValid = true;
+    } else if (invalidGlobalValues.has(value)) {
+      isValid = false;
+    } else if (invalidKeywordValues[styleProperty]?.includes(value)) {
+      isValid = false;
+    } else if (Array.isArray(styleProperties)) {
+      isValid = styleProperties.includes(value);
+    }
   }
 
   if (isValid) {

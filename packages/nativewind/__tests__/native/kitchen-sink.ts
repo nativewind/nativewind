@@ -223,6 +223,7 @@ testCompile(
   will-change-scroll
   // Sizing - Height
   h-1
+  h-max // Should be ignored
   // Sizing - Max-Width
   max-w-full
   // Sizing - Min-Width

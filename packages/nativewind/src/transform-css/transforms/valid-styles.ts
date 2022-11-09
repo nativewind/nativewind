@@ -17,6 +17,16 @@ export type StyleProperty =
   | "stroke"
   | "strokeWidth";
 
+export const invalidGlobalValues = new Set([
+  "auto",
+  "inherit",
+  "initial",
+  "revert",
+  "revert-layer",
+  "unset",
+  "currentColor",
+]);
+
 export const validProperties: Record<StyleProperty, true | string[]> = {
   alignContent: [
     "flex-start",
@@ -141,4 +151,13 @@ export const validProperties: Record<StyleProperty, true | string[]> = {
   fill: true,
   stroke: true,
   strokeWidth: true,
+};
+
+export const invalidKeywordValues: Partial<Record<StyleProperty, string[]>> = {
+  height: ["max-content", "min-content", "fit-content"],
+  maxHeight: ["max-content", "min-content", "fit-content"],
+  maxWidth: ["max-content", "min-content", "fit-content"],
+  minHeight: ["max-content", "min-content", "fit-content"],
+  minWidth: ["max-content", "min-content", "fit-content"],
+  width: ["max-content", "min-content", "fit-content"],
 };
