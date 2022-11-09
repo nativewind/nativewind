@@ -72,7 +72,7 @@ function startTailwind(
 
   let inputPath: string | undefined;
   try {
-    if (main === "node_modules/expo/AppEntry.js") {
+    if (main.includes("expo/AppEntry")) {
       const file = readdirSync(cwd()).find((file) =>
         file.match(/app.(ts|tsx|cjs|mjs|js)/gi)
       );
@@ -85,8 +85,8 @@ function startTailwind(
     if (main) {
       const cssImport = readFileSync(main, "utf8").match(/["'](.+\.css)["']/);
 
-      if (cssImport && typeof cssImport[0] === "string") {
-        inputPath = cssImport[0];
+      if (cssImport && typeof cssImport[1] === "string") {
+        inputPath = cssImport[1];
       }
     }
   } finally {
