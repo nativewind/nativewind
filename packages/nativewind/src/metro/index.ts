@@ -122,8 +122,8 @@ function startTailwind(
   const isDevelopment = process.env.NODE_ENV !== "production";
 
   if (isDevelopment) {
-    let doneFirstOutput = true;
-    let doneFirstLogging = true;
+    let doneFirstOutput = false;
+    let doneFirstLogging = false;
 
     spawnCommands.push("--watch", "--poll");
 
