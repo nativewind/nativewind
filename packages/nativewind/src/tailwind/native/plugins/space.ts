@@ -13,7 +13,7 @@ export const space = plugin(function ({ matchUtilities, theme }) {
       "space-y": (value: string) => {
         return {
           "&:children:not-first-child": {
-            "margin-right": value,
+            "margin-top": value,
           },
         };
       },
