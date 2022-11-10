@@ -41,7 +41,10 @@ export function pushStyle(
   let isValid = styleProperties === true;
 
   if (typeof value === "string") {
-    if (styleProperty === "flexBasis" && value === "auto") {
+    if (value.startsWith("-") && !value.startsWith("--")) {
+      // Remove vendor prefixes eg. -moz-some-value
+      isValid = false;
+    } else if (styleProperty === "flexBasis" && value === "auto") {
       // This is the only exception to the global values
       isValid = true;
     } else if (invalidGlobalValues.has(value)) {
