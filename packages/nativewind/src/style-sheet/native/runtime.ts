@@ -271,6 +271,8 @@ export function resetRuntime() {
   darkRootVariableValues = {};
   dangerouslyCompileStyles = undefined;
 
+  childClassMap.set("parent", "parent:children");
+
   setVariables({
     "--platform": Platform.OS,
     "--rem": 14, // RN appears to use fontSize: 14 as a default for <Text />

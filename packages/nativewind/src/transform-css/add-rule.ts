@@ -12,7 +12,7 @@ import { transform } from "./transforms/transform";
 import { textDecoration } from "./transforms/text-decoration";
 import { textDecorationLine } from "./transforms/text-decoration-line";
 import { textShadow } from "./transforms/text-shadow";
-import { AtomRecord, SelectorMeta, AtomStyle, skip } from "./types";
+import { AtomRecord, SelectorMeta, AtomStyle, skip, isRaw } from "./types";
 import { borderStyle } from "./transforms/border-style";
 
 export function addRule(
@@ -21,7 +21,7 @@ export function addRule(
   meta: SelectorMeta
 ) {
   const selectorList = node.prelude;
-  if (selectorList.type === "Raw") return skip;
+  if (isRaw(selectorList)) return skip;
 
   const styles = getDeclarations(node.block, meta);
 
@@ -223,11 +223,18 @@ function getSelector(node: CssNode, meta: SelectorMeta) {
         break;
       }
       case "PseudoClassSelector": {
+        // eslint-disable-next-line unicorn/prefer-switch
         if (node.name === "children") {
           hasParent = true;
           tokens.push(`:${node.name}`);
         } else if (node.name === "root") {
           tokens.push(`:${node.name}`);
+        } else if (node.name === "nth-child") {
+          const nthChild = node.children?.toArray()[0];
+          if (nthChild?.type !== "Nth" || nthChild.nth.type !== "Identifier") {
+            return;
+          }
+          meta.conditions.push(nthChild.nth.name);
         } else {
           switch (node.name) {
             case "active":

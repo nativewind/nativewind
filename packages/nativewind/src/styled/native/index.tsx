@@ -185,14 +185,14 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
 
         return isNativeWindComponent(child)
           ? cloneElement(child, {
-              nthChild,
+              nthChild: nthChild + 1,
               lastChild: children.length - 1 === nthChild,
               className: childClassName,
             } as Record<string, unknown>)
           : createElement(StyledComponent, {
               key: child.key,
               component: child.type,
-              nthChild,
+              nthChild: nthChild + 1,
               lastChild: children.length - 1 === nthChild,
               ...child.props,
               className: childClassName,

@@ -32,7 +32,7 @@ export function withConditionals(
         switch (key) {
           case "first-child": {
             return (
-              typeof source["nthChild"] === "number" && source["nthChild"] === 0
+              typeof source["nthChild"] === "number" && source["nthChild"] === 1
             );
           }
           case "last-child": {
@@ -40,7 +40,7 @@ export function withConditionals(
           }
           case "not-first-child": {
             return (
-              typeof source["nthChild"] === "number" && source["nthChild"] > 0
+              typeof source["nthChild"] === "number" && source["nthChild"] > 1
             );
           }
           case "odd": {
