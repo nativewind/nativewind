@@ -4,6 +4,7 @@ import { getCreateOptions } from "../src/transform-css";
 import nativePreset from "../src/tailwind/native";
 import { AtomRecord } from "../src/transform-css/types";
 import { NativeWindStyleSheet } from "../src";
+import postcssPluginPack from "../src/postcss/plugin";
 
 interface NativewindCompileOptions {
   css?: string;
@@ -26,6 +27,7 @@ function compile(
         ...(config?.safelist ?? []),
       ] as string[],
     }),
+    postcssPluginPack,
   ]).process(`@tailwind components;@tailwind utilities;${css ?? ""}`).css;
 
   // console.log(output);

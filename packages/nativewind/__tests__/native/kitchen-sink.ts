@@ -276,6 +276,7 @@ testCompile(
   text-center
   // Typography - Text Color
   text-black
+  text-black/50
   // Typography - Text Decoration
   underline
   // Typography - Text Decoration Color
@@ -792,6 +793,13 @@ testCompile(
         styles: [
           {
             color: "#000",
+          },
+        ],
+      },
+      "text-black/50": {
+        styles: [
+          {
+            color: "rgba(0, 0, 0, 0.5)",
           },
         ],
       },

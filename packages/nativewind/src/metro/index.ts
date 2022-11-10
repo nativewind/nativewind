@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any, unicorn/prefer-module */
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { cwd } from "node:process";
@@ -7,28 +7,19 @@ import { spawn, spawnSync } from "node:child_process";
 import findCacheDir from "find-cache-dir";
 import { getCreateOptions } from "../transform-css";
 
-export interface WithNativeWindOptions {
-  postcss?: string;
-}
-
 export interface GetTransformOptionsOptions {
   dev: boolean;
   hot: boolean;
   platform: string | null | undefined;
 }
 
-export interface WithTailwindOptions
-  extends WithNativeWindOptions,
-    GetTransformOptionsOptions {
+export interface WithTailwindOptions extends GetTransformOptionsOptions {
   cacheDirectory: string;
   output: string;
 }
 
 // We actually don't do anything to the Metro config,
-export default function withNativeWind(
-  config: Record<string, any> = {},
-  options: WithNativeWindOptions = {}
-) {
+export default function withNativeWind(config: Record<string, any> = {}) {
   /**
    * NATIVEWIND_OUTPUT needs to be set before this is returned, otherwise
    * it won't be passed to Babel
@@ -52,7 +43,6 @@ export default function withNativeWind(
         const transformOptions: GetTransformOptionsOptions = args[1];
 
         startTailwind(entry, {
-          ...options,
           ...transformOptions,
           cacheDirectory,
           output,
@@ -66,7 +56,7 @@ export default function withNativeWind(
 
 function startTailwind(
   main: string,
-  { postcss, platform, cacheDirectory, output }: WithTailwindOptions
+  { platform, cacheDirectory, output }: WithTailwindOptions
 ) {
   process.env.NATIVEWIND_NATIVE = platform !== "web" ? "true" : undefined;
 
@@ -96,11 +86,14 @@ function startTailwind(
     }
   }
 
-  const spawnCommands = ["tailwind", "-i", inputPath];
-
-  if (postcss) {
-    spawnCommands.push("--postcss", postcss);
-  }
+  const postcssConfig = join(__dirname, "../postcss/index.js");
+  const spawnCommands = [
+    "tailwind",
+    "-i",
+    inputPath,
+    "--postcss",
+    postcssConfig,
+  ];
 
   process.stdout.clearLine(0); // clear current text
   process.stdout.cursorTo(0); // move cursor to beginning of line

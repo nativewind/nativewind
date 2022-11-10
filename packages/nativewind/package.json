@@ -49,13 +49,14 @@
     "types.d.ts"
   ],
   "dependencies": {
-    "@babel/helper-module-imports": "7.18.6",
     "@babel/core": "7.19.6",
+    "@babel/helper-module-imports": "7.18.6",
     "class-variance-authority": "^0.2.4",
     "css-tree": "^2.2.1",
     "find-cache-dir": "^3.3.2",
     "jest-expo": "^46.0.1",
     "micromatch": "^4.0.5",
+    "postcss-color-functional-notation": "^4.2.4",
     "react-is": "^18.1.0",
     "tailwind-merge": "^1.7.0",
     "use-sync-external-store": "^1.1.0"
