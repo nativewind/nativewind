@@ -4,7 +4,6 @@ import { isFragment } from "react-is";
 import { cva } from "class-variance-authority";
 
 import {
-  createElement,
   ReactNode,
   ComponentType,
   forwardRef,
@@ -15,6 +14,7 @@ import {
   createContext,
   cloneElement,
   useReducer,
+  ReactElement,
 } from "react";
 
 import type { StyledOptions } from "../index";
@@ -37,7 +37,6 @@ export function styled(
   maybeOptions: StyledOptions<any, any> = {}
 ) {
   const {
-    classProps,
     class: baseClassName = "",
     props: propsToTransform,
     ...cvaOptions
@@ -59,7 +58,7 @@ export function styled(
         ...props,
       });
 
-      if (!generatedClassName) {
+      if (!generatedClassName && !propsToTransform) {
         return <Component ref={ref} {...props} />;
       }
 
@@ -138,7 +137,6 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
    */
   const styledProps = withStyledProps({
     propsToTransform,
-    classProps,
     componentState,
     componentProps,
   });
@@ -183,20 +181,22 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
           ? `${classesToInherit} ${childPropClassName}`
           : classesToInherit;
 
-        return isNativeWindComponent(child)
-          ? cloneElement(child, {
-              nthChild: nthChild + 1,
-              lastChild: children.length - 1 === nthChild,
-              className: childClassName,
-            } as Record<string, unknown>)
-          : createElement(StyledComponent, {
-              key: child.key,
-              component: child.type,
-              nthChild: nthChild + 1,
-              lastChild: children.length - 1 === nthChild,
-              ...child.props,
-              className: childClassName,
-            });
+        return isNativeWindComponent(child) ? (
+          cloneElement(child, {
+            nthChild: nthChild + 1,
+            lastChild: children.length - 1 === nthChild,
+            className: childClassName,
+          } as Record<string, unknown>)
+        ) : (
+          <StyledComponent
+            key={child.key}
+            component={child.type}
+            nthChild={nthChild + 1}
+            lastChild={children.length - 1 === nthChild}
+            {...child.props}
+            className={childClassName}
+          />
+        );
       } else {
         return child;
       }
@@ -225,35 +225,29 @@ export const StyledComponent = forwardRef(function NativeWindStyledComponent(
     ref,
   };
 
-  let reactNode: ReactNode = Array.isArray(children)
-    ? createElement(Component, props, ...children)
-    : createElement(Component, props, children);
+  let reactNode: ReactElement = <Component {...props}>{children}</Component>;
 
   /**
    * Determine if we need to wrap element in Providers
    */
   if (typeof interactionMeta.group === "string") {
-    reactNode = createElement(groupContent.Provider, {
-      children: reactNode,
-      value: {
-        ...stateInheritance,
-        [interactionMeta.group]: componentState,
-      },
-    });
+    reactNode = (
+      <groupContent.Provider
+        value={{
+          ...stateInheritance,
+          [interactionMeta.group]: componentState,
+        }}
+      >
+        {reactNode}
+      </groupContent.Provider>
+    );
   }
 
   return reactNode;
 });
 
-function isNativeWindComponent(node: ReactNode) {
-  return (
-    typeof node === "object" &&
-    node &&
-    "type" in node &&
-    (node.type as unknown as Record<string, string>).displayName?.startsWith(
-      "NativeWind"
-    )
-  );
+function isNativeWindComponent(node: unknown) {
+  return (node as any).displayName?.startsWith("NativeWind");
 }
 
 function flattenChildren(

@@ -12,11 +12,12 @@ export function styled(
     style: StyleProp<Style>;
     ref: ForwardedRef<unknown>;
   }>,
-  styledBaseClassNameOrOptions?: string | StyledOptions<unknown, never>,
-  maybeOptions: StyledOptions<any, any> = {}
+  styledBaseClassNameOrOptions?:
+    | string
+    | StyledOptions<Record<string, unknown>, any, string>,
+  maybeOptions: StyledOptions<Record<string, unknown>, any, string> = {}
 ) {
   const {
-    classProps,
     class: baseClassName,
     props,
     ...cvaOptions
@@ -24,12 +25,21 @@ export function styled(
     ? styledBaseClassNameOrOptions
     : maybeOptions;
 
+  let classProps: string[] = [];
+
+  if (props) {
+    for (const [key, propOptions] of Object.entries(props)) {
+      if (propOptions && typeof propOptions === "object" && propOptions.class) {
+        classProps.push(key);
+      }
+    }
+  }
+
   const classGenerator = cva(
     [
       typeof styledBaseClassNameOrOptions === "string"
         ? styledBaseClassNameOrOptions
         : baseClassName,
-      classProps,
     ],
     cvaOptions
   );
@@ -38,8 +48,10 @@ export function styled(
     { className, tw, ...props },
     ref
   ) {
+    const classPropsClassName = classProps.map((prop) => props[prop]).join(" ");
+
     const generatedClassName = classGenerator({
-      class: tw ?? className,
+      class: [classPropsClassName, tw ?? className],
       ...props,
     });
 

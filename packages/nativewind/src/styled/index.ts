@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ComponentType, FunctionComponent, ReactElement } from "react";
-import type { Style } from "../transform-css/types";
 import type {
   StringToBoolean,
   ClassValue,
@@ -28,13 +27,18 @@ export type FunctionComponentWithClassName<T> = FunctionComponent<
   }
 >;
 
+export interface StyledPropOptions {
+  name?: string;
+  value?: string;
+  class?: boolean;
+}
+
 export type StyledOptions<
   T,
   V extends ConfigSchema,
   P extends keyof T = never
 > = {
-  props?: Partial<Record<P, keyof Style | true>>;
-  classProps?: (keyof T & string)[];
+  props?: Partial<Record<string, StyledPropOptions | P | true>>;
   class?: string;
 
   // From CVA types

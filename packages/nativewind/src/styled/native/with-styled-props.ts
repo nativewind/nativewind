@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 import type { ComponentState } from ".";
+import type { StyledPropOptions } from "..";
 import {
   getStyleSet,
   subscribeToStyleSheet,
@@ -7,46 +8,26 @@ import {
 import { withConditionals } from "./with-conditionals";
 
 export interface WithStyledPropsOptions {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  componentProps: Record<string, any>;
-  propsToTransform?: Record<string, unknown>;
+  componentProps: Record<string, unknown>;
+  propsToTransform?: Record<string, StyledPropOptions | string | true>;
   componentState: ComponentState;
-  classProps?: string[];
 }
 
 export function withStyledProps({
   propsToTransform,
   componentProps,
   componentState,
-  classProps,
 }: WithStyledPropsOptions) {
   const styledProps: Record<string, unknown> = {};
 
-  if (classProps) {
-    for (const prop of classProps) {
-      const { className: actualClassName } = withConditionals(
-        componentProps[prop],
-        componentState
-      );
-
-      const styles = useSyncExternalStore(
-        subscribeToStyleSheet,
-        () => getStyleSet(actualClassName),
-        () => getStyleSet(actualClassName)
-      );
-
-      Object.assign(
-        styledProps,
-        { [prop]: undefined },
-        Array.isArray(styles) ? styles[0] : styles
-      );
-    }
-  }
-
   if (propsToTransform) {
-    for (const [prop, styleKey] of Object.entries(propsToTransform)) {
+    for (const [propName, propOptions] of Object.entries(propsToTransform)) {
+      const prop = componentProps[propName];
+
+      if (typeof prop !== "string") continue;
+
       const { className: actualClassName } = withConditionals(
-        componentProps[prop],
+        prop,
         componentState
       );
 
@@ -56,11 +37,16 @@ export function withStyledProps({
         () => getStyleSet(actualClassName)
       );
 
-      if (typeof styleKey === "boolean") {
+      if (typeof propOptions === "boolean") {
         styledProps[prop] = styles;
+      } else if (typeof propOptions === "string") {
+        styledProps[propOptions] = styles;
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        styledProps[prop] = (styles as any)[styleKey as any];
+        const { name = prop, value } = propOptions;
+
+        const styleValue = value ? (styles as any)[propOptions as any] : styles;
+
+        styledProps[name] = styleValue;
       }
     }
   }

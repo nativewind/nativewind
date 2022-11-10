@@ -10,7 +10,7 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test("StyledComponent wrapping styled()", () => {
+test.only("StyledComponent wrapping styled()", () => {
   /**
    * When using styled() & the babel plugin, it will convert the styled()
    * component into <StyledComponent component={styled(component) } />
@@ -30,10 +30,8 @@ test("StyledComponent wrapping styled()", () => {
     (props) => props.children
   ) as FunctionComponent<ViewProps>;
 
-  const MyStyledComponent = styled(Component);
-
   render(
-    <nativewind.StyledComponent component={MyStyledComponent} className="p-4" />
+    <nativewind.StyledComponent component={styled(Component)} className="p-4" />
   );
 
   expect(Component).toHaveBeenCalledWith(
@@ -163,6 +161,48 @@ test("with Stylesheet.create", () => {
           justifyContent: "center",
         },
       ],
+    }),
+    {}
+  );
+});
+
+test("prop alias", () => {
+  create("m-2");
+
+  const OuterView = jest.fn((props) => props.children);
+  const InnerView = jest.fn();
+
+  function ViewWithInner({
+    innerStyle,
+    ...props
+  }: ViewProps & { innerStyle?: StyleProp<ViewStyle> }) {
+    return (
+      <OuterView {...props}>
+        <InnerView style={innerStyle} />
+      </OuterView>
+    );
+  }
+
+  const StyledViewWithInner = styled(ViewWithInner, {
+    props: {
+      innerClassName: "innerStyle",
+    },
+  });
+
+  render(<StyledViewWithInner innerClassName="m-2" />);
+
+  expect(OuterView).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: undefined,
+    }),
+    {}
+  );
+
+  expect(InnerView).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: {
+        margin: 7,
+      },
     }),
     {}
   );
