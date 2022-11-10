@@ -25,7 +25,7 @@ export function styled(
     ? styledBaseClassNameOrOptions
     : maybeOptions;
 
-  let classProps: string[] = [];
+  const classProps: string[] = [];
 
   if (props) {
     for (const [key, propOptions] of Object.entries(props)) {

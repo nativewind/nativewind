@@ -43,10 +43,7 @@ export function withStyledProps({
         styledProps[propOptions] = styles;
       } else {
         const { name = prop, value } = propOptions;
-
-        const styleValue = value ? (styles as any)[propOptions as any] : styles;
-
-        styledProps[name] = styleValue;
+        styledProps[name] = value ? styles[value] : styles;
       }
     }
   }

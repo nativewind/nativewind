@@ -5,6 +5,7 @@ import type {
   ClassValue,
   ClassProp,
 } from "class-variance-authority/dist/types";
+import { Style } from "../transform-css/types";
 
 // Taken from CVA
 type ConfigSchema = Record<string, Record<string, ClassValue>>;
@@ -29,7 +30,7 @@ export type FunctionComponentWithClassName<T> = FunctionComponent<
 
 export interface StyledPropOptions {
   name?: string;
-  value?: string;
+  value?: keyof Style;
   class?: boolean;
 }
 
