@@ -20,10 +20,6 @@ Nativewind defaults to CSS for web if using React Native Web >=0.18
 
 You can control this setting via the `NativeWindStyleSheet.setOutput({ web: 'native' })`
 
-## useTailwind()
-
-`useTailwind()` has been removed.
-
 ## spreadProps option on styled() has been removed
 
 For most cases the classProps option should work as people expect, but due to issues with CSS this option was removed.
