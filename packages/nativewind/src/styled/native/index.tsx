@@ -39,6 +39,7 @@ export function styled(
   const {
     class: baseClassName = "",
     props: propsToTransform,
+    defaultVariants,
     ...cvaOptions
   } = typeof styledBaseClassNameOrOptions === "object"
     ? styledBaseClassNameOrOptions
@@ -78,6 +79,8 @@ export function styled(
       Component.displayName || Component.name || "NoName"
     }`;
   }
+
+  Styled.defaultProps = defaultVariants;
 
   return Styled;
 }
