@@ -83,4 +83,4 @@ export declare function StyledComponent<P>(
   }
 ): ReactElement<any, any> | null;
 
-export * from "./web";
+export * from "../runtime/web/styled";

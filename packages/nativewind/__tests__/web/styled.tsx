@@ -1,11 +1,7 @@
 import { render } from "@testing-library/react-native";
-import { FunctionComponent } from "react";
-import { ViewProps } from "react-native";
 import { styled } from "../../src";
 
-const Component = jest.fn(
-  (props) => props.children
-) as FunctionComponent<ViewProps>;
+const Component = jest.fn((props) => props.children);
 
 afterEach(() => {
   jest.clearAllMocks();

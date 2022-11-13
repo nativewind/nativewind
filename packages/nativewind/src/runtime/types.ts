@@ -1,8 +1,6 @@
 import { ColorSchemeName, Dimensions } from "react-native";
 import type { AtomRecord, VariableValue } from "../transform-css/types";
 
-export * from "./web";
-
 export declare function useUnsafeVariable<
   T extends string | number | undefined
 >(name: `--${string}`): [T | undefined, (value: T) => void];

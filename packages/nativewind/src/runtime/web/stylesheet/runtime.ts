@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/no-array-for-each */
-import { VariableValue } from "../../transform-css/types";
+import { VariableValue } from "../../../transform-css/types";
 
 const variableSubscriptions = new Map<string, Set<() => void>>();
 

@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "use-sync-external-store/shim";
-import { VariableValue } from "../../transform-css/types";
+import { VariableValue } from "../../../transform-css/types";
 import { resolve } from "./resolve";
 import { setVariables, subscribeToVariable, variables } from "./runtime";
 

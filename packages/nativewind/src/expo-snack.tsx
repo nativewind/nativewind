@@ -1,7 +1,7 @@
 import { ComponentType, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { Config } from "tailwindcss";
-import { NativeWindStyleSheet } from "./style-sheet";
+import { NativeWindStyleSheet } from "./runtime";
 
 interface ExpoSnackConfig extends Config {
   compileUrl?: string;

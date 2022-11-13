@@ -41,10 +41,12 @@
   "files": [
     "babel.js",
     "dist/",
+    "expo.js",
     "metro.js",
     "plugin.js",
     "tailwind.js",
     "tailwind/",
+    "theme.d.ts",
     "theme.js",
     "types.d.ts"
   ],

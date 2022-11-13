@@ -1,5 +1,5 @@
-import { NativeWindStyleSheet, useUnsafeVariable } from "./style-sheet";
-import { colorSchemeKey } from "./style-sheet/common";
+import { colorSchemeKey } from "./runtime/common";
+import { NativeWindStyleSheet, useUnsafeVariable } from "./runtime";
 
 export function useColorScheme() {
   const [colorScheme, setColorScheme] = useUnsafeVariable(colorSchemeKey);

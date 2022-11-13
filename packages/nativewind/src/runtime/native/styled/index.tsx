@@ -17,17 +17,16 @@ import {
   ReactElement,
 } from "react";
 
-import type { StyledOptions } from "../index";
-
 import { useInteraction } from "./use-interaction";
 import { withStyledProps } from "./with-styled-props";
 import { ConditionalStateRecord, withConditionals } from "./with-conditionals";
 
+import { StyledOptions } from "../../../styled";
 import {
-  getChildClasses,
-  getStyleSet,
   subscribeToStyleSheet,
-} from "../../style-sheet/native/runtime";
+  getStyleSet,
+  getChildClasses,
+} from "../stylesheet/runtime";
 
 const groupContent = createContext<ConditionalStateRecord>({});
 

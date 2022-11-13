@@ -1,5 +1,5 @@
 import { Dimensions, I18nManager } from "react-native";
-import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../index";
+import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../../types";
 
 import { setDimensions } from "./dimensions";
 import {

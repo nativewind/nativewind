@@ -5,7 +5,7 @@ import {
   ColorValue,
   PlatformColor,
 } from "react-native";
-import { ShadowValue, VariableValue } from "../../transform-css/types";
+import { ShadowValue, VariableValue } from "../../../transform-css/types";
 import { variables } from "./runtime";
 
 interface ObjectAttribute {

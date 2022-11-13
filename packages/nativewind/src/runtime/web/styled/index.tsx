@@ -1,17 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentType, ForwardedRef, forwardRef, useMemo } from "react";
-import { StyleProp } from "react-native";
+import { ComponentType, forwardRef, useMemo } from "react";
 import { cva } from "class-variance-authority";
-
-import { Style } from "../../transform-css/types";
-import type { StyledOptions } from "../index";
-import { mergeClassNames } from "../../style-sheet";
+import { StyledOptions } from "../../../styled";
+import { Style } from "../../../transform-css/types";
+import { mergeClassNames } from "../stylesheet";
 
 export function styled(
-  Component: ComponentType<{
-    style: StyleProp<Style>;
-    ref: ForwardedRef<unknown>;
-  }>,
+  Component: ComponentType,
   styledBaseClassNameOrOptions?:
     | string
     | StyledOptions<Record<string, unknown>, any, string>,

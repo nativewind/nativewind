@@ -1,5 +1,5 @@
-import { atoms } from "../../style-sheet/native/runtime";
-import { Atom } from "../../transform-css/types";
+import { Atom } from "../../../transform-css/types";
+import { atoms } from "../stylesheet/runtime";
 
 export interface ConditionalStateRecord {
   [key: string]: boolean | number | ConditionalStateRecord;

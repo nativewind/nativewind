@@ -1,10 +1,7 @@
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 import type { ComponentState } from ".";
-import type { StyledPropOptions } from "..";
-import {
-  getStyleSet,
-  subscribeToStyleSheet,
-} from "../../style-sheet/native/runtime";
+import { StyledPropOptions } from "../../../styled";
+import { subscribeToStyleSheet, getStyleSet } from "../stylesheet/runtime";
 import { withConditionals } from "./with-conditionals";
 
 export interface WithStyledPropsOptions {

@@ -1,10 +1,13 @@
 import { Appearance, ColorSchemeName } from "react-native";
-import { colorSchemeKey, colorSchemeSystemKey, darkModeKey } from "../common";
-import { getVariablesForColorScheme, setVariables, variables } from "./runtime";
+import {
+  darkModeKey,
+  colorSchemeKey,
+  colorSchemeSystemKey,
+} from "../../common";
+import { getVariable } from "./runtime";
 
 Appearance.addChangeListener(({ colorScheme }) => {
-  if (variables.get(darkModeKey) === "class") {
-    // Ignore automatically switching
+  if (getVariable(darkModeKey) === "class") {
     return;
   }
   internalSetColorScheme(colorScheme);
@@ -16,15 +19,15 @@ function internalSetColorScheme(system?: ColorSchemeName | "system" | null) {
       ? Appearance.getColorScheme() || "light"
       : system;
 
-  setVariables({
-    [colorSchemeSystemKey]: system ?? "system",
-    [colorSchemeKey]: colorScheme,
-    ...getVariablesForColorScheme(colorScheme),
-  });
+  if (colorScheme === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
 }
 
 export function setColorScheme(system?: ColorSchemeName | "system" | null) {
-  if (variables.get(darkModeKey) !== "class") {
+  if (getVariable(darkModeKey) !== "class") {
     console.error(
       `Cannot manually control color scheme. Please set "darkMode: 'class'" in your 'tailwind.config.js'`
     );
@@ -35,11 +38,11 @@ export function setColorScheme(system?: ColorSchemeName | "system" | null) {
 }
 
 export function getColorScheme() {
-  return variables.get(colorSchemeKey) as "light" | "dark";
+  return getVariable(colorSchemeKey) as "light" | "dark";
 }
 
 export function toggleColorScheme() {
-  if (variables.get(darkModeKey) !== "class") {
+  if (getVariable(darkModeKey) !== "class") {
     console.error(
       `Cannot manually control color scheme. Please set "darkMode: 'class'" in your 'tailwind.config.js'`
     );
@@ -47,9 +50,9 @@ export function toggleColorScheme() {
   }
 
   const currentColor =
-    variables.get(colorSchemeSystemKey) === "system"
+    getVariable(colorSchemeSystemKey) === "system"
       ? Appearance.getColorScheme() || "light"
-      : variables.get(colorSchemeKey);
+      : getVariable(colorSchemeKey);
 
   internalSetColorScheme(currentColor === "light" ? "dark" : "light");
 }

@@ -5,8 +5,8 @@ import {
   AtomRecord,
   Style,
   VariableValue,
-} from "../../transform-css/types";
-import { colorSchemeKey } from "../common";
+} from "../../../transform-css/types";
+import { colorSchemeKey } from "../../common";
 import { resolve } from "./resolve";
 
 type ComputedAtom = Atom & { computedStyle: Style; recompute: () => Style };

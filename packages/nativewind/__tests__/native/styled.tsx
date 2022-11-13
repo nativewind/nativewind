@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react-native";
 import { FunctionComponent } from "react";
 import { StyleProp, ViewProps, ViewStyle, StyleSheet } from "react-native";
-import * as nativewind from "../../src/styled/native";
+import * as nativewind from "../../src/runtime/native/styled";
 import { NativeWindStyleSheet, styled, StyledComponent } from "../../src";
 import { create } from "../test-utils";
 
@@ -26,9 +26,7 @@ test.only("StyledComponent wrapping styled()", () => {
     "render"
   );
 
-  const Component = jest.fn(
-    (props) => props.children
-  ) as FunctionComponent<ViewProps>;
+  const Component = jest.fn((props) => props.children);
 
   render(
     <nativewind.StyledComponent component={styled(Component)} className="p-4" />

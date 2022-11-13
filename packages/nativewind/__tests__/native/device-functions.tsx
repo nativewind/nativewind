@@ -1,17 +1,17 @@
 import { render } from "@testing-library/react-native";
 import { create } from "../test-utils";
+import { NativeWindStyleSheet, styled } from "../../src";
 import {
+  hairlineWidth,
+  platformSelect,
+  platformColor,
+  pixelRatio,
+  pixelRatioSelect,
   fontScale,
   fontScaleSelect,
   getPixelSizeForLayoutSize,
-  hairlineWidth,
-  pixelRatio,
-  pixelRatioSelect,
-  platformColor,
-  platformSelect,
   roundToNearestPixel,
-} from "../../src/theme-functions/index.native";
-import { NativeWindStyleSheet, styled } from "../../src";
+} from "../../src/runtime/native/theme-functions";
 
 afterEach(() => {
   NativeWindStyleSheet.__reset();
