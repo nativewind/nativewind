@@ -1,4 +1,3 @@
-export { cva as variants } from "class-variance-authority";
 export { useColorScheme } from "./use-color-scheme";
 export {
   styled,
@@ -6,3 +5,11 @@ export {
   NativeWindStyleSheet,
   useUnsafeVariable,
 } from "./runtime";
+
+export { variants } from "./runtime/variants";
+export type {
+  VariantsConfig,
+  Variants,
+  ConfigVariants,
+  ClassProp,
+} from "./runtime/variants";
