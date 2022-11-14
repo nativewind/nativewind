@@ -3,6 +3,7 @@ export {
   StyledComponent,
   NativeWindStyleSheet,
   useUnsafeVariable,
+  useColorScheme,
 } from "./runtime";
 
 export { variants } from "./runtime/variants";
