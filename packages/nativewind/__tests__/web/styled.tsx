@@ -1,7 +1,11 @@
 import { render } from "@testing-library/react-native";
+import { createElement, ReactNode } from "react";
+import { ViewStyle } from "react-native";
 import { styled } from "../../src";
 
-const Component = jest.fn((props) => props.children);
+const Component = jest.fn(
+  (props: { children?: ReactNode; style?: ViewStyle }) => <>{props.children}</>
+);
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -11,6 +15,8 @@ test("styled", () => {
   const StyledComponent = styled(Component);
 
   render(<StyledComponent className="text-black" />);
+
+  createElement(StyledComponent);
 
   expect(Component).toHaveBeenCalledWith(
     {
@@ -39,7 +45,7 @@ test("default styles", () => {
   );
 });
 
-test("cva options", () => {
+test("variants", () => {
   const StyledComponent = styled(Component, "bg-white", {
     variants: {
       size: {

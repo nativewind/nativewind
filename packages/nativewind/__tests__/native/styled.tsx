@@ -10,7 +10,7 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test.only("StyledComponent wrapping styled()", () => {
+test("StyledComponent wrapping styled()", () => {
   /**
    * When using styled() & the babel plugin, it will convert the styled()
    * component into <StyledComponent component={styled(component) } />
@@ -57,7 +57,7 @@ test("default variant", () => {
         large: "p-4",
       },
     },
-    defaultVariants: {
+    defaultProps: {
       size: "large",
     },
   });

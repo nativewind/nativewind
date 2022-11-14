@@ -1,68 +1,87 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentType, forwardRef, useMemo } from "react";
-import { cva } from "class-variance-authority";
-import { StyledOptions } from "../../../styled";
+import { ComponentType, CSSProperties, forwardRef, useMemo } from "react";
 import { Style } from "../../../transform-css/types";
 import { mergeClassNames } from "../stylesheet";
+import {
+  Styled,
+  StyledOptions,
+  TransformConfigOption,
+} from "../../types/styled";
+import { variants, VariantsConfig } from "../../variants";
 
-export function styled(
-  Component: ComponentType,
-  styledBaseClassNameOrOptions?:
-    | string
-    | StyledOptions<Record<string, unknown>, any, string>,
-  maybeOptions: StyledOptions<Record<string, unknown>, any, string> = {}
-) {
-  const {
-    class: baseClassName,
-    props,
-    defaultVariants,
-    ...cvaOptions
-  } = typeof styledBaseClassNameOrOptions === "object"
-    ? styledBaseClassNameOrOptions
-    : maybeOptions;
+function isClassPropOptions(
+  options: unknown
+): options is TransformConfigOption {
+  return Boolean(options && typeof options === "object" && "class" in options);
+}
+
+function useStyle(classValue?: string, style?: CSSProperties) {
+  return useMemo(() => {
+    const mergedClassName = classValue
+      ? mergeClassNames(classValue)
+      : undefined;
+
+    if (mergedClassName && style) {
+      return [
+        { $$css: true, [mergedClassName]: mergedClassName } as Style,
+        style,
+      ];
+    } else if (mergedClassName) {
+      return { $$css: true, [mergedClassName]: mergedClassName } as Style;
+    }
+    if (style) {
+      return style;
+    }
+  }, [style, classValue]);
+}
+
+export const styled: Styled = <
+  T,
+  C,
+  PAdd extends string,
+  PRemove extends keyof T & string
+>(
+  Component: ComponentType<T>,
+  classValueOrOptions?: string | StyledOptions<T, C, PAdd, PRemove>,
+  maybeOptions?: StyledOptions<T, C, PAdd, PRemove>
+) => {
+  const { props, defaultProps, ...variantsConfig } =
+    typeof classValueOrOptions === "object"
+      ? classValueOrOptions
+      : maybeOptions ?? ({} as StyledOptions<T, C, PAdd, PRemove>);
+
+  const baseClassValue =
+    typeof classValueOrOptions === "string" ? classValueOrOptions : "";
 
   const classProps: string[] = [];
 
   if (props) {
     for (const [key, propOptions] of Object.entries(props)) {
-      if (propOptions && typeof propOptions === "object" && propOptions.class) {
+      if (isClassPropOptions(propOptions)) {
         classProps.push(key);
       }
     }
   }
 
-  const classGenerator = cva(
-    [
-      typeof styledBaseClassNameOrOptions === "string"
-        ? styledBaseClassNameOrOptions
-        : baseClassName,
-    ],
-    cvaOptions
+  const classGenerator = variants(
+    baseClassValue,
+    variantsConfig as VariantsConfig<C>
   );
 
   const Styled = forwardRef<unknown, any>(function (
-    { className, tw, ...props },
+    { tw, className, ...props },
     ref
   ) {
-    const classPropsClassName = classProps.map((prop) => props[prop]).join(" ");
+    const transformClassValue = classProps.map((prop) => props[prop]);
 
-    const generatedClassName = classGenerator({
-      class: [classPropsClassName, tw ?? className],
+    const classValue = classGenerator({
       ...props,
+      className: [transformClassValue, tw ?? className],
     });
 
-    if (!generatedClassName) {
-      return <Component ref={ref} {...props} />;
-    }
+    const style = useStyle(classValue, props.style);
 
-    return (
-      <StyledComponent
-        ref={ref}
-        component={Component}
-        className={generatedClassName}
-        {...props}
-      />
-    );
+    return <Component ref={ref} {...props} style={style} />;
   });
 
   if (typeof Component !== "string") {
@@ -71,30 +90,15 @@ export function styled(
     }`;
   }
 
-  Styled.defaultProps = defaultVariants;
+  Styled.defaultProps = defaultProps;
 
   return Styled;
-}
+};
 
 export const StyledComponent = forwardRef(function StyledComponent(
-  { component: Component, className, style: inlineStyle, ...props }: any,
+  { component: Component, className, tw, style: inlineStyle, ...props }: any,
   ref
 ) {
-  const style = useMemo(() => {
-    const mergedClassName = className ? mergeClassNames(className) : undefined;
-
-    if (mergedClassName && inlineStyle) {
-      return [
-        { $$css: true, [mergedClassName]: mergedClassName } as Style,
-        inlineStyle,
-      ];
-    } else if (mergedClassName) {
-      return { $$css: true, [mergedClassName]: mergedClassName } as Style;
-    }
-    if (inlineStyle) {
-      return inlineStyle;
-    }
-  }, [inlineStyle, className]);
-
+  const style = useStyle(tw ?? className, props.style);
   return <Component ref={ref} {...props} style={style} />;
 });

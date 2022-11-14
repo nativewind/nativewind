@@ -1,4 +1,3 @@
-import { styled } from "./styled";
 import {
   ActivityIndicator as RNActivityIndicator,
   FlatList as RNFlatList,
@@ -23,6 +22,7 @@ import {
   InputAccessoryView as RNInputAccessoryView,
   SafeAreaView as RNSafeAreaView,
 } from "react-native";
+import { styled } from "./runtime";
 
 /**
  * Hello!

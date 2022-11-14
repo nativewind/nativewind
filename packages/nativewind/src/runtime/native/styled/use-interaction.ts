@@ -6,7 +6,7 @@ import {
   TargetedEvent,
   MouseEvent,
 } from "react-native";
-import type { ComponentStateAction } from ".";
+import { ComponentStateAction } from "./use-styled";
 
 declare module "react-native" {
   interface PressableProps {

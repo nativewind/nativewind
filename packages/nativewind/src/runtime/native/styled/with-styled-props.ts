@@ -1,41 +1,38 @@
 import { useSyncExternalStore } from "use-sync-external-store/shim";
-import type { ComponentState } from ".";
-import { StyledPropOptions } from "../../../styled";
+import type { TransformConfigOption } from "../../types/styled";
 import { subscribeToStyleSheet, getStyleSet } from "../stylesheet/runtime";
+import { ComponentState } from "./use-styled";
 import { withConditionals } from "./with-conditionals";
 
 export interface WithStyledPropsOptions {
-  componentProps: Record<string, unknown>;
-  propsToTransform?: Record<string, StyledPropOptions | string | true>;
+  props: Record<string, unknown>;
+  transformConfig?: Record<string, TransformConfigOption | string | true>;
   componentState: ComponentState;
 }
 
 export function withStyledProps({
-  propsToTransform,
-  componentProps,
+  transformConfig,
+  props,
   componentState,
 }: WithStyledPropsOptions) {
   const styledProps: Record<string, unknown> = {};
 
-  if (propsToTransform) {
-    for (const [propName, propOptions] of Object.entries(propsToTransform)) {
-      const prop = componentProps[propName];
+  if (transformConfig) {
+    for (const [propName, propOptions] of Object.entries(transformConfig)) {
+      const prop = props[propName];
 
       if (typeof prop !== "string") continue;
 
-      const { className: actualClassName } = withConditionals(
-        prop,
-        componentState
-      );
+      const { className } = withConditionals(prop, componentState);
 
       const styles = useSyncExternalStore(
         subscribeToStyleSheet,
-        () => getStyleSet(actualClassName),
-        () => getStyleSet(actualClassName)
+        () => getStyleSet(className),
+        () => getStyleSet(className)
       );
 
       if (typeof propOptions === "boolean") {
-        styledProps[prop] = styles;
+        styledProps[propName] = styles;
       } else if (typeof propOptions === "string") {
         styledProps[propOptions] = styles;
       } else {
