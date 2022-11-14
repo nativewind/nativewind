@@ -7,12 +7,7 @@ import type {
   ReactElement,
 } from "react";
 
-import {
-  ClassProp,
-  ClassProp,
-  ConfigVariants,
-  VariantsConfig,
-} from "../variants";
+import { ClassProp, ConfigVariants, VariantsConfig } from "../variants";
 
 import { Style } from "../../transform-css/types";
 
