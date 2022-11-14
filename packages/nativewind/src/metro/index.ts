@@ -109,7 +109,7 @@ function startTailwind(
   );
   writeFileSync(
     output,
-    `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");\create(${createOptions});`
+    `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${createOptions});`
   );
 
   const isDevelopment = process.env.NODE_ENV !== "production";
@@ -134,7 +134,7 @@ function startTailwind(
       );
       writeFileSync(
         output,
-        `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");\create(${createOptions});`
+        `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${createOptions});`
       );
     });
 
