@@ -1,11 +1,58 @@
 import { act, render } from "@testing-library/react-native";
 import { NativeWindStyleSheet, styled } from "../../src";
-import { create } from "../test-utils";
+import { create, testCompile } from "../test-utils";
 
 afterEach(() => {
   NativeWindStyleSheet.__reset();
   jest.clearAllMocks();
 });
+
+testCompile.only(
+  "text-[color:var(--my-variable)]",
+  {
+    config: {
+      darkMode: "class",
+      theme: {
+        variables: {
+          "--my-variable": "red",
+        },
+        darkVariables: {
+          "--my-variable": "blue",
+        },
+      },
+    },
+  },
+  (output) => {
+    expect(output).toStrictEqual({
+      ":root": {
+        variables: [
+          {
+            "--dark-mode": "class",
+            "--my-variable": "red",
+          },
+        ],
+      },
+      ":root[dark]": {
+        variables: [
+          {
+            "--my-variable": "blue",
+          },
+        ],
+      },
+      "text-[color:var(--my-variable)]": {
+        styles: [
+          {
+            color: {
+              function: "var",
+              values: ["--my-variable"],
+            },
+          },
+        ],
+        subscriptions: ["--my-variable"],
+      },
+    });
+  }
+);
 
 test("set via theme", () => {
   create("text-[color:var(--my-variable)]", {

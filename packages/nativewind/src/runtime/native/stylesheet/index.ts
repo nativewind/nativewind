@@ -1,4 +1,4 @@
-import { Dimensions, I18nManager } from "react-native";
+import { Dimensions } from "react-native";
 import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../../types";
 
 import { setDimensions } from "./dimensions";
@@ -35,8 +35,4 @@ export { useUnsafeVariable } from "./use-unsafe-variable";
 function __reset() {
   resetRuntime();
   setDimensions(Dimensions);
-  setVariables({
-    "--i18n-direction": I18nManager.isRTL ? "rtl" : "ltr",
-  });
 }
-__reset();

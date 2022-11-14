@@ -1,5 +1,10 @@
 /* eslint-disable unicorn/no-array-for-each */
-import { Appearance, ColorSchemeName, Platform } from "react-native";
+import {
+  Appearance,
+  ColorSchemeName,
+  I18nManager,
+  Platform,
+} from "react-native";
 import {
   Atom,
   AtomRecord,
@@ -11,15 +16,31 @@ import { resolve } from "./resolve";
 
 type ComputedAtom = Atom & { computedStyle: Style; recompute: () => Style };
 
+const defaultVariables = {
+  "--platform": Platform.OS,
+  "--rem": 14, // RN appears to use fontSize: 14 as a default for <Text />
+  "--color-scheme": Appearance.getColorScheme() ?? "light",
+  "--color-scheme-system": "system",
+  "--i18n-direction": I18nManager.isRTL ? "rtl" : "ltr",
+};
+
+const defaultChildClass = {
+  parent: "parent:children",
+};
+
 const styleSets = new Map<string, Style>();
-const childClassMap = new Map<string, string>();
+const childClassMap = new Map<string, string>(
+  Object.entries(defaultChildClass)
+);
 const componentListeners = new Set<() => void>();
 
 const emptyStyles = {};
 export const atoms = new Map<string, ComputedAtom>();
 const atomDependents = new Map<string, Set<string>>();
 
-export const variables = new Map<string, VariableValue>();
+export const variables = new Map<string, VariableValue>(
+  Object.entries(defaultVariables)
+);
 const variableSubscriptions = new Map<string, Set<() => void>>();
 let rootVariableValues: Record<string, VariableValue> = {};
 let darkRootVariableValues: Record<string, VariableValue> = {};
@@ -262,21 +283,17 @@ export function __dangerouslyCompileStyles(
 export function resetRuntime() {
   componentListeners.clear();
   variableSubscriptions.clear();
-
   atomDependents.clear();
   styleSets.clear();
   atoms.clear();
   variables.clear();
+  childClassMap.clear();
   rootVariableValues = {};
   darkRootVariableValues = {};
   dangerouslyCompileStyles = undefined;
 
-  childClassMap.set("parent", "parent:children");
-
-  setVariables({
-    "--platform": Platform.OS,
-    "--rem": 14, // RN appears to use fontSize: 14 as a default for <Text />
-    "--color-scheme": Appearance.getColorScheme() ?? "light",
-    "--color-scheme-system": "system",
-  });
+  setVariables(defaultVariables);
+  for (const entry of Object.entries(defaultChildClass)) {
+    childClassMap.set(...entry);
+  }
 }

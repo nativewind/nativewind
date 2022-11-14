@@ -23,3 +23,5 @@ export function setDimensions(dimensions: Dimensions) {
     });
   });
 }
+
+setDimensions(Dimensions);
