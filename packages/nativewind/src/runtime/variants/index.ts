@@ -18,7 +18,7 @@ export type ConfigVariants<T> = T extends ConfigSchema
   ? {
       [Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | null;
     }
-  : never;
+  : unknown;
 
 export type VariantsConfig<T> = T extends ConfigSchema
   ? ClassProp & {
@@ -26,7 +26,7 @@ export type VariantsConfig<T> = T extends ConfigSchema
       defaultProps?: ConfigVariants<T>;
       compoundVariants?: Array<ConfigVariants<T> & ClassProp>;
     }
-  : never;
+  : ClassProp;
 
 export type VariantProps<T> = T extends ConfigSchema
   ? ConfigVariants<T> & ClassProp
@@ -57,7 +57,7 @@ export const variants: Variants =
   (props?: VariantProps<T>): string => {
     let baseClassValue: ClassValue;
 
-    if (typeof base === "object" && !Array.isArray(base)) {
+    if (base && typeof base === "object" && !Array.isArray(base)) {
       config = base;
       baseClassValue = base.className;
     } else {
@@ -67,26 +67,32 @@ export const variants: Variants =
     const variantClassValue: ClassValue = [];
     const propClassValue: ClassValue = props?.tw ?? props?.className;
 
-    if (!config?.variants) {
+    if (!config) {
+      return joinClasses([baseClassValue, variantClassValue, propClassValue]);
+    }
+
+    if (!("variants" in config) && !("compoundVariants" in config)) {
       return joinClasses([baseClassValue, variantClassValue, propClassValue]);
     }
 
     const { variants, defaultProps, compoundVariants } = config;
 
-    for (const variant of Object.keys(variants)) {
-      const variantProp = props?.[variant as keyof typeof props];
-      if (variantProp === null) continue;
+    if (variants) {
+      for (const variant of Object.keys(variants)) {
+        const variantProp = props?.[variant as keyof typeof props];
+        if (variantProp === null) continue;
 
-      const variantKey =
-        variantProp === undefined
-          ? defaultProps?.[variant]?.toString()
-          : variantProp.toString();
+        const variantKey =
+          variantProp === undefined
+            ? defaultProps?.[variant]?.toString()
+            : variantProp.toString();
 
-      if (variantKey) {
-        const classValue = variants[variant][variantKey];
-        Array.isArray(classValue)
-          ? variantClassValue.push(...classValue)
-          : variantClassValue.push(classValue);
+        if (variantKey) {
+          const classValue = variants[variant][variantKey];
+          Array.isArray(classValue)
+            ? variantClassValue.push(...classValue)
+            : variantClassValue.push(classValue);
+        }
       }
     }
 

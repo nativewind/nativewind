@@ -7,7 +7,7 @@ import {
   StyledOptions,
   TransformConfigOption,
 } from "../../types/styled";
-import { variants, VariantsConfig } from "../../variants";
+import { ConfigSchema, variants, VariantsConfig } from "../../variants";
 
 function isClassPropOptions(
   options: unknown
@@ -35,20 +35,15 @@ function useStyle(classValue?: string, style?: CSSProperties) {
   }, [style, classValue]);
 }
 
-export const styled: Styled = <
-  T,
-  C,
-  PAdd extends string,
-  PRemove extends keyof T & string
->(
+export const styled: Styled = <T, TVariants extends ConfigSchema>(
   Component: ComponentType<T>,
-  classValueOrOptions?: string | StyledOptions<T, C, PAdd, PRemove>,
-  maybeOptions?: StyledOptions<T, C, PAdd, PRemove>
+  classValueOrOptions?: string | StyledOptions<T, TVariants>,
+  maybeOptions?: StyledOptions<T, TVariants>
 ) => {
   const { props, defaultProps, ...variantsConfig } =
     typeof classValueOrOptions === "object"
       ? classValueOrOptions
-      : maybeOptions ?? ({} as StyledOptions<T, C, PAdd, PRemove>);
+      : maybeOptions ?? ({} as StyledOptions<T, TVariants>);
 
   const baseClassValue =
     typeof classValueOrOptions === "string" ? classValueOrOptions : "";
@@ -65,7 +60,7 @@ export const styled: Styled = <
 
   const classGenerator = variants(
     baseClassValue,
-    variantsConfig as VariantsConfig<C>
+    variantsConfig as VariantsConfig<TVariants>
   );
 
   const Styled = forwardRef<unknown, any>(function (

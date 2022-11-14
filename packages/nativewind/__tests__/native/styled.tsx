@@ -1,6 +1,12 @@
 import { render } from "@testing-library/react-native";
 import { FunctionComponent } from "react";
-import { StyleProp, ViewProps, ViewStyle, StyleSheet } from "react-native";
+import {
+  StyleProp,
+  ViewProps,
+  ViewStyle,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 import * as nativewind from "../../src/runtime/native/styled";
 import { NativeWindStyleSheet, styled, StyledComponent } from "../../src";
 import { create } from "../test-utils";
@@ -8,6 +14,25 @@ import { create } from "../test-utils";
 afterEach(() => {
   NativeWindStyleSheet.__reset();
   jest.clearAllMocks();
+});
+
+test("types", () => {
+  create("p-4");
+
+  const Button = styled(Pressable, "test", {
+    props: {
+      test: "style",
+    },
+    className: "Asd",
+  });
+
+  render(
+    <Button
+      onPress={() => {
+        console.log(1);
+      }}
+    />
+  );
 });
 
 test("StyledComponent wrapping styled()", () => {
