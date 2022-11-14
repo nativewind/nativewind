@@ -7,7 +7,12 @@ import type {
   ReactElement,
 } from "react";
 
-import { ClassProp, ConfigVariants, VariantsConfig } from "../variants";
+import {
+  ClassProp,
+  ClassProp,
+  ConfigVariants,
+  VariantsConfig,
+} from "../variants";
 
 import { Style } from "../../transform-css/types";
 
@@ -71,7 +76,8 @@ export type Styled = {
   ): FunctionComponent<
     Omit<PropsWithRef<T>, TransformRemove<TTransform>> &
       ConfigVariants<TVariants> &
-      TransformAdd<TTransform>
+      TransformAdd<TTransform> &
+      ClassProp
   >;
   // styled(Text, "default", { ...OPTIONS })
   <T, TVariants, TTransform>(
@@ -81,7 +87,8 @@ export type Styled = {
   ): FunctionComponent<
     Omit<PropsWithRef<T>, TransformRemove<TTransform>> &
       ConfigVariants<TVariants> &
-      TransformAdd<TTransform>
+      TransformAdd<TTransform> &
+      ClassProp
   >;
 };
 
