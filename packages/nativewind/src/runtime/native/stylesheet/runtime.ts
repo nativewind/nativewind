@@ -22,6 +22,7 @@ const defaultVariables = {
   "--color-scheme": Appearance.getColorScheme() ?? "light",
   "--color-scheme-system": "system",
   "--i18n-direction": I18nManager.isRTL ? "rtl" : "ltr",
+  ...getVariablesForColorScheme(Appearance.getColorScheme() ?? "light"),
 };
 
 const defaultChildClass = {
