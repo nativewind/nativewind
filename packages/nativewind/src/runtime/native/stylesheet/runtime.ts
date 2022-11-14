@@ -12,6 +12,7 @@ import {
   VariableValue,
 } from "../../../transform-css/types";
 import { colorSchemeKey } from "../../common";
+import { getColorScheme } from "./color-scheme";
 import { resolve } from "./resolve";
 
 type ComputedAtom = Atom & { computedStyle: Style; recompute: () => Style };
@@ -22,7 +23,6 @@ const defaultVariables = {
   "--color-scheme": Appearance.getColorScheme() ?? "light",
   "--color-scheme-system": "system",
   "--i18n-direction": I18nManager.isRTL ? "rtl" : "ltr",
-  ...getVariablesForColorScheme(Appearance.getColorScheme() ?? "light"),
 };
 
 const defaultChildClass = {
@@ -68,6 +68,10 @@ export function create(atomRecord: AtomRecord) {
           ...darkRootVariableValues,
           ...atom.variables[0],
         };
+      }
+
+      if (getColorScheme() === "dark") {
+        setVariables(darkRootVariableValues);
       }
     } else {
       setAtom(name, atom);
