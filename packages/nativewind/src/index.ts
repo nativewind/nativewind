@@ -1,4 +1,3 @@
-export { useColorScheme } from "./use-color-scheme";
 export {
   styled,
   StyledComponent,
