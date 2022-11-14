@@ -8,23 +8,15 @@ afterEach(() => {
 });
 
 test("set via theme", () => {
-  create("text-[color:var(--my-nested-variable)]", {
+  create("text-[color:var(--my-variable)]", {
     config: {
       darkMode: "class",
       theme: {
         variables: {
-          my: {
-            nested: {
-              variable: "red",
-            },
-          },
+          "--my-variable": "red",
         },
         darkVariables: {
-          my: {
-            nested: {
-              variable: "blue",
-            },
-          },
+          "--my-variable": "blue",
         },
       },
     },
@@ -33,9 +25,7 @@ test("set via theme", () => {
   const MyComponent = jest.fn();
   const StyledComponent = styled(MyComponent);
 
-  render(
-    <StyledComponent className="text-[color:var(--my-nested-variable)]" />
-  );
+  render(<StyledComponent className="text-[color:var(--my-variable)]" />);
 
   expect(MyComponent).toHaveBeenCalledWith(
     {
