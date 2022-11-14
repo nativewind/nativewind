@@ -1,13 +1,15 @@
 import { Dimensions } from "react-native";
-import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../../types";
+import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../../types/stylesheet";
 
 import { setDimensions } from "./dimensions";
+
 import {
   create,
   resetRuntime,
   setVariables,
   __dangerouslyCompileStyles,
 } from "./runtime";
+
 import {
   getColorScheme,
   setColorScheme,

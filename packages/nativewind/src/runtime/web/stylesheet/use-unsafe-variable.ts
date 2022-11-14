@@ -1,15 +1,14 @@
-import { useRef } from "react";
-import { ColorValue } from "react-native";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
+import { VariableValue } from "../../../transform-css/types";
+import { UseUnsafeVariable } from "../../types/stylesheet";
 import { setVariables, subscribeToVariable } from "./runtime";
 
 let rootStyle: CSSStyleDeclaration | undefined;
 
-export const useUnsafeVariable = <T extends string | number | ColorValue>(
+export const useUnsafeVariable: UseUnsafeVariable = <T extends VariableValue>(
   name: `--${string}`,
   ssrValue?: T
 ): [T | undefined, (value: T) => void] => {
-  const setVariable = useRef((value: T) => setVariables({ [name]: value }));
   const value = useSyncExternalStore(
     subscribeToVariable(name),
     () => {
@@ -19,5 +18,5 @@ export const useUnsafeVariable = <T extends string | number | ColorValue>(
     () => ssrValue
   );
 
-  return [value, setVariable.current];
+  return [value, (value: T) => setVariables({ [name]: value })];
 };

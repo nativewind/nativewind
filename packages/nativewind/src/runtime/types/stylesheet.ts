@@ -1,9 +1,10 @@
-import { ColorSchemeName, Dimensions } from "react-native";
-import type { AtomRecord, VariableValue } from "../transform-css/types";
+import type { ColorSchemeName, Dimensions } from "react-native";
+import type { AtomRecord, VariableValue } from "../../transform-css/types";
 
-export declare function useUnsafeVariable<
-  T extends string | number | undefined
->(name: `--${string}`): [T | undefined, (value: T) => void];
+export type UseUnsafeVariable = <T extends VariableValue>(
+  name: `--${string}`,
+  ssrValue?: T
+) => [T | undefined, (value: T) => void];
 
 export interface NativeWindStyleSheet {
   create: (atomRecord: AtomRecord) => void;
@@ -16,5 +17,3 @@ export interface NativeWindStyleSheet {
   setWebClassNameMergeStrategy: (callback: (classes: string) => string) => void;
   __dangerouslyCompileStyles: (callback: (className: string) => void) => void;
 }
-
-export declare const NativeWindStyleSheet: NativeWindStyleSheet;

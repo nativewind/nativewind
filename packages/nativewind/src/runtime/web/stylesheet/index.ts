@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import { twMerge } from "tailwind-merge";
-import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../../types";
+import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../../types/stylesheet";
 import { setVariables } from "./runtime";
 import {
   getColorScheme,
