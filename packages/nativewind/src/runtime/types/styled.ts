@@ -56,7 +56,12 @@ export type InferTransform<T> = T extends TransformSchema
   : unknown;
 
 export type StyledOptions<T, TVariants> = VariantsConfig<TVariants> &
-  TransformConfig<T>;
+  TransformConfig<T> & {
+    defaultProps?: Partial<T>;
+    compoundVariants?: Array<
+      Partial<T> & ClassProp & ConfigVariants<TVariants>
+    >;
+  };
 
 export type Styled = {
   // styled(Text) OR styled(Text, "default")
