@@ -59,7 +59,6 @@
     "postcss": "^8.4.19",
     "postcss-color-functional-notation": "^4.2.4",
     "react-is": "^18.1.0",
-    "tailwind-merge": "^1.7.0",
     "use-sync-external-store": "^1.1.0"
   },
   "devDependencies": {

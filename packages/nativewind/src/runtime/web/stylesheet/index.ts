@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-import { twMerge } from "tailwind-merge";
 import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../../types/stylesheet";
 import { setVariables } from "./runtime";
 import {
@@ -17,7 +16,7 @@ if (typeof StyleSheet.create({ test: {} }).test !== "object") {
   throw new Error("NativeWind only supports React Native Web >=0.18");
 }
 
-let webMergeStrategy: (classes: string) => string = twMerge;
+let webMergeStrategy: (classes: string) => string = (classes) => classes;
 
 export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   create: noop,

@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react-native";
-import { NativeWindStyleSheet, styled, StyledComponent } from "../../src";
+import { styled, StyledComponent } from "../../src";
 
 test("StyledComponent", () => {
   const MyComponent = jest.fn();
@@ -37,36 +37,6 @@ test("StyledComponent styled()", () => {
           "text-black": "text-black",
         },
       ],
-    },
-    {}
-  );
-});
-
-test("style merging", () => {
-  const MyComponent = jest.fn();
-
-  render(<StyledComponent component={MyComponent} className="p-5 p-2 p-4" />);
-
-  expect(MyComponent).toHaveBeenCalledWith(
-    {
-      style: {
-        $$css: true,
-        "p-4": "p-4",
-      },
-    },
-    {}
-  );
-
-  MyComponent.mockReset();
-  NativeWindStyleSheet.setWebClassNameMergeStrategy((className) => className);
-  render(<StyledComponent component={MyComponent} className="p-5 p-2 p-4" />);
-
-  expect(MyComponent).toHaveBeenCalledWith(
-    {
-      style: {
-        $$css: true,
-        "p-5 p-2 p-4": "p-5 p-2 p-4",
-      },
     },
     {}
   );

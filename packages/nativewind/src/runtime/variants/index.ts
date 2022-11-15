@@ -45,7 +45,7 @@ export const joinClasses = (classValue: ClassValue): string => {
   const MAX_SAFE_TYPESCRIPT_FLAT_VALUE = 21;
 
   return Array.isArray(classValue)
-    ? classValue.flat(MAX_SAFE_TYPESCRIPT_FLAT_VALUE).join(" ")
+    ? classValue.flat(MAX_SAFE_TYPESCRIPT_FLAT_VALUE).filter(Boolean).join(" ")
     : classValue ?? "";
 };
 

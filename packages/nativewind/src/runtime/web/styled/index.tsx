@@ -1,38 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentType, CSSProperties, forwardRef, useMemo } from "react";
-import { Style } from "../../../transform-css/types";
-import { mergeClassNames } from "../stylesheet";
+import { ComponentType, forwardRef } from "react";
 import {
   Styled,
   StyledOptions,
   TransformConfigOption,
 } from "../../types/styled";
 import { ConfigSchema, variants, VariantsConfig } from "../../variants";
+import { useStyle } from "./use-style";
 
 function isClassPropOptions(
   options: unknown
 ): options is TransformConfigOption {
   return Boolean(options && typeof options === "object" && "class" in options);
-}
-
-function useStyle(classValue?: string, style?: CSSProperties) {
-  return useMemo(() => {
-    const mergedClassName = classValue
-      ? mergeClassNames(classValue)
-      : undefined;
-
-    if (mergedClassName && style) {
-      return [
-        { $$css: true, [mergedClassName]: mergedClassName } as Style,
-        style,
-      ];
-    } else if (mergedClassName) {
-      return { $$css: true, [mergedClassName]: mergedClassName } as Style;
-    }
-    if (style) {
-      return style;
-    }
-  }, [style, classValue]);
 }
 
 export const styled: Styled = <T, TVariants extends ConfigSchema>(
