@@ -107,7 +107,9 @@ export const variants: Variants =
 
     for (const { className, tw, ...compoundVariant } of compoundVariants) {
       const match = Object.entries(compoundVariant).every(([key, value]) => {
-        return mergedProps[key as keyof VariantProps<T>] === value;
+        return typeof value === "boolean"
+          ? Boolean(mergedProps[key as keyof VariantProps<T>]) === value
+          : mergedProps[key as keyof VariantProps<T>] === value;
       });
 
       if (match) variantClassValue.push(tw ?? className ?? "");

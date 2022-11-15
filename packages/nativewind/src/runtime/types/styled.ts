@@ -59,7 +59,8 @@ export type StyledOptions<T, TVariants> = VariantsConfig<TVariants> &
   TransformConfig<T> & {
     defaultProps?: Partial<T>;
     compoundVariants?: Array<
-      Partial<T> & ClassProp & ConfigVariants<TVariants>
+      { [K in keyof T]?: T[K] | boolean } & ClassProp &
+        ConfigVariants<TVariants>
     >;
   };
 

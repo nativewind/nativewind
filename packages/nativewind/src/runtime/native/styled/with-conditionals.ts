@@ -6,13 +6,13 @@ export interface ConditionalStateRecord {
 }
 
 export function withConditionals(
-  className = "",
+  classValue = "",
   componentState: ConditionalStateRecord = {}
 ) {
   const keyTokens: string[] = [];
   let interactionMeta: Atom["meta"] = {};
 
-  for (const atomName of className.split(/\s+/)) {
+  for (const atomName of classValue.split(/\s+/)) {
     const atom = atoms.get(atomName);
 
     if (atom?.conditions) {
@@ -74,8 +74,23 @@ export function withConditionals(
     }
   }
 
+  const className = keyTokens
+    .sort((a, b) => {
+      const aImportant = a.startsWith("!");
+      const bImportant = b.startsWith("!");
+
+      return aImportant && bImportant
+        ? 0
+        : aImportant
+        ? 1
+        : bImportant
+        ? -1
+        : 0;
+    })
+    .join(" ");
+
   return {
-    className: keyTokens.join(" "),
+    className,
     interactionMeta,
   };
 }
