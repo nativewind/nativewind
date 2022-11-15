@@ -76,8 +76,8 @@ export function withConditionals(
 
   const className = keyTokens
     .sort((a, b) => {
-      const aImportant = a.startsWith("!");
-      const bImportant = b.startsWith("!");
+      const aImportant = a.includes("!");
+      const bImportant = b.includes("!");
 
       return aImportant && bImportant
         ? 0
