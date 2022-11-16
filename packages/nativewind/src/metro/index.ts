@@ -6,6 +6,7 @@ import { spawn, spawnSync } from "node:child_process";
 
 import findCacheDir from "find-cache-dir";
 import { getCreateOptions } from "../transform-css";
+import isExpo from "./expo/is-metro";
 
 export interface GetTransformOptionsOptions {
   dev: boolean;
@@ -62,7 +63,7 @@ function startTailwind(
 
   let inputPath: string | undefined;
   try {
-    if (main.includes("expo/AppEntry")) {
+    if (isExpo(main)) {
       const file = readdirSync(cwd()).find((file) =>
         file.match(/app.(ts|tsx|cjs|mjs|js)/gi)
       );

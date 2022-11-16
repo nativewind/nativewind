@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-array-for-each */
 import { VariableValue } from "../../../transform-css/types";
 
 const variableSubscriptions = new Map<string, Set<() => void>>();
@@ -15,9 +14,12 @@ export function setVariables(properties: Record<`--${string}`, VariableValue>) {
   const subscriptions = new Set<() => void>();
 
   for (const [name, value] of Object.entries(properties)) {
-    variableSubscriptions.get(name)?.forEach((callback) => {
-      subscriptions.add(callback);
-    });
+    const callbacks = variableSubscriptions.get(name);
+    if (callbacks) {
+      for (const callback of callbacks) {
+        subscriptions.add(callback);
+      }
+    }
     document.documentElement.style.setProperty(name, value.toString());
   }
 }
