@@ -1,13 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentType, forwardRef } from "react";
-import { Styled, StyledOptions } from "../../types/styled";
-import { ConfigSchema, variants, VariantsConfig } from "../../variants";
+import {
+  AnyStyledOptions,
+  Styled,
+  StyledComponentType,
+} from "../../types/styled";
+import { variants } from "../../variants";
 import useStyled from "./use-styled";
 
-export const styled: Styled = <T, TVariants extends ConfigSchema>(
-  component: ComponentType<T>,
-  classValueOrOptions?: string | StyledOptions<T, TVariants>,
-  maybeOptions?: StyledOptions<T, TVariants>
+export const styled: Styled = (
+  component: ComponentType,
+  classValueOrOptions?: string | AnyStyledOptions,
+  maybeOptions?: AnyStyledOptions
 ) => {
   const {
     props: transformConfig,
@@ -15,16 +18,14 @@ export const styled: Styled = <T, TVariants extends ConfigSchema>(
     ...cvaOptions
   } = typeof classValueOrOptions === "object"
     ? classValueOrOptions
-    : maybeOptions ?? ({} as StyledOptions<T, TVariants>);
+    : maybeOptions ?? ({} as AnyStyledOptions);
 
   const baseClassValue =
     typeof classValueOrOptions === "string" ? classValueOrOptions : "";
 
-  const classGenerator = variants(
-    baseClassValue,
-    cvaOptions as VariantsConfig<TVariants>
-  );
+  const classGenerator = variants(baseClassValue, cvaOptions);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Styled = forwardRef<unknown, any>(
     ({ tw, className, ...props }, ref) => {
       const classValue = classGenerator({
@@ -55,4 +56,4 @@ export const styled: Styled = <T, TVariants extends ConfigSchema>(
   return Styled;
 };
 
-export const StyledComponent = forwardRef(useStyled);
+export const StyledComponent = forwardRef(useStyled) as StyledComponentType;

@@ -14,13 +14,18 @@ export type ClassProp =
   | { tw?: never; className?: string }
   | { tw?: string; className?: never };
 
+export interface ClassProp2 {
+  tw?: string;
+  className?: string;
+}
+
 export type ConfigVariants<T> = T extends ConfigSchema
   ? {
       [Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | null;
     }
   : unknown;
 
-export type VariantsConfig<T> = T extends ConfigSchema
+export type VariantsConfig<T = unknown> = T extends ConfigSchema
   ? ClassProp & {
       variants?: T;
       defaultProps?: ConfigVariants<T>;

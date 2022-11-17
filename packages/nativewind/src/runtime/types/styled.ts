@@ -1,17 +1,21 @@
 import type {
-  ComponentProps,
+  ComponentPropsWithoutRef,
   ComponentPropsWithRef,
-  ComponentType,
+  ElementType,
   FunctionComponent,
-  JSXElementConstructor,
   ReactElement,
 } from "react";
 
-import { ClassProp, ConfigVariants, VariantsConfig } from "../variants";
+import {
+  ClassProp,
+  ClassProp2,
+  ConfigVariants,
+  VariantsConfig,
+} from "../variants";
 
 import { Style } from "../../transform-css/types";
 
-type PropsWithRef<T> = ComponentPropsWithRef<ComponentType<T>>;
+type StringKeys<T> = Extract<keyof T, string>;
 
 export type TransformConfigOption<T = string> = {
   name?: T;
@@ -19,85 +23,129 @@ export type TransformConfigOption<T = string> = {
   class?: boolean;
 };
 
-export type TransformAdd<TTransform> =
-  TTransform extends TransformSchema<string>
-    ? { [K in keyof TTransform]?: string }
-    : unknown;
+type TransformProps<T, TTransform> = Record<keyof TTransform, string> &
+  Omit<T, Extract<keyof T, keyof TransformMapping<TTransform>>>;
 
-export type TransformRemove<T> =
-  | TransformRemoveBoolean<T>
-  | TransformRemoveAlias<T>;
+export type TransformMapping<TTransform> = {
+  [Key in keyof TTransform as InferTransformAlias<Key, TTransform[Key]>]: Key;
+};
 
-export type TransformRemoveBoolean<T> = T extends Record<infer V, true>
-  ? V extends string
+type InferTransformAlias<K, V> = K extends string
+  ? V extends true
+    ? K
+    : V extends string
     ? V
+    : V extends { name: infer N }
+    ? N extends string
+      ? N
+      : never
+    : V extends Record<string, unknown>
+    ? K
     : never
   : never;
 
-export type TransformRemoveAlias<T> = T extends Record<
-  string,
-  infer V | true | TransformConfigOption<infer V>
->
-  ? V extends string
-    ? V
-    : never
-  : never;
+type SetOptional<T, K extends string> = Omit<T, Extract<K, keyof T>> &
+  Partial<Pick<T, Extract<K, keyof T>>>;
 
-export type TransformSchema<T extends string = string> = Record<
+type OptionalProps<T> = Exclude<
+  {
+    [Key in keyof T]: T extends Record<Key, T[Key]> ? never : Key;
+  }[keyof T],
+  undefined
+>;
+
+export type TransformSchema<T> = Record<
   string,
   T | true | TransformConfigOption<T>
 >;
 
-export type TransformConfig<T> = {
-  props?: TransformSchema<keyof T & string>;
-};
-export type InferTransform<T> = T extends TransformSchema
-  ? { props?: T }
+export type InferTransform<T, TTransform> = T extends TransformSchema<T>
+  ? { props?: TTransform }
   : unknown;
 
-export type StyledOptions<T, TVariants> = VariantsConfig<TVariants> &
-  TransformConfig<T> & {
-    defaultProps?: Partial<T>;
+export type InferDefaultProps<TDefaultProps, T, TVariants, TTransform> =
+  TDefaultProps extends Record<string, unknown>
+    ? { defaultProps?: DefaultProps<T, TVariants, TTransform> }
+    : unknown;
+
+type DefaultProps<T, TVariants, TTransform> = Partial<
+  TransformProps<T, TTransform> | ConfigVariants<TVariants>
+>;
+
+export type StyledOptions<T, TVariants, TTransform, TDefaultProps> =
+  VariantsConfig<TVariants> & {
+    props?: TTransform & TransformSchema<keyof T>;
+    defaultProps?: TDefaultProps & DefaultProps<T, TVariants, TTransform>;
     compoundVariants?: Array<
       { [K in keyof T]?: T[K] | boolean } & ClassProp &
         ConfigVariants<TVariants>
     >;
   };
 
+type OptionalTransformProps<T, TTransform> = Extract<
+  TransformMapping<TTransform>[Extract<
+    keyof TransformMapping<TTransform>,
+    OptionalProps<T>
+  >],
+  string
+>;
+
+export type StyledComponentProps<T, TVariants, TTransform, TDefaultProps> =
+  SetOptional<
+    TransformProps<T, TTransform> & ConfigVariants<TVariants> & ClassProp2,
+    StringKeys<TDefaultProps> | OptionalTransformProps<T, TTransform>
+  >;
+
+export type StyledFunctionComponent<
+  T extends ElementType,
+  TVariants = unknown,
+  TTransform = unknown,
+  TDefaultProps = unknown
+> = FunctionComponent<
+  StyledComponentProps<
+    ComponentPropsWithRef<T>,
+    TVariants,
+    TTransform,
+    TDefaultProps
+  >
+>;
+
 export type Styled = {
   // styled(Text) OR styled(Text, "default")
-  <T>(
-    component: ComponentType<T>,
+  <T extends ElementType>(
+    component: T,
     defaultClassName?: string
-  ): FunctionComponent<PropsWithRef<T> & ClassProp>;
+  ): StyledFunctionComponent<T>;
   // styled(Text, { ...OPTIONS })
-  <T, TVariants, TTransform>(
-    component: ComponentType<T>,
-    options: StyledOptions<T, TVariants> & InferTransform<TTransform>
-  ): FunctionComponent<
-    Omit<PropsWithRef<T>, TransformRemove<TTransform>> &
-      ConfigVariants<TVariants> &
-      TransformAdd<TTransform> &
-      ClassProp
-  >;
+  <T extends ElementType, TVariants, TTransform, TDefaultProps>(
+    component: T,
+    options: StyledOptions<
+      ComponentPropsWithoutRef<T>,
+      TVariants,
+      TTransform,
+      TDefaultProps
+    >
+  ): StyledFunctionComponent<T, TVariants, TTransform, TDefaultProps>;
   // styled(Text, "default", { ...OPTIONS })
-  <T, TVariants, TTransform>(
-    component: ComponentType<T>,
+  <T extends ElementType, TVariants, TTransform, TDefaultProps>(
+    component: T,
     defaultClassName: string,
-    options: StyledOptions<T, TVariants> & InferTransform<TTransform>
-  ): FunctionComponent<
-    Omit<PropsWithRef<T>, TransformRemove<TTransform>> &
-      ConfigVariants<TVariants> &
-      TransformAdd<TTransform> &
-      ClassProp
-  >;
+    options: StyledOptions<
+      ComponentPropsWithoutRef<T>,
+      TVariants,
+      TTransform,
+      TDefaultProps
+    >
+  ): StyledFunctionComponent<T, TVariants, TTransform, TDefaultProps>;
 };
 
-export type StyledComponent = {
-  <T extends JSXElementConstructor<any>, P = ComponentProps<T>>(
-    props: P &
+export type StyledComponentType = {
+  <T>(
+    props: T &
       ClassProp & {
-        component: ComponentType<T>;
+        component: ElementType<T>;
       }
-  ): ReactElement<P, T> | null;
+  ): ReactElement<T>;
 };
+
+export type AnyStyledOptions = StyledOptions<any, any, any, any>;

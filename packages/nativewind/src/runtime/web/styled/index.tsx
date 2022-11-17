@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentType, forwardRef } from "react";
 import {
+  AnyStyledOptions,
   Styled,
-  StyledOptions,
+  StyledComponentType,
   TransformConfigOption,
 } from "../../types/styled";
-import { ConfigSchema, variants, VariantsConfig } from "../../variants";
+import { variants } from "../../variants";
 import { useStyle } from "./use-style";
 
 function isClassPropOptions(
@@ -14,15 +14,15 @@ function isClassPropOptions(
   return Boolean(options && typeof options === "object" && "class" in options);
 }
 
-export const styled: Styled = <T, TVariants extends ConfigSchema>(
-  Component: ComponentType<T>,
-  classValueOrOptions?: string | StyledOptions<T, TVariants>,
-  maybeOptions?: StyledOptions<T, TVariants>
+export const styled: Styled = (
+  Component: ComponentType,
+  classValueOrOptions?: string | AnyStyledOptions,
+  maybeOptions?: AnyStyledOptions
 ) => {
   const { props, defaultProps, ...variantsConfig } =
     typeof classValueOrOptions === "object"
       ? classValueOrOptions
-      : maybeOptions ?? ({} as StyledOptions<T, TVariants>);
+      : maybeOptions ?? ({} as AnyStyledOptions);
 
   const baseClassValue =
     typeof classValueOrOptions === "string" ? classValueOrOptions : "";
@@ -37,11 +37,9 @@ export const styled: Styled = <T, TVariants extends ConfigSchema>(
     }
   }
 
-  const classGenerator = variants(
-    baseClassValue,
-    variantsConfig as VariantsConfig<TVariants>
-  );
+  const classGenerator = variants(baseClassValue, variantsConfig);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Styled = forwardRef<unknown, any>(function (
     { tw, className, ...props },
     ref
@@ -69,10 +67,13 @@ export const styled: Styled = <T, TVariants extends ConfigSchema>(
   return Styled;
 };
 
-export const StyledComponent = forwardRef(function StyledComponent(
-  { component: Component, className, tw, style: inlineStyle, ...props }: any,
-  ref
-) {
-  const style = useStyle(tw ?? className, props.style);
-  return <Component ref={ref} {...props} style={style} />;
-});
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const StyledComponent = forwardRef<unknown, any>(
+  function StyledComponent(
+    { component: Component, className, tw, style: inlineStyle, ...props },
+    ref
+  ) {
+    const style = useStyle(tw ?? className, props.style);
+    return <Component ref={ref} {...props} style={style} />;
+  }
+) as StyledComponentType;

@@ -1,12 +1,6 @@
 import { render } from "@testing-library/react-native";
 import { FunctionComponent } from "react";
-import {
-  StyleProp,
-  ViewProps,
-  ViewStyle,
-  StyleSheet,
-  Pressable,
-} from "react-native";
+import { StyleProp, ViewProps, ViewStyle, StyleSheet } from "react-native";
 import * as nativewind from "../../src/runtime/native/styled";
 import { NativeWindStyleSheet, styled, StyledComponent } from "../../src";
 import { create } from "../test-utils";
@@ -16,24 +10,30 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test("types", () => {
-  create("p-4");
+// test("types", () => {
+//   create("p-4");
 
-  const Button = styled(Pressable, "test", {
-    props: {
-      test: "style",
-    },
-    className: "Asd",
-  });
+//   const Button = styled(Pressable, {
+//     props: {
+//       test: "onFocus",
+//     },
+//     className: "Asd",
+//     defaultProps: {
+//       test: () => { return},
+//       onBlur: () => {
+//         return;
+//       },
+//     },
+//   });
 
-  render(
-    <Button
-      onPress={() => {
-        console.log(1);
-      }}
-    />
-  );
-});
+//   render(
+//     <Button
+//       onPress={() => {
+//         console.log(1);
+//       }}
+//     />
+//   );
+// });
 
 test("StyledComponent wrapping styled()", () => {
   /**
@@ -106,10 +106,11 @@ test("with props & variant", () => {
   const OuterView = jest.fn((props) => props.children);
   const InnerView = jest.fn();
 
-  function ViewWithInner({
-    innerStyle,
-    ...props
-  }: ViewProps & { innerStyle?: StyleProp<ViewStyle> }) {
+  interface ViewWithInnerProps extends ViewProps {
+    innerStyle?: StyleProp<ViewStyle>;
+  }
+
+  function ViewWithInner({ innerStyle, ...props }: ViewWithInnerProps) {
     return (
       <OuterView {...props}>
         <InnerView style={innerStyle} />
@@ -126,9 +127,12 @@ test("with props & variant", () => {
         large: "p-4",
       },
     },
+    defaultProps: {
+      size: "large",
+    },
   });
 
-  render(<StyledViewWithInner innerStyle="m-2" size="large" />);
+  render(<StyledViewWithInner innerStyle="m-2" />);
 
   expect(OuterView).toHaveBeenCalledWith(
     expect.objectContaining({
