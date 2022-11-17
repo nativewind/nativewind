@@ -23,8 +23,10 @@ export default function withNativeWind(config: Record<string, any> = {}) {
     throw new Error("[NativeWind] Unable to secure cache directory");
 
   const filename = join(cacheDirectory, "output");
-  const output = `${filename}.js`;
-  writeFileSync(output, "");
+  const outputJSPath = `${filename}.js`;
+  const outputCSSPath = `${filename}.css`;
+
+  writeFileSync(outputJSPath, "");
 
   process.env.NATIVEWIND_OUTPUT = filename;
 
@@ -46,7 +48,8 @@ export default function withNativeWind(config: Record<string, any> = {}) {
         runTailwindCli(entry, {
           ...transformOptions,
           cacheDirectory,
-          outputPath: output,
+          outputJSPath,
+          outputCSSPath,
         });
 
         return config.transformer?.getTransformOptions(...args);

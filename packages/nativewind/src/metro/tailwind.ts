@@ -8,18 +8,20 @@ import isExpo from "./expo/is-metro";
 
 export interface WithTailwindOptions extends GetTransformOptionsOptions {
   cacheDirectory: string;
-  outputPath: string;
+  outputJSPath: string;
+  outputCSSPath: string;
 }
 
 export default function runTailwindCli(
   main: string,
-  { platform, cacheDirectory, outputPath }: WithTailwindOptions
+  { platform, cacheDirectory, outputJSPath, outputCSSPath }: WithTailwindOptions
 ) {
   process.env.NATIVEWIND_NATIVE = platform !== "web" ? "true" : undefined;
 
   let createOptions: Record<string, unknown> = {};
 
   let inputPath: string | undefined;
+
   try {
     if (isExpo(main)) {
       const file = readdirSync(cwd()).find((file) =>
@@ -51,6 +53,8 @@ export default function runTailwindCli(
     "tailwind",
     "-i",
     inputPath,
+    "-o",
+    outputCSSPath,
     "--postcss",
     postcssConfig,
   ];
@@ -70,7 +74,7 @@ export default function runTailwindCli(
   };
 
   writeFileSync(
-    outputPath,
+    outputJSPath,
     `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
       createOptions
     )}); //${Date.now()}`
@@ -87,12 +91,6 @@ export default function runTailwindCli(
       shell: true,
     });
 
-    let chunks: string[] = [];
-
-    cli.stdout.on("data", (data) => {
-      chunks.push(Buffer.from(data, "utf8").toString().trim());
-    });
-
     cli.stderr.on("data", (data: Buffer) => {
       const message = data.toString().trim();
       const isDone = data.includes("Done");
@@ -107,22 +105,15 @@ export default function runTailwindCli(
         return;
       }
 
-      const css = chunks.join("\n");
-      chunks = [];
-
-      createOptions = {
-        ...createOptions,
-        ...getCreateOptions(css),
-      };
-
-      chunks = [];
-
-      writeFileSync(
-        outputPath,
-        `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
-          createOptions
-        )}); //${Date.now()}`
-      );
+      if (isDone) {
+        const css = readFileSync(outputCSSPath, "utf8");
+        writeFileSync(
+          outputJSPath,
+          `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
+            getCreateOptions(css)
+          )}); //${Date.now()}`
+        );
+      }
 
       if (message) console.error(`NativeWind: ${message}`);
     });
