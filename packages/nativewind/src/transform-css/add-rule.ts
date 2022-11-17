@@ -46,8 +46,13 @@ export function addRule(
       if (styles.fontSize) {
         selectorMeta.variables.push({ "--rem": styles.fontSize });
       }
-      createOptions[selector] ??= {
-        variables: [flatten(selectorMeta.variables)],
+      createOptions[selector] = {
+        variables: [
+          flatten([
+            ...(createOptions[selector]?.variables ?? []),
+            ...selectorMeta.variables,
+          ]),
+        ],
       };
       return;
     }

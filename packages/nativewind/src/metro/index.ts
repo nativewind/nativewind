@@ -46,7 +46,7 @@ export default function withNativeWind(config: Record<string, any> = {}) {
         runTailwindCli(entry, {
           ...transformOptions,
           cacheDirectory,
-          output,
+          outputPath: output,
         });
 
         return config.transformer?.getTransformOptions(...args);

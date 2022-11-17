@@ -250,6 +250,7 @@ testCompile(
   duration-75
   // Transitions & Animation - Transition Property
   transition-all
+  transition-all
   // Transitions & Animation - Transition Timing Function
   ease-linear
   // Typography - Background Color

@@ -8,12 +8,12 @@ import isExpo from "./expo/is-metro";
 
 export interface WithTailwindOptions extends GetTransformOptionsOptions {
   cacheDirectory: string;
-  output: string;
+  outputPath: string;
 }
 
 export default function runTailwindCli(
   main: string,
-  { platform, cacheDirectory, output }: WithTailwindOptions
+  { platform, cacheDirectory, outputPath }: WithTailwindOptions
 ) {
   process.env.NATIVEWIND_NATIVE = platform !== "web" ? "true" : undefined;
 
@@ -70,7 +70,7 @@ export default function runTailwindCli(
   };
 
   writeFileSync(
-    output,
+    outputPath,
     `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
       createOptions
     )}); //${Date.now()}`
@@ -94,7 +94,7 @@ export default function runTailwindCli(
     });
 
     cli.stderr.on("data", (data: Buffer) => {
-      const output = data.toString().trim();
+      const message = data.toString().trim();
       const isDone = data.includes("Done");
 
       if (!doneFirst && isDone) {
@@ -103,7 +103,7 @@ export default function runTailwindCli(
       }
 
       // Ignore this, RN projects won't have Browserslist setup anyway.
-      if (output.startsWith("[Browserslist] Could not parse")) {
+      if (message.startsWith("[Browserslist] Could not parse")) {
         return;
       }
 
@@ -118,13 +118,13 @@ export default function runTailwindCli(
       chunks = [];
 
       writeFileSync(
-        output,
+        outputPath,
         `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
           createOptions
         )}); //${Date.now()}`
       );
 
-      if (output) console.error(`NativeWind: ${output}`);
+      if (message) console.error(`NativeWind: ${message}`);
     });
   }
 }
