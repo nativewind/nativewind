@@ -17,6 +17,8 @@ export default function runTailwindCli(
 ) {
   process.env.NATIVEWIND_NATIVE = platform !== "web" ? "true" : undefined;
 
+  let createOptions: Record<string, unknown> = {};
+
   let inputPath: string | undefined;
   try {
     if (isExpo(main)) {
@@ -62,19 +64,22 @@ export default function runTailwindCli(
     `NativeWind: ${stderr.toString().replace("\nRebuilding...\n\n", "").trim()}`
   );
 
-  const createOptions = JSON.stringify(
-    getCreateOptions(stdout.toString().trim())
-  );
+  createOptions = {
+    ...createOptions,
+    ...getCreateOptions(stdout.toString().trim()),
+  };
+
   writeFileSync(
     output,
-    `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${createOptions});`
+    `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
+      createOptions
+    )}); //${Date.now()}`
   );
 
   const isDevelopment = process.env.NODE_ENV !== "production";
 
   if (isDevelopment) {
-    let doneFirstOutput = false;
-    let doneFirstLogging = false;
+    let doneFirst = false;
 
     spawnCommands.push("--watch", "--poll");
 
@@ -82,24 +87,18 @@ export default function runTailwindCli(
       shell: true,
     });
 
+    let chunks: string[] = [];
+
     cli.stdout.on("data", (data) => {
-      if (!doneFirstOutput) {
-        doneFirstOutput = true;
-        return;
-      }
-      const createOptions = JSON.stringify(
-        getCreateOptions(data.toString().trim())
-      );
-      writeFileSync(
-        output,
-        `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${createOptions});`
-      );
+      chunks.push(Buffer.from(data, "utf8").toString().trim());
     });
 
     cli.stderr.on("data", (data: Buffer) => {
       const output = data.toString().trim();
-      if (!doneFirstLogging) {
-        doneFirstLogging = data.includes("Done");
+      const isDone = data.includes("Done");
+
+      if (!doneFirst && isDone) {
+        doneFirst = true;
         return;
       }
 
@@ -107,6 +106,23 @@ export default function runTailwindCli(
       if (output.startsWith("[Browserslist] Could not parse")) {
         return;
       }
+
+      const css = chunks.join("\n");
+      chunks = [];
+
+      createOptions = {
+        ...createOptions,
+        ...getCreateOptions(css),
+      };
+
+      chunks = [];
+
+      writeFileSync(
+        output,
+        `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
+          createOptions
+        )}); //${Date.now()}`
+      );
 
       if (output) console.error(`NativeWind: ${output}`);
     });
