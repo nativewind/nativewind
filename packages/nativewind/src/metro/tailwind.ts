@@ -92,30 +92,40 @@ export default function runTailwindCli(
     });
 
     cli.stderr.on("data", (data: Buffer) => {
+      const start = Date.now();
+
       const message = data.toString().trim();
-      const isDone = data.includes("Done");
+      const isDone = message.includes("Done");
+
+      if (!message) return;
 
       if (!doneFirst && isDone) {
         doneFirst = true;
         return;
       }
 
-      // Ignore this, RN projects won't have Browserslist setup anyway.
-      if (message.startsWith("[Browserslist] Could not parse")) {
-        return;
+      if (!isDone) {
+        // Ignore this, RN projects won't have Browserslist setup anyway.
+        if (message.startsWith("[Browserslist] Could not parse")) {
+          return;
+        }
+
+        console.error(`NativeWind: ${message}`);
       }
 
-      if (isDone) {
-        const css = readFileSync(outputCSSPath, "utf8");
-        writeFileSync(
-          outputJSPath,
-          `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
-            getCreateOptions(css)
-          )}); //${Date.now()}`
-        );
-      }
+      const timeMatch = message.match(/\d+/);
+      const time = Number.parseInt(timeMatch ? timeMatch[0] : "0", 10);
 
-      if (message) console.error(`NativeWind: ${message}`);
+      const css = readFileSync(outputCSSPath, "utf8");
+      writeFileSync(
+        outputJSPath,
+        `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
+          getCreateOptions(css)
+        )}); //${Date.now()}`
+      );
+
+      const total = time + (start - Date.now());
+      console.error(`NativeWind: Done in ${total}ms`);
     });
   }
 }
