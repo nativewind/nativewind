@@ -18,8 +18,6 @@ export default function runTailwindCli(
 ) {
   process.env.NATIVEWIND_NATIVE = platform !== "web" ? "true" : undefined;
 
-  let createOptions: Record<string, unknown> = {};
-
   let inputPath: string | undefined;
 
   try {
@@ -63,22 +61,12 @@ export default function runTailwindCli(
   process.stdout.cursorTo(0); // move cursor to beginning of line
 
   console.log("NativeWind: Rebuilding...");
-  const { stdout, stderr } = spawnSync("npx", spawnCommands, { shell: true });
+  const { stderr } = spawnSync("npx", spawnCommands, { shell: true });
   console.log(
     `NativeWind: ${stderr.toString().replace("\nRebuilding...\n\n", "").trim()}`
   );
 
-  createOptions = {
-    ...createOptions,
-    ...getCreateOptions(stdout.toString().trim()),
-  };
-
-  writeFileSync(
-    outputJSPath,
-    `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
-      createOptions
-    )}); //${Date.now()}`
-  );
+  generateStyles(outputCSSPath, outputJSPath);
 
   const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -116,16 +104,20 @@ export default function runTailwindCli(
       const timeMatch = message.match(/\d+/);
       const time = Number.parseInt(timeMatch ? timeMatch[0] : "0", 10);
 
-      const css = readFileSync(outputCSSPath, "utf8");
-      writeFileSync(
-        outputJSPath,
-        `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
-          getCreateOptions(css)
-        )}); //${Date.now()}`
-      );
+      generateStyles(outputCSSPath, outputJSPath);
 
       const total = time + (start - Date.now());
       console.error(`NativeWind: Done in ${total}ms`);
     });
   }
+}
+
+function generateStyles(outputCSSPath: string, outputJSPath: string) {
+  const css = readFileSync(outputCSSPath, "utf8");
+  writeFileSync(
+    outputJSPath,
+    `const {create}=require("nativewind/dist/runtime/native/stylesheet/runtime");create(${JSON.stringify(
+      getCreateOptions(css)
+    )}); //${Date.now()}`
+  );
 }
