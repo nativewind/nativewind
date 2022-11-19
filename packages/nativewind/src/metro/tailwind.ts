@@ -92,7 +92,15 @@ export default function runTailwindCli(
         return;
       }
 
-      if (!isDone) {
+      if (isDone) {
+        const timeMatch = message.match(/\d+/);
+        const time = Number.parseInt(timeMatch ? timeMatch[0] : "0", 10);
+
+        generateStyles(outputCSSPath, outputJSPath);
+
+        const total = time + (Date.now() - start);
+        console.error(`NativeWind: Done in ${total}ms`);
+      } else {
         // Ignore this, RN projects won't have Browserslist setup anyway.
         if (message.startsWith("[Browserslist] Could not parse")) {
           return;
@@ -100,14 +108,6 @@ export default function runTailwindCli(
 
         console.error(`NativeWind: ${message}`);
       }
-
-      const timeMatch = message.match(/\d+/);
-      const time = Number.parseInt(timeMatch ? timeMatch[0] : "0", 10);
-
-      generateStyles(outputCSSPath, outputJSPath);
-
-      const total = time + (start - Date.now());
-      console.error(`NativeWind: Done in ${total}ms`);
     });
   }
 }
