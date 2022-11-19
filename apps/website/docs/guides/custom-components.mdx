@@ -6,9 +6,13 @@ NativeWind's strength really shines with writing your own custom components.
 
 When passing styles between components, they are compiled on the parent and passed as a `style` prop to the child.
 
+:::caution
+ You need to use style, className is not passed down!
+:::
+
+
 ```tsx
 function MyComponent({ style }) {
-  // You need to use style, className is not passed down!
   return <Text style={style} />;
 }
 
