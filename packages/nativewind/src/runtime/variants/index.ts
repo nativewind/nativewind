@@ -4,7 +4,6 @@
  * This was forked from https://github.com/joe-bell/cva
  * License: https://github.com/joe-bell/cva/blob/4039155edfd5007cde0e1c9e0060ed838419f242/LICENSE
  */
-
 type ClassValue = string | null | undefined | ClassValue[];
 type StringToBoolean<T> = T extends "true" | "false" ? boolean : T;
 
@@ -92,11 +91,10 @@ export const variants: Variants =
             ? defaultProps?.[variant]?.toString()
             : variantProp.toString();
 
-        if (variantKey) {
-          const classValue = variants[variant][variantKey];
-          Array.isArray(classValue)
-            ? variantClassValue.push(...classValue)
-            : variantClassValue.push(classValue);
+        if (!variantKey && variants[variant]["false"]) {
+          variantClassValue.push(variants[variant]["false"]);
+        } else if (variantKey && variants[variant][variantKey]) {
+          variantClassValue.push(variants[variant][variantKey]);
         }
       }
     }

@@ -10,31 +10,6 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-// test("types", () => {
-//   create("p-4");
-
-//   const Button = styled(Pressable, {
-//     props: {
-//       test: "onFocus",
-//     },
-//     className: "Asd",
-//     defaultProps: {
-//       test: () => { return},
-//       onBlur: () => {
-//         return;
-//       },
-//     },
-//   });
-
-//   render(
-//     <Button
-//       onPress={() => {
-//         console.log(1);
-//       }}
-//     />
-//   );
-// });
-
 test("StyledComponent wrapping styled()", () => {
   /**
    * When using styled() & the babel plugin, it will convert the styled()
@@ -88,6 +63,38 @@ test("default variant", () => {
   });
 
   render(<MyStyledComponent />);
+
+  expect(Component).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: {
+        backgroundColor: "#fff",
+        padding: 14,
+      },
+    }),
+    {}
+  );
+});
+
+test("boolean variants", () => {
+  create("bg-white p-4");
+
+  const Component = jest.fn(
+    (props) => props.children
+  ) as FunctionComponent<ViewProps>;
+
+  const MyStyledComponent = styled(Component, {
+    variants: {
+      white: {
+        true: "bg-white",
+        black: "bg-white",
+      },
+      appearance: {
+        false: "p-4",
+      },
+    },
+  });
+
+  render(<MyStyledComponent white />);
 
   expect(Component).toHaveBeenCalledWith(
     expect.objectContaining({
