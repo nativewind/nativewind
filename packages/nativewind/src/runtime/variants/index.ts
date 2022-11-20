@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type { ClassProp } from "../types/styled";
+
 /**
  * This was forked from https://github.com/joe-bell/cva
  * License: https://github.com/joe-bell/cva/blob/4039155edfd5007cde0e1c9e0060ed838419f242/LICENSE
@@ -8,15 +10,6 @@ type ClassValue = string | null | undefined | ClassValue[];
 type StringToBoolean<T> = T extends "true" | "false" ? boolean : T;
 
 export type ConfigSchema = Record<string, Record<string, ClassValue>>;
-
-export type ClassProp =
-  | { tw?: never; className?: string }
-  | { tw?: string; className?: never };
-
-export interface ClassProp2 {
-  tw?: string;
-  className?: string;
-}
 
 export type ConfigVariants<T> = T extends ConfigSchema
   ? {
@@ -55,28 +48,28 @@ export const joinClasses = (classValue: ClassValue): string => {
 
 export const variants: Variants =
   <T>(
-    base: string | string[] | VariantsConfig<T>,
+    baseOrConfig: string | string[] | VariantsConfig<T>,
     config?: VariantsConfig<T>
   ) =>
   (props?: VariantProps<T>): string => {
-    let baseClassValue: ClassValue;
+    let base: ClassValue;
 
-    if (base && typeof base === "object" && !Array.isArray(base)) {
-      config = base;
-      baseClassValue = base.className;
+    if (typeof baseOrConfig === "object" && !Array.isArray(baseOrConfig)) {
+      config = baseOrConfig;
+      base = baseOrConfig.tw ?? baseOrConfig.className;
     } else {
-      baseClassValue = base;
+      base = baseOrConfig;
     }
 
     const variantClassValue: ClassValue = [];
     const propClassValue: ClassValue = props?.tw ?? props?.className;
 
     if (!config) {
-      return joinClasses([baseClassValue, variantClassValue, propClassValue]);
+      return joinClasses([base, variantClassValue, propClassValue]);
     }
 
     if (!("variants" in config) && !("compoundVariants" in config)) {
-      return joinClasses([baseClassValue, variantClassValue, propClassValue]);
+      return joinClasses([base, variantClassValue, propClassValue]);
     }
 
     const { variants, defaultProps, compoundVariants } = config;
@@ -100,7 +93,7 @@ export const variants: Variants =
     }
 
     if (!compoundVariants) {
-      return joinClasses([baseClassValue, variantClassValue, propClassValue]);
+      return joinClasses([base, variantClassValue, propClassValue]);
     }
 
     const mergedProps: VariantProps<T> = {
@@ -118,5 +111,5 @@ export const variants: Variants =
       if (match) variantClassValue.push(tw ?? className ?? "");
     }
 
-    return joinClasses([baseClassValue, variantClassValue, propClassValue]);
+    return joinClasses([base, variantClassValue, propClassValue]);
   };

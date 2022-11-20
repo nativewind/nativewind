@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   ComponentPropsWithoutRef,
   ComponentPropsWithRef,
@@ -7,16 +6,15 @@ import type {
   ReactElement,
 } from "react";
 
-import {
-  ClassProp,
-  ClassProp2,
-  ConfigVariants,
-  VariantsConfig,
-} from "../variants";
+import { ConfigVariants, VariantsConfig } from "../variants";
 
 import { Style } from "../../transform-css/types";
 
 type StringKeys<T> = Extract<keyof T, string>;
+
+export type ClassProp =
+  | { tw?: never; className?: string }
+  | { tw?: string; className?: never };
 
 export type TransformConfigOption<T = string> = {
   name?: T;
@@ -27,7 +25,7 @@ export type TransformConfigOption<T = string> = {
 type TransformProps<T, TTransform> = Record<keyof TTransform, string> &
   Omit<T, Extract<keyof T, keyof TransformMapping<TTransform>>>;
 
-export type TransformMapping<TTransform> = {
+type TransformMapping<TTransform> = {
   [Key in keyof TTransform as InferTransformAlias<Key, TTransform[Key]>]: Key;
 };
 
@@ -55,19 +53,15 @@ type OptionalProps<T> = Exclude<
   undefined
 >;
 
-export type TransformSchema<T> = Record<
-  string,
-  T | true | TransformConfigOption<T>
+type OptionalTransformProps<T, TTransform> = Extract<
+  TransformMapping<TTransform>[Extract<
+    keyof TransformMapping<TTransform>,
+    OptionalProps<T>
+  >],
+  string
 >;
 
-export type InferTransform<T, TTransform> = T extends TransformSchema<T>
-  ? { props?: TTransform }
-  : unknown;
-
-export type InferDefaultProps<TDefaultProps, T, TVariants, TTransform> =
-  TDefaultProps extends Record<string, unknown>
-    ? { defaultProps?: DefaultProps<T, TVariants, TTransform> }
-    : unknown;
+type TransformSchema<T> = Record<string, T | true | TransformConfigOption<T>>;
 
 type DefaultProps<T, TVariants, TTransform> = Partial<
   TransformProps<T, TTransform> | ConfigVariants<TVariants>
@@ -83,17 +77,9 @@ export type StyledOptions<T, TVariants, TTransform, TDefaultProps> =
     >;
   };
 
-type OptionalTransformProps<T, TTransform> = Extract<
-  TransformMapping<TTransform>[Extract<
-    keyof TransformMapping<TTransform>,
-    OptionalProps<T>
-  >],
-  string
->;
-
 export type StyledComponentProps<T, TVariants, TTransform, TDefaultProps> =
   SetOptional<
-    TransformProps<T, TTransform> & ConfigVariants<TVariants> & ClassProp2,
+    TransformProps<T, TTransform> & ConfigVariants<TVariants> & ClassProp,
     StringKeys<TDefaultProps> | OptionalTransformProps<T, TTransform>
   >;
 
@@ -149,4 +135,5 @@ export type StyledComponentType = {
   ): ReactElement<T>;
 };
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type AnyStyledOptions = StyledOptions<any, any, any, any>;
