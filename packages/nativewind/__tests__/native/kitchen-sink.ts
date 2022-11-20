@@ -259,6 +259,7 @@ testCompile(
   content-none
   // Typography - Font Size
   text-base
+  text-9xl
   // Typography - Font Smoothing
   antialiased
   // Typography - Font Style
@@ -785,6 +786,22 @@ testCompile(
             lineHeight: {
               function: "rem",
               values: [1.5],
+            },
+          },
+        ],
+        subscriptions: ["--rem"],
+      },
+
+      "text-9xl": {
+        styles: [
+          {
+            fontSize: {
+              function: "rem",
+              values: [8],
+            },
+            lineHeight: {
+              function: "rem",
+              values: [8],
             },
           },
         ],

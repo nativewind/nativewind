@@ -13,6 +13,7 @@ import { scale } from "./plugins/scale";
 import { skew } from "./plugins/skew";
 import { rotate } from "./plugins/rotate";
 import { translate } from "./plugins/translate";
+import { fontSize } from "./plugins/font-size";
 
 const preset: Config = {
   content: [],
@@ -60,6 +61,7 @@ const preset: Config = {
     nativewind,
     parent,
     space,
+    fontSize,
     variables,
     scale,
     skew,
@@ -75,14 +77,15 @@ const preset: Config = {
     divideOpacity: false,
     divideStyle: false,
     divideWidth: false,
+    fontSize: false,
     gap: false,
     placeholderOpacity: false,
     ringOpacity: false,
-    space: false,
-    textOpacity: false,
+    rotate: false,
     scale: false,
     skew: false,
-    rotate: false,
+    space: false,
+    textOpacity: false,
     translate: false,
   },
 };
