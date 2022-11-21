@@ -1,14 +1,14 @@
 import plugin from "tailwindcss/plugin";
 
-export default plugin(function ({ addVariant }) {
+export const platforms = plugin(function ({ addVariant }) {
   const nativePlatforms = ["android", "ios", "windows", "macos"];
 
   for (const platform of nativePlatforms) {
-    addVariant(platform, `&:${platform}`);
+    addVariant(platform, `@media ${platform}`);
   }
 
   addVariant(
     "native",
-    nativePlatforms.map((platform) => `&:${platform}`)
+    nativePlatforms.map((platform) => `@media ${platform}`)
   );
 });

@@ -14,7 +14,8 @@ export function parseMediaQuery(node: MediaQuery, selectorMeta: SelectorMeta) {
   // eslint-disable-next-line unicorn/no-array-for-each
   node.children.forEach((child) => {
     if (child.type === "Identifier" && platforms.has(child.name)) {
-      selectorMeta.conditions.push(child.name);
+      selectorMeta.atRules ??= [];
+      selectorMeta.atRules.push(["--platform", child.name]);
     } else if (child.type === "MediaFeature") {
       selectorMeta.atRules ??= [];
 

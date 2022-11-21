@@ -5,8 +5,8 @@ import { elevation } from "./plugins/elevation";
 import { gap } from "./plugins/gap";
 import { parent } from "./plugins/parent";
 import { space } from "./plugins/space";
-import nativewind from "./plugins/nativewind";
-import variables from "./plugins/variables";
+import { platforms } from "./plugins/platforms";
+import { variables } from "./plugins/variables";
 import { boxShadow } from "./plugins/box-shadow";
 import { darkMode } from "./plugins/dark-mode";
 import { scale } from "./plugins/scale";
@@ -58,7 +58,7 @@ const preset: Config = {
     divide,
     elevation,
     gap,
-    nativewind,
+    platforms,
     parent,
     space,
     fontSize,

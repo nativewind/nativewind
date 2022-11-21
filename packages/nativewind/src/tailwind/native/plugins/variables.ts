@@ -1,6 +1,6 @@
 import plugin from "tailwindcss/plugin";
 
-export default plugin(function ({ addUtilities, theme }) {
+export const variables = plugin(function ({ addUtilities, theme }) {
   const rootVariables = theme("variables");
   const darkVariables = theme("darkVariables");
 
