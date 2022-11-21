@@ -76,19 +76,19 @@ export const variants: Variants =
 
     if (variants) {
       for (const variant of Object.keys(variants)) {
-        const variantProp = props?.[variant as keyof typeof props];
-        if (variantProp === null) continue;
+        const value = props?.[variant as keyof typeof props];
+        if (value === null) continue;
 
-        const variantKey =
-          variantProp === undefined
+        const key =
+          value === undefined
             ? defaultProps?.[variant]?.toString()
-            : variantProp.toString();
+            : value.toString();
 
-        if (!variantKey && variants[variant]["false"]) {
+        if (!key && variants[variant]["false"]) {
           variantClassValue.push(variants[variant]["false"]);
-        } else if (variantKey && variants[variant][variantKey]) {
-          variantClassValue.push(variants[variant][variantKey]);
-        } else if (variantKey && variants[variant]["true"]) {
+        } else if (key && variants[variant][key]) {
+          variantClassValue.push(variants[variant][key]);
+        } else if (key && variants[variant]["true"]) {
           variantClassValue.push(variants[variant]["true"]);
         }
       }
