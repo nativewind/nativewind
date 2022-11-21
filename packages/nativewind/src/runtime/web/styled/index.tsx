@@ -70,7 +70,7 @@ export const styled: Styled = (
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const StyledComponent = forwardRef<unknown, any>(
   function StyledComponent(
-    { component: Component, className, tw, style: inlineStyle, ...props },
+    { component: Component, className, tw, ...props },
     ref
   ) {
     const style = useStyle(tw ?? className, props.style);

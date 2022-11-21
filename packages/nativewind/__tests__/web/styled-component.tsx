@@ -17,6 +17,33 @@ test("StyledComponent", () => {
   );
 });
 
+test("StyledComponent preserve style={}", () => {
+  const MyComponent = jest.fn();
+
+  render(
+    <StyledComponent
+      component={MyComponent}
+      className="text-black"
+      style={{ background: "red" }}
+    />
+  );
+
+  expect(MyComponent).toHaveBeenCalledWith(
+    {
+      style: [
+        {
+          $$css: true,
+          "text-black": "text-black",
+        },
+        {
+          background: "red",
+        },
+      ],
+    },
+    {}
+  );
+});
+
 test("StyledComponent styled()", () => {
   const MyComponent = jest.fn();
   const StyledMyComponent = styled(MyComponent, "font-bold");
