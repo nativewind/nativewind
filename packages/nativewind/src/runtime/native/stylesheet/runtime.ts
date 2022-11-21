@@ -18,7 +18,6 @@ import { resolve } from "./resolve";
 type ComputedAtom = Atom & { computedStyle: Style; recompute: () => Style };
 
 const defaultVariables = {
-  "--platform": Platform.OS,
   "--rem": 14, // RN appears to use fontSize: 14 as a default for <Text />
   "--color-scheme": Appearance.getColorScheme() ?? "light",
   "--color-scheme-system": "system",

@@ -15,7 +15,7 @@ export function parseMediaQuery(node: MediaQuery, selectorMeta: SelectorMeta) {
   node.children.forEach((child) => {
     if (child.type === "Identifier" && platforms.has(child.name)) {
       selectorMeta.atRules ??= [];
-      selectorMeta.atRules.push(["--platform", child.name]);
+      selectorMeta.atRules.push(["platform", child.name]);
     } else if (child.type === "MediaFeature") {
       selectorMeta.atRules ??= [];
 
