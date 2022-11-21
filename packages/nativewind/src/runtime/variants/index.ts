@@ -74,15 +74,18 @@ export const variants: Variants =
 
     const { variants, defaultProps, compoundVariants } = config;
 
+    const mergedProps: Record<string, unknown> = {
+      ...defaultProps,
+      ...props,
+    };
+
     if (variants) {
       for (const variant of Object.keys(variants)) {
-        const value = props?.[variant as keyof typeof props];
+        const value = mergedProps?.[variant as keyof typeof props];
+
         if (value === null) continue;
 
-        const key =
-          value === undefined
-            ? defaultProps?.[variant]?.toString()
-            : value.toString();
+        const key = value?.toString();
 
         if (value && key && variants[variant][key]) {
           variantClassValue.push(variants[variant][key]);
@@ -98,16 +101,11 @@ export const variants: Variants =
       return joinClasses([base, variantClassValue, propClassValue]);
     }
 
-    const mergedProps: VariantProps<T> = {
-      ...(defaultProps as VariantProps<T>),
-      ...props,
-    };
-
     for (const { className, tw, ...compoundVariant } of compoundVariants) {
       const match = Object.entries(compoundVariant).every(([key, value]) => {
         return typeof value === "boolean"
-          ? Boolean(mergedProps[key as keyof VariantProps<T>]) === value
-          : mergedProps[key as keyof VariantProps<T>] === value;
+          ? Boolean(mergedProps[key]) === value
+          : mergedProps[key] === value;
       });
 
       if (match) variantClassValue.push(tw ?? className ?? "");
