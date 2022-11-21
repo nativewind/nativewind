@@ -88,6 +88,8 @@ export const variants: Variants =
           variantClassValue.push(variants[variant]["false"]);
         } else if (variantKey && variants[variant][variantKey]) {
           variantClassValue.push(variants[variant][variantKey]);
+        } else if (variantKey && variants[variant]["true"]) {
+          variantClassValue.push(variants[variant]["true"]);
         }
       }
     }
