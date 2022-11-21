@@ -79,7 +79,9 @@ export type StyledOptions<T, TVariants, TTransform, TDefaultProps> =
 
 export type StyledComponentProps<T, TVariants, TTransform, TDefaultProps> =
   SetOptional<
-    TransformProps<T, TTransform> & ConfigVariants<TVariants> & ClassProp,
+    TransformProps<T, TTransform> &
+      Omit<ConfigVariants<TVariants>, keyof T> &
+      ClassProp,
     StringKeys<TDefaultProps> | OptionalTransformProps<T, TTransform>
   >;
 

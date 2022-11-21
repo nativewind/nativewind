@@ -15,8 +15,7 @@ export function useStyle(classValue?: string, style?: CSSProperties) {
       ];
     } else if (mergedClassName) {
       return { $$css: true, [mergedClassName]: mergedClassName } as Style;
-    }
-    if (style) {
+    } else if (style) {
       return style;
     }
   }, [style, classValue]);

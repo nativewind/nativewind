@@ -67,3 +67,82 @@ test("variants", () => {
     {}
   );
 });
+
+test("truthy boolean variants", () => {
+  const StyledComponent = styled(Component, "bg-white", {
+    variants: {
+      padding: {
+        true: "p-4",
+      },
+    },
+  });
+
+  render(<StyledComponent className="text-black" padding />);
+
+  expect(Component).toHaveBeenCalledWith(
+    {
+      padding: true,
+      style: {
+        $$css: true,
+        "bg-white p-4 text-black": "bg-white p-4 text-black",
+      },
+    },
+    {}
+  );
+});
+
+test("false boolean variants", () => {
+  const StyledComponent = styled(Component, "bg-white", {
+    variants: {
+      padding: {
+        true: "p-4",
+        false: "p-2",
+      },
+    },
+  });
+
+  render(<StyledComponent className="text-black" />);
+
+  expect(Component).toHaveBeenCalledWith(
+    {
+      style: {
+        $$css: true,
+        "bg-white p-2 text-black": "bg-white p-2 text-black",
+      },
+    },
+    {}
+  );
+});
+
+test("truthy fallback boolean variants", () => {
+  const Component = jest.fn(
+    (props: {
+      children?: ReactNode;
+      style?: ViewStyle;
+      padding?: "large" | "small";
+    }) => <>{props.children}</>
+  );
+
+  const StyledComponent = styled(Component, "bg-white", {
+    variants: {
+      padding: {
+        large: "p-8",
+        true: "p-4",
+        false: "p-2",
+      },
+    },
+  });
+
+  render(<StyledComponent className="text-black" padding="small" />);
+
+  expect(Component).toHaveBeenCalledWith(
+    {
+      padding: "small",
+      style: {
+        $$css: true,
+        "bg-white p-4 text-black": "bg-white p-4 text-black",
+      },
+    },
+    {}
+  );
+});
