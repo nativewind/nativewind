@@ -86,9 +86,9 @@ export const variants: Variants =
 
         if (!key && variants[variant]["false"]) {
           variantClassValue.push(variants[variant]["false"]);
-        } else if (key && variants[variant][key]) {
+        } else if (value && key && variants[variant][key]) {
           variantClassValue.push(variants[variant][key]);
-        } else if (key && variants[variant]["true"]) {
+        } else if (value && variants[variant]["true"]) {
           variantClassValue.push(variants[variant]["true"]);
         }
       }
