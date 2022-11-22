@@ -1,4 +1,4 @@
-import { VariantProps, variants } from "../src";
+import { variants } from "../src";
 
 test("default only", () => {
   const result = variants("text-base")();
