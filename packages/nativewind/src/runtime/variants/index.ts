@@ -25,11 +25,15 @@ export type VariantsConfig<T = unknown> = T extends ConfigSchema
     }
   : ClassProp;
 
-export type VariantProps<T> = T extends ConfigSchema
+export type VariantProps<T> = T extends (props?: infer P) => string
+  ? Omit<P, keyof ClassProp>
+  : never;
+
+type Props<T> = T extends ConfigSchema
   ? ConfigVariants<T> & ClassProp
   : ClassProp;
 
-type VariantsFunction<T> = (props?: VariantProps<T>) => string;
+type VariantsFunction<T> = (props?: Props<T>) => string;
 
 export type Variants = {
   <T>(config: VariantsConfig<T>): VariantsFunction<T>;
@@ -51,7 +55,7 @@ export const variants: Variants =
     baseOrConfig: string | string[] | VariantsConfig<T>,
     config?: VariantsConfig<T>
   ) =>
-  (props?: VariantProps<T>): string => {
+  (props?: Props<T>): string => {
     let base: ClassValue;
 
     if (typeof baseOrConfig === "object" && !Array.isArray(baseOrConfig)) {

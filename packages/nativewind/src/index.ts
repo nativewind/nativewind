@@ -8,8 +8,9 @@ export {
 
 export { variants } from "./runtime/variants";
 export type {
-  VariantsConfig,
-  Variants,
   ConfigVariants,
+  VariantProps,
+  Variants,
+  VariantsConfig,
 } from "./runtime/variants";
 export type { Styled, ClassProp } from "./runtime/types/styled";

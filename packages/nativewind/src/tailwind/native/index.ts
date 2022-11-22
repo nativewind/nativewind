@@ -1,19 +1,19 @@
 import { Config } from "tailwindcss";
 
-import { divide } from "./plugins/divide";
-import { elevation } from "./plugins/elevation";
-import { gap } from "./plugins/gap";
-import { parent } from "./plugins/parent";
-import { space } from "./plugins/space";
-import { platforms } from "./plugins/platforms";
-import { variables } from "./plugins/variables";
 import { boxShadow } from "./plugins/box-shadow";
 import { darkMode } from "./plugins/dark-mode";
+import { divide } from "./plugins/divide";
+import { elevation } from "./plugins/elevation";
+import { fontSize } from "./plugins/font-size";
+import { gap } from "./plugins/gap";
+import { parent } from "./plugins/parent";
+import { platforms } from "./plugins/platforms";
+import { rotate } from "./plugins/rotate";
 import { scale } from "./plugins/scale";
 import { skew } from "./plugins/skew";
-import { rotate } from "./plugins/rotate";
+import { space } from "./plugins/space";
 import { translate } from "./plugins/translate";
-import { fontSize } from "./plugins/font-size";
+import { variables } from "./plugins/variables";
 
 const preset: Config = {
   content: [],
@@ -57,16 +57,16 @@ const preset: Config = {
     darkMode,
     divide,
     elevation,
-    gap,
-    platforms,
-    parent,
-    space,
     fontSize,
-    variables,
+    gap,
+    parent,
+    platforms,
+    rotate,
     scale,
     skew,
-    rotate,
+    space,
     translate,
+    variables,
   ],
   corePlugins: {
     backgroundOpacity: false,

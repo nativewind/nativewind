@@ -1,4 +1,4 @@
-import { variants } from "../src";
+import { VariantProps, variants } from "../src";
 
 test("default only", () => {
   const result = variants("text-base")();
@@ -32,7 +32,7 @@ test("variants", () => {
   expect(result).toEqual("text-base text-lg text-blue-500");
 });
 
-test.only("default variants", () => {
+test("default variants", () => {
   const result = variants({
     variants: {
       size: {

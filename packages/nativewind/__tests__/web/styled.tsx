@@ -29,6 +29,24 @@ test("styled", () => {
   );
 });
 
+test("styled", () => {
+  const StyledComponent = styled(Component);
+
+  render(<StyledComponent className="text-black" />);
+
+  createElement(StyledComponent);
+
+  expect(Component).toHaveBeenCalledWith(
+    {
+      style: {
+        $$css: true,
+        "text-black": "text-black",
+      },
+    },
+    {}
+  );
+});
+
 test("default styles", () => {
   const StyledComponent = styled(Component, "bg-white");
 
