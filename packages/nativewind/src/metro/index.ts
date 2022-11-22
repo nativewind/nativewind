@@ -40,8 +40,10 @@ export default function withNativeWind(config: Record<string, any> = {}) {
 
         // Clear Metro's progress bar and move to the start of the line
         // We will print out own output before letting Metro print again
-        process.stdout.clearLine(0);
-        process.stdout.cursorTo(0);
+        if (process.stdout.isTTY) {
+          process.stdout.clearLine(0);
+          process.stdout.cursorTo(0);
+        }
 
         expoColorSchemeWarning(entry);
 
