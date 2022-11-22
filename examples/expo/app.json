@@ -16,8 +16,7 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.alantoa.expo"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
