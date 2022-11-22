@@ -15,7 +15,7 @@ test("platformSelect", () => {
   // Tests run as ios
   expect(MyComponent).toHaveBeenCalledWith(
     {
-      style: { color: "#3b82f6" },
+      style: { color: "#ef4444" },
     },
     {}
   );
