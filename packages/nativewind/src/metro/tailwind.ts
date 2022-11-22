@@ -57,11 +57,6 @@ export default function runTailwindCli(
     postcssConfig,
   ];
 
-  if (process.stdout.isTTY) {
-    process.stdout.clearLine(0); // clear current text
-    process.stdout.cursorTo(0); // move cursor to beginning of line
-  }
-
   console.log("NativeWind: Rebuilding...");
   const { stderr } = spawnSync("npx", spawnCommands, { shell: true });
   console.log(
