@@ -11,17 +11,26 @@ import {
   Style,
   VariableValue,
 } from "../../../transform-css/types";
-import { colorSchemeKey } from "../../common";
+
 import { getColorScheme } from "./color-scheme";
 import { resolve } from "./resolve";
+import {
+  colorSchemeKey,
+  colorSchemeSystemKey,
+  darkModeKey,
+  i18nDirection,
+  rem,
+  vh,
+  vw,
+} from "../../common";
 
 type ComputedAtom = Atom & { computedStyle: Style; recompute: () => Style };
 
 const defaultVariables = {
-  "--rem": 14, // RN appears to use fontSize: 14 as a default for <Text />
-  "--color-scheme": Appearance.getColorScheme() ?? "light",
-  "--color-scheme-system": "system",
-  "--i18n-direction": I18nManager.isRTL ? "rtl" : "ltr",
+  [rem]: 14, // RN appears to use fontSize: 14 as a default for <Text />
+  [colorSchemeKey]: Appearance.getColorScheme() ?? "light",
+  [colorSchemeSystemKey]: "system",
+  [i18nDirection]: I18nManager.isRTL ? "rtl" : "ltr",
 };
 
 const defaultClassList = {
@@ -58,10 +67,10 @@ export function create(atomRecord: AtomRecord) {
       if (atom.variables) {
         rootVariableValues = atom.variables[0];
 
-        if (rootVariableValues["--dark-mode"] !== "class") {
-          rootVariableValues["--color-scheme"] =
+        if (rootVariableValues[darkModeKey] !== "class") {
+          rootVariableValues[colorSchemeKey] =
             Appearance.getColorScheme() ?? "light";
-          rootVariableValues["--color-scheme-system"] = "system";
+          rootVariableValues[colorSchemeSystemKey] = "system";
         }
 
         setVariables(rootVariableValues);
@@ -195,28 +204,28 @@ export function setAtom(name: string, atom: Atom) {
               return params === Platform.OS;
             }
             case "width": {
-              return params === resolve(variables.get("--device-width"));
+              return params === resolve(variables.get(vw));
             }
             case "min-width": {
-              const value = resolve(variables.get("--device-width"));
+              const value = resolve(variables.get(vw));
               if (typeof value !== "number") return false;
               return (params ?? 0) >= value;
             }
             case "max-width": {
-              const value = resolve(variables.get("--device-width"));
+              const value = resolve(variables.get(vw));
               if (typeof value !== "number") return false;
               return (params ?? 0) <= value;
             }
             case "height": {
-              return params === resolve(variables.get("--device-height"));
+              return params === resolve(variables.get(vh));
             }
             case "min-height": {
-              const value = resolve(variables.get("--device-height"));
+              const value = resolve(variables.get(vh));
               if (typeof value !== "number") return false;
               return (params ?? 0) >= value;
             }
             case "max-height": {
-              const value = resolve(variables.get("--device-height"));
+              const value = resolve(variables.get(vh));
               if (typeof value !== "number") return false;
               return (params ?? 0) <= value;
             }

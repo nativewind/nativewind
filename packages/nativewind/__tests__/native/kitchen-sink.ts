@@ -404,7 +404,7 @@ testCompile(
             maxWidth: 1536,
           },
         ],
-        subscriptions: ["--device-width"],
+        subscriptions: ["--window-width"],
       },
       "content-around": {
         styles: [

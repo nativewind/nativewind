@@ -6,6 +6,7 @@ import {
   PlatformColor,
 } from "react-native";
 import { ShadowValue, VariableValue } from "../../../transform-css/types";
+import { rem, vh, vw } from "../../common";
 import { variables } from "./runtime";
 
 interface ObjectAttribute {
@@ -71,17 +72,17 @@ export function resolve(style?: VariableValue): ResolvedValue {
     case "vw": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
-      return (value / 100) * (variables.get("--window-width") as number);
+      return (value / 100) * (variables.get(vw) as number);
     }
     case "vh": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
-      return (value / 100) * (variables.get("--window-height") as number);
+      return (value / 100) * (variables.get(vh) as number);
     }
     case "rem": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
-      return value * (variables.get("--rem") as number);
+      return value * (variables.get(rem) as number);
     }
     case "var": {
       const [variable, defaultValue] = resolvedValues;

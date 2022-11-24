@@ -1,5 +1,6 @@
 import { FunctionNode } from "css-tree";
 import { parse } from "css-tree";
+import { rem, vh, vw } from "../runtime/common";
 import {
   StyleValue,
   isFunctionValue,
@@ -65,21 +66,21 @@ export function encodeValue(
           return Number.parseFloat(node.value.toString());
         }
         case "rem": {
-          subscriptions.push("--rem");
+          subscriptions.push(rem);
           return {
             function: node.unit,
             values: [Number.parseFloat(node.value.toString())],
           };
         }
         case "vw": {
-          subscriptions.push("--window-width");
+          subscriptions.push(vw);
           return {
             function: node.unit,
             values: [Number.parseFloat(node.value.toString())],
           };
         }
         case "vh": {
-          subscriptions.push("--window-height");
+          subscriptions.push(vh);
           return {
             function: node.unit,
             values: [Number.parseFloat(node.value.toString())],

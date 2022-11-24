@@ -36,7 +36,7 @@ testCompile("sm:gap-2", (output) => {
   expect(output).toStrictEqual({
     "sm:gap-2": {
       childClasses: ["sm:gap-2:children"],
-      subscriptions: ["--device-width", "--rem"],
+      subscriptions: ["--window-width", "--rem"],
       atRules: {
         0: [["min-width", 640]],
       },
@@ -48,7 +48,7 @@ testCompile("sm:gap-2", (output) => {
       ],
     },
     "sm:gap-2:children": {
-      subscriptions: ["--device-width", "--rem"],
+      subscriptions: ["--window-width", "--rem"],
       atRules: {
         0: [["min-width", 640]],
       },

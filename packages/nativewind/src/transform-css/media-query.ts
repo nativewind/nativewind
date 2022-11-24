@@ -1,4 +1,5 @@
 import { MediaQuery } from "css-tree";
+import { colorSchemeKey, vh, vw } from "../runtime/common";
 import { SelectorMeta } from "./types";
 
 const platforms = new Set([
@@ -20,17 +21,17 @@ export function parseMediaQuery(node: MediaQuery, selectorMeta: SelectorMeta) {
       selectorMeta.atRules ??= [];
 
       if (child.name.includes("prefers-color-scheme")) {
-        selectorMeta.subscriptions.push("--color-scheme");
-        selectorMeta.atRules.push(["--color-scheme", "dark"]);
+        selectorMeta.subscriptions.push(colorSchemeKey);
+        selectorMeta.atRules.push([colorSchemeKey, "dark"]);
         return;
       }
 
       if (child.name.includes("width")) {
-        selectorMeta.subscriptions.push("--device-width");
+        selectorMeta.subscriptions.push(vw);
       }
 
       if (child.name.includes("height")) {
-        selectorMeta.subscriptions.push("--device-height");
+        selectorMeta.subscriptions.push(vh);
       }
 
       switch (child.value?.type) {
