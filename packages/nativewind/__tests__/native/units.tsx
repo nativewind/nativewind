@@ -42,7 +42,7 @@ test("%", () => {
   );
 });
 
-test.only("vw", () => {
+test("vw", () => {
   create("w-[1vw]");
 
   NativeWindStyleSheet.setDimensions({

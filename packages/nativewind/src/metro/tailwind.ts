@@ -113,7 +113,7 @@ function generateStyles(outputCSSPath: string, outputJSPath: string) {
   const css = readFileSync(outputCSSPath, "utf8");
   writeFileSync(
     outputJSPath,
-    `const {create}=require("nativewind/dist/runtime/native/stylesheet");create(${JSON.stringify(
+    `const {NativeWindStyleSheet}=require("nativewind/dist/runtime/native/stylesheet");NativeWindStyleSheet.create(${JSON.stringify(
       getCreateOptions(css)
     )}); //${Date.now()}`
   );
