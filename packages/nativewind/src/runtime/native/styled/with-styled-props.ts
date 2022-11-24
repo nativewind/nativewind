@@ -31,13 +31,15 @@ export function withStyledProps({
         () => getStyleSet(className)
       );
 
-      if (typeof propOptions === "boolean") {
-        styledProps[propName] = styles;
-      } else if (typeof propOptions === "string") {
-        styledProps[propOptions] = styles;
-      } else {
-        const { name = prop, value } = propOptions;
-        styledProps[name] = value ? styles[value] : styles;
+      if (styles) {
+        if (typeof propOptions === "boolean") {
+          styledProps[propName] = styles;
+        } else if (typeof propOptions === "string") {
+          styledProps[propOptions] = styles;
+        } else {
+          const { name = prop, value } = propOptions;
+          styledProps[name] = value ? styles[value] : styles;
+        }
       }
     }
   }

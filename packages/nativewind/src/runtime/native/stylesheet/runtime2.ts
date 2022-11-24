@@ -24,19 +24,14 @@ const defaultVariables = {
   "--i18n-direction": I18nManager.isRTL ? "rtl" : "ltr",
 };
 
-const defaultClassList = {
-  parent: { childClassList: "parent:children" },
+const defaultChildClass = {
+  parent: "parent:children",
 };
 
-interface ClassListRecord {
-  style?: Style;
-  childClassList?: string;
-}
-
-const classListMap = new Map<string, ClassListRecord>(
-  Object.entries(defaultClassList)
+const styleSets = new Map<string, Style>();
+const childClassMap = new Map<string, string>(
+  Object.entries(defaultChildClass)
 );
-
 const componentListeners = new Set<() => void>();
 
 const emptyStyles = {};
@@ -83,23 +78,23 @@ export function create(atomRecord: AtomRecord) {
   }
 
   componentListeners.forEach((l) => l());
-  resetClassListMap();
+  styleSets.clear();
 }
 
-export function getStyleSet(name: string) {
-  const classList = classListMap.get(name);
+export function getStyleSet(styleSet: string) {
+  let style = styleSets.get(styleSet);
 
-  if (classList) {
-    return classList.style;
+  if (style) {
+    return style;
   }
 
   if (dangerouslyCompileStyles) {
-    dangerouslyCompileStyles(name);
+    dangerouslyCompileStyles(styleSet);
   }
 
   const childClasses = [];
 
-  for (const atom of name.split(/\s+/)) {
+  for (const atom of styleSet.split(/\s+/)) {
     let dependentSet = atomDependents.get(atom);
 
     const atomChildClasses = atoms.get(atom)?.childClasses;
@@ -109,38 +104,29 @@ export function getStyleSet(name: string) {
       dependentSet = new Set();
       atomDependents.set(atom, dependentSet);
     }
-    dependentSet.add(name);
+    dependentSet.add(styleSet);
   }
 
   if (childClasses.length > 0) {
-    classListMap.set(name, {
-      ...classListMap.get(name),
-      childClassList: childClasses.join(" "),
-    });
+    childClassMap.set(styleSet, childClasses.join(" "));
   }
+  style = updateStyleSet(styleSet);
 
-  return updateStyleSet(name).style;
+  return style;
 }
 
-function updateStyleSet(classList: string) {
-  const style: Style = {};
+function updateStyleSet(styleSet: string) {
+  const newStyle = {};
 
-  for (const atomName of classList.split(/\s+/)) {
-    Object.assign(style, getAtomStyle(atomName));
+  for (const atomName of styleSet.split(/\s+/)) {
+    Object.assign(newStyle, getAtomStyle(atomName));
   }
 
-  const newClassList = {
-    ...classListMap.get(classList),
-    style: style,
-  };
-
-  classListMap.set(classList, newClassList);
-
-  return newClassList;
+  styleSets.set(styleSet, newStyle);
+  return newStyle;
 }
-
-export function getChildClassList(classList: string) {
-  return classListMap.get(classList)?.childClassList;
+export function getChildClasses(styleSet: string) {
+  return childClassMap.get(styleSet);
 }
 
 function getAtomStyle(atomName: string) {
@@ -302,19 +288,16 @@ export function resetRuntime() {
   componentListeners.clear();
   variableSubscriptions.clear();
   atomDependents.clear();
+  styleSets.clear();
   atoms.clear();
   variables.clear();
+  childClassMap.clear();
   rootVariableValues = {};
   darkRootVariableValues = {};
   dangerouslyCompileStyles = undefined;
 
   setVariables(defaultVariables);
-  resetClassListMap();
-}
-
-function resetClassListMap() {
-  classListMap.clear();
-  for (const entry of Object.entries(defaultClassList)) {
-    classListMap.set(...entry);
+  for (const entry of Object.entries(defaultChildClass)) {
+    childClassMap.set(...entry);
   }
 }

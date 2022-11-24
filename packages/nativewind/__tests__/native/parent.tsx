@@ -2,7 +2,7 @@ import { render } from "@testing-library/react-native";
 import { StyledComponent } from "../../src";
 import { create } from "../test-utils";
 
-test(":first", () => {
+test.only(":first", () => {
   create("first:text-black parent");
 
   const Parent = jest.fn(({ children }) => children);

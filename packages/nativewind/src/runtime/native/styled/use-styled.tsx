@@ -21,7 +21,7 @@ import { ConditionalStateRecord, withConditionals } from "./with-conditionals";
 import {
   subscribeToStyleSheet,
   getStyleSet,
-  getChildClasses,
+  getChildClassList,
 } from "../stylesheet/runtime";
 import { StyledComponent } from ".";
 
@@ -116,11 +116,11 @@ export default function useStyled(
   /**
    * Resolve the child styles
    */
-  const classesToInherit = getChildClasses(className);
+  const classesToInherit = getChildClassList(className);
   if (classesToInherit && children) {
     children = flattenChildren(children).map((child, nthChild, children) => {
       if (isValidElement(child)) {
-        const childPropClassName = child.props.className ?? child.props.tw;
+        const childPropClassName = child.props.tw ?? child.props.className;
         const childClassName = childPropClassName
           ? `${classesToInherit} ${childPropClassName}`
           : classesToInherit;
@@ -148,10 +148,10 @@ export default function useStyled(
   }
 
   const style = useMemo(() => {
-    const keys = Object.keys(styles).length;
-    if (keys > 0 && inlineStyles) {
+    const hasStyles = styles && Object.keys(styles).length > 0;
+    if (hasStyles && inlineStyles) {
       return [styles, inlineStyles];
-    } else if (keys > 0) {
+    } else if (hasStyles) {
       return styles;
     } else if (inlineStyles) {
       return inlineStyles;
