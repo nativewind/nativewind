@@ -8,4 +8,4 @@ export const vw = "--window-width";
 export const vh = "--window-height";
 export const orientation = "--window-orientation";
 
-export const i18nDirection = "--window-orientation";
+export const i18nDirection = "--i18n-direction";

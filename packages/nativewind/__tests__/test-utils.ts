@@ -5,6 +5,7 @@ import nativePreset from "../src/tailwind/native";
 import { AtomRecord } from "../src/transform-css/types";
 import { NativeWindStyleSheet } from "../src";
 import postcssPluginPack from "../src/postcss/plugin";
+import { EmitterSubscription } from "react-native";
 
 interface NativewindCompileOptions {
   css?: string;
@@ -76,3 +77,13 @@ const createTestCompileProxy = <T extends jest.It>(object: T): T =>
   });
 
 export const testCompile = createTestCompileProxy(test as TestCompile);
+
+export function setDimensions({ width = 0, height = 0 }) {
+  NativeWindStyleSheet.setDimensions({
+    get: jest.fn().mockReturnValue({ width, height }),
+    /* eslint-disable unicorn/no-useless-undefined */
+    set: () => undefined,
+    addEventListener: () =>
+      ({ remove: () => undefined } as unknown as EmitterSubscription),
+  });
+}

@@ -1,8 +1,7 @@
 /* eslint-disable unicorn/no-useless-undefined */
 import { act, render } from "@testing-library/react-native";
-import { EmitterSubscription } from "react-native";
 import { NativeWindStyleSheet, styled } from "../../src";
-import { create } from "../test-utils";
+import { create, setDimensions } from "../test-utils";
 
 afterEach(() => {
   NativeWindStyleSheet.__reset();
@@ -45,12 +44,7 @@ test("%", () => {
 test("vw", () => {
   create("w-[1vw]");
 
-  NativeWindStyleSheet.setDimensions({
-    get: jest.fn().mockReturnValue({ width: 100, height: 100 }),
-    set: () => undefined,
-    addEventListener: () =>
-      ({ remove: () => undefined } as unknown as EmitterSubscription),
-  });
+  setDimensions({ width: 100, height: 100 });
 
   const MyComponent = jest.fn();
   const StyledComponent = styled(MyComponent);
@@ -65,12 +59,7 @@ test("vw", () => {
   );
 
   act(() => {
-    NativeWindStyleSheet.setDimensions({
-      get: jest.fn().mockReturnValue({ width: 50, height: 100 }),
-      set: () => undefined,
-      addEventListener: () =>
-        ({ remove: () => undefined } as unknown as EmitterSubscription),
-    });
+    setDimensions({ width: 50, height: 100 });
   });
 
   expect(MyComponent).toHaveBeenCalledWith(
@@ -84,12 +73,7 @@ test("vw", () => {
 test("vh", () => {
   create("h-[1vh]");
 
-  NativeWindStyleSheet.setDimensions({
-    get: jest.fn().mockReturnValue({ width: 100, height: 100 }),
-    set: () => undefined,
-    addEventListener: () =>
-      ({ remove: () => undefined } as unknown as EmitterSubscription),
-  });
+  setDimensions({ width: 100, height: 100 });
 
   const MyComponent = jest.fn();
   const StyledComponent = styled(MyComponent);
@@ -106,12 +90,7 @@ test("vh", () => {
 
   act(() => {
     MyComponent.mockReset();
-    NativeWindStyleSheet.setDimensions({
-      get: jest.fn().mockReturnValue({ width: 100, height: 50 }),
-      set: () => undefined,
-      addEventListener: () =>
-        ({ remove: () => undefined } as unknown as EmitterSubscription),
-    });
+    setDimensions({ width: 100, height: 50 });
   });
 
   expect(MyComponent).toHaveBeenCalledTimes(1);

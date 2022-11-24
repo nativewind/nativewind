@@ -204,39 +204,59 @@ export function setAtom(name: string, atom: Atom) {
       let atRuleConditionsMet = true;
 
       if (atRules && atRules.length >= 0) {
-        atRuleConditionsMet = atRules.every(([rule, params]) => {
+        atRuleConditionsMet = atRules.every(([rule, condition]) => {
           switch (rule) {
             case colorSchemeKey: {
-              return variables.get(colorSchemeKey) === params;
+              return variables.get(colorSchemeKey) === condition;
             }
             case "platform": {
-              return params === Platform.OS;
+              return condition === Platform.OS;
             }
             case "width": {
-              return params === resolve(variables.get(vw));
+              return condition === resolve(variables.get(vw));
             }
             case "min-width": {
-              const value = resolve(variables.get(vw));
-              if (typeof value !== "number") return false;
-              return (params ?? 0) >= value;
+              const current = resolve(variables.get(vw));
+              if (
+                typeof current !== "number" ||
+                typeof condition !== "number"
+              ) {
+                return false;
+              }
+              return current >= condition;
             }
             case "max-width": {
-              const value = resolve(variables.get(vw));
-              if (typeof value !== "number") return false;
-              return (params ?? 0) <= value;
+              const current = resolve(variables.get(vw));
+              if (
+                typeof current !== "number" ||
+                typeof condition !== "number"
+              ) {
+                return false;
+              }
+              return current <= condition;
             }
             case "height": {
-              return params === resolve(variables.get(vh));
+              return condition === resolve(variables.get(vh));
             }
             case "min-height": {
-              const value = resolve(variables.get(vh));
-              if (typeof value !== "number") return false;
-              return (params ?? 0) >= value;
+              const current = resolve(variables.get(vh));
+              if (
+                typeof current !== "number" ||
+                typeof condition !== "number"
+              ) {
+                return false;
+              }
+              return current >= condition;
             }
             case "max-height": {
-              const value = resolve(variables.get(vh));
-              if (typeof value !== "number") return false;
-              return (params ?? 0) <= value;
+              const current = resolve(variables.get(vh));
+              if (
+                typeof current !== "number" ||
+                typeof condition !== "number"
+              ) {
+                return false;
+              }
+              return current <= condition;
             }
             default: {
               return true;
