@@ -714,6 +714,13 @@ testCompile(
         ],
         subscriptions: ["--rem"],
       },
+      "self-auto": {
+        styles: [
+          {
+            alignSelf: "auto",
+          },
+        ],
+      },
       "self-baseline": {
         styles: [
           {
@@ -735,6 +742,7 @@ testCompile(
           },
         ],
       },
+
       "self-start": {
         styles: [
           {

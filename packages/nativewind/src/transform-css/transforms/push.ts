@@ -1,4 +1,5 @@
 import {
+  autoException,
   invalidGlobalValues,
   invalidKeywordValues,
   StyleProperty,
@@ -44,8 +45,7 @@ export function pushStyle(
     if (value.startsWith("-") && !value.startsWith("--")) {
       // Remove vendor prefixes eg. -moz-some-value
       isValid = false;
-    } else if (styleProperty === "flexBasis" && value === "auto") {
-      // This is the only exception to the global values
+    } else if (value === "auto" && autoException.has(styleProperty)) {
       isValid = true;
     } else if (invalidGlobalValues.has(value)) {
       isValid = false;

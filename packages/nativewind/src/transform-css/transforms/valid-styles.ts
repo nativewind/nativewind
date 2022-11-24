@@ -27,6 +27,23 @@ export const invalidGlobalValues = new Set([
   "currentColor",
 ]);
 
+export const autoException = new Set([
+  "flexBasis",
+  "textAlign",
+  "alignSelf",
+  "textAlignVertical",
+  "writingDirection",
+  "margin",
+  "marginBottom",
+  "marginEnd",
+  "marginHorizontal",
+  "marginLeft",
+  "marginRight",
+  "marginStart",
+  "marginTop",
+  "marginVertical",
+]);
+
 export const validProperties: Record<StyleProperty, true | string[]> = {
   alignContent: [
     "flex-start",
