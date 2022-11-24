@@ -15,50 +15,13 @@ import { space } from "./plugins/space";
 import { translate } from "./plugins/translate";
 import { variables } from "./plugins/variables";
 
-const preset: Config = {
-  content: [],
-  theme: {
-    extend: {
-      aspectRatio: {
-        auto: "0",
-        square: "1",
-        video: "1.777777778",
-      },
-      letterSpacing: {
-        tighter: "-0.5px",
-        tight: "-0.25px",
-        normal: "0px",
-        wide: "0.25px",
-        wider: "0.5px",
-        widest: "1px",
-      },
-      elevation: {
-        sm: "1.5",
-        DEFAULT: "3",
-        md: "6",
-        lg: "7.5",
-        xl: "12.5",
-        "2xl": "25",
-        none: "0",
-      },
-      boxShadow: {
-        sm: "0px 1px 2px rgba(0, 0, 0, 0.1)",
-        DEFAULT: "0px 2px 6px rgba(0, 0, 0, 0.1)",
-        md: "0px 6px 10px rgba(0, 0, 0, 0.1)",
-        lg: "0px 10px 15px rgba(0, 0, 0, 0.1)",
-        xl: "0px 20px 25px rgba(0, 0, 0, 0.1)",
-        "2xl": "0px 25px 50px rgba(0, 0, 0, 0.1)",
-        none: "0px 0px 0px rgba(0, 0, 0, 0)",
-      },
-    },
-  },
-  plugins: [
+export default function nativewindPreset({ gapPolyfill = true }) {
+  const plugins = [
     boxShadow,
     darkMode,
     divide,
     elevation,
     fontSize,
-    gap,
     parent,
     platforms,
     rotate,
@@ -67,8 +30,9 @@ const preset: Config = {
     space,
     translate,
     variables,
-  ],
-  corePlugins: {
+  ];
+
+  const corePlugins: Config["corePlugins"] = {
     backgroundOpacity: false,
     borderOpacity: false,
     boxShadow: false,
@@ -78,7 +42,6 @@ const preset: Config = {
     divideStyle: false,
     divideWidth: false,
     fontSize: false,
-    gap: false,
     placeholderOpacity: false,
     ringOpacity: false,
     rotate: false,
@@ -87,7 +50,53 @@ const preset: Config = {
     space: false,
     textOpacity: false,
     translate: false,
-  },
-};
+  };
 
-export default preset;
+  if (gapPolyfill) {
+    plugins.push(gap);
+    corePlugins.gap = false;
+  }
+
+  const preset: Config = {
+    content: [],
+    theme: {
+      extend: {
+        aspectRatio: {
+          auto: "0",
+          square: "1",
+          video: "1.777777778",
+        },
+        letterSpacing: {
+          tighter: "-0.5px",
+          tight: "-0.25px",
+          normal: "0px",
+          wide: "0.25px",
+          wider: "0.5px",
+          widest: "1px",
+        },
+        elevation: {
+          sm: "1.5",
+          DEFAULT: "3",
+          md: "6",
+          lg: "7.5",
+          xl: "12.5",
+          "2xl": "25",
+          none: "0",
+        },
+        boxShadow: {
+          sm: "0px 1px 2px rgba(0, 0, 0, 0.1)",
+          DEFAULT: "0px 2px 6px rgba(0, 0, 0, 0.1)",
+          md: "0px 6px 10px rgba(0, 0, 0, 0.1)",
+          lg: "0px 10px 15px rgba(0, 0, 0, 0.1)",
+          xl: "0px 20px 25px rgba(0, 0, 0, 0.1)",
+          "2xl": "0px 25px 50px rgba(0, 0, 0, 0.1)",
+          none: "0px 0px 0px rgba(0, 0, 0, 0)",
+        },
+      },
+    },
+    plugins,
+    corePlugins,
+  };
+
+  return preset;
+}
