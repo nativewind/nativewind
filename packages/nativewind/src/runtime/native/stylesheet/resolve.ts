@@ -72,16 +72,19 @@ export function resolve(style?: VariableValue): ResolvedValue {
     case "vw": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
+      if (!value) return 0;
       return (value / 100) * (variables.get(vw) as number);
     }
     case "vh": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
+      if (!value) return 0;
       return (value / 100) * (variables.get(vh) as number);
     }
     case "rem": {
       const [value] = resolvedValues;
       if (typeof value !== "number") return;
+      if (!value) return 0;
       return value * (variables.get(rem) as number);
     }
     case "var": {

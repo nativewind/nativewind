@@ -1,9 +1,11 @@
 /* eslint-disable unicorn/no-array-for-each */
 import {
   Appearance,
+  Dimensions,
   ColorSchemeName,
   I18nManager,
   Platform,
+  EmitterSubscription,
 } from "react-native";
 import {
   Atom,
@@ -14,11 +16,13 @@ import {
 
 import { getColorScheme } from "./color-scheme";
 import { resolve } from "./resolve";
+
 import {
   colorSchemeKey,
   colorSchemeSystemKey,
   darkModeKey,
   i18nDirection,
+  orientation,
   rem,
   vh,
   vw,
@@ -26,11 +30,18 @@ import {
 
 type ComputedAtom = Atom & { computedStyle: Style; recompute: () => Style };
 
+const window = Dimensions.get("window");
+let dangerouslyCompileStyles: ((classNames: string) => void) | undefined;
+let dimensionsListener: EmitterSubscription | undefined;
+
 const defaultVariables = {
   [rem]: 14, // RN appears to use fontSize: 14 as a default for <Text />
   [colorSchemeKey]: Appearance.getColorScheme() ?? "light",
   [colorSchemeSystemKey]: "system",
   [i18nDirection]: I18nManager.isRTL ? "rtl" : "ltr",
+  [vw]: window.width,
+  [vh]: window.height,
+  [orientation]: window.width > window.height ? "landscape" : "portrait",
 };
 
 const defaultClassList = {
@@ -58,8 +69,6 @@ export const variables = new Map<string, VariableValue>(
 const variableSubscriptions = new Map<string, Set<() => void>>();
 let rootVariableValues: Record<string, VariableValue> = {};
 let darkRootVariableValues: Record<string, VariableValue> = {};
-
-let dangerouslyCompileStyles: ((classNames: string) => void) | undefined;
 
 export function create(atomRecord: AtomRecord) {
   for (const [name, atom] of Object.entries(atomRecord)) {
@@ -305,6 +314,26 @@ export function __dangerouslyCompileStyles(
   callback: typeof dangerouslyCompileStyles
 ) {
   dangerouslyCompileStyles = callback;
+}
+
+export function setDimensions(dimensions: Dimensions) {
+  dimensionsListener?.remove();
+
+  const window = dimensions.get("window");
+
+  setVariables({
+    [vw]: window.width,
+    [vh]: window.height,
+    [orientation]: window.width > window.height ? "landscape" : "portrait",
+  });
+
+  dimensionsListener = dimensions.addEventListener("change", ({ window }) => {
+    setVariables({
+      [vw]: window.width,
+      [vh]: window.height,
+      [orientation]: window.width > window.height ? "landscape" : "portrait",
+    });
+  });
 }
 
 export function resetRuntime() {

@@ -1,12 +1,10 @@
-import { Dimensions } from "react-native";
 import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../../types/stylesheet";
-
-import { setDimensions } from "./dimensions";
 
 import {
   create,
   resetRuntime,
   setVariables,
+  setDimensions,
   __dangerouslyCompileStyles,
 } from "./runtime";
 
@@ -16,25 +14,18 @@ import {
   toggleColorScheme,
 } from "./color-scheme";
 
-const noop = () => {
-  return;
-};
-
 export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   create,
-  __reset,
+  __reset: resetRuntime,
   getColorScheme,
   setColorScheme,
   toggleColorScheme,
   setVariables,
   setDimensions,
-  setWebClassNameMergeStrategy: noop,
   __dangerouslyCompileStyles,
+  setWebClassNameMergeStrategy: () => {
+    return;
+  },
 };
 
 export { useUnsafeVariable } from "./use-unsafe-variable";
-
-function __reset() {
-  resetRuntime();
-  setDimensions(Dimensions);
-}
