@@ -22,7 +22,7 @@ function compile(
     tailwind({
       ...config,
       content: [],
-      presets: [nativePreset],
+      presets: [nativePreset()],
       safelist: [
         ...classNames.split(" "),
         ...(config?.safelist ?? []),
