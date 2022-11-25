@@ -15,7 +15,11 @@ export type StyleProperty =
    */
   | "fill"
   | "stroke"
-  | "strokeWidth";
+  | "strokeWidth"
+  /**
+   * Future props
+   */
+  | "gap";
 
 export const invalidGlobalValues = new Set([
   "auto",
@@ -99,6 +103,7 @@ export const validProperties: Record<StyleProperty, true | string[]> = {
   fontStyle: true,
   fontVariant: true,
   fontWeight: true,
+  gap: true,
   height: true,
   includeFontPadding: true,
   justifyContent: true,
