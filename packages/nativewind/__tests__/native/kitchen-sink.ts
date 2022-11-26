@@ -186,6 +186,7 @@ testCompile(
   order-1
   // Layout - Overflow
   overflow-hidden
+  overflow-visible
   // Layout - Overscroll Behavior
   overscroll-contain
   // Layout - Top Right Bottom Left
@@ -689,6 +690,13 @@ testCompile(
         styles: [
           {
             overflow: "hidden",
+          },
+        ],
+      },
+      "overflow-visible": {
+        styles: [
+          {
+            overflow: "visible",
           },
         ],
       },
