@@ -241,3 +241,24 @@ test("prop alias", () => {
     {}
   );
 });
+
+test("ensure falsy values are not stripped", () => {
+  create("left-0");
+  const Component = jest.fn((props) => props.children);
+
+  render(
+    <nativewind.StyledComponent
+      component={styled(Component)}
+      className="left-0"
+    />
+  );
+
+  expect(Component).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: {
+        left: 0,
+      },
+    }),
+    {}
+  );
+});

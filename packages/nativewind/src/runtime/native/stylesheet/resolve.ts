@@ -23,19 +23,10 @@ export type ResolvedValue =
   | undefined;
 
 export function resolve(style?: VariableValue): ResolvedValue {
-  if (!style) return;
-
-  if (typeof style === "string") {
+  // We only need to resolve function styles
+  if (!(typeof style === "object" && "function" in style)) {
     return style;
   }
-
-  if (typeof style === "number") {
-    return style;
-  }
-
-  if ("__TYPE__" in style) return style;
-
-  if (!("values" in style)) return style;
 
   const resolvedValues = style.values.map((value) => resolve(value));
 
