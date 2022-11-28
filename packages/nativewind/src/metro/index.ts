@@ -12,6 +12,10 @@ export interface GetTransformOptionsOptions {
   platform: string | null | undefined;
 }
 
+if (!("replaceAll" in String.prototype)) {
+  throw new Error("NativeWind requires Node 16+");
+}
+
 // We actually don't do anything to the Metro config,
 export default function withNativeWind(config: Record<string, any> = {}) {
   /**
