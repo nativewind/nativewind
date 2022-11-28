@@ -53,3 +53,17 @@ test("default variants", () => {
 
   expect(result).toEqual("text-base text-sm text-blue-500");
 });
+
+test("function compoundVariants", () => {
+  const result = variants({
+    variants: {
+      size: {
+        small: "text-sm",
+      },
+    },
+    className: "text-base",
+    compoundVariants: [() => "text-blue-500"],
+  })({ size: "small" });
+
+  expect(result).toEqual("text-base text-sm text-blue-500");
+});

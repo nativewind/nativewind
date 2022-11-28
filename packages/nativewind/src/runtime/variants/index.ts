@@ -17,11 +17,15 @@ export type ConfigVariants<T> = T extends ConfigSchema
     }
   : unknown;
 
+export type CompoundVariant<T> =
+  | (ConfigVariants<T> & ClassProp)
+  | ((props?: Props<T>) => string);
+
 export type VariantsConfig<T = unknown> = T extends ConfigSchema
   ? ClassProp & {
       variants?: T;
       defaultProps?: ConfigVariants<T>;
-      compoundVariants?: Array<ConfigVariants<T> & ClassProp>;
+      compoundVariants?: Array<CompoundVariant<T>>;
     }
   : ClassProp;
 
@@ -105,14 +109,20 @@ export const variants: Variants =
       return joinClasses([base, variantClassValue, propClassValue]);
     }
 
-    for (const { className, tw, ...compoundVariant } of compoundVariants) {
-      const match = Object.entries(compoundVariant).every(([key, value]) => {
-        return typeof value === "boolean"
-          ? Boolean(mergedProps[key]) === value
-          : mergedProps[key] === value;
-      });
+    for (const compoundVariant of compoundVariants) {
+      if (typeof compoundVariant === "function") {
+        const match = compoundVariant(props);
+        if (match) variantClassValue.push(match);
+      } else {
+        const { className, tw, ...criteria } = compoundVariant;
+        const match = Object.entries(criteria).every(([key, value]) => {
+          return typeof value === "boolean"
+            ? Boolean(mergedProps[key]) === value
+            : mergedProps[key] === value;
+        });
 
-      if (match) variantClassValue.push(tw ?? className ?? "");
+        if (match) variantClassValue.push(tw ?? className ?? "");
+      }
     }
 
     return joinClasses([base, variantClassValue, propClassValue]);
