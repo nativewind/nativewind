@@ -67,16 +67,28 @@ module.exports = {
  */
 + const withNativewind = require("nativewind/metro")
 
-module.exports = withNativewind({
-  transformer: {
-    getTransformOptions: async () => ({
-      transform: {
-        experimentalImportSupport: false,
-        inlineRequires: true,
-      },
-    }),
-  },
-});
+
+- module.exports = {
+-   transformer: {
+-     getTransformOptions: async () => ({
+-       transform: {
+-         experimentalImportSupport: false,
+-         inlineRequires: true,
+-       },
+-     }),
+-   },
+- };
+
++ module.exports = withNativewind({
++   transformer: {
++     getTransformOptions: async () => ({
++       transform: {
++         experimentalImportSupport: false,
++         inlineRequires: true,
++       },
++     }),
++   },
++ });
 ```
 
 ## Thats it 🎉

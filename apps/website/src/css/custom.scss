@@ -7,6 +7,9 @@
 /**
  * The base theme is MIT licensed by https://github.com/novuhq/novu
  */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @import "variables";
 @import "media-queries";

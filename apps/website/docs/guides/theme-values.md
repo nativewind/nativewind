@@ -1,6 +1,8 @@
 # Retrieving theme values
 
-If you need theme values at runtime, its best to retrieve them directly from Tailwind or your `tailwind.config.js`. [Tailwind CSS has documentation on referencing theme values in Javascript](https://tailwindcss.com/docs/configuration#referencing-in-java-script).
+The best method to retrieve theme values is to directly import them. You should consult [Tailwind CSS's documentation on referencing theme values in Javascript](https://tailwindcss.com/docs/configuration#referencing-in-java-script) before using other solutions.
+
+For example, if you are using the default Tailwind colors, you can import them directly
 
 ```tsx
 import colors from "tailwindcss/colors";
@@ -10,7 +12,7 @@ export function MyActivityIndicator(props) {
 }
 ```
 
-Or adding your custom colors into a shared file
+Or for custom colors, split them into their own shared file
 
 ```tsx
 // colors.js

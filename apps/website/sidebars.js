@@ -24,8 +24,9 @@ const sidebars = {
       label: "Overview",
       collapsed: false,
       items: [
-        "overview/overview",
+        "home",
         "guides/goals",
+        "guides/migrating_2_3",
         // "overview/benchmarks",
       ],
     },
@@ -49,10 +50,9 @@ const sidebars = {
       label: "Guides",
       collapsed: false,
       items: [
-        "guides/theme-values",
         "guides/custom-components",
+        "guides/theme-values",
         "guides/troubleshooting",
-        "guides/tailwindcss-react-native",
       ],
     },
     {

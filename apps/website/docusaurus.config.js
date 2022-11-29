@@ -26,7 +26,22 @@ const config = {
     { src: "https://snack.expo.dev/embed.js", defer: true },
   ],
 
-  plugins: ["docusaurus-plugin-sass"],
+  plugins: [
+    "docusaurus-plugin-sass",
+    async function myPlugin() {
+      return {
+        name: "docusaurus-tailwindcss",
+        configurePostCss(postcssOptions) {
+          // Appends TailwindCSS and AutoPrefixer.
+          postcssOptions.plugins.push(
+            require("tailwindcss"),
+            require("autoprefixer")
+          );
+          return postcssOptions;
+        },
+      };
+    },
+  ],
 
   presets: [
     [
@@ -37,7 +52,6 @@ const config = {
           breadcrumbs: false,
           editUrl: `https://github.com/marklawlor/nativewind/edit/main/apps/website/`,
           remarkPlugins: [require("./src/remark-snackplayer")],
-          routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),
           includeCurrentVersion: true,
           lastVersion: "current",

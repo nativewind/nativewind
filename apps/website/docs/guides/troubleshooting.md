@@ -1,25 +1,60 @@
 # Troubleshooting
 
-## Styles randomly not working
+## My app crashed and cannot recover
 
-NativeWind adds code to each file which is cached by Webpack/Metro. As each file is cache individually, changes to your `tailwind.config.js` or other files may not be reflected across your project.
+Your app crashed and has cached the bad version, you will need to reset your cache.
 
-To fix this issue, simply clear your project's cache either by `expo start -c` or `react-native start --reset-cache`.
+- Delete `node_modules/.cache/nativewind`
+- Clear your app's cache
+  - Expo: start with `expo start -c`
+  - React Native CLI: start with `react-native start --clear-cache`
 
-## Native styles not working at all
+## Slow builds
 
-### Follow the official troubleshooting guide
+Make sure your `tailwind.config.js` content only include the required files. You need to avoid [broad content patterns](https://tailwindcss.com/docs/content-configuration#pattern-recommendations), as it will process things like your `node_modules`.
 
-Please read the [Tailwind content troubleshooting](https://tailwindcss.com/docs/content-configuration#classes-aren-t-generated)
+## Styles not working
 
-### Verify your configuration
+### Check your content
 
-If you are 100% your files are covered by `content`, try running
+Make sure your `tailwind.config.js` content configuration is correct and matches all of the right source files.
 
-`npx tailwind -o output.css`
+A common mistake is missing a file extension, for example if you’re using jsx instead of js for your React components:
 
-This will generate a `output.css` file with your projects styles written as `css`. Verify that it includes your expected styles (it may include extra styles).
+```diff
+// tailwind.config.js
+module.exports = {
+  content: [
+-   './src/**/*.{html,js}',
++   './src/**/*.{html,js,jsx}'
+  ],
+  // ...
+}
+```
 
-### Manually generate the output
+Or creating a new folder mid-project that wasn’t covered originally and forgetting to add it to your configuration:
 
-Follow the [Native Tailwind CLI setup guide](https://www.nativewind.dev/guides/cli-native#native) to generate `nativewind-output.js`. This file includes the generated NativeWind styles.
+```diff
+// tailwind.config.js
+module.exports = {
+  content: [
+    './pages/**/*.{html,js,jsx}',
+    './components/**/*.{html,js,jsx}',
++   './util/**/*.{html,js}'
+  ],
+  // ...
+}
+```
+
+### Don't construct class names dynamically
+
+The TailwindCSS compiler [does not allow for dynamic class names](https://tailwindcss.com/docs/content-configuration#dynamic-class-names). Use this pattern instead
+
+```diff
+- <Text className="text-{{ error ? 'red' : 'green' }}-600"></Text>
++ <Text className="{{ error ? 'text-red-600' : 'text-green-600' }}"></Text>
+```
+
+## `className` is undefined
+
+The `className` prop is not passed to child components, it is transformed into a style object and passed via the `style` prop.
