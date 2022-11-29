@@ -29,6 +29,28 @@ test("styled", () => {
   );
 });
 
+test.only("props", () => {
+  const StyledComponent = styled(Component, {
+    props: {
+      test: true,
+    },
+  });
+
+  render(<StyledComponent className="text-black" test="bg-red-500" />);
+
+  createElement(StyledComponent);
+
+  expect(Component).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: {
+        $$css: true,
+        "bg-red-500 text-black": "bg-red-500 text-black",
+      },
+    }),
+    {}
+  );
+});
+
 test("styled", () => {
   const StyledComponent = styled(Component);
 

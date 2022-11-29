@@ -8,12 +8,6 @@ import {
 import { variants } from "../../variants";
 import { useStyle } from "./use-style";
 
-function isClassPropOptions(
-  options: unknown
-): options is TransformConfigOption {
-  return Boolean(options && typeof options === "object" && "class" in options);
-}
-
 export const styled: Styled = (
   Component: ComponentType,
   classValueOrOptions?: string | AnyStyledOptions,
@@ -31,7 +25,7 @@ export const styled: Styled = (
 
   if (props) {
     for (const [key, propOptions] of Object.entries(props)) {
-      if (isClassPropOptions(propOptions)) {
+      if (shouldAppendClassName(propOptions)) {
         classProps.push(key);
       }
     }
@@ -77,3 +71,13 @@ export const StyledComponent = forwardRef<unknown, any>(
     return <Component ref={ref} {...props} style={style} />;
   }
 ) as StyledComponentType;
+
+function shouldAppendClassName(
+  options: unknown
+): options is TransformConfigOption {
+  return (
+    options === true ||
+    typeof options === "string" ||
+    Boolean(options && typeof options === "object" && "class" in options)
+  );
+}
