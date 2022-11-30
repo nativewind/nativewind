@@ -6,6 +6,9 @@ const unsupportedVariants = ["ios", "android", "windows", "macos", "native"];
 export default function nativewindPreset() {
   const preset: Config = {
     content: [],
+    theme: {
+      nativewind: true,
+    },
     plugins: [
       plugin(function ({ addVariant }) {
         addVariant("web", "&");

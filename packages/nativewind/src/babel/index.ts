@@ -73,15 +73,9 @@ function resolveTailwindConfig(options: NativeWindPresetOptions): Config {
     tailwindConfig = validateConfig(newConfig);
   }
 
-  const hasPreset = tailwindConfig.presets?.some((preset) => {
-    return (
-      (typeof preset === "object" || typeof preset === "function") &&
-      ("nativewind" in preset ||
-        ("default" in preset && "nativewind" in preset["default"]))
-    );
-  });
-
-  if (!hasPreset) {
+  // Ensure that one of the NativeWind presets are included
+  // This is mostly for DevUX and to reduce support issues
+  if (!tailwindConfig.theme?.nativewind) {
     throw new Error("NativeWind preset was not included");
   }
 

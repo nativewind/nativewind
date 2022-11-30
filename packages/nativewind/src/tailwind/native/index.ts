@@ -19,6 +19,7 @@ export default function nativewindPreset({ gapPolyfill = true } = {}) {
   const preset: Config = {
     content: [],
     theme: {
+      nativewind: true,
       extend: {
         aspectRatio: {
           auto: "0",
