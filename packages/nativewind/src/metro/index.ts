@@ -16,7 +16,6 @@ if (!("replaceAll" in String.prototype)) {
   throw new Error("NativeWind requires Node 16+");
 }
 
-// We actually don't do anything to the Metro config,
 export default function withNativeWind(config: Record<string, any> = {}) {
   /**
    * NATIVEWIND_OUTPUT needs to be set before this is returned, otherwise

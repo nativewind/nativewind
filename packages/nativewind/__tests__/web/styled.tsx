@@ -30,23 +30,51 @@ test("styled", () => {
 });
 
 test.only("props", () => {
+  const Component = jest.fn(
+    (props: {
+      children?: ReactNode;
+      style?: ViewStyle;
+      other?: ViewStyle;
+      another?: ViewStyle;
+    }) => <>{props.children}</>
+  );
+
   const StyledComponent = styled(Component, {
     props: {
       test: true,
+      alias: "other",
+      classProp: {
+        class: true,
+      },
     },
   });
 
-  render(<StyledComponent className="text-black" test="bg-red-500" />);
+  render(
+    <StyledComponent
+      className="text-black"
+      test="bg-red-500"
+      alias="text-bold"
+      classProp="underline"
+    />
+  );
 
   createElement(StyledComponent);
 
   expect(Component).toHaveBeenCalledWith(
-    expect.objectContaining({
+    {
       style: {
         $$css: true,
-        "bg-red-500 text-black": "bg-red-500 text-black",
+        "underline text-black": "underline text-black",
       },
-    }),
+      test: {
+        $$css: true,
+        "bg-red-500": "bg-red-500",
+      },
+      other: {
+        $$css: true,
+        "text-bold": "text-bold",
+      },
+    },
     {}
   );
 });

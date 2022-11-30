@@ -3,7 +3,6 @@ import {
   AnyStyledOptions,
   Styled,
   StyledComponentType,
-  TransformConfigOption,
 } from "../../types/styled";
 import { variants } from "../../variants";
 import { useStyle } from "./use-style";
@@ -22,14 +21,25 @@ export const styled: Styled = (
     typeof classValueOrOptions === "string" ? classValueOrOptions : "";
 
   const classProps: string[] = [];
+  const extraTransform: Record<string, string> = {};
 
   if (props) {
     for (const [key, propOptions] of Object.entries(props)) {
-      if (shouldAppendClassName(propOptions)) {
+      if (
+        propOptions &&
+        typeof propOptions === "object" &&
+        "class" in propOptions
+      ) {
         classProps.push(key);
+      } else if (typeof propOptions === "string") {
+        extraTransform[key] = propOptions;
+      } else if (propOptions === true) {
+        extraTransform[key] = key;
       }
     }
   }
+
+  const hasExtraProps = props && Object.keys(extraTransform).length > 0;
 
   const classGenerator = variants(baseClassValue, variantsConfig);
 
@@ -38,16 +48,35 @@ export const styled: Styled = (
     { tw, className, ...props },
     ref
   ) {
-    const transformClassValue = classProps.map((prop) => props[prop]);
+    let processedProps = props;
+    const transformClassValue: string[] = [];
 
-    const classValue = classGenerator({
-      ...props,
-      className: [transformClassValue, tw ?? className],
-    });
+    if (hasExtraProps || classProps.length > 0) {
+      processedProps = {};
 
-    const style = useStyle(classValue, props.style);
+      for (const [key, value] of Object.entries(props)) {
+        if (extraTransform[key] && typeof value === "string") {
+          const newKey =
+            key === extraTransform[key] ? key : extraTransform[key];
 
-    return <Component ref={ref} {...props} style={style} />;
+          processedProps[newKey] = { $$css: true, [value]: value };
+        } else if (classProps.includes(key) && typeof value === "string") {
+          transformClassValue.push(value);
+        } else {
+          processedProps[key] = value;
+        }
+      }
+    }
+
+    const style = useStyle(
+      classGenerator({
+        ...props,
+        className: [transformClassValue.join(" "), tw ?? className],
+      }),
+      props.style
+    );
+
+    return <Component ref={ref} {...processedProps} style={style} />;
   });
 
   if (typeof Component !== "string") {
@@ -71,13 +100,3 @@ export const StyledComponent = forwardRef<unknown, any>(
     return <Component ref={ref} {...props} style={style} />;
   }
 ) as StyledComponentType;
-
-function shouldAppendClassName(
-  options: unknown
-): options is TransformConfigOption {
-  return (
-    options === true ||
-    typeof options === "string" ||
-    Boolean(options && typeof options === "object" && "class" in options)
-  );
-}
