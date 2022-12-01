@@ -23,6 +23,7 @@ export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
   setVariables,
   setDimensions,
   __dangerouslyCompileStyles,
+  getSSRStyles: () => ({}),
   setWebClassNameMergeStrategy: () => {
     return;
   },

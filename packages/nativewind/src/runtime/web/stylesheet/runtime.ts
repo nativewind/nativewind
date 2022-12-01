@@ -1,28 +1,32 @@
 import { VariableValue } from "../../../transform-css/types";
 
 const variableSubscriptions = new Map<string, Set<() => void>>();
+const variables = new Map<string, VariableValue>();
 
-let rootStyle: CSSStyleDeclaration;
 export function getVariable(name: `--${string}`) {
-  if (typeof window !== undefined) {
-    rootStyle ??= getComputedStyle(document.documentElement);
-    return rootStyle.getPropertyValue(name);
-  }
+  return variables.get(name);
+}
+
+export function getSSRStyles() {
+  return { "font-size": "--rem", ...Object.fromEntries(variables) };
 }
 
 export function setVariables(properties: Record<`--${string}`, VariableValue>) {
-  const subscriptions = new Set<() => void>();
-
   for (const [name, value] of Object.entries(properties)) {
-    const callbacks = variableSubscriptions.get(name);
-    if (callbacks) {
-      for (const callback of callbacks) {
-        subscriptions.add(callback);
-      }
+    // eslint-disable-next-line unicorn/no-array-for-each
+    variableSubscriptions.get(name)?.forEach((callback) => {
+      callback();
+    });
+
+    variables.set(name, value);
+
+    if (typeof document !== undefined) {
+      document.documentElement.style.setProperty(name, value.toString());
     }
-    document.documentElement.style.setProperty(name, value.toString());
   }
 }
+
+setVariables({ "--rem": "16px" });
 
 export function subscribeToVariable(name: string) {
   return (callback: () => void) => {

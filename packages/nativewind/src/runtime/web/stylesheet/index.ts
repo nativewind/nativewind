@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import type { NativeWindStyleSheet as NativeWindStyleSheetInterface } from "../../types/stylesheet";
-import { setVariables } from "./runtime";
+import { getSSRStyles, setVariables } from "./runtime";
 import {
   getColorScheme,
   setColorScheme,
@@ -30,6 +30,7 @@ export const NativeWindStyleSheet: NativeWindStyleSheetInterface = {
     webMergeStrategy = callback;
   },
   __dangerouslyCompileStyles: noop,
+  getSSRStyles,
 };
 
 export function mergeClassNames(className: string) {

@@ -30,7 +30,7 @@ export const styled: Styled = (
     ({ tw, className, ...props }, ref) => {
       const classValue = classGenerator({
         ...props,
-        className: [tw ?? className],
+        className: tw ?? className,
       });
 
       return useStyled(

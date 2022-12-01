@@ -15,5 +15,6 @@ export interface NativeWindStyleSheet {
   setVariables: (properties: Record<`--${string}`, VariableValue>) => void;
   setDimensions: (dimensions: Dimensions) => void;
   setWebClassNameMergeStrategy: (callback: (classes: string) => string) => void;
+  getSSRStyles: () => Record<string, string>;
   __dangerouslyCompileStyles: (callback: (className: string) => void) => void;
 }
