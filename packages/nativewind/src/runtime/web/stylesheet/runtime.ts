@@ -8,7 +8,7 @@ export function getVariable(name: `--${string}`) {
 }
 
 export function getSSRStyles() {
-  return { "font-size": "--rem", ...Object.fromEntries(variables) };
+  return { fontSize: "var(--rem)", ...Object.fromEntries(variables) };
 }
 
 export function setVariables(properties: Record<`--${string}`, VariableValue>) {
@@ -20,13 +20,15 @@ export function setVariables(properties: Record<`--${string}`, VariableValue>) {
 
     variables.set(name, value);
 
-    if (typeof document !== undefined) {
-      document.documentElement.style.setProperty(name, value.toString());
+    if (typeof window !== "undefined") {
+      window.document.documentElement.style.setProperty(name, value.toString());
     }
   }
 }
 
-setVariables({ "--rem": "16px" });
+if (typeof window !== "undefined") {
+  window.document.documentElement.style.setProperty("font-size", "var(--rem)");
+}
 
 export function subscribeToVariable(name: string) {
   return (callback: () => void) => {
