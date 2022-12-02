@@ -17,7 +17,7 @@
     "@tamagui/babel-plugin": "1.0.1-beta.226",
     "@ui-kitten/components": "5.1.2",
     "chart.js": "4.0.1",
-    "chartjs-chart-error-bars": "3.10.0",
+    "chartjs-chart-error-bars": "4.0.0",
     "dripsy": "3.8.1",
     "expo": "47.0.8",
     "jest": "29.3.1",
