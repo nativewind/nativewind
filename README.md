@@ -14,7 +14,7 @@
 
 `NativeWind` is a complete tooling solution to use [Tailwind CSS](https://tailwindcss.com) on all React Native platforms (ios/android/web/window/macos/etc). It can be used either as a utility styling library or for building your own component library.
 
-On native devices, `NativeWind` pre-builts your styles and uses a minimal runtime for dynamic styles. While in your browser, it provides a compatibility layer between React Native and your CSS.
+On native devices, `NativeWind` pre-builds your styles and uses a minimal runtime for dynamic styles. While in your browser, it provides a compatibility layer between React Native and your CSS.
 
 In addition to styling, `NativeWind` provides optional Babel plugins to create a consistent developer experience, such as supporting a `className` prop on any component.
 
@@ -43,7 +43,7 @@ Click the picture to go to a live example!
 - Polyfills pseudo classes - hover / focus / active are available on compatible components
 - Supports arbitrary classes / media queries
 - Supports `clamp()`
-- Platform only variants eg. `android:text-black`
+- Platform only variants e.g. `android:text-black`
 - Group and named groups allow styling based upon parent state
 - Create simple layouts with `gap`/`space`/`divide`
 
