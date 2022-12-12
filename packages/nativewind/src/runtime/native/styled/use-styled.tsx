@@ -88,7 +88,7 @@ export default function useStyled(
   /**
    * Filter classes that don't apply (eg hover classes)
    */
-  const { className, interactionMeta } = withConditionals(propClassName, {
+  const { className, interactionMeta } = withConditionals(tw ?? propClassName, {
     ...componentState,
     ...stateInheritance,
     nthChild,

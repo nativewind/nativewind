@@ -10,40 +10,6 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test("StyledComponent wrapping styled()", () => {
-  /**
-   * When using styled() & the babel plugin, it will convert the styled()
-   * component into <StyledComponent component={styled(component) } />
-   *
-   * This test ensures that StyledComponent is only called once, and the
-   * styled(component) doesn't call StyledComponent again
-   *
-   */
-  create("p-4");
-
-  const renderSpy = jest.spyOn(
-    nativewind.StyledComponent as unknown as Record<string, () => void>,
-    "render"
-  );
-
-  const Component = jest.fn((props) => props.children);
-
-  render(
-    <nativewind.StyledComponent component={styled(Component)} className="p-4" />
-  );
-
-  expect(Component).toHaveBeenCalledWith(
-    expect.objectContaining({
-      style: {
-        padding: 14,
-      },
-    }),
-    {}
-  );
-
-  expect(renderSpy).toHaveBeenCalledTimes(1);
-});
-
 test("default variant", () => {
   create("bg-white p-4");
 
@@ -261,4 +227,38 @@ test("ensure falsy values are not stripped", () => {
     }),
     {}
   );
+});
+
+test("StyledComponent wrapping styled()", () => {
+  /**
+   * When using styled() & the babel plugin, it will convert the styled()
+   * component into <StyledComponent component={styled(component) } />
+   *
+   * This test ensures that StyledComponent is only called once, and the
+   * styled(component) doesn't call StyledComponent again
+   *
+   */
+  create("p-4");
+
+  const renderSpy = jest.spyOn(
+    nativewind.StyledComponent as unknown as Record<string, () => void>,
+    "render"
+  );
+
+  const Component = jest.fn((props) => props.children);
+
+  render(
+    <nativewind.StyledComponent component={styled(Component)} className="p-4" />
+  );
+
+  expect(Component).toHaveBeenCalledWith(
+    expect.objectContaining({
+      style: {
+        padding: 14,
+      },
+    }),
+    {}
+  );
+
+  expect(renderSpy).toHaveBeenCalledTimes(1);
 });
