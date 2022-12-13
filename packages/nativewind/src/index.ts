@@ -13,4 +13,4 @@ export type {
   Variants,
   VariantsConfig,
 } from "./runtime/variants";
-export type { Styled, ClassProp } from "./runtime/types/styled";
+export type { Styled, ClassProp, StyledProps } from "./runtime/types/styled";

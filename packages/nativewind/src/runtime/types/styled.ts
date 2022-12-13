@@ -137,5 +137,7 @@ export type StyledComponentType = {
   ): ReactElement<T>;
 };
 
+export type StyledProps<P> = P & ClassProp;
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type AnyStyledOptions = StyledOptions<any, any, any, any>;
