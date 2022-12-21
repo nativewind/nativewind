@@ -18,6 +18,7 @@ module.exports = {
       "error",
       { ignoreRestSiblings: true },
     ],
+    "prefer-const": ["error", { destructuring: "all" }],
     "unicorn/numeric-separators-style": "off",
     "unicorn/prevent-abbreviations": [
       "error",

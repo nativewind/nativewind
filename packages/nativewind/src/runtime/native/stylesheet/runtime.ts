@@ -293,8 +293,12 @@ export function setAtom(name: string, atom: Atom) {
 export function setVariables(properties: Record<`--${string}`, VariableValue>) {
   const subscriptions = new Set<() => void>();
 
-  for (const [name, value] of Object.entries(properties)) {
+  for (let [name, value] of Object.entries(properties)) {
     if (value === variables.get(name)) continue;
+
+    if (typeof value === "string" && value.endsWith("px")) {
+      value = value.replace("px", "");
+    }
 
     variables.set(name, value);
 
