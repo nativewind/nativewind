@@ -34,7 +34,7 @@
     "twrnc": "3.5.0"
   },
   "devDependencies": {
-    "@babel/core": "7.20.5",
+    "@babel/core": "7.20.7",
     "patch-package": "6.5.0"
   },
   "private": true
