@@ -38,11 +38,11 @@ export type StyledProps<P> = P & {
   baseTw?: string;
 };
 
-type ForwardRef<T, P> = ForwardRefExoticComponent<
+export type ForwardRef<T, P> = ForwardRefExoticComponent<
   PropsWithoutRef<P> & RefAttributes<T>
 >;
 
-type InferRef<T> = T extends RefAttributes<infer R> | ClassAttributes<infer R>
+export type InferRef<T> = T extends RefAttributes<infer R> | ClassAttributes<infer R>
   ? R
   : unknown;
 
