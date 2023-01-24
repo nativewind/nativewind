@@ -54,7 +54,7 @@
     "micromatch": "^4.0.5",
     "postcss": "^8.4.12",
     "postcss-calc": "^8.2.4",
-    "postcss-color-functional-notation": "^4.2.2",
+    "postcss-color-functional-notation": "^5.0.0",
     "postcss-css-variables": "^0.18.0",
     "postcss-nested": "^6.0.0",
     "react-is": "^18.1.0",
