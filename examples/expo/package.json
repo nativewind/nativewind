@@ -1,7 +1,7 @@
 {
   "name": "expo-example",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
+  "main": "index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -14,7 +14,8 @@
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "react-native": "0.69.4",
-    "react-native-web": "0.18.7"
+    "react-native-web": "0.18.7",
+    "nativewind": "*"
   },
   "devDependencies": {
     "@babel/core": "7.12.9",
