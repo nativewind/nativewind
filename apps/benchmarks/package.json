@@ -16,7 +16,7 @@
     "@eva-design/eva": "2.1.1",
     "@tamagui/babel-plugin": "1.2.15",
     "@ui-kitten/components": "5.1.2",
-    "chart.js": "4.2.0",
+    "chart.js": "4.2.1",
     "chartjs-chart-error-bars": "4.1.1",
     "dripsy": "3.10.0",
     "expo": "47.0.13",
