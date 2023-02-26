@@ -31,6 +31,30 @@ function B({ textClassName }) {
 }
 ```
 
+### Intellisense for custom class names
+
+To get Intellisense (autocompletion) working for custom class names, update your 
+editor's language server configuration. The examples below enable autocompletion 
+for class names with "Styles" in it. You can change this to accept whatever suits 
+your requirements.
+
+#### VS Code Example
+
+```json
+"tailwindCSS.classAttributes": [".*Styles*"],
+```
+
+#### Neovim (lspconfig) Example
+```lua
+    tailwindcss = {
+      settings = {
+        tailwindCSS = {
+          classAttributes = { ".*Styles*" }
+        }
+      }
+    }
+```
+
 ## Merging styles
 
 NativeWind doesn't require you to merge or provide styles as an array. You can simply append the two classNames strings together
