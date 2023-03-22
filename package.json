@@ -13,7 +13,7 @@
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i"
   },
   "devDependencies": {
-    "@changesets/cli": "2.26.0",
+    "@changesets/cli": "2.26.1",
     "@types/node": "18.15.5",
     "eslint": "8.36.0",
     "eslint-config-prettier": "8.8.0",
