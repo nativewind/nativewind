@@ -19,6 +19,6 @@
     "tailwindcss": "3.2.4"
   },
   "devDependencies": {
-    "vercel": "28.18.0"
+    "vercel": "28.18.1"
   }
 }
