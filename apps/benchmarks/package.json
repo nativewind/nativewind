@@ -13,7 +13,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "@eva-design/eva": "2.1.1",
+    "@eva-design/eva": "2.2.0",
     "@tamagui/babel-plugin": "1.14.4",
     "@ui-kitten/components": "5.1.2",
     "chart.js": "4.2.1",
