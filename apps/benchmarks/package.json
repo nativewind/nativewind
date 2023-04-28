@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.21.3",
-    "patch-package": "6.5.1"
+    "patch-package": "7.0.0"
   },
   "private": true
 }
