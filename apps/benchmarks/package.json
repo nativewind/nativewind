@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@eva-design/eva": "2.2.0",
-    "@tamagui/babel-plugin": "1.22.10",
+    "@tamagui/babel-plugin": "1.22.12",
     "@ui-kitten/components": "5.3.1",
     "chart.js": "4.3.0",
     "chartjs-chart-error-bars": "4.2.0",
