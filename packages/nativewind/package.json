@@ -84,7 +84,7 @@
     "moti": "0.25.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "0.71.7",
+    "react-native": "0.71.8",
     "react-native-svg": "13.6.0",
     "react-native-web": "0.19.4",
     "react-test-renderer": "18.2.0",
