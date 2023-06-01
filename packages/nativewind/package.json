@@ -71,7 +71,7 @@
     "@types/css-to-react-native": "3.0.0",
     "@types/jest": "29.5.2",
     "@types/micromatch": "4.0.2",
-    "@types/react": "18.2.7",
+    "@types/react": "18.2.8",
     "@types/react-is": "18.2.0",
     "@types/react-native": "0.72.2",
     "@types/use-sync-external-store": "0.0.3",
