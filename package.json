@@ -19,6 +19,6 @@
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-unicorn": "47.0.0",
     "prettier": "2.8.8",
-    "typescript": "5.1.5"
+    "typescript": "5.1.6"
   }
 }
