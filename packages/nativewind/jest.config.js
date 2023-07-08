@@ -1,24 +1,7 @@
-const { defaults: tsjPreset } = require("ts-jest/presets");
-
-/** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  ...tsjPreset,
-  preset: "react-native",
-  transform: {
-    "^.+\\.jsx$": "babel-jest",
-    "^.+\\.tsx?$": [
-      "ts-jest",
-      {
-        tsconfig: "tsconfig.spec.json",
-      },
-    ],
-  },
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
-  testPathIgnorePatterns: [
-    "/node_modules/",
-    "/__tests__/babel/",
-    "/__tests__/tailwindcss/runner/",
-    "/__tests__/style-sheet/tests",
-    "/__tests__/types.d.ts",
-  ],
+  preset: 'jest-expo',
+  roots: ['src'],
+  setupFilesAfterEnv: ['./src/__tests__/setupAfterEnv.ts'],
+  setupFiles: ['./src/__tests__/setup.ts'],
+  testPathIgnorePatterns: ['/node_modules/', '/__tests__/utils', '/__tests__/setup', '.d.ts$'],
 };
