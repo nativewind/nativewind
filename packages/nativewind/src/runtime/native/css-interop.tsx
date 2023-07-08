@@ -17,7 +17,7 @@ import {
   styleMetaMap,
 } from "./globals";
 import { useInteractionHandlers, useInteractionSignals } from "./interaction";
-import { useComputation } from "./signals";
+import { useComputation } from "../shared/signals";
 import { StyleSheet } from "./stylesheet";
 
 type CSSInteropWrapperProps = {

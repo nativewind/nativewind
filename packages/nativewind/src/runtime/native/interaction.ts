@@ -7,7 +7,7 @@ import {
 } from "react-native";
 
 import { Interaction, InteropMeta } from "../../types";
-import { createSignal } from "./signals";
+import { createSignal } from "../shared/signals";
 
 export function useInteractionSignals(): Interaction {
   return React.useMemo(

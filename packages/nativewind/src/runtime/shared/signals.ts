@@ -2,8 +2,9 @@ import { useMemo, useEffect, useState } from "react";
 
 import { Signal } from "../../types";
 /*
- * This file handles the reactivity of our style.
- * The problem is that styles can conditionally use dynamic units (e.g. rem), and they
+ * This file handles the style reactivity.
+ *
+ * styles can conditionally use dynamic units (e.g. rem), and they
  * might not be on the top level, e.g. var(var(var(10rem)))
  * They also might be inside media/container queries and/or never used!
  *
