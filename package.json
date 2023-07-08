@@ -18,6 +18,7 @@
     "eslint": "8.44.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-unicorn": "47.0.0",
+    "metro-react-native-babel-preset": "^0.77.0",
     "prettier": "3.0.0",
     "typescript": "5.1.6"
   }
