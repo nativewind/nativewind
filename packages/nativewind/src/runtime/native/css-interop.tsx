@@ -336,7 +336,13 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
  * @param props - An object that may contain a `className` property and a `style` property
  * @returns The modified input object with updated `style` property
  */
-function classNameToStyle({ className, ...props }: Record<string, unknown>) {
+function classNameToStyle({
+  className,
+  tw,
+  ...props
+}: Record<string, unknown>) {
+  className ??= tw;
+
   if (typeof className === "string") {
     // Split className string into an array of class names, then map each class
     // name to its corresponding global style object, if one exists.

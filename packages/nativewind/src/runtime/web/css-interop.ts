@@ -1,9 +1,11 @@
 export function defaultCSSInterop(
   jsx: Function,
   type: any,
-  { className, ...props }: Record<string | number, unknown>,
+  { className, tw, ...props }: Record<string | number, unknown>,
   key: string,
 ) {
+  className ??= tw;
+
   if (typeof className === "string") {
     const classNameStyle = { $$css: true, [className]: className };
     props.style = Array.isArray(props.style)
