@@ -8,6 +8,8 @@ import {
 import { ExtractedAnimation, StyleMeta, StyleProp } from "../../types";
 import { createSignal } from "./signals";
 
+export const INTERNAL_SET = Symbol();
+
 export const globalStyles = new Map<string, StyleProp>();
 export const styleMetaMap = new WeakMap<
   NonNullable<StyleProp> | NonNullable<StyleProp>[],
@@ -37,7 +39,7 @@ function viewportUnit(key: "width" | "height", dimensions: Dimensions) {
     });
   };
 
-  return { get, reset, __set: signal.set };
+  return { get, reset, [INTERNAL_SET]: signal.set };
 }
 
 function createRem(defaultValue: number) {

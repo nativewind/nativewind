@@ -1,6 +1,7 @@
 import { act, render } from "@testing-library/react-native";
 
 import {
+  INTERNAL_SET,
   colorScheme,
   isReduceMotionEnabled,
   vw,
@@ -76,7 +77,7 @@ test("width (plain)", () => {
   });
 
   act(() => {
-    vw.__set(500);
+    vw[INTERNAL_SET](500);
   });
 
   expect(A).styleToEqual({
@@ -99,7 +100,7 @@ test("width (range)", () => {
   });
 
   act(() => {
-    vw.__set(500);
+    vw[INTERNAL_SET](500);
   });
 
   expect(A).styleToEqual({
@@ -122,7 +123,7 @@ test("min-width", () => {
   });
 
   act(() => {
-    vw.__set(300);
+    vw[INTERNAL_SET](300);
   });
 
   expect(A).styleToEqual({
@@ -145,7 +146,7 @@ test("max-width", () => {
   });
 
   act(() => {
-    vw.__set(300);
+    vw[INTERNAL_SET](300);
   });
 
   expect(A).styleToEqual({

@@ -1,7 +1,5 @@
 import { act, render } from "@testing-library/react-native";
-import React from "react";
-
-import { rem, vh, vw } from "../runtime/native/globals";
+import { INTERNAL_SET, rem, vh, vw } from "../runtime/native/globals";
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "./utils";
 
@@ -42,7 +40,7 @@ test("vw", () => {
   });
 
   act(() => {
-    vw.__set(100);
+    vw[INTERNAL_SET](100);
   });
 
   expect(vw.get()).toEqual(100);
@@ -58,7 +56,7 @@ test("vh", () => {
   expect(A).styleToEqual({ height: 133.4 });
 
   act(() => {
-    vh.__set(100);
+    vh[INTERNAL_SET](100);
   });
 
   expect(vh.get()).toEqual(100);
