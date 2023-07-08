@@ -1,7 +1,24 @@
-import { Dimensions, StyleSheet as RNStyleSheet, Appearance } from 'react-native';
+import {
+  Dimensions,
+  StyleSheet as RNStyleSheet,
+  Appearance,
+} from "react-native";
 
-import { StyleSheetRegisterOptions, ExtractedStyle, StyleProp, StyleMeta } from '../../types';
-import { animationMap, colorScheme, globalStyles, rem, styleMetaMap, vh, vw } from './globals';
+import {
+  StyleSheetRegisterOptions,
+  ExtractedStyle,
+  StyleProp,
+  StyleMeta,
+} from "../../types";
+import {
+  animationMap,
+  colorScheme,
+  globalStyles,
+  rem,
+  styleMetaMap,
+  vh,
+  vw,
+} from "./globals";
 
 const subscriptions = new Set<() => void>();
 
@@ -100,7 +117,7 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
       hasMeta = true;
 
       const requiresLayout = styles.animations.name?.some((nameObj) => {
-        const name = nameObj.type === 'none' ? 'none' : nameObj.value;
+        const name = nameObj.type === "none" ? "none" : nameObj.value;
         return animationMap.get(name)?.requiresLayout;
       });
 
@@ -112,7 +129,7 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
     if (styles.container) {
       meta.container = {
         names: styles.container.names,
-        type: styles.container.type ?? 'normal',
+        type: styles.container.type ?? "normal",
       };
       hasMeta = true;
     }

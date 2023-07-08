@@ -1,7 +1,17 @@
-import { isRuntimeValue } from '../../shared';
-import { Interaction, RuntimeValue, Style, StyleMeta, StyleProp } from '../../types';
-import { testContainerQuery, testMediaQuery, testPseudoClasses } from './conditions';
-import { rem, styleMetaMap, vh, vw } from './globals';
+import { isRuntimeValue } from "../../shared";
+import {
+  Interaction,
+  RuntimeValue,
+  Style,
+  StyleMeta,
+  StyleProp,
+} from "../../types";
+import {
+  testContainerQuery,
+  testMediaQuery,
+  testPseudoClasses,
+} from "./conditions";
+import { rem, styleMetaMap, vh, vw } from "./globals";
 
 export interface FlattenStyleOptions {
   variables: Record<string, any>;
@@ -27,7 +37,7 @@ export interface FlattenStyleOptions {
 export function flattenStyle(
   styles: StyleProp,
   options: FlattenStyleOptions,
-  flatStyle?: Style
+  flatStyle?: Style,
 ): Style {
   let flatStyleMeta: StyleMeta;
 
@@ -106,7 +116,7 @@ export function flattenStyle(
   }
 
   if (styleMeta.container) {
-    flatStyleMeta.container ??= { type: 'normal', names: [] };
+    flatStyleMeta.container ??= { type: "normal", names: [] };
 
     if (styleMeta.container.names) {
       flatStyleMeta.container.names = styleMeta.container.names;
@@ -126,9 +136,14 @@ export function flattenStyle(
       // Skip already set variables
       if (key in flatStyleMeta.variables) continue;
 
-      const getterOrValue = extractValue(value, flatStyle, flatStyleMeta, options);
+      const getterOrValue = extractValue(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        options,
+      );
 
-      if (typeof getterOrValue === 'function') {
+      if (typeof getterOrValue === "function") {
         Object.defineProperty(flatStyleMeta.variables, key, {
           enumerable: true,
           get() {
@@ -145,18 +160,23 @@ export function flattenStyle(
     // Skip already set keys
     if (key in flatStyle) continue;
 
-    if (key === 'transform') {
+    if (key === "transform") {
       const transforms: Record<string, unknown>[] = [];
 
       for (const transform of value) {
         // Transform is either an React Native transform object OR
         // A extracted value with type: "function"
-        if ('type' in transform) {
-          const getterOrValue = extractValue(transform, flatStyle, flatStyleMeta, options);
+        if ("type" in transform) {
+          const getterOrValue = extractValue(
+            transform,
+            flatStyle,
+            flatStyleMeta,
+            options,
+          );
 
           if (getterOrValue === undefined) {
             continue;
-          } else if (typeof getterOrValue === 'function') {
+          } else if (typeof getterOrValue === "function") {
             transforms.push(
               Object.defineProperty({}, transform.name, {
                 configurable: true,
@@ -164,16 +184,21 @@ export function flattenStyle(
                 get() {
                   return getterOrValue();
                 },
-              })
+              }),
             );
           }
         } else {
           for (const [tKey, tValue] of Object.entries(transform)) {
             const $transform: Record<string, any> = {};
 
-            const getterOrValue = extractValue(tValue, flatStyle, flatStyleMeta, options);
+            const getterOrValue = extractValue(
+              tValue,
+              flatStyle,
+              flatStyleMeta,
+              options,
+            );
 
-            if (typeof getterOrValue === 'function') {
+            if (typeof getterOrValue === "function") {
               Object.defineProperty($transform, tKey, {
                 configurable: true,
                 enumerable: true,
@@ -192,9 +217,14 @@ export function flattenStyle(
 
       flatStyle.transform = transforms as any;
     } else {
-      const getterOrValue = extractValue(value, flatStyle, flatStyleMeta, options);
+      const getterOrValue = extractValue(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        options,
+      );
 
-      if (typeof getterOrValue === 'function') {
+      if (typeof getterOrValue === "function") {
         Object.defineProperty(flatStyle, key, {
           configurable: true,
           enumerable: true,
@@ -224,31 +254,34 @@ function extractValue(
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  options: FlattenStyleOptions
+  options: FlattenStyleOptions,
 ): any {
   if (isRuntimeValue(value)) {
     switch (value.name) {
-      case 'vh':
+      case "vh":
         return round((vh.get() / 100) * (value.arguments[0] as number));
-      case 'vw':
+      case "vw":
         return round((vw.get() / 100) * (value.arguments[0] as number));
-      case 'var':
+      case "var":
         return () => {
           const name = value.arguments[0] as string;
-          const resolvedValue = flatStyleMeta.variables?.[name] ?? options.variables[name];
-          return typeof resolvedValue === 'function' ? resolvedValue() : resolvedValue;
+          const resolvedValue =
+            flatStyleMeta.variables?.[name] ?? options.variables[name];
+          return typeof resolvedValue === "function"
+            ? resolvedValue()
+            : resolvedValue;
         };
-      case 'rem':
+      case "rem":
         return round(rem.get() * (value.arguments[0] as number));
-      case 'em':
+      case "em":
         return () => {
           const multiplier = value.arguments[0] as number;
-          if ('fontSize' in flatStyle) {
+          if ("fontSize" in flatStyle) {
             return round((flatStyle.fontSize || 0) * multiplier);
           }
           return undefined;
         };
-      case 'ch': {
+      case "ch": {
         const multiplier = value.arguments[0] as number;
 
         let reference: number | undefined;
@@ -257,7 +290,7 @@ function extractValue(
           reference = options.ch;
         } else if (options.interaction?.layout.height.get()) {
           reference = options.interaction.layout.height.get();
-        } else if (typeof flatStyle.height === 'number') {
+        } else if (typeof flatStyle.height === "number") {
           reference = flatStyle.height;
         }
 
@@ -267,7 +300,7 @@ function extractValue(
           return () => {
             if (options.interaction?.layout.height.get()) {
               reference = options.interaction.layout.height.get();
-            } else if (typeof flatStyle.height === 'number') {
+            } else if (typeof flatStyle.height === "number") {
               reference = flatStyle.height;
             } else {
               reference = 0;
@@ -277,7 +310,7 @@ function extractValue(
           };
         }
       }
-      case 'cw': {
+      case "cw": {
         const multiplier = value.arguments[0] as number;
 
         let reference: number | undefined;
@@ -286,7 +319,7 @@ function extractValue(
           reference = options.cw;
         } else if (options.interaction?.layout.width.get()) {
           reference = options.interaction.layout.width.get();
-        } else if (typeof flatStyle.width === 'number') {
+        } else if (typeof flatStyle.width === "number") {
           reference = flatStyle.width;
         }
 
@@ -296,7 +329,7 @@ function extractValue(
           return () => {
             if (options.interaction?.layout.width.get()) {
               reference = options.interaction.layout.width.get();
-            } else if (typeof flatStyle.width === 'number') {
+            } else if (typeof flatStyle.width === "number") {
               reference = flatStyle.width;
             } else {
               reference = 0;
@@ -306,25 +339,37 @@ function extractValue(
           };
         }
       }
-      case 'perspective':
-      case 'translateX':
-      case 'translateY':
-      case 'scaleX':
-      case 'scaleY':
-      case 'scale':
-        return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-          shouldRunwrap: true,
-          shouldParseFloat: true,
-        });
-      case 'rotate':
-      case 'rotateX':
-      case 'rotateY':
-      case 'rotateZ':
-      case 'skewX':
-      case 'skewY':
-        return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-          shouldRunwrap: true,
-        });
+      case "perspective":
+      case "translateX":
+      case "translateY":
+      case "scaleX":
+      case "scaleY":
+      case "scale":
+        return extractRuntimeFunction(
+          value,
+          flatStyle,
+          flatStyleMeta,
+          options,
+          {
+            shouldRunwrap: true,
+            shouldParseFloat: true,
+          },
+        );
+      case "rotate":
+      case "rotateX":
+      case "rotateY":
+      case "rotateZ":
+      case "skewX":
+      case "skewY":
+        return extractRuntimeFunction(
+          value,
+          flatStyle,
+          flatStyleMeta,
+          options,
+          {
+            shouldRunwrap: true,
+          },
+        );
       default: {
         return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options);
       }
@@ -339,7 +384,7 @@ function extractRuntimeFunction(
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
   options: FlattenStyleOptions,
-  { shouldRunwrap = false, shouldParseFloat = false } = {}
+  { shouldRunwrap = false, shouldParseFloat = false } = {},
 ) {
   let isStatic = true;
   const args: unknown[] = [];
@@ -347,7 +392,7 @@ function extractRuntimeFunction(
   for (const arg of value.arguments) {
     const getterOrValue = extractValue(arg, flatStyle, flatStyleMeta, options);
 
-    if (typeof getterOrValue === 'function') {
+    if (typeof getterOrValue === "function") {
       isStatic = false;
     }
 
@@ -356,11 +401,11 @@ function extractRuntimeFunction(
 
   const valueFn = () => {
     const $args = args
-      .map((a) => (typeof a === 'function' ? a() : a))
+      .map((a) => (typeof a === "function" ? a() : a))
       .filter((a) => a !== undefined)
-      .join(', ');
+      .join(", ");
 
-    if ($args === '') {
+    if ($args === "") {
       return;
     }
 

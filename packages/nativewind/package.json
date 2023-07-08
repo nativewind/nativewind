@@ -28,14 +28,14 @@
     "url": "https://github.com/marklawlor/nativewind/issues"
   },
   "engines": {
-    "node": ">=14.18"
+    "node": ">=16"
   },
   "scripts": {
     "test": "jest",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
-    "build": "rm -rf dist && tsc"
+    "build": "rm -rf dist && tsc -p tsconfig.build.json"
   },
   "files": [
     "dist/",
@@ -54,6 +54,11 @@
     "@types/metro-config": "0.76.2",
     "jest": "^29.3.1",
     "jest-expo": "49.0.0-alpha.1",
+    "metro": "^0.77.0",
+    "metro-cache": "^0.77.0",
+    "metro-resolver": "^0.77.0",
+    "metro-transform-worker": "^0.77.0",
+    "metro-react-native-babel-preset": "^0.77.0",
     "react-native-reanimated": "~3.0.2"
   },
   "peerDependencies": {

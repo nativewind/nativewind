@@ -1,14 +1,14 @@
-import { render } from '@testing-library/react-native';
-import React from 'react';
+import { render } from "@testing-library/react-native";
+import React from "react";
 
-import { StyleSheet } from '../runtime/native/stylesheet';
-import { createMockComponent, registerCSS } from './utils';
+import { StyleSheet } from "../runtime/native/stylesheet";
+import { createMockComponent, registerCSS } from "./utils";
 
 afterEach(() => {
   StyleSheet.__reset();
 });
 
-test('group', async () => {
+test("group", async () => {
   const A = createMockComponent();
   const B = createMockComponent();
 
@@ -17,8 +17,8 @@ test('group', async () => {
       color: red;
     }`,
     {
-      grouping: ['^group\\/.*'],
-    }
+      grouping: ["^group\\/.*"],
+    },
   );
 
   const { rerender } = render(<B className="my-class" />);
@@ -28,13 +28,13 @@ test('group', async () => {
   rerender(
     <A testID="A" className="group/item">
       <B testID="B" className="my-class" />
-    </A>
+    </A>,
   );
 
-  expect(B).styleToEqual({ color: 'rgba(255, 0, 0, 1)' });
+  expect(B).styleToEqual({ color: "rgba(255, 0, 0, 1)" });
 });
 
-test('invalid group', async () => {
+test("invalid group", async () => {
   const A = createMockComponent();
   const B = createMockComponent();
 
@@ -43,8 +43,8 @@ test('invalid group', async () => {
       color: red;
     }`,
     {
-      grouping: ['^group\\/.*'],
-    }
+      grouping: ["^group\\/.*"],
+    },
   );
 
   const { rerender } = render(<B className="my-class" />);
@@ -54,7 +54,7 @@ test('invalid group', async () => {
   rerender(
     <A testID="A" className="invalid">
       <B className="my-class" />
-    </A>
+    </A>,
   );
 
   expect(B).styleToEqual(undefined);

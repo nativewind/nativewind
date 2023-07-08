@@ -1,5 +1,11 @@
-import { AnimationIterationCount, AnimationName, Time } from 'lightningcss';
-import React, { ComponentType, useMemo, forwardRef, useState, useEffect } from 'react';
+import { AnimationIterationCount, AnimationName, Time } from "lightningcss";
+import React, {
+  ComponentType,
+  useMemo,
+  forwardRef,
+  useState,
+  useEffect,
+} from "react";
 import {
   AnimatableValue,
   SharedValue,
@@ -8,7 +14,7 @@ import {
   withRepeat,
   withSequence,
   withTiming,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 import {
   AnimatableCSSProperty,
@@ -17,10 +23,10 @@ import {
   Interaction,
   InteropMeta,
   Style,
-} from '../../types';
-import { createAnimatedComponent } from './animated-component';
-import { flattenStyle } from './flatten-style';
-import { animationMap, styleMetaMap } from './globals';
+} from "../../types";
+import { createAnimatedComponent } from "./animated-component";
+import { flattenStyle } from "./flatten-style";
+import { animationMap, styleMetaMap } from "./globals";
 
 type AnimationInteropProps = Record<string, unknown> & {
   __component: ComponentType<any>;
@@ -44,19 +50,22 @@ export const AnimationInterop = forwardRef(function Animated(
     __interopMeta: interopMeta,
     ...props
   }: AnimationInteropProps,
-  ref: unknown
+  ref: unknown,
 ) {
   Component = createAnimatedComponent(Component);
 
   const isLayoutReady = useIsLayoutReady(interopMeta, interaction);
 
-  for (const prop of new Set([...interopMeta.transitionProps, ...interopMeta.animatedProps])) {
+  for (const prop of new Set([
+    ...interopMeta.transitionProps,
+    ...interopMeta.animatedProps,
+  ])) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     props[prop] = useAnimationAndTransitions(
       props[prop] as Record<string, AnimatableValue>,
       __variables,
       interaction,
-      isLayoutReady
+      isLayoutReady,
     );
   }
 
@@ -68,7 +77,7 @@ export const AnimationInterop = forwardRef(function Animated(
  */
 function useIsLayoutReady(interopMeta: InteropMeta, interaction: Interaction) {
   const [layoutReady, setLayoutReady] = useState(
-    interopMeta.requiresLayout ? interaction.layout.width.get() !== 0 : true
+    interopMeta.requiresLayout ? interaction.layout.width.get() !== 0 : true,
   );
 
   useEffect(() => {
@@ -97,7 +106,7 @@ function useAnimationAndTransitions(
   style: Record<string, AnimatableValue>,
   variables: Record<string, unknown>,
   interaction: Interaction,
-  isLayoutReady: boolean
+  isLayoutReady: boolean,
 ) {
   const {
     animations: {
@@ -114,7 +123,7 @@ function useAnimationAndTransitions(
   const [transitionProps, transitionValues] = useTransitions(
     transitions,
     transitionDurations,
-    style
+    style,
   );
 
   const [animationProps, animationValues] = useAnimations(
@@ -124,7 +133,7 @@ function useAnimationAndTransitions(
     style,
     variables,
     interaction,
-    isLayoutReady
+    isLayoutReady,
   );
 
   return useAnimatedStyle(() => {
@@ -136,7 +145,10 @@ function useAnimationAndTransitions(
       transform: style.transform ? [] : undefined,
     };
 
-    function doAnimation(props: string[], values: SharedValue<AnimatableValue>[]) {
+    function doAnimation(
+      props: string[],
+      values: SharedValue<AnimatableValue>[],
+    ) {
       for (const [index, prop] of props.entries()) {
         const value = values[index].value;
 
@@ -159,7 +171,7 @@ function useAnimationAndTransitions(
 function useTransitions(
   transitions: AnimatableCSSProperty[],
   transitionDurations: Time[],
-  style: Record<string, AnimatableValue>
+  style: Record<string, AnimatableValue>,
 ) {
   const transitionProps: string[] = [];
   const transitionValues: SharedValue<AnimatableValue>[] = [];
@@ -169,12 +181,12 @@ function useTransitions(
     const value = style[prop] ?? defaultValues[prop];
     const duration = timeToMS(
       getValue(transitionDurations, index, {
-        type: 'seconds',
+        type: "seconds",
         value: 0,
-      })
+      }),
     );
 
-    if (prop === 'transform') {
+    if (prop === "transform") {
       const valueObj = Object.assign({}, ...((value || []) as any[]));
 
       for (const tProp of transformProps) {
@@ -204,39 +216,42 @@ function useAnimations(
   style: Record<string, unknown>,
   variables: Record<string, unknown>,
   interaction: Interaction,
-  isLayoutReady: boolean
+  isLayoutReady: boolean,
 ) {
   const animations = useMemo(() => {
     const animations = new Map<string, TimingFrameProperties[]>();
 
     for (let index = 0; index < animationNames.length; index++) {
-      const name = getValue(animationNames, index, { type: 'none' });
+      const name = getValue(animationNames, index, { type: "none" });
       const totalDuration = timeToMS(
         getValue(animationDurations, index, {
-          type: 'seconds',
+          type: "seconds",
           value: 0,
-        })
+        }),
       );
 
       let keyframes: ExtractedAnimation;
-      if (name.type === 'none') {
+      if (name.type === "none") {
         keyframes = defaultAnimation;
       } else {
         keyframes = animationMap.get(name.value) || defaultAnimation;
       }
 
-      const propProgressValues: Record<string, Record<number, AnimatableValue>> = {};
+      const propProgressValues: Record<
+        string,
+        Record<number, AnimatableValue>
+      > = {};
 
       for (const { style: $style, selector: progress } of keyframes.frames) {
         const flatStyle = flattenStyle($style, {
           variables,
           interaction,
-          ch: typeof style.height === 'number' ? style.height : undefined,
-          cw: typeof style.width === 'number' ? style.width : undefined,
+          ch: typeof style.height === "number" ? style.height : undefined,
+          cw: typeof style.width === "number" ? style.width : undefined,
         });
 
         for (let [prop, value] of Object.entries(flatStyle)) {
-          if (prop === 'transform') {
+          if (prop === "transform") {
             if (value.length === 0) {
               value = defaultTransformEntries;
             }
@@ -270,7 +285,8 @@ function useAnimations(
         for (let i = 0; i < orderedProgress.length; i++) {
           const progress = orderedProgress[i];
           const value = progressValues[progress];
-          const previousProgress = progress === 0 || i === 0 ? 0 : orderedProgress[i - 1];
+          const previousProgress =
+            progress === 0 || i === 0 ? 0 : orderedProgress[i - 1];
 
           frames.push({
             duration: totalDuration * (progress - previousProgress),
@@ -325,7 +341,7 @@ function useAnimations(
 function getInitialValue(
   prop: string,
   frame: TimingFrameProperties,
-  style: Style
+  style: Style,
 ): AnimatableValue {
   if (frame.value === PLACEHOLDER) {
     if (transformProps.has(prop)) {
@@ -352,38 +368,41 @@ const PLACEHOLDER = {} as AnimatableValue;
 const emptyArray: any[] = [];
 const defaultAnimation: ExtractedAnimation = { frames: [] };
 const timeToMS = (time: Time) => {
-  return time.type === 'milliseconds' ? time.value : time.value * 1000;
+  return time.type === "milliseconds" ? time.value : time.value * 1000;
 };
-const getIterations = (iterations: AnimationIterationCount[], index: number) => {
-  const iteration = getValue(iterations, index, { type: 'infinite' });
-  return iteration.type === 'infinite' ? Infinity : iteration.value;
+const getIterations = (
+  iterations: AnimationIterationCount[],
+  index: number,
+) => {
+  const iteration = getValue(iterations, index, { type: "infinite" });
+  return iteration.type === "infinite" ? Infinity : iteration.value;
 };
 
 export const defaultValues: {
   [K in AnimatableCSSProperty]?: Style[K];
 } = {
-  backgroundColor: 'transparent',
-  borderBottomColor: 'transparent',
+  backgroundColor: "transparent",
+  borderBottomColor: "transparent",
   borderBottomLeftRadius: 0,
   borderBottomRightRadius: 0,
   borderBottomWidth: 0,
-  borderColor: 'transparent',
-  borderLeftColor: 'transparent',
+  borderColor: "transparent",
+  borderLeftColor: "transparent",
   borderLeftWidth: 0,
   borderRadius: 0,
-  borderRightColor: 'transparent',
+  borderRightColor: "transparent",
   borderRightWidth: 0,
-  borderTopColor: 'transparent',
+  borderTopColor: "transparent",
   borderTopWidth: 0,
   borderWidth: 0,
   bottom: 0,
-  color: 'transparent',
+  color: "transparent",
   flex: 1,
   flexBasis: 1,
   flexGrow: 1,
   flexShrink: 1,
   fontSize: 14,
-  fontWeight: '400',
+  fontWeight: "400",
   gap: 0,
   left: 0,
   lineHeight: 14,
@@ -412,15 +431,17 @@ export const defaultTransform: Record<string, AnimatableValue> = {
   translateY: 0,
   scaleX: 1,
   scaleY: 1,
-  rotate: '0deg',
-  rotateX: '0deg',
-  rotateY: '0deg',
-  rotateZ: '0deg',
-  skewX: '0deg',
-  skewY: '0deg',
+  rotate: "0deg",
+  rotateX: "0deg",
+  rotateY: "0deg",
+  rotateZ: "0deg",
+  skewX: "0deg",
+  skewY: "0deg",
   scale: 1,
 };
 export const transformProps = new Set(Object.keys(defaultTransform));
-export const defaultTransformEntries = Object.entries(defaultTransform).map(([key, value]) => ({
-  [key]: value,
-}));
+export const defaultTransformEntries = Object.entries(defaultTransform).map(
+  ([key, value]) => ({
+    [key]: value,
+  }),
+);

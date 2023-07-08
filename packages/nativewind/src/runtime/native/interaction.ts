@@ -1,13 +1,13 @@
-import React from 'react';
+import React from "react";
 import {
   GestureResponderEvent,
   LayoutChangeEvent,
   NativeSyntheticEvent,
   TargetedEvent,
-} from 'react-native';
+} from "react-native";
 
-import { Interaction, InteropMeta } from '../../types';
-import { createSignal } from './signals';
+import { Interaction, InteropMeta } from "../../types";
+import { createSignal } from "./signals";
 
 export function useInteractionSignals(): Interaction {
   return React.useMemo(
@@ -20,14 +20,14 @@ export function useInteractionSignals(): Interaction {
         height: createSignal<number>(0),
       },
     }),
-    []
+    [],
   );
 }
 
 export function useInteractionHandlers(
   props: Record<string, any>,
   signals: Interaction,
-  meta: InteropMeta
+  meta: InteropMeta,
 ) {
   const propsRef = React.useRef(props);
   propsRef.current = props;
@@ -74,7 +74,7 @@ export function useInteractionHandlers(
         signals.layout.height.set(event.nativeEvent.layout.height);
       },
     }),
-    []
+    [],
   );
 
   const handlers: Partial<typeof memoHandlers> = {};

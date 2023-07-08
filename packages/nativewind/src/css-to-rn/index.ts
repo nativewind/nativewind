@@ -11,18 +11,18 @@ import {
   ContainerType,
   ContainerRule,
   Selector,
-} from 'lightningcss';
+} from "lightningcss";
 
-import { isRuntimeValue } from '../shared';
+import { isRuntimeValue } from "../shared";
 import {
   ExtractedContainerQuery,
   ExtractedStyle,
   StyleSheetRegisterOptions,
   AnimatableCSSProperty,
   ExtractedAnimation,
-} from '../types';
-import { ParseDeclarationOptions, parseDeclaration } from './parseDeclaration';
-import { exhaustiveCheck } from './utils';
+} from "../types";
+import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
+import { exhaustiveCheck } from "./utils";
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
@@ -38,7 +38,7 @@ export type CssToReactNativeRuntimeOptions = {
  */
 export function cssToReactNativeRuntime(
   code: Buffer,
-  options: CssToReactNativeRuntimeOptions = {}
+  options: CssToReactNativeRuntimeOptions = {},
 ): StyleSheetRegisterOptions {
   // Create maps to store the extracted style declarations and animations
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
@@ -47,17 +47,21 @@ export function cssToReactNativeRuntime(
   // Parse the grouping options to create an array of regular expressions
   const grouping =
     options.grouping?.map((value) => {
-      return typeof value === 'string' ? new RegExp(value) : value;
+      return typeof value === "string" ? new RegExp(value) : value;
     }) ?? [];
 
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
   lightningcss({
-    filename: 'style.css', // This is ignored, but required
+    filename: "style.css", // This is ignored, but required
     code,
     visitor: {
       Rule(rule) {
         // Extract the style declarations and animations from the current rule
-        extractRule(rule, { ...options, grouping, declarations, keyframes }, options);
+        extractRule(
+          rule,
+          { ...options, grouping, declarations, keyframes },
+          options,
+        );
         // We have processed this rule, so now delete it from the AST
         return [];
       },
@@ -97,26 +101,26 @@ interface ExtractRuleOptions {
 function extractRule(
   rule: Rule,
   extractOptions: ExtractRuleOptions,
-  parseOptions: CssToReactNativeRuntimeOptions
+  parseOptions: CssToReactNativeRuntimeOptions,
 ) {
   // Check the rule's type to determine which extraction function to call
   switch (rule.type) {
-    case 'keyframes': {
+    case "keyframes": {
       // If the rule is a keyframe animation, extract it with the `extractKeyFrames` function
       extractKeyFrames(rule.value, extractOptions, parseOptions);
       break;
     }
-    case 'container': {
+    case "container": {
       // If the rule is a container, extract it with the `extractedContainer` function
       extractedContainer(rule.value, extractOptions, parseOptions);
       break;
     }
-    case 'media': {
+    case "media": {
       // If the rule is a media query, extract it with the `extractMedia` function
       extractMedia(rule.value, extractOptions, parseOptions);
       break;
     }
-    case 'style': {
+    case "style": {
       // If the rule is a style declaration, extract it with the `getExtractedStyle` function and store it in the `declarations` map
       if (rule.value.declarations) {
         setStyleForSelectorList(
@@ -125,7 +129,7 @@ function extractRule(
             ...getExtractedStyle(rule.value.declarations, parseOptions),
           },
           rule.value.selectors,
-          extractOptions
+          extractOptions,
         );
       }
       break;
@@ -146,7 +150,7 @@ function extractRule(
 function extractMedia(
   mediaRule: MediaRule,
   extractOptions: ExtractRuleOptions,
-  parseOptions: CssToReactNativeRuntimeOptions
+  parseOptions: CssToReactNativeRuntimeOptions,
 ) {
   // Initialize an empty array to store screen media queries
   const media: MediaQuery[] = [];
@@ -154,8 +158,8 @@ function extractMedia(
   // Iterate over all media queries in the mediaRule
   for (const mediaQuery of mediaRule.query.mediaQueries) {
     // Check if the media type is screen
-    let isScreen = mediaQuery.mediaType !== 'print';
-    if (mediaQuery.qualifier === 'not') {
+    let isScreen = mediaQuery.mediaType !== "print";
+    if (mediaQuery.qualifier === "not") {
       isScreen = !isScreen;
     }
 
@@ -190,7 +194,7 @@ function extractMedia(
 function extractedContainer(
   containerRule: ContainerRule,
   extractOptions: ExtractRuleOptions,
-  parseOptions: CssToReactNativeRuntimeOptions
+  parseOptions: CssToReactNativeRuntimeOptions,
 ) {
   // Create a new ExtractRuleOptions object with the updated container query information
   const newExtractOptions: ExtractRuleOptions = {
@@ -219,11 +223,14 @@ function extractedContainer(
 function setStyleForSelectorList(
   style: ExtractedStyle,
   selectorList: SelectorList,
-  { declarations, grouping = [] }: ExtractRuleOptions
+  { declarations, grouping = [] }: ExtractRuleOptions,
 ) {
   for (const selector of selectorList) {
     // Find the last className selector in the selector list
-    const classSelectorIndex = findLastIndex(selector, (s) => s.type === 'class');
+    const classSelectorIndex = findLastIndex(
+      selector,
+      (s) => s.type === "class",
+    );
 
     // If no className selector is found, skip this selector
     if (classSelectorIndex === -1) {
@@ -253,7 +260,7 @@ function setStyleForSelectorList(
             names: [condition.className],
           },
         },
-        declarations
+        declarations,
       );
     }
 
@@ -274,7 +281,9 @@ function setStyleForSelectorList(
     }
 
     // Extract the className selector and its pseudo-classes
-    const groupedDelecarationSelectors = groupSelector(selector.slice(classSelectorIndex));
+    const groupedDelecarationSelectors = groupSelector(
+      selector.slice(classSelectorIndex),
+    );
 
     // If there is more than one selector, skip this selector
     if (groupedDelecarationSelectors.length !== 1) {
@@ -287,7 +296,7 @@ function setStyleForSelectorList(
     addDeclaration(
       className,
       { ...style, pseudoClasses, containerQuery: containerQueries },
-      declarations
+      declarations,
     );
   }
 }
@@ -295,7 +304,7 @@ function setStyleForSelectorList(
 function addDeclaration(
   className: string,
   style: ExtractedStyle,
-  declarations: ExtractRuleOptions['declarations']
+  declarations: ExtractRuleOptions["declarations"],
 ) {
   const existing = declarations.get(className);
 
@@ -319,17 +328,17 @@ function groupSelector(selectors: Selector) {
 
   for (const selector of selectors) {
     switch (selector.type) {
-      case 'combinator':
-      case 'universal':
-      case 'namespace':
-      case 'type':
-      case 'id':
-      case 'pseudo-element':
-      case 'nesting':
-      case 'attribute':
+      case "combinator":
+      case "universal":
+      case "namespace":
+      case "type":
+      case "id":
+      case "pseudo-element":
+      case "nesting":
+      case "attribute":
         current = undefined;
         break;
-      case 'class':
+      case "class":
         // Selectors like .foo.bar are not valid
         if (current?.className) {
           groupedSelectors.pop();
@@ -341,11 +350,11 @@ function groupSelector(selectors: Selector) {
           groupedSelectors.push(current);
         }
         break;
-      case 'pseudo-class':
+      case "pseudo-class":
         switch (selector.kind) {
-          case 'hover':
-          case 'active':
-          case 'focus':
+          case "hover":
+          case "active":
+          case "focus":
             if (!current) break;
             current.pseudoClasses ??= {};
             current.pseudoClasses[selector.kind] = true;
@@ -363,7 +372,7 @@ function groupSelector(selectors: Selector) {
 function extractKeyFrames(
   keyframes: KeyframesRule<Declaration>,
   extractOptions: ExtractRuleOptions,
-  options: CssToReactNativeRuntimeOptions
+  options: CssToReactNativeRuntimeOptions,
 ) {
   const extractedAnimation: ExtractedAnimation = { frames: [] };
   const frames = extractedAnimation.frames;
@@ -378,24 +387,24 @@ function extractKeyFrames(
 
     for (const selector of frame.selectors) {
       const keyframe =
-        selector.type === 'percentage'
+        selector.type === "percentage"
           ? selector.value * 100
-          : selector.type === 'from'
+          : selector.type === "from"
           ? 0
-          : selector.type === 'to'
+          : selector.type === "to"
           ? 100
           : undefined;
 
       if (keyframe === undefined) continue;
 
       switch (selector.type) {
-        case 'percentage':
+        case "percentage":
           frames.push({ selector: selector.value, style });
           break;
-        case 'from':
+        case "from":
           frames.push({ selector: 0, style });
           break;
-        case 'to':
+        case "to":
           frames.push({ selector: 1, style });
           break;
         default:
@@ -420,13 +429,16 @@ interface GetExtractedStyleOptions extends CssToReactNativeRuntimeOptions {
 
 function getExtractedStyle(
   declarationBlock: DeclarationBlock<Declaration>,
-  options: GetExtractedStyleOptions
+  options: GetExtractedStyleOptions,
 ): ExtractedStyle {
   const extrtactedStyle: ExtractedStyle = {
     style: {},
   };
 
-  const declarationArray = [declarationBlock.declarations, declarationBlock.importantDeclarations]
+  const declarationArray = [
+    declarationBlock.declarations,
+    declarationBlock.importantDeclarations,
+  ]
     .flat()
     .filter((d): d is Declaration => !!d);
 
@@ -439,12 +451,16 @@ function getExtractedStyle(
    * The `append` option allows the same property to be added multiple times
    * E.g. `transform` accepts an array of transforms
    */
-  function addStyleProp(property: string, value: any, { shortHand = false, append = false } = {}) {
+  function addStyleProp(
+    property: string,
+    value: any,
+    { shortHand = false, append = false } = {},
+  ) {
     if (value === undefined) {
       return;
     }
 
-    if (property.startsWith('--')) {
+    if (property.startsWith("--")) {
       return addVariable(property, value);
     }
 
@@ -480,29 +496,29 @@ function getExtractedStyle(
   function addContainerProp(
     declaration: Extract<
       Declaration,
-      { property: 'container' | 'container-name' | 'container-type' }
-    >
+      { property: "container" | "container-name" | "container-type" }
+    >,
   ) {
     let names: false | string[] = false;
     let type: ContainerType | undefined;
 
     switch (declaration.property) {
-      case 'container':
-        if (declaration.value.name.type === 'none') {
+      case "container":
+        if (declaration.value.name.type === "none") {
           names = false;
         } else {
           names = declaration.value.name.value;
         }
         type = declaration.value.containerType;
         break;
-      case 'container-name':
-        if (declaration.value.type === 'none') {
+      case "container-name":
+        if (declaration.value.type === "none") {
           names = false;
         } else {
           names = declaration.value.value;
         }
         break;
-      case 'container-type':
+      case "container-type":
         type = declaration.value;
         break;
     }
@@ -527,32 +543,32 @@ function getExtractedStyle(
       Declaration,
       {
         property:
-          | 'transition-property'
-          | 'transition-duration'
-          | 'transition-delay'
-          | 'transition-timing-function'
-          | 'transition';
+          | "transition-property"
+          | "transition-duration"
+          | "transition-delay"
+          | "transition-timing-function"
+          | "transition";
       }
-    >
+    >,
   ) {
     extrtactedStyle.transition ??= {};
 
     switch (declaration.property) {
-      case 'transition-property':
+      case "transition-property":
         extrtactedStyle.transition.property = declaration.value.map((v) => {
           return kebabToCamelCase(v.property) as AnimatableCSSProperty;
         });
         break;
-      case 'transition-duration':
+      case "transition-duration":
         extrtactedStyle.transition.duration = declaration.value;
         break;
-      case 'transition-delay':
+      case "transition-delay":
         extrtactedStyle.transition.delay = declaration.value;
         break;
-      case 'transition-timing-function':
+      case "transition-timing-function":
         extrtactedStyle.transition.timingFunction = declaration.value;
         break;
-      case 'transition': {
+      case "transition": {
         let setProperty = true;
         let setDuration = true;
         let setDelay = true;
@@ -587,7 +603,9 @@ function getExtractedStyle(
         for (const value of declaration.value) {
           if (setProperty) {
             extrtactedStyle.transition.property?.push(
-              kebabToCamelCase(value.property.property) as AnimatableCSSProperty
+              kebabToCamelCase(
+                value.property.property,
+              ) as AnimatableCSSProperty,
             );
           }
           if (setDuration) {
@@ -597,7 +615,9 @@ function getExtractedStyle(
             extrtactedStyle.transition.delay?.push(value.delay);
           }
           if (setTiming) {
-            extrtactedStyle.transition.timingFunction?.push(value.timingFunction);
+            extrtactedStyle.transition.timingFunction?.push(
+              value.timingFunction,
+            );
           }
         }
         break;
@@ -606,7 +626,7 @@ function getExtractedStyle(
   }
 
   function addAnimationProp(property: string, value: any) {
-    if (property === 'animation') {
+    if (property === "animation") {
       const groupedProperties: Record<string, any[]> = {};
 
       for (const animation of value as Animation[]) {
@@ -619,14 +639,14 @@ function getExtractedStyle(
       extrtactedStyle.animations ??= {};
       for (const [property, value] of Object.entries(groupedProperties)) {
         const key = property
-          .replace('animation-', '')
+          .replace("animation-", "")
           .replace(/-./g, (x) => x[1].toUpperCase()) as keyof Animation;
 
         extrtactedStyle.animations[key] ??= value;
       }
     } else {
       const key = property
-        .replace('animation-', '')
+        .replace("animation-", "")
         .replace(/-./g, (x) => x[1].toUpperCase()) as keyof Animation;
 
       extrtactedStyle.animations ??= {};

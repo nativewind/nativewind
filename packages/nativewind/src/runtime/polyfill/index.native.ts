@@ -1,13 +1,16 @@
-import { ComponentType } from 'react';
-import { View, Text, Pressable } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { ComponentType } from "react";
+import { View, Text, Pressable } from "react-native";
+import Animated from "react-native-reanimated";
 
-import { defaultCSSInterop } from '../native/css-interop';
-import { InteropFunction, polyfillMapping } from './mapping';
+import { defaultCSSInterop } from "../native/css-interop";
+import { InteropFunction, polyfillMapping } from "./mapping";
 
 export { defaultCSSInterop };
 
-export function makeStyled(component: ComponentType, interop: InteropFunction = defaultCSSInterop) {
+export function makeStyled(
+  component: ComponentType,
+  interop: InteropFunction = defaultCSSInterop,
+) {
   polyfillMapping.set(component, interop);
 }
 
@@ -26,9 +29,13 @@ export function svgCSSInterop(
   type: ComponentType<any>,
   props: any,
   key: string,
-  experimentalFeatures?: boolean
+  experimentalFeatures?: boolean,
 ) {
-  function svgInterop(type: ComponentType, { style, ...$props }: Record<string, any>, key: string) {
+  function svgInterop(
+    type: ComponentType,
+    { style, ...$props }: Record<string, any>,
+    key: string,
+  ) {
     if (style.fill !== undefined) {
       $props.fill = style.fill;
       delete style.fill;
