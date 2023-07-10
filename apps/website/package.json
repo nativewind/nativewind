@@ -25,7 +25,7 @@
     "benchmarks": "0.0.0",
     "chart.js": "4.3.0",
     "clsx": "1.2.1",
-    "dedent": "0.7.0",
+    "dedent": "1.0.1",
     "docusaurus-plugin-sass": "0.2.4",
     "lodash.debounce": "4.0.8",
     "nativewind": "2.0.11",
