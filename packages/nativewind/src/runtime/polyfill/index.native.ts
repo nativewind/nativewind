@@ -29,7 +29,6 @@ export function svgCSSInterop(
   type: ComponentType<any>,
   props: any,
   key: string,
-  experimentalFeatures?: boolean,
 ) {
   function svgInterop(
     type: ComponentType,
@@ -49,5 +48,5 @@ export function svgCSSInterop(
     return jsx(type, { ...$props, style }, key);
   }
 
-  return defaultCSSInterop(svgInterop, type, props, key, experimentalFeatures);
+  return defaultCSSInterop(svgInterop, type, props, key);
 }

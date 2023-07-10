@@ -40,7 +40,6 @@ export function createMockComponent(
         b,
         props,
         "key",
-        true,
       );
     },
   );

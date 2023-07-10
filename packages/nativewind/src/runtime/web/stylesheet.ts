@@ -1,4 +1,7 @@
-const Stylesheet = {
+export const Stylesheet = {
+  classNameMergeStrategy(c: string) {
+    return c;
+  },
   register() {
     throw new Error("Stylesheet.register is not available on web");
   },

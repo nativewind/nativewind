@@ -5,11 +5,10 @@ export function render(
   type: any,
   props: Record<string | number, unknown>,
   key: string,
-  experimental = true,
 ) {
   const cssInterop = polyfillMapping.get(type);
   if (cssInterop && !props.__skipCssInterop) {
-    return cssInterop(jsx, type, props, key, experimental);
+    return cssInterop(jsx, type, props, key);
   } else {
     return jsx(type, props, key);
   }

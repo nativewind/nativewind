@@ -1,5 +1,7 @@
-import React, {
+import {
   ComponentType,
+  forwardRef,
+  useContext,
   useMemo,
   useEffect,
   useReducer,
@@ -7,7 +9,12 @@ import React, {
 } from "react";
 import { View, Pressable } from "react-native";
 
-import { ContainerRuntime, InteropMeta, StyleMeta } from "../../types";
+import {
+  ContainerRuntime,
+  CssInteropPropMapping,
+  InteropMeta,
+  StyleMeta,
+} from "../../types";
 import { AnimationInterop } from "./animations";
 import { flattenStyle } from "./flatten-style";
 import {
@@ -23,7 +30,6 @@ import { StyleSheet } from "./stylesheet";
 type CSSInteropWrapperProps = {
   __component: ComponentType<any>;
   __styleKeys: string[];
-  __experimental: boolean;
 } & Record<string, any>;
 
 /**
@@ -32,7 +38,6 @@ type CSSInteropWrapperProps = {
  * @param type The React component type that should be rendered.
  * @param props The props object that should be passed to the component.
  * @param key The optional key to use for the component.
- * @param experimental Indicates whether this component should use experimental features
  * @returns The element rendered via the suppled JSX function
  */
 export function defaultCSSInterop(
@@ -40,12 +45,10 @@ export function defaultCSSInterop(
   type: ComponentType<any>,
   { ...props }: any,
   key: string,
-  experimental = false,
+  mapping: CssInteropPropMapping = { style: "className" },
 ) {
-  // This sets the component type and specifies the style keys that should be used.
-  props.__component = type;
-  props.__styleKeys = ["style"];
-  props.__experimental = experimental;
+  // Rewrite the props to include style objects and other metadata
+  props = mapProps(props, type, mapping);
 
   /**
    * If the development environment is enabled, we should use the DevOnlyCSSInteropWrapper to wrap every component.
@@ -54,9 +57,6 @@ export function defaultCSSInterop(
   if (__DEV__) {
     return jsx(DevOnlyCSSInteropWrapper, props, key);
   }
-
-  // Rewrite the className prop to a style object.
-  props = classNameToStyle(props);
 
   // If the styles are dynamic, we need to wrap the component with the CSSInteropWrapper to handle style updates.
   return areStylesDynamic(props.style)
@@ -68,38 +68,27 @@ export function defaultCSSInterop(
  * This is the DevOnlyCSSInteropWrapper that should be used in development environments to handle async style updates.
  * It subscribes to StyleSheet.register, so it can handle style changes that may occur asynchronously.
  */
-const DevOnlyCSSInteropWrapper = React.forwardRef(
-  function DevOnlyCSSInteropWrapper(
-    {
-      __component: Component,
-      __styleKeys,
-      __experimental,
-      ...props
-    }: CSSInteropWrapperProps,
-    ref,
-  ) {
-    // This uses a reducer and the useEffect hook to subscribe to StyleSheet.register.
-    const [, render] = useReducer(rerenderReducer, 0);
-    useEffect(() => StyleSheet.__subscribe(render), []);
+const DevOnlyCSSInteropWrapper = forwardRef(function DevOnlyCSSInteropWrapper(
+  { __component: Component, __styleKeys, ...props }: CSSInteropWrapperProps,
+  ref,
+) {
+  // This uses a reducer and the useEffect hook to subscribe to StyleSheet.register.
+  const [, render] = useReducer(rerenderReducer, 0);
+  useEffect(() => StyleSheet.__subscribe(render), []);
 
-    // This applies the styles using the classNameToStyle function, which returns the style object.
-    props = classNameToStyle(props);
-
-    // If the styles are dynamic, we need to wrap the component with the CSSInteropWrapper to handle style updates.
-    return areStylesDynamic(props.style) ? (
-      <CSSInteropWrapper
-        {...props}
-        ref={ref}
-        __component={Component}
-        __styleKeys={__styleKeys}
-        __skipCssInterop
-        __experimental={__experimental}
-      />
-    ) : (
-      <Component {...props} ref={ref} __skipCssInterop />
-    );
-  },
-);
+  // If the styles are dynamic, we need to wrap the component with the CSSInteropWrapper to handle style updates.
+  return areStylesDynamic(props.style) ? (
+    <CSSInteropWrapper
+      {...props}
+      ref={ref}
+      __component={Component}
+      __styleKeys={__styleKeys}
+      __skipCssInterop
+    />
+  ) : (
+    <Component {...props} ref={ref} __skipCssInterop />
+  );
+});
 
 /**
  * This component is a wrapper that handles the styling interop between React Native and CSS functionality
@@ -111,22 +100,16 @@ const DevOnlyCSSInteropWrapper = React.forwardRef(
  *
  * @param __component - Component to be rendered
  * @param __styleKeys - List of keys with the style props that need to be computed
- * @param __experimental - Flag indicating if should we should advanced featuers
  * @param $props - Any other props to be passed to the component
  * @param ref - Ref to the component
  */
-const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
-  {
-    __component: Component,
-    __styleKeys,
-    __experimental: experimental,
-    ...$props
-  }: CSSInteropWrapperProps,
+const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
+  { __component: Component, __styleKeys, ...$props }: CSSInteropWrapperProps,
   ref,
 ) {
-  const [, rerender] = React.useReducer(rerenderReducer, 0);
-  const inheritedVariables = React.useContext(VariableContext);
-  const inheritedContainers = React.useContext(ContainerContext);
+  const rerender = useRerender();
+  const inheritedVariables = useContext(VariableContext);
+  const inheritedContainers = useContext(ContainerContext);
   const interaction = useInteractionSignals();
 
   /**
@@ -302,7 +285,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     );
   }
 
-  if (experimental && $interopMeta.animationInteropKey) {
+  if ($interopMeta.animationInteropKey) {
     return (
       <AnimationInterop
         {...props}
@@ -328,41 +311,50 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
 });
 
 /**
- * Maps each class name in the `className` property of the input object
- * to its corresponding global style object and combines the resulting
- * array of styles with any existing styles in the `style` property of
- * the input object.
+ * Maps each "style" prop to its aliased name
+ * If the style is a string it fetches the style object from the global registry
+ * If there are existing styles, they are merged together
  *
  * @param props - An object that may contain a `className` property and a `style` property
  * @returns The modified input object with updated `style` property
  */
-function classNameToStyle({
-  className,
-  tw,
-  ...props
-}: Record<string, unknown>) {
-  className ??= tw;
+function mapProps(
+  props: Record<string, unknown>,
+  type: ComponentType<any>,
+  mapping: CssInteropPropMapping,
+) {
+  for (const [key, keyMapping] of Object.entries(mapping)) {
+    const prop = keyMapping === true ? key : keyMapping;
+    const { [prop]: className, ...rest } = props;
 
-  if (typeof className === "string") {
-    // Split className string into an array of class names, then map each class
-    // name to its corresponding global style object, if one exists.
-    const classNameStyle = className
-      .split(/\s+/)
-      .map((s) => globalStyles.get(s));
+    if (typeof className === "string") {
+      props = rest;
+      // Split className string into an array of class names, then map each class
+      // name to its corresponding global style object, if one exists.
+      const classNameStyle = className
+        .split(/\s+/)
+        .map((s) => globalStyles.get(s));
 
-    // Combine the resulting array of styles with any existing styles in the `style` property
-    // of the input object.
-    props.style = Array.isArray(props.style)
-      ? [...classNameStyle, ...props.style]
-      : props.style
-      ? [...classNameStyle, props.style]
-      : classNameStyle;
+      // Combine the resulting array of styles with any existing styles in the `style` property
+      // of the input object.
+      const existingProp = props[key];
+      let newProp = Array.isArray(existingProp)
+        ? [...classNameStyle, ...existingProp]
+        : existingProp
+        ? [...classNameStyle, existingProp]
+        : classNameStyle;
 
-    // If there is only one style in the resulting array, replace the array with that single style.
-    if (Array.isArray(props.style) && props.style.length <= 1) {
-      props.style = props.style[0];
+      // If there is only one style in the resulting array, replace the array with that single style.
+      if (Array.isArray(newProp) && newProp.length <= 1) {
+        newProp = newProp[0];
+      }
+
+      props[key] = newProp;
     }
   }
+
+  props.__component = type;
+  props.__styleKeys = Object.keys(mapping);
 
   return props;
 }
@@ -387,6 +379,7 @@ function areStylesDynamic(style: any): boolean {
 }
 
 /* Micro optimizations. Save these externally so they are not recreated every render  */
+const useRerender = () => useReducer(rerenderReducer, 0)[1];
 const rerenderReducer = (acc: number) => acc + 1;
 const defaultMeta: StyleMeta = { container: { names: [], type: "normal" } };
 const initialMeta: InteropMeta = {

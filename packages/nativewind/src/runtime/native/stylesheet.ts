@@ -27,7 +27,9 @@ const subscriptions = new Set<() => void>();
  * It allows us to intercept the creation of styles and "tag" them wit the metadata
  */
 const parialStyleSheet = {
-  rem,
+  classNameMergeStrategy(c: string) {
+    return c;
+  },
   __subscribe(subscription: () => void) {
     subscriptions.add(subscription);
     return () => {

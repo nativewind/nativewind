@@ -25,6 +25,11 @@ import type {
   ViewStyle,
 } from "react-native";
 
+export type CssInteropPropMapping<P = Record<string, unknown>> = Record<
+  keyof P,
+  true | string
+>;
+
 export type RuntimeValue = {
   type: "runtime";
   name: string;

@@ -5,7 +5,9 @@ export type InteropFunction = (
   type: any,
   props: Record<string | number, unknown>,
   key: string,
-  experimentalFeatures?: boolean,
 ) => any;
 
-export const polyfillMapping = new WeakMap<ComponentType, InteropFunction>();
+export const polyfillMapping = new WeakMap<
+  ComponentType<any>,
+  InteropFunction
+>();

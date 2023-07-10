@@ -1,11 +1,5 @@
 import { AnimationIterationCount, AnimationName, Time } from "lightningcss";
-import React, {
-  ComponentType,
-  useMemo,
-  forwardRef,
-  useState,
-  useEffect,
-} from "react";
+import { ComponentType, useMemo, forwardRef, useState, useEffect } from "react";
 import {
   AnimatableValue,
   SharedValue,

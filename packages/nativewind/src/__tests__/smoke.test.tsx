@@ -5,7 +5,6 @@
  * https://en.wikipedia.org/wiki/Smoke_testing_(software)
  */
 import { render } from "@testing-library/react-native";
-import React from "react";
 
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "./utils";

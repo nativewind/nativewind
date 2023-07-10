@@ -1,4 +1,5 @@
 # v4 Migration
 
 - Requires Node v16+
-- `className` has higher priority than `tw`
+- `tw` has been removed
+  - Can restore the functionality by creating a new polyfill

@@ -3,14 +3,24 @@ import { View, Text, Pressable } from "react-native";
 
 import { defaultCSSInterop } from "../web/css-interop";
 import { InteropFunction, polyfillMapping } from "./mapping";
+import { CssInteropPropMapping } from "../../types";
 
 export { defaultCSSInterop };
 
-export function makeStyled(
-  component: ComponentType,
-  interop: InteropFunction = defaultCSSInterop,
+export function makeStyled<P>(
+  component: ComponentType<P>,
+  interop: InteropFunction | Record<keyof P, string> = defaultCSSInterop,
 ) {
-  polyfillMapping.set(component, interop);
+  if (typeof interop === "function") {
+    polyfillMapping.set(component, interop);
+  } else {
+    polyfillMapping.set(component, (...props) => {
+      return defaultCSSInterop(
+        ...props,
+        Object.entries(interop) as CssInteropPropMapping,
+      );
+    });
+  }
 }
 
 makeStyled(View);
