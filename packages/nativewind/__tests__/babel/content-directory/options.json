@@ -1,8 +1,0 @@
-{
-  "tailwindConfig": {
-    "content": [
-      "./content-directory/code.{js,ts,jsx,tsx}",
-      "./content-directory/test/*.{js,ts,jsx,tsx}"
-    ]
-  }
-}

@@ -1,7 +1,7 @@
 import { act, render } from "@testing-library/react-native";
 import { INTERNAL_SET, rem, vh, vw } from "../runtime/native/globals";
 import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "./utils";
+import { createMockComponent, registerCSS } from "../testing-library";
 
 const A = createMockComponent();
 

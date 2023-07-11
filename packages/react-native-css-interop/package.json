@@ -50,12 +50,12 @@
     "metro-react-native-babel-preset": "^0.77.0",
     "react": "^18.2.0",
     "react-native": "0.72.1",
-    "react-native-reanimated": "~3.0.2"
+    "react-native-reanimated": "~3.3.0"
   },
   "peerDependencies": {
     "react": ">=18",
     "react-native": "*",
-    "react-native-reanimated": ">=2.17.0 || >=3",
+    "react-native-reanimated": ">=3.3.0",
     "tailwindcss": "~3"
   },
   "peerDependenciesMeta": {

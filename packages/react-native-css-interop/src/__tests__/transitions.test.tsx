@@ -1,10 +1,8 @@
 import { render } from "@testing-library/react-native";
-import React from "react";
 import { View } from "react-native";
-// import Animated from "react-native-reanimated";
 
 import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "./utils";
+import { createMockComponent, registerCSS } from "../testing-library";
 
 const A = createMockComponent(View);
 

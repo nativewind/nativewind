@@ -7,7 +7,7 @@
 import { render } from "@testing-library/react-native";
 
 import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "./utils";
+import { createMockComponent, registerCSS } from "../testing-library";
 
 type TestSuite<T extends keyof CSSStyleDeclaration> = readonly [
   CSSStyleDeclaration[T],

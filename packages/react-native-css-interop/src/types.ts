@@ -6,7 +6,9 @@ import type {
   Time,
   EasingFunction,
 } from "lightningcss";
-import type {
+import {
+  Appearance,
+  Dimensions,
   ImageStyle,
   MatrixTransform,
   PerpectiveTransform,
@@ -227,6 +229,11 @@ export type KebabToCamelCase<S extends string> =
   S extends `${infer P1}-${infer P2}${infer P3}`
     ? `${Lowercase<P1>}${Uppercase<P2>}${KebabToCamelCase<P3>}`
     : Lowercase<S>;
+
+export interface ResetOptions {
+  dimensions?: Dimensions;
+  appearance?: typeof Appearance;
+}
 
 /*
  * This is a list of all the CSS properties that can be animated

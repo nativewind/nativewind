@@ -7,7 +7,7 @@ import {
   vw,
 } from "../runtime/native/globals";
 import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "./utils";
+import { createMockComponent, registerCSS } from "../testing-library";
 
 const A = createMockComponent();
 

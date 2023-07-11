@@ -38,14 +38,15 @@ export interface CssToReactNativeRuntimeValue
 /**
  * Converts a CSS file to a collection of style declarations that can be used with the StyleSheet API
  *
- * @param {Buffer} code - The CSS file contents as a buffer
+ * @param {Buffer|string} code - The CSS file contents
  * @param {CssToReactNativeRuntimeOptions} options - (Optional) Options for the conversion process
  * @returns {StyleSheetRegisterOptions} - An object containing the extracted style declarations and animations
  */
 export function cssToReactNativeRuntime(
-  code: Buffer,
+  code: Buffer | string,
   options: CssToReactNativeRuntimeOptions = {},
 ): CssToReactNativeRuntimeValue {
+  code = typeof code === "string" ? Buffer.from(code) : code;
   // Create maps to store the extracted style declarations and animations
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
   const keyframes = new Map<string, ExtractedAnimation>();
