@@ -22,7 +22,6 @@
     "@uiw/codemirror-theme-dracula": "4.21.7",
     "@uiw/codemirror-theme-eclipse": "4.21.7",
     "@uiw/react-codemirror": "4.21.7",
-    "benchmarks": "0.0.0",
     "chart.js": "4.3.0",
     "clsx": "1.2.1",
     "dedent": "0.7.0",

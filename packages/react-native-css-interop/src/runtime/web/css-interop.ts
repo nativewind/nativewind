@@ -1,5 +1,5 @@
 import { CssInteropPropMapping } from "../../types";
-import { Stylesheet } from "./stylesheet";
+import { StyleSheet } from "./stylesheet";
 
 export function defaultCSSInterop(
   jsx: Function,
@@ -21,7 +21,7 @@ export function defaultCSSInterop(
         $$css: true,
         // Merge based upon the key
         // If multiple props combine to the same key they will override each other
-        [key]: Stylesheet.classNameMergeStrategy(classNames),
+        [key]: StyleSheet.classNameMergeStrategy(classNames),
       };
 
       const existingProp = props[key];

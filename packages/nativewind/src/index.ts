@@ -1,10 +1,3 @@
-import React from "react";
+import "react-native-css-interop/polyfill";
 
-export { StyleSheet } from "react-native";
-export {
-  defaultCSSInterop,
-  makeStyled,
-  svgCSSInterop,
-} from "./runtime/polyfill";
-
-export const createElement = React.createElement;
+export { enableCSSInterop } from "react-native-css-interop";

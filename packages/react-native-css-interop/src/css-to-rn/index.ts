@@ -29,6 +29,12 @@ export type CssToReactNativeRuntimeOptions = {
   grouping?: (string | RegExp)[];
 };
 
+export interface CssToReactNativeRuntimeValue
+  extends StyleSheetRegisterOptions {
+  warnings: string[];
+  errors: string[];
+}
+
 /**
  * Converts a CSS file to a collection of style declarations that can be used with the StyleSheet API
  *
@@ -39,7 +45,7 @@ export type CssToReactNativeRuntimeOptions = {
 export function cssToReactNativeRuntime(
   code: Buffer,
   options: CssToReactNativeRuntimeOptions = {},
-): StyleSheetRegisterOptions {
+): CssToReactNativeRuntimeValue {
   // Create maps to store the extracted style declarations and animations
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
   const keyframes = new Map<string, ExtractedAnimation>();
@@ -72,6 +78,8 @@ export function cssToReactNativeRuntime(
   return {
     declarations: Object.fromEntries(declarations),
     keyframes: Object.fromEntries(keyframes),
+    warnings: [],
+    errors: [],
   };
 }
 

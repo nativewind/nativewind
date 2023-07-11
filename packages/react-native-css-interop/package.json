@@ -1,7 +1,7 @@
 {
-  "version": "4.0.0",
-  "name": "nativewind",
-  "description": "Use Tailwindcss in your cross-platform React Native applications",
+  "version": "0.0.0",
+  "name": "react-native-css-interop",
+  "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
@@ -9,8 +9,6 @@
     "react-native",
     "react",
     "native",
-    "tailwind",
-    "tailwindcss",
     "theme",
     "style"
   ],
@@ -38,21 +36,31 @@
     "build": "rm -rf dist && tsc -p tsconfig.build.json"
   },
   "files": [
-    "dist/",
-    "tailwind/",
-    "types.d.ts"
+    "dist/"
   ],
   "dependencies": {
-    "react-native-css-interop": "^0.0.0"
+    "lightningcss": "~1.19.0"
   },
   "devDependencies": {
     "@testing-library/react-native": "^12.0.1",
     "@types/jest": "^29.5.1",
+    "@types/react": "^18.2.14",
     "jest": "^29.3.1",
     "jest-expo": "^49.0.0",
-    "tailwindcss": "^3.0.0"
+    "metro-react-native-babel-preset": "^0.77.0",
+    "react": "^18.2.0",
+    "react-native": "0.72.1",
+    "react-native-reanimated": "~3.0.2"
   },
   "peerDependencies": {
+    "react": ">=18",
+    "react-native": "*",
+    "react-native-reanimated": ">=2.17.0 || >=3",
     "tailwindcss": "~3"
+  },
+  "peerDependenciesMeta": {
+    "react-native-reanimated": {
+      "optional": true
+    }
   }
 }
