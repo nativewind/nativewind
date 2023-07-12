@@ -236,8 +236,17 @@ export interface ResetOptions {
   appearance?: typeof Appearance;
 }
 
-export type ExtractionWarning = {
-  reason: string;
+export type ExtractionWarning =
+  | ExtractionWarningProperty
+  | ExtractionWarningValue;
+
+export type ExtractionWarningProperty = {
+  type: "IncompatibleNativeProperty";
+  property: string;
+};
+
+export type ExtractionWarningValue = {
+  type: "IncompatibleNativeValue";
   property: string;
   value: any;
 };

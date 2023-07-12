@@ -78,7 +78,7 @@ export interface ParseDeclarationOptions {
   requiresLayout: () => void;
 }
 
-export interface ParseUnparsedDeclarationOptions
+export interface ParseDeclarationOptionsWithValueWarning
   extends ParseDeclarationOptions {
   addValueWarning: (value: any) => void;
 }
@@ -102,7 +102,7 @@ export function parseDeclaration(
         ...options,
         addValueWarning(value: any) {
           addWarning({
-            reason: "IncompatibleNativeValue",
+            type: "IncompatibleNativeValue",
             property: declaration.value.propertyId.property,
             value,
           });
@@ -116,7 +116,7 @@ export function parseDeclaration(
         ...options,
         addValueWarning(value: any) {
           addWarning({
-            reason: "IncompatibleNativeValue",
+            type: "IncompatibleNativeValue",
             property: declaration.value.name,
             value,
           });
@@ -125,9 +125,23 @@ export function parseDeclaration(
     );
   }
 
+  const parseOptions = {
+    ...options,
+    addValueWarning(value: any) {
+      addWarning({
+        type: "IncompatibleNativeValue",
+        property: declaration.property,
+        value,
+      });
+    },
+  };
+
   switch (declaration.property) {
     case "background-color":
-      return addStyleProp(declaration.property, parseColor(declaration.value));
+      return addStyleProp(
+        declaration.property,
+        parseColor(declaration.value, parseOptions),
+      );
     case "background-image":
       return;
     case "background-position-x":
@@ -153,7 +167,10 @@ export function parseDeclaration(
     case "opacity":
       return addStyleProp(declaration.property, declaration.value);
     case "color":
-      return addStyleProp(declaration.property, parseColor(declaration.value));
+      return addStyleProp(
+        declaration.property,
+        parseColor(declaration.value, parseOptions),
+      );
     case "display":
       if (
         declaration.value.type === "keyword" &&
@@ -173,45 +190,57 @@ export function parseDeclaration(
     case "width":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "height":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "min-width":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "min-height":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "max-width":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "max-height":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "block-size":
-      return addStyleProp("width", parseSize(declaration.value, options));
+      return addStyleProp("width", parseSize(declaration.value, parseOptions));
     case "inline-size":
-      return addStyleProp("height", parseSize(declaration.value, options));
+      return addStyleProp("height", parseSize(declaration.value, parseOptions));
     case "min-block-size":
-      return addStyleProp("min-width", parseSize(declaration.value, options));
+      return addStyleProp(
+        "min-width",
+        parseSize(declaration.value, parseOptions),
+      );
     case "min-inline-size":
-      return addStyleProp("min-height", parseSize(declaration.value, options));
+      return addStyleProp(
+        "min-height",
+        parseSize(declaration.value, parseOptions),
+      );
     case "max-block-size":
-      return addStyleProp("max-width", parseSize(declaration.value, options));
+      return addStyleProp(
+        "max-width",
+        parseSize(declaration.value, parseOptions),
+      );
     case "max-inline-size":
-      return addStyleProp("max-height", parseSize(declaration.value, options));
+      return addStyleProp(
+        "max-height",
+        parseSize(declaration.value, parseOptions),
+      );
     case "box-sizing":
       return;
     case "overflow":
@@ -231,92 +260,95 @@ export function parseDeclaration(
     case "top":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "bottom":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "left":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "right":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "inset-block-start":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "inset-block-end":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "inset-inline-start":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "inset-inline-end":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "inset-block":
       addStyleProp(
         "inset-block-start",
-        parseLengthPercentageOrAuto(declaration.value.blockStart, options),
+        parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
         { shortHand: true },
       );
       addStyleProp(
         "inset-block-end",
-        parseLengthPercentageOrAuto(declaration.value.blockEnd, options),
+        parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
         { shortHand: true },
       );
       return;
     case "inset-inline":
       addStyleProp(
         "inset-block-start",
-        parseLengthPercentageOrAuto(declaration.value.inlineStart, options),
+        parseLengthPercentageOrAuto(
+          declaration.value.inlineStart,
+          parseOptions,
+        ),
         { shortHand: true },
       );
       addStyleProp(
         "inset-block-end",
-        parseLengthPercentageOrAuto(declaration.value.inlineEnd, options),
+        parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
         { shortHand: true },
       );
       return;
     case "inset":
       addStyleProp(
         "top",
-        parseLengthPercentageOrAuto(declaration.value.top, options),
+        parseLengthPercentageOrAuto(declaration.value.top, parseOptions),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         "bottom",
-        parseLengthPercentageOrAuto(declaration.value.bottom, options),
+        parseLengthPercentageOrAuto(declaration.value.bottom, parseOptions),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         "left",
-        parseLengthPercentageOrAuto(declaration.value.left, options),
+        parseLengthPercentageOrAuto(declaration.value.left, parseOptions),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         "right",
-        parseLengthPercentageOrAuto(declaration.value.right, options),
+        parseLengthPercentageOrAuto(declaration.value.right, parseOptions),
         {
           shortHand: true,
         },
@@ -325,21 +357,45 @@ export function parseDeclaration(
     case "border-spacing":
       return;
     case "border-top-color":
-      return addStyleProp(declaration.property, parseColor(declaration.value));
+      return addStyleProp(
+        declaration.property,
+        parseColor(declaration.value, parseOptions),
+      );
     case "border-bottom-color":
-      return addStyleProp(declaration.property, parseColor(declaration.value));
+      return addStyleProp(
+        declaration.property,
+        parseColor(declaration.value, parseOptions),
+      );
     case "border-left-color":
-      return addStyleProp(declaration.property, parseColor(declaration.value));
+      return addStyleProp(
+        declaration.property,
+        parseColor(declaration.value, parseOptions),
+      );
     case "border-right-color":
-      return addStyleProp(declaration.property, parseColor(declaration.value));
+      return addStyleProp(
+        declaration.property,
+        parseColor(declaration.value, parseOptions),
+      );
     case "border-block-start-color":
-      return addStyleProp("border-top-color", parseColor(declaration.value));
+      return addStyleProp(
+        "border-top-color",
+        parseColor(declaration.value, parseOptions),
+      );
     case "border-block-end-color":
-      return addStyleProp("border-bottom-color", parseColor(declaration.value));
+      return addStyleProp(
+        "border-bottom-color",
+        parseColor(declaration.value, parseOptions),
+      );
     case "border-inline-start-color":
-      return addStyleProp("border-left-color", parseColor(declaration.value));
+      return addStyleProp(
+        "border-left-color",
+        parseColor(declaration.value, parseOptions),
+      );
     case "border-inline-end-color":
-      return addStyleProp("border-right-color", parseColor(declaration.value));
+      return addStyleProp(
+        "border-right-color",
+        parseColor(declaration.value, parseOptions),
+      );
     case "border-top-style":
       return;
     case "border-bottom-style":
@@ -359,104 +415,104 @@ export function parseDeclaration(
     case "border-top-width":
       return addStyleProp(
         declaration.property,
-        parseBorderSideWidth(declaration.value, options),
+        parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-bottom-width":
       return addStyleProp(
         declaration.property,
-        parseBorderSideWidth(declaration.value, options),
+        parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-left-width":
       return addStyleProp(
         declaration.property,
-        parseBorderSideWidth(declaration.value, options),
+        parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-right-width":
       return addStyleProp(
         declaration.property,
-        parseBorderSideWidth(declaration.value, options),
+        parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-block-start-width":
       return addStyleProp(
         "border-top-width",
-        parseBorderSideWidth(declaration.value, options),
+        parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-block-end-width":
       return addStyleProp(
         "border-bottom-width",
-        parseBorderSideWidth(declaration.value, options),
+        parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-inline-start-width":
       return addStyleProp(
         "border-left-width",
-        parseBorderSideWidth(declaration.value, options),
+        parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-inline-end-width":
       return addStyleProp(
         "border-right-width",
-        parseBorderSideWidth(declaration.value, options),
+        parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-top-left-radius":
       return addStyleProp(
         declaration.property,
-        parseLength(declaration.value[0], options),
+        parseLength(declaration.value[0], parseOptions),
       );
     case "border-top-right-radius":
       return addStyleProp(
         declaration.property,
-        parseLength(declaration.value[0], options),
+        parseLength(declaration.value[0], parseOptions),
       );
     case "border-bottom-left-radius":
       return addStyleProp(
         declaration.property,
-        parseLength(declaration.value[0], options),
+        parseLength(declaration.value[0], parseOptions),
       );
     case "border-bottom-right-radius":
       return addStyleProp(
         declaration.property,
-        parseLength(declaration.value[0], options),
+        parseLength(declaration.value[0], parseOptions),
       );
     case "border-start-start-radius":
       return addStyleProp(
         declaration.property,
-        parseLength(declaration.value[0], options),
+        parseLength(declaration.value[0], parseOptions),
       );
     case "border-start-end-radius":
       return addStyleProp(
         declaration.property,
-        parseLength(declaration.value[0], options),
+        parseLength(declaration.value[0], parseOptions),
       );
     case "border-end-start-radius":
       return addStyleProp(
         declaration.property,
-        parseLength(declaration.value[0], options),
+        parseLength(declaration.value[0], parseOptions),
       );
     case "border-end-end-radius":
       return addStyleProp(
         declaration.property,
-        parseLength(declaration.value[0], options),
+        parseLength(declaration.value[0], parseOptions),
       );
     case "border-radius":
       addStyleProp(
         "border-bottom-left-radius",
-        parseLength(declaration.value.bottomLeft[0], options),
+        parseLength(declaration.value.bottomLeft[0], parseOptions),
         { shortHand: true },
       );
       addStyleProp(
         "border-bottom-right-radius",
-        parseLength(declaration.value.bottomRight[0], options),
+        parseLength(declaration.value.bottomRight[0], parseOptions),
         { shortHand: true },
       );
       addStyleProp(
         "border-top-left-radius",
-        parseLength(declaration.value.topLeft[0], options),
+        parseLength(declaration.value.topLeft[0], parseOptions),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         "border-top-right-radius",
-        parseLength(declaration.value.topRight[0], options),
+        parseLength(declaration.value.topRight[0], parseOptions),
         {
           shortHand: true,
         },
@@ -475,22 +531,34 @@ export function parseDeclaration(
     case "border-image":
       return;
     case "border-color":
-      addStyleProp("border-top-color", parseColor(declaration.value.top), {
-        shortHand: true,
-      });
       addStyleProp(
-        "border-bottom-color",
-        parseColor(declaration.value.bottom),
+        "border-top-color",
+        parseColor(declaration.value.top, parseOptions),
         {
           shortHand: true,
         },
       );
-      addStyleProp("border-left-color", parseColor(declaration.value.left), {
-        shortHand: true,
-      });
-      addStyleProp("border-right-color", parseColor(declaration.value.right), {
-        shortHand: true,
-      });
+      addStyleProp(
+        "border-bottom-color",
+        parseColor(declaration.value.bottom, parseOptions),
+        {
+          shortHand: true,
+        },
+      );
+      addStyleProp(
+        "border-left-color",
+        parseColor(declaration.value.left, parseOptions),
+        {
+          shortHand: true,
+        },
+      );
+      addStyleProp(
+        "border-right-color",
+        parseColor(declaration.value.right, parseOptions),
+        {
+          shortHand: true,
+        },
+      );
       return;
     case "border-style":
       return addStyleProp(
@@ -500,69 +568,81 @@ export function parseDeclaration(
     case "border-width":
       addStyleProp(
         "border-top-width",
-        parseBorderSideWidth(declaration.value.top, options),
+        parseBorderSideWidth(declaration.value.top, parseOptions),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         "border-bottom-width",
-        parseBorderSideWidth(declaration.value.bottom, options),
+        parseBorderSideWidth(declaration.value.bottom, parseOptions),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         "border-left-width",
-        parseBorderSideWidth(declaration.value.left, options),
+        parseBorderSideWidth(declaration.value.left, parseOptions),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         "border-right-width",
-        parseBorderSideWidth(declaration.value.right, options),
+        parseBorderSideWidth(declaration.value.right, parseOptions),
         {
           shortHand: true,
         },
       );
       return;
     case "border-block-color":
-      addStyleProp("border-top-color", parseColor(declaration.value.start));
-      addStyleProp("border-bottom-color", parseColor(declaration.value.end));
+      addStyleProp(
+        "border-top-color",
+        parseColor(declaration.value.start, parseOptions),
+      );
+      addStyleProp(
+        "border-bottom-color",
+        parseColor(declaration.value.end, parseOptions),
+      );
       return;
     case "border-block-style":
       return;
     case "border-block-width":
       addStyleProp(
         "border-top-width",
-        parseBorderSideWidth(declaration.value.start, options),
+        parseBorderSideWidth(declaration.value.start, parseOptions),
       );
       addStyleProp(
         "border-bottom-width",
-        parseBorderSideWidth(declaration.value.end, options),
+        parseBorderSideWidth(declaration.value.end, parseOptions),
       );
       return;
     case "border-inline-color":
-      addStyleProp("border-left-color", parseColor(declaration.value.start));
-      addStyleProp("border-right-color", parseColor(declaration.value.end));
+      addStyleProp(
+        "border-left-color",
+        parseColor(declaration.value.start, parseOptions),
+      );
+      addStyleProp(
+        "border-right-color",
+        parseColor(declaration.value.end, parseOptions),
+      );
       return;
     case "border-inline-style":
       return;
     case "border-inline-width":
       addStyleProp(
         "border-left-width",
-        parseBorderSideWidth(declaration.value.start, options),
+        parseBorderSideWidth(declaration.value.start, parseOptions),
       );
       addStyleProp(
         "border-right-width",
-        parseBorderSideWidth(declaration.value.end, options),
+        parseBorderSideWidth(declaration.value.end, parseOptions),
       );
       return;
     case "border":
       addStyleProp(
         "border-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
         {
           shortHand: true,
         },
@@ -574,93 +654,117 @@ export function parseDeclaration(
     case "border-top":
       addStyleProp(
         declaration.property + "-color",
-        parseColor(declaration.value.color),
+        parseColor(declaration.value.color, parseOptions),
       );
       addStyleProp(
         declaration.property + "-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-bottom":
       addStyleProp(
         declaration.property + "-color",
-        parseColor(declaration.value.color),
+        parseColor(declaration.value.color, parseOptions),
       );
       addStyleProp(
         declaration.property + "-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-left":
       addStyleProp(
         declaration.property + "-color",
-        parseColor(declaration.value.color),
+        parseColor(declaration.value.color, parseOptions),
       );
       addStyleProp(
         declaration.property + "-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-right":
       addStyleProp(
         declaration.property + "-color",
-        parseColor(declaration.value.color),
+        parseColor(declaration.value.color, parseOptions),
       );
       addStyleProp(
         declaration.property + "-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-block":
-      addStyleProp("border-top-color", parseColor(declaration.value.color));
-      addStyleProp("border-bottom-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-top-color",
+        parseColor(declaration.value.color, parseOptions),
+      );
+      addStyleProp(
+        "border-bottom-color",
+        parseColor(declaration.value.color, parseOptions),
+      );
       addStyleProp(
         "border-top-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       addStyleProp(
         "border-bottom-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-block-start":
-      addStyleProp("border-top-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-top-color",
+        parseColor(declaration.value.color, parseOptions),
+      );
       addStyleProp(
         "border-top-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-block-end":
-      addStyleProp("border-bottom-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-bottom-color",
+        parseColor(declaration.value.color, parseOptions),
+      );
       addStyleProp(
         "border-bottom-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-inline":
-      addStyleProp("border-left-color", parseColor(declaration.value.color));
-      addStyleProp("border-right-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-left-color",
+        parseColor(declaration.value.color, parseOptions),
+      );
+      addStyleProp(
+        "border-right-color",
+        parseColor(declaration.value.color, parseOptions),
+      );
       addStyleProp(
         "border-left-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       addStyleProp(
         "border-right-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-inline-start":
-      addStyleProp("border-left-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-left-color",
+        parseColor(declaration.value.color, parseOptions),
+      );
       addStyleProp(
         "border-left-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-inline-end":
-      addStyleProp("border-right-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-right-color",
+        parseColor(declaration.value.color, parseOptions),
+      );
       addStyleProp(
         "border-right-width",
-        parseBorderSideWidth(declaration.value.width, options),
+        parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "outline":
@@ -686,14 +790,14 @@ export function parseDeclaration(
     case "flex-basis":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "flex":
       addStyleProp("flex-grow", declaration.value.grow);
       addStyleProp("flex-shrink", declaration.value.shrink);
       addStyleProp(
         "flex-basis",
-        parseLengthPercentageOrAuto(declaration.value.basis, options),
+        parseLengthPercentageOrAuto(declaration.value.basis, parseOptions),
       );
       break;
     case "order":
@@ -701,19 +805,19 @@ export function parseDeclaration(
     case "align-content":
       return addStyleProp(
         declaration.property,
-        parseAlignContent(declaration.value),
+        parseAlignContent(declaration.value, parseOptions),
       );
     case "justify-content":
       return addStyleProp(
         declaration.property,
-        parseJustifyContent(declaration.value),
+        parseJustifyContent(declaration.value, parseOptions),
       );
     case "place-content":
       return;
     case "align-self":
       return addStyleProp(
         declaration.property,
-        parseAlignSelf(declaration.value),
+        parseAlignSelf(declaration.value, parseOptions),
       );
     case "justify-self":
       return;
@@ -722,19 +826,22 @@ export function parseDeclaration(
     case "align-items":
       return addStyleProp(
         declaration.property,
-        parseAlignItems(declaration.value),
+        parseAlignItems(declaration.value, parseOptions),
       );
     case "justify-items":
       return;
     case "place-items":
       return;
     case "row-gap":
-      return addStyleProp("row-gap", parseGap(declaration.value, options));
+      return addStyleProp("row-gap", parseGap(declaration.value, parseOptions));
     case "column-gap":
-      return addStyleProp("row-gap", parseGap(declaration.value, options));
+      return addStyleProp("row-gap", parseGap(declaration.value, parseOptions));
     case "gap":
-      addStyleProp("row-gap", parseGap(declaration.value.row, options));
-      addStyleProp("column-gap", parseGap(declaration.value.column, options));
+      addStyleProp("row-gap", parseGap(declaration.value.row, parseOptions));
+      addStyleProp(
+        "column-gap",
+        parseGap(declaration.value.column, parseOptions),
+      );
       return;
     case "box-orient":
       return;
@@ -801,150 +908,171 @@ export function parseDeclaration(
     case "margin-top":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "margin-bottom":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "margin-left":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "margin-right":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "margin-block-start":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "margin-block-end":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "margin-inline-start":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "margin-inline-end":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "margin-block":
       addStyleProp(
         declaration.property + "-start",
-        parseLengthPercentageOrAuto(declaration.value.blockStart, options),
+        parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
         { shortHand: true },
       );
       addStyleProp(
         declaration.property + "-end",
-        parseLengthPercentageOrAuto(declaration.value.blockEnd, options),
+        parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
         { shortHand: true },
       );
       return;
     case "margin-inline":
       addStyleProp(
         declaration.property + "-start",
-        parseLengthPercentageOrAuto(declaration.value.inlineStart, options),
+        parseLengthPercentageOrAuto(
+          declaration.value.inlineStart,
+          parseOptions,
+        ),
         { shortHand: true },
       );
       addStyleProp(
         declaration.property + "-end",
-        parseLengthPercentageOrAuto(declaration.value.inlineEnd, options),
+        parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
         { shortHand: true },
       );
       return;
     case "margin":
-      addStyleProp("margin-top", parseSize(declaration.value.top, options));
-      addStyleProp("margin-left", parseSize(declaration.value.left, options));
-      addStyleProp("margin-right", parseSize(declaration.value.right, options));
+      addStyleProp(
+        "margin-top",
+        parseSize(declaration.value.top, parseOptions),
+      );
+      addStyleProp(
+        "margin-left",
+        parseSize(declaration.value.left, parseOptions),
+      );
+      addStyleProp(
+        "margin-right",
+        parseSize(declaration.value.right, parseOptions),
+      );
       addStyleProp(
         "margin-bottom",
-        parseSize(declaration.value.bottom, options),
+        parseSize(declaration.value.bottom, parseOptions),
       );
       return;
     case "padding-top":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "padding-bottom":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "padding-left":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "padding-right":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, options),
+        parseSize(declaration.value, parseOptions),
       );
     case "padding-block-start":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-block-end":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-inline-start":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-inline-end":
       return addStyleProp(
         declaration.property,
-        parseLengthPercentageOrAuto(declaration.value, options),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-block":
       addStyleProp(
         declaration.property + "-start",
-        parseLengthPercentageOrAuto(declaration.value.blockStart, options),
+        parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
         { shortHand: true },
       );
       addStyleProp(
         declaration.property + "-end",
-        parseLengthPercentageOrAuto(declaration.value.blockEnd, options),
+        parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
         { shortHand: true },
       );
       return;
     case "padding-inline":
       addStyleProp(
         declaration.property + "-start",
-        parseLengthPercentageOrAuto(declaration.value.inlineStart, options),
+        parseLengthPercentageOrAuto(
+          declaration.value.inlineStart,
+          parseOptions,
+        ),
         { shortHand: true },
       );
       addStyleProp(
         declaration.property + "-end",
-        parseLengthPercentageOrAuto(declaration.value.inlineEnd, options),
+        parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
         { shortHand: true },
       );
       break;
     case "padding":
-      addStyleProp("padding-top", parseSize(declaration.value.top, options));
-      addStyleProp("padding-left", parseSize(declaration.value.left, options));
+      addStyleProp(
+        "padding-top",
+        parseSize(declaration.value.top, parseOptions),
+      );
+      addStyleProp(
+        "padding-left",
+        parseSize(declaration.value.left, parseOptions),
+      );
       addStyleProp(
         "padding-right",
-        parseSize(declaration.value.right, options),
+        parseSize(declaration.value.right, parseOptions),
       );
       addStyleProp(
         "paddingBottom",
-        parseSize(declaration.value.bottom, options),
+        parseSize(declaration.value.bottom, parseOptions),
       );
       break;
     case "scroll-margin-top":
@@ -978,7 +1106,7 @@ export function parseDeclaration(
     case "font-size":
       return addStyleProp(
         declaration.property,
-        parseFontSize(declaration.value, options),
+        parseFontSize(declaration.value, parseOptions),
       );
     case "font-stretch":
       return;
@@ -1000,7 +1128,7 @@ export function parseDeclaration(
     case "line-height":
       return addStyleProp(
         declaration.property,
-        parseLineHeight(declaration.value, options),
+        parseLineHeight(declaration.value, parseOptions),
       );
     case "font":
       addStyleProp(
@@ -1012,14 +1140,14 @@ export function parseDeclaration(
       );
       addStyleProp(
         "line-height",
-        parseLineHeight(declaration.value.lineHeight, options),
+        parseLineHeight(declaration.value.lineHeight, parseOptions),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         declaration.property + "-size",
-        parseFontSize(declaration.value.size, options),
+        parseFontSize(declaration.value.size, parseOptions),
         {
           shortHand: true,
         },
@@ -1075,7 +1203,10 @@ export function parseDeclaration(
         switch (transform.type) {
           case "perspective":
             transforms.push({
-              [transform.type]: parseLength(transform.value, options) as number,
+              [transform.type]: parseLength(
+                transform.value,
+                parseOptions,
+              ) as number,
             });
             break;
           case "translateX":
@@ -1084,7 +1215,7 @@ export function parseDeclaration(
               [transform.type]: parseLengthOrCoercePercentageToRuntime(
                 transform.value,
                 "cw",
-                options,
+                parseOptions,
               ) as number,
             });
             break;
@@ -1094,7 +1225,7 @@ export function parseDeclaration(
               [transform.type]: parseLengthOrCoercePercentageToRuntime(
                 transform.value,
                 "ch",
-                options,
+                parseOptions,
               ) as number,
             });
             break;
@@ -1108,18 +1239,24 @@ export function parseDeclaration(
             break;
           case "translate":
             transforms.push({
-              translateX: parseLength(transform.value[0], options) as number,
+              translateX: parseLength(
+                transform.value[0],
+                parseOptions,
+              ) as number,
             });
             transforms.push({
-              translateY: parseLength(transform.value[1], options) as number,
+              translateY: parseLength(
+                transform.value[1],
+                parseOptions,
+              ) as number,
             });
             break;
           case "scale":
             transforms.push({
-              scaleX: parseLength(transform.value[0], options) as number,
+              scaleX: parseLength(transform.value[0], parseOptions) as number,
             });
             transforms.push({
-              scaleY: parseLength(transform.value[1], options) as number,
+              scaleY: parseLength(transform.value[1], parseOptions) as number,
             });
             break;
           case "skew":
@@ -1174,8 +1311,8 @@ export function parseDeclaration(
       return addStyleProp(
         "transform",
         [
-          { scaleX: parseLength(declaration.value.x, options) },
-          { scaleY: parseLength(declaration.value.y, options) },
+          { scaleX: parseLength(declaration.value.x, parseOptions) },
+          { scaleY: parseLength(declaration.value.y, parseOptions) },
         ],
         { append: true },
       );
@@ -1207,7 +1344,7 @@ export function parseDeclaration(
       if (declaration.value.type !== "normal") {
         return addStyleProp(
           declaration.property,
-          parseLength(declaration.value.value, options),
+          parseLength(declaration.value.value, parseOptions),
         );
       }
       return;
@@ -1221,19 +1358,22 @@ export function parseDeclaration(
     case "text-decoration-style":
       return;
     case "text-decoration-color":
-      return addStyleProp(declaration.property, parseColor(declaration.value));
+      return addStyleProp(
+        declaration.property,
+        parseColor(declaration.value, parseOptions),
+      );
     case "text-decoration-thickness":
       if (declaration.value.type === "length-percentage") {
         return addStyleProp(
           declaration.property,
-          parseLength(declaration.value.value, options),
+          parseLength(declaration.value.value, parseOptions),
         );
       }
       return;
     case "text-decoration":
       addStyleProp(
         "text-decoration-color",
-        parseColor(declaration.value.color),
+        parseColor(declaration.value.color, parseOptions),
       );
       addStyleProp(
         "text-decoration-line",
@@ -1242,7 +1382,7 @@ export function parseDeclaration(
       if (declaration.value.thickness.type === "length-percentage") {
         addStyleProp(
           declaration.property,
-          parseLength(declaration.value.thickness.value, options),
+          parseLength(declaration.value.thickness.value, parseOptions),
         );
       }
       return;
@@ -1257,7 +1397,7 @@ export function parseDeclaration(
     case "text-emphasis-position":
       return;
     case "text-shadow":
-      return parseTextShadow(declaration.value, addStyleProp, options);
+      return parseTextShadow(declaration.value, addStyleProp, parseOptions);
     case "box-decoration-break":
     case "resize":
     case "cursor":
@@ -1325,16 +1465,20 @@ export function parseDeclaration(
     case "mask-box-image-repeat":
     case "filter":
     case "backdrop-filter":
+      addWarning({
+        type: "IncompatibleNativeProperty",
+        property: declaration.property,
+      });
       return;
     case "z-index":
       if (declaration.value.type === "integer") {
         addStyleProp(
           declaration.property,
-          parseLength(declaration.value.value, options),
+          parseLength(declaration.value.value, parseOptions),
         );
       } else {
         addWarning({
-          reason: "IncompatibleNativeValue",
+          type: "IncompatibleNativeValue",
           property: declaration.property,
           value: declaration.value.type,
         });
@@ -1352,7 +1496,7 @@ export function parseDeclaration(
 
 function reduceParseUnparsed(
   tokenOrValues: TokenOrValue[],
-  options: ParseUnparsedDeclarationOptions,
+  options: ParseDeclarationOptionsWithValueWarning,
   allowUnwrap = false,
 ) {
   const result = tokenOrValues
@@ -1372,7 +1516,7 @@ function unparsedToUnparsedLonghand(
   type: string,
   longhands: string[],
   args: TokenOrValue[],
-  options: ParseUnparsedDeclarationOptions,
+  options: ParseDeclarationOptionsWithValueWarning,
 ) {
   return longhands
     .map((longhand, i) => {
@@ -1391,7 +1535,7 @@ function unparsedToUnparsedLonghand(
  */
 function parseUnparsed(
   tokenOrValue: TokenOrValue | TokenOrValue[] | string | number,
-  options: ParseUnparsedDeclarationOptions,
+  options: ParseDeclarationOptionsWithValueWarning,
 ): string | number | object | undefined {
   if (typeof tokenOrValue === "string" || typeof tokenOrValue === "number") {
     return tokenOrValue;
@@ -1654,13 +1798,18 @@ function parseSize(size: Size | MaxSize, options: ParseDeclarationOptions) {
   return undefined;
 }
 
-function parseColor(color: CssColor) {
+function parseColor(
+  color: CssColor,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   switch (color.type) {
     case "rgb":
       return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.alpha})`;
     case "hsl":
       return `hsla(${color.h}, ${color.s}, ${color.l}, ${color.alpha})`;
     case "currentcolor":
+      options.addValueWarning(color.type);
+      return;
     case "lab":
     case "lch":
     case "oklab":
@@ -1674,6 +1823,7 @@ function parseColor(color: CssColor) {
     case "xyz-d50":
     case "xyz-d65":
     case "hwb":
+      options.addValueWarning(`Invalid color unit ${color.type}`);
       return undefined;
     default: {
       exhaustiveCheck(color);
@@ -1698,7 +1848,10 @@ function parseLengthPercentageOrAuto(
   return undefined;
 }
 
-function parseJustifyContent(justifyContent: JustifyContent) {
+function parseJustifyContent(
+  justifyContent: JustifyContent,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   const allowed = new Set([
     "flex-start",
     "flex-end",
@@ -1712,10 +1865,10 @@ function parseJustifyContent(justifyContent: JustifyContent) {
 
   switch (justifyContent.type) {
     case "normal":
-      return;
     case "left":
     case "right":
-      return;
+      value = justifyContent.type;
+      break;
     case "content-distribution":
     case "content-position":
       value = justifyContent.value;
@@ -1726,13 +1879,17 @@ function parseJustifyContent(justifyContent: JustifyContent) {
   }
 
   if (value && !allowed.has(value)) {
+    options.addValueWarning(value);
     return;
   }
 
   return value;
 }
 
-function parseAlignContent(alignItems: AlignContent) {
+function parseAlignContent(
+  alignItems: AlignContent,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   const allowed = new Set([
     "flex-start",
     "flex-end",
@@ -1747,10 +1904,9 @@ function parseAlignContent(alignItems: AlignContent) {
   switch (alignItems.type) {
     case "normal":
     case "baseline-position":
+      value = alignItems.type;
       break;
     case "content-distribution":
-      value = alignItems.value;
-      break;
     case "content-position":
       value = alignItems.value;
       break;
@@ -1760,14 +1916,19 @@ function parseAlignContent(alignItems: AlignContent) {
   }
 
   if (value && !allowed.has(value)) {
+    options.addValueWarning(value);
     return;
   }
 
   return value;
 }
 
-function parseAlignItems(alignItems: AlignItems) {
+function parseAlignItems(
+  alignItems: AlignItems,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   const allowed = new Set([
+    "auto",
     "flex-start",
     "flex-end",
     "center",
@@ -1779,7 +1940,8 @@ function parseAlignItems(alignItems: AlignItems) {
 
   switch (alignItems.type) {
     case "normal":
-      return "auto";
+      value = "auto";
+      break;
     case "stretch":
       value = alignItems.type;
       break;
@@ -1795,13 +1957,17 @@ function parseAlignItems(alignItems: AlignItems) {
   }
 
   if (value && !allowed.has(value)) {
+    options.addValueWarning(value);
     return;
   }
 
   return value;
 }
 
-function parseAlignSelf(alignItems: AlignSelf) {
+function parseAlignSelf(
+  alignItems: AlignSelf,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   const allowed = new Set([
     "auto",
     "flex-start",
@@ -1816,7 +1982,7 @@ function parseAlignSelf(alignItems: AlignSelf) {
   switch (alignItems.type) {
     case "normal":
     case "auto":
-      return "auto";
+      value = "auto";
     case "stretch":
       value = alignItems.type;
       break;
@@ -1832,6 +1998,7 @@ function parseAlignSelf(alignItems: AlignSelf) {
   }
 
   if (value && !allowed.has(value)) {
+    options.addValueWarning(value);
     return;
   }
 
@@ -1859,9 +2026,9 @@ function parseFontWeight(fontWeight: FontWeight) {
 function parseTextShadow(
   [textshadow]: TextShadow[],
   addStyleProp: AddStyleProp,
-  options: ParseDeclarationOptions,
+  options: ParseDeclarationOptionsWithValueWarning,
 ) {
-  addStyleProp("textShadowColor", parseColor(textshadow.color));
+  addStyleProp("textShadowColor", parseColor(textshadow.color, options));
   addStyleProp("textShadowOffset", {
     width: parseLength(textshadow.xOffset, options),
     height: parseLength(textshadow.yOffset, options),
