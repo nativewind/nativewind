@@ -1,5 +1,6 @@
-import type { ConfigT } from "metro-config";
+import type { ConfigT, GetTransformOptions } from "metro-config";
 import path from "path";
+import { expoColorSchemeWarning } from "./expo";
 
 export type { ConfigT };
 
@@ -26,6 +27,13 @@ export function withCssInterop(
 ) {
   const { input, output } = getInputOutput(options);
 
+  const getTransformOptions = async (
+    ...args: Parameters<GetTransformOptions>
+  ) => {
+    expoColorSchemeWarning();
+    return config.transformer?.getTransformOptions?.(...args);
+  };
+
   return {
     ...config,
     resolver: {
@@ -37,6 +45,7 @@ export function withCssInterop(
     ),
     transformer: {
       ...config.transformer,
+      getTransformOptions,
       existingTransformerPath: config.transformerPath,
       externallyManagedCss: {
         [input]: output,

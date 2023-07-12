@@ -12,7 +12,12 @@ export function withTailwind(config: ConfigT, options?: WithCssInteropOptions) {
     options: any,
     getDependenciesOf: any,
   ) => {
-    process.stdout.clearLine(0);
+    // Clear Metro's progress bar and move to the start of the line
+    // We will print out own output before letting Metro print again
+    if (process.stdout.isTTY) {
+      process.stdout.clearLine(0);
+      process.stdout.cursorTo(0);
+    }
 
     const { input, output } = getInputOutput(options);
 
