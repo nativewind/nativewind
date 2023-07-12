@@ -30,7 +30,11 @@ import type {
   VerticalAlign,
 } from "lightningcss";
 
-import type { RuntimeValue, TransformRecord } from "../types";
+import type {
+  ExtractionWarning,
+  RuntimeValue,
+  TransformRecord,
+} from "../types";
 import { exhaustiveCheck } from "./utils";
 
 type AddStyleProp = (
@@ -62,6 +66,7 @@ type AddTransitionProp = (
     }
   >,
 ) => void;
+type AddWarning = (warning: ExtractionWarning) => void;
 
 export interface ParseDeclarationOptions {
   inlineRem?: number | false;
@@ -69,7 +74,13 @@ export interface ParseDeclarationOptions {
   addAnimationProp: AddAnimationDefaultProp;
   addContainerProp: AddContainerProp;
   addTransitionProp: AddTransitionProp;
+  addWarning: AddWarning;
   requiresLayout: () => void;
+}
+
+export interface ParseUnparsedDeclarationOptions
+  extends ParseDeclarationOptions {
+  addValueWarning: (value: any) => void;
 }
 
 export function parseDeclaration(
@@ -81,17 +92,36 @@ export function parseDeclaration(
     addAnimationProp,
     addContainerProp,
     addTransitionProp,
+    addWarning,
   } = options;
 
   if (declaration.property === "unparsed") {
     return addStyleProp(
       declaration.value.propertyId.property,
-      parseUnparsed(declaration.value.value, options),
+      parseUnparsed(declaration.value.value, {
+        ...options,
+        addValueWarning(value: any) {
+          addWarning({
+            reason: "IncompatibleNativeValue",
+            property: declaration.value.propertyId.property,
+            value,
+          });
+        },
+      }),
     );
   } else if (declaration.property === "custom") {
     return addStyleProp(
       declaration.value.name,
-      parseUnparsed(declaration.value.value, options),
+      parseUnparsed(declaration.value.value, {
+        ...options,
+        addValueWarning(value: any) {
+          addWarning({
+            reason: "IncompatibleNativeValue",
+            property: declaration.value.name,
+            value,
+          });
+        },
+      }),
     );
   }
 
@@ -1302,6 +1332,12 @@ export function parseDeclaration(
           declaration.property,
           parseLength(declaration.value.value, options),
         );
+      } else {
+        addWarning({
+          reason: "IncompatibleNativeValue",
+          property: declaration.property,
+          value: declaration.value.type,
+        });
       }
       return;
     case "container-type":
@@ -1316,7 +1352,7 @@ export function parseDeclaration(
 
 function reduceParseUnparsed(
   tokenOrValues: TokenOrValue[],
-  options: ParseDeclarationOptions,
+  options: ParseUnparsedDeclarationOptions,
   allowUnwrap = false,
 ) {
   const result = tokenOrValues
@@ -1336,7 +1372,7 @@ function unparsedToUnparsedLonghand(
   type: string,
   longhands: string[],
   args: TokenOrValue[],
-  options: ParseDeclarationOptions,
+  options: ParseUnparsedDeclarationOptions,
 ) {
   return longhands
     .map((longhand, i) => {
@@ -1355,7 +1391,7 @@ function unparsedToUnparsedLonghand(
  */
 function parseUnparsed(
   tokenOrValue: TokenOrValue | TokenOrValue[] | string | number,
-  options: ParseDeclarationOptions,
+  options: ParseUnparsedDeclarationOptions,
 ): string | number | object | undefined {
   if (typeof tokenOrValue === "string" || typeof tokenOrValue === "number") {
     return tokenOrValue;
@@ -1436,8 +1472,9 @@ function parseUnparsed(
         case "string":
         case "number":
           return tokenOrValue.value.value;
-        case "function":
         case "ident":
+          options.addValueWarning(tokenOrValue.value.value);
+        case "function":
         case "at-keyword":
         case "hash":
         case "id-hash":

@@ -18,6 +18,7 @@ import {
   styleMetaMap,
   vh,
   vw,
+  warnings,
 } from "./globals";
 
 const subscriptions = new Set<() => void>();
@@ -52,7 +53,7 @@ const parialStyleSheet = {
 
     if (options.declarations) {
       for (const [name, styles] of Object.entries(options.declarations)) {
-        globalStyles.set(name, tagStyles(styles));
+        globalStyles.set(name, tagStyles(name, styles));
       }
     }
 
@@ -64,7 +65,7 @@ const parialStyleSheet = {
     const namedStyles: Record<string, StyleProp> = {};
 
     for (const [name, style] of Object.entries(styles)) {
-      namedStyles[name] = tagStyles(style);
+      namedStyles[name] = tagStyles(name, style);
     }
 
     for (const subscription of subscriptions) {
@@ -77,11 +78,14 @@ const parialStyleSheet = {
 
 export const StyleSheet = Object.assign({}, RNStyleSheet, parialStyleSheet);
 
-function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
+function tagStyles(
+  name: string,
+  styles: ExtractedStyle | ExtractedStyle[],
+): StyleProp {
   if (Array.isArray(styles)) {
     let didTag = false;
     const taggedStyles = styles.map((s) => {
-      const taggedStyle = tagStyles(s);
+      const taggedStyle = tagStyles(name, s);
       didTag ||= styleMetaMap.has(s.style);
       return taggedStyle;
     });
@@ -148,6 +152,10 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
     if (styles.requiresLayout) {
       meta.requiresLayout = styles.requiresLayout;
       hasMeta = true;
+    }
+
+    if (process.env.NODE_ENV !== "production" && styles.warnings) {
+      warnings.set(name, styles.warnings);
     }
 
     if (hasMeta) {

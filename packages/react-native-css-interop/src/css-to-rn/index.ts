@@ -20,6 +20,7 @@ import {
   StyleSheetRegisterOptions,
   AnimatableCSSProperty,
   ExtractedAnimation,
+  ExtractionWarning,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import { exhaustiveCheck } from "./utils";
@@ -28,12 +29,6 @@ export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
   grouping?: (string | RegExp)[];
 };
-
-export interface CssToReactNativeRuntimeValue
-  extends StyleSheetRegisterOptions {
-  warnings: string[];
-  errors: string[];
-}
 
 /**
  * Converts a CSS file to a collection of style declarations that can be used with the StyleSheet API
@@ -45,7 +40,7 @@ export interface CssToReactNativeRuntimeValue
 export function cssToReactNativeRuntime(
   code: Buffer | string,
   options: CssToReactNativeRuntimeOptions = {},
-): CssToReactNativeRuntimeValue {
+): StyleSheetRegisterOptions {
   code = typeof code === "string" ? Buffer.from(code) : code;
   // Create maps to store the extracted style declarations and animations
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
@@ -79,8 +74,6 @@ export function cssToReactNativeRuntime(
   return {
     declarations: Object.fromEntries(declarations),
     keyframes: Object.fromEntries(keyframes),
-    warnings: [],
-    errors: [],
   };
 }
 
@@ -663,6 +656,11 @@ function getExtractedStyle(
     }
   }
 
+  function addWarning(warning: ExtractionWarning) {
+    extrtactedStyle.warnings ??= [];
+    extrtactedStyle.warnings.push(warning);
+  }
+
   function requiresLayout() {
     extrtactedStyle.requiresLayout = true;
   }
@@ -673,6 +671,7 @@ function getExtractedStyle(
     addContainerProp,
     addTransitionProp,
     requiresLayout,
+    addWarning,
     ...options,
   };
 

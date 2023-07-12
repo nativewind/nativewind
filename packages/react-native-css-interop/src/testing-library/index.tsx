@@ -11,17 +11,14 @@ import {
   CssToReactNativeRuntimeOptions,
   cssToReactNativeRuntime,
 } from "../css-to-rn";
-import { CssInteropPropMapping } from "../types";
+import { CssInteropPropMapping, ExtractionWarning, Style } from "../types";
+import { warned, warnings } from "../runtime/shared/globals";
 
 declare global {
   namespace jest {
     interface Matchers<R> {
-      styleToEqual(
-        style?: Record<string, unknown> | Record<string, unknown>[],
-      ): R;
-      toHaveAnimatedStyle(
-        style?: Record<string, unknown> | Record<string, unknown>[],
-      ): R;
+      styleToEqual(style?: Style): R;
+      toHaveStyleWarnings(warnings: Map<string, ExtractionWarning[]>): R;
     }
   }
 }
@@ -61,13 +58,13 @@ export function createMockComponent(
 
 export function resetStyles() {
   StyleSheet.__reset();
+  warnings.clear();
+  warned.clear();
 }
 
 export function registerCSS(
   css: string,
   options?: CssToReactNativeRuntimeOptions,
 ) {
-  const { warnings, errors, ...rest } = cssToReactNativeRuntime(css, options);
-  StyleSheet.register(rest);
-  return { warnings, errors };
+  StyleSheet.register(cssToReactNativeRuntime(css, options));
 }

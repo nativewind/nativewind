@@ -55,6 +55,7 @@ export type ExtractedStyle = {
   containerQuery?: ExtractedContainerQuery[];
   transition?: ExtractedTransition;
   requiresLayout?: boolean;
+  warnings?: ExtractionWarning[];
 };
 
 export type InteropMeta = {
@@ -234,6 +235,12 @@ export interface ResetOptions {
   dimensions?: Dimensions;
   appearance?: typeof Appearance;
 }
+
+export type ExtractionWarning = {
+  reason: string;
+  property: string;
+  value: any;
+};
 
 /*
  * This is a list of all the CSS properties that can be animated

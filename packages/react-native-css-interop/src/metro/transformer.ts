@@ -31,9 +31,7 @@ export function cssInteropTransform(
       : worker.transform(config, projectRoot, filename, data, options);
   }
 
-  const { warnings, errors, ...stylesheetOptions } =
-    cssToReactNativeRuntime(data);
-  const stringifiedOptions = JSON.stringify(stylesheetOptions);
+  const stringifiedOptions = JSON.stringify(cssToReactNativeRuntime(data));
 
   // TODO: Log warnings and errors
 

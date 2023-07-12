@@ -5,17 +5,34 @@ import {
   Appearance,
 } from "react-native";
 
-import { ExtractedAnimation, StyleMeta, StyleProp } from "../../types";
+import {
+  ExtractedAnimation,
+  ExtractionWarning,
+  StyleMeta,
+  StyleProp,
+} from "../../types";
 import { createSignal } from "./signals";
 
 export const INTERNAL_SET = Symbol();
 
-export const globalStyles = new Map<string, StyleProp>();
 export const styleMetaMap = new WeakMap<
   NonNullable<StyleProp> | NonNullable<StyleProp>[],
   StyleMeta
 >();
 export const animationMap = new Map<string, ExtractedAnimation>();
+
+export const globalStyles = new Map<string, StyleProp>();
+export function getGlobalStyle(name: string) {
+  if (warnings.has(name) && !warned.has(name)) {
+    warned.add(name);
+    console.log(warnings.get(name));
+  }
+
+  return globalStyles.get(name);
+}
+
+export const warnings = new Map<string, ExtractionWarning[]>();
+export const warned = new Set<string>();
 
 export const rem = createRem(14);
 export const vw = viewportUnit("width", Dimensions);
