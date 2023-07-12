@@ -67,5 +67,7 @@ export function registerCSS(
   css: string,
   options?: CssToReactNativeRuntimeOptions,
 ) {
-  StyleSheet.register(cssToReactNativeRuntime(css, options));
+  const { warnings, errors, ...rest } = cssToReactNativeRuntime(css, options);
+  StyleSheet.register(rest);
+  return { warnings, errors };
 }
