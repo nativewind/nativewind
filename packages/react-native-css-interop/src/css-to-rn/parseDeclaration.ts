@@ -1095,7 +1095,6 @@ export function parseDeclaration(
     case "scroll-padding-left":
     case "scroll-padding-right":
     case "scroll-padding-block-start":
-    case "scroll-padding-block-end":
     case "scroll-padding-inline-start":
     case "scroll-padding-inline-end":
     case "scroll-padding-block":
@@ -1474,6 +1473,7 @@ export function parseDeclaration(
     case "mask-box-image-repeat":
     case "filter":
     case "backdrop-filter":
+    case "scroll-padding-block-end":
       addWarning({
         type: "IncompatibleNativeProperty",
         property: declaration.property,
