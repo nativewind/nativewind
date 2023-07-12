@@ -246,7 +246,7 @@ export function parseDeclaration(
     case "overflow":
       return addStyleProp(
         declaration.property,
-        parseOverflow(declaration.value.x),
+        parseOverflow(declaration.value.x, parseOptions),
       );
     case "overflow-x":
       return;
@@ -563,7 +563,7 @@ export function parseDeclaration(
     case "border-style":
       return addStyleProp(
         declaration.property,
-        parseBorderStyle(declaration.value),
+        parseBorderStyle(declaration.value, parseOptions),
       );
     case "border-width":
       addStyleProp(
@@ -647,9 +647,13 @@ export function parseDeclaration(
           shortHand: true,
         },
       );
-      addStyleProp("border-style", parseBorderStyle(declaration.value.style), {
-        shortHand: true,
-      });
+      addStyleProp(
+        "border-style",
+        parseBorderStyle(declaration.value.style, parseOptions),
+        {
+          shortHand: true,
+        },
+      );
       return;
     case "border-top":
       addStyleProp(
@@ -1101,7 +1105,7 @@ export function parseDeclaration(
     case "font-weight":
       return addStyleProp(
         declaration.property,
-        parseFontWeight(declaration.value),
+        parseFontWeight(declaration.value, parseOptions),
       );
     case "font-size":
       return addStyleProp(
@@ -1118,12 +1122,12 @@ export function parseDeclaration(
     case "font-style":
       return addStyleProp(
         declaration.property,
-        parseFontStyle(declaration.value),
+        parseFontStyle(declaration.value, parseOptions),
       );
     case "font-variant-caps":
       return addStyleProp(
         declaration.property,
-        parseFontVariantCaps(declaration.value),
+        parseFontVariantCaps(declaration.value, parseOptions),
       );
     case "line-height":
       return addStyleProp(
@@ -1154,20 +1158,19 @@ export function parseDeclaration(
       );
       addStyleProp(
         declaration.property + "-style",
-        parseFontStyle(declaration.value.style),
+        parseFontStyle(declaration.value.style, parseOptions),
         {
           shortHand: true,
         },
       );
-
       addStyleProp(
         declaration.property + "-variant",
-        parseFontVariantCaps(declaration.value.variantCaps),
+        parseFontVariantCaps(declaration.value.variantCaps, parseOptions),
         { shortHand: true },
       );
       addStyleProp(
         declaration.property + "-weight",
-        parseFontWeight(declaration.value.weight),
+        parseFontWeight(declaration.value.weight, parseOptions),
         {
           shortHand: true,
         },
@@ -1235,7 +1238,9 @@ export function parseDeclaration(
           case "rotateZ":
           case "skewX":
           case "skewY":
-            transforms.push({ [transform.type]: parseAngle(transform.value) });
+            transforms.push({
+              [transform.type]: parseAngle(transform.value, parseOptions),
+            });
             break;
           case "translate":
             transforms.push({
@@ -1260,8 +1265,12 @@ export function parseDeclaration(
             });
             break;
           case "skew":
-            transforms.push({ skewX: parseAngle(transform.value[0]) });
-            transforms.push({ skewY: parseAngle(transform.value[1]) });
+            transforms.push({
+              skewX: parseAngle(transform.value[0], parseOptions),
+            });
+            transforms.push({
+              skewY: parseAngle(transform.value[1], parseOptions),
+            });
             break;
           case "translateZ":
           case "translate3d":
@@ -1353,7 +1362,7 @@ export function parseDeclaration(
     case "text-decoration-line":
       return addStyleProp(
         declaration.property,
-        parseTextDecorationLine(declaration.value),
+        parseTextDecorationLine(declaration.value, parseOptions),
       );
     case "text-decoration-style":
       return;
@@ -1377,7 +1386,7 @@ export function parseDeclaration(
       );
       addStyleProp(
         "text-decoration-line",
-        parseTextDecorationLine(declaration.value.line),
+        parseTextDecorationLine(declaration.value.line, parseOptions),
       );
       if (declaration.value.thickness.type === "length-percentage") {
         addStyleProp(
@@ -1603,7 +1612,7 @@ function parseUnparsed(
     case "length":
       return parseLength(tokenOrValue.value, options);
     case "angle":
-      return parseAngle(tokenOrValue.value);
+      return parseAngle(tokenOrValue.value, options);
     case "color":
     case "url":
     case "env":
@@ -1617,15 +1626,22 @@ function parseUnparsed(
         case "number":
           return tokenOrValue.value.value;
         case "ident":
-          options.addValueWarning(tokenOrValue.value.value);
         case "function":
+          options.addValueWarning(tokenOrValue.value.value);
+          return;
+        case "percentage":
+          options.addValueWarning(`${tokenOrValue.value.value}%`);
+          return;
+        case "dimension":
+          options.addValueWarning(
+            `${tokenOrValue.value.value}${tokenOrValue.value.unit}`,
+          );
+          return;
         case "at-keyword":
         case "hash":
         case "id-hash":
         case "unquoted-url":
         case "delim":
-        case "percentage":
-        case "dimension":
         case "white-space":
         case "comment":
         case "colon":
@@ -1646,7 +1662,7 @@ function parseUnparsed(
         case "close-parenthesis":
         case "close-square-bracket":
         case "close-curly-bracket":
-          return undefined;
+          return;
         default: {
           exhaustiveCheck(tokenOrValue.value);
           return;
@@ -1667,7 +1683,7 @@ export function parseLength(
     | DimensionPercentageFor_LengthValue
     | NumberOrPercentage
     | LengthValue,
-  options: ParseDeclarationOptions,
+  options: ParseDeclarationOptionsWithValueWarning,
 ): number | string | RuntimeValue | undefined {
   const { inlineRem = 14 } = options;
   if (typeof length === "number") {
@@ -1740,6 +1756,7 @@ export function parseLength(
       case "lvmax":
       case "dvmax":
       case "cqmax":
+        options.addValueWarning(`${length.value}${length.unit}`);
         return undefined;
       default: {
         exhaustiveCheck(length.unit);
@@ -1765,17 +1782,24 @@ export function parseLength(
   return undefined;
 }
 
-function parseAngle(angle: Angle) {
+function parseAngle(
+  angle: Angle,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   switch (angle.type) {
     case "deg":
     case "rad":
       return `${angle.value}${angle.type}`;
     default:
+      options.addValueWarning(angle.value);
       return undefined;
   }
 }
 
-function parseSize(size: Size | MaxSize, options: ParseDeclarationOptions) {
+function parseSize(
+  size: Size | MaxSize,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   switch (size.type) {
     case "length-percentage":
       return parseLength(size.value, options);
@@ -1789,6 +1813,7 @@ function parseSize(size: Size | MaxSize, options: ParseDeclarationOptions) {
     case "fit-content-function":
     case "stretch":
     case "contain":
+      options.addValueWarning(size.type);
       return undefined;
     default: {
       exhaustiveCheck(size);
@@ -1834,10 +1859,11 @@ function parseColor(
 
 function parseLengthPercentageOrAuto(
   lengthPercentageOrAuto: LengthPercentageOrAuto,
-  options: ParseDeclarationOptions,
+  options: ParseDeclarationOptionsWithValueWarning,
 ) {
   switch (lengthPercentageOrAuto.type) {
     case "auto":
+      options.addValueWarning(lengthPercentageOrAuto.type);
       return;
     case "length-percentage":
       return parseLength(lengthPercentageOrAuto.value, options);
@@ -2005,7 +2031,10 @@ function parseAlignSelf(
   return value;
 }
 
-function parseFontWeight(fontWeight: FontWeight) {
+function parseFontWeight(
+  fontWeight: FontWeight,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   switch (fontWeight.type) {
     case "absolute":
       if (fontWeight.value.type === "weight") {
@@ -2015,6 +2044,7 @@ function parseFontWeight(fontWeight: FontWeight) {
       }
     case "bolder":
     case "lighter":
+      options.addValueWarning(fontWeight.type);
       return;
     default: {
       exhaustiveCheck(fontWeight);
@@ -2036,11 +2066,15 @@ function parseTextShadow(
   addStyleProp("textShadowRadius", parseLength(textshadow.blur, options));
 }
 
-function parseTextDecorationLine(textDecorationLine: TextDecorationLine) {
+function parseTextDecorationLine(
+  textDecorationLine: TextDecorationLine,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   if (!Array.isArray(textDecorationLine)) {
     if (textDecorationLine === "none") {
       return textDecorationLine;
     }
+    options.addValueWarning(textDecorationLine);
     return;
   }
 
@@ -2056,26 +2090,35 @@ function parseTextDecorationLine(textDecorationLine: TextDecorationLine) {
     return "line-through";
   }
 
+  options.addValueWarning(textDecorationLine.join(" "));
   return undefined;
 }
 
-function parseOverflow(overflow: OverflowKeyword) {
+function parseOverflow(
+  overflow: OverflowKeyword,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   const allowed = new Set(["visible", "hidden", "scroll"]);
 
   if (allowed.has(overflow)) {
     return overflow;
   }
 
+  options.addValueWarning(overflow);
   return undefined;
 }
 
-function parseBorderStyle(borderStyle: BorderStyle | LineStyle) {
+function parseBorderStyle(
+  borderStyle: BorderStyle | LineStyle,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   const allowed = new Set(["solid", "dotted", "dashed"]);
 
   if (typeof borderStyle === "string") {
     if (allowed.has(borderStyle)) {
       return borderStyle;
     } else {
+      options.addValueWarning(borderStyle);
       return undefined;
     }
   } else if (
@@ -2087,17 +2130,20 @@ function parseBorderStyle(borderStyle: BorderStyle | LineStyle) {
     return borderStyle.top;
   }
 
+  options.addValueWarning(JSON.stringify(borderStyle));
+
   return undefined;
 }
 
 function parseBorderSideWidth(
   borderSideWidth: BorderSideWidth,
-  options: ParseDeclarationOptions,
+  options: ParseDeclarationOptionsWithValueWarning,
 ) {
   if (borderSideWidth.type === "length") {
     return parseLength(borderSideWidth.value, options);
   }
 
+  options.addValueWarning(borderSideWidth.type);
   return undefined;
 }
 
@@ -2127,31 +2173,45 @@ function parseFontFamily(fontFamily: FontFamily[]) {
 
 function parseLineHeight(
   lineHeight: LineHeight,
-  options: ParseDeclarationOptions,
+  options: ParseDeclarationOptionsWithValueWarning,
 ) {
-  if (lineHeight.type === "number") {
-    return {
-      type: "runtime",
-      name: "em",
-      arguments: [lineHeight.value],
-    };
-  } else if (lineHeight.type === "length") {
-    const length = lineHeight.value;
+  switch (lineHeight.type) {
+    case "number":
+      return {
+        type: "runtime",
+        name: "em",
+        arguments: [lineHeight.value],
+      };
+    case "length": {
+      const length = lineHeight.value;
 
-    if (length.type === "dimension") {
-      return parseLength(length, options);
+      switch (length.type) {
+        case "dimension":
+          return parseLength(length, options);
+        case "percentage":
+        case "calc":
+          options.addValueWarning(length.value);
+          return undefined;
+        default: {
+          exhaustiveCheck(length);
+        }
+      }
     }
   }
 
   return undefined;
 }
 
-function parseFontSize(fontSize: FontSize, options: ParseDeclarationOptions) {
+function parseFontSize(
+  fontSize: FontSize,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   switch (fontSize.type) {
     case "length":
       return parseLength(fontSize.value, options);
     case "absolute":
     case "relative":
+      options.addValueWarning(fontSize.value);
       return undefined;
     default: {
       exhaustiveCheck(fontSize);
@@ -2160,12 +2220,16 @@ function parseFontSize(fontSize: FontSize, options: ParseDeclarationOptions) {
   return undefined;
 }
 
-function parseFontStyle(fontStyle: FontStyle) {
+function parseFontStyle(
+  fontStyle: FontStyle,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   switch (fontStyle.type) {
     case "normal":
     case "italic":
       return fontStyle.type;
     case "oblique":
+      options.addValueWarning(fontStyle.type);
       return undefined;
     default: {
       exhaustiveCheck(fontStyle);
@@ -2174,7 +2238,10 @@ function parseFontStyle(fontStyle: FontStyle) {
   return undefined;
 }
 
-function parseFontVariantCaps(fontVariantCaps: FontVariantCaps) {
+function parseFontVariantCaps(
+  fontVariantCaps: FontVariantCaps,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   const allowed = new Set([
     "small-caps",
     "oldstyle-nums",
@@ -2186,13 +2253,14 @@ function parseFontVariantCaps(fontVariantCaps: FontVariantCaps) {
     return fontVariantCaps;
   }
 
+  options.addValueWarning(fontVariantCaps);
   return undefined;
 }
 
 function parseLengthOrCoercePercentageToRuntime(
   value: Length | DimensionPercentageFor_LengthValue | NumberOrPercentage,
   runtimeName: string,
-  options: ParseDeclarationOptions,
+  options: ParseDeclarationOptionsWithValueWarning,
 ) {
   if (value.type === "percentage") {
     options.requiresLayout();
@@ -2206,8 +2274,12 @@ function parseLengthOrCoercePercentageToRuntime(
   }
 }
 
-function parseGap(value: GapValue, options: ParseDeclarationOptions) {
+function parseGap(
+  value: GapValue,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   if (value.type === "normal") {
+    options.addValueWarning(value.type);
     return;
   }
 
