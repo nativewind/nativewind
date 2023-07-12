@@ -1,4 +1,5 @@
-import React, {
+import {
+  forwardRef,
   ComponentType,
   ForwardRefExoticComponent,
   RefAttributes,
@@ -35,25 +36,30 @@ export function createMockComponent(
 ): ForwardRefExoticComponent<
   MockComponentProps & RefAttributes<MockComponentProps>
 > {
-  const component = jest.fn((props, ref) => <Component ref={ref} {...props} />);
-  const componentForwarded = React.forwardRef(component);
-  const componentWithRef = React.forwardRef<MockComponentProps>(
-    (props, ref) => {
+  const spy = jest.fn((props, ref) => <Component ref={ref} {...props} />);
+
+  // We need to forward the ref through the mock that Jest creates
+  const spyWithRef = forwardRef(spy);
+
+  return Object.assign(
+    // Create a wrapper that manually calls our jsxImportSource without changing the default jsxImportSource
+    forwardRef<MockComponentProps>((props, ref) => {
       return defaultCSSInterop(
+        // Create a fake `jsx` function. This will render the component called the real jsxImportSource
         (ComponentType: ComponentType<any>, props: object, key: string) => {
           return <ComponentType ref={ref} key={key} {...props} />;
         },
-        componentForwarded,
+        spyWithRef,
         props,
         "any-string-value",
         mapping,
       );
+    }),
+    // Append the mock so we can access it
+    {
+      mock: spy.mock,
     },
   );
-
-  return Object.assign(componentWithRef, {
-    mock: component.mock,
-  });
 }
 
 export function resetStyles() {
