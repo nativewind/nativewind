@@ -1590,16 +1590,22 @@ function parseUnparsed(
     }
     case "function": {
       switch (tokenOrValue.value.name) {
+        case "platformSelect":
+          return parseReactNativeFunction(
+            tokenOrValue.value.name,
+            tokenOrValue.value.arguments,
+            options,
+          );
         case "translate":
           return unparsedToUnparsedLonghand(
-            "function",
+            "runtime",
             ["translateX", "translateY"],
             tokenOrValue.value.arguments,
             options,
           );
         default: {
           return {
-            type: tokenOrValue.type,
+            type: "runtime",
             name: tokenOrValue.value.name,
             arguments: reduceParseUnparsed(
               tokenOrValue.value.arguments,
@@ -2284,6 +2290,22 @@ function parseGap(
   }
 
   return parseLength(value.value, options);
+}
+
+function parseReactNativeFunction(
+  name: string,
+  args: TokenOrValue[],
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  // TODO
+  console.log(
+    args.flatMap((tokenOrValue) => parseUnparsed(tokenOrValue, options)),
+  );
+  return {
+    type: "runtime",
+    name,
+    arguments: [],
+  };
 }
 
 function round(number: number) {
