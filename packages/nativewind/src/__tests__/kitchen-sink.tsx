@@ -34,8 +34,8 @@ const invalidValue = (property: string, value: any) => ({
 });
 
 function testCases(cases: Case[]) {
-  test.each(cases)("%s", (className, expected) => {
-    renderTailwind(<A className={className} />);
+  test.each(cases)("%s", async (className, expected) => {
+    await renderTailwind(<A className={className} />);
 
     if (expected.success) {
       expect(A).styleToEqual(expected.success);

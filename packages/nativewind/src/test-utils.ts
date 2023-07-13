@@ -4,16 +4,18 @@ import postcss from "postcss";
 import { registerCSS } from "react-native-css-interop/testing-library";
 import tailwind from "tailwindcss";
 
-export function renderTailwind<T>(
+export async function renderTailwind<T>(
   component: React.ReactElement<T>,
   options?: RenderOptions,
-): ReturnType<typeof render> {
-  const css = postcss([
+): Promise<ReturnType<typeof render>> {
+  const { css } = await postcss([
     tailwind({
       theme: {},
       content: [{ raw: prettyFormat(component), extension: "html" }],
     }),
-  ]).process("@tailwind base;@tailwind components;@tailwind utilities;").css;
+  ]).process("@tailwind base;@tailwind components;@tailwind utilities;", {
+    from: undefined,
+  });
 
   registerCSS(css);
 
