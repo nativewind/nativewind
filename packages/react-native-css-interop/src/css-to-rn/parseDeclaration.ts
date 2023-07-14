@@ -1311,6 +1311,9 @@ const invalidNativeProperties = [
   "border-right-style",
   "border-spacing",
   "border-top-style",
+  "break-after",
+  "break-before",
+  "break-inside",
   "box-align",
   "box-decoration-break",
   "box-direction",
@@ -2117,7 +2120,7 @@ function parseBorderStyle(
     return borderStyle.top;
   }
 
-  options.addValueWarning(JSON.stringify(borderStyle));
+  options.addValueWarning(JSON.stringify(borderStyle.top));
 
   return undefined;
 }

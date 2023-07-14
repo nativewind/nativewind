@@ -95,6 +95,10 @@ describe("Filters - Blur", () => {
   testCases([["blur", invalidProperty("filter")]]);
 });
 
+describe("Filters - Brightness", () => {
+  testCases([["brightness-0", invalidProperty("filter")]]);
+});
+
 describe("Backgrounds - Background Attachment", () => {
   testCases([
     ["bg-fixed", invalidProperty("background-attachment")],
@@ -182,5 +186,102 @@ describe("Tables - Border Collapse", () => {
   testCases([
     ["border-collapse", invalidProperty("border-collapse")],
     ["border-separate", invalidProperty("border-collapse")],
+  ]);
+});
+
+describe("Border - Border Radius", () => {
+  testCases([
+    [
+      "rounded",
+      style({
+        borderBottomLeftRadius: 3.5,
+        borderBottomRightRadius: 3.5,
+        borderTopLeftRadius: 3.5,
+        borderTopRightRadius: 3.5,
+      }),
+    ],
+    [
+      "rounded-t",
+      style({
+        borderTopLeftRadius: 3.5,
+        borderTopRightRadius: 3.5,
+      }),
+    ],
+    [
+      "rounded-b",
+      style({
+        borderBottomLeftRadius: 3.5,
+        borderBottomRightRadius: 3.5,
+      }),
+    ],
+    [
+      "rounded-full",
+      style({
+        borderBottomLeftRadius: 9999,
+        borderBottomRightRadius: 9999,
+        borderTopLeftRadius: 9999,
+        borderTopRightRadius: 9999,
+      }),
+    ],
+  ]);
+});
+
+describe("Tables - Border Style", () => {
+  testCases([
+    ["border-solid", style({ borderStyle: "solid" })],
+    ["border-dashed", style({ borderStyle: "dashed" })],
+    ["border-dotted", style({ borderStyle: "dotted" })],
+    ["border-none", invalidValue("border-style", '"none"')],
+    ["border-double", invalidValue("border-style", '"double"')],
+    ["border-hidden", invalidValue("border-style", '"hidden"')],
+  ]);
+});
+
+describe("Layout - Box Decoration Break", () => {
+  testCases([
+    ["box-decoration-clone", invalidProperty("box-decoration-break")],
+    ["box-decoration-slice", invalidProperty("box-decoration-break")],
+  ]);
+});
+
+describe("Layout - Box Sizing", () => {
+  testCases([
+    ["box-border", invalidProperty("box-sizing")],
+    ["box-content", invalidProperty("box-sizing")],
+  ]);
+});
+
+describe("Layout - Break After", () => {
+  testCases([
+    ["break-after-auto", invalidProperty("break-after")],
+    ["break-after-avoid", invalidProperty("break-after")],
+    ["break-after-all", invalidProperty("break-after")],
+    ["break-after-avoid-page", invalidProperty("break-after")],
+    ["break-after-page", invalidProperty("break-after")],
+    ["break-after-left", invalidProperty("break-after")],
+    ["break-after-right", invalidProperty("break-after")],
+    ["break-after-column", invalidProperty("break-after")],
+  ]);
+});
+
+describe("Layout - Break Before", () => {
+  testCases([
+    ["break-before-auto", invalidProperty("break-before")],
+    ["break-before-avoid", invalidProperty("break-before")],
+    ["break-before-all", invalidProperty("break-before")],
+    ["break-before-avoid-page", invalidProperty("break-before")],
+    ["break-before-page", invalidProperty("break-before")],
+    ["break-before-left", invalidProperty("break-before")],
+    ["break-before-right", invalidProperty("break-before")],
+    ["break-before-column", invalidProperty("break-before")],
+  ]);
+});
+
+describe("Layout - Break Inside", () => {
+  testCases([
+    ["break-inside-auto", invalidProperty("break-inside")],
+    ["break-inside-avoid", invalidProperty("break-inside")],
+    ["break-inside-avoid-page", invalidProperty("break-inside")],
+    ["break-inside-avoid-column", invalidProperty("break-inside")],
   ]);
 });
