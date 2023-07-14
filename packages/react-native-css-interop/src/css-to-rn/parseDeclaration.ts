@@ -96,10 +96,10 @@ export function parseDeclaration(
     addWarning,
   } = options;
 
-  const invalidNativeProperties = new Set(["backdrop-filter"]);
-
   if (declaration.property === "unparsed") {
-    if (invalidNativeProperties.has(declaration.value.propertyId.property)) {
+    if (
+      invalidNativePropertiesLoose.has(declaration.value.propertyId.property)
+    ) {
       return addWarning({
         type: "IncompatibleNativeProperty",
         property: declaration.value.propertyId.property,
@@ -127,6 +127,12 @@ export function parseDeclaration(
       }),
     );
   } else if (declaration.property === "custom") {
+    if (invalidNativePropertiesLoose.has(declaration.value.name)) {
+      return addWarning({
+        type: "IncompatibleNativeProperty",
+        property: declaration.value.name,
+      });
+    }
     return addStyleProp(
       declaration.value.name,
       parseUnparsed(declaration.value.value, {
@@ -158,7 +164,24 @@ export function parseDeclaration(
         value,
       });
     },
+    addFunctionValueWarning(value: any) {
+      addWarning({
+        type: "IncompatibleNativeFunctionValue",
+        property: declaration.property,
+        value,
+      });
+    },
   };
+
+  const addInvalidProperty = () =>
+    addWarning({
+      type: "IncompatibleNativeProperty",
+      property: declaration.property,
+    });
+
+  if (invalidNativePropertiesLoose.has(declaration.property)) {
+    return addInvalidProperty();
+  }
 
   switch (declaration.property) {
     case "background-color":
@@ -166,28 +189,6 @@ export function parseDeclaration(
         declaration.property,
         parseColor(declaration.value, parseOptions),
       );
-    case "background-image":
-      return;
-    case "background-position-x":
-      return;
-    case "background-position-y":
-      return;
-    case "background-position":
-      return;
-    case "background-size":
-      return;
-    case "background-repeat":
-      return;
-    case "background-attachment":
-      return;
-    case "background-clip":
-      return;
-    case "background-origin":
-      return;
-    case "background":
-      return;
-    case "box-shadow":
-      return;
     case "opacity":
       return addStyleProp(declaration.property, declaration.value);
     case "color":
@@ -265,19 +266,11 @@ export function parseDeclaration(
         "max-height",
         parseSize(declaration.value, parseOptions),
       );
-    case "box-sizing":
-      return;
     case "overflow":
       return addStyleProp(
         declaration.property,
         parseOverflow(declaration.value.x, parseOptions),
       );
-    case "overflow-x":
-      return;
-    case "overflow-y":
-      return;
-    case "text-overflow":
-      return;
     case "position":
       // Position works differently on web and native
       return;
@@ -378,8 +371,6 @@ export function parseDeclaration(
         },
       );
       return;
-    case "border-spacing":
-      return;
     case "border-top-color":
       return addStyleProp(
         declaration.property,
@@ -420,22 +411,6 @@ export function parseDeclaration(
         "border-right-color",
         parseColor(declaration.value, parseOptions),
       );
-    case "border-top-style":
-      return;
-    case "border-bottom-style":
-      return;
-    case "border-left-style":
-      return;
-    case "border-right-style":
-      return;
-    case "border-block-start-style":
-      return;
-    case "border-block-end-style":
-      return;
-    case "border-inline-start-style":
-      return;
-    case "border-inline-end-style":
-      return;
     case "border-top-width":
       return addStyleProp(
         declaration.property,
@@ -542,18 +517,6 @@ export function parseDeclaration(
         },
       );
       return;
-    case "border-image-source":
-      return;
-    case "border-image-outset":
-      return;
-    case "border-image-repeat":
-      return;
-    case "border-image-width":
-      return;
-    case "border-image-slice":
-      return;
-    case "border-image":
-      return;
     case "border-color":
       addStyleProp(
         "border-top-color",
@@ -629,8 +592,6 @@ export function parseDeclaration(
         parseColor(declaration.value.end, parseOptions),
       );
       return;
-    case "border-block-style":
-      return;
     case "border-block-width":
       addStyleProp(
         "border-top-width",
@@ -650,8 +611,6 @@ export function parseDeclaration(
         "border-right-color",
         parseColor(declaration.value.end, parseOptions),
       );
-      return;
-    case "border-inline-style":
       return;
     case "border-inline-width":
       addStyleProp(
@@ -795,14 +754,6 @@ export function parseDeclaration(
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
-    case "outline":
-      return;
-    case "outline-color":
-      return;
-    case "outline-style":
-      return;
-    case "outline-width":
-      return;
     case "flex-direction":
       return addStyleProp(declaration.property, declaration.value);
     case "flex-wrap":
@@ -828,8 +779,6 @@ export function parseDeclaration(
         parseLengthPercentageOrAuto(declaration.value.basis, parseOptions),
       );
       break;
-    case "order":
-      return;
     case "align-content":
       return addStyleProp(
         declaration.property,
@@ -840,26 +789,16 @@ export function parseDeclaration(
         declaration.property,
         parseJustifyContent(declaration.value, parseOptions),
       );
-    case "place-content":
-      return;
     case "align-self":
       return addStyleProp(
         declaration.property,
         parseAlignSelf(declaration.value, parseOptions),
       );
-    case "justify-self":
-      return;
-    case "place-self":
-      return;
     case "align-items":
       return addStyleProp(
         declaration.property,
         parseAlignItems(declaration.value, parseOptions),
       );
-    case "justify-items":
-      return;
-    case "place-items":
-      return;
     case "row-gap":
       return addStyleProp("row-gap", parseGap(declaration.value, parseOptions));
     case "column-gap":
@@ -870,68 +809,6 @@ export function parseDeclaration(
         "column-gap",
         parseGap(declaration.value.column, parseOptions),
       );
-      return;
-    case "box-orient":
-      return;
-    case "box-direction":
-      return;
-    case "box-ordinal-group":
-      return;
-    case "box-align":
-      return;
-    case "box-flex":
-      return;
-    case "box-flex-group":
-      return;
-    case "box-pack":
-      return;
-    case "box-lines":
-      return;
-    case "flex-pack":
-      return;
-    case "flex-order":
-      return;
-    case "flex-align":
-      return;
-    case "flex-item-align":
-      return;
-    case "flex-line-pack":
-      return;
-    case "flex-positive":
-      return;
-    case "flex-negative":
-      return;
-    case "flex-preferred-size":
-      return;
-    case "grid-template-columns":
-      return;
-    case "grid-template-rows":
-      return;
-    case "grid-auto-columns":
-      return;
-    case "grid-auto-rows":
-      return;
-    case "grid-auto-flow":
-      return;
-    case "grid-template-areas":
-      return;
-    case "grid-template":
-      return;
-    case "grid":
-      return;
-    case "grid-row-start":
-      return;
-    case "grid-row-end":
-      return;
-    case "grid-column-start":
-      return;
-    case "grid-column-end":
-      return;
-    case "grid-row":
-      return;
-    case "grid-column":
-      return;
-    case "grid-area":
       return;
     case "margin-top":
       return addStyleProp(
@@ -1103,28 +980,6 @@ export function parseDeclaration(
         parseSize(declaration.value.bottom, parseOptions),
       );
       break;
-    case "scroll-margin-top":
-    case "scroll-margin-bottom":
-    case "scroll-margin-left":
-    case "scroll-margin-right":
-    case "scroll-margin-block-start":
-    case "scroll-margin-block-end":
-    case "scroll-margin-inline-start":
-    case "scroll-margin-inline-end":
-    case "scroll-margin-block":
-    case "scroll-margin-inline":
-    case "scroll-margin":
-    case "scroll-padding-top":
-    case "scroll-padding-bottom":
-    case "scroll-padding-left":
-    case "scroll-padding-right":
-    case "scroll-padding-block-start":
-    case "scroll-padding-inline-start":
-    case "scroll-padding-inline-end":
-    case "scroll-padding-block":
-    case "scroll-padding-inline":
-    case "scroll-padding":
-      return;
     case "font-weight":
       return addStyleProp(
         declaration.property,
@@ -1135,8 +990,6 @@ export function parseDeclaration(
         declaration.property,
         parseFontSize(declaration.value, parseOptions),
       );
-    case "font-stretch":
-      return;
     case "font-family":
       return addStyleProp(
         declaration.property,
@@ -1204,8 +1057,6 @@ export function parseDeclaration(
         declaration.property,
         parseVerticalAlign(declaration.value),
       );
-    case "font-palette":
-      return;
     case "transition-property":
     case "transition-duration":
     case "transition-delay":
@@ -1308,18 +1159,6 @@ export function parseDeclaration(
 
       return addStyleProp(declaration.property, transforms);
     }
-    case "transform-origin":
-      return;
-    case "transform-style":
-      return;
-    case "transform-box":
-      return;
-    case "backface-visibility":
-      return;
-    case "perspective":
-      return;
-    case "perspective-origin":
-      return;
     case "translate":
       return addStyleProp(
         "transform",
@@ -1350,28 +1189,6 @@ export function parseDeclaration(
       );
     case "text-transform":
       return addStyleProp(declaration.property, declaration.value.case);
-    case "white-space":
-      return;
-    case "tab-size":
-      return;
-    case "word-break":
-      return;
-    case "line-break":
-      return;
-    case "hyphens":
-      return;
-    case "overflow-wrap":
-      return;
-    case "word-wrap":
-      return;
-    case "text-align":
-      return;
-    case "text-align-last":
-      return;
-    case "text-justify":
-      return;
-    case "word-spacing":
-      return;
     case "letter-spacing":
       if (declaration.value.type !== "normal") {
         return addStyleProp(
@@ -1380,15 +1197,11 @@ export function parseDeclaration(
         );
       }
       return;
-    case "text-indent":
-      return;
     case "text-decoration-line":
       return addStyleProp(
         declaration.property,
         parseTextDecorationLine(declaration.value, parseOptions),
       );
-    case "text-decoration-style":
-      return;
     case "text-decoration-color":
       return addStyleProp(
         declaration.property,
@@ -1418,92 +1231,8 @@ export function parseDeclaration(
         );
       }
       return;
-    case "text-decoration-skip-ink":
-      return;
-    case "text-emphasis-style":
-      return;
-    case "text-emphasis-color":
-      return;
-    case "text-emphasis":
-      return;
-    case "text-emphasis-position":
-      return;
     case "text-shadow":
       return parseTextShadow(declaration.value, addStyleProp, parseOptions);
-    case "box-decoration-break":
-    case "resize":
-    case "cursor":
-    case "caret-color":
-    case "caret-shape":
-    case "caret":
-    case "user-select":
-    case "accent-color":
-    case "appearance":
-    case "list-style-type":
-    case "list-style-image":
-    case "list-style-position":
-    case "list-style":
-    case "marker-side":
-    case "composes":
-    case "fill":
-    case "fill-rule":
-    case "fill-opacity":
-    case "stroke":
-    case "stroke-opacity":
-    case "stroke-width":
-    case "stroke-linecap":
-    case "stroke-linejoin":
-    case "stroke-miterlimit":
-    case "stroke-dasharray":
-    case "stroke-dashoffset":
-    case "marker-start":
-    case "marker-mid":
-    case "marker-end":
-    case "marker":
-    case "color-interpolation":
-    case "color-interpolation-filters":
-    case "color-rendering":
-    case "shape-rendering":
-    case "text-rendering":
-    case "image-rendering":
-    case "clip-path":
-    case "clip-rule":
-    case "mask-image":
-    case "mask-mode":
-    case "mask-repeat":
-    case "mask-position-x":
-    case "mask-position-y":
-    case "mask-position":
-    case "mask-clip":
-    case "mask-origin":
-    case "mask-size":
-    case "mask-composite":
-    case "mask-type":
-    case "mask":
-    case "mask-border-source":
-    case "mask-border-mode":
-    case "mask-border-slice":
-    case "mask-border-width":
-    case "mask-border-outset":
-    case "mask-border-repeat":
-    case "mask-border":
-    case "-webkit-mask-composite":
-    case "mask-source-type":
-    case "mask-box-image":
-    case "mask-box-image-source":
-    case "mask-box-image-slice":
-    case "mask-box-image-width":
-    case "mask-box-image-outset":
-    case "mask-box-image-repeat":
-    case "filter":
-    case "backdrop-filter":
-    case "scroll-padding-block-end":
-    case "view-transition-name":
-      addWarning({
-        type: "IncompatibleNativeProperty",
-        property: declaration.property,
-      });
-      return;
     case "z-index":
       if (declaration.value.type === "integer") {
         addStyleProp(
@@ -1533,9 +1262,224 @@ export function parseDeclaration(
         );
       }
 
+      // Assert that this was handled before the switch statement
+      assertIsInvalidDeclarationProperty(declaration);
+
+      // The if declaration is
+      //  - NOT a invalidNativeProperty and
+      //  - NOT handled by the switch
+      // Then this will error. `declaration` should be of type 'never'
       exhaustiveCheck(declaration);
     }
   }
+}
+
+const invalidNativeProperties = [
+  "-webkit-mask-composite",
+  "accent-color",
+  "appearance",
+  "backdrop-filter",
+  "backdrop-filter",
+  "backface-visibility",
+  "background",
+  "background-attachment",
+  "background-blend-mode",
+  "background-clip",
+  "background-image",
+  "background-image",
+  "background-origin",
+  "background-position",
+  "background-position-x",
+  "background-position-y",
+  "background-repeat",
+  "background-size",
+  "border-block-end-style",
+  "border-block-start-style",
+  "border-block-style",
+  "border-bottom-style",
+  "border-collapse",
+  "border-image",
+  "border-image-outset",
+  "border-image-repeat",
+  "border-image-slice",
+  "border-image-source",
+  "border-image-width",
+  "border-inline-end-style",
+  "border-inline-start-style",
+  "border-inline-style",
+  "border-left-style",
+  "border-right-style",
+  "border-spacing",
+  "border-top-style",
+  "box-align",
+  "box-decoration-break",
+  "box-direction",
+  "box-flex",
+  "box-flex-group",
+  "box-lines",
+  "box-ordinal-group",
+  "box-orient",
+  "box-pack",
+  "box-shadow",
+  "box-sizing",
+  "caret",
+  "caret-color",
+  "caret-shape",
+  "clip-path",
+  "clip-rule",
+  "color-interpolation",
+  "color-interpolation-filters",
+  "color-rendering",
+  "composes",
+  "cursor",
+  "fill",
+  "fill-opacity",
+  "fill-rule",
+  "filter",
+  "filter",
+  "flex-align",
+  "flex-item-align",
+  "flex-line-pack",
+  "flex-negative",
+  "flex-order",
+  "flex-pack",
+  "flex-positive",
+  "flex-preferred-size",
+  "font-palette",
+  "font-stretch",
+  "grid",
+  "grid-area",
+  "grid-auto-columns",
+  "grid-auto-flow",
+  "grid-auto-rows",
+  "grid-column",
+  "grid-column-end",
+  "grid-column-start",
+  "grid-row",
+  "grid-row-end",
+  "grid-row-start",
+  "grid-template",
+  "grid-template-areas",
+  "grid-template-columns",
+  "grid-template-rows",
+  "hyphens",
+  "image-rendering",
+  "justify-items",
+  "justify-self",
+  "line-break",
+  "list-style",
+  "list-style-image",
+  "list-style-position",
+  "list-style-type",
+  "marker",
+  "marker-end",
+  "marker-mid",
+  "marker-side",
+  "marker-start",
+  "mask",
+  "mask-border",
+  "mask-border-mode",
+  "mask-border-outset",
+  "mask-border-repeat",
+  "mask-border-slice",
+  "mask-border-source",
+  "mask-border-width",
+  "mask-box-image",
+  "mask-box-image-outset",
+  "mask-box-image-repeat",
+  "mask-box-image-slice",
+  "mask-box-image-source",
+  "mask-box-image-width",
+  "mask-clip",
+  "mask-composite",
+  "mask-image",
+  "mask-mode",
+  "mask-origin",
+  "mask-position",
+  "mask-position-x",
+  "mask-position-y",
+  "mask-repeat",
+  "mask-size",
+  "mask-source-type",
+  "mask-type",
+  "order",
+  "outline",
+  "outline-color",
+  "outline-style",
+  "outline-width",
+  "overflow-wrap",
+  "overflow-x",
+  "overflow-y",
+  "perspective",
+  "perspective-origin",
+  "place-content",
+  "place-items",
+  "place-self",
+  "resize",
+  "scroll-margin",
+  "scroll-margin-block",
+  "scroll-margin-block-end",
+  "scroll-margin-block-start",
+  "scroll-margin-bottom",
+  "scroll-margin-inline",
+  "scroll-margin-inline-end",
+  "scroll-margin-inline-start",
+  "scroll-margin-left",
+  "scroll-margin-right",
+  "scroll-margin-top",
+  "scroll-padding",
+  "scroll-padding-block",
+  "scroll-padding-block-end",
+  "scroll-padding-block-start",
+  "scroll-padding-bottom",
+  "scroll-padding-inline",
+  "scroll-padding-inline-end",
+  "scroll-padding-inline-start",
+  "scroll-padding-left",
+  "scroll-padding-right",
+  "scroll-padding-top",
+  "shape-rendering",
+  "stroke",
+  "stroke-dasharray",
+  "stroke-dashoffset",
+  "stroke-linecap",
+  "stroke-linejoin",
+  "stroke-miterlimit",
+  "stroke-opacity",
+  "stroke-width",
+  "tab-size",
+  "text-align",
+  "text-align-last",
+  "text-decoration-skip-ink",
+  "text-decoration-style",
+  "text-emphasis",
+  "text-emphasis-color",
+  "text-emphasis-position",
+  "text-emphasis-style",
+  "text-indent",
+  "text-justify",
+  "text-overflow",
+  "text-rendering",
+  "transform-box",
+  "transform-origin",
+  "transform-style",
+  "user-select",
+  "view-transition-name",
+  "white-space",
+  "word-break",
+  "word-spacing",
+  "word-wrap",
+] as const;
+
+const invalidNativePropertiesLoose = new Set<string>(invalidNativeProperties);
+
+function assertIsInvalidDeclarationProperty(
+  declaration: Declaration,
+): asserts declaration is Exclude<
+  Declaration,
+  { property: (typeof invalidNativeProperties)[number] }
+> {
+  `Unhandled case: ${declaration.property}`;
 }
 
 function reduceParseUnparsed(

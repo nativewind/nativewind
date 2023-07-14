@@ -1,65 +1,10 @@
-import { ViewStyle, ImageStyle, TextStyle } from "react-native";
 import {
   createMockComponent,
   resetStyles,
 } from "react-native-css-interop/testing-library";
-import { renderTailwind } from "../test-utils";
-import {
-  ExtractionWarning,
-  StyleMeta,
-} from "react-native-css-interop/dist/types";
-
-type Style = ViewStyle & TextStyle & ImageStyle;
-type Case = [
-  string,
-  {
-    style?: ReturnType<typeof style>["style"];
-    warning?: (name: string) => Map<string, ExtractionWarning[]>;
-    meta?: StyleMeta;
-  },
-];
-
-const A = createMockComponent();
+import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
-
-const style = (style: Style & Record<string, unknown>) => ({ style });
-const invalidProperty = (property: string) => ({
-  warning: (name: string) =>
-    new Map<string, ExtractionWarning[]>([
-      [name, [{ type: "IncompatibleNativeProperty", property }]],
-    ]),
-});
-const invalidValue = (property: string, value: any) => ({
-  warning: (name: string) =>
-    new Map<string, ExtractionWarning[]>([
-      [name, [{ type: "IncompatibleNativeValue", property, value }]],
-    ]),
-});
-
-function testCases(cases: Case[]) {
-  test.each(cases)("%s", async (className, expected) => {
-    await renderTailwind(<A className={className} />);
-
-    if (expected.style) {
-      expect(A).styleToEqual(expected.style);
-    } else {
-      expect(A).styleToEqual({});
-    }
-
-    if (expected.warning) {
-      expect(A).toHaveStyleWarnings(expected.warning(className));
-    } else {
-      expect(A).toHaveStyleWarnings(new Map());
-    }
-
-    if (expected.meta) {
-      expect(A).styleMetaToEqual(expected.meta);
-    } else {
-      expect(A).styleMetaToEqual(undefined);
-    }
-  });
-}
 
 describe("Interactivity - Accent Color", () => {
   testCases([
@@ -131,4 +76,114 @@ describe("Filters - Backdrop Grayscale", () => {
 
 describe("Filters - Backdrop Hue Rotate", () => {
   testCases([["backdrop-hue-rotate-0", invalidProperty("backdrop-filter")]]);
+});
+
+describe("Filters - Backdrop Invert", () => {
+  testCases([["backdrop-invert-0", invalidProperty("backdrop-filter")]]);
+});
+
+describe("Filters - Backdrop Opacity", () => {
+  testCases([["backdrop-opacity-0", invalidProperty("backdrop-filter")]]);
+});
+
+describe("Filters - Backdrop Saturate", () => {
+  testCases([["backdrop-saturate-0", invalidProperty("backdrop-filter")]]);
+});
+
+describe("Filters - Backdrop Saturate", () => {
+  testCases([["backdrop-sepia-0", invalidProperty("backdrop-filter")]]);
+});
+
+describe.only("Filters - Blur", () => {
+  testCases([["blur", invalidProperty("filter")]]);
+});
+
+describe("Backgrounds - Background Attachment", () => {
+  testCases([
+    ["bg-fixed", invalidProperty("background-attachment")],
+    ["bg-local", invalidProperty("background-attachment")],
+    ["bg-scroll", invalidProperty("background-attachment")],
+  ]);
+});
+
+describe("Effects - Background Blend Mode", () => {
+  testCases([
+    ["bg-blend-normal", invalidProperty("background-blend-mode")],
+    ["bg-blend-multiply", invalidProperty("background-blend-mode")],
+    ["bg-blend-screen", invalidProperty("background-blend-mode")],
+    ["bg-blend-overlay", invalidProperty("background-blend-mode")],
+    ["bg-blend-darken", invalidProperty("background-blend-mode")],
+    ["bg-blend-lighten", invalidProperty("background-blend-mode")],
+    ["bg-blend-color-dodge", invalidProperty("background-blend-mode")],
+    ["bg-blend-color-burn", invalidProperty("background-blend-mode")],
+    ["bg-blend-hard-light", invalidProperty("background-blend-mode")],
+    ["bg-blend-soft-light", invalidProperty("background-blend-mode")],
+    ["bg-blend-difference", invalidProperty("background-blend-mode")],
+    ["bg-blend-exclusion", invalidProperty("background-blend-mode")],
+    ["bg-blend-hue", invalidProperty("background-blend-mode")],
+    ["bg-blend-saturation", invalidProperty("background-blend-mode")],
+    ["bg-blend-color", invalidProperty("background-blend-mode")],
+    ["bg-blend-luminosity", invalidProperty("background-blend-mode")],
+  ]);
+});
+
+describe("Backgrounds - Background Clip", () => {
+  testCases([
+    ["bg-clip-border", invalidProperty("background-clip")],
+    ["bg-clip-padding", invalidProperty("background-clip")],
+    ["bg-clip-content", invalidProperty("background-clip")],
+    ["bg-clip-text", invalidProperty("background-clip")],
+  ]);
+});
+
+describe("Typography - Background Color", () => {
+  testCases([
+    ["bg-current", invalidValue("background-color", "currentcolor")],
+    ["bg-transparent", style({ backgroundColor: "rgba(0, 0, 0, 0)" })],
+    [
+      "bg-white",
+      {
+        style: { backgroundColor: "rgba(255, 255, 255, 1)" },
+        meta: { variables: { "--tw-bg-opacity": 1 } },
+      },
+    ],
+  ]);
+});
+
+describe("Backgrounds - Background Image", () => {
+  testCases([
+    ["bg-none", invalidProperty("background-image")],
+    ["bg-gradient-to-t", invalidProperty("background-image")],
+  ]);
+});
+
+describe("Backgrounds - Background Origin", () => {
+  testCases([
+    ["bg-origin-border", invalidProperty("background-origin")],
+    ["bg-origin-padding", invalidProperty("background-origin")],
+    ["bg-origin-content", invalidProperty("background-origin")],
+  ]);
+});
+
+describe("Backgrounds - Background Position", () => {
+  testCases([["bg-bottom", invalidProperty("background-position")]]);
+});
+
+describe("Backgrounds - Background Repeat", () => {
+  testCases([["bg-repeat", invalidProperty("background-repeat")]]);
+});
+
+describe("Backgrounds - Background Size", () => {
+  testCases([
+    ["bg-auto", invalidProperty("background-size")],
+    ["bg-cover", invalidProperty("background-size")],
+    ["bg-contain", invalidProperty("background-size")],
+  ]);
+});
+
+describe("Tables - Border Collapse", () => {
+  testCases([
+    ["border-collapse", invalidProperty("border-collapse")],
+    ["border-separate", invalidProperty("border-collapse")],
+  ]);
 });
