@@ -41,7 +41,12 @@ export function cssToReactNativeRuntime(
   code: Buffer | string,
   options: CssToReactNativeRuntimeOptions = {},
 ): StyleSheetRegisterOptions {
-  code = typeof code === "string" ? Buffer.from(code) : code;
+  code = typeof code === "string" ? code : code.toString("utf-8");
+  // I don't know why we need to remove this line, but we do :shug:
+  // Issue: https://github.com/parcel-bundler/lightningcss/issues/484
+  code = code.replaceAll("-webkit-text-size-adjust: 100%;", "");
+  code = Buffer.from(code);
+
   // Create maps to store the extracted style declarations and animations
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
   const keyframes = new Map<string, ExtractedAnimation>();

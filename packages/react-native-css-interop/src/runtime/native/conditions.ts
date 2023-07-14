@@ -1,9 +1,11 @@
 import {
+  ContainerCondition,
+  Declaration,
   MediaCondition,
-  MediaFeature,
   MediaFeatureComparison,
   MediaFeatureValue,
   MediaQuery,
+  QueryFeatureFor_MediaFeatureId,
 } from "lightningcss";
 
 import { exhaustiveCheck } from "../../css-to-rn/utils";
@@ -91,7 +93,7 @@ export function testContainerQuery(
  * This is also used for container queries
  */
 export function testCondition(
-  condition: MediaCondition | null | undefined,
+  condition: ContainerCondition<Declaration> | null | undefined,
   conditionReference: ConditionReference,
 ): boolean {
   if (!condition) return true;
@@ -108,13 +110,16 @@ export function testCondition(
     }
   } else if (condition.type === "not") {
     return !testCondition(condition.value, conditionReference);
+  } else if (condition.type === "style") {
+    // TODO
+    return false;
   }
 
   return testFeature(condition.value, conditionReference);
 }
 
 function testFeature(
-  feature: MediaFeature,
+  feature: QueryFeatureFor_MediaFeatureId,
   conditionReference: ConditionReference,
 ) {
   switch (feature.type) {
@@ -134,7 +139,7 @@ function testFeature(
 }
 
 function testPlainFeature(
-  feature: Extract<MediaFeature, { type: "plain" }>,
+  feature: Extract<QueryFeatureFor_MediaFeatureId, { type: "plain" }>,
   ref: ConditionReference,
 ) {
   const value = getMediaFeatureValue(feature.value);
@@ -184,7 +189,7 @@ function getMediaFeatureValue(value: MediaFeatureValue) {
 }
 
 function testRange(
-  feature: Extract<MediaFeature, { type: "range" }>,
+  feature: Extract<QueryFeatureFor_MediaFeatureId, { type: "range" }>,
   ref: ConditionReference,
 ) {
   const value = getMediaFeatureValue(feature.value);
@@ -224,7 +229,9 @@ function testComparision(
   }
 }
 
-function testBoolean(feature: Extract<MediaFeature, { type: "boolean" }>) {
+function testBoolean(
+  feature: Extract<QueryFeatureFor_MediaFeatureId, { type: "boolean" }>,
+) {
   switch (feature.name) {
     case "prefers-reduced-motion":
       return isReduceMotionEnabled.get();

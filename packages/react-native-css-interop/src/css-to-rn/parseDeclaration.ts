@@ -1474,6 +1474,7 @@ export function parseDeclaration(
     case "filter":
     case "backdrop-filter":
     case "scroll-padding-block-end":
+    case "view-transition-name":
       addWarning({
         type: "IncompatibleNativeProperty",
         property: declaration.property,
@@ -1498,6 +1499,16 @@ export function parseDeclaration(
     case "container":
       return addContainerProp(declaration);
     default: {
+      const $declaration = declaration as any;
+
+      // This is missing from the types
+      if ($declaration.property === "aspect-ratio") {
+        return addStyleProp(
+          $declaration.property,
+          parseAspectRatio($declaration.value),
+        );
+      }
+
       exhaustiveCheck(declaration);
     }
   }
@@ -1619,13 +1630,6 @@ function parseUnparsed(
       return parseLength(tokenOrValue.value, options);
     case "angle":
       return parseAngle(tokenOrValue.value, options);
-    case "color":
-    case "url":
-    case "env":
-    case "time":
-    case "resolution":
-    case "dashed-ident":
-      return;
     case "token":
       switch (tokenOrValue.value.type) {
         case "string":
@@ -1674,6 +1678,13 @@ function parseUnparsed(
           return;
         }
       }
+    case "color":
+    case "url":
+    case "env":
+    case "time":
+    case "resolution":
+    case "dashed-ident":
+      return;
     default: {
       exhaustiveCheck(tokenOrValue);
     }
@@ -2294,18 +2305,33 @@ function parseGap(
 
 function parseReactNativeFunction(
   name: string,
-  args: TokenOrValue[],
-  options: ParseDeclarationOptionsWithValueWarning,
+  _args: TokenOrValue[],
+  _options: ParseDeclarationOptionsWithValueWarning,
 ) {
   // TODO
-  console.log(
-    args.flatMap((tokenOrValue) => parseUnparsed(tokenOrValue, options)),
-  );
+  // console.log(
+  //   args.flatMap((tokenOrValue) => parseUnparsed(tokenOrValue, options)),
+  // );
   return {
     type: "runtime",
     name,
     arguments: [],
   };
+}
+
+function parseAspectRatio(
+  // This is missing types
+  aspectRatio: any,
+) {
+  if (aspectRatio.auto) {
+    return "auto";
+  } else {
+    if (aspectRatio.ratio[0] === aspectRatio.ratio[1]) {
+      return 1;
+    } else {
+      return aspectRatio.ratio.join(" / ");
+    }
+  }
 }
 
 function round(number: number) {

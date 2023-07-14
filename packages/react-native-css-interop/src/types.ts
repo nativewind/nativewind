@@ -5,6 +5,8 @@ import type {
   MediaCondition,
   Time,
   EasingFunction,
+  ContainerCondition,
+  Declaration,
 } from "lightningcss";
 import {
   Appearance,
@@ -145,7 +147,7 @@ export type ContainerRuntime = {
 
 export type ExtractedContainerQuery = {
   name?: string | null;
-  condition?: MediaCondition;
+  condition?: ContainerCondition<Declaration>;
   pseudoClasses?: PseudoClassesQuery;
 };
 

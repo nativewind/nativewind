@@ -74,3 +74,26 @@ describe("Layout - Align Items", () => {
     ["items-stretch", success({ alignItems: "stretch" })],
   ]);
 });
+
+describe("Layout - Align Self", () => {
+  testCases([
+    ["self-auto", success({ alignSelf: "auto" })],
+    ["self-start", success({ alignSelf: "flex-start" })],
+    ["self-end", success({ alignSelf: "flex-end" })],
+    ["self-center", success({ alignSelf: "center" })],
+    ["self-stretch", success({ alignSelf: "stretch" })],
+    ["self-baseline", success({ alignSelf: "baseline" })],
+  ]);
+});
+
+describe("Interactivity - Appearance", () => {
+  testCases([["appearance-none", invalidProperty("appearance")]]);
+});
+
+describe("Layout - Aspect Ratio", () => {
+  testCases([
+    ["aspect-square", success({ aspectRatio: 1 })],
+    ["aspect-video", success({ aspectRatio: "16 / 9" })],
+    ["aspect-[4/3]", success({ aspectRatio: "4 / 3" })],
+  ]);
+});
