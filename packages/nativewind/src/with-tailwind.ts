@@ -5,6 +5,7 @@ import {
   WithCssInteropOptions,
 } from "react-native-css-interop/metro";
 import { build as twBuild } from "tailwindcss/lib/cli/build";
+import { cssToReactNativeRuntimeOptions } from "./with-tailwind-options";
 
 export function withTailwind(config: ConfigT, options?: WithCssInteropOptions) {
   const getTransformOptions = async (
@@ -43,6 +44,9 @@ export function withTailwind(config: ConfigT, options?: WithCssInteropOptions) {
         getTransformOptions,
       },
     },
-    options,
+    {
+      ...options,
+      cssToReactNativeRuntime: cssToReactNativeRuntimeOptions,
+    },
   );
 }

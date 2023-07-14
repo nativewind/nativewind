@@ -81,6 +81,7 @@ export interface ParseDeclarationOptions {
 export interface ParseDeclarationOptionsWithValueWarning
   extends ParseDeclarationOptions {
   addValueWarning: (value: any) => void;
+  addFunctionValueWarning: (value: any) => void;
 }
 
 export function parseDeclaration(
@@ -95,11 +96,27 @@ export function parseDeclaration(
     addWarning,
   } = options;
 
+  const invalidNativeProperties = new Set(["backdrop-filter"]);
+
   if (declaration.property === "unparsed") {
+    if (invalidNativeProperties.has(declaration.value.propertyId.property)) {
+      return addWarning({
+        type: "IncompatibleNativeProperty",
+        property: declaration.value.propertyId.property,
+      });
+    }
+
     return addStyleProp(
       declaration.value.propertyId.property,
       parseUnparsed(declaration.value.value, {
         ...options,
+        addFunctionValueWarning(value: any) {
+          addWarning({
+            type: "IncompatibleNativeFunctionValue",
+            property: declaration.value.propertyId.property,
+            value,
+          });
+        },
         addValueWarning(value: any) {
           addWarning({
             type: "IncompatibleNativeValue",
@@ -117,6 +134,13 @@ export function parseDeclaration(
         addValueWarning(value: any) {
           addWarning({
             type: "IncompatibleNativeValue",
+            property: declaration.value.name,
+            value,
+          });
+        },
+        addFunctionValueWarning(value: any) {
+          addWarning({
+            type: "IncompatibleNativeFunctionValue",
             property: declaration.value.name,
             value,
           });
@@ -1615,14 +1639,16 @@ function parseUnparsed(
             options,
           );
         default: {
-          return {
-            type: "runtime",
-            name: tokenOrValue.value.name,
-            arguments: reduceParseUnparsed(
-              tokenOrValue.value.arguments,
-              options,
-            ),
-          };
+          options.addFunctionValueWarning(tokenOrValue.value.name);
+          return;
+          // return {
+          //   type: "runtime",
+          //   name: tokenOrValue.value.name,
+          //   arguments: reduceParseUnparsed(
+          //     tokenOrValue.value.arguments,
+          //     options,
+          //   ),
+          // };
         }
       }
     }

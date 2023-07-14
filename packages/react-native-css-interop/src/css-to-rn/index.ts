@@ -28,6 +28,7 @@ import { exhaustiveCheck } from "./utils";
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
   grouping?: (string | RegExp)[];
+  ignorePropertyWarningRegex?: (string | RegExp)[];
 };
 
 /**
@@ -662,6 +663,16 @@ function getExtractedStyle(
   }
 
   function addWarning(warning: ExtractionWarning) {
+    const warningRegexArray = options.ignorePropertyWarningRegex;
+
+    if (warningRegexArray) {
+      const match = warningRegexArray.some((regex) =>
+        new RegExp(regex).test(warning.property),
+      );
+
+      if (match) return;
+    }
+
     extrtactedStyle.warnings ??= [];
     extrtactedStyle.warnings.push(warning);
   }

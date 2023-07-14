@@ -4,10 +4,14 @@ import worker, {
   TransformResponse,
 } from "metro-transform-worker";
 
-import { cssToReactNativeRuntime } from "../css-to-rn";
+import {
+  cssToReactNativeRuntime,
+  CssToReactNativeRuntimeOptions,
+} from "../css-to-rn";
 
 export function cssInteropTransform(
   config: JsTransformerConfig & {
+    cssToReactNativeRuntime?: CssToReactNativeRuntimeOptions;
     existingTransformerPath: string;
     externallyManagedCss?: Record<string, string>;
   },
@@ -31,7 +35,9 @@ export function cssInteropTransform(
       : worker.transform(config, projectRoot, filename, data, options);
   }
 
-  const stringifiedOptions = JSON.stringify(cssToReactNativeRuntime(data));
+  const stringifiedOptions = JSON.stringify(
+    cssToReactNativeRuntime(data, config.cssToReactNativeRuntime),
+  );
 
   // TODO: Log warnings and errors
 

@@ -12,14 +12,19 @@ import {
   CssToReactNativeRuntimeOptions,
   cssToReactNativeRuntime,
 } from "../css-to-rn";
-import { CssInteropPropMapping, ExtractionWarning, Style } from "../types";
-import { warned, warnings } from "../runtime/shared/globals";
+import {
+  CssInteropPropMapping,
+  ExtractionWarning,
+  Style,
+  StyleMeta,
+} from "../types";
 
 declare global {
   namespace jest {
     interface Matchers<R> {
       styleToEqual(style?: Style): R;
-      toHaveStyleWarnings(warnings: Map<string, ExtractionWarning[]>): R;
+      styleMetaToEqual(styleMeta?: StyleMeta): R;
+      toHaveStyleWarnings(warnings?: Map<string, ExtractionWarning[]>): R;
     }
   }
 }
@@ -64,8 +69,6 @@ export function createMockComponent(
 
 export function resetStyles() {
   StyleSheet.__reset();
-  warnings.clear();
-  warned.clear();
 }
 
 export function registerCSS(

@@ -18,6 +18,7 @@ import {
   styleMetaMap,
   vh,
   vw,
+  warned,
   warnings,
 } from "./globals";
 
@@ -39,6 +40,9 @@ const parialStyleSheet = {
   },
   __reset({ dimensions = Dimensions, appearance = Appearance } = {}) {
     globalStyles.clear();
+    animationMap.clear();
+    warnings.clear();
+    warned.clear();
     rem.reset();
     vw.reset(dimensions);
     vh.reset(dimensions);

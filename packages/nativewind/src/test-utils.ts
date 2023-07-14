@@ -3,6 +3,7 @@ import { format as prettyFormat } from "pretty-format";
 import postcss from "postcss";
 import { registerCSS } from "react-native-css-interop/testing-library";
 import tailwind from "tailwindcss";
+import { cssToReactNativeRuntimeOptions } from "./with-tailwind-options";
 
 export async function renderTailwind<T>(
   component: React.ReactElement<T>,
@@ -17,7 +18,7 @@ export async function renderTailwind<T>(
     from: undefined,
   });
 
-  registerCSS(css);
+  registerCSS(css, cssToReactNativeRuntimeOptions);
 
   return render(component, options);
 }

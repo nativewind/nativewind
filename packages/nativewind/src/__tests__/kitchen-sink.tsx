@@ -4,14 +4,18 @@ import {
   resetStyles,
 } from "react-native-css-interop/testing-library";
 import { renderTailwind } from "../test-utils";
-import { ExtractionWarning } from "react-native-css-interop/dist/types";
+import {
+  ExtractionWarning,
+  StyleMeta,
+} from "react-native-css-interop/dist/types";
 
 type Style = ViewStyle & TextStyle & ImageStyle;
 type Case = [
   string,
   {
-    success?: ReturnType<typeof success>["success"];
-    failure?: (name: string) => Map<string, ExtractionWarning[]>;
+    style?: ReturnType<typeof style>["style"];
+    warning?: (name: string) => Map<string, ExtractionWarning[]>;
+    meta?: StyleMeta;
   },
 ];
 
@@ -19,15 +23,15 @@ const A = createMockComponent();
 
 afterEach(() => resetStyles());
 
-const success = (style: Style) => ({ success: style });
+const style = (style: Style & Record<string, unknown>) => ({ style });
 const invalidProperty = (property: string) => ({
-  failure: (name: string) =>
+  warning: (name: string) =>
     new Map<string, ExtractionWarning[]>([
       [name, [{ type: "IncompatibleNativeProperty", property }]],
     ]),
 });
 const invalidValue = (property: string, value: any) => ({
-  failure: (name: string) =>
+  warning: (name: string) =>
     new Map<string, ExtractionWarning[]>([
       [name, [{ type: "IncompatibleNativeValue", property, value }]],
     ]),
@@ -37,11 +41,22 @@ function testCases(cases: Case[]) {
   test.each(cases)("%s", async (className, expected) => {
     await renderTailwind(<A className={className} />);
 
-    if (expected.success) {
-      expect(A).styleToEqual(expected.success);
-    } else if (expected.failure) {
+    if (expected.style) {
+      expect(A).styleToEqual(expected.style);
+    } else {
       expect(A).styleToEqual({});
-      expect(A).toHaveStyleWarnings(expected.failure(className));
+    }
+
+    if (expected.warning) {
+      expect(A).toHaveStyleWarnings(expected.warning(className));
+    } else {
+      expect(A).toHaveStyleWarnings(new Map());
+    }
+
+    if (expected.meta) {
+      expect(A).styleMetaToEqual(expected.meta);
+    } else {
+      expect(A).styleMetaToEqual(undefined);
     }
   });
 }
@@ -56,33 +71,33 @@ describe("Interactivity - Accent Color", () => {
 
 describe("Layout - Align Content", () => {
   testCases([
-    ["content-center", success({ alignContent: "center" })],
-    ["content-start", success({ alignContent: "flex-start" })],
-    ["content-end", success({ alignContent: "flex-end" })],
-    ["content-between", success({ alignContent: "space-between" })],
-    ["content-around", success({ alignContent: "space-around" })],
+    ["content-center", style({ alignContent: "center" })],
+    ["content-start", style({ alignContent: "flex-start" })],
+    ["content-end", style({ alignContent: "flex-end" })],
+    ["content-between", style({ alignContent: "space-between" })],
+    ["content-around", style({ alignContent: "space-around" })],
     ["content-evenly", invalidValue("align-content", "space-evenly")],
   ]);
 });
 
 describe("Layout - Align Items", () => {
   testCases([
-    ["items-center", success({ alignItems: "center" })],
-    ["items-start", success({ alignItems: "flex-start" })],
-    ["items-end", success({ alignItems: "flex-end" })],
-    ["items-baseline", success({ alignItems: "baseline" })],
-    ["items-stretch", success({ alignItems: "stretch" })],
+    ["items-center", style({ alignItems: "center" })],
+    ["items-start", style({ alignItems: "flex-start" })],
+    ["items-end", style({ alignItems: "flex-end" })],
+    ["items-baseline", style({ alignItems: "baseline" })],
+    ["items-stretch", style({ alignItems: "stretch" })],
   ]);
 });
 
 describe("Layout - Align Self", () => {
   testCases([
-    ["self-auto", success({ alignSelf: "auto" })],
-    ["self-start", success({ alignSelf: "flex-start" })],
-    ["self-end", success({ alignSelf: "flex-end" })],
-    ["self-center", success({ alignSelf: "center" })],
-    ["self-stretch", success({ alignSelf: "stretch" })],
-    ["self-baseline", success({ alignSelf: "baseline" })],
+    ["self-auto", style({ alignSelf: "auto" })],
+    ["self-start", style({ alignSelf: "flex-start" })],
+    ["self-end", style({ alignSelf: "flex-end" })],
+    ["self-center", style({ alignSelf: "center" })],
+    ["self-stretch", style({ alignSelf: "stretch" })],
+    ["self-baseline", style({ alignSelf: "baseline" })],
   ]);
 });
 
@@ -92,8 +107,28 @@ describe("Interactivity - Appearance", () => {
 
 describe("Layout - Aspect Ratio", () => {
   testCases([
-    ["aspect-square", success({ aspectRatio: 1 })],
-    ["aspect-video", success({ aspectRatio: "16 / 9" })],
-    ["aspect-[4/3]", success({ aspectRatio: "4 / 3" })],
+    ["aspect-square", style({ aspectRatio: 1 })],
+    ["aspect-video", style({ aspectRatio: "16 / 9" })],
+    ["aspect-[4/3]", style({ aspectRatio: "4 / 3" })],
   ]);
+});
+
+describe("Filters - Backdrop Blur", () => {
+  testCases([["backdrop-blur-none", invalidProperty("backdrop-filter")]]);
+});
+
+describe("Filters - Backdrop Brightness", () => {
+  testCases([["backdrop-brightness-0", invalidProperty("backdrop-filter")]]);
+});
+
+describe("Filters - Backdrop Contrast", () => {
+  testCases([["backdrop-contrast-0", invalidProperty("backdrop-filter")]]);
+});
+
+describe("Filters - Backdrop Grayscale", () => {
+  testCases([["backdrop-grayscale-0", invalidProperty("backdrop-filter")]]);
+});
+
+describe("Filters - Backdrop Hue Rotate", () => {
+  testCases([["backdrop-hue-rotate-0", invalidProperty("backdrop-filter")]]);
 });

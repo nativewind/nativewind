@@ -1,11 +1,13 @@
 import type { ConfigT, GetTransformOptions } from "metro-config";
 import path from "path";
 import { expoColorSchemeWarning } from "./expo";
+import { CssToReactNativeRuntimeOptions } from "../css-to-rn";
 
 export type { ConfigT };
 
 export interface WithCssInteropOptions {
   input?: string;
+  cssToReactNativeRuntime?: CssToReactNativeRuntimeOptions;
 }
 
 export function getInputOutput({
@@ -45,6 +47,7 @@ export function withCssInterop(
     ),
     transformer: {
       ...config.transformer,
+      cssToReactNativeRuntime: options?.cssToReactNativeRuntime,
       getTransformOptions,
       existingTransformerPath: config.transformerPath,
       externallyManagedCss: {

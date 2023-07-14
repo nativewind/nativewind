@@ -240,7 +240,8 @@ export interface ResetOptions {
 
 export type ExtractionWarning =
   | ExtractionWarningProperty
-  | ExtractionWarningValue;
+  | ExtractionWarningValue
+  | ExtractionWarningFunctionValue;
 
 export type ExtractionWarningProperty = {
   type: "IncompatibleNativeProperty";
@@ -249,6 +250,12 @@ export type ExtractionWarningProperty = {
 
 export type ExtractionWarningValue = {
   type: "IncompatibleNativeValue";
+  property: string;
+  value: any;
+};
+
+export type ExtractionWarningFunctionValue = {
+  type: "IncompatibleNativeFunctionValue";
   property: string;
   value: any;
 };
