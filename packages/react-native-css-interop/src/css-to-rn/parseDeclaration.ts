@@ -35,7 +35,7 @@ import type {
   RuntimeValue,
   TransformRecord,
 } from "../types";
-import { exhaustiveCheck } from "./utils";
+import { exhaustiveCheck } from "../shared";
 
 type AddStyleProp = (
   property: string,

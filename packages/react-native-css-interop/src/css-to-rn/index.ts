@@ -13,7 +13,7 @@ import {
   Selector,
 } from "lightningcss";
 
-import { isRuntimeValue } from "../shared";
+import { exhaustiveCheck, isRuntimeValue } from "../shared";
 import {
   ExtractedContainerQuery,
   ExtractedStyle,
@@ -23,7 +23,6 @@ import {
   ExtractionWarning,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
-import { exhaustiveCheck } from "./utils";
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;

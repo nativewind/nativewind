@@ -1,5 +1,9 @@
 import { RuntimeValue } from "./types";
 
+export function exhaustiveCheck(value: never) {
+  throw new Error(`Unhandled case: ${value}`);
+}
+
 export function isRuntimeValue(value: unknown): value is RuntimeValue {
   if (!value) {
     return false;

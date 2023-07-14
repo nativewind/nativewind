@@ -1,14 +1,12 @@
 import {
   ContainerCondition,
   Declaration,
-  MediaCondition,
   MediaFeatureComparison,
   MediaFeatureValue,
   MediaQuery,
   QueryFeatureFor_MediaFeatureId,
 } from "lightningcss";
 
-import { exhaustiveCheck } from "../../css-to-rn/utils";
 import {
   ContainerRuntime,
   ExtractedContainerQuery,
@@ -17,6 +15,7 @@ import {
   SignalLike,
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, vh, vw } from "./globals";
+import { exhaustiveCheck } from "../../shared";
 
 interface ConditionReference {
   width: number | SignalLike<number>;

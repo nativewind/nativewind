@@ -1,14 +1,11 @@
-import {
-  createMockComponent,
-  resetStyles,
-} from "react-native-css-interop/testing-library";
+import { resetStyles } from "react-native-css-interop/testing-library";
 import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
 
 describe("Interactivity - Accent Color", () => {
   testCases([
-    ["accent-inherit", invalidValue("accent-color", "inherit")],
+    ["accent-inherit", invalidProperty("accent-color")],
     ["accent-current", invalidProperty("accent-color")],
     ["accent-white", invalidProperty("accent-color")],
   ]);
@@ -94,7 +91,7 @@ describe("Filters - Backdrop Saturate", () => {
   testCases([["backdrop-sepia-0", invalidProperty("backdrop-filter")]]);
 });
 
-describe.only("Filters - Blur", () => {
+describe("Filters - Blur", () => {
   testCases([["blur", invalidProperty("filter")]]);
 });
 
