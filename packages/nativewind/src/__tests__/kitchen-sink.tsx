@@ -3,14 +3,6 @@ import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
 
-describe("Interactivity - Accent Color", () => {
-  testCases([
-    ["accent-inherit", invalidProperty("accent-color")],
-    ["accent-current", invalidProperty("accent-color")],
-    ["accent-white", invalidProperty("accent-color")],
-  ]);
-});
-
 describe("Layout - Align Content", () => {
   testCases([
     ["content-center", style({ alignContent: "center" })],
@@ -43,8 +35,45 @@ describe("Layout - Align Self", () => {
   ]);
 });
 
+describe("Interactivity - Accent Color", () => {
+  testCases([
+    ["accent-inherit", invalidProperty("accent-color")],
+    ["accent-current", invalidProperty("accent-color")],
+    ["accent-white", invalidProperty("accent-color")],
+  ]);
+});
+
 describe("Interactivity - Appearance", () => {
   testCases([["appearance-none", invalidProperty("appearance")]]);
+});
+
+describe("Interactivity - Touch Action", () => {
+  testCases([["touch-auto", invalidProperty("touch-action")]]);
+  testCases([["touch-none", invalidProperty("touch-action")]]);
+  testCases([["touch-pan-x", invalidProperty("touch-action")]]);
+  testCases([["touch-pan-left", invalidProperty("touch-action")]]);
+  testCases([["touch-pan-right", invalidProperty("touch-action")]]);
+  testCases([["touch-pan-y", invalidProperty("touch-action")]]);
+  testCases([["touch-pan-up", invalidProperty("touch-action")]]);
+  testCases([["touch-pan-down", invalidProperty("touch-action")]]);
+  testCases([["touch-pinch-zoom", invalidProperty("touch-action")]]);
+  testCases([["touch-manipulation", invalidProperty("touch-action")]]);
+});
+
+describe("Interactivity - User Select", () => {
+  testCases([["select-none", invalidProperty("user-select")]]);
+  testCases([["select-text", invalidProperty("user-select")]]);
+  testCases([["select-all", invalidProperty("user-select")]]);
+  testCases([["select-auto", invalidProperty("user-select")]]);
+});
+
+describe("Interactivity - Will Change", () => {
+  testCases([
+    ["will-change-auto", invalidProperty("will-change")],
+    ["will-change-scroll", invalidProperty("will-change")],
+    ["will-change-contents", invalidProperty("will-change")],
+    ["will-change-transform", invalidProperty("will-change")],
+  ]);
 });
 
 describe("Layout - Aspect Ratio", () => {
@@ -148,6 +177,110 @@ describe("Typography - Background Color", () => {
         meta: { variables: { "--tw-bg-opacity": 1 } },
       },
     ],
+  ]);
+});
+
+describe("Typography - Text Decoration Style", () => {
+  testCases([
+    ["decoration-solid", style({ textDecorationStyle: "solid" })],
+    ["decoration-double", style({ textDecorationStyle: "double" })],
+    ["decoration-dotted", style({ textDecorationStyle: "dotted" })],
+    ["decoration-dashed", style({ textDecorationStyle: "dashed" })],
+    ["decoration-wavy", invalidValue("text-decoration-style", "wavy")],
+  ]);
+});
+
+describe("Typography - Text Decoration Thickness", () => {
+  testCases([
+    ["decoration-auto", invalidProperty("text-decoration-thickness")],
+  ]);
+});
+
+describe("Typography - Text Decoration", () => {
+  testCases([
+    ["underline", style({ textDecorationLine: "underline" })],
+    ["line-through", style({ textDecorationLine: "line-through" })],
+    ["no-underline", style({ textDecorationLine: "none" })],
+    ["overline", invalidValue("text-decoration-line", "overline")],
+  ]);
+});
+
+describe("Typography - Text Indent", () => {
+  testCases([
+    ["indent-px", invalidProperty("text-indent")],
+    ["indent-0", invalidProperty("text-indent")],
+    ["indent-1", invalidProperty("text-indent")],
+  ]);
+});
+
+describe("Typography - Text Transform", () => {
+  testCases([
+    ["uppercase", style({ textTransform: "uppercase" })],
+    ["lowercase", style({ textTransform: "lowercase" })],
+    ["capitalize", style({ textTransform: "capitalize" })],
+    ["normal-case", style({ textTransform: "none" })],
+  ]);
+});
+
+describe("Typography - Text Overflow", () => {
+  testCases([
+    ["text-ellipsis", invalidProperty("text-overflow")],
+    ["text-clip", invalidProperty("text-overflow")],
+  ]);
+});
+
+describe("Typography - Text Underline Offset", () => {
+  testCases([
+    ["underline-offset-auto", invalidProperty("text-underline-offset")],
+    ["underline-offset-0", invalidProperty("text-underline-offset")],
+  ]);
+});
+
+describe("Typography - Vertical Alignment", () => {
+  testCases([
+    ["align-baseline", invalidValue("vertical-align", "baseline")],
+    ["align-top", style({ verticalAlign: "top" })],
+    ["align-middle", style({ verticalAlign: "middle" })],
+    ["align-bottom", style({ verticalAlign: "bottom" })],
+    ["align-text-top", invalidValue("vertical-align", "text-top")],
+    ["align-text-bottom", invalidValue("vertical-align", "text-bottom")],
+    ["align-sub", invalidValue("vertical-align", "sub")],
+    ["align-super", invalidValue("vertical-align", "super")],
+  ]);
+});
+
+describe("Typography - Whitespace", () => {
+  testCases([
+    ["whitespace-normal", invalidProperty("white-space")],
+    ["whitespace-nowrap", invalidProperty("white-space")],
+    ["whitespace-pre", invalidProperty("white-space")],
+    ["whitespace-pre-line", invalidProperty("white-space")],
+    ["whitespace-pre-wrap", invalidProperty("white-space")],
+  ]);
+});
+
+describe("Typography - Word Break", () => {
+  testCases([
+    [
+      "break-normal",
+      {
+        warning: () =>
+          new Map([
+            [
+              "break-normal",
+              [
+                {
+                  property: "overflow-wrap",
+                  type: "IncompatibleNativeProperty",
+                },
+                { property: "word-break", type: "IncompatibleNativeProperty" },
+              ],
+            ],
+          ]),
+      },
+    ],
+    ["break-words", invalidProperty("overflow-wrap")],
+    ["break-all", invalidProperty("word-break")],
   ]);
 });
 
@@ -283,5 +416,19 @@ describe("Layout - Break Inside", () => {
     ["break-inside-avoid", invalidProperty("break-inside")],
     ["break-inside-avoid-page", invalidProperty("break-inside")],
     ["break-inside-avoid-column", invalidProperty("break-inside")],
+  ]);
+});
+
+describe("Layout - Visibility", () => {
+  testCases([
+    ["visible", invalidProperty("visibility")],
+    ["invisible", invalidProperty("visibility")],
+  ]);
+});
+
+describe("Layout - Z-Index", () => {
+  testCases([
+    ["z-auto", invalidValue("z-index", "auto")],
+    ["z-0", style({ zIndex: 0 })],
   ]);
 });

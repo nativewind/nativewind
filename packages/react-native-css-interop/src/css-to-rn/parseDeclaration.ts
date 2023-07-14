@@ -25,6 +25,7 @@ import type {
   OverflowKeyword,
   Size,
   TextDecorationLine,
+  TextDecorationStyle,
   TextShadow,
   TokenOrValue,
   VerticalAlign,
@@ -208,9 +209,6 @@ export function parseDeclaration(
       ) {
         addStyleProp(declaration.property, declaration.value.inside.type);
       }
-      return;
-    case "visibility":
-      // Might be possible to polyfill this with opacity 0 and to disable event handlers
       return;
     case "width":
       return addStyleProp(
@@ -1055,7 +1053,7 @@ export function parseDeclaration(
     case "vertical-align":
       return addStyleProp(
         declaration.property,
-        parseVerticalAlign(declaration.value),
+        parseVerticalAlign(declaration.value, parseOptions),
       );
     case "transition-property":
     case "transition-duration":
@@ -1251,6 +1249,11 @@ export function parseDeclaration(
     case "container-name":
     case "container":
       return addContainerProp(declaration);
+    case "text-decoration-style":
+      return addStyleProp(
+        declaration.property,
+        parseTextDecorationStyle(declaration.value, parseOptions),
+      );
     default: {
       const $declaration = declaration as any;
 
@@ -1311,9 +1314,6 @@ const invalidNativeProperties = [
   "border-right-style",
   "border-spacing",
   "border-top-style",
-  "break-after",
-  "break-before",
-  "break-inside",
   "box-align",
   "box-decoration-break",
   "box-direction",
@@ -1325,6 +1325,9 @@ const invalidNativeProperties = [
   "box-pack",
   "box-shadow",
   "box-sizing",
+  "break-after",
+  "break-before",
+  "break-inside",
   "caret",
   "caret-color",
   "caret-shape",
@@ -1454,7 +1457,7 @@ const invalidNativeProperties = [
   "text-align",
   "text-align-last",
   "text-decoration-skip-ink",
-  "text-decoration-style",
+  "text-decoration-thickness",
   "text-emphasis",
   "text-emphasis-color",
   "text-emphasis-position",
@@ -1463,12 +1466,16 @@ const invalidNativeProperties = [
   "text-justify",
   "text-overflow",
   "text-rendering",
+  "text-underline-offset",
+  "touch-action",
   "transform-box",
   "transform-origin",
   "transform-style",
   "user-select",
   "view-transition-name",
+  "visibility",
   "white-space",
+  "will-change",
   "word-break",
   "word-spacing",
   "word-wrap",
@@ -2056,6 +2063,20 @@ function parseTextShadow(
   addStyleProp("textShadowRadius", parseLength(textshadow.blur, options));
 }
 
+function parseTextDecorationStyle(
+  textDecorationStyle: TextDecorationStyle,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  const allowed = new Set(["solid", "double", "dotted", "dashed"]);
+
+  if (allowed.has(textDecorationStyle)) {
+    return textDecorationStyle;
+  }
+
+  options.addValueWarning(textDecorationStyle);
+  return undefined;
+}
+
 function parseTextDecorationLine(
   textDecorationLine: TextDecorationLine,
   options: ParseDeclarationOptionsWithValueWarning,
@@ -2137,7 +2158,10 @@ function parseBorderSideWidth(
   return undefined;
 }
 
-function parseVerticalAlign(verticalAlign: VerticalAlign) {
+function parseVerticalAlign(
+  verticalAlign: VerticalAlign,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   if (verticalAlign.type === "length") {
     return undefined;
   }
@@ -2148,6 +2172,7 @@ function parseVerticalAlign(verticalAlign: VerticalAlign) {
     return verticalAlign.value;
   }
 
+  options.addValueWarning(verticalAlign.value);
   return undefined;
 }
 
