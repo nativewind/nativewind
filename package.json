@@ -17,7 +17,7 @@
     "@types/node": "18.16.19",
     "eslint": "8.45.0",
     "eslint-config-prettier": "8.8.0",
-    "eslint-plugin-unicorn": "47.0.0",
+    "eslint-plugin-unicorn": "48.0.0",
     "prettier": "3.0.0",
     "typescript": "5.1.6"
   }
