@@ -63,7 +63,7 @@
   "devDependencies": {
     "@babel/core": "7.21.8",
     "@babel/plugin-syntax-jsx": "7.21.4",
-    "@cspell/eslint-plugin": "6.31.1",
+    "@cspell/eslint-plugin": "6.31.2",
     "@testing-library/react-hooks": "8.0.1",
     "@testing-library/react-native": "12.1.2",
     "@types/css": "0.0.33",
