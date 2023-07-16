@@ -306,6 +306,45 @@ describe("Layout - Float", () => {
   testCases([["float-none", invalidProperty("float")]]);
 });
 
+describe("Layout - Margin", () => {
+  testCases([
+    [
+      "m-0",
+      style({ marginLeft: 0, marginTop: 0, marginRight: 0, marginBottom: 0 }),
+    ],
+    ["mx-0", style({ marginLeft: 0, marginRight: 0 })],
+    ["my-0", style({ marginTop: 0, marginBottom: 0 })],
+    ["mt-0", style({ marginTop: 0 })],
+    ["mr-0", style({ marginRight: 0 })],
+    ["mb-0", style({ marginBottom: 0 })],
+    ["ml-0", style({ marginLeft: 0 })],
+    ["ms-0", style({ marginStart: 0 })],
+    ["me-0", style({ marginEnd: 0 })],
+  ]);
+});
+
+describe("Layout - Padding", () => {
+  testCases([
+    [
+      "p-0",
+      style({
+        paddingLeft: 0,
+        paddingTop: 0,
+        paddingRight: 0,
+        paddingBottom: 0,
+      }),
+    ],
+    ["px-0", style({ paddingLeft: 0, paddingRight: 0 })],
+    ["py-0", style({ paddingTop: 0, paddingBottom: 0 })],
+    ["pt-0", style({ paddingTop: 0 })],
+    ["pr-0", style({ paddingRight: 0 })],
+    ["pb-0", style({ paddingBottom: 0 })],
+    ["pl-0", style({ paddingLeft: 0 })],
+    ["ps-0", style({ paddingStart: 0 })],
+    ["pe-0", style({ paddingEnd: 0 })],
+  ]);
+});
+
 describe("Filters - Backdrop Blur", () => {
   testCases([["backdrop-blur-none", invalidProperty("backdrop-filter")]]);
 });
@@ -354,6 +393,13 @@ describe("Filters - Drop Shadow", () => {
   testCases([["drop-shadow", invalidProperty("filter")]]);
 });
 
+describe("Filters - Invert", () => {
+  testCases([
+    ["invert-0", invalidProperty("filter")],
+    ["invert", invalidProperty("filter")],
+  ]);
+});
+
 describe("Filters - Saturate", () => {
   testCases([
     ["saturate-0", invalidProperty("filter")],
@@ -400,6 +446,40 @@ describe("Backgrounds - Background Clip", () => {
     ["bg-clip-padding", invalidProperty("background-clip")],
     ["bg-clip-content", invalidProperty("background-clip")],
     ["bg-clip-text", invalidProperty("background-clip")],
+  ]);
+});
+
+// Needs the plugin to override the `em`
+describe.skip("Typography - Letter Spacing", () => {
+  testCases([
+    ["tracking-tighter", style({ letterSpacing: -0.5 })],
+    ["tracking-tight", style({ letterSpacing: -0.25 })],
+    ["tracking-normal", style({ letterSpacing: 0 })],
+    ["tracking-wide", style({ letterSpacing: 0.25 })],
+    ["tracking-wider", style({ letterSpacing: 0.5 })],
+    ["tracking-widest", style({ letterSpacing: 1 })],
+  ]);
+});
+
+describe("Typography - Line Height", () => {
+  testCases([
+    ["leading-3", style({ lineHeight: 10.5 })],
+    ["leading-4", style({ lineHeight: 14 })],
+  ]);
+});
+
+describe("Typography - List Style Position", () => {
+  testCases([
+    ["list-inside", invalidProperty("list-style-position")],
+    ["list-outside", invalidProperty("list-style-position")],
+  ]);
+});
+
+describe("Typography - List Style Type", () => {
+  testCases([
+    ["list-none", invalidProperty("list-style-type")],
+    ["list-disc", invalidProperty("list-style-type")],
+    ["list-decimal", invalidProperty("list-style-type")],
   ]);
 });
 
@@ -563,6 +643,54 @@ describe("Flexbox & Grid - Gap", () => {
     ["gap-0", style({ columnGap: 0, rowGap: 0 })],
     ["gap-1", style({ columnGap: 3.5, rowGap: 3.5 })],
     ["gap-px", style({ columnGap: 1, rowGap: 1 })],
+  ]);
+});
+
+describe("Flexbox & Grid - Grid Column Start / End", () => {
+  testCases([
+    ["col-auto", invalidProperty("grid-column")],
+    ["col-span-1", invalidProperty("grid-column")],
+    ["col-span-full", invalidProperty("grid-column")],
+    ["col-start-1", invalidProperty("grid-column-start")],
+    ["col-start-auto", invalidProperty("grid-column-start")],
+    ["col-end-1", invalidProperty("grid-column-end")],
+    ["col-end-auto", invalidProperty("grid-column-end")],
+  ]);
+});
+
+describe("Flexbox & Grid - Grid Row Start / End", () => {
+  testCases([
+    ["row-auto", invalidProperty("grid-row")],
+    ["row-span-1", invalidProperty("grid-row")],
+    ["row-span-full", invalidProperty("grid-row")],
+    ["row-start-1", invalidProperty("grid-row-start")],
+    ["row-start-auto", invalidProperty("grid-row-start")],
+    ["row-end-1", invalidProperty("grid-row-end")],
+    ["row-end-auto", invalidProperty("grid-row-end")],
+  ]);
+});
+
+describe("Flexbox & Grid - Grid Template Columns", () => {
+  testCases([
+    ["grid-cols-1", invalidProperty("grid-template-columns")],
+    ["grid-cols-2", invalidProperty("grid-template-columns")],
+    ["grid-cols-none", invalidProperty("grid-template-columns")],
+    [
+      "grid-cols-[200px_minmax(900px,_1fr)_100px]",
+      invalidProperty("grid-template-columns"),
+    ],
+  ]);
+});
+
+describe("Flexbox & Grid - Grid Template Rows", () => {
+  testCases([
+    ["grid-rows-1", invalidProperty("grid-template-rows")],
+    ["grid-rows-2", invalidProperty("grid-template-rows")],
+    ["grid-rows-none", invalidProperty("grid-template-rows")],
+    [
+      "grid-rows-[200px_minmax(900px,_1fr)_100px]",
+      invalidProperty("grid-template-rows"),
+    ],
   ]);
 });
 
@@ -842,6 +970,13 @@ describe("Layout - Break Inside", () => {
   ]);
 });
 
+describe("Layout - Isolation", () => {
+  testCases([
+    ["isolate", invalidProperty("isolation")],
+    ["isolation-auto", invalidProperty("isolation")],
+  ]);
+});
+
 describe("Layout - Grid Auto Flow", () => {
   testCases([
     ["grid-flow-row", invalidProperty("grid-auto-flow")],
@@ -866,6 +1001,36 @@ describe("Layout - Grid Auto Rows", () => {
     ["auto-rows-min", invalidProperty("grid-auto-rows")],
     ["auto-rows-max", invalidProperty("grid-auto-rows")],
     ["auto-rows-fr", invalidProperty("grid-auto-rows")],
+  ]);
+});
+
+describe("Layout - Justify Content", () => {
+  testCases([
+    ["justify-start", style({ justifyContent: "flex-start" })],
+    ["justify-end", style({ justifyContent: "flex-end" })],
+    ["justify-center", style({ justifyContent: "center" })],
+    ["justify-between", style({ justifyContent: "space-between" })],
+    ["justify-around", style({ justifyContent: "space-around" })],
+    ["justify-evenly", style({ justifyContent: "space-evenly" })],
+  ]);
+});
+
+describe("Layout - Justify Items", () => {
+  testCases([
+    ["justify-items-start", invalidProperty("justify-items")],
+    ["justify-items-end", invalidProperty("justify-items")],
+    ["justify-items-center", invalidProperty("justify-items")],
+    ["justify-items-stretch", invalidProperty("justify-items")],
+  ]);
+});
+
+describe("Layout - Justify Self", () => {
+  testCases([
+    ["justify-self-auto", invalidProperty("justify-self")],
+    ["justify-self-start", invalidProperty("justify-self")],
+    ["justify-self-end", invalidProperty("justify-self")],
+    ["justify-self-center", invalidProperty("justify-self")],
+    ["justify-self-stretch", invalidProperty("justify-self")],
   ]);
 });
 

@@ -831,39 +831,39 @@ export function parseDeclaration(
       );
     case "margin-block-start":
       return addStyleProp(
-        declaration.property,
+        "margin-start",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "margin-block-end":
       return addStyleProp(
-        declaration.property,
+        "margin-end",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "margin-inline-start":
       return addStyleProp(
-        declaration.property,
+        "margin-start",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "margin-inline-end":
       return addStyleProp(
-        declaration.property,
+        "margin-end",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "margin-block":
       addStyleProp(
-        declaration.property + "-start",
+        "margin-start",
         parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
         { shortHand: true },
       );
       addStyleProp(
-        declaration.property + "-end",
+        "margin-end",
         parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
         { shortHand: true },
       );
       return;
     case "margin-inline":
       addStyleProp(
-        declaration.property + "-start",
+        "margin-start",
         parseLengthPercentageOrAuto(
           declaration.value.inlineStart,
           parseOptions,
@@ -871,16 +871,12 @@ export function parseDeclaration(
         { shortHand: true },
       );
       addStyleProp(
-        declaration.property + "-end",
+        "margin-end",
         parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
         { shortHand: true },
       );
       return;
     case "margin":
-      addStyleProp(
-        "margin-top",
-        parseSize(declaration.value.top, parseOptions),
-      );
       addStyleProp(
         "margin-left",
         parseSize(declaration.value.left, parseOptions),
@@ -892,6 +888,10 @@ export function parseDeclaration(
       addStyleProp(
         "margin-bottom",
         parseSize(declaration.value.bottom, parseOptions),
+      );
+      addStyleProp(
+        "margin-top",
+        parseSize(declaration.value.top, parseOptions),
       );
       return;
     case "padding-top":
@@ -916,39 +916,39 @@ export function parseDeclaration(
       );
     case "padding-block-start":
       return addStyleProp(
-        declaration.property,
+        "padding-start",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-block-end":
       return addStyleProp(
-        declaration.property,
+        "padding-end",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-inline-start":
       return addStyleProp(
-        declaration.property,
+        "padding-start",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-inline-end":
       return addStyleProp(
-        declaration.property,
+        "padding-end",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-block":
       addStyleProp(
-        declaration.property + "-start",
+        "padding-start",
         parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
         { shortHand: true },
       );
       addStyleProp(
-        declaration.property + "-end",
+        "padding-end",
         parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
         { shortHand: true },
       );
       return;
     case "padding-inline":
       addStyleProp(
-        declaration.property + "-start",
+        "padding-start",
         parseLengthPercentageOrAuto(
           declaration.value.inlineStart,
           parseOptions,
@@ -956,11 +956,11 @@ export function parseDeclaration(
         { shortHand: true },
       );
       addStyleProp(
-        declaration.property + "-end",
+        "padding-end",
         parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
         { shortHand: true },
       );
-      break;
+      return;
     case "padding":
       addStyleProp(
         "padding-top",
@@ -1510,6 +1510,15 @@ const invalidNativeProperties = [
   "grid-auto-flow",
   "grid-auto-columns",
   "grid-auto-rows",
+  "grid-columns",
+  "grid-column-start",
+  "grid-column-end",
+  "grid-rows",
+  "grid-row-end",
+  "grid-row-start",
+  "grid-template-columns",
+  "grid-template-rows",
+  "isolation",
 ] as const;
 
 const invalidNativePropertiesLoose = new Set<string>(invalidNativeProperties);
@@ -1718,6 +1727,7 @@ export function parseLength(
   options: ParseDeclarationOptionsWithValueWarning,
 ): number | string | RuntimeValue | undefined {
   const { inlineRem = 14 } = options;
+
   if (typeof length === "number") {
     return length;
   }
