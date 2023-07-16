@@ -59,15 +59,6 @@ describe("Interactivity - Accent Color", () => {
   ]);
 });
 
-describe("Interactivity - Resize", () => {
-  testCases([
-    ["resize-none", invalidProperty("resize")],
-    ["resize-y", invalidProperty("resize")],
-    ["resize-x", invalidProperty("resize")],
-    ["resize", invalidProperty("resize")],
-  ]);
-});
-
 describe("Interactivity - Caret Color", () => {
   testCases([
     ["caret-inherit", invalidProperty("caret-color")],
@@ -81,6 +72,22 @@ describe("Interactivity - Cursor", () => {
     ["cursor-auto", invalidProperty("cursor")],
     ["cursor-default", invalidProperty("cursor")],
     ["cursor-default", invalidProperty("cursor")],
+  ]);
+});
+
+describe("Interactivity - Pointer Events", () => {
+  testCases([
+    ["pointer-events-none", invalidProperty("pointer-events")],
+    ["pointer-events-auto", invalidProperty("pointer-events")],
+  ]);
+});
+
+describe("Interactivity - Resize", () => {
+  testCases([
+    ["resize-none", invalidProperty("resize")],
+    ["resize-y", invalidProperty("resize")],
+    ["resize-x", invalidProperty("resize")],
+    ["resize", invalidProperty("resize")],
   ]);
 });
 
@@ -393,6 +400,20 @@ describe("Filters - Drop Shadow", () => {
   testCases([["drop-shadow", invalidProperty("filter")]]);
 });
 
+describe("Filters - Grayscale", () => {
+  testCases([
+    ["grayscale", invalidProperty("filter")],
+    ["grayscale-0", invalidProperty("filter")],
+  ]);
+});
+
+describe("Filters - Hue Rotate", () => {
+  testCases([
+    ["hue-rotate-0", invalidProperty("filter")],
+    ["hue-rotate-180", invalidProperty("filter")],
+  ]);
+});
+
 describe("Filters - Invert", () => {
   testCases([
     ["invert-0", invalidProperty("filter")],
@@ -447,6 +468,10 @@ describe("Backgrounds - Background Clip", () => {
     ["bg-clip-content", invalidProperty("background-clip")],
     ["bg-clip-text", invalidProperty("background-clip")],
   ]);
+});
+
+describe("Typography - Content", () => {
+  testCases([["content-none", invalidProperty("content")]]);
 });
 
 // Needs the plugin to override the `em`
@@ -812,9 +837,9 @@ describe("Typography - Word Break", () => {
   ]);
 });
 
-describe.skip("Backgrounds - Background Image", () => {
+describe.skip("Backgrounds - Gradient Color Stops", () => {
   testCases([
-    ["from-inherit", invalidProperty("background-image")],
+    // ["from-inherit", invalidProperty("background-image")],
     // ["from-current", invalidProperty("background-image")],
     // ["from-transparent", invalidProperty("background-image")],
     // ["from-white", invalidProperty("background-image")],
