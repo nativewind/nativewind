@@ -24,7 +24,7 @@
     "@uiw/react-codemirror": "4.21.7",
     "benchmarks": "0.0.0",
     "chart.js": "4.3.0",
-    "clsx": "1.2.1",
+    "clsx": "2.0.0",
     "dedent": "1.0.2",
     "docusaurus-plugin-sass": "0.2.4",
     "lodash.debounce": "4.0.8",
