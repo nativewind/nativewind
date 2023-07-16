@@ -35,11 +35,156 @@ describe("Layout - Align Self", () => {
   ]);
 });
 
+describe("Layout - Clear", () => {
+  testCases([
+    ["clear-right", invalidProperty("clear")],
+    ["clear-left", invalidProperty("clear")],
+    ["clear-both", invalidProperty("clear")],
+    ["clear-none", invalidProperty("clear")],
+  ]);
+});
+
+describe("Layout - Columns", () => {
+  testCases([
+    ["columns-1", invalidProperty("columns")],
+    ["columns-2", invalidProperty("columns")],
+  ]);
+});
+
 describe("Interactivity - Accent Color", () => {
   testCases([
     ["accent-inherit", invalidProperty("accent-color")],
     ["accent-current", invalidProperty("accent-color")],
     ["accent-white", invalidProperty("accent-color")],
+  ]);
+});
+
+describe("Interactivity - Resize", () => {
+  testCases([
+    ["resize-none", invalidProperty("resize")],
+    ["resize-y", invalidProperty("resize")],
+    ["resize-x", invalidProperty("resize")],
+    ["resize", invalidProperty("resize")],
+  ]);
+});
+
+describe("Interactivity - Caret Color", () => {
+  testCases([
+    ["caret-inherit", invalidProperty("caret-color")],
+    ["caret-current", invalidProperty("caret-color")],
+    ["caret-white", invalidProperty("caret-color")],
+  ]);
+});
+
+describe("Interactivity - Cursor", () => {
+  testCases([
+    ["cursor-auto", invalidProperty("cursor")],
+    ["cursor-default", invalidProperty("cursor")],
+    ["cursor-default", invalidProperty("cursor")],
+  ]);
+});
+
+describe("Interactivity - Scroll Behavior", () => {
+  testCases([
+    ["scroll-auto", invalidProperty("scroll-behavior")],
+    ["scroll-smooth", invalidProperty("scroll-behavior")],
+  ]);
+});
+
+describe("Interactivity - Scroll Margin", () => {
+  testCases([
+    ["scroll-m-0", invalidProperty("scroll-margin")],
+    [
+      "scroll-mx-0",
+      invalidProperty("scroll-margin-left", "scroll-margin-right"),
+    ],
+    [
+      "scroll-my-0",
+      invalidProperty("scroll-margin-top", "scroll-margin-bottom"),
+    ],
+    ["scroll-mt-0", invalidProperty("scroll-margin-top")],
+    ["scroll-mr-0", invalidProperty("scroll-margin-right")],
+    ["scroll-mb-0", invalidProperty("scroll-margin-bottom")],
+    ["scroll-ml-0", invalidProperty("scroll-margin-left")],
+    ["scroll-ms-0", invalidProperty("scroll-margin-inline-start")],
+    ["scroll-me-0", invalidProperty("scroll-margin-inline-end")],
+    ["scroll-m-px", invalidProperty("scroll-margin")],
+    [
+      "scroll-mx-px",
+      invalidProperty("scroll-margin-left", "scroll-margin-right"),
+    ],
+    [
+      "scroll-my-px",
+      invalidProperty("scroll-margin-top", "scroll-margin-bottom"),
+    ],
+    ["scroll-mt-px", invalidProperty("scroll-margin-top")],
+    ["scroll-mr-px", invalidProperty("scroll-margin-right")],
+    ["scroll-mb-px", invalidProperty("scroll-margin-bottom")],
+    ["scroll-ml-px", invalidProperty("scroll-margin-left")],
+    ["scroll-ms-px", invalidProperty("scroll-margin-inline-start")],
+    ["scroll-me-px", invalidProperty("scroll-margin-inline-end")],
+  ]);
+});
+
+describe("Interactivity - Scroll Padding", () => {
+  testCases([
+    ["scroll-p-0", invalidProperty("scroll-padding")],
+    [
+      "scroll-px-0",
+      invalidProperty("scroll-padding-left", "scroll-padding-right"),
+    ],
+    [
+      "scroll-py-0",
+      invalidProperty("scroll-padding-top", "scroll-padding-bottom"),
+    ],
+    ["scroll-pt-0", invalidProperty("scroll-padding-top")],
+    ["scroll-pr-0", invalidProperty("scroll-padding-right")],
+    ["scroll-pb-0", invalidProperty("scroll-padding-bottom")],
+    ["scroll-pl-0", invalidProperty("scroll-padding-left")],
+    ["scroll-ps-0", invalidProperty("scroll-padding-inline-start")],
+    ["scroll-pe-0", invalidProperty("scroll-padding-inline-end")],
+    ["scroll-p-px", invalidProperty("scroll-padding")],
+    [
+      "scroll-px-px",
+      invalidProperty("scroll-padding-left", "scroll-padding-right"),
+    ],
+    [
+      "scroll-py-px",
+      invalidProperty("scroll-padding-top", "scroll-padding-bottom"),
+    ],
+    ["scroll-pt-px", invalidProperty("scroll-padding-top")],
+    ["scroll-pr-px", invalidProperty("scroll-padding-right")],
+    ["scroll-pb-px", invalidProperty("scroll-padding-bottom")],
+    ["scroll-pl-px", invalidProperty("scroll-padding-left")],
+    ["scroll-ps-px", invalidProperty("scroll-padding-inline-start")],
+    ["scroll-pe-px", invalidProperty("scroll-padding-inline-end")],
+  ]);
+});
+
+describe("Interactivity - Scroll Snap Align", () => {
+  testCases([
+    ["snap-start", invalidProperty("scroll-snap-align")],
+    ["snap-end", invalidProperty("scroll-snap-align")],
+    ["snap-center", invalidProperty("scroll-snap-align")],
+    ["snap-align-none", invalidProperty("scroll-snap-align")],
+  ]);
+});
+
+describe("Interactivity - Scroll Snap Stop", () => {
+  testCases([
+    ["snap-normal", invalidProperty("scroll-snap-stop")],
+    ["snap-always", invalidProperty("scroll-snap-stop")],
+  ]);
+});
+
+describe("Interactivity - Scroll Snap Type", () => {
+  testCases([
+    ["snap-none", invalidProperty("scroll-snap-type")],
+    ["snap-x", invalidProperty("scroll-snap-type")],
+    ["snap-y", invalidProperty("scroll-snap-type")],
+    ["snap-both", invalidProperty("scroll-snap-type")],
+    ["snap-mandatory", style({})],
+    ["snap-proximity", style({})],
   ]);
 });
 
@@ -82,6 +227,83 @@ describe("Layout - Aspect Ratio", () => {
     ["aspect-video", style({ aspectRatio: "16 / 9" })],
     ["aspect-[4/3]", style({ aspectRatio: "4 / 3" })],
   ]);
+});
+
+describe("Layout - Flex", () => {
+  testCases([
+    ["flex", style({ display: "flex" })],
+    ["flex-1", style({ flexBasis: "0%", flexGrow: 1, flexShrink: 1 })],
+    [
+      "flex-auto",
+      {
+        ...style({ flexGrow: 1, flexShrink: 1 }),
+        ...invalidValue("flex", "auto"),
+      },
+    ],
+    [
+      "flex-initial",
+      {
+        ...style({ flexGrow: 0, flexShrink: 1 }),
+        ...invalidValue("flex", "auto"),
+      },
+    ],
+    [
+      "flex-none",
+      {
+        ...style({ flexGrow: 0, flexShrink: 0 }),
+        ...invalidValue("flex", "auto"),
+      },
+    ],
+  ]);
+});
+
+describe("Layout - Flex Basis", () => {
+  testCases([
+    ["basis-auto", invalidValue("flex-basis", "auto")],
+    ["basis-0", style({ flexBasis: 0 })],
+    ["basis-1", style({ flexBasis: 3.5 })],
+    ["basis-px", style({ flexBasis: 1 })],
+    ["basis-full", style({ flexBasis: "100%" })],
+    ["basis-1/2", style({ flexBasis: "50%" })],
+  ]);
+});
+
+describe("Layout - Flex Direction", () => {
+  testCases([
+    ["flex-row", style({ flexDirection: "row" })],
+    ["flex-col", style({ flexDirection: "column" })],
+    ["flex-row-reverse", style({ flexDirection: "row-reverse" })],
+    ["flex-col-reverse", style({ flexDirection: "column-reverse" })],
+  ]);
+});
+
+describe("Layout - Flex Grow", () => {
+  testCases([
+    ["grow", style({ flexGrow: 1 })],
+    ["grow-0", style({ flexGrow: 0 })],
+    ["grow-[2]", style({ flexGrow: 2 })],
+  ]);
+});
+
+describe("Layout - Flex Shrink", () => {
+  testCases([
+    ["shrink", style({ flexShrink: 1 })],
+    ["shrink-0", style({ flexShrink: 0 })],
+  ]);
+});
+
+describe("Layout - Flex Wrap", () => {
+  testCases([
+    ["flex-wrap", style({ flexWrap: "wrap" })],
+    ["flex-nowrap", style({ flexWrap: "nowrap" })],
+    ["flex-wrap-reverse", style({ flexWrap: "wrap-reverse" })],
+  ]);
+});
+
+describe("Layout - Float", () => {
+  testCases([["float-right", invalidProperty("float")]]);
+  testCases([["float-left", invalidProperty("float")]]);
+  testCases([["float-none", invalidProperty("float")]]);
 });
 
 describe("Filters - Backdrop Blur", () => {
@@ -128,6 +350,21 @@ describe("Filters - Brightness", () => {
   testCases([["brightness-0", invalidProperty("filter")]]);
 });
 
+describe("Filters - Drop Shadow", () => {
+  testCases([["drop-shadow", invalidProperty("filter")]]);
+});
+
+describe("Filters - Saturate", () => {
+  testCases([
+    ["saturate-0", invalidProperty("filter")],
+    ["saturate-100", invalidProperty("filter")],
+  ]);
+});
+
+describe("Filters - Sepia", () => {
+  testCases([["sepia", invalidProperty("filter")]]);
+});
+
 describe("Backgrounds - Background Attachment", () => {
   testCases([
     ["bg-fixed", invalidProperty("background-attachment")],
@@ -163,6 +400,169 @@ describe("Backgrounds - Background Clip", () => {
     ["bg-clip-padding", invalidProperty("background-clip")],
     ["bg-clip-content", invalidProperty("background-clip")],
     ["bg-clip-text", invalidProperty("background-clip")],
+  ]);
+});
+
+describe("Typography - Font Size", () => {
+  testCases([
+    ["text-xs", style({ fontSize: 10.5, lineHeight: 14 })],
+    ["text-base", style({ fontSize: 14, lineHeight: 21 })],
+  ]);
+});
+
+describe("Typography - Text Align", () => {
+  testCases([
+    ["text-left", style({ textAlign: "left" })],
+    ["text-center", style({ textAlign: "center" })],
+    ["text-right", style({ textAlign: "right" })],
+    ["text-justify", style({ textAlign: "justify" })],
+  ]);
+});
+
+describe("Typography - Text Color", () => {
+  testCases([
+    [
+      "text-black",
+      {
+        style: { color: "rgba(0, 0, 0, 1)" },
+        meta: { variables: { "--tw-text-opacity": 1 } },
+      },
+    ],
+    [
+      "text-white",
+      {
+        style: { color: "rgba(255, 255, 255, 1)" },
+        meta: { variables: { "--tw-text-opacity": 1 } },
+      },
+    ],
+    [
+      "text-transparent",
+      {
+        style: { color: "rgba(0, 0, 0, 0)" },
+      },
+    ],
+    [
+      "text-slate-50",
+      {
+        style: { color: "rgba(248, 250, 252, 1)" },
+        meta: { variables: { "--tw-text-opacity": 1 } },
+      },
+    ],
+    [
+      "text-white/50",
+      {
+        style: { color: "rgba(255, 255, 255, 0.501960813999176)" },
+      },
+    ],
+    ["text-current", invalidValue("color", "currentcolor")],
+    ["text-inherit", invalidValue("color", "inherit")],
+  ]);
+});
+
+describe("Typography - Text Decoration Color", () => {
+  testCases([
+    ["decoration-black", style({ textDecorationColor: "rgba(0, 0, 0, 1)" })],
+    [
+      "decoration-white",
+      style({ textDecorationColor: "rgba(255, 255, 255, 1)" }),
+    ],
+    [
+      "decoration-transparent",
+      style({ textDecorationColor: "rgba(0, 0, 0, 0)" }),
+    ],
+    [
+      "decoration-slate-50",
+      style({ textDecorationColor: "rgba(248, 250, 252, 1)" }),
+    ],
+    [
+      "decoration-current",
+      invalidValue("text-decoration-color", "currentcolor"),
+    ],
+    ["decoration-inherit", invalidValue("text-decoration-color", "inherit")],
+  ]);
+});
+
+describe("Typography - Text Decoration Style", () => {
+  testCases([
+    ["decoration-solid", style({ textDecorationStyle: "solid" })],
+    ["decoration-double", style({ textDecorationStyle: "double" })],
+    ["decoration-dotted", style({ textDecorationStyle: "dotted" })],
+    ["decoration-dashed", style({ textDecorationStyle: "dashed" })],
+    ["decoration-wavy", invalidValue("text-decoration-style", "wavy")],
+  ]);
+});
+
+describe("Typography - Font Smoothing", () => {
+  testCases([
+    [
+      "antialiased",
+      {
+        warning: () =>
+          new Map([
+            [
+              "antialiased",
+              [
+                {
+                  property: "-webkit-font-smoothing",
+                  type: "IncompatibleNativeValue",
+                  value: "antialiased",
+                },
+                {
+                  property: "-moz-osx-font-smoothing",
+                  type: "IncompatibleNativeValue",
+                  value: "grayscale",
+                },
+              ],
+            ],
+          ]),
+      },
+    ],
+    [
+      "subpixel-antialiased",
+      {
+        warning: () =>
+          new Map([
+            [
+              "subpixel-antialiased",
+              [
+                {
+                  property: "-webkit-font-smoothing",
+                  type: "IncompatibleNativeValue",
+                  value: "auto",
+                },
+                {
+                  property: "-moz-osx-font-smoothing",
+                  type: "IncompatibleNativeValue",
+                  value: "auto",
+                },
+              ],
+            ],
+          ]),
+      },
+    ],
+  ]);
+});
+
+describe("Typography - Font Style", () => {
+  testCases([
+    ["italic", style({ fontStyle: "italic" })],
+    ["not-italic", style({ fontStyle: "normal" })],
+  ]);
+});
+
+describe("Typography - Font Weight", () => {
+  testCases([
+    ["font-thin", style({ fontWeight: "100" })],
+    ["font-normal", style({ fontWeight: "400" })],
+    ["font-black", style({ fontWeight: "900" })],
+  ]);
+});
+
+describe("Flexbox & Grid - Gap", () => {
+  testCases([
+    ["gap-0", style({ columnGap: 0, rowGap: 0 })],
+    ["gap-1", style({ columnGap: 3.5, rowGap: 3.5 })],
+    ["gap-px", style({ columnGap: 1, rowGap: 1 })],
   ]);
 });
 
@@ -284,7 +684,24 @@ describe("Typography - Word Break", () => {
   ]);
 });
 
-describe("Backgrounds - Background Image", () => {
+describe.skip("Backgrounds - Background Image", () => {
+  testCases([
+    ["from-inherit", invalidProperty("background-image")],
+    // ["from-current", invalidProperty("background-image")],
+    // ["from-transparent", invalidProperty("background-image")],
+    // ["from-white", invalidProperty("background-image")],
+    // ["via-inherit", invalidProperty("background-image")],
+    // ["via-current", invalidProperty("background-image")],
+    // ["via-transparent", invalidProperty("background-image")],
+    // ["via-white", invalidProperty("background-image")],
+    // ["to-inherit", invalidProperty("background-image")],
+    // ["to-current", invalidProperty("background-image")],
+    // ["to-transparent", invalidProperty("background-image")],
+    // ["to-white", invalidProperty("background-image")],
+  ]);
+});
+
+describe("Backgrounds - Gradient Color Stops", () => {
   testCases([
     ["bg-none", invalidProperty("background-image")],
     ["bg-gradient-to-t", invalidProperty("background-image")],
@@ -319,6 +736,12 @@ describe("Tables - Border Collapse", () => {
   testCases([
     ["border-collapse", invalidProperty("border-collapse")],
     ["border-separate", invalidProperty("border-collapse")],
+  ]);
+});
+describe("Tables - Table Layout", () => {
+  testCases([
+    ["table-auto", invalidProperty("table-layout")],
+    ["table-fixed", invalidProperty("table-layout")],
   ]);
 });
 
@@ -416,6 +839,33 @@ describe("Layout - Break Inside", () => {
     ["break-inside-avoid", invalidProperty("break-inside")],
     ["break-inside-avoid-page", invalidProperty("break-inside")],
     ["break-inside-avoid-column", invalidProperty("break-inside")],
+  ]);
+});
+
+describe("Layout - Grid Auto Flow", () => {
+  testCases([
+    ["grid-flow-row", invalidProperty("grid-auto-flow")],
+    ["grid-flow-col", invalidProperty("grid-auto-flow")],
+    ["grid-flow-row-dense", invalidProperty("grid-auto-flow")],
+    ["grid-flow-col-dense", invalidProperty("grid-auto-flow")],
+  ]);
+});
+
+describe("Layout - Grid Auto Columns", () => {
+  testCases([
+    ["auto-cols-auto", invalidProperty("grid-auto-columns")],
+    ["auto-cols-min", invalidProperty("grid-auto-columns")],
+    ["auto-cols-max", invalidProperty("grid-auto-columns")],
+    ["auto-cols-fr", invalidProperty("grid-auto-columns")],
+  ]);
+});
+
+describe("Layout - Grid Auto Rows", () => {
+  testCases([
+    ["auto-rows-auto", invalidProperty("grid-auto-rows")],
+    ["auto-rows-min", invalidProperty("grid-auto-rows")],
+    ["auto-rows-max", invalidProperty("grid-auto-rows")],
+    ["auto-rows-fr", invalidProperty("grid-auto-rows")],
   ]);
 });
 

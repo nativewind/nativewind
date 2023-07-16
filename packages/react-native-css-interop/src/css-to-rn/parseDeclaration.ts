@@ -24,6 +24,7 @@ import type {
   NumberOrPercentage,
   OverflowKeyword,
   Size,
+  TextAlign,
   TextDecorationLine,
   TextDecorationStyle,
   TextShadow,
@@ -1254,6 +1255,11 @@ export function parseDeclaration(
         declaration.property,
         parseTextDecorationStyle(declaration.value, parseOptions),
       );
+    case "text-align":
+      return addStyleProp(
+        declaration.property,
+        parseTextAlign(declaration.value, parseOptions),
+      );
     default: {
       const $declaration = declaration as any;
 
@@ -1331,11 +1337,13 @@ const invalidNativeProperties = [
   "caret",
   "caret-color",
   "caret-shape",
+  "clear",
   "clip-path",
   "clip-rule",
   "color-interpolation",
   "color-interpolation-filters",
   "color-rendering",
+  "columns",
   "composes",
   "cursor",
   "fill",
@@ -1351,6 +1359,7 @@ const invalidNativeProperties = [
   "flex-pack",
   "flex-positive",
   "flex-preferred-size",
+  "float",
   "font-palette",
   "font-stretch",
   "grid",
@@ -1422,28 +1431,47 @@ const invalidNativeProperties = [
   "place-items",
   "place-self",
   "resize",
+  "scroll-behavior",
+  "scroll-margin",
   "scroll-margin",
   "scroll-margin-block",
   "scroll-margin-block-end",
   "scroll-margin-block-start",
   "scroll-margin-bottom",
+  "scroll-margin-bottom",
   "scroll-margin-inline",
   "scroll-margin-inline-end",
+  "scroll-margin-inline-end",
+  "scroll-margin-inline-start",
   "scroll-margin-inline-start",
   "scroll-margin-left",
+  "scroll-margin-left",
+  "scroll-margin-right",
   "scroll-margin-right",
   "scroll-margin-top",
+  "scroll-margin-top",
+  "scroll-padding",
   "scroll-padding",
   "scroll-padding-block",
   "scroll-padding-block-end",
   "scroll-padding-block-start",
   "scroll-padding-bottom",
+  "scroll-padding-bottom",
   "scroll-padding-inline",
   "scroll-padding-inline-end",
+  "scroll-padding-inline-end",
+  "scroll-padding-inline-start",
   "scroll-padding-inline-start",
   "scroll-padding-left",
+  "scroll-padding-left",
+  "scroll-padding-right",
   "scroll-padding-right",
   "scroll-padding-top",
+  "scroll-padding-top",
+  "scroll-snap",
+  "scroll-snap-align",
+  "scroll-snap-stop",
+  "scroll-snap-type",
   "shape-rendering",
   "stroke",
   "stroke-dasharray",
@@ -1454,7 +1482,7 @@ const invalidNativeProperties = [
   "stroke-opacity",
   "stroke-width",
   "tab-size",
-  "text-align",
+  "table-layout",
   "text-align-last",
   "text-decoration-skip-ink",
   "text-decoration-thickness",
@@ -1479,6 +1507,9 @@ const invalidNativeProperties = [
   "word-break",
   "word-spacing",
   "word-wrap",
+  "grid-auto-flow",
+  "grid-auto-columns",
+  "grid-auto-rows",
 ] as const;
 
 const invalidNativePropertiesLoose = new Set<string>(invalidNativeProperties);
@@ -1535,8 +1566,12 @@ function parseUnparsed(
   tokenOrValue: TokenOrValue | TokenOrValue[] | string | number,
   options: ParseDeclarationOptionsWithValueWarning,
 ): string | number | object | undefined {
-  if (typeof tokenOrValue === "string" || typeof tokenOrValue === "number") {
+  if (typeof tokenOrValue === "string") {
     return tokenOrValue;
+  }
+
+  if (typeof tokenOrValue === "number") {
+    return round(tokenOrValue);
   }
 
   if (Array.isArray(tokenOrValue)) {
@@ -1551,9 +1586,9 @@ function parseUnparsed(
           type: "runtime",
           name: "rgba",
           arguments: [
-            value.r * 255,
-            value.g * 255,
-            value.b * 255,
+            round(value.r * 255),
+            round(value.g * 255),
+            round(value.b * 255),
             parseUnparsed(tokenOrValue.value.alpha, options),
           ],
         };
@@ -1765,7 +1800,7 @@ export function parseLength(
         return undefined;
       }
       case "number": {
-        return length.value;
+        return round(length.value);
       }
       case "percentage": {
         return `${round(length.value * 100)}%`;
@@ -2035,7 +2070,7 @@ function parseFontWeight(
   switch (fontWeight.type) {
     case "absolute":
       if (fontWeight.value.type === "weight") {
-        return fontWeight.value.value;
+        return fontWeight.value.value.toString();
       } else {
         return fontWeight.value.type;
       }
@@ -2315,6 +2350,19 @@ function parseReactNativeFunction(
     name,
     arguments: [],
   };
+}
+
+function parseTextAlign(
+  textAlign: TextAlign,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  const allowed = new Set(["auto", "left", "right", "center", "justify"]);
+  if (allowed.has(textAlign)) {
+    return textAlign;
+  }
+
+  options.addValueWarning(textAlign);
+  return undefined;
 }
 
 function parseAspectRatio(

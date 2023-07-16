@@ -10,5 +10,5 @@ tailwindRunner(
     "col-start-auto",
     "col-end-1",
     "col-end-auto",
-  ])
+  ]),
 );

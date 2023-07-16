@@ -42,10 +42,16 @@ type Case = [
 ];
 
 export const style = (style: Style & Record<string, unknown>) => ({ style });
-export const invalidProperty = (property: string) => ({
+export const invalidProperty = (...properties: string[]) => ({
   warning: (name: string) =>
     new Map<string, ExtractionWarning[]>([
-      [name, [{ type: "IncompatibleNativeProperty", property }]],
+      [
+        name,
+        properties.map((property) => ({
+          type: "IncompatibleNativeProperty",
+          property,
+        })),
+      ],
     ]),
 });
 export const invalidValue = (property: string, value: any) => ({
