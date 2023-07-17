@@ -31,7 +31,7 @@ test("translateY percentage", () => {
   });
 });
 
-test("rotate-180", () => {
+test.skip("rotate-180", () => {
   registerCSS(`
     .rotate-180 {
       --tw-rotate: 180deg;

@@ -1350,7 +1350,9 @@ export function parseDeclaration(
 const invalidNativeProperties = [
   "-webkit-mask-composite",
   "content",
+  "mix-blend-mode",
   "accent-color",
+  "object-fit",
   "appearance",
   "backdrop-filter",
   "backdrop-filter",

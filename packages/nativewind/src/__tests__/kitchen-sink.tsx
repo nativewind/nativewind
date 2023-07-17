@@ -6,102 +6,102 @@ import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
 afterEach(() => resetStyles());
 
 describe("Layout - Align Content", () => {
-  testCases([
+  testCases(
     ["content-center", style({ alignContent: "center" })],
     ["content-start", style({ alignContent: "flex-start" })],
     ["content-end", style({ alignContent: "flex-end" })],
     ["content-between", style({ alignContent: "space-between" })],
     ["content-around", style({ alignContent: "space-around" })],
     ["content-evenly", invalidValue("align-content", "space-evenly")],
-  ]);
+  );
 });
 
 describe("Layout - Align Items", () => {
-  testCases([
+  testCases(
     ["items-center", style({ alignItems: "center" })],
     ["items-start", style({ alignItems: "flex-start" })],
     ["items-end", style({ alignItems: "flex-end" })],
     ["items-baseline", style({ alignItems: "baseline" })],
     ["items-stretch", style({ alignItems: "stretch" })],
-  ]);
+  );
 });
 
 describe("Layout - Align Self", () => {
-  testCases([
+  testCases(
     ["self-auto", style({ alignSelf: "auto" })],
     ["self-start", style({ alignSelf: "flex-start" })],
     ["self-end", style({ alignSelf: "flex-end" })],
     ["self-center", style({ alignSelf: "center" })],
     ["self-stretch", style({ alignSelf: "stretch" })],
     ["self-baseline", style({ alignSelf: "baseline" })],
-  ]);
+  );
 });
 
 describe("Layout - Clear", () => {
-  testCases([
+  testCases(
     ["clear-right", invalidProperty("clear")],
     ["clear-left", invalidProperty("clear")],
     ["clear-both", invalidProperty("clear")],
     ["clear-none", invalidProperty("clear")],
-  ]);
+  );
 });
 
 describe("Layout - Columns", () => {
-  testCases([
+  testCases(
     ["columns-1", invalidProperty("columns")],
     ["columns-2", invalidProperty("columns")],
-  ]);
+  );
 });
 
 describe("Interactivity - Accent Color", () => {
-  testCases([
+  testCases(
     ["accent-inherit", invalidProperty("accent-color")],
     ["accent-current", invalidProperty("accent-color")],
     ["accent-white", invalidProperty("accent-color")],
-  ]);
+  );
 });
 
 describe("Interactivity - Caret Color", () => {
-  testCases([
+  testCases(
     ["caret-inherit", invalidProperty("caret-color")],
     ["caret-current", invalidProperty("caret-color")],
     ["caret-white", invalidProperty("caret-color")],
-  ]);
+  );
 });
 
 describe("Interactivity - Cursor", () => {
-  testCases([
+  testCases(
     ["cursor-auto", invalidProperty("cursor")],
     ["cursor-default", invalidProperty("cursor")],
     ["cursor-default", invalidProperty("cursor")],
-  ]);
+  );
 });
 
 describe("Interactivity - Pointer Events", () => {
-  testCases([
+  testCases(
     ["pointer-events-none", invalidProperty("pointer-events")],
     ["pointer-events-auto", invalidProperty("pointer-events")],
-  ]);
+  );
 });
 
 describe("Interactivity - Resize", () => {
-  testCases([
+  testCases(
     ["resize-none", invalidProperty("resize")],
     ["resize-y", invalidProperty("resize")],
     ["resize-x", invalidProperty("resize")],
     ["resize", invalidProperty("resize")],
-  ]);
+  );
 });
 
 describe("Interactivity - Scroll Behavior", () => {
-  testCases([
+  testCases(
     ["scroll-auto", invalidProperty("scroll-behavior")],
     ["scroll-smooth", invalidProperty("scroll-behavior")],
-  ]);
+  );
 });
 
 describe("Interactivity - Scroll Margin", () => {
-  testCases([
+  testCases(
     ["scroll-m-0", invalidProperty("scroll-margin")],
     [
       "scroll-mx-0",
@@ -132,11 +132,11 @@ describe("Interactivity - Scroll Margin", () => {
     ["scroll-ml-px", invalidProperty("scroll-margin-left")],
     ["scroll-ms-px", invalidProperty("scroll-margin-inline-start")],
     ["scroll-me-px", invalidProperty("scroll-margin-inline-end")],
-  ]);
+  );
 });
 
 describe("Interactivity - Scroll Padding", () => {
-  testCases([
+  testCases(
     ["scroll-p-0", invalidProperty("scroll-padding")],
     [
       "scroll-px-0",
@@ -167,79 +167,79 @@ describe("Interactivity - Scroll Padding", () => {
     ["scroll-pl-px", invalidProperty("scroll-padding-left")],
     ["scroll-ps-px", invalidProperty("scroll-padding-inline-start")],
     ["scroll-pe-px", invalidProperty("scroll-padding-inline-end")],
-  ]);
+  );
 });
 
 describe("Interactivity - Scroll Snap Align", () => {
-  testCases([
+  testCases(
     ["snap-start", invalidProperty("scroll-snap-align")],
     ["snap-end", invalidProperty("scroll-snap-align")],
     ["snap-center", invalidProperty("scroll-snap-align")],
     ["snap-align-none", invalidProperty("scroll-snap-align")],
-  ]);
+  );
 });
 
 describe("Interactivity - Scroll Snap Stop", () => {
-  testCases([
+  testCases(
     ["snap-normal", invalidProperty("scroll-snap-stop")],
     ["snap-always", invalidProperty("scroll-snap-stop")],
-  ]);
+  );
 });
 
 describe("Interactivity - Scroll Snap Type", () => {
-  testCases([
+  testCases(
     ["snap-none", invalidProperty("scroll-snap-type")],
     ["snap-x", invalidProperty("scroll-snap-type")],
     ["snap-y", invalidProperty("scroll-snap-type")],
     ["snap-both", invalidProperty("scroll-snap-type")],
     ["snap-mandatory", style({})],
     ["snap-proximity", style({})],
-  ]);
+  );
 });
 
 describe("Interactivity - Appearance", () => {
-  testCases([["appearance-none", invalidProperty("appearance")]]);
+  testCases(["appearance-none", invalidProperty("appearance")]);
 });
 
 describe("Interactivity - Touch Action", () => {
-  testCases([["touch-auto", invalidProperty("touch-action")]]);
-  testCases([["touch-none", invalidProperty("touch-action")]]);
-  testCases([["touch-pan-x", invalidProperty("touch-action")]]);
-  testCases([["touch-pan-left", invalidProperty("touch-action")]]);
-  testCases([["touch-pan-right", invalidProperty("touch-action")]]);
-  testCases([["touch-pan-y", invalidProperty("touch-action")]]);
-  testCases([["touch-pan-up", invalidProperty("touch-action")]]);
-  testCases([["touch-pan-down", invalidProperty("touch-action")]]);
-  testCases([["touch-pinch-zoom", invalidProperty("touch-action")]]);
-  testCases([["touch-manipulation", invalidProperty("touch-action")]]);
+  testCases(["touch-auto", invalidProperty("touch-action")]);
+  testCases(["touch-none", invalidProperty("touch-action")]);
+  testCases(["touch-pan-x", invalidProperty("touch-action")]);
+  testCases(["touch-pan-left", invalidProperty("touch-action")]);
+  testCases(["touch-pan-right", invalidProperty("touch-action")]);
+  testCases(["touch-pan-y", invalidProperty("touch-action")]);
+  testCases(["touch-pan-up", invalidProperty("touch-action")]);
+  testCases(["touch-pan-down", invalidProperty("touch-action")]);
+  testCases(["touch-pinch-zoom", invalidProperty("touch-action")]);
+  testCases(["touch-manipulation", invalidProperty("touch-action")]);
 });
 
 describe("Interactivity - User Select", () => {
-  testCases([["select-none", invalidProperty("user-select")]]);
-  testCases([["select-text", invalidProperty("user-select")]]);
-  testCases([["select-all", invalidProperty("user-select")]]);
-  testCases([["select-auto", invalidProperty("user-select")]]);
+  testCases(["select-none", invalidProperty("user-select")]);
+  testCases(["select-text", invalidProperty("user-select")]);
+  testCases(["select-all", invalidProperty("user-select")]);
+  testCases(["select-auto", invalidProperty("user-select")]);
 });
 
 describe("Interactivity - Will Change", () => {
-  testCases([
+  testCases(
     ["will-change-auto", invalidProperty("will-change")],
     ["will-change-scroll", invalidProperty("will-change")],
     ["will-change-contents", invalidProperty("will-change")],
     ["will-change-transform", invalidProperty("will-change")],
-  ]);
+  );
 });
 
 describe("Layout - Aspect Ratio", () => {
-  testCases([
+  testCases(
     ["aspect-square", style({ aspectRatio: 1 })],
     ["aspect-video", style({ aspectRatio: "16 / 9" })],
     ["aspect-[4/3]", style({ aspectRatio: "4 / 3" })],
-  ]);
+  );
 });
 
 describe("Layout - Flex", () => {
-  testCases([
+  testCases(
     ["flex", style({ display: "flex" })],
     ["flex-1", style({ flexBasis: "0%", flexGrow: 1, flexShrink: 1 })],
     [
@@ -263,60 +263,60 @@ describe("Layout - Flex", () => {
         ...invalidValue("flex", "auto"),
       },
     ],
-  ]);
+  );
 });
 
 describe("Layout - Flex Basis", () => {
-  testCases([
+  testCases(
     ["basis-auto", invalidValue("flex-basis", "auto")],
     ["basis-0", style({ flexBasis: 0 })],
     ["basis-1", style({ flexBasis: 3.5 })],
     ["basis-px", style({ flexBasis: 1 })],
     ["basis-full", style({ flexBasis: "100%" })],
     ["basis-1/2", style({ flexBasis: "50%" })],
-  ]);
+  );
 });
 
 describe("Layout - Flex Direction", () => {
-  testCases([
+  testCases(
     ["flex-row", style({ flexDirection: "row" })],
     ["flex-col", style({ flexDirection: "column" })],
     ["flex-row-reverse", style({ flexDirection: "row-reverse" })],
     ["flex-col-reverse", style({ flexDirection: "column-reverse" })],
-  ]);
+  );
 });
 
 describe("Layout - Flex Grow", () => {
-  testCases([
+  testCases(
     ["grow", style({ flexGrow: 1 })],
     ["grow-0", style({ flexGrow: 0 })],
     ["grow-[2]", style({ flexGrow: 2 })],
-  ]);
+  );
 });
 
 describe("Layout - Flex Shrink", () => {
-  testCases([
+  testCases(
     ["shrink", style({ flexShrink: 1 })],
     ["shrink-0", style({ flexShrink: 0 })],
-  ]);
+  );
 });
 
 describe("Layout - Flex Wrap", () => {
-  testCases([
+  testCases(
     ["flex-wrap", style({ flexWrap: "wrap" })],
     ["flex-nowrap", style({ flexWrap: "nowrap" })],
     ["flex-wrap-reverse", style({ flexWrap: "wrap-reverse" })],
-  ]);
+  );
 });
 
 describe("Layout - Float", () => {
-  testCases([["float-right", invalidProperty("float")]]);
-  testCases([["float-left", invalidProperty("float")]]);
-  testCases([["float-none", invalidProperty("float")]]);
+  testCases(["float-right", invalidProperty("float")]);
+  testCases(["float-left", invalidProperty("float")]);
+  testCases(["float-none", invalidProperty("float")]);
 });
 
 describe("Layout - Margin", () => {
-  testCases([
+  testCases(
     [
       "m-0",
       style({ marginLeft: 0, marginTop: 0, marginRight: 0, marginBottom: 0 }),
@@ -329,11 +329,11 @@ describe("Layout - Margin", () => {
     ["ml-0", style({ marginLeft: 0 })],
     ["ms-0", style({ marginStart: 0 })],
     ["me-0", style({ marginEnd: 0 })],
-  ]);
+  );
 });
 
 describe("Layout - Padding", () => {
-  testCases([
+  testCases(
     [
       "p-0",
       style({
@@ -341,8 +341,8 @@ describe("Layout - Padding", () => {
         paddingTop: 0,
         paddingRight: 0,
         paddingBottom: 0,
-      }),
-    ],
+      }),]
+    ,
     ["px-0", style({ paddingLeft: 0, paddingRight: 0 })],
     ["py-0", style({ paddingTop: 0, paddingBottom: 0 })],
     ["pt-0", style({ paddingTop: 0 })],
@@ -351,99 +351,99 @@ describe("Layout - Padding", () => {
     ["pl-0", style({ paddingLeft: 0 })],
     ["ps-0", style({ paddingStart: 0 })],
     ["pe-0", style({ paddingEnd: 0 })],
-  ]);
+  );
 });
 
 describe("Filters - Backdrop Blur", () => {
-  testCases([["backdrop-blur-none", invalidProperty("backdrop-filter")]]);
+  testCases(["backdrop-blur-none", invalidProperty("backdrop-filter")]);
 });
 
 describe("Filters - Backdrop Brightness", () => {
-  testCases([["backdrop-brightness-0", invalidProperty("backdrop-filter")]]);
+  testCases(["backdrop-brightness-0", invalidProperty("backdrop-filter")]);
 });
 
 describe("Filters - Backdrop Contrast", () => {
-  testCases([["backdrop-contrast-0", invalidProperty("backdrop-filter")]]);
+  testCases(["backdrop-contrast-0", invalidProperty("backdrop-filter")]);
 });
 
 describe("Filters - Backdrop Grayscale", () => {
-  testCases([["backdrop-grayscale-0", invalidProperty("backdrop-filter")]]);
+  testCases(["backdrop-grayscale-0", invalidProperty("backdrop-filter")]);
 });
 
 describe("Filters - Backdrop Hue Rotate", () => {
-  testCases([["backdrop-hue-rotate-0", invalidProperty("backdrop-filter")]]);
+  testCases(["backdrop-hue-rotate-0", invalidProperty("backdrop-filter")]);
 });
 
 describe("Filters - Backdrop Invert", () => {
-  testCases([["backdrop-invert-0", invalidProperty("backdrop-filter")]]);
+  testCases(["backdrop-invert-0", invalidProperty("backdrop-filter")]);
 });
 
 describe("Filters - Backdrop Opacity", () => {
-  testCases([["backdrop-opacity-0", invalidProperty("backdrop-filter")]]);
+  testCases(["backdrop-opacity-0", invalidProperty("backdrop-filter")]);
 });
 
 describe("Filters - Backdrop Saturate", () => {
-  testCases([["backdrop-saturate-0", invalidProperty("backdrop-filter")]]);
+  testCases(["backdrop-saturate-0", invalidProperty("backdrop-filter")]);
 });
 
 describe("Filters - Backdrop Saturate", () => {
-  testCases([["backdrop-sepia-0", invalidProperty("backdrop-filter")]]);
+  testCases(["backdrop-sepia-0", invalidProperty("backdrop-filter")]);
 });
 
 describe("Filters - Blur", () => {
-  testCases([["blur", invalidProperty("filter")]]);
+  testCases(["blur", invalidProperty("filter")]);
 });
 
 describe("Filters - Brightness", () => {
-  testCases([["brightness-0", invalidProperty("filter")]]);
+  testCases(["brightness-0", invalidProperty("filter")]);
 });
 
 describe("Filters - Drop Shadow", () => {
-  testCases([["drop-shadow", invalidProperty("filter")]]);
+  testCases(["drop-shadow", invalidProperty("filter")]);
 });
 
 describe("Filters - Grayscale", () => {
-  testCases([
+  testCases(
     ["grayscale", invalidProperty("filter")],
     ["grayscale-0", invalidProperty("filter")],
-  ]);
+  );
 });
 
 describe("Filters - Hue Rotate", () => {
-  testCases([
+  testCases(
     ["hue-rotate-0", invalidProperty("filter")],
     ["hue-rotate-180", invalidProperty("filter")],
-  ]);
+  );
 });
 
 describe("Filters - Invert", () => {
-  testCases([
+  testCases(
     ["invert-0", invalidProperty("filter")],
     ["invert", invalidProperty("filter")],
-  ]);
+  );
 });
 
 describe("Filters - Saturate", () => {
-  testCases([
+  testCases(
     ["saturate-0", invalidProperty("filter")],
     ["saturate-100", invalidProperty("filter")],
-  ]);
+  );
 });
 
 describe("Filters - Sepia", () => {
-  testCases([["sepia", invalidProperty("filter")]]);
+  testCases(["sepia", invalidProperty("filter")]);
 });
 
 describe("Backgrounds - Background Attachment", () => {
-  testCases([
+  testCases(
     ["bg-fixed", invalidProperty("background-attachment")],
     ["bg-local", invalidProperty("background-attachment")],
     ["bg-scroll", invalidProperty("background-attachment")],
-  ]);
+  );
 });
 
 describe("Effects - Background Blend Mode", () => {
-  testCases([
+  testCases(
     ["bg-blend-normal", invalidProperty("background-blend-mode")],
     ["bg-blend-multiply", invalidProperty("background-blend-mode")],
     ["bg-blend-screen", invalidProperty("background-blend-mode")],
@@ -460,74 +460,95 @@ describe("Effects - Background Blend Mode", () => {
     ["bg-blend-saturation", invalidProperty("background-blend-mode")],
     ["bg-blend-color", invalidProperty("background-blend-mode")],
     ["bg-blend-luminosity", invalidProperty("background-blend-mode")],
-  ]);
+  );
+});
+
+describe("Effects - Mix Blend Mode", () => {
+  testCases(
+    ["mix-blend-normal", invalidProperty("mix-blend-mode")],
+    ["mix-blend-multiply", invalidProperty("mix-blend-mode")],
+    ["mix-blend-screen", invalidProperty("mix-blend-mode")],
+    ["mix-blend-overlay", invalidProperty("mix-blend-mode")],
+    ["mix-blend-darken", invalidProperty("mix-blend-mode")],
+    ["mix-blend-lighten", invalidProperty("mix-blend-mode")],
+    ["mix-blend-color-dodge", invalidProperty("mix-blend-mode")],
+    ["mix-blend-color-burn", invalidProperty("mix-blend-mode")],
+    ["mix-blend-hard-light", invalidProperty("mix-blend-mode")],
+    ["mix-blend-soft-light", invalidProperty("mix-blend-mode")],
+    ["mix-blend-difference", invalidProperty("mix-blend-mode")],
+    ["mix-blend-exclusion", invalidProperty("mix-blend-mode")],
+    ["mix-blend-hue", invalidProperty("mix-blend-mode")],
+    ["mix-blend-saturation", invalidProperty("mix-blend-mode")],
+    ["mix-blend-color", invalidProperty("mix-blend-mode")],
+    ["mix-blend-luminosity", invalidProperty("mix-blend-mode")],
+  );
 });
 
 describe("Backgrounds - Background Clip", () => {
-  testCases([
+  testCases(
     ["bg-clip-border", invalidProperty("background-clip")],
     ["bg-clip-padding", invalidProperty("background-clip")],
     ["bg-clip-content", invalidProperty("background-clip")],
     ["bg-clip-text", invalidProperty("background-clip")],
-  ]);
+  );
 });
 
 describe("Typography - Content", () => {
-  testCases([["content-none", invalidProperty("content")]]);
+  testCases(["content-none", invalidProperty("content")]);
 });
 
 // Needs the plugin to override the `em`
 describe.skip("Typography - Letter Spacing", () => {
-  testCases([
+  testCases(
     ["tracking-tighter", style({ letterSpacing: -0.5 })],
     ["tracking-tight", style({ letterSpacing: -0.25 })],
     ["tracking-normal", style({ letterSpacing: 0 })],
     ["tracking-wide", style({ letterSpacing: 0.25 })],
     ["tracking-wider", style({ letterSpacing: 0.5 })],
     ["tracking-widest", style({ letterSpacing: 1 })],
-  ]);
+  );
 });
 
 describe("Typography - Line Height", () => {
-  testCases([
+  testCases(
     ["leading-3", style({ lineHeight: 10.5 })],
     ["leading-4", style({ lineHeight: 14 })],
-  ]);
+  );
 });
 
 describe("Typography - List Style Position", () => {
-  testCases([
+  testCases(
     ["list-inside", invalidProperty("list-style-position")],
     ["list-outside", invalidProperty("list-style-position")],
-  ]);
+  );
 });
 
 describe("Typography - List Style Type", () => {
-  testCases([
+  testCases(
     ["list-none", invalidProperty("list-style-type")],
     ["list-disc", invalidProperty("list-style-type")],
     ["list-decimal", invalidProperty("list-style-type")],
-  ]);
+  );
 });
 
 describe("Typography - Font Size", () => {
-  testCases([
+  testCases(
     ["text-xs", style({ fontSize: 10.5, lineHeight: 14 })],
     ["text-base", style({ fontSize: 14, lineHeight: 21 })],
-  ]);
+  );
 });
 
 describe("Typography - Text Align", () => {
-  testCases([
+  testCases(
     ["text-left", style({ textAlign: "left" })],
     ["text-center", style({ textAlign: "center" })],
     ["text-right", style({ textAlign: "right" })],
     ["text-justify", style({ textAlign: "justify" })],
-  ]);
+  );
 });
 
 describe("Typography - Text Color", () => {
-  testCases([
+  testCases(
     [
       "text-black",
       {
@@ -563,11 +584,11 @@ describe("Typography - Text Color", () => {
     ],
     ["text-current", invalidValue("color", "currentcolor")],
     ["text-inherit", invalidValue("color", "inherit")],
-  ]);
+  );
 });
 
 describe("Typography - Text Decoration Color", () => {
-  testCases([
+  testCases(
     ["decoration-black", style({ textDecorationColor: "rgba(0, 0, 0, 1)" })],
     [
       "decoration-white",
@@ -586,21 +607,21 @@ describe("Typography - Text Decoration Color", () => {
       invalidValue("text-decoration-color", "currentcolor"),
     ],
     ["decoration-inherit", invalidValue("text-decoration-color", "inherit")],
-  ]);
+  );
 });
 
 describe("Typography - Text Decoration Style", () => {
-  testCases([
+  testCases(
     ["decoration-solid", style({ textDecorationStyle: "solid" })],
     ["decoration-double", style({ textDecorationStyle: "double" })],
     ["decoration-dotted", style({ textDecorationStyle: "dotted" })],
     ["decoration-dashed", style({ textDecorationStyle: "dashed" })],
     ["decoration-wavy", invalidValue("text-decoration-style", "wavy")],
-  ]);
+  );
 });
 
 describe("Typography - Font Smoothing", () => {
-  testCases([
+  testCases(
     [
       "antialiased",
       {
@@ -647,34 +668,34 @@ describe("Typography - Font Smoothing", () => {
           ]),
       },
     ],
-  ]);
+  );
 });
 
 describe("Typography - Font Style", () => {
-  testCases([
+  testCases(
     ["italic", style({ fontStyle: "italic" })],
     ["not-italic", style({ fontStyle: "normal" })],
-  ]);
+  );
 });
 
 describe("Typography - Font Weight", () => {
-  testCases([
+  testCases(
     ["font-thin", style({ fontWeight: "100" })],
     ["font-normal", style({ fontWeight: "400" })],
     ["font-black", style({ fontWeight: "900" })],
-  ]);
+  );
 });
 
 describe("Flexbox & Grid - Gap", () => {
-  testCases([
+  testCases(
     ["gap-0", style({ columnGap: 0, rowGap: 0 })],
     ["gap-1", style({ columnGap: 3.5, rowGap: 3.5 })],
     ["gap-px", style({ columnGap: 1, rowGap: 1 })],
-  ]);
+  );
 });
 
 describe("Flexbox & Grid - Grid Column Start / End", () => {
-  testCases([
+  testCases(
     ["col-auto", invalidProperty("grid-column")],
     ["col-span-1", invalidProperty("grid-column")],
     ["col-span-full", invalidProperty("grid-column")],
@@ -682,11 +703,11 @@ describe("Flexbox & Grid - Grid Column Start / End", () => {
     ["col-start-auto", invalidProperty("grid-column-start")],
     ["col-end-1", invalidProperty("grid-column-end")],
     ["col-end-auto", invalidProperty("grid-column-end")],
-  ]);
+  );
 });
 
 describe("Flexbox & Grid - Grid Row Start / End", () => {
-  testCases([
+  testCases(
     ["row-auto", invalidProperty("grid-row")],
     ["row-span-1", invalidProperty("grid-row")],
     ["row-span-full", invalidProperty("grid-row")],
@@ -694,11 +715,11 @@ describe("Flexbox & Grid - Grid Row Start / End", () => {
     ["row-start-auto", invalidProperty("grid-row-start")],
     ["row-end-1", invalidProperty("grid-row-end")],
     ["row-end-auto", invalidProperty("grid-row-end")],
-  ]);
+  );
 });
 
 describe("Flexbox & Grid - Grid Template Columns", () => {
-  testCases([
+  testCases(
     ["grid-cols-1", invalidProperty("grid-template-columns")],
     ["grid-cols-2", invalidProperty("grid-template-columns")],
     ["grid-cols-none", invalidProperty("grid-template-columns")],
@@ -706,11 +727,11 @@ describe("Flexbox & Grid - Grid Template Columns", () => {
       "grid-cols-[200px_minmax(900px,_1fr)_100px]",
       invalidProperty("grid-template-columns"),
     ],
-  ]);
+  );
 });
 
 describe("Flexbox & Grid - Grid Template Rows", () => {
-  testCases([
+  testCases(
     ["grid-rows-1", invalidProperty("grid-template-rows")],
     ["grid-rows-2", invalidProperty("grid-template-rows")],
     ["grid-rows-none", invalidProperty("grid-template-rows")],
@@ -718,11 +739,11 @@ describe("Flexbox & Grid - Grid Template Rows", () => {
       "grid-rows-[200px_minmax(900px,_1fr)_100px]",
       invalidProperty("grid-template-rows"),
     ],
-  ]);
+  );
 });
 
 describe("Typography - Background Color", () => {
-  testCases([
+  testCases(
     ["bg-current", invalidValue("background-color", "currentcolor")],
     ["bg-transparent", style({ backgroundColor: "rgba(0, 0, 0, 0)" })],
     [
@@ -732,67 +753,67 @@ describe("Typography - Background Color", () => {
         meta: { variables: { "--tw-bg-opacity": 1 } },
       },
     ],
-  ]);
+  );
 });
 
 describe("Typography - Text Decoration Style", () => {
-  testCases([
+  testCases(
     ["decoration-solid", style({ textDecorationStyle: "solid" })],
     ["decoration-double", style({ textDecorationStyle: "double" })],
     ["decoration-dotted", style({ textDecorationStyle: "dotted" })],
     ["decoration-dashed", style({ textDecorationStyle: "dashed" })],
     ["decoration-wavy", invalidValue("text-decoration-style", "wavy")],
-  ]);
+  );
 });
 
 describe("Typography - Text Decoration Thickness", () => {
-  testCases([
+  testCases(
     ["decoration-auto", invalidProperty("text-decoration-thickness")],
-  ]);
+  );
 });
 
 describe("Typography - Text Decoration", () => {
-  testCases([
+  testCases(
     ["underline", style({ textDecorationLine: "underline" })],
     ["line-through", style({ textDecorationLine: "line-through" })],
     ["no-underline", style({ textDecorationLine: "none" })],
     ["overline", invalidValue("text-decoration-line", "overline")],
-  ]);
+  );
 });
 
 describe("Typography - Text Indent", () => {
-  testCases([
+  testCases(
     ["indent-px", invalidProperty("text-indent")],
     ["indent-0", invalidProperty("text-indent")],
     ["indent-1", invalidProperty("text-indent")],
-  ]);
+  );
 });
 
 describe("Typography - Text Transform", () => {
-  testCases([
+  testCases(
     ["uppercase", style({ textTransform: "uppercase" })],
     ["lowercase", style({ textTransform: "lowercase" })],
     ["capitalize", style({ textTransform: "capitalize" })],
     ["normal-case", style({ textTransform: "none" })],
-  ]);
+  );
 });
 
 describe("Typography - Text Overflow", () => {
-  testCases([
+  testCases(
     ["text-ellipsis", invalidProperty("text-overflow")],
     ["text-clip", invalidProperty("text-overflow")],
-  ]);
+  );
 });
 
 describe("Typography - Text Underline Offset", () => {
-  testCases([
+  testCases(
     ["underline-offset-auto", invalidProperty("text-underline-offset")],
     ["underline-offset-0", invalidProperty("text-underline-offset")],
-  ]);
+  );
 });
 
 describe("Typography - Vertical Alignment", () => {
-  testCases([
+  testCases(
     ["align-baseline", invalidValue("vertical-align", "baseline")],
     ["align-top", style({ verticalAlign: "top" })],
     ["align-middle", style({ verticalAlign: "middle" })],
@@ -801,21 +822,21 @@ describe("Typography - Vertical Alignment", () => {
     ["align-text-bottom", invalidValue("vertical-align", "text-bottom")],
     ["align-sub", invalidValue("vertical-align", "sub")],
     ["align-super", invalidValue("vertical-align", "super")],
-  ]);
+  );
 });
 
 describe("Typography - Whitespace", () => {
-  testCases([
+  testCases(
     ["whitespace-normal", invalidProperty("white-space")],
     ["whitespace-nowrap", invalidProperty("white-space")],
     ["whitespace-pre", invalidProperty("white-space")],
     ["whitespace-pre-line", invalidProperty("white-space")],
     ["whitespace-pre-wrap", invalidProperty("white-space")],
-  ]);
+  );
 });
 
 describe("Typography - Word Break", () => {
-  testCases([
+  testCases(
     [
       "break-normal",
       {
@@ -836,11 +857,11 @@ describe("Typography - Word Break", () => {
     ],
     ["break-words", invalidProperty("overflow-wrap")],
     ["break-all", invalidProperty("word-break")],
-  ]);
+  );
 });
 
 describe.skip("Backgrounds - Gradient Color Stops", () => {
-  testCases([
+  testCases(
     // ["from-inherit", invalidProperty("background-image")],
     // ["from-current", invalidProperty("background-image")],
     // ["from-transparent", invalidProperty("background-image")],
@@ -853,55 +874,55 @@ describe.skip("Backgrounds - Gradient Color Stops", () => {
     // ["to-current", invalidProperty("background-image")],
     // ["to-transparent", invalidProperty("background-image")],
     // ["to-white", invalidProperty("background-image")],
-  ]);
+  );
 });
 
 describe("Backgrounds - Gradient Color Stops", () => {
-  testCases([
+  testCases(
     ["bg-none", invalidProperty("background-image")],
     ["bg-gradient-to-t", invalidProperty("background-image")],
-  ]);
+  );
 });
 
 describe("Backgrounds - Background Origin", () => {
-  testCases([
+  testCases(
     ["bg-origin-border", invalidProperty("background-origin")],
     ["bg-origin-padding", invalidProperty("background-origin")],
     ["bg-origin-content", invalidProperty("background-origin")],
-  ]);
+  );
 });
 
 describe("Backgrounds - Background Position", () => {
-  testCases([["bg-bottom", invalidProperty("background-position")]]);
+  testCases(["bg-bottom", invalidProperty("background-position")]);
 });
 
 describe("Backgrounds - Background Repeat", () => {
-  testCases([["bg-repeat", invalidProperty("background-repeat")]]);
+  testCases(["bg-repeat", invalidProperty("background-repeat")]);
 });
 
 describe("Backgrounds - Background Size", () => {
-  testCases([
+  testCases(
     ["bg-auto", invalidProperty("background-size")],
     ["bg-cover", invalidProperty("background-size")],
     ["bg-contain", invalidProperty("background-size")],
-  ]);
+  );
 });
 
 describe("Tables - Border Collapse", () => {
-  testCases([
+  testCases(
     ["border-collapse", invalidProperty("border-collapse")],
     ["border-separate", invalidProperty("border-collapse")],
-  ]);
+  );
 });
 describe("Tables - Table Layout", () => {
-  testCases([
+  testCases(
     ["table-auto", invalidProperty("table-layout")],
     ["table-fixed", invalidProperty("table-layout")],
-  ]);
+  );
 });
 
 describe("Border - Border Color", () => {
-  testCases([
+  testCases(
     [
       "border-white",
       {
@@ -1068,11 +1089,11 @@ describe("Border - Border Color", () => {
     ["border-l-inherit", invalidValue("border-left-color", "inherit")],
     ["border-r-current", invalidValue("border-right-color", "currentcolor")],
     ["border-r-inherit", invalidValue("border-right-color", "inherit")],
-  ]);
+  );
 });
 
 describe("Border - Border Radius", () => {
-  testCases([
+  testCases(
     [
       "rounded",
       style({
@@ -1105,22 +1126,22 @@ describe("Border - Border Radius", () => {
         borderTopRightRadius: 9999,
       }),
     ],
-  ]);
+  );
 });
 
 describe("Tables - Border Style", () => {
-  testCases([
+  testCases(
     ["border-solid", style({ borderStyle: "solid" })],
     ["border-dashed", style({ borderStyle: "dashed" })],
     ["border-dotted", style({ borderStyle: "dotted" })],
     ["border-none", invalidValue("border-style", '"none"')],
     ["border-double", invalidValue("border-style", '"double"')],
     ["border-hidden", invalidValue("border-style", '"hidden"')],
-  ]);
+  );
 });
 
 describe("Sizing - Height", () => {
-  testCases([
+  testCases(
     ["h-0", style({ height: 0 })],
     ["h-px", style({ height: 1 })],
     ["h-1", style({ height: 3.5 })],
@@ -1134,25 +1155,45 @@ describe("Sizing - Height", () => {
       "h-screen",
       { ...style({ height: Dimensions.get("window").height }), meta: {} },
     ],
-  ]);
+  );
+});
+
+describe("Sizing - Max Width", () => {
+  testCases(
+    ["max-w-0", style({ maxWidth: 0 })],
+    ["max-w-full", style({ maxWidth: "100%" })],
+    ["max-w-min", invalidValue("max-width", "min-content")],
+    ["max-w-max", invalidValue("max-width", "max-content")],
+    ["max-w-fit", invalidValue("max-width", "fit-content")],
+  );
+});
+
+describe("Sizing - Min Width", () => {
+  testCases(
+    ["min-w-0", style({ minWidth: 0 })],
+    ["min-w-full", style({ minWidth: "100%" })],
+    ["min-w-min", invalidValue("min-width", "min-content")],
+    ["min-w-max", invalidValue("min-width", "max-content")],
+    ["min-w-fit", invalidValue("min-width", "fit-content")],
+  );
 });
 
 describe("Layout - Box Decoration Break", () => {
-  testCases([
+  testCases(
     ["box-decoration-clone", invalidProperty("box-decoration-break")],
     ["box-decoration-slice", invalidProperty("box-decoration-break")],
-  ]);
+  );
 });
 
 describe("Layout - Box Sizing", () => {
-  testCases([
+  testCases(
     ["box-border", invalidProperty("box-sizing")],
     ["box-content", invalidProperty("box-sizing")],
-  ]);
+  );
 });
 
 describe("Layout - Break After", () => {
-  testCases([
+  testCases(
     ["break-after-auto", invalidProperty("break-after")],
     ["break-after-avoid", invalidProperty("break-after")],
     ["break-after-all", invalidProperty("break-after")],
@@ -1161,11 +1202,11 @@ describe("Layout - Break After", () => {
     ["break-after-left", invalidProperty("break-after")],
     ["break-after-right", invalidProperty("break-after")],
     ["break-after-column", invalidProperty("break-after")],
-  ]);
+  );
 });
 
 describe("Layout - Break Before", () => {
-  testCases([
+  testCases(
     ["break-before-auto", invalidProperty("break-before")],
     ["break-before-avoid", invalidProperty("break-before")],
     ["break-before-all", invalidProperty("break-before")],
@@ -1174,92 +1215,121 @@ describe("Layout - Break Before", () => {
     ["break-before-left", invalidProperty("break-before")],
     ["break-before-right", invalidProperty("break-before")],
     ["break-before-column", invalidProperty("break-before")],
-  ]);
+  );
 });
 
 describe("Layout - Break Inside", () => {
-  testCases([
+  testCases(
     ["break-inside-auto", invalidProperty("break-inside")],
     ["break-inside-avoid", invalidProperty("break-inside")],
     ["break-inside-avoid-page", invalidProperty("break-inside")],
     ["break-inside-avoid-column", invalidProperty("break-inside")],
-  ]);
+  );
 });
 
 describe("Layout - Isolation", () => {
-  testCases([
+  testCases(
     ["isolate", invalidProperty("isolation")],
     ["isolation-auto", invalidProperty("isolation")],
-  ]);
+  );
 });
 
 describe("Layout - Grid Auto Flow", () => {
-  testCases([
+  testCases(
     ["grid-flow-row", invalidProperty("grid-auto-flow")],
     ["grid-flow-col", invalidProperty("grid-auto-flow")],
     ["grid-flow-row-dense", invalidProperty("grid-auto-flow")],
     ["grid-flow-col-dense", invalidProperty("grid-auto-flow")],
-  ]);
+  );
 });
 
 describe("Layout - Grid Auto Columns", () => {
-  testCases([
+  testCases(
     ["auto-cols-auto", invalidProperty("grid-auto-columns")],
     ["auto-cols-min", invalidProperty("grid-auto-columns")],
     ["auto-cols-max", invalidProperty("grid-auto-columns")],
     ["auto-cols-fr", invalidProperty("grid-auto-columns")],
-  ]);
+  );
 });
 
 describe("Layout - Grid Auto Rows", () => {
-  testCases([
+  testCases(
     ["auto-rows-auto", invalidProperty("grid-auto-rows")],
     ["auto-rows-min", invalidProperty("grid-auto-rows")],
     ["auto-rows-max", invalidProperty("grid-auto-rows")],
     ["auto-rows-fr", invalidProperty("grid-auto-rows")],
-  ]);
+  );
 });
 
 describe("Layout - Justify Content", () => {
-  testCases([
+  testCases(
     ["justify-start", style({ justifyContent: "flex-start" })],
     ["justify-end", style({ justifyContent: "flex-end" })],
     ["justify-center", style({ justifyContent: "center" })],
     ["justify-between", style({ justifyContent: "space-between" })],
     ["justify-around", style({ justifyContent: "space-around" })],
     ["justify-evenly", style({ justifyContent: "space-evenly" })],
-  ]);
+  );
 });
 
 describe("Layout - Justify Items", () => {
-  testCases([
+  testCases(
     ["justify-items-start", invalidProperty("justify-items")],
     ["justify-items-end", invalidProperty("justify-items")],
     ["justify-items-center", invalidProperty("justify-items")],
     ["justify-items-stretch", invalidProperty("justify-items")],
-  ]);
+  );
 });
 
 describe("Layout - Justify Self", () => {
-  testCases([
+  testCases(
     ["justify-self-auto", invalidProperty("justify-self")],
     ["justify-self-start", invalidProperty("justify-self")],
     ["justify-self-end", invalidProperty("justify-self")],
     ["justify-self-center", invalidProperty("justify-self")],
     ["justify-self-stretch", invalidProperty("justify-self")],
-  ]);
+  );
+});
+
+describe("Layout - Place Items", () => {
+  testCases(
+    ["place-items-start", invalidProperty("place-items")],
+    ["place-items-end", invalidProperty("place-items")],
+    ["place-items-center", invalidProperty("place-items")],
+    ["place-items-stretch", invalidProperty("place-items")],
+  );
+});
+
+describe("Layout - Place Self", () => {
+  testCases(
+    ["place-self-auto", invalidProperty("place-self")],
+    ["place-self-start", invalidProperty("place-self")],
+    ["place-self-end", invalidProperty("place-self")],
+    ["place-self-center", invalidProperty("place-self")],
+    ["place-self-stretch", invalidProperty("place-self")],
+  );
+});
+
+describe("Layout - Object Fit", () => {
+  testCases(
+    ["object-contain", invalidProperty("object-fit")],
+    ["object-cover", invalidProperty("object-fit")],
+    ["object-fill", invalidProperty("object-fit")],
+    ["object-none", invalidProperty("object-fit")],
+    ["object-scale-down", invalidProperty("object-fit")],
+  );
 });
 
 describe("Layout - Visibility", () => {
-  testCases([
+  testCases(
     ["visible", invalidProperty("visibility")],
     ["invisible", invalidProperty("visibility")],
-  ]);
+  );
 });
 
 describe("Layout - Z-Index", () => {
-  testCases([
+  testCases(
     ["z-auto", invalidValue("z-index", "auto")],
     ["z-0", style({ zIndex: 0 })],
-  ]);
+  );
 });

@@ -12,6 +12,7 @@
     "jsx": "react",
     "moduleResolution": "node",
     "strict": true,
+    "noEmit": true,
     "skipLibCheck": true,
     "declaration": true
   }

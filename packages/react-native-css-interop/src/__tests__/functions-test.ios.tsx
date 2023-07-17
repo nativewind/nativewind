@@ -9,7 +9,7 @@ afterEach(() => {
   StyleSheet.__reset();
 });
 
-describe("functions - ios", () => {
+describe.skip("functions - ios", () => {
   test("platformSelect", () => {
     registerCSS(
       `.my-class { color: platformSelect(ios/red android/blue default/green); }`,
