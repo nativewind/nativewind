@@ -1,3 +1,5 @@
+import { Dimensions } from "react-native";
+
 import { resetStyles } from "react-native-css-interop/testing-library";
 import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
 
@@ -898,6 +900,177 @@ describe("Tables - Table Layout", () => {
   ]);
 });
 
+describe("Border - Border Color", () => {
+  testCases([
+    [
+      "border-white",
+      {
+        ...style({ borderColor: "rgba(255, 255, 255, 1)" }),
+        meta: { variables: { "--tw-border-opacity": 1 } },
+      },
+    ],
+    [
+      "border-x-white",
+      {
+        ...style({
+          borderLeftColor: "rgba(255, 255, 255, 1)",
+          borderRightColor: "rgba(255, 255, 255, 1)",
+        }),
+        meta: { variables: { "--tw-border-opacity": 1 } },
+      },
+    ],
+    [
+      "border-y-white",
+      {
+        ...style({
+          borderTopColor: "rgba(255, 255, 255, 1)",
+          borderBottomColor: "rgba(255, 255, 255, 1)",
+        }),
+        meta: { variables: { "--tw-border-opacity": 1 } },
+      },
+    ],
+    [
+      "border-t-white",
+      {
+        ...style({ borderTopColor: "rgba(255, 255, 255, 1)" }),
+        meta: { variables: { "--tw-border-opacity": 1 } },
+      },
+    ],
+    [
+      "border-b-white",
+      {
+        ...style({ borderBottomColor: "rgba(255, 255, 255, 1)" }),
+        meta: { variables: { "--tw-border-opacity": 1 } },
+      },
+    ],
+    [
+      "border-l-white",
+      {
+        ...style({ borderLeftColor: "rgba(255, 255, 255, 1)" }),
+        meta: { variables: { "--tw-border-opacity": 1 } },
+      },
+    ],
+    [
+      "border-r-white",
+      {
+        ...style({ borderRightColor: "rgba(255, 255, 255, 1)" }),
+        meta: { variables: { "--tw-border-opacity": 1 } },
+      },
+    ],
+    [
+      "border-current",
+      {
+        warning: () =>
+          new Map([
+            [
+              "border-current",
+              [
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "border-top-color",
+                  value: "currentcolor",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "border-bottom-color",
+                  value: "currentcolor",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "border-left-color",
+                  value: "currentcolor",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "border-right-color",
+                  value: "currentcolor",
+                },
+              ],
+            ],
+          ]),
+      },
+    ],
+    ["border-inherit", invalidValue("border-color", "inherit")],
+    [
+      "border-x-inherit",
+      {
+        warning: () =>
+          new Map([
+            [
+              "border-x-inherit",
+              [
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "border-left-color",
+                  value: "inherit",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "border-right-color",
+                  value: "inherit",
+                },
+              ],
+            ],
+          ]),
+      },
+    ],
+    [
+      "border-y-current",
+      {
+        warning: () =>
+          new Map([
+            [
+              "border-y-current",
+              [
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "border-top-color",
+                  value: "currentcolor",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "border-bottom-color",
+                  value: "currentcolor",
+                },
+              ],
+            ],
+          ]),
+      },
+    ],
+    [
+      "border-y-inherit",
+      {
+        warning: () =>
+          new Map([
+            [
+              "border-y-inherit",
+              [
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "border-top-color",
+                  value: "inherit",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "border-bottom-color",
+                  value: "inherit",
+                },
+              ],
+            ],
+          ]),
+      },
+    ],
+    ["border-t-current", invalidValue("border-top-color", "currentcolor")],
+    ["border-t-inherit", invalidValue("border-top-color", "inherit")],
+    ["border-b-current", invalidValue("border-bottom-color", "currentcolor")],
+    ["border-b-inherit", invalidValue("border-bottom-color", "inherit")],
+    ["border-l-current", invalidValue("border-left-color", "currentcolor")],
+    ["border-l-inherit", invalidValue("border-left-color", "inherit")],
+    ["border-r-current", invalidValue("border-right-color", "currentcolor")],
+    ["border-r-inherit", invalidValue("border-right-color", "inherit")],
+  ]);
+});
+
 describe("Border - Border Radius", () => {
   testCases([
     [
@@ -943,6 +1116,24 @@ describe("Tables - Border Style", () => {
     ["border-none", invalidValue("border-style", '"none"')],
     ["border-double", invalidValue("border-style", '"double"')],
     ["border-hidden", invalidValue("border-style", '"hidden"')],
+  ]);
+});
+
+describe("Sizing - Height", () => {
+  testCases([
+    ["h-0", style({ height: 0 })],
+    ["h-px", style({ height: 1 })],
+    ["h-1", style({ height: 3.5 })],
+    ["h-1/2", style({ height: "50%" })],
+    ["h-full", style({ height: "100%" })],
+    ["h-auto", style({ height: "auto" })],
+    ["h-min", invalidValue("height", "min-content")],
+    ["h-max", invalidValue("height", "max-content")],
+    ["h-fit", invalidValue("height", "fit-content")],
+    [
+      "h-screen",
+      { ...style({ height: Dimensions.get("window").height }), meta: {} },
+    ],
   ]);
 });
 

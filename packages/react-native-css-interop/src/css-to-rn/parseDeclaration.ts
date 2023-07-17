@@ -519,28 +519,92 @@ export function parseDeclaration(
     case "border-color":
       addStyleProp(
         "border-top-color",
-        parseColor(declaration.value.top, parseOptions),
+        parseColor(declaration.value.top, {
+          ...parseOptions,
+          addValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeValue",
+              property: "border-top-color",
+              value,
+            });
+          },
+          addFunctionValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeFunctionValue",
+              property: "border-top-color",
+              value,
+            });
+          },
+        }),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         "border-bottom-color",
-        parseColor(declaration.value.bottom, parseOptions),
+        parseColor(declaration.value.bottom, {
+          ...parseOptions,
+          addValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeValue",
+              property: "border-bottom-color",
+              value,
+            });
+          },
+          addFunctionValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeFunctionValue",
+              property: "border-bottom-color",
+              value,
+            });
+          },
+        }),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         "border-left-color",
-        parseColor(declaration.value.left, parseOptions),
+        parseColor(declaration.value.left, {
+          ...parseOptions,
+          addValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeValue",
+              property: "border-left-color",
+              value,
+            });
+          },
+          addFunctionValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeFunctionValue",
+              property: "border-left-color",
+              value,
+            });
+          },
+        }),
         {
           shortHand: true,
         },
       );
       addStyleProp(
         "border-right-color",
-        parseColor(declaration.value.right, parseOptions),
+        parseColor(declaration.value.right, {
+          ...parseOptions,
+          addValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeValue",
+              property: "border-right-color",
+              value,
+            });
+          },
+          addFunctionValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeFunctionValue",
+              property: "border-right-color",
+              value,
+            });
+          },
+        }),
         {
           shortHand: true,
         },
