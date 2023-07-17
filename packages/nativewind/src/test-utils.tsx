@@ -7,7 +7,7 @@ import {
   registerCSS,
 } from "react-native-css-interop/testing-library";
 import tailwind from "tailwindcss";
-import { cssToReactNativeRuntimeOptions } from "./with-tailwind-options";
+import { cssToReactNativeRuntimeOptions } from "./metro/with-tailwind-options";
 import {
   ExtractionWarning,
   StyleMeta,
