@@ -1,34 +1,26 @@
-import type { ConfigT, GetTransformOptions } from "metro-config";
-import path from "path";
+import type {
+  IntermediateConfigT,
+  GetTransformOptions,
+  TransformerConfigT,
+} from "metro-config";
 import { expoColorSchemeWarning } from "./expo";
 import { CssToReactNativeRuntimeOptions } from "../css-to-rn";
 
-export type { ConfigT };
+export type { CssToReactNativeRuntimeOptions };
 
-export interface WithCssInteropOptions {
-  input?: string;
+export type ComposableTransformerConfigT = TransformerConfigT & {
+  transformerPath?: string;
   cssToReactNativeRuntime?: CssToReactNativeRuntimeOptions;
-}
+} & Record<string, unknown>;
 
-export function getInputOutput({
-  input = "global.css",
-}: WithCssInteropOptions = {}) {
-  const output = path.resolve(
-    process.cwd(),
-    path.join(`node_modules/.cache/expo`, input),
-  );
-
-  input = path.resolve(process.cwd(), input);
-
-  return { input, output };
+export interface ComposableIntermediateConfigT extends IntermediateConfigT {
+  transformer: ComposableTransformerConfigT;
 }
 
 export function withCssInterop(
-  config: ConfigT,
-  options?: WithCssInteropOptions,
-) {
-  const { input, output } = getInputOutput(options);
-
+  config: ComposableIntermediateConfigT,
+  options: CssToReactNativeRuntimeOptions = {},
+): ComposableIntermediateConfigT {
   const getTransformOptions = async (
     ...args: Parameters<GetTransformOptions>
   ) => {
@@ -47,12 +39,9 @@ export function withCssInterop(
     ),
     transformer: {
       ...config.transformer,
-      cssToReactNativeRuntime: options?.cssToReactNativeRuntime,
+      cssToReactNativeRuntime: options,
       getTransformOptions,
-      existingTransformerPath: config.transformerPath,
-      externallyManagedCss: {
-        [input]: output,
-      },
+      transformerPath: config.transformerPath,
     },
-  } as ConfigT;
+  };
 }

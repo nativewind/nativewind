@@ -5,6 +5,8 @@ import { render } from "./render";
 
 export const Fragment = React.Fragment;
 
+console.warn("---");
+
 export function jsx(type: any, props: any, key: any) {
   return render((ReactJSXRuntime as any).jsx, type, props, key);
 }

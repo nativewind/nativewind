@@ -73,8 +73,8 @@ const DevOnlyCSSInteropWrapper = forwardRef(function DevOnlyCSSInteropWrapper(
   ref,
 ) {
   // This uses a reducer and the useEffect hook to subscribe to StyleSheet.register.
-  const [, render] = useReducer(rerenderReducer, 0);
-  useEffect(() => StyleSheet.__subscribe(render), []);
+  // const [, render] = useReducer(rerenderReducer, 0);
+  // useEffect(() => StyleSheet.__subscribe(render), []);
 
   // If the styles are dynamic, we need to wrap the component with the CSSInteropWrapper to handle style updates.
   return areStylesDynamic(props.style) ? (
@@ -146,6 +146,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
       [$props[key], inheritedVariables, inheritedContainers],
       rerender,
     );
+
     /* eslint-enable react-hooks/rules-of-hooks */
 
     /*

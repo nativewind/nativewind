@@ -9,59 +9,39 @@ import {
   CssToReactNativeRuntimeOptions,
 } from "../css-to-rn";
 
-export function cssInteropTransform(
-  config: JsTransformerConfig & {
-    cssToReactNativeRuntime?: CssToReactNativeRuntimeOptions;
-    existingTransformerPath: string;
-    externallyManagedCss?: Record<string, string>;
-  },
+interface CssInteropJsTransformerConfig extends JsTransformerConfig {
+  transformerPath?: string;
+  cssToReactNativeRuntime?: CssToReactNativeRuntimeOptions;
+}
+
+export function transform(
+  config: CssInteropJsTransformerConfig,
   projectRoot: string,
   filename: string,
   data: Buffer,
   options: JsTransformOptions,
 ): Promise<TransformResponse> {
+  const transformer = config.transformerPath
+    ? require(config.transformerPath).transform
+    : worker.transform;
+
   // If the file is not CSS, then use the default behavior.
   const isCss = options.type !== "asset" && matchCss(filename);
-
-  if (!isCss) {
-    return config.existingTransformerPath
-      ? require(config.existingTransformerPath)(
-          config,
-          projectRoot,
-          filename,
-          data,
-          options,
-        )
-      : worker.transform(config, projectRoot, filename, data, options);
+  if (!isCss || options.platform === "web") {
+    return transformer(config, projectRoot, filename, data, options);
   }
 
-  const stringifiedOptions = JSON.stringify(
+  const runtimeData = JSON.stringify(
     cssToReactNativeRuntime(data, config.cssToReactNativeRuntime),
   );
 
-  // TODO: Log warnings and errors
+  data = Buffer.from(
+    matchCssModule(filename)
+      ? `module.exports = require("react-native-css-interop").StyleSheet.create(${runtimeData});`
+      : `require("react-native-css-interop").StyleSheet.register(${runtimeData});`,
+  );
 
-  if (matchCssModule(filename)) {
-    return worker.transform(
-      config,
-      projectRoot,
-      filename,
-      Buffer.from(
-        `module.exports = require("react-native-css-interop").StyleSheet.create(${stringifiedOptions});`,
-      ),
-      options,
-    );
-  } else {
-    return worker.transform(
-      config,
-      projectRoot,
-      filename,
-      Buffer.from(
-        `require("react-native-css-interop").StyleSheet.register(${stringifiedOptions});`,
-      ),
-      options,
-    );
-  }
+  return worker.transform(config, projectRoot, filename, data, options);
 }
 
 function matchCss(filePath: string): boolean {

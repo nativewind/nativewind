@@ -2,12 +2,12 @@
   "name": "nativewind-monorepo",
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "examples/*"
   ],
   "scripts": {
     "test": "npm run test --workspace=nativewind --",
-    "test:babel": "npm run test --workspace=nativewind -- __tests__/babel",
-    "benchmarks": "npm run test --workspace=benchmarks --",
+    "test:css": "npm run test --workspace=react-native-css-interop --",
     "build": "npm run build --workspace=nativewind --",
     "example": "npm start --workspace=example --",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i"

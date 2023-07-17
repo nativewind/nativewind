@@ -2,7 +2,7 @@
   "version": "0.0.0",
   "name": "react-native-css-interop",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/index",
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "keywords": [
