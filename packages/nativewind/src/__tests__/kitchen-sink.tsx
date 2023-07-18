@@ -341,8 +341,8 @@ describe("Layout - Padding", () => {
         paddingTop: 0,
         paddingRight: 0,
         paddingBottom: 0,
-      }),]
-    ,
+      }),
+    ],
     ["px-0", style({ paddingLeft: 0, paddingRight: 0 })],
     ["py-0", style({ paddingTop: 0, paddingBottom: 0 })],
     ["pt-0", style({ paddingTop: 0 })],
@@ -481,6 +481,13 @@ describe("Effects - Mix Blend Mode", () => {
     ["mix-blend-saturation", invalidProperty("mix-blend-mode")],
     ["mix-blend-color", invalidProperty("mix-blend-mode")],
     ["mix-blend-luminosity", invalidProperty("mix-blend-mode")],
+  );
+});
+
+describe("Effects - Opacity", () => {
+  testCases(
+    ["opacity-0", style({ opacity: 0 })],
+    ["opacity-100", style({ opacity: 1 })],
   );
 });
 
@@ -767,9 +774,7 @@ describe("Typography - Text Decoration Style", () => {
 });
 
 describe("Typography - Text Decoration Thickness", () => {
-  testCases(
-    ["decoration-auto", invalidProperty("text-decoration-thickness")],
-  );
+  testCases(["decoration-auto", invalidProperty("text-decoration-thickness")]);
 });
 
 describe("Typography - Text Decoration", () => {
@@ -861,20 +866,19 @@ describe("Typography - Word Break", () => {
 });
 
 describe.skip("Backgrounds - Gradient Color Stops", () => {
-  testCases(
-    // ["from-inherit", invalidProperty("background-image")],
-    // ["from-current", invalidProperty("background-image")],
-    // ["from-transparent", invalidProperty("background-image")],
-    // ["from-white", invalidProperty("background-image")],
-    // ["via-inherit", invalidProperty("background-image")],
-    // ["via-current", invalidProperty("background-image")],
-    // ["via-transparent", invalidProperty("background-image")],
-    // ["via-white", invalidProperty("background-image")],
-    // ["to-inherit", invalidProperty("background-image")],
-    // ["to-current", invalidProperty("background-image")],
-    // ["to-transparent", invalidProperty("background-image")],
-    // ["to-white", invalidProperty("background-image")],
-  );
+  testCases();
+  // ["from-inherit", invalidProperty("background-image")],
+  // ["from-current", invalidProperty("background-image")],
+  // ["from-transparent", invalidProperty("background-image")],
+  // ["from-white", invalidProperty("background-image")],
+  // ["via-inherit", invalidProperty("background-image")],
+  // ["via-current", invalidProperty("background-image")],
+  // ["via-transparent", invalidProperty("background-image")],
+  // ["via-white", invalidProperty("background-image")],
+  // ["to-inherit", invalidProperty("background-image")],
+  // ["to-current", invalidProperty("background-image")],
+  // ["to-transparent", invalidProperty("background-image")],
+  // ["to-white", invalidProperty("background-image")],
 });
 
 describe("Backgrounds - Gradient Color Stops", () => {
@@ -1317,6 +1321,42 @@ describe("Layout - Object Fit", () => {
     ["object-fill", invalidProperty("object-fit")],
     ["object-none", invalidProperty("object-fit")],
     ["object-scale-down", invalidProperty("object-fit")],
+  );
+});
+
+describe("Layout - Overflow", () => {
+  testCases(
+    ["overflow-auto", invalidValue("overflow", "auto")],
+    ["overflow-clip", invalidValue("overflow", "clip")],
+    // ["overflow-scroll", invalidValue("overflow", "scroll")],
+    ["overflow-x-auto", invalidProperty("overflow-x")],
+    ["overflow-y-auto", invalidProperty("overflow-y")],
+    ["overflow-x-hidden", invalidProperty("overflow-x")],
+    ["overflow-y-hidden", invalidProperty("overflow-y")],
+    ["overflow-x-clip", invalidProperty("overflow-x")],
+    ["overflow-y-clip", invalidProperty("overflow-y")],
+    ["overflow-x-visible", invalidProperty("overflow-x")],
+    ["overflow-y-visible", invalidProperty("overflow-y")],
+    ["overflow-x-scroll", invalidProperty("overflow-x")],
+    ["overflow-y-scroll", invalidProperty("overflow-y")],
+    ["overflow-hidden", style({ overflow: "hidden" })],
+    ["overflow-visible", style({ overflow: "visible" })],
+  );
+});
+
+describe("Layout - Overscroll Behavior", () => {
+  testCases(
+    ["overscroll-auto", invalidProperty("overscroll-behavior")],
+    ["overscroll-contain", invalidProperty("overscroll-behavior")],
+  );
+});
+
+describe("Layout - Order", () => {
+  testCases(
+    ["order-1", invalidProperty("order")],
+    ["order-first", invalidProperty("order")],
+    ["order-last", invalidProperty("order")],
+    ["order-none", invalidProperty("order")],
   );
 });
 

@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "noEmit": false
   },
   "include": ["src/**/*"],
   "exclude": ["cli/*", "babel.config.js", "metro.config.js", "jest.config.js"]

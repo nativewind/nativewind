@@ -1541,6 +1541,7 @@ const invalidNativeProperties = [
   "scroll-padding-inline-end",
   "scroll-padding-inline-end",
   "scroll-padding-inline-start",
+  "overscroll-behavior",
   "scroll-padding-inline-start",
   "scroll-padding-left",
   "scroll-padding-left",
@@ -1587,6 +1588,10 @@ const invalidNativeProperties = [
   "word-break",
   "word-spacing",
   "word-wrap",
+  "order",
+  "overflow-x",
+  "overflow-y",
+  "overflow-behaviour",
 ] as const;
 
 const invalidNativePropertiesLoose = new Set<string>(invalidNativeProperties);
@@ -2222,7 +2227,7 @@ function parseOverflow(
   overflow: OverflowKeyword,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
-  const allowed = new Set(["visible", "hidden", "scroll"]);
+  const allowed = new Set(["visible", "hidden"]);
 
   if (allowed.has(overflow)) {
     return overflow;

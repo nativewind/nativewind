@@ -30,6 +30,10 @@ declare global {
 }
 
 type MockComponentProps = ViewProps & { className?: string };
+type MockComponent = ForwardRefExoticComponent<
+  MockComponentProps & RefAttributes<MockComponentProps>
+> &
+  jest.Mock<JSX.Element, [props: any, ref: any], any>;
 
 /*
  * Creates a mocked component that renders with the defaultCSSInterop WITHOUT needing
@@ -38,9 +42,7 @@ type MockComponentProps = ViewProps & { className?: string };
 export function createMockComponent(
   Component: React.ComponentType<any> = View,
   mapping?: CssInteropPropMapping,
-): ForwardRefExoticComponent<
-  MockComponentProps & RefAttributes<MockComponentProps>
-> {
+): MockComponent {
   const spy = jest.fn((props, ref) => <Component ref={ref} {...props} />);
 
   // We need to forward the ref through the mock that Jest creates
@@ -61,9 +63,7 @@ export function createMockComponent(
       );
     }),
     // Append the mock so we can access it
-    {
-      mock: spy.mock,
-    },
+    spy,
   );
 }
 

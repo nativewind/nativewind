@@ -61,9 +61,9 @@ export const invalidValue = (property: string, value: any) => ({
     ]),
 });
 
-const A = createMockComponent();
-
 export function testCases(...cases: Case[]) {
+  const A = createMockComponent();
+
   test.each(cases)("%s", async (className, expected) => {
     await renderTailwind(<A className={className} />);
 
