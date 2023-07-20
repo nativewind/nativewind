@@ -108,6 +108,8 @@ export function flattenStyle(
     };
   }
 
+  debugger;
+
   if (styleMeta.transition) {
     flatStyleMeta.transition = {
       ...styleMeta.transition,

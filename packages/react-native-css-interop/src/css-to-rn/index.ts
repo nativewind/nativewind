@@ -495,6 +495,14 @@ function getExtractedStyle(
     }
   }
 
+  function addShortHandStyleProp(
+    property: string,
+    value: any,
+    { append = false } = {},
+  ) {
+    return addStyleProp(property, value, { shortHand: true, append });
+  }
+
   function addVariable(property: string, value: any) {
     extrtactedStyle.variables ??= {};
     extrtactedStyle.variables[property] = value;
@@ -682,6 +690,7 @@ function getExtractedStyle(
 
   const parseDeclarationOptions: ParseDeclarationOptions = {
     addStyleProp,
+    addShortHandStyleProp,
     addAnimationProp,
     addContainerProp,
     addTransitionProp,

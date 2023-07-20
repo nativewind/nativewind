@@ -33,7 +33,8 @@
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
-    "build": "rm -rf dist && tsc -p tsconfig.build.json"
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "build:watch": "npm run build -- -w"
   },
   "files": [
     "dist/"

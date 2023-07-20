@@ -12,19 +12,32 @@ import {
   ExtractionWarning,
   StyleMeta,
 } from "react-native-css-interop/dist/types";
+import exp from "constants";
+
+export interface RenderTailwindOptions extends RenderOptions {
+  trimBase?: boolean;
+}
 
 export async function renderTailwind<T>(
   component: React.ReactElement<T>,
-  options?: RenderOptions,
+  { trimBase = true, ...options }: RenderTailwindOptions = {},
 ): Promise<ReturnType<typeof render>> {
-  const { css } = await postcss([
+  let { css } = await postcss([
     tailwind({
       theme: {},
       content: [{ raw: prettyFormat(component), extension: "html" }],
     }),
-  ]).process("@tailwind base;@tailwind components;@tailwind utilities;", {
-    from: undefined,
-  });
+  ]).process(
+    "@tailwind base;/*END_OF_BASE*/@tailwind components;@tailwind utilities;",
+    {
+      from: undefined,
+    },
+  );
+
+  if (trimBase) {
+    const index = css.indexOf("/*END_OF_BASE*/");
+    css = css.substring(index);
+  }
 
   registerCSS(css, cssToReactNativeRuntimeOptions);
 
@@ -79,10 +92,6 @@ export function testCases(...cases: Case[]) {
       expect(A).toHaveStyleWarnings(new Map());
     }
 
-    if (expected.meta) {
-      expect(A).styleMetaToEqual(expected.meta);
-    } else {
-      expect(A).styleMetaToEqual(undefined);
-    }
+    expect(className).styleMetaToEqual(expected.meta);
   });
 }

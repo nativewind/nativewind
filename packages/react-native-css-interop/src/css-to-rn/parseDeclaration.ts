@@ -73,6 +73,7 @@ type AddWarning = (warning: ExtractionWarning) => void;
 export interface ParseDeclarationOptions {
   inlineRem?: number | false;
   addStyleProp: AddStyleProp;
+  addShortHandStyleProp: AddStyleProp;
   addAnimationProp: AddAnimationDefaultProp;
   addContainerProp: AddContainerProp;
   addTransitionProp: AddTransitionProp;
@@ -92,11 +93,14 @@ export function parseDeclaration(
 ) {
   const {
     addStyleProp,
+    addShortHandStyleProp,
     addAnimationProp,
     addContainerProp,
     addTransitionProp,
     addWarning,
   } = options;
+
+  // console.log(declaration);
 
   if (declaration.property === "unparsed") {
     if (
@@ -314,60 +318,108 @@ export function parseDeclaration(
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "inset-block":
-      addStyleProp(
+      addShortHandStyleProp(
         "inset-block-start",
         parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
-        { shortHand: true },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "inset-block-end",
         parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
-        { shortHand: true },
       );
       return;
     case "inset-inline":
-      addStyleProp(
+      addShortHandStyleProp(
         "inset-block-start",
         parseLengthPercentageOrAuto(
           declaration.value.inlineStart,
           parseOptions,
         ),
-        { shortHand: true },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "inset-block-end",
         parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
-        { shortHand: true },
       );
       return;
     case "inset":
-      addStyleProp(
+      addShortHandStyleProp(
         "top",
-        parseLengthPercentageOrAuto(declaration.value.top, parseOptions),
-        {
-          shortHand: true,
-        },
+        parseLengthPercentageOrAuto(declaration.value.top, {
+          ...parseOptions,
+          addValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeValue",
+              property: "top",
+              value,
+            });
+          },
+          addFunctionValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeFunctionValue",
+              property: "top",
+              value,
+            });
+          },
+        }),
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "bottom",
-        parseLengthPercentageOrAuto(declaration.value.bottom, parseOptions),
-        {
-          shortHand: true,
-        },
+        parseLengthPercentageOrAuto(declaration.value.bottom, {
+          ...parseOptions,
+          addValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeValue",
+              property: "bottom",
+              value,
+            });
+          },
+          addFunctionValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeFunctionValue",
+              property: "bottom",
+              value,
+            });
+          },
+        }),
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "left",
-        parseLengthPercentageOrAuto(declaration.value.left, parseOptions),
-        {
-          shortHand: true,
-        },
+        parseLengthPercentageOrAuto(declaration.value.left, {
+          ...parseOptions,
+          addValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeValue",
+              property: "left",
+              value,
+            });
+          },
+          addFunctionValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeFunctionValue",
+              property: "left",
+              value,
+            });
+          },
+        }),
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "right",
-        parseLengthPercentageOrAuto(declaration.value.right, parseOptions),
-        {
-          shortHand: true,
-        },
+        parseLengthPercentageOrAuto(declaration.value.right, {
+          ...parseOptions,
+          addValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeValue",
+              property: "right",
+              value,
+            });
+          },
+          addFunctionValueWarning(value: any) {
+            addWarning({
+              type: "IncompatibleNativeFunctionValue",
+              property: "right",
+              value,
+            });
+          },
+        }),
       );
       return;
     case "border-top-color":
@@ -491,33 +543,25 @@ export function parseDeclaration(
         parseLength(declaration.value[0], parseOptions),
       );
     case "border-radius":
-      addStyleProp(
+      addShortHandStyleProp(
         "border-bottom-left-radius",
         parseLength(declaration.value.bottomLeft[0], parseOptions),
-        { shortHand: true },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "border-bottom-right-radius",
         parseLength(declaration.value.bottomRight[0], parseOptions),
-        { shortHand: true },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "border-top-left-radius",
         parseLength(declaration.value.topLeft[0], parseOptions),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "border-top-right-radius",
         parseLength(declaration.value.topRight[0], parseOptions),
-        {
-          shortHand: true,
-        },
       );
       return;
     case "border-color":
-      addStyleProp(
+      addShortHandStyleProp(
         "border-top-color",
         parseColor(declaration.value.top, {
           ...parseOptions,
@@ -536,11 +580,8 @@ export function parseDeclaration(
             });
           },
         }),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "border-bottom-color",
         parseColor(declaration.value.bottom, {
           ...parseOptions,
@@ -559,11 +600,8 @@ export function parseDeclaration(
             });
           },
         }),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "border-left-color",
         parseColor(declaration.value.left, {
           ...parseOptions,
@@ -582,11 +620,8 @@ export function parseDeclaration(
             });
           },
         }),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "border-right-color",
         parseColor(declaration.value.right, {
           ...parseOptions,
@@ -605,9 +640,6 @@ export function parseDeclaration(
             });
           },
         }),
-        {
-          shortHand: true,
-        },
       );
       return;
     case "border-style":
@@ -616,33 +648,21 @@ export function parseDeclaration(
         parseBorderStyle(declaration.value, parseOptions),
       );
     case "border-width":
-      addStyleProp(
+      addShortHandStyleProp(
         "border-top-width",
         parseBorderSideWidth(declaration.value.top, parseOptions),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "border-bottom-width",
         parseBorderSideWidth(declaration.value.bottom, parseOptions),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "border-left-width",
         parseBorderSideWidth(declaration.value.left, parseOptions),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "border-right-width",
         parseBorderSideWidth(declaration.value.right, parseOptions),
-        {
-          shortHand: true,
-        },
       );
       return;
     case "border-block-color":
@@ -686,19 +706,13 @@ export function parseDeclaration(
       );
       return;
     case "border":
-      addStyleProp(
+      addShortHandStyleProp(
         "border-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "border-style",
         parseBorderStyle(declaration.value.style, parseOptions),
-        {
-          shortHand: true,
-        },
       );
       return;
     case "border-top":
@@ -914,30 +928,26 @@ export function parseDeclaration(
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "margin-block":
-      addStyleProp(
+      addShortHandStyleProp(
         "margin-start",
         parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
-        { shortHand: true },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "margin-end",
         parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
-        { shortHand: true },
       );
       return;
     case "margin-inline":
-      addStyleProp(
+      addShortHandStyleProp(
         "margin-start",
         parseLengthPercentageOrAuto(
           declaration.value.inlineStart,
           parseOptions,
         ),
-        { shortHand: true },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "margin-end",
         parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
-        { shortHand: true },
       );
       return;
     case "margin":
@@ -999,30 +1009,26 @@ export function parseDeclaration(
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-block":
-      addStyleProp(
+      addShortHandStyleProp(
         "padding-start",
         parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
-        { shortHand: true },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "padding-end",
         parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
-        { shortHand: true },
       );
       return;
     case "padding-inline":
-      addStyleProp(
+      addShortHandStyleProp(
         "padding-start",
         parseLengthPercentageOrAuto(
           declaration.value.inlineStart,
           parseOptions,
         ),
-        { shortHand: true },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "padding-end",
         parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
-        { shortHand: true },
       );
       return;
     case "padding":
@@ -1074,45 +1080,29 @@ export function parseDeclaration(
         parseLineHeight(declaration.value, parseOptions),
       );
     case "font":
-      addStyleProp(
+      addShortHandStyleProp(
         declaration.property + "-family",
         parseFontFamily(declaration.value.family),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         "line-height",
         parseLineHeight(declaration.value.lineHeight, parseOptions),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         declaration.property + "-size",
         parseFontSize(declaration.value.size, parseOptions),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         declaration.property + "-style",
         parseFontStyle(declaration.value.style, parseOptions),
-        {
-          shortHand: true,
-        },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         declaration.property + "-variant",
         parseFontVariantCaps(declaration.value.variantCaps, parseOptions),
-        { shortHand: true },
       );
-      addStyleProp(
+      addShortHandStyleProp(
         declaration.property + "-weight",
         parseFontWeight(declaration.value.weight, parseOptions),
-        {
-          shortHand: true,
-        },
       );
       return;
     case "vertical-align":
@@ -1542,6 +1532,8 @@ const invalidNativeProperties = [
   "scroll-padding-inline-end",
   "scroll-padding-inline-start",
   "overscroll-behavior",
+  "overscroll-behavior-x",
+  "overscroll-behavior-y",
   "scroll-padding-inline-start",
   "scroll-padding-left",
   "scroll-padding-left",
@@ -1911,9 +1903,13 @@ function parseAngle(
   }
 }
 
+type ParseSizeOptions = ParseDeclarationOptionsWithValueWarning & {
+  allowAuto?: boolean;
+};
+
 function parseSize(
   size: Size | MaxSize,
-  options: ParseDeclarationOptionsWithValueWarning,
+  { allowAuto = false, ...options }: ParseSizeOptions,
 ) {
   switch (size.type) {
     case "length-percentage":
@@ -1921,7 +1917,12 @@ function parseSize(
     case "none":
       return size.type;
     case "auto":
-      return size.type;
+      if (allowAuto) {
+        return size.type;
+      } else {
+        options.addValueWarning(size.type);
+        return undefined;
+      }
     case "min-content":
     case "max-content":
     case "fit-content":

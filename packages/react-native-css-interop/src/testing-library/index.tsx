@@ -23,7 +23,7 @@ declare global {
   namespace jest {
     interface Matchers<R> {
       styleToEqual(style?: Style): R;
-      styleMetaToEqual(styleMeta?: StyleMeta): R;
+      styleMetaToEqual(className: string): R;
       toHaveStyleWarnings(warnings?: Map<string, ExtractionWarning[]>): R;
     }
   }

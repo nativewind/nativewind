@@ -1151,13 +1151,31 @@ describe("Sizing - Height", () => {
     ["h-1", style({ height: 3.5 })],
     ["h-1/2", style({ height: "50%" })],
     ["h-full", style({ height: "100%" })],
-    ["h-auto", style({ height: "auto" })],
+    ["h-auto", invalidValue("height", "auto")],
     ["h-min", invalidValue("height", "min-content")],
     ["h-max", invalidValue("height", "max-content")],
     ["h-fit", invalidValue("height", "fit-content")],
     [
       "h-screen",
       { ...style({ height: Dimensions.get("window").height }), meta: {} },
+    ],
+  );
+});
+
+describe("Sizing - Width", () => {
+  testCases(
+    ["w-0", style({ width: 0 })],
+    ["w-px", style({ width: 1 })],
+    ["w-1", style({ width: 3.5 })],
+    ["w-1/2", style({ width: "50%" })],
+    ["w-full", style({ width: "100%" })],
+    ["w-auto", invalidValue("width", "auto")],
+    ["w-min", invalidValue("width", "min-content")],
+    ["w-max", invalidValue("width", "max-content")],
+    ["w-fit", invalidValue("width", "fit-content")],
+    [
+      "w-screen",
+      { ...style({ width: Dimensions.get("window").width }), meta: {} },
     ],
   );
 });
@@ -1314,6 +1332,118 @@ describe("Layout - Place Self", () => {
   );
 });
 
+describe("Layout - Top Right Bottom Left", () => {
+  testCases(
+    ["top-0", style({ top: 0 })],
+    ["top-px", style({ top: 1 })],
+    ["top-1", style({ top: 3.5 })],
+    ["top-1/2", style({ top: "50%" })],
+    ["top-full", style({ top: "100%" })],
+    ["top-[10px]", style({ top: 10 })],
+    ["bottom-0", style({ bottom: 0 })],
+    ["bottom-px", style({ bottom: 1 })],
+    ["bottom-1", style({ bottom: 3.5 })],
+    ["bottom-1/2", style({ bottom: "50%" })],
+    ["bottom-full", style({ bottom: "100%" })],
+    ["bottom-[10px]", style({ bottom: 10 })],
+    ["left-0", style({ left: 0 })],
+    ["left-px", style({ left: 1 })],
+    ["left-1", style({ left: 3.5 })],
+    ["left-1/2", style({ left: "50%" })],
+    ["left-full", style({ left: "100%" })],
+    ["left-[10px]", style({ left: 10 })],
+    ["right-0", style({ right: 0 })],
+    ["right-px", style({ right: 1 })],
+    ["right-1", style({ right: 3.5 })],
+    ["right-1/2", style({ right: "50%" })],
+    ["right-full", style({ right: "100%" })],
+    ["right-[10px]", style({ right: 10 })],
+    [
+      "inset-auto",
+      {
+        warning: () =>
+          new Map([
+            [
+              "inset-auto",
+              [
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "top",
+                  value: "auto",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "bottom",
+                  value: "auto",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "left",
+                  value: "auto",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "right",
+                  value: "auto",
+                },
+              ],
+            ],
+          ]),
+      },
+    ],
+    [
+      "inset-x-auto",
+      {
+        warning: () =>
+          new Map([
+            [
+              "inset-x-auto",
+              [
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "left",
+                  value: "auto",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "right",
+                  value: "auto",
+                },
+              ],
+            ],
+          ]),
+      },
+    ],
+    [
+      "inset-y-auto",
+      {
+        warning: () =>
+          new Map([
+            [
+              "inset-y-auto",
+              [
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "top",
+                  value: "auto",
+                },
+                {
+                  type: "IncompatibleNativeValue",
+                  property: "bottom",
+                  value: "auto",
+                },
+              ],
+            ],
+          ]),
+      },
+    ],
+    ["top-auto", invalidValue("top", "auto")],
+    ["right-auto", invalidValue("right", "auto")],
+    ["bottom-auto", invalidValue("bottom", "auto")],
+    ["left-auto", invalidValue("left", "auto")],
+  );
+});
+
 describe("Layout - Object Fit", () => {
   testCases(
     ["object-contain", invalidProperty("object-fit")],
@@ -1348,6 +1478,13 @@ describe("Layout - Overscroll Behavior", () => {
   testCases(
     ["overscroll-auto", invalidProperty("overscroll-behavior")],
     ["overscroll-contain", invalidProperty("overscroll-behavior")],
+    ["overscroll-none", invalidProperty("overscroll-behavior")],
+    ["overscroll-y-auto", invalidProperty("overscroll-behavior-y")],
+    ["overscroll-y-contain", invalidProperty("overscroll-behavior-y")],
+    ["overscroll-y-none", invalidProperty("overscroll-behavior-y")],
+    ["overscroll-x-auto", invalidProperty("overscroll-behavior-x")],
+    ["overscroll-x-contain", invalidProperty("overscroll-behavior-x")],
+    ["overscroll-x-none", invalidProperty("overscroll-behavior-x")],
   );
 });
 
@@ -1371,5 +1508,172 @@ describe("Layout - Z-Index", () => {
   testCases(
     ["z-auto", invalidValue("z-index", "auto")],
     ["z-0", style({ zIndex: 0 })],
+  );
+});
+
+describe("Transforms - Transform Origin", () => {
+  testCases(
+    ["origin-center", invalidProperty("transform-origin")],
+    ["origin-top", invalidProperty("transform-origin")],
+    ["origin-top-right", invalidProperty("transform-origin")],
+    ["origin-right", invalidProperty("transform-origin")],
+    ["origin-bottom-right", invalidProperty("transform-origin")],
+    ["origin-bottom", invalidProperty("transform-origin")],
+    ["origin-bottom-left", invalidProperty("transform-origin")],
+    ["origin-left", invalidProperty("transform-origin")],
+    ["origin-top-left", invalidProperty("transform-origin")],
+  );
+});
+
+describe("Transitions & Animation - Transition Delay", () => {
+  testCases([
+    "delay-0",
+    {
+      meta: {
+        transition: { delay: [{ value: 0, type: "seconds" }] },
+      },
+    },
+  ]);
+});
+
+describe("Transitions & Animation - Transition Duration", () => {
+  testCases([
+    "duration-75",
+    {
+      meta: {
+        transition: { duration: [{ value: 75, type: "milliseconds" }] },
+      },
+    },
+  ]);
+});
+
+describe("Transitions & Animation - Transition Property", () => {
+  testCases(
+    // TODO: Add tests for all transition properties
+    // "transition-none",
+    // "transition-all",
+    // "transition",
+    // "transition-colors",
+    // "transition-opacity",
+    // "transition-shadow",
+    // "transition-transform",
+    [
+      "transition-colors",
+      {
+        style: {
+          backgroundColor: "transparent",
+          borderColor: "transparent",
+          color: "transparent",
+        },
+        meta: {
+          transition: {
+            duration: [{ value: 150, type: "milliseconds" }],
+            timingFunction: [
+              {
+                type: "cubic-bezier",
+                x1: 0.4000000059604645,
+                x2: 0.20000000298023224,
+                y1: 0,
+                y2: 1,
+              },
+            ],
+            property: [
+              "color",
+              "backgroundColor",
+              "borderColor",
+              "textDecorationColor",
+              "fill",
+              "stroke",
+            ],
+          },
+        },
+      },
+    ],
+    [
+      "transition-opacity",
+      {
+        style: {
+          opacity: 1,
+        },
+        meta: {
+          transition: {
+            duration: [{ value: 150, type: "milliseconds" }],
+            timingFunction: [
+              {
+                type: "cubic-bezier",
+                x1: 0.4000000059604645,
+                x2: 0.20000000298023224,
+                y1: 0,
+                y2: 1,
+              },
+            ],
+            property: ["opacity"],
+          },
+        },
+      },
+    ],
+  );
+});
+
+describe("Transitions & Animation - Transition Timing Function", () => {
+  testCases(
+    [
+      "ease-linear",
+      { meta: { transition: { timingFunction: [{ type: "linear" }] } } },
+    ],
+    [
+      "ease-in",
+      {
+        meta: {
+          transition: {
+            timingFunction: [
+              {
+                type: "cubic-bezier",
+                x1: 0.4000000059604645,
+                x2: 1,
+                y1: 0,
+                y2: 1,
+              },
+            ],
+          },
+        },
+      },
+    ],
+    [
+      "ease-out",
+      {
+        meta: {
+          transition: {
+            timingFunction: [
+              {
+                type: "cubic-bezier",
+                x1: 0,
+                x2: 0.20000000298023224,
+                y1: 0,
+                y2: 1,
+              },
+            ],
+          },
+        },
+      },
+    ],
+    [
+      "ease-in-out",
+      {
+        meta: {
+          transition: {
+            timingFunction: [
+              {
+                type: "cubic-bezier",
+                x1: 0.4000000059604645,
+                x2: 0.20000000298023224,
+                y1: 0,
+                y2: 1,
+              },
+            ],
+          },
+        },
+      },
+    ],
   );
 });

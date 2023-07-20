@@ -132,12 +132,16 @@ function useAnimationAndTransitions(
 
   return useAnimatedStyle(() => {
     const transformProps = new Set(Object.keys(defaultTransform));
-    const result: Record<string, unknown> = {
-      ...style,
+    const result: Record<string, unknown> = { ...style };
+
+    if (style.fontWeight) {
       // Reanimated crashes if the fontWeight is numeric
-      fontWeight: style.fontWeight?.toString(),
-      transform: style.transform ? [] : undefined,
-    };
+      result.fontWeight = style.fontWeight?.toString();
+    }
+
+    if (style.transform) {
+      result.transform = [];
+    }
 
     function doAnimation(
       props: string[],

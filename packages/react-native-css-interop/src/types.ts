@@ -264,7 +264,7 @@ export type ExtractionWarningFunctionValue = {
  * This is a list of all the CSS properties that can be animated
  * Source: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animated_properties
  */
-export type AnimatableCSSProperty = keyof Style &
+export type AnimatableCSSProperty = (keyof Style | "fill" | "stroke") &
   KebabToCamelCase<
     | "background-color"
     | "border-bottom-color"
@@ -282,6 +282,7 @@ export type AnimatableCSSProperty = keyof Style &
     | "border-width"
     | "bottom"
     | "color"
+    | "fill"
     | "flex"
     | "flex-basis"
     | "flex-grow"
@@ -313,7 +314,9 @@ export type AnimatableCSSProperty = keyof Style &
     | "right"
     | "rotate"
     | "scale"
+    | "stroke"
     | "text-decoration"
+    | "text-decoration-color"
     | "top"
     | "transform"
     | "transform-origin"
