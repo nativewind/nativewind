@@ -31,7 +31,7 @@
     "reassure": "0.9.1",
     "tamagui": "1.43.13",
     "ts-jest": "29.1.1",
-    "twrnc": "3.6.2"
+    "twrnc": "3.6.3"
   },
   "devDependencies": {
     "@babel/core": "7.21.8",
