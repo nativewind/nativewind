@@ -31,36 +31,12 @@ test("translateY percentage", () => {
   });
 });
 
-test.skip("rotate-180", () => {
-  registerCSS(`
-    .rotate-180 {
-      --tw-rotate: 180deg;
-      transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-    }
-  `);
+test("rotate-180", () => {
+  registerCSS(`.rotate-180 { transform: rotate(180deg); }`);
 
   render(<A className="rotate-180" />);
 
   expect(A).styleToEqual({
-    transform: [
-      {
-        translateX: 0,
-      },
-      {
-        rotate: "180deg",
-      },
-      {
-        skewX: "0deg",
-      },
-      {
-        skewY: "0deg",
-      },
-      {
-        scaleX: 1,
-      },
-      {
-        scaleY: 1,
-      },
-    ],
+    transform: [{ rotate: "180deg" }],
   });
 });

@@ -6,7 +6,8 @@
     "examples/*"
   ],
   "scripts": {
-    "test": "npm run test --workspace=nativewind --",
+    "test": "jest",
+    "test:nativewind": "npm run test --workspace=nativewind --",
     "test:css": "npm run test --workspace=react-native-css-interop --",
     "build": "npm run build --workspace=nativewind --",
     "example": "npm start --workspace=example --",

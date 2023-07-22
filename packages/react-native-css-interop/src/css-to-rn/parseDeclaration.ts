@@ -32,6 +32,7 @@ import type {
   TextShadow,
   TokenOrValue,
   VerticalAlign,
+  Transform,
 } from "lightningcss";
 
 import type {
@@ -110,25 +111,27 @@ export function parseDeclaration(
       });
     }
 
+    const parseOptions = {
+      ...options,
+      addFunctionValueWarning(value: any) {
+        addWarning({
+          type: "IncompatibleNativeFunctionValue",
+          property: declaration.value.propertyId.property,
+          value,
+        });
+      },
+      addValueWarning(value: any) {
+        addWarning({
+          type: "IncompatibleNativeValue",
+          property: declaration.value.propertyId.property,
+          value,
+        });
+      },
+    };
+
     return addStyleProp(
       declaration.value.propertyId.property,
-      parseUnparsed(declaration.value.value, {
-        ...options,
-        addFunctionValueWarning(value: any) {
-          addWarning({
-            type: "IncompatibleNativeFunctionValue",
-            property: declaration.value.propertyId.property,
-            value,
-          });
-        },
-        addValueWarning(value: any) {
-          addWarning({
-            type: "IncompatibleNativeValue",
-            property: declaration.value.propertyId.property,
-            value,
-          });
-        },
-      }),
+      parseUnparsed(declaration.value.value, parseOptions),
     );
   } else if (declaration.property === "custom") {
     if (
@@ -1120,90 +1123,10 @@ export function parseDeclaration(
     case "animation":
       return addAnimationProp(declaration.property, declaration.value);
     case "transform": {
-      const transforms: TransformRecord[] = [];
-
-      for (const transform of declaration.value) {
-        switch (transform.type) {
-          case "perspective":
-            transforms.push({
-              [transform.type]: parseLength(
-                transform.value,
-                parseOptions,
-              ) as number,
-            });
-            break;
-          case "translateX":
-          case "scaleX":
-            transforms.push({
-              [transform.type]: parseLengthOrCoercePercentageToRuntime(
-                transform.value,
-                "cw",
-                parseOptions,
-              ) as number,
-            });
-            break;
-          case "translateY":
-          case "scaleY":
-            transforms.push({
-              [transform.type]: parseLengthOrCoercePercentageToRuntime(
-                transform.value,
-                "ch",
-                parseOptions,
-              ) as number,
-            });
-            break;
-          case "rotate":
-          case "rotateX":
-          case "rotateY":
-          case "rotateZ":
-          case "skewX":
-          case "skewY":
-            transforms.push({
-              [transform.type]: parseAngle(transform.value, parseOptions),
-            });
-            break;
-          case "translate":
-            transforms.push({
-              translateX: parseLength(
-                transform.value[0],
-                parseOptions,
-              ) as number,
-            });
-            transforms.push({
-              translateY: parseLength(
-                transform.value[1],
-                parseOptions,
-              ) as number,
-            });
-            break;
-          case "scale":
-            transforms.push({
-              scaleX: parseLength(transform.value[0], parseOptions) as number,
-            });
-            transforms.push({
-              scaleY: parseLength(transform.value[1], parseOptions) as number,
-            });
-            break;
-          case "skew":
-            transforms.push({
-              skewX: parseAngle(transform.value[0], parseOptions),
-            });
-            transforms.push({
-              skewY: parseAngle(transform.value[1], parseOptions),
-            });
-            break;
-          case "translateZ":
-          case "translate3d":
-          case "scaleZ":
-          case "scale3d":
-          case "rotate3d":
-          case "matrix":
-          case "matrix3d":
-            break;
-        }
-      }
-
-      return addStyleProp(declaration.property, transforms);
+      return addStyleProp(
+        declaration.property,
+        parseTransform(declaration.value, parseOptions),
+      );
     }
     case "translate":
       return addStyleProp(
@@ -1489,21 +1412,28 @@ function reduceParseUnparsed(
   }
 }
 
-function unparsedToUnparsedLonghand(
-  type: string,
-  longhands: string[],
-  args: TokenOrValue[],
+function unparsedFunction(
+  token: Extract<TokenOrValue, { type: "function" }>,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
-  return longhands
-    .map((longhand, i) => {
-      return {
-        type,
-        name: longhand,
-        arguments: [parseUnparsed(args[i], options)],
-      };
-    })
-    .filter((v) => v.arguments.length);
+  return {
+    type: "runtime",
+    name: token.value.name,
+    arguments: reduceParseUnparsed(token.value.arguments, options),
+  };
+}
+
+function unparsedKnownShorthand(
+  mapping: Record<string, TokenOrValue>,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  return Object.entries(mapping).map(([name, tokenOrValue]) => {
+    return {
+      type: "runtime",
+      name,
+      arguments: [parseUnparsed(tokenOrValue, options)],
+    };
+  });
 }
 
 /**
@@ -1562,30 +1492,37 @@ function parseUnparsed(
     }
     case "function": {
       switch (tokenOrValue.value.name) {
+        case "translate":
+          return unparsedKnownShorthand(
+            {
+              translateX: tokenOrValue.value.arguments[0],
+              translateY: tokenOrValue.value.arguments[2],
+            },
+            options,
+          );
+        case "scale":
+          return unparsedKnownShorthand(
+            {
+              scaleX: tokenOrValue.value.arguments[0],
+              scaleY: tokenOrValue.value.arguments[2],
+            },
+            options,
+          );
+        case "rotate":
+        case "skewX":
+        case "skewY":
+        case "scaleX":
+        case "scaleY":
+          return unparsedFunction(tokenOrValue, options);
         case "platformSelect":
           return parseReactNativeFunction(
             tokenOrValue.value.name,
             tokenOrValue.value.arguments,
             options,
           );
-        case "translate":
-          return unparsedToUnparsedLonghand(
-            "runtime",
-            ["translateX", "translateY"],
-            tokenOrValue.value.arguments,
-            options,
-          );
         default: {
           options.addFunctionValueWarning(tokenOrValue.value.name);
           return;
-          // return {
-          //   type: "runtime",
-          //   name: tokenOrValue.value.name,
-          //   arguments: reduceParseUnparsed(
-          //     tokenOrValue.value.arguments,
-          //     options,
-          //   ),
-          // };
         }
       }
     }
@@ -2327,7 +2264,6 @@ function parseDisplay(
   display: Display,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
-  console.log(display);
   if (display.type === "keyword") {
     if (display.value === "none") {
       return display.value;
@@ -2387,6 +2323,87 @@ function parseAspectRatio(
       return aspectRatio.ratio.join(" / ");
     }
   }
+}
+
+function parseTransform(
+  transforms: Transform[],
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  const records: TransformRecord[] = [];
+
+  for (const transform of transforms) {
+    switch (transform.type) {
+      case "perspective":
+        records.push({
+          [transform.type]: parseLength(transform.value, options) as number,
+        });
+        break;
+      case "translateX":
+      case "scaleX":
+        records.push({
+          [transform.type]: parseLengthOrCoercePercentageToRuntime(
+            transform.value,
+            "cw",
+            options,
+          ) as number,
+        });
+        break;
+      case "translateY":
+      case "scaleY":
+        records.push({
+          [transform.type]: parseLengthOrCoercePercentageToRuntime(
+            transform.value,
+            "ch",
+            options,
+          ) as number,
+        });
+        break;
+      case "translate":
+        records.push({
+          translateX: parseLength(transform.value[0], options) as number,
+        });
+        records.push({
+          translateY: parseLength(transform.value[1], options) as number,
+        });
+        break;
+      case "scale":
+        records.push({
+          scaleX: parseLength(transform.value[0], options) as number,
+        });
+        records.push({
+          scaleY: parseLength(transform.value[1], options) as number,
+        });
+        break;
+      case "skew":
+        records.push({
+          skewX: parseAngle(transform.value[0], options),
+        });
+        records.push({
+          skewY: parseAngle(transform.value[1], options),
+        });
+        break;
+      case "rotate":
+      case "rotateX":
+      case "rotateY":
+      case "rotateZ":
+      case "skewX":
+      case "skewY":
+        records.push({
+          [transform.type]: parseAngle(transform.value, options),
+        });
+        break;
+      case "translateZ":
+      case "translate3d":
+      case "scaleZ":
+      case "scale3d":
+      case "rotate3d":
+      case "matrix":
+      case "matrix3d":
+        break;
+    }
+  }
+
+  return records;
 }
 
 function round(number: number) {

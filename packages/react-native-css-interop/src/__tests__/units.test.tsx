@@ -64,7 +64,7 @@ test("vh", () => {
 });
 
 test("rem - default", () => {
-  registerCSS(`.my-class { fontSize: 10rem; }`);
+  registerCSS(`.my-class { font-size: 10rem; }`);
 
   render(<A className="my-class" />);
 
@@ -72,7 +72,7 @@ test("rem - default", () => {
 });
 
 test("rem - override", () => {
-  registerCSS(`.my-class { fontSize: 10rem; }`, {
+  registerCSS(`.my-class { font-size: 10rem; }`, {
     inlineRem: 10,
   });
 
@@ -82,7 +82,7 @@ test("rem - override", () => {
 });
 
 test("rem - dynamic", () => {
-  registerCSS(`.my-class { fontSize: 10rem; }`, {
+  registerCSS(`.my-class { font-size: 10rem; }`, {
     inlineRem: false,
   });
 

@@ -8,7 +8,7 @@ export const VariableContext = createContext<Record<string, any>>({
   "--tw-border-spacing-y": 0,
   "--tw-translate-x": 0,
   "--tw-translate-y": 0,
-  "--tw-rotate": 0,
+  "--tw-rotate": "0deg",
   "--tw-skew-x": "0deg",
   "--tw-skew-y": "0deg",
   "--tw-scale-x": 1,

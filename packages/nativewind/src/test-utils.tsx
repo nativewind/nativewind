@@ -1,6 +1,5 @@
 import { ViewStyle, ImageStyle, TextStyle } from "react-native";
 import { RenderOptions, render } from "@testing-library/react-native";
-import { format as prettyFormat } from "pretty-format";
 import postcss from "postcss";
 import {
   createMockComponent,
@@ -12,36 +11,26 @@ import {
   ExtractionWarning,
   StyleMeta,
 } from "react-native-css-interop/dist/types";
-import exp from "constants";
 
 export interface RenderTailwindOptions extends RenderOptions {
-  trimBase?: boolean;
+  css?: string;
 }
 
-export async function renderTailwind<T>(
+export async function renderTailwind<T extends { className: string }>(
   component: React.ReactElement<T>,
-  { trimBase = true, ...options }: RenderTailwindOptions = {},
+  {
+    css = "@tailwind components;@tailwind utilities;",
+    ...options
+  }: RenderTailwindOptions = {},
 ): Promise<ReturnType<typeof render>> {
-  let { css } = await postcss([
+  let { css: output } = await postcss([
     tailwind({
       theme: {},
-      content: [{ raw: prettyFormat(component), extension: "html" }],
+      content: [{ raw: component.props.className }],
     }),
-  ]).process(
-    "@tailwind base;/*END_OF_BASE*/@tailwind components;@tailwind utilities;",
-    {
-      from: undefined,
-    },
-  );
+  ]).process(css, { from: undefined });
 
-  if (trimBase) {
-    const index = css.indexOf("/*END_OF_BASE*/");
-    css = css.substring(index);
-  }
-
-  // console.log(css);
-
-  registerCSS(css, cssToReactNativeRuntimeOptions);
+  registerCSS(output, cssToReactNativeRuntimeOptions);
 
   return render(component, options);
 }
