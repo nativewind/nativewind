@@ -377,7 +377,7 @@ const getIterations = (
 };
 
 export const defaultValues: {
-  [K in AnimatableCSSProperty]?: Style[K];
+  [K in AnimatableCSSProperty]?: K extends keyof Style ? Style[K] : unknown;
 } = {
   backgroundColor: "transparent",
   borderBottomColor: "transparent",

@@ -83,7 +83,7 @@ export function testCases(...cases: Case[]) {
     if (expected.style) {
       expect(A).styleToEqual(expected.style);
     } else {
-      expect(A).styleToEqual({});
+      expect(A).styleToEqual(undefined);
     }
 
     if (expected.warning) {
