@@ -39,13 +39,15 @@ export async function renderTailwind<T>(
     css = css.substring(index);
   }
 
+  // console.log(css);
+
   registerCSS(css, cssToReactNativeRuntimeOptions);
 
   return render(component, options);
 }
 
 type Style = ViewStyle & TextStyle & ImageStyle;
-type Case = [
+type TestCase = [
   string,
   {
     style?: ReturnType<typeof style>["style"];
@@ -74,7 +76,7 @@ export const invalidValue = (property: string, value: any) => ({
     ]),
 });
 
-export function testCases(...cases: Case[]) {
+export function testCases(...cases: TestCase[]) {
   const A = createMockComponent();
 
   test.each(cases)("%s", async (className, expected) => {

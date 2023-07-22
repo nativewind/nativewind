@@ -1,5 +1,7 @@
 import { resetStyles } from "react-native-css-interop/testing-library";
-import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
+import { invalidProperty, testCases } from "../test-utils";
+
+afterEach(() => resetStyles());
 
 describe("Filters - Blur", () => {
   testCases(["blur", invalidProperty("filter")]);

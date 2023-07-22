@@ -8,6 +8,7 @@ import type {
   CssColor,
   Declaration,
   DimensionPercentageFor_LengthValue,
+  Display,
   FontFamily,
   FontSize,
   FontStyle,
@@ -203,18 +204,10 @@ export function parseDeclaration(
         parseColor(declaration.value, parseOptions),
       );
     case "display":
-      if (
-        declaration.value.type === "keyword" &&
-        declaration.value.value === "none"
-      ) {
-        addStyleProp(declaration.property, declaration.value.value);
-      } else if (
-        declaration.value.type === "pair" &&
-        declaration.value.inside.type === "flex"
-      ) {
-        addStyleProp(declaration.property, declaration.value.inside.type);
-      }
-      return;
+      return addStyleProp(
+        declaration.property,
+        parseDisplay(declaration.value, parseOptions),
+      );
     case "width":
       return addStyleProp(
         declaration.property,
@@ -1442,6 +1435,7 @@ const validProperties = [
   "transition-delay",
   "transition-timing-function",
   "transition",
+  "aspect-ratio",
   "animation-duration",
   "animation-timing-function",
   "animation-iteration-count",
@@ -2327,6 +2321,57 @@ function parseTextAlign(
 
   options.addValueWarning(textAlign);
   return undefined;
+}
+
+function parseDisplay(
+  display: Display,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  console.log(display);
+  if (display.type === "keyword") {
+    if (display.value === "none") {
+      return display.value;
+    } else {
+      return options.addValueWarning(display.value);
+    }
+  } else if (display.type === "pair") {
+    if (display.outside === "block") {
+      switch (display.inside.type) {
+        case "flow":
+          if (display.isListItem) {
+            return options.addValueWarning("list-item");
+          } else {
+            return options.addValueWarning("block");
+          }
+        case "flow-root":
+          return options.addValueWarning("flow-root");
+        case "table":
+          return options.addValueWarning(display.inside.type);
+        case "flex":
+          return display.inside.type;
+        case "box":
+        case "grid":
+        case "ruby":
+          return options.addValueWarning(display.inside.type);
+      }
+    } else {
+      switch (display.inside.type) {
+        case "flow":
+          return options.addValueWarning("inline");
+        case "flow-root":
+          return options.addValueWarning("inline-block");
+        case "table":
+          return options.addValueWarning("inline-table");
+        case "flex":
+          return options.addValueWarning("inline-flex");
+        case "box":
+        case "grid":
+          return options.addValueWarning("inline-grid");
+        case "ruby":
+          return options.addValueWarning(display.inside.type);
+      }
+    }
+  }
 }
 
 function parseAspectRatio(

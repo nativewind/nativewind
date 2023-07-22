@@ -26,13 +26,11 @@ describe("Typography - Font Smoothing", () => {
               [
                 {
                   property: "-webkit-font-smoothing",
-                  type: "IncompatibleNativeValue",
-                  value: "antialiased",
+                  type: "IncompatibleNativeProperty",
                 },
                 {
                   property: "-moz-osx-font-smoothing",
-                  type: "IncompatibleNativeValue",
-                  value: "grayscale",
+                  type: "IncompatibleNativeProperty",
                 },
               ],
             ],
@@ -49,13 +47,11 @@ describe("Typography - Font Smoothing", () => {
               [
                 {
                   property: "-webkit-font-smoothing",
-                  type: "IncompatibleNativeValue",
-                  value: "auto",
+                  type: "IncompatibleNativeProperty",
                 },
                 {
                   property: "-moz-osx-font-smoothing",
-                  type: "IncompatibleNativeValue",
-                  value: "auto",
+                  type: "IncompatibleNativeProperty",
                 },
               ],
             ],

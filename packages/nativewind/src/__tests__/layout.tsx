@@ -80,7 +80,7 @@ describe("Layout - Box Sizing", () => {
   );
 });
 
-describe("Layout - Display", () => {
+describe.only("Layout - Display", () => {
   testCases(
     ["flex", style({ display: "flex" })],
     ["hidden", style({ display: "none" })],
@@ -96,7 +96,7 @@ describe("Layout - Display", () => {
     ["table-column-group", invalidValue("display", "table-column-group")],
     ["table-footer-group", invalidValue("display", "table-footer-group")],
     ["table-header-group", invalidValue("display", "table-header-group")],
-    ["table-row-group	", invalidValue("display", "table-row-group	")],
+    ["table-row-group", invalidValue("display", "table-row-group")],
     ["table-row", invalidValue("display", "table-row")],
     ["flow-root", invalidValue("display", "flow-root")],
     ["grid", invalidValue("display", "grid")],
