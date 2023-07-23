@@ -3,6 +3,7 @@ import {
   StyleSheet as RNStyleSheet,
   Appearance,
 } from "react-native";
+import { createContext, useContext } from "react";
 
 import {
   StyleSheetRegisterOptions,
@@ -24,11 +25,15 @@ import {
 
 const subscriptions = new Set<() => void>();
 
+export const VariableContext = createContext<Record<string, unknown> | null>(
+  null,
+);
+
 /**
  * This is a custom wrapper around the React Native Stylesheet.
  * It allows us to intercept the creation of styles and "tag" them wit the metadata
  */
-const parialStyleSheet = {
+export const StyleSheet = Object.assign({}, RNStyleSheet, {
   classNameMergeStrategy(c: string) {
     return c;
   },
@@ -47,6 +52,10 @@ const parialStyleSheet = {
     vw.reset(dimensions);
     vh.reset(dimensions);
     colorScheme.reset(appearance);
+    rootVariables = {};
+    rootDarkVariables = {};
+    defaultVariables = {};
+    defaultDarkVariables = {};
   },
   register: (options: StyleSheetRegisterOptions) => {
     if (options.keyframes) {
@@ -59,6 +68,27 @@ const parialStyleSheet = {
       for (const [name, styles] of Object.entries(options.declarations)) {
         globalStyles.set(name, tagStyles(name, styles));
       }
+    }
+
+    if (options.defaultVariables) defaultVariables = options.defaultVariables;
+    if (options.defaultDarkVariables) {
+      defaultDarkVariables = {
+        ...options.defaultVariables,
+        ...options.defaultDarkVariables,
+      };
+    }
+    if (options.rootVariables) {
+      rootVariables = {
+        ...options.rootVariables,
+        ...defaultVariables,
+      };
+    }
+    if (options.rootDarkVariables) {
+      rootDarkVariables = {
+        ...options?.rootVariables,
+        ...options.rootDarkVariables,
+        ...defaultDarkVariables,
+      };
     }
 
     for (const subscription of subscriptions) {
@@ -78,9 +108,7 @@ const parialStyleSheet = {
 
     return namedStyles;
   },
-};
-
-export const StyleSheet = Object.assign({}, RNStyleSheet, parialStyleSheet);
+});
 
 function tagStyles(
   name: string,
@@ -167,5 +195,31 @@ function tagStyles(
     }
 
     return styles.style;
+  }
+}
+
+let rootVariables: Record<string, unknown> = {};
+let rootDarkVariables: Record<string, unknown> = {};
+let defaultVariables: Record<string, unknown> = {};
+let defaultDarkVariables: Record<string, unknown> = {};
+
+export function useVariables() {
+  let $variables = useContext(VariableContext);
+
+  // $variables will be null if this is a top-level component
+  if ($variables === null) {
+    return Appearance.getColorScheme() === "light"
+      ? rootVariables
+      : rootDarkVariables;
+  } else {
+    return Appearance.getColorScheme() === "light"
+      ? {
+          ...$variables,
+          ...defaultVariables,
+        }
+      : {
+          ...$variables,
+          ...defaultDarkVariables,
+        };
   }
 }

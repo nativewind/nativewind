@@ -143,6 +143,7 @@ export function parseDeclaration(
         property: declaration.value.name,
       });
     }
+
     return addStyleProp(
       declaration.value.name,
       parseUnparsed(declaration.value.value, {
@@ -1534,8 +1535,8 @@ function parseUnparsed(
       switch (tokenOrValue.value.type) {
         case "string":
         case "number":
-          return tokenOrValue.value.value;
         case "ident":
+          return tokenOrValue.value.value;
         case "function":
           options.addValueWarning(tokenOrValue.value.value);
           return;

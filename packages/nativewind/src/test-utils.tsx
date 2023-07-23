@@ -66,10 +66,17 @@ export const invalidValue = (property: string, value: any) => ({
 });
 
 export function testCases(...cases: TestCase[]) {
+  return testCasesWithOptions({}, ...cases);
+}
+
+export function testCasesWithOptions(
+  options: RenderTailwindOptions,
+  ...cases: TestCase[]
+) {
   const A = createMockComponent();
 
   test.each(cases)("%s", async (className, expected) => {
-    await renderTailwind(<A className={className} />);
+    await renderTailwind(<A className={className} />, options);
 
     if (expected.style) {
       expect(A).styleToEqual(expected.style);

@@ -2,7 +2,6 @@ import type {
   MediaQuery,
   Animation,
   ContainerType,
-  MediaCondition,
   Time,
   EasingFunction,
   ContainerCondition,
@@ -193,6 +192,10 @@ export type PseudoClassesQuery = {
 export type StyleSheetRegisterOptions = {
   declarations?: Record<string, ExtractedStyle | ExtractedStyle[]>;
   keyframes?: Record<string, ExtractedAnimation>;
+  rootVariables?: Record<string, ExtractedStyleValue>;
+  rootDarkVariables?: Record<string, ExtractedStyleValue>;
+  defaultVariables?: Record<string, ExtractedStyleValue>;
+  defaultDarkVariables?: Record<string, ExtractedStyleValue>;
 };
 
 export type Style = ViewStyle & TextStyle & ImageStyle;

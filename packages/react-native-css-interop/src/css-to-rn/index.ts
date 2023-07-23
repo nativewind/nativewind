@@ -26,6 +26,7 @@ import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
+  darkMode?: false | string;
   grouping?: (string | RegExp)[];
   ignorePropertyWarningRegex?: (string | RegExp)[];
 };
@@ -47,15 +48,23 @@ export function cssToReactNativeRuntime(
   code = code.replaceAll("-webkit-text-size-adjust: 100%;", "");
   code = Buffer.from(code);
 
-  // Create maps to store the extracted style declarations and animations
-  const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
-  const keyframes = new Map<string, ExtractedAnimation>();
-
   // Parse the grouping options to create an array of regular expressions
   const grouping =
     options.grouping?.map((value) => {
       return typeof value === "string" ? new RegExp(value) : value;
     }) ?? [];
+
+  // These will by mutated by `extractRule`
+  const extractOptions: ExtractRuleOptions = {
+    ...options,
+    grouping,
+    declarations: new Map(),
+    keyframes: new Map(),
+    rootVariables: {},
+    rootDarkVariables: {},
+    defaultVariables: {},
+    defaultDarkVariables: {},
+  };
 
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
   lightningcss({
@@ -64,11 +73,7 @@ export function cssToReactNativeRuntime(
     visitor: {
       Rule(rule) {
         // Extract the style declarations and animations from the current rule
-        extractRule(
-          rule,
-          { ...options, grouping, declarations, keyframes },
-          options,
-        );
+        extractRule(rule, extractOptions, options);
         // We have processed this rule, so now delete it from the AST
         return [];
       },
@@ -77,8 +82,12 @@ export function cssToReactNativeRuntime(
 
   // Convert the extracted style declarations and animations from maps to objects and return them
   return {
-    declarations: Object.fromEntries(declarations),
-    keyframes: Object.fromEntries(keyframes),
+    declarations: Object.fromEntries(extractOptions.declarations),
+    keyframes: Object.fromEntries(extractOptions.keyframes),
+    rootVariables: extractOptions.rootVariables,
+    rootDarkVariables: extractOptions.rootDarkVariables,
+    defaultVariables: extractOptions.defaultVariables,
+    defaultDarkVariables: extractOptions.defaultDarkVariables,
   };
 }
 
@@ -95,7 +104,12 @@ interface ExtractRuleOptions {
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
   keyframes: Map<string, ExtractedAnimation>;
   style?: Partial<ExtractedStyle>;
-  grouping?: RegExp[];
+  grouping: RegExp[];
+  darkMode?: false | string;
+  rootVariables: StyleSheetRegisterOptions["rootVariables"];
+  rootDarkVariables: StyleSheetRegisterOptions["rootDarkVariables"];
+  defaultVariables: StyleSheetRegisterOptions["defaultVariables"];
+  defaultDarkVariables: StyleSheetRegisterOptions["defaultDarkVariables"];
 }
 
 /**
@@ -230,9 +244,39 @@ function extractedContainer(
 function setStyleForSelectorList(
   style: ExtractedStyle,
   selectorList: SelectorList,
-  { declarations, grouping = [] }: ExtractRuleOptions,
+  options: ExtractRuleOptions,
 ) {
+  const { declarations, grouping } = options;
+
   for (const selector of selectorList) {
+    if (style.variables) {
+      if (isRootVariableSelector(selector)) {
+        Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(
+          options,
+          { rootVariables: style.variables },
+        );
+        continue;
+      } else if (isRootDarkVariableSelector(selector, style, options)) {
+        Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(
+          options,
+          { rootDarkVariables: style.variables },
+        );
+        continue;
+      } else if (isDefaultVariableSelector(selector)) {
+        Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(
+          options,
+          { defaultVariables: style.variables },
+        );
+        continue;
+      } else if (isDefaultDarkVariableSelector(selector, style, options)) {
+        Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(
+          options,
+          { defaultDarkVariables: style.variables },
+        );
+        continue;
+      }
+    }
+
     // Find the last className selector in the selector list
     const classSelectorIndex = findLastIndex(
       selector,
@@ -706,6 +750,7 @@ function getExtractedStyle(
   return extrtactedStyle;
 }
 
+// Array.findLastIndex is added in Node 18. v14 is still in maintenance at time of writing
 function findLastIndex<T>(array: T[], predicate: (arg: T) => boolean) {
   for (let index = array.length - 1; index >= 0; index--) {
     if (predicate(array[index])) {
@@ -717,4 +762,86 @@ function findLastIndex<T>(array: T[], predicate: (arg: T) => boolean) {
 
 function kebabToCamelCase(str: string) {
   return str.replace(/-./g, (x) => x[1].toUpperCase());
+}
+
+function isRootVariableSelector(selector: Selector): boolean {
+  return (
+    selector.length === 1 &&
+    selector[0].type === "pseudo-class" &&
+    selector[0].kind === "root"
+  );
+}
+
+function isRootDarkVariableSelector(
+  selector: Selector,
+  style: ExtractedStyle,
+  { darkMode }: ExtractRuleOptions,
+): boolean {
+  if (darkMode) {
+    return (
+      selector.length === 2 &&
+      selector[0].type === "pseudo-class" &&
+      selector[0].kind === "root" &&
+      selector[1].type === "class" &&
+      selector[1].name === darkMode
+    );
+  } else if (
+    style.media &&
+    style.media.length === 1 &&
+    selector.length === 1 &&
+    selector[0].type === "pseudo-class" &&
+    selector[0].kind === "root"
+  ) {
+    const media = style.media[0];
+    const condition = media.condition;
+    return Boolean(
+      media.qualifier !== "not" &&
+        condition &&
+        condition.type === "feature" &&
+        condition.value.type === "plain" &&
+        condition.value.name === "prefers-color-scheme" &&
+        condition.value.value.type === "ident" &&
+        condition.value.value.value === "dark",
+    );
+  }
+
+  return false;
+}
+
+function isDefaultVariableSelector(selector: Selector): boolean {
+  return selector.length === 1 && selector[0].type === "universal";
+}
+
+function isDefaultDarkVariableSelector(
+  selector: Selector,
+  style: ExtractedStyle,
+  { darkMode }: ExtractRuleOptions,
+): boolean {
+  if (darkMode) {
+    return (
+      selector.length === 2 &&
+      selector[0].type === "class" &&
+      selector[0].name === darkMode &&
+      selector[1].type === "universal"
+    );
+  } else if (
+    style.media &&
+    style.media.length === 1 &&
+    selector.length === 1 &&
+    selector[0].type === "universal"
+  ) {
+    const media = style.media[0];
+    const condition = media.condition;
+    return Boolean(
+      media.qualifier !== "not" &&
+        condition &&
+        condition.type === "feature" &&
+        condition.value.type === "plain" &&
+        condition.value.name === "prefers-color-scheme" &&
+        condition.value.value.type === "ident" &&
+        condition.value.value.value === "dark",
+    );
+  }
+
+  return false;
 }

@@ -67,3 +67,14 @@ test("inherit variables", () => {
   expect(A).styleToEqual({});
   expect(B).styleToEqual({ width: 20 });
 });
+
+test.only(":root variables", () => {
+  registerCSS(`
+    :root { --my-var: red; }
+    .my-class { color: var(--my-var); }
+  `);
+
+  render(<A className="my-class" />);
+
+  expect(A).styleToEqual({ color: "red" });
+});

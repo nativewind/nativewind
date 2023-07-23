@@ -17,15 +17,10 @@ import {
 } from "../../types";
 import { AnimationInterop } from "./animations";
 import { flattenStyle } from "./flatten-style";
-import {
-  ContainerContext,
-  VariableContext,
-  globalStyles,
-  styleMetaMap,
-} from "./globals";
+import { ContainerContext, globalStyles, styleMetaMap } from "./globals";
 import { useInteractionHandlers, useInteractionSignals } from "./interaction";
 import { useComputation } from "../shared/signals";
-import { StyleSheet } from "./stylesheet";
+import { StyleSheet, VariableContext, useVariables } from "./stylesheet";
 
 type CSSInteropWrapperProps = {
   __component: ComponentType<any>;
@@ -43,52 +38,18 @@ type CSSInteropWrapperProps = {
 export function defaultCSSInterop(
   jsx: Function,
   type: ComponentType<any>,
-  { ...props }: any,
+  props: any,
   key: string,
   mapping: CssInteropPropMapping = { style: "className" },
 ) {
   // Rewrite the props to include style objects and other metadata
   props = mapProps(props, type, mapping);
 
-  /**
-   * If the development environment is enabled, we should use the DevOnlyCSSInteropWrapper to wrap every component.
-   * This wrapper subscribes to StyleSheet.register, so it can handle hot reloading of styles.
-   */
-  if (__DEV__) {
-    return jsx(DevOnlyCSSInteropWrapper, props, key);
-  }
-
   // If the styles are dynamic, we need to wrap the component with the CSSInteropWrapper to handle style updates.
   return areStylesDynamic(props.style)
     ? jsx(CSSInteropWrapper, props, key)
     : jsx(type, props, key);
 }
-
-/**
- * This is the DevOnlyCSSInteropWrapper that should be used in development environments to handle async style updates.
- * It subscribes to StyleSheet.register, so it can handle style changes that may occur asynchronously.
- */
-const DevOnlyCSSInteropWrapper = forwardRef(function DevOnlyCSSInteropWrapper(
-  { __component: Component, __styleKeys, ...props }: CSSInteropWrapperProps,
-  ref,
-) {
-  // This uses a reducer and the useEffect hook to subscribe to StyleSheet.register.
-  const [, render] = useReducer(rerenderReducer, 0);
-  useEffect(() => StyleSheet.__subscribe(render), []);
-
-  // If the styles are dynamic, we need to wrap the component with the CSSInteropWrapper to handle style updates.
-  return areStylesDynamic(props.style) ? (
-    <CSSInteropWrapper
-      {...props}
-      ref={ref}
-      __component={Component}
-      __styleKeys={__styleKeys}
-      __skipCssInterop
-    />
-  ) : (
-    <Component {...props} ref={ref} __skipCssInterop />
-  );
-});
 
 /**
  * This component is a wrapper that handles the styling interop between React Native and CSS functionality
@@ -108,9 +69,17 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
   ref,
 ) {
   const rerender = useRerender();
-  const inheritedVariables = useContext(VariableContext);
+  const inheritedVariables = useVariables();
   const inheritedContainers = useContext(ContainerContext);
   const interaction = useInteractionSignals();
+
+  /**
+   * If the development environment is enabled, we should rerender all components if the StyleSheet updates.
+   * This is because things like :root variables may have updated.
+   */
+  if (__DEV__) {
+    useEffect(() => StyleSheet.__subscribe(rerender), []);
+  }
 
   /**
    * The purpose of interopMeta is to reduce the number of operations performed in the render function.
@@ -320,7 +289,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
  * @returns The modified input object with updated `style` property
  */
 function mapProps(
-  props: Record<string, unknown>,
+  { ...props }: Record<string, unknown>,
   type: ComponentType<any>,
   mapping: CssInteropPropMapping,
 ) {

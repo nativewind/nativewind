@@ -1,10 +1,17 @@
 import { resetStyles } from "react-native-css-interop/testing-library";
-import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
+import {
+  invalidProperty,
+  testCases,
+  testCasesWithOptions,
+} from "../test-utils";
 
 afterEach(() => resetStyles());
 
 describe("Transforms - Scale", () => {
-  testCases(
+  testCasesWithOptions(
+    {
+      css: "@tailwind base;@tailwind components;@tailwind utilities;",
+    },
     [
       "scale-0",
       {
@@ -12,9 +19,9 @@ describe("Transforms - Scale", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 0 },
             { scaleY: 0 },
           ],
@@ -34,9 +41,9 @@ describe("Transforms - Scale", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 0 },
             { scaleY: 1 },
           ],
@@ -55,9 +62,9 @@ describe("Transforms - Scale", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 0 },
           ],
@@ -76,9 +83,9 @@ describe("Transforms - Scale", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 0.5 },
             { scaleY: 0.5 },
           ],
@@ -98,9 +105,9 @@ describe("Transforms - Scale", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 0.5 },
             { scaleY: 1 },
           ],
@@ -119,9 +126,9 @@ describe("Transforms - Scale", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 0.5 },
           ],
@@ -137,7 +144,10 @@ describe("Transforms - Scale", () => {
 });
 
 describe("Transforms - Rotate", () => {
-  testCases(
+  testCasesWithOptions(
+    {
+      css: "@tailwind base;@tailwind components;@tailwind utilities;",
+    },
     [
       "rotate-0",
       {
@@ -146,8 +156,8 @@ describe("Transforms - Rotate", () => {
             { translateX: 0 },
             { translateY: 0 },
             { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -167,8 +177,8 @@ describe("Transforms - Rotate", () => {
             { translateX: 0 },
             { translateY: 0 },
             { rotate: "180deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -184,7 +194,10 @@ describe("Transforms - Rotate", () => {
 });
 
 describe("Transforms - Translate", () => {
-  testCases(
+  testCasesWithOptions(
+    {
+      css: "@tailwind base;@tailwind components;@tailwind utilities;",
+    },
     [
       "translate-x-0",
       {
@@ -192,9 +205,9 @@ describe("Transforms - Translate", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -213,9 +226,9 @@ describe("Transforms - Translate", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -234,9 +247,9 @@ describe("Transforms - Translate", () => {
           transform: [
             { translateX: 1 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -255,9 +268,9 @@ describe("Transforms - Translate", () => {
           transform: [
             { translateX: 0 },
             { translateY: 1 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -276,9 +289,9 @@ describe("Transforms - Translate", () => {
           transform: [
             { translateX: 3.5 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -297,9 +310,9 @@ describe("Transforms - Translate", () => {
           transform: [
             { translateX: 0 },
             { translateY: 3.5 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -316,7 +329,10 @@ describe("Transforms - Translate", () => {
 
 describe.skip("Transforms - Translate (%)", () => {
   // TODO - These require the tailwind plugin
-  testCases(
+  testCasesWithOptions(
+    {
+      css: "@tailwind base;@tailwind components;@tailwind utilities;",
+    },
     [
       "translate-x-1/2",
       {
@@ -324,9 +340,9 @@ describe.skip("Transforms - Translate (%)", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -345,9 +361,9 @@ describe.skip("Transforms - Translate (%)", () => {
           transform: [
             { translateX: 0 },
             { translateY: 3.5 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -366,9 +382,9 @@ describe.skip("Transforms - Translate (%)", () => {
           transform: [
             { translateX: 3.5 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -387,9 +403,9 @@ describe.skip("Transforms - Translate (%)", () => {
           transform: [
             { translateX: 0 },
             { translateY: 3.5 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -405,7 +421,10 @@ describe.skip("Transforms - Translate (%)", () => {
 });
 
 describe("Transforms - Skew", () => {
-  testCases(
+  testCasesWithOptions(
+    {
+      css: "@tailwind base;@tailwind components;@tailwind utilities;",
+    },
     [
       "skew-x-0",
       {
@@ -413,9 +432,9 @@ describe("Transforms - Skew", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
+            { rotate: "0" },
             { skewX: "0deg" },
-            { skewY: "0deg" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -434,8 +453,8 @@ describe("Transforms - Skew", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
             { skewY: "0deg" },
             { scaleX: 1 },
             { scaleY: 1 },
@@ -455,9 +474,9 @@ describe("Transforms - Skew", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
+            { rotate: "0" },
             { skewX: "1deg" },
-            { skewY: "0deg" },
+            { skewY: "0" },
             { scaleX: 1 },
             { scaleY: 1 },
           ],
@@ -476,8 +495,8 @@ describe("Transforms - Skew", () => {
           transform: [
             { translateX: 0 },
             { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
+            { rotate: "0" },
+            { skewX: "0" },
             { skewY: "1deg" },
             { scaleX: 1 },
             { scaleY: 1 },
@@ -494,22 +513,27 @@ describe("Transforms - Skew", () => {
 });
 
 describe("Transforms - Mixed", () => {
-  testCases([
-    "rotate-90 skew-y-1 translate-x-1",
+  testCasesWithOptions(
     {
-      style: {
-        transform: [
-          { translateX: 3.5 },
-          { translateY: 0 },
-          { rotate: "90deg" },
-          { skewX: "0deg" },
-          { skewY: "1deg" },
-          { scaleX: 1 },
-          { scaleY: 1 },
-        ],
-      },
+      css: "@tailwind base;@tailwind components;@tailwind utilities;",
     },
-  ]);
+    [
+      "rotate-90 skew-y-1 translate-x-1",
+      {
+        style: {
+          transform: [
+            { translateX: 3.5 },
+            { translateY: 0 },
+            { rotate: "90deg" },
+            { skewX: "0" },
+            { skewY: "1deg" },
+            { scaleX: 1 },
+            { scaleY: 1 },
+          ],
+        },
+      },
+    ],
+  );
 });
 
 describe("Transforms - Transform Origin", () => {
