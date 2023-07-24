@@ -25,6 +25,7 @@ declare global {
       styleToEqual(style?: Style): R;
       styleMetaToEqual(meta?: StyleMeta): R;
       toHaveStyleWarnings(warnings?: Map<string, ExtractionWarning[]>): R;
+      toHaveAnimatedStyle(style?: Style): R;
     }
   }
 }

@@ -248,7 +248,10 @@ function useAnimations(
           cw: typeof style.width === "number" ? style.width : undefined,
         });
 
-        for (let [prop, value] of Object.entries(flatStyle)) {
+        // TODO: Allow for non-style props to be animated
+        for (let [prop, value] of Object.entries(
+          flatStyle.get("style") ?? {},
+        )) {
           if (prop === "transform") {
             if (value.length === 0) {
               value = defaultTransformEntries;

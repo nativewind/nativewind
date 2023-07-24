@@ -11,7 +11,7 @@ beforeEach(() => {
   StyleSheet.__reset();
 });
 
-test.skip("basic animation", () => {
+test("basic animation", () => {
   registerCSS(`
 .my-class {
   animation-duration: 3s;
@@ -50,7 +50,7 @@ test.skip("basic animation", () => {
   });
 });
 
-test.skip("single frame", () => {
+test("single frame", () => {
   registerCSS(`
     .my-class {
       animation-duration: 3s;
@@ -85,7 +85,7 @@ test.skip("single frame", () => {
   });
 });
 
-test.skip("transform - starting", () => {
+test("transform - starting", () => {
   registerCSS(`
     .my-class {
       animation-duration: 3s;
@@ -121,7 +121,7 @@ test.skip("transform - starting", () => {
   });
 });
 
-test.skip("bounce", () => {
+test("bounce", () => {
   registerCSS(`
     .animate-bounce {
       animation: bounce 1s infinite;
