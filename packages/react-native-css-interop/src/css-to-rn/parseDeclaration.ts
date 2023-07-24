@@ -2240,8 +2240,6 @@ function parseReactNativeFunction(
   let key: string | undefined;
   const runtimeArgs: Record<string, unknown> = {};
 
-  console.log(args);
-
   for (const token of args) {
     if (!key) {
       if (token.type === "token" && token.value.type === "ident") {
