@@ -49,6 +49,7 @@ export type ExtractedStyle = {
   isDynamic?: boolean;
   media?: MediaQuery[];
   variables?: Record<string, ExtractedStyleValue>;
+  prop?: [string, string | true];
   style: Record<string, ExtractedStyleValue>;
   pseudoClasses?: PseudoClassesQuery;
   animations?: ExtractedAnimations;
@@ -97,9 +98,11 @@ export type PropInteropMeta = {
   hasActive?: boolean;
   hasHover?: boolean;
   hasFocus?: boolean;
+  extractValue?: string;
 };
 
 export type StyleMeta = {
+  prop?: [string, string | true];
   variableProps?: Set<string>;
   media?: MediaQuery[];
   variables?: Record<string, unknown>;

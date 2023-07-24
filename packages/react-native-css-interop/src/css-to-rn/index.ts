@@ -11,6 +11,8 @@ import {
   ContainerType,
   ContainerRule,
   Selector,
+  TokenOrValue,
+  Token,
 } from "lightningcss";
 
 import { exhaustiveCheck, isRuntimeValue } from "../shared";
@@ -249,6 +251,8 @@ function setStyleForSelectorList(
   const { declarations, grouping } = options;
 
   for (const selector of selectorList) {
+    style = { ...style };
+
     if (style.variables) {
       if (isRootVariableSelector(selector)) {
         Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(
@@ -277,78 +281,57 @@ function setStyleForSelectorList(
       }
     }
 
-    // Find the last className selector in the selector list
-    const classSelectorIndex = findLastIndex(
-      selector,
-      (s) => s.type === "class",
-    );
+    const normalisedSelector = normaliseSelector(selector);
 
-    // If no className selector is found, skip this selector
-    if (classSelectorIndex === -1) {
+    // This is an invalid selector
+    if (!normalisedSelector) {
       continue;
     }
 
-    // Extract the conditions before the className selector
-    const conditions = groupSelector(selector.slice(0, classSelectorIndex));
+    const {
+      className,
+      groupClassName,
+      pseudoClasses,
+      groupPseudoClasses,
+      mapToProp,
+    } = normalisedSelector;
 
-    // Check if all the conditions are valid based on the grouping in the ExtractRuleOptions
-    const conditionValid = conditions.every((c) => {
-      return grouping.some((g) => g.test(c.className));
-    });
-
-    // If not all the conditions are valid, skip this selector
-    if (!conditionValid) {
-      continue;
+    if (mapToProp) {
+      style.prop = mapToProp;
     }
 
-    // Add the conditions to the declarations object
-    for (const condition of conditions) {
+    if (groupClassName) {
+      // Check if the groupClassName are valid based on the grouping in the ExtractRuleOptions
+      const groupingValid = grouping.some((group) =>
+        group.test(groupClassName),
+      );
+
+      // If its invalid, dismiss the entire rule
+      if (!groupingValid) {
+        continue;
+      }
+
+      // Add the conditions to the declarations object
       addDeclaration(
-        condition.className,
+        groupClassName,
         {
           style: {},
           container: {
-            names: [condition.className],
+            names: [groupClassName],
           },
         },
         declarations,
       );
+
+      style.containerQuery ??= [];
+      style.containerQuery.push({
+        name: groupClassName,
+        pseudoClasses: groupPseudoClasses,
+      });
     }
-
-    let containerQueries = style.containerQuery;
-
-    // If there are any conditions, add them to the container queries
-    if (conditions.length > 0) {
-      containerQueries ??= [];
-
-      for (const condition of conditions) {
-        const containerQuery: ExtractedContainerQuery = {
-          name: condition.className,
-          pseudoClasses: condition.pseudoClasses,
-        };
-
-        containerQueries.push(containerQuery);
-      }
-    }
-
-    // Extract the className selector and its pseudo-classes
-    const groupedDelecarationSelectors = groupSelector(
-      selector.slice(classSelectorIndex),
-    );
-
-    // If there is more than one selector, skip this selector
-    if (groupedDelecarationSelectors.length !== 1) {
-      continue;
-    }
-
-    const [{ className, pseudoClasses }] = groupedDelecarationSelectors;
 
     // Add the className selector and its pseudo-classes to the declarations object, with the extracted style and container queries
-    addDeclaration(
-      className,
-      { ...style, pseudoClasses, containerQuery: containerQueries },
-      declarations,
-    );
+    addDeclaration(className, { ...style, pseudoClasses }, declarations);
   }
 }
 
@@ -368,18 +351,20 @@ function addDeclaration(
   }
 }
 
-type GroupedSelector = {
-  className: string;
-  pseudoClasses?: Record<string, true>;
-};
+function normaliseSelector(selectors: Selector) {
+  let className: string | undefined;
+  let groupClassName: string | undefined;
+  let pseudoClasses: Record<string, true> | undefined;
+  let groupPseudoClasses: Record<string, true> | undefined;
+  let mapToProp: [string, true] | [string, string] | undefined;
 
-function groupSelector(selectors: Selector) {
-  let current: GroupedSelector | undefined;
-  const groupedSelectors: GroupedSelector[] = [];
+  let previousWasCombinator = true;
 
   for (const selector of selectors) {
     switch (selector.type) {
       case "combinator":
+        previousWasCombinator = true;
+        break;
       case "universal":
       case "namespace":
       case "type":
@@ -387,29 +372,60 @@ function groupSelector(selectors: Selector) {
       case "pseudo-element":
       case "nesting":
       case "attribute":
-        current = undefined;
+        previousWasCombinator = false;
         break;
       case "class":
         // Selectors like .foo.bar are not valid
-        if (current?.className) {
-          groupedSelectors.pop();
-          return [];
-        } else {
-          current = {
-            className: selector.name,
-          };
-          groupedSelectors.push(current);
+        if (!previousWasCombinator) {
+          return null;
+        } else if (className) {
+          // You can only have 1 group className
+          if (groupClassName) {
+            return null;
+          } else {
+            // Move these values to the group
+            groupClassName = className;
+            groupPseudoClasses = pseudoClasses;
+            pseudoClasses = undefined;
+          }
         }
+        className = selector.name;
         break;
       case "pseudo-class":
+        // There must be a class selector before a pseudo-class
+        if (!className) return null;
         switch (selector.kind) {
           case "hover":
           case "active":
           case "focus":
-            if (!current) break;
-            current.pseudoClasses ??= {};
-            current.pseudoClasses[selector.kind] = true;
+            pseudoClasses ??= {};
+            pseudoClasses[selector.kind] = true;
             break;
+          case "custom-function": {
+            if (selector.name === "rn-prop") {
+              const tokenArgs = selector.arguments
+                .filter(
+                  (token): token is Extract<TokenOrValue, { type: "token" }> =>
+                    token.type === "token",
+                )
+                .map((token) => token.value);
+
+              const idents = tokenArgs.filter(
+                (token): token is Extract<Token, { type: "ident" }> => {
+                  return token.type === "ident";
+                },
+              );
+
+              if (idents.length === 1) {
+                mapToProp = [idents[0].value, true];
+              } else if (idents.length === 2) {
+                mapToProp = [idents[0].value, idents[1].value];
+              } else {
+                return null;
+              }
+            }
+            break;
+          }
         }
         break;
       default:
@@ -417,7 +433,17 @@ function groupSelector(selectors: Selector) {
     }
   }
 
-  return groupedSelectors;
+  if (!className) {
+    return null;
+  }
+
+  return {
+    className,
+    pseudoClasses,
+    groupClassName,
+    groupPseudoClasses,
+    mapToProp,
+  };
 }
 
 function extractKeyFrames(
@@ -750,16 +776,6 @@ function getExtractedStyle(
   return extrtactedStyle;
 }
 
-// Array.findLastIndex is added in Node 18. v14 is still in maintenance at time of writing
-function findLastIndex<T>(array: T[], predicate: (arg: T) => boolean) {
-  for (let index = array.length - 1; index >= 0; index--) {
-    if (predicate(array[index])) {
-      return index;
-    }
-  }
-  return -1;
-}
-
 function kebabToCamelCase(str: string) {
   return str.replace(/-./g, (x) => x[1].toUpperCase());
 }
@@ -845,3 +861,5 @@ function isDefaultDarkVariableSelector(
 
   return false;
 }
+
+function getRNPropPseudoClass(selector: Selector) {}

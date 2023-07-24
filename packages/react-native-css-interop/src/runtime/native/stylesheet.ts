@@ -128,8 +128,8 @@ function tagStyles(
 
     return taggedStyles;
   } else {
-    const meta: StyleMeta = {};
     let hasMeta = false;
+    const meta: StyleMeta = {};
 
     if (styles.isDynamic) {
       hasMeta = true;
@@ -183,6 +183,11 @@ function tagStyles(
     }
     if (styles.requiresLayout) {
       meta.requiresLayout = styles.requiresLayout;
+      hasMeta = true;
+    }
+
+    if (styles.prop) {
+      meta.prop = styles.prop;
       hasMeta = true;
     }
 

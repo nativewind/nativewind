@@ -11,7 +11,7 @@ import {
   testMediaQuery,
   testPseudoClasses,
 } from "./conditions";
-import { rem, styleMetaMap, vh, vw } from "./globals";
+import { globalStyles, rem, styleMetaMap, vh, vw } from "./globals";
 
 export interface FlattenStyleOptions {
   variables: Record<string, any>;
@@ -35,44 +35,66 @@ export interface FlattenStyleOptions {
  * @returns The flattened style object.
  */
 export function flattenStyle(
-  styles: StyleProp,
+  style: StyleProp,
+  className: string[] | undefined,
   options: FlattenStyleOptions,
-  flatStyle?: Style,
-): Style {
-  let flatStyleMeta: StyleMeta;
+  flatProps: Map<string, Style> = new Map(),
+): Map<string, Style> {
+  if (className) {
+    // Split className string into an array of class names, then map each class
+    // name to its corresponding global style object, if one exists.
+    const classNameStyle = className
+      .map((s) => globalStyles.get(s))
+      .filter(Boolean);
 
-  if (!flatStyle) {
-    flatStyle = {};
-    flatStyleMeta = {};
-    styleMetaMap.set(flatStyle, flatStyleMeta);
-  } else {
-    flatStyleMeta = styleMetaMap.get(flatStyle) ?? {};
+    // Combine the resulting array of styles with any existing styles in the `style` property
+    // of the input object.
+    if (classNameStyle.length > 0) {
+      style = Array.isArray(style)
+        ? [...classNameStyle, ...style]
+        : style
+        ? [...classNameStyle, style]
+        : classNameStyle;
+    }
+
+    // If there is only one style in the resulting array, replace the array with that single style.
+    if (Array.isArray(style) && style.length <= 1) {
+      style = style[0];
+    }
   }
 
-  if (!styles) {
-    return flatStyle;
-  }
-
-  if (Array.isArray(styles)) {
+  if (Array.isArray(style)) {
     // We need to flatten in reverse order so that the last style in the array is the one defined
-    for (let i = styles.length - 1; i >= 0; i--) {
-      if (styles[i]) {
-        flattenStyle(styles[i], options, flatStyle);
+    for (let i = style.length - 1; i >= 0; i--) {
+      if (style[i]) {
+        flattenStyle(style[i], undefined, options, flatProps);
       }
     }
-    return flatStyle;
+    return flatProps;
   }
 
-  // The is the metadata for the style object.
-  // It contains information is like the MediaQuery data
-  //
-  // Note: This is different to flatStyleMeta, which is the metadata
-  // for the FLATTENED style object
-  const styleMeta = styleMetaMap.get(styles) || {};
+  if (!style) {
+    return flatProps;
+  }
 
   /*
    * TODO: Investigate if we early exit if there is no styleMeta.
    */
+  const styleMeta: StyleMeta = styleMetaMap.get(style) ?? {};
+
+  let flatStyle: Style;
+  let flatStyleMeta: StyleMeta;
+  const [prop, propMapping] = styleMeta.prop ?? ["style", true];
+
+  if (!flatProps.has(prop)) {
+    flatStyle = {};
+    flatStyleMeta = {};
+    flatProps.set(prop, flatStyle);
+    styleMetaMap.set(flatStyle, flatStyleMeta);
+  } else {
+    flatStyle = flatProps.get(prop)!;
+    flatStyleMeta = styleMetaMap.get(flatStyle)!;
+  }
 
   /*
    * START OF CONDITIONS CHECK
@@ -86,29 +108,28 @@ export function flattenStyle(
     };
 
     if (!testPseudoClasses(options.interaction, styleMeta.pseudoClasses)) {
-      return flatStyle;
+      return flatProps;
     }
   }
 
   // Skip failed media queries
   if (styleMeta.media && !styleMeta.media.every((m) => testMediaQuery(m))) {
-    return flatStyle;
+    return flatProps;
   }
 
   if (!testContainerQuery(styleMeta.containerQuery, options.containers)) {
-    return flatStyle;
+    return flatProps;
   }
   /*
    * END OF CONDITIONS CHECK
    */
+
   if (styleMeta.animations) {
     flatStyleMeta.animations = {
       ...styleMeta.animations,
       ...flatStyleMeta.animations,
     };
   }
-
-  debugger;
 
   if (styleMeta.transition) {
     flatStyleMeta.transition = {
@@ -126,6 +147,10 @@ export function flattenStyle(
     if (styleMeta.container.type) {
       flatStyleMeta.container.type = styleMeta.container.type;
     }
+  }
+
+  if (styleMeta.prop) {
+    flatStyleMeta.prop = styleMeta.prop;
   }
 
   if (styleMeta.requiresLayout) {
@@ -158,7 +183,12 @@ export function flattenStyle(
     }
   }
 
-  for (const [key, value] of Object.entries(styles)) {
+  for (const [key, value] of Object.entries(style)) {
+    // If there is propMapping, only map the specified styles
+    if (typeof propMapping === "string" && key !== propMapping) {
+      continue;
+    }
+
     // Skip already set keys
     if (key in flatStyle) continue;
 
@@ -240,7 +270,7 @@ export function flattenStyle(
     }
   }
 
-  return flatStyle;
+  return flatProps;
 }
 
 /**

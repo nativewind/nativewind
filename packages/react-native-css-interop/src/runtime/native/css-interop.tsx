@@ -24,7 +24,6 @@ import { StyleSheet, VariableContext, useVariables } from "./stylesheet";
 
 type CSSInteropWrapperProps = {
   __component: ComponentType<any>;
-  __styleKeys: string[];
 } & Record<string, any>;
 
 /**
@@ -40,15 +39,38 @@ export function defaultCSSInterop(
   type: ComponentType<any>,
   props: any,
   key: string,
-  mapping: CssInteropPropMapping = { style: "className" },
 ) {
-  // Rewrite the props to include style objects and other metadata
-  props = mapProps(props, type, mapping);
+  const classNames: string[] | undefined = props.className?.split(/\s+/);
 
-  // If the styles are dynamic, we need to wrap the component with the CSSInteropWrapper to handle style updates.
-  return areStylesDynamic(props.style)
-    ? jsx(CSSInteropWrapper, props, key)
-    : jsx(type, props, key);
+  // Normal component without className prop
+  if (!classNames) {
+    return jsx(type, props, key);
+  }
+
+  const styles = classNames.map((s) => globalStyles.get(s)).filter(Boolean);
+
+  // The wrapper will affect performance, so only include it if needed
+  if (styles.some((s) => s && styleMetaMap.has(s))) {
+    return jsx(
+      CSSInteropWrapper,
+      { ...props, className: classNames, __component: type },
+      key,
+    );
+  }
+
+  // Merge the static styles with the props.style
+  let style = Array.isArray(props.style)
+    ? [...styles, ...props.style]
+    : props.style
+    ? [...styles, props.style]
+    : styles;
+
+  // If there is only one style in the resulting array, replace the array with the single style.
+  if (Array.isArray(style) && style.length <= 1) {
+    style = style[0];
+  }
+
+  return jsx(type, { ...props, style }, key);
 }
 
 /**
@@ -60,12 +82,11 @@ export function defaultCSSInterop(
  * calculates the new style and meta again using a helper function called flattenStyle.
  *
  * @param __component - Component to be rendered
- * @param __styleKeys - List of keys with the style props that need to be computed
  * @param $props - Any other props to be passed to the component
  * @param ref - Ref to the component
  */
 const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
-  { __component: Component, __styleKeys, ...$props }: CSSInteropWrapperProps,
+  { __component: Component, className, ...$props }: CSSInteropWrapperProps,
   ref,
 ) {
   const rerender = useRerender();
@@ -93,123 +114,149 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
    * to update the state.
    */
   const [$interopMeta, setInteropMeta] = useState<InteropMeta>(initialMeta);
-  let interopMeta = $interopMeta;
 
-  for (const key of __styleKeys) {
-    /**
-     * Create a computation that will flatten the style object.
-     * Any signals read while the computation is running will be subscribed to.
-     *
-     * useComputation handles the reactivity/memoization
-     * flattenStyle handles converting the schema to a style object and collecting the metadata
-     */
-    /* eslint-disable react-hooks/rules-of-hooks -- __styleKeys is immutable */
-    const style = useComputation(
-      () => {
-        return flattenStyle($props[key], {
-          interaction,
-          variables: inheritedVariables,
-          containers: inheritedContainers,
-        });
-      },
-      [$props[key], inheritedVariables, inheritedContainers],
-      rerender,
-    );
+  /**
+   * Create a computation that will flatten the className and generate a interopMeta
+   * Any signals read while the computation is running will be subscribed to.
+   *
+   * useComputation handles the reactivity/memoization
+   * flattenStyle handles converting the classNames collecting the metadata
+   */
+  const interopMeta = useComputation(
+    () => {
+      const flatProps = flattenStyle($props.style, className, {
+        interaction,
+        variables: inheritedVariables,
+        containers: inheritedContainers,
+      });
 
-    /* eslint-enable react-hooks/rules-of-hooks */
+      /*
+       * This is our guard to detect is anything has changed. If interopMeta !== $interopMeta
+       *   then the interopMeta as updated
+       */
+      let interopMeta = $interopMeta;
 
-    /*
-     * Recalculate the interop meta when a style change occurs, due to a style update.
-     * Rather than comparing the changes, we recalculate the entire meta.
-     * To update the interop meta, we modify the `styledProps` and `styledPropsMeta` properties,
-     * which will be flattened later.
-     */
-    if (interopMeta.styledProps[key] !== style) {
-      const meta = styleMetaMap.get(style) ?? defaultMeta;
+      /*
+       * Recalculate the interop meta when a style change occurs, due to a style update.
+       * Rather than comparing the changes, we recalculate the entire meta.
+       * To update the interop meta, we modify the `styledProps` and `styledPropsMeta` properties,
+       * which will be flattened later.
+       */
+      for (const [key, style] of flatProps) {
+        if (interopMeta.styledProps[key] !== style) {
+          const meta = styleMetaMap.get(style) ?? defaultMeta;
 
-      interopMeta = {
-        ...interopMeta,
-        styledProps: { ...interopMeta.styledProps, [key]: style },
-        styledPropsMeta: {
-          ...interopMeta.styledPropsMeta,
-          [key]: {
-            animated: Boolean(meta.animations),
-            transition: Boolean(meta.transition),
-            requiresLayout: Boolean(meta.requiresLayout),
-            variables: meta.variables,
-            containers: meta.container?.names,
-            hasActive: meta.pseudoClasses?.active,
-            hasHover: meta.pseudoClasses?.hover,
-            hasFocus: meta.pseudoClasses?.focus,
-          },
-        },
-      };
-    }
-  }
-
-  // interopMeta has changed since last render (or it's the first render)
-  // Recalculate the derived attributes and rerender
-  if (interopMeta !== $interopMeta) {
-    let hasInlineVariables = false;
-    let hasInlineContainers = false;
-    let requiresLayout = false;
-    let hasActive: boolean | undefined = false;
-    let hasHover: boolean | undefined = false;
-    let hasFocus: boolean | undefined = false;
-
-    const variables = {};
-    const containers: Record<string, ContainerRuntime> = {};
-    const animatedProps = new Set<string>();
-    const transitionProps = new Set<string>();
-
-    for (const key of __styleKeys) {
-      const meta = interopMeta.styledPropsMeta[key];
-
-      Object.assign(variables, meta.variables);
-
-      if (meta.variables) hasInlineVariables = true;
-      if (meta.animated) animatedProps.add(key);
-      if (meta.transition) transitionProps.add(key);
-      if (meta.containers) {
-        hasInlineContainers = true;
-        const runtime: ContainerRuntime = {
-          type: "normal",
-          interaction,
-          style: interopMeta.styledProps[key],
-        };
-
-        containers.__default = runtime;
-        for (const name of meta.containers) {
-          containers[name] = runtime;
+          interopMeta = {
+            ...interopMeta,
+            styledProps: { ...interopMeta.styledProps, [key]: style },
+            styledPropsMeta: {
+              ...interopMeta.styledPropsMeta,
+              [key]: {
+                animated: Boolean(meta.animations),
+                transition: Boolean(meta.transition),
+                requiresLayout: Boolean(meta.requiresLayout),
+                variables: meta.variables,
+                containers: meta.container?.names,
+                hasActive: meta.pseudoClasses?.active,
+                hasHover: meta.pseudoClasses?.hover,
+                hasFocus: meta.pseudoClasses?.focus,
+                extractValue:
+                  typeof meta.prop?.[1] === "string"
+                    ? meta.prop?.[1]
+                    : undefined,
+              },
+            },
+          };
         }
       }
 
-      requiresLayout ||= hasInlineContainers || meta.requiresLayout;
-      hasActive ||= hasInlineContainers || meta.hasActive;
-      hasHover ||= hasInlineContainers || meta.hasHover;
-      hasFocus ||= hasInlineContainers || meta.hasFocus;
-    }
+      // interopMeta has changed since last render (or it's the first render)
+      // Recalculate the derived attributes
+      if (interopMeta !== $interopMeta) {
+        let hasInlineVariables = false;
+        let hasInlineContainers = false;
+        let requiresLayout = false;
+        let hasActive: boolean | undefined = false;
+        let hasHover: boolean | undefined = false;
+        let hasFocus: boolean | undefined = false;
 
-    let animationInteropKey: string | undefined = undefined;
-    if (animatedProps.size > 0 || transitionProps.size > 0) {
-      animationInteropKey = [...animatedProps, ...transitionProps].join(":");
-    }
+        const variables = {};
+        const containers: Record<string, ContainerRuntime> = {};
+        const animatedProps = new Set<string>();
+        const transitionProps = new Set<string>();
 
-    interopMeta = {
-      ...interopMeta,
-      variables,
-      containers,
-      animatedProps,
-      transitionProps,
-      requiresLayout,
-      hasInlineVariables,
-      hasInlineContainers,
-      animationInteropKey,
-      hasActive,
-      hasHover,
-      hasFocus,
-    };
+        for (const [key] of flatProps) {
+          const meta = interopMeta.styledPropsMeta[key];
 
+          Object.assign(variables, meta.variables);
+
+          if (meta.variables) hasInlineVariables = true;
+          if (meta.containers) {
+            hasInlineContainers = true;
+            const runtime: ContainerRuntime = {
+              type: "normal",
+              interaction,
+              style: interopMeta.styledProps[key],
+            };
+
+            containers.__default = runtime;
+            for (const name of meta.containers) {
+              containers[name] = runtime;
+            }
+          }
+
+          if (meta.extractValue) {
+            /**
+             * Good luck typing this. Lets just ignore that styledProps can sometimes be other values...
+             *
+             * I really don't know how extractedValues can work with animations/transitions, so atm they simply don't
+             */
+            (interopMeta.styledProps as any)[key] = (
+              interopMeta.styledProps[key] as Record<string, unknown>
+            )[meta.extractValue];
+          } else {
+            if (meta.animated) animatedProps.add(key);
+            if (meta.transition) transitionProps.add(key);
+          }
+
+          requiresLayout ||= hasInlineContainers || meta.requiresLayout;
+          hasActive ||= hasInlineContainers || meta.hasActive;
+          hasHover ||= hasInlineContainers || meta.hasHover;
+          hasFocus ||= hasInlineContainers || meta.hasFocus;
+        }
+
+        let animationInteropKey: string | undefined = undefined;
+        if (animatedProps.size > 0 || transitionProps.size > 0) {
+          animationInteropKey = [...animatedProps, ...transitionProps].join(
+            ":",
+          );
+        }
+
+        interopMeta = {
+          ...interopMeta,
+          variables,
+          containers,
+          animatedProps,
+          transitionProps,
+          requiresLayout,
+          hasInlineVariables,
+          hasInlineContainers,
+          animationInteropKey,
+          hasActive,
+          hasHover,
+          hasFocus,
+        };
+      }
+
+      return interopMeta;
+    },
+    [className, $props.style, inheritedVariables, inheritedContainers],
+    rerender,
+  );
+
+  // If something changed, then store the results of that change
+  // TODO: Investigate if this should be a ref?
+  if (interopMeta !== $interopMeta) {
     setInteropMeta(interopMeta);
   }
 
@@ -221,13 +268,13 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
   }
 
   const variables = useMemo(
-    () => Object.assign({}, inheritedVariables, $interopMeta.variables),
-    [inheritedVariables, $interopMeta.variables],
+    () => Object.assign({}, inheritedVariables, interopMeta.variables),
+    [inheritedVariables, interopMeta.variables],
   );
 
   const containers = useMemo(
-    () => Object.assign({}, inheritedContainers, $interopMeta.containers),
-    [inheritedContainers, $interopMeta.containers],
+    () => Object.assign({}, inheritedContainers, interopMeta.containers),
+    [inheritedContainers, interopMeta.containers],
   );
 
   // This doesn't need to be memoized as it's values will be spread across the component
@@ -239,7 +286,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
 
   let children: JSX.Element = props.children;
 
-  if ($interopMeta.hasInlineVariables) {
+  if (interopMeta.hasInlineVariables) {
     children = (
       <VariableContext.Provider value={variables}>
         {children}
@@ -247,7 +294,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
     );
   }
 
-  if ($interopMeta.hasInlineContainers) {
+  if (interopMeta.hasInlineContainers) {
     children = (
       <ContainerContext.Provider value={containers}>
         {children}
@@ -255,17 +302,17 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
     );
   }
 
-  if ($interopMeta.animationInteropKey) {
+  if (interopMeta.animationInteropKey) {
     return (
       <AnimationInterop
         {...props}
         ref={ref}
-        key={$interopMeta.animationInteropKey}
+        key={interopMeta.animationInteropKey}
         __component={Component}
         __variables={variables}
         __containers={inheritedContainers}
         __interaction={interaction}
-        __interopMeta={$interopMeta}
+        __interopMeta={interopMeta}
         __skipCssInterop
       >
         {children}
@@ -279,74 +326,6 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
     );
   }
 });
-
-/**
- * Maps each "style" prop to its aliased name
- * If the style is a string it fetches the style object from the global registry
- * If there are existing styles, they are merged together
- *
- * @param props - An object that may contain a `className` property and a `style` property
- * @returns The modified input object with updated `style` property
- */
-function mapProps(
-  { ...props }: Record<string, unknown>,
-  type: ComponentType<any>,
-  mapping: CssInteropPropMapping,
-) {
-  for (const [key, keyMapping] of Object.entries(mapping)) {
-    const prop = keyMapping === true ? key : keyMapping;
-    const { [prop]: className, ...rest } = props;
-
-    if (typeof className === "string") {
-      props = rest;
-      // Split className string into an array of class names, then map each class
-      // name to its corresponding global style object, if one exists.
-      const classNameStyle = className
-        .split(/\s+/)
-        .map((s) => globalStyles.get(s));
-
-      // Combine the resulting array of styles with any existing styles in the `style` property
-      // of the input object.
-      const existingProp = props[key];
-      let newProp = Array.isArray(existingProp)
-        ? [...classNameStyle, ...existingProp]
-        : existingProp
-        ? [...classNameStyle, existingProp]
-        : classNameStyle;
-
-      // If there is only one style in the resulting array, replace the array with that single style.
-      if (Array.isArray(newProp) && newProp.length <= 1) {
-        newProp = newProp[0];
-      }
-
-      props[key] = newProp;
-    }
-  }
-
-  props.__component = type;
-  props.__styleKeys = Object.keys(mapping);
-
-  return props;
-}
-
-/**
- * Determines whether a style object or array of style objects contains dynamic styles.
- * @param style The style object or array of style objects to check.
- * @returns True if the style object or array contains dynamic styles; otherwise, false.
- */
-function areStylesDynamic(style: any): boolean {
-  if (!style) return false; // If there is no style, it can't be dynamic.
-  if (styleMetaMap.has(style)) return true; // If it's already tagged, it's dynamic.
-
-  // If we have an array of styles, check each one.
-  // We can then tag the array so we don't have to check it again.
-  if (Array.isArray(style) && style.some(areStylesDynamic)) {
-    styleMetaMap.set(style, {}); // Tag the array so we don't have to check it again.
-    return true;
-  }
-
-  return false;
-}
 
 /* Micro optimizations. Save these externally so they are not recreated every render  */
 const useRerender = () => useReducer(rerenderReducer, 0)[1];

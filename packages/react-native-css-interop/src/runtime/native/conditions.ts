@@ -22,17 +22,15 @@ interface ConditionReference {
   height: number | SignalLike<number>;
 }
 
-const defaultConditionReference: ConditionReference = {
-  width: vw,
-  height: vh,
-};
-
 /**
  * Test a media query against current conditions
  */
 export function testMediaQuery(
   mediaQuery: MediaQuery,
-  conditionReference: ConditionReference = defaultConditionReference,
+  conditionReference: ConditionReference = {
+    width: vw,
+    height: vh,
+  },
 ) {
   const pass = testCondition(mediaQuery.condition, conditionReference);
   return mediaQuery.qualifier === "not" ? !pass : pass;
@@ -197,15 +195,14 @@ function testRange(
     return false;
   }
 
-  /*eslint no-fallthrough: ["error", { "commentPattern": "break[\\s\\w]*omitted" }]*/
   switch (feature.name) {
     case "height":
       return testComparision(feature.operator, ref.height, value);
     case "width":
       return testComparision(feature.operator, ref.width, value);
+    default:
+      return false;
   }
-
-  return false;
 }
 
 function testComparision(
