@@ -1,4 +1,5 @@
 import { render } from "@testing-library/react-native";
+import { StyleSheet as RNStyleSheet } from "react-native";
 
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "../testing-library";
@@ -22,5 +23,18 @@ describe("functions - ios", () => {
     render(<A className="my-class" />);
 
     expect(A).styleToEqual({ color: "black" });
+  });
+
+  test("hairlineWidth", () => {
+    registerCSS(
+      `.my-class {
+        --test: hairlineWidth();
+        width: var(--test);
+      }`,
+    );
+
+    render(<A className="my-class" />);
+
+    expect(A).styleToEqual({ width: RNStyleSheet.hairlineWidth });
   });
 });

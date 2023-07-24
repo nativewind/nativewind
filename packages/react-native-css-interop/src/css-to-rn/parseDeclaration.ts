@@ -1515,8 +1515,22 @@ function parseUnparsed(
         case "scaleX":
         case "scaleY":
           return unparsedFunction(tokenOrValue, options);
+        case "platformColor":
+        case "getPixelSizeForLayoutSize":
+        case "roundToNearestPixel":
+        case "getfontScale":
+        case "getPixelRatio":
+          return unparsedFunction(tokenOrValue, options);
+        case "hairlineWidth":
+          return {
+            type: "runtime",
+            name: tokenOrValue.value.name,
+            arguments: [],
+          };
         case "platformSelect":
-          return parseReactNativeFunction(
+        case "fontScaleSelect":
+        case "pixelScaleSelect":
+          return parseRNRuntimeSpecificsFunction(
             tokenOrValue.value.name,
             tokenOrValue.value.arguments,
             options,
@@ -2232,7 +2246,7 @@ function parseGap(
   return parseLength(value.value, options);
 }
 
-function parseReactNativeFunction(
+function parseRNRuntimeSpecificsFunction(
   name: string,
   args: TokenOrValue[],
   options: ParseDeclarationOptionsWithValueWarning,

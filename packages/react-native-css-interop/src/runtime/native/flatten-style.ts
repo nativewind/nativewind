@@ -1,4 +1,4 @@
-import { Platform } from "react-native";
+import { Platform, PlatformColor, StyleSheet } from "react-native";
 import { isRuntimeValue } from "../../shared";
 import {
   Interaction,
@@ -381,9 +381,9 @@ function extractValue(
     case "scaleX":
     case "scaleY":
     case "scale":
-      return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-        shouldRunwrap: true,
-        shouldParseFloat: true,
+      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
+        wrap: false,
+        parseFloat: true,
       });
     case "rotate":
     case "rotateX":
@@ -391,54 +391,106 @@ function extractValue(
     case "rotateZ":
     case "skewX":
     case "skewY":
-      return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-        shouldRunwrap: true,
+      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
+        wrap: false,
       });
+    case "hairlineWidth":
+      return StyleSheet.hairlineWidth;
     case "platformSelect":
-      return extractValue(
-        Platform.select(value.arguments[0]),
+      return createRuntimeFunction(
+        {
+          ...value,
+          arguments: [Platform.select(value.arguments[0])],
+        },
         flatStyle,
         flatStyleMeta,
         options,
+        {
+          wrap: false,
+        },
       );
+    case "platformColor":
+      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
+        wrap: false,
+        joinArgs: false,
+        callback: PlatformColor,
+        spreadCallbackArgs: true,
+      });
     default: {
-      return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options);
+      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options);
     }
   }
 }
 
-function extractRuntimeFunction(
+interface CreateRuntimeFunctionOptions {
+  wrap?: boolean;
+  parseFloat?: boolean;
+  joinArgs?: boolean;
+  callback?: Function;
+  spreadCallbackArgs?: boolean;
+}
+
+/**
+ * TODO: This function is overloaded with functionality
+ */
+function createRuntimeFunction(
   value: RuntimeValue,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
   options: FlattenStyleOptions,
-  { shouldRunwrap = false, shouldParseFloat = false } = {},
+  {
+    wrap = true,
+    parseFloat: shouldParseFloat = false,
+    joinArgs = true,
+    spreadCallbackArgs = false,
+    callback,
+  }: CreateRuntimeFunctionOptions = {},
 ) {
   let isStatic = true;
   const args: unknown[] = [];
 
-  for (const arg of value.arguments) {
-    const getterOrValue = extractValue(arg, flatStyle, flatStyleMeta, options);
+  if (value.arguments) {
+    for (const arg of value.arguments) {
+      const getterOrValue = extractValue(
+        arg,
+        flatStyle,
+        flatStyleMeta,
+        options,
+      );
 
-    if (typeof getterOrValue === "function") {
-      isStatic = false;
+      if (typeof getterOrValue === "function") {
+        isStatic = false;
+      }
+
+      args.push(getterOrValue);
     }
-
-    args.push(getterOrValue);
   }
 
   const valueFn = () => {
-    const $args = args
+    let $args: any = args
       .map((a) => (typeof a === "function" ? a() : a))
-      .filter((a) => a !== undefined)
-      .join(", ");
+      .filter((a) => a !== undefined);
 
-    if ($args === "") {
-      return;
+    if (joinArgs) {
+      $args = $args.join(", ");
+
+      if ($args === "") {
+        return;
+      }
     }
 
-    const result = shouldRunwrap ? $args : `${value.name}(${$args})`;
-    return shouldParseFloat ? parseFloat(result) : result;
+    let result = wrap ? `${value.name}(${$args})` : $args;
+    result = shouldParseFloat ? parseFloat(result) : result;
+
+    if (callback) {
+      if (spreadCallbackArgs && Array.isArray(result)) {
+        return callback(...result);
+      } else {
+        return callback(result);
+      }
+    }
+
+    return result;
   };
 
   return isStatic ? valueFn() : valueFn;

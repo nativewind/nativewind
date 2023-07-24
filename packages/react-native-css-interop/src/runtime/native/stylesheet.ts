@@ -3,7 +3,7 @@ import {
   StyleSheet as RNStyleSheet,
   Appearance,
 } from "react-native";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
 
 import {
   StyleSheetRegisterOptions,
@@ -211,20 +211,22 @@ let defaultDarkVariables: Record<string, unknown> = {};
 export function useVariables() {
   let $variables = useContext(VariableContext);
 
-  // $variables will be null if this is a top-level component
-  if ($variables === null) {
-    return Appearance.getColorScheme() === "light"
-      ? rootVariables
-      : rootDarkVariables;
-  } else {
-    return Appearance.getColorScheme() === "light"
-      ? {
-          ...$variables,
-          ...defaultVariables,
-        }
-      : {
-          ...$variables,
-          ...defaultDarkVariables,
-        };
-  }
+  return useMemo(() => {
+    // $variables will be null if this is a top-level component
+    if ($variables === null) {
+      return Appearance.getColorScheme() === "light"
+        ? rootVariables
+        : rootDarkVariables;
+    } else {
+      return Appearance.getColorScheme() === "light"
+        ? {
+            ...$variables,
+            ...defaultVariables,
+          }
+        : {
+            ...$variables,
+            ...defaultDarkVariables,
+          };
+    }
+  }, [$variables]);
 }

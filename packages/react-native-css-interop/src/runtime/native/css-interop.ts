@@ -9,12 +9,7 @@ import {
 } from "react";
 import { View, Pressable } from "react-native";
 
-import {
-  ContainerRuntime,
-  CssInteropPropMapping,
-  InteropMeta,
-  StyleMeta,
-} from "../../types";
+import { ContainerRuntime, InteropMeta, StyleMeta } from "../../types";
 import { AnimationInterop } from "./animations";
 import { flattenStyle } from "./flatten-style";
 import { ContainerContext, globalStyles, styleMetaMap } from "./globals";
@@ -24,6 +19,7 @@ import { StyleSheet, VariableContext, useVariables } from "./stylesheet";
 
 type CSSInteropWrapperProps = {
   __component: ComponentType<any>;
+  __jsx: Function;
 } & Record<string, any>;
 
 /**
@@ -53,7 +49,7 @@ export function defaultCSSInterop(
   if (styles.some((s) => s && styleMetaMap.has(s))) {
     return jsx(
       CSSInteropWrapper,
-      { ...props, className: classNames, __component: type },
+      { ...props, className: classNames, __component: type, __jsx: jsx },
       key,
     );
   }
@@ -86,7 +82,12 @@ export function defaultCSSInterop(
  * @param ref - Ref to the component
  */
 const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
-  { __component: Component, className, ...$props }: CSSInteropWrapperProps,
+  {
+    __component: component,
+    __jsx: jsx,
+    className,
+    ...$props
+  }: CSSInteropWrapperProps,
   ref,
 ) {
   const rerender = useRerender();
@@ -261,10 +262,10 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
   }
 
   if (
-    Component === View &&
+    component === View &&
     (interopMeta.hasActive || interopMeta.hasHover || interopMeta.hasFocus)
   ) {
-    Component = Pressable;
+    component = Pressable;
   }
 
   const variables = useMemo(
@@ -286,44 +287,32 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
 
   let children: JSX.Element = props.children;
 
+  // Call `jsx` directly so we can bypass the polyfill render method
   if (interopMeta.hasInlineVariables) {
-    children = (
-      <VariableContext.Provider value={variables}>
-        {children}
-      </VariableContext.Provider>
-    );
+    children = jsx(VariableContext.Provider, { value: variables, children });
   }
 
   if (interopMeta.hasInlineContainers) {
-    children = (
-      <ContainerContext.Provider value={containers}>
-        {children}
-      </ContainerContext.Provider>
-    );
+    children = jsx(ContainerContext.Provider, { value: containers, children });
   }
 
   if (interopMeta.animationInteropKey) {
-    return (
-      <AnimationInterop
-        {...props}
-        ref={ref}
-        key={interopMeta.animationInteropKey}
-        __component={Component}
-        __variables={variables}
-        __containers={inheritedContainers}
-        __interaction={interaction}
-        __interopMeta={interopMeta}
-        __skipCssInterop
-      >
-        {children}
-      </AnimationInterop>
+    return jsx(
+      AnimationInterop,
+      {
+        ...props,
+        ref,
+        children,
+        __component: component,
+        __variables: variables,
+        __containers: inheritedContainers,
+        __interaction: interaction,
+        __interopMeta: interopMeta,
+      },
+      interopMeta.animationInteropKey,
     );
   } else {
-    return (
-      <Component {...props} ref={ref} __skipCssInterop>
-        {children}
-      </Component>
-    );
+    return jsx(component, { ...props, ref, children });
   }
 });
 

@@ -7,9 +7,5 @@ export function render(
   key: string,
 ) {
   const cssInterop = polyfillMapping.get(type);
-  if (cssInterop && !props.__skipCssInterop) {
-    return cssInterop(jsx, type, props, key);
-  } else {
-    return jsx(type, props, key);
-  }
+  return cssInterop ? cssInterop(jsx, type, props, key) : jsx(type, props, key);
 }
