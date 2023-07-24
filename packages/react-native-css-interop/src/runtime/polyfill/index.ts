@@ -7,15 +7,9 @@ import { InteropFunction, polyfillMapping } from "./mapping";
 
 export function enableCSSInterop<P>(
   component: ComponentType<P>,
-  interop: InteropFunction | Record<keyof P, string> = defaultCSSInterop,
+  interop: InteropFunction = defaultCSSInterop,
 ) {
-  if (typeof interop === "function") {
-    polyfillMapping.set(component, interop);
-  } else {
-    polyfillMapping.set(component, (...props) => {
-      return defaultCSSInterop(...props, interop);
-    });
-  }
+  polyfillMapping.set(component, interop);
 }
 
 enableCSSInterop(Animated.Text);

@@ -4,7 +4,7 @@ import {
   ForwardRefExoticComponent,
   RefAttributes,
 } from "react";
-import { View, ViewProps } from "react-native";
+import { Platform, View, ViewProps } from "react-native";
 
 import { defaultCSSInterop } from "../runtime/css-interop";
 import { StyleSheet } from "../index";
@@ -76,5 +76,7 @@ export function registerCSS(
   css: string,
   options?: CssToReactNativeRuntimeOptions,
 ) {
-  StyleSheet.register(cssToReactNativeRuntime(css, options));
+  StyleSheet.register(
+    cssToReactNativeRuntime(css, { ...options, platform: Platform.OS }),
+  );
 }

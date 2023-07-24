@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import { isRuntimeValue } from "../../shared";
 import {
   Interaction,
@@ -288,127 +289,122 @@ function extractValue(
   flatStyleMeta: StyleMeta,
   options: FlattenStyleOptions,
 ): any {
-  if (isRuntimeValue(value)) {
-    switch (value.name) {
-      case "vh":
-        return round((vh.get() / 100) * (value.arguments[0] as number));
-      case "vw":
-        return round((vw.get() / 100) * (value.arguments[0] as number));
-      case "var":
-        return () => {
-          const name = value.arguments[0] as string;
-          const resolvedValue =
-            flatStyleMeta.variables?.[name] ?? options.variables[name];
-          return typeof resolvedValue === "function"
-            ? resolvedValue()
-            : resolvedValue;
-        };
-      case "rem":
-        return round(rem.get() * (value.arguments[0] as number));
-      case "em":
-        return () => {
-          const multiplier = value.arguments[0] as number;
-          if ("fontSize" in flatStyle) {
-            return round((flatStyle.fontSize || 0) * multiplier);
-          }
-          return undefined;
-        };
-      case "ch": {
-        const multiplier = value.arguments[0] as number;
-
-        let reference: number | undefined;
-
-        if (options.ch) {
-          reference = options.ch;
-        } else if (options.interaction?.layout.height.get()) {
-          reference = options.interaction.layout.height.get();
-        } else if (typeof flatStyle.height === "number") {
-          reference = flatStyle.height;
-        }
-
-        if (reference) {
-          return round(reference * multiplier);
-        } else {
-          return () => {
-            if (options.interaction?.layout.height.get()) {
-              reference = options.interaction.layout.height.get();
-            } else if (typeof flatStyle.height === "number") {
-              reference = flatStyle.height;
-            } else {
-              reference = 0;
-            }
-
-            return round(reference * multiplier);
-          };
-        }
-      }
-      case "cw": {
-        const multiplier = value.arguments[0] as number;
-
-        let reference: number | undefined;
-
-        if (options.cw) {
-          reference = options.cw;
-        } else if (options.interaction?.layout.width.get()) {
-          reference = options.interaction.layout.width.get();
-        } else if (typeof flatStyle.width === "number") {
-          reference = flatStyle.width;
-        }
-
-        if (reference) {
-          return round(reference * multiplier);
-        } else {
-          return () => {
-            if (options.interaction?.layout.width.get()) {
-              reference = options.interaction.layout.width.get();
-            } else if (typeof flatStyle.width === "number") {
-              reference = flatStyle.width;
-            } else {
-              reference = 0;
-            }
-
-            return round(reference * multiplier);
-          };
-        }
-      }
-      case "perspective":
-      case "translateX":
-      case "translateY":
-      case "scaleX":
-      case "scaleY":
-      case "scale":
-        return extractRuntimeFunction(
-          value,
-          flatStyle,
-          flatStyleMeta,
-          options,
-          {
-            shouldRunwrap: true,
-            shouldParseFloat: true,
-          },
-        );
-      case "rotate":
-      case "rotateX":
-      case "rotateY":
-      case "rotateZ":
-      case "skewX":
-      case "skewY":
-        return extractRuntimeFunction(
-          value,
-          flatStyle,
-          flatStyleMeta,
-          options,
-          {
-            shouldRunwrap: true,
-          },
-        );
-      default: {
-        return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options);
-      }
-    }
+  if (!isRuntimeValue(value)) {
+    return value;
   }
 
-  return value;
+  switch (value.name) {
+    case "vh":
+      return round((vh.get() / 100) * (value.arguments[0] as number));
+    case "vw":
+      return round((vw.get() / 100) * (value.arguments[0] as number));
+    case "var":
+      return () => {
+        const name = value.arguments[0] as string;
+        const resolvedValue =
+          flatStyleMeta.variables?.[name] ?? options.variables[name];
+        return typeof resolvedValue === "function"
+          ? resolvedValue()
+          : resolvedValue;
+      };
+    case "rem":
+      return round(rem.get() * (value.arguments[0] as number));
+    case "em":
+      return () => {
+        const multiplier = value.arguments[0] as number;
+        if ("fontSize" in flatStyle) {
+          return round((flatStyle.fontSize || 0) * multiplier);
+        }
+        return undefined;
+      };
+    case "ch": {
+      const multiplier = value.arguments[0] as number;
+
+      let reference: number | undefined;
+
+      if (options.ch) {
+        reference = options.ch;
+      } else if (options.interaction?.layout.height.get()) {
+        reference = options.interaction.layout.height.get();
+      } else if (typeof flatStyle.height === "number") {
+        reference = flatStyle.height;
+      }
+
+      if (reference) {
+        return round(reference * multiplier);
+      } else {
+        return () => {
+          if (options.interaction?.layout.height.get()) {
+            reference = options.interaction.layout.height.get();
+          } else if (typeof flatStyle.height === "number") {
+            reference = flatStyle.height;
+          } else {
+            reference = 0;
+          }
+
+          return round(reference * multiplier);
+        };
+      }
+    }
+    case "cw": {
+      const multiplier = value.arguments[0] as number;
+
+      let reference: number | undefined;
+
+      if (options.cw) {
+        reference = options.cw;
+      } else if (options.interaction?.layout.width.get()) {
+        reference = options.interaction.layout.width.get();
+      } else if (typeof flatStyle.width === "number") {
+        reference = flatStyle.width;
+      }
+
+      if (reference) {
+        return round(reference * multiplier);
+      } else {
+        return () => {
+          if (options.interaction?.layout.width.get()) {
+            reference = options.interaction.layout.width.get();
+          } else if (typeof flatStyle.width === "number") {
+            reference = flatStyle.width;
+          } else {
+            reference = 0;
+          }
+
+          return round(reference * multiplier);
+        };
+      }
+    }
+    case "perspective":
+    case "translateX":
+    case "translateY":
+    case "scaleX":
+    case "scaleY":
+    case "scale":
+      return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
+        shouldRunwrap: true,
+        shouldParseFloat: true,
+      });
+    case "rotate":
+    case "rotateX":
+    case "rotateY":
+    case "rotateZ":
+    case "skewX":
+    case "skewY":
+      return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
+        shouldRunwrap: true,
+      });
+    case "platformSelect":
+      return extractValue(
+        Platform.select(value.arguments[0]),
+        flatStyle,
+        flatStyleMeta,
+        options,
+      );
+    default: {
+      return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options);
+    }
+  }
 }
 
 function extractRuntimeFunction(

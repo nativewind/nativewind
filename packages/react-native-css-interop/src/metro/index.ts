@@ -19,7 +19,7 @@ export interface ComposableIntermediateConfigT extends IntermediateConfigT {
 
 export function withCssInterop(
   config: ComposableIntermediateConfigT,
-  options: CssToReactNativeRuntimeOptions = {},
+  options: CssToReactNativeRuntimeOptions,
 ): ComposableIntermediateConfigT {
   const getTransformOptions = async (
     ...args: Parameters<GetTransformOptions>

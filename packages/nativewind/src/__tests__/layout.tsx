@@ -80,7 +80,7 @@ describe("Layout - Box Sizing", () => {
   );
 });
 
-describe.only("Layout - Display", () => {
+describe("Layout - Display", () => {
   testCases(
     ["flex", style({ display: "flex" })],
     ["hidden", style({ display: "none" })],

@@ -17,7 +17,6 @@ import {
 
 import { exhaustiveCheck, isRuntimeValue } from "../shared";
 import {
-  ExtractedContainerQuery,
   ExtractedStyle,
   StyleSheetRegisterOptions,
   AnimatableCSSProperty,
@@ -31,6 +30,7 @@ export type CssToReactNativeRuntimeOptions = {
   darkMode?: false | string;
   grouping?: (string | RegExp)[];
   ignorePropertyWarningRegex?: (string | RegExp)[];
+  platform: string;
 };
 
 /**
@@ -42,7 +42,7 @@ export type CssToReactNativeRuntimeOptions = {
  */
 export function cssToReactNativeRuntime(
   code: Buffer | string,
-  options: CssToReactNativeRuntimeOptions = {},
+  options: CssToReactNativeRuntimeOptions = { platform: "native" },
 ): StyleSheetRegisterOptions {
   code = typeof code === "string" ? code : code.toString("utf-8");
   // I don't know why we need to remove this line, but we do :shug:
@@ -103,6 +103,7 @@ export function cssToReactNativeRuntime(
  * @property {RegExp[]} [grouping] - An array of regular expressions for grouping related rules together.
  */
 interface ExtractRuleOptions {
+  platform: string;
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
   keyframes: Map<string, ExtractedAnimation>;
   style?: Partial<ExtractedStyle>;

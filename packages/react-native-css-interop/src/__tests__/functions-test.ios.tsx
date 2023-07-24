@@ -9,14 +9,18 @@ afterEach(() => {
   StyleSheet.__reset();
 });
 
-describe.skip("functions - ios", () => {
+describe("functions - ios", () => {
   test("platformSelect", () => {
     registerCSS(
-      `.my-class { color: platformSelect(ios/red android/blue default/green); }`,
+      `.my-class {
+        --test: black;
+        color: green;
+        color: platformSelect(ios/var(--test), android/blue);
+      }`,
     );
 
     render(<A className="my-class" />);
 
-    expect(A).styleToEqual({ color: "rgba(255, 0, 0, 1)" });
+    expect(A).styleToEqual({ color: "black" });
   });
 });
