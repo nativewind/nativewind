@@ -146,21 +146,69 @@ describe("Interactivity - Scroll Snap Type", () => {
     ["snap-x", invalidProperty("scroll-snap-type")],
     ["snap-y", invalidProperty("scroll-snap-type")],
     ["snap-both", invalidProperty("scroll-snap-type")],
-    ["snap-mandatory", style({})],
-    ["snap-proximity", style({})],
+    [
+      "snap-mandatory",
+      { meta: { variables: { "--tw-scroll-snap-strictness": "mandatory" } } },
+    ],
+    [
+      "snap-proximity",
+      { meta: { variables: { "--tw-scroll-snap-strictness": "proximity" } } },
+    ],
   );
 });
 
 describe("Interactivity - Touch Action", () => {
   testCases(["touch-auto", invalidProperty("touch-action")]);
   testCases(["touch-none", invalidProperty("touch-action")]);
-  testCases(["touch-pan-x", invalidProperty("touch-action")]);
-  testCases(["touch-pan-left", invalidProperty("touch-action")]);
-  testCases(["touch-pan-right", invalidProperty("touch-action")]);
-  testCases(["touch-pan-y", invalidProperty("touch-action")]);
-  testCases(["touch-pan-up", invalidProperty("touch-action")]);
-  testCases(["touch-pan-down", invalidProperty("touch-action")]);
-  testCases(["touch-pinch-zoom", invalidProperty("touch-action")]);
+  testCases([
+    "touch-pan-x",
+    {
+      ...invalidProperty("touch-action"),
+      meta: { variables: { "--tw-pan-x": "pan-x" } },
+    },
+  ]);
+  testCases([
+    "touch-pan-left",
+    {
+      ...invalidProperty("touch-action"),
+      meta: { variables: { "--tw-pan-x": "pan-left" } },
+    },
+  ]);
+  testCases([
+    "touch-pan-right",
+    {
+      ...invalidProperty("touch-action"),
+      meta: { variables: { "--tw-pan-x": "pan-right" } },
+    },
+  ]);
+  testCases([
+    "touch-pan-y",
+    {
+      ...invalidProperty("touch-action"),
+      meta: { variables: { "--tw-pan-y": "pan-y" } },
+    },
+  ]);
+  testCases([
+    "touch-pan-up",
+    {
+      ...invalidProperty("touch-action"),
+      meta: { variables: { "--tw-pan-y": "pan-up" } },
+    },
+  ]);
+  testCases([
+    "touch-pan-down",
+    {
+      ...invalidProperty("touch-action"),
+      meta: { variables: { "--tw-pan-y": "pan-down" } },
+    },
+  ]);
+  testCases([
+    "touch-pinch-zoom",
+    {
+      ...invalidProperty("touch-action"),
+      meta: { variables: { "--tw-pinch-zoom": "pinch-zoom" } },
+    },
+  ]);
   testCases(["touch-manipulation", invalidProperty("touch-action")]);
 });
 

@@ -71,7 +71,7 @@ type AddTransitionProp = (
     }
   >,
 ) => void;
-type AddWarning = (warning: ExtractionWarning) => void;
+type AddWarning = (warning: ExtractionWarning) => undefined;
 
 export interface ParseDeclarationOptions {
   inlineRem?: number | false;
@@ -86,8 +86,8 @@ export interface ParseDeclarationOptions {
 
 export interface ParseDeclarationOptionsWithValueWarning
   extends ParseDeclarationOptions {
-  addValueWarning: (value: any) => void;
-  addFunctionValueWarning: (value: any) => void;
+  addValueWarning: (value: any) => undefined;
+  addFunctionValueWarning: (value: any) => undefined;
 }
 
 export function parseDeclaration(
@@ -114,14 +114,14 @@ export function parseDeclaration(
     const parseOptions = {
       ...options,
       addFunctionValueWarning(value: any) {
-        addWarning({
+        return addWarning({
           type: "IncompatibleNativeFunctionValue",
           property: declaration.value.propertyId.property,
           value,
         });
       },
       addValueWarning(value: any) {
-        addWarning({
+        return addWarning({
           type: "IncompatibleNativeValue",
           property: declaration.value.propertyId.property,
           value,
@@ -149,14 +149,14 @@ export function parseDeclaration(
       parseUnparsed(declaration.value.value, {
         ...options,
         addValueWarning(value: any) {
-          addWarning({
+          return addWarning({
             type: "IncompatibleNativeValue",
             property: declaration.value.name,
             value,
           });
         },
         addFunctionValueWarning(value: any) {
-          addWarning({
+          return addWarning({
             type: "IncompatibleNativeFunctionValue",
             property: declaration.value.name,
             value,
@@ -169,14 +169,14 @@ export function parseDeclaration(
   const parseOptions = {
     ...options,
     addValueWarning(value: any) {
-      addWarning({
+      return addWarning({
         type: "IncompatibleNativeValue",
         property: declaration.property,
         value,
       });
     },
     addFunctionValueWarning(value: any) {
-      addWarning({
+      return addWarning({
         type: "IncompatibleNativeFunctionValue",
         property: declaration.property,
         value,
@@ -184,11 +184,12 @@ export function parseDeclaration(
     },
   };
 
-  const addInvalidProperty = () =>
-    addWarning({
+  const addInvalidProperty = () => {
+    return addWarning({
       type: "IncompatibleNativeProperty",
       property: declaration.property,
     });
+  };
 
   if (!isValid(declaration)) {
     return addInvalidProperty();
@@ -1237,6 +1238,8 @@ export function parseDeclaration(
   }
 }
 
+const invalidIdent = new Set(["auto", "inherit"]);
+
 const validProperties = [
   "background-color",
   "opacity",
@@ -1550,7 +1553,11 @@ function parseUnparsed(
         case "string":
         case "number":
         case "ident":
-          return tokenOrValue.value.value;
+          if (invalidIdent.has(tokenOrValue.value.value.toString())) {
+            return options.addValueWarning(tokenOrValue.value.value);
+          } else {
+            return tokenOrValue.value.value;
+          }
         case "function":
           options.addValueWarning(tokenOrValue.value.value);
           return;

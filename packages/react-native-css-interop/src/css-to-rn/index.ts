@@ -30,7 +30,7 @@ export type CssToReactNativeRuntimeOptions = {
   darkMode?: false | string;
   grouping?: (string | RegExp)[];
   ignorePropertyWarningRegex?: (string | RegExp)[];
-  platform: string;
+  platform?: string;
 };
 
 /**
@@ -103,7 +103,7 @@ export function cssToReactNativeRuntime(
  * @property {RegExp[]} [grouping] - An array of regular expressions for grouping related rules together.
  */
 interface ExtractRuleOptions {
-  platform: string;
+  platform?: string;
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
   keyframes: Map<string, ExtractedAnimation>;
   style?: Partial<ExtractedStyle>;
@@ -740,7 +740,7 @@ function getExtractedStyle(
     }
   }
 
-  function addWarning(warning: ExtractionWarning) {
+  function addWarning(warning: ExtractionWarning): undefined {
     const warningRegexArray = options.ignorePropertyWarningRegex;
 
     if (warningRegexArray) {

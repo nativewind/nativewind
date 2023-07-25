@@ -1,4 +1,5 @@
 import path from "path";
+import type { GetTransformOptionsOpts } from "metro-config";
 import {
   withCssInterop,
   CssToReactNativeRuntimeOptions,
@@ -48,15 +49,19 @@ export function withNativeWind(
       output,
     },
     getTransformOptions: async (
-      entryPoints: any,
-      options: any,
-      getDependenciesOf: any,
+      entryPoints: ReadonlyArray<string>,
+      options: GetTransformOptionsOpts,
+      getDependenciesOf: (filePath: string) => Promise<string[]>,
     ) => {
       // Clear Metro's progress bar and move to the start of the line
       // We will print out own output before letting Metro print again
       if (process.stdout.isTTY) {
         process.stdout.clearLine(0);
         process.stdout.cursorTo(0);
+      }
+
+      if (options.platform !== "web") {
+        process.env.NATIVEWIND_NATIVE = "1";
       }
 
       await twBuild({

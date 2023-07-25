@@ -79,14 +79,62 @@ describe("Typography - Font Weight", () => {
 describe("Typography - Font Variant Numeric", () => {
   testCases(
     ["normal-nums", invalidProperty("font-variant-numeric")],
-    ["ordinal", invalidProperty("font-variant-numeric")],
-    ["slashed-zero", invalidProperty("font-variant-numeric")],
-    ["lining-nums", invalidProperty("font-variant-numeric")],
-    ["oldstyle-nums", invalidProperty("font-variant-numeric")],
-    ["proportional-nums", invalidProperty("font-variant-numeric")],
-    ["tabular-nums", invalidProperty("font-variant-numeric")],
-    ["diagonal-fractions", invalidProperty("font-variant-numeric")],
-    ["stacked-fractions", invalidProperty("font-variant-numeric")],
+    [
+      "ordinal",
+      {
+        ...invalidProperty("font-variant-numeric"),
+        meta: { variables: { "--tw-ordinal": "ordinal" } },
+      },
+    ],
+    [
+      "slashed-zero",
+      {
+        ...invalidProperty("font-variant-numeric"),
+        meta: { variables: { "--tw-slashed-zero": "slashed-zero" } },
+      },
+    ],
+    [
+      "lining-nums",
+      {
+        ...invalidProperty("font-variant-numeric"),
+        meta: { variables: { "--tw-numeric-figure": "lining-nums" } },
+      },
+    ],
+    [
+      "oldstyle-nums",
+      {
+        ...invalidProperty("font-variant-numeric"),
+        meta: { variables: { "--tw-numeric-figure": "oldstyle-nums" } },
+      },
+    ],
+    [
+      "proportional-nums",
+      {
+        ...invalidProperty("font-variant-numeric"),
+        meta: { variables: { "--tw-numeric-spacing": "proportional-nums" } },
+      },
+    ],
+    [
+      "tabular-nums",
+      {
+        ...invalidProperty("font-variant-numeric"),
+        meta: { variables: { "--tw-numeric-spacing": "tabular-nums" } },
+      },
+    ],
+    [
+      "diagonal-fractions",
+      {
+        ...invalidProperty("font-variant-numeric"),
+        meta: { variables: { "--tw-numeric-fraction": "diagonal-fractions" } },
+      },
+    ],
+    [
+      "stacked-fractions",
+      {
+        ...invalidProperty("font-variant-numeric"),
+        meta: { variables: { "--tw-numeric-fraction": "stacked-fractions" } },
+      },
+    ],
   );
 });
 
@@ -328,5 +376,11 @@ describe("Typography - Hyphens", () => {
 });
 
 describe("Typography - Content", () => {
-  testCases(["content-none", invalidProperty("content")]);
+  testCases([
+    "content-none",
+    {
+      ...invalidProperty("content"),
+      meta: { variables: { "--tw-content": "none" } },
+    },
+  ]);
 });
