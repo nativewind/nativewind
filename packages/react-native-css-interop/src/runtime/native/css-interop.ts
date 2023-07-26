@@ -33,40 +33,31 @@ type CSSInteropWrapperProps = {
 export function defaultCSSInterop(
   jsx: Function,
   type: ComponentType<any>,
-  props: any,
+  props: Record<string | number, unknown>,
   key: string,
+  stylePropKey: string = "style",
 ) {
-  const classNames: string[] | undefined = props.className?.split(/\s+/);
+  const styleProp = props[stylePropKey];
 
   // Normal component without className prop
-  if (!classNames) {
+  if (!styleProp) {
     return jsx(type, props, key);
   }
 
-  const styles = classNames.map((s) => globalStyles.get(s)).filter(Boolean);
+  const hasMeta = Array.isArray(styleProp)
+    ? styleProp.some((s) => s && styleMetaMap.has(s))
+    : styleMetaMap.has(styleProp);
 
   // The wrapper will affect performance, so only include it if needed
-  if (styles.some((s) => s && styleMetaMap.has(s))) {
+  if (hasMeta) {
     return jsx(
       CSSInteropWrapper,
-      { ...props, className: classNames, __component: type, __jsx: jsx },
+      { ...props, __component: type, __jsx: jsx },
       key,
     );
   }
 
-  // Merge the static styles with the props.style
-  let style = Array.isArray(props.style)
-    ? [...styles, ...props.style]
-    : props.style
-    ? [...styles, props.style]
-    : styles;
-
-  // If there is only one style in the resulting array, replace the array with the single style.
-  if (Array.isArray(style) && style.length <= 1) {
-    style = style[0];
-  }
-
-  return jsx(type, { ...props, style }, key);
+  return jsx(type, props, key);
 }
 
 /**
@@ -125,7 +116,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
    */
   const interopMeta = useComputation(
     () => {
-      const flatProps = flattenStyle($props.style, className, {
+      const flatProps = flattenStyle($props.style, {
         interaction,
         variables: inheritedVariables,
         containers: inheritedContainers,
@@ -251,7 +242,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
 
       return interopMeta;
     },
-    [className, $props.style, inheritedVariables, inheritedContainers],
+    [$props.style, inheritedVariables, inheritedContainers],
     rerender,
   );
 

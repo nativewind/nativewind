@@ -241,7 +241,7 @@ function useAnimations(
       > = {};
 
       for (const { style: $style, selector: progress } of keyframes.frames) {
-        const flatStyle = flattenStyle($style, undefined, {
+        const flatStyle = flattenStyle($style, {
           variables,
           interaction,
           ch: typeof style.height === "number" ? style.height : undefined,

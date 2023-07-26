@@ -1,4 +1,3 @@
-import "react-native-css-interop/polyfill";
 import { createElement as createReactElement } from "react";
 
 /**

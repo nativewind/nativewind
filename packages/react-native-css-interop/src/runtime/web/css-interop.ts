@@ -5,10 +5,12 @@ export function defaultCSSInterop(
   jsx: Function,
   type: any,
   { ...props }: Record<string | number, unknown>,
-  reactKey: string,
+  reactKey?: string,
   mapping: CssInteropPropMapping = { style: "className" },
 ) {
   for (const [key, prop] of Object.entries(mapping)) {
+    if (!prop) continue;
+
     // Extract the prop from the rest of the props
     const propToExtract = prop === true ? key : prop;
     const { [propToExtract]: classNames, ...rest } = props;

@@ -37,38 +37,14 @@ export interface FlattenStyleOptions {
  */
 export function flattenStyle(
   style: StyleProp,
-  className: string[] | undefined,
   options: FlattenStyleOptions,
   flatProps: Map<string, Style> = new Map(),
 ): Map<string, Style> {
-  if (className) {
-    // Split className string into an array of class names, then map each class
-    // name to its corresponding global style object, if one exists.
-    const classNameStyle = className
-      .map((s) => globalStyles.get(s))
-      .filter(Boolean);
-
-    // Combine the resulting array of styles with any existing styles in the `style` property
-    // of the input object.
-    if (classNameStyle.length > 0) {
-      style = Array.isArray(style)
-        ? [...classNameStyle, ...style]
-        : style
-        ? [...classNameStyle, style]
-        : classNameStyle;
-    }
-
-    // If there is only one style in the resulting array, replace the array with that single style.
-    if (Array.isArray(style) && style.length <= 1) {
-      style = style[0];
-    }
-  }
-
   if (Array.isArray(style)) {
     // We need to flatten in reverse order so that the last style in the array is the one defined
     for (let i = style.length - 1; i >= 0; i--) {
       if (style[i]) {
-        flattenStyle(style[i], undefined, options, flatProps);
+        flattenStyle(style[i], options, flatProps);
       }
     }
     return flatProps;

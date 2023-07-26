@@ -38,7 +38,7 @@ export async function transform(
       projectRoot,
       filename,
       Buffer.from(
-        `require("react-native-css-interop/polyfill");module.exports=require("${config.nativewind.output}");`,
+        `require("react-native-css-interop");module.exports=require("${config.nativewind.output}");`,
         "utf8",
       ),
       options,

@@ -7,6 +7,7 @@
     "sourceMap": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "react-native-css-interop-env.d.ts"
   ]
 }

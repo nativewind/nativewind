@@ -18,6 +18,7 @@ import {
   Style,
   StyleMeta,
 } from "../types";
+import { createPropRemapper, render } from "../runtime/render";
 
 declare global {
   namespace jest {
@@ -42,7 +43,7 @@ type MockComponent = ForwardRefExoticComponent<
  */
 export function createMockComponent(
   Component: React.ComponentType<any> = View,
-  mapping?: CssInteropPropMapping,
+  mapping = { style: "className" },
 ): MockComponent {
   const spy = jest.fn((props, ref) => <Component ref={ref} {...props} />);
 
@@ -51,16 +52,17 @@ export function createMockComponent(
 
   return Object.assign(
     // Create a wrapper that manually calls our jsxImportSource without changing the default jsxImportSource
-    forwardRef<MockComponentProps>((props, ref) => {
-      return defaultCSSInterop(
+    forwardRef<MockComponentProps>((props: Record<string, unknown>, ref) => {
+      return render(
         // Create a fake `jsx` function. This will render the component called the real jsxImportSource
-        (ComponentType: ComponentType<any>, props: object, key: string) => {
+        (ComponentType: ComponentType<any>, props: object, key?: string) => {
           return <ComponentType ref={ref} key={key} {...props} />;
         },
         spyWithRef,
         props,
-        "any-string-value",
-        mapping,
+        props.key?.toString(),
+        createPropRemapper(mapping),
+        defaultCSSInterop,
       );
     }),
     // Append the mock so we can access it

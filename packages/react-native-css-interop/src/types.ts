@@ -28,10 +28,14 @@ import {
   ViewStyle,
 } from "react-native";
 
-export type CssInteropPropMapping<P = Record<string, unknown>> = Record<
-  keyof P,
-  true | string
->;
+export type CssInteropPropMapping<P extends object = Record<string, unknown>> =
+  {
+    [K in keyof P]?: string | true;
+  };
+
+export type CssInteropProps<M> = {
+  [K in keyof M]?: M[K] extends string ? M[K] : M[K] extends true ? K : never;
+};
 
 export type RuntimeValue = {
   type: "runtime";
