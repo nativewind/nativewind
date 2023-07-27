@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "fs/promises";
 import type { GetTransformOptionsOpts } from "metro-config";
 import {
   withCssInterop,
@@ -39,6 +40,8 @@ export function withNativeWind(
   // It will manually call the react-native-css-interop transformer
   config.transformerPath = require.resolve("nativewind/dist/metro/transformer");
 
+  let tailwindHasStarted = false;
+
   // Use getTransformOptions to bootstrap the Tailwind CLI, but ensure
   // we still call the original
   const previousTransformOptions = config.transformer?.getTransformOptions;
@@ -64,12 +67,24 @@ export function withNativeWind(
         process.env.NATIVEWIND_NATIVE = "1";
       }
 
-      await twBuild({
-        "--input": input,
-        "--output": output,
-        "--watch": options.dev ? "always" : false,
-        "--poll": true,
-      });
+      if (!tailwindHasStarted) {
+        tailwindHasStarted = true;
+
+        // Run once to ensure the file exists
+        await twBuild({
+          "--input": input,
+          "--output": output,
+        });
+
+        if (options.dev) {
+          await twBuild({
+            "--input": input,
+            "--output": output,
+            "--watch": "always",
+            "--poll": true,
+          });
+        }
+      }
 
       return previousTransformOptions?.(
         entryPoints,

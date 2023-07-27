@@ -27,6 +27,7 @@ export function transform(
 
   // If the file is not CSS, then use the default behavior.
   const isCss = options.type !== "asset" && matchCss(filename);
+
   if (!isCss || options.platform === "web") {
     return transformer(config, projectRoot, filename, data, options);
   }

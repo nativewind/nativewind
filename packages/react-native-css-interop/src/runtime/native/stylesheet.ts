@@ -186,11 +186,6 @@ function tagStyles(
       hasMeta = true;
     }
 
-    if (styles.prop) {
-      meta.prop = styles.prop;
-      hasMeta = true;
-    }
-
     if (process.env.NODE_ENV !== "production" && styles.warnings) {
       warnings.set(name, styles.warnings);
     }
