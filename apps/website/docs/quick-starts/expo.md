@@ -1,42 +1,51 @@
 import StartCoding from "../\_start-coding.md"
 
-# Expo
-
-:::tip
-
-A example of an Expo project can be found on [Github](https://github.com/marklawlor/nativewind/tree/next/examples/expo)
-
-:::
+# Expo Router
 
 ## 1. Create the project
 
 Create the project with the Expo CLI
 
 ```bash
-npx create-expo-app my-app
-
-cd my-app
+npx create-expo-app@latest -e with-router
 ```
 
 You will need to install `nativewind` and it's peer dependency `tailwindcss`.
 
 ```bash
 yarn add nativewind
-yarn add --dev tailwindcss
+yarn add --dev tailwindcss@3.3.2
 ```
 
-## 2. Setup Tailwind CSS
+## 2. Upgrade to Expo SDK 49
+
+```bash
+npm install expo@^49.0.0 or yarn add expo@^49.0.0
+npx expo install --fix
+```
+
+## 3. Create your first route
+
+```
+npm start
+```
+
+Open your app on any device and follow the onscreen instructions.
+
+## 4. Setup Tailwind CSS
 
 Run `npx tailwindcss init` to create a `tailwind.config.js` file
 
 Add the paths to all of your component files in your tailwind.config.js file. Remember to replace `<custom directory>` with the actual name of your directory e.g. `screens`.
+
+This is the same as follow the `Using PostCSS` instructions: https://tailwindcss.com/docs/installation/using-postcss
 
 ```diff
 // tailwind.config.js
 
 module.exports = {
 - content: [],
-+ content: ["./App.{js,jsx,ts,tsx}", "./<custom directory>/**/*.{js,jsx,ts,tsx}"],
++ content: ["./app/**/*.{js,jsx,ts,tsx}", "./<custom directory>/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {},
   },
@@ -44,7 +53,23 @@ module.exports = {
 }
 ```
 
-## 3. Add the Babel plugin
+```css
+// global.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+```js
+// postcss.config.js
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+  },
+};
+```
+
+## 5. Add the Babel plugin
 
 Modify your `babel.config.js`
 
@@ -54,71 +79,40 @@ module.exports = function (api) {
   api.cache(true);
   return {
     presets: ["babel-preset-expo"],
-+   plugins: ["nativewind/babel"],
+    plugins: [
+      "@babel/plugin-proposal-export-namespace-from",
+      "react-native-reanimated/plugin",
+      require.resolve("expo-router/babel"),
++     "nativewind/babel",
+    ],
   };
 };
 
 ```
 
-<StartCoding />
+## 6. Enable CSS Support in Expo's Metro Config
 
-## Expo Web
+```js
+// metro.confgi.js
+const { getDefaultConfig } = require("expo/metro-config");
 
-When running on web, NativeWind is a compatability layer between [Tailwind CSS](http://www.tailwindcss.com) and React Native.
-
-You will need follow a [Tailwind CSS installation guide](https://tailwindcss.com/docs/installation) and ensure NativeWind is transpiled.
-
-
-### Example webpack setup
-
-A complete setup can be found on the [Expo project example](https://github.com/marklawlor/nativewind/tree/next/examples/expo) 
-
-:::caution
-
-Expo Web only supports Webpack 4, please ensure you are only installing webpack loaders that that support Webpack 4. For example, The latest version of `postcss-loader` is not compatible with Webpack 4 and instead, `postcss-loader@4.2.0` should be used.
-
-https://github.com/expo/expo-cli/pull/3763
-
-:::
-
-Expo Web uses webpack, so one possible setup is adding `PostCSS` to your `webpack.config.js` and adding [Tailwind CSS as a PostCSS plugin](https://tailwindcss.com/docs/installation/using-postcss).
-
-You can also add `nativewind` to your transpilation list through the `@expo/webpack-config` babel options.
-
-```tsx
-// webpack.config.js
-const createExpoWebpackConfigAsync = require("@expo/webpack-config");
-
-module.exports = async function (env, argv) {
-  const config = await createExpoWebpackConfigAsync(
-    {
-      ...env,
-      babel: {
-        dangerouslyAddModulePathsToTranspile: ["nativewind"],
-      },
-    },
-    argv
-  );
-
-  config.module.rules.push({
-    test: /\.css$/i,
-    use: ["postcss-loader"],
-  });
-
-  return config;
-};
-```
-
-### Expo SDK <=45
-
-Expo SDK <=45 supports React Native Web <=0.17 which cannot output classNames. You need to change the NativeWindStyleSheet output to use `native` for all platforms.
-
-```tsx
-// App.js
-
-import { NativeWindStyleSheet } from "nativewind";
-
-NativeWindStyleSheet.setOutput({
-  default: "native",
+const config = getDefaultConfig(__dirname, {
+  isCSSEnabled: true,
 });
+
+module.exports = config;
 ```
+
+## 7. Create a `app/_layout` file
+
+```js
+import { Slot } from "expo-router";
+
+import "../global.css";
+
+export default function () {
+  return <Slot />;
+}
+```
+
+<StartCoding />
