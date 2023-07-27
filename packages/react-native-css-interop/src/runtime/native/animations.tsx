@@ -19,7 +19,7 @@ import {
   Style,
 } from "../../types";
 import { createAnimatedComponent } from "./animated-component";
-import { flattenStyle } from "./flatten-style";
+import { flattenStyle, flattenStyleProps } from "./flatten-style";
 import { animationMap, styleMetaMap } from "./globals";
 
 type AnimationInteropProps = Record<string, unknown> & {
@@ -249,9 +249,7 @@ function useAnimations(
         });
 
         // TODO: Allow for non-style props to be animated
-        for (let [prop, value] of Object.entries(
-          flatStyle.get("style") ?? {},
-        )) {
+        for (let [prop, value] of Object.entries(flatStyle)) {
           if (prop === "transform") {
             if (value.length === 0) {
               value = defaultTransformEntries;

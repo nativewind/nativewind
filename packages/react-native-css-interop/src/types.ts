@@ -28,14 +28,42 @@ import {
   ViewStyle,
 } from "react-native";
 
-export type CssInteropPropMapping<P extends object = Record<string, unknown>> =
-  {
-    [K in keyof P]?: string | true;
-  };
+export type CssInteropPropMapping<P extends object> = {
+  [K in keyof P]?: string | true;
+};
+
+export type NativeStyleToPropMapping<P extends object> = {
+  [K in keyof Style & string]?: K extends keyof P ? keyof P | true : keyof P;
+};
 
 export type CssInteropProps<M> = {
   [K in keyof M]?: M[K] extends string ? M[K] : M[K] extends true ? K : never;
 };
+
+export type JSXFunction = (
+  type: any,
+  props: Record<string | number, unknown>,
+  key?: string,
+) => any;
+
+export type BasicInteropFunction = (
+  jsx: JSXFunction,
+  type: any,
+  props: Record<string | number, unknown>,
+  key: string | undefined,
+) => any;
+
+export type InteropFunction = (
+  jsx: JSXFunction,
+  type: any,
+  props: Record<string | number, unknown>,
+  key: string | undefined,
+  styledProps: string[],
+) => any;
+
+export type PropMapperFunction = (
+  props: Record<string | number, unknown>,
+) => Record<string | number, unknown>;
 
 export type RuntimeValue = {
   type: "runtime";
@@ -102,11 +130,9 @@ export type PropInteropMeta = {
   hasActive?: boolean;
   hasHover?: boolean;
   hasFocus?: boolean;
-  extractValue?: string;
 };
 
 export type StyleMeta = {
-  prop?: [string, string | true];
   variableProps?: Set<string>;
   media?: MediaQuery[];
   variables?: Record<string, unknown>;

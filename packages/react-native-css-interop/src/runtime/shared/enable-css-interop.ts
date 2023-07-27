@@ -16,91 +16,69 @@ import {
 
 import { defaultCSSInterop } from "../css-interop";
 import {
-  InteropFunction,
-  JSXFunction,
-  createPropRemapper,
+  createPropMapper as createPropMapper,
   interopMapping,
-  propReMapping,
+  propMapping,
 } from "../render";
 import { CssInteropPropMapping, CssInteropProps } from "../../types";
 
-export function enableCSSInterop<
-  P extends object,
-  M extends CssInteropPropMapping<P>,
->(
+export function enableCSSInterop<P extends object, M>(
   component: ComponentType<P>,
-  mapping?: M & Partial<Record<keyof P, unknown>>,
-  styleProp = "style",
-  interop: InteropFunction = defaultCSSInterop,
+  mapping: CssInteropPropMapping<P>,
+  interop = defaultCSSInterop,
 ): ComponentType<P & CssInteropProps<M>> {
-  if (mapping) {
-    enableClassNameResolution(component, mapping);
-  }
-  interopMapping.set(component, interop);
-  return component;
+  const mappingMap = new Map(Object.entries(mapping));
+  interopMapping.set(component, (jsx, type, props, key) => {
+    return interop(jsx, type, props, key, mappingMap);
+  });
+
+  return component as ComponentType<P & CssInteropProps<M>>;
 }
 
-export function enableClassNameResolution<
-  P extends object,
-  M extends CssInteropPropMapping<P>,
->(
+export function bindProps<P extends object, M>(
   component: ComponentType<P>,
-  mapping: M & Partial<Record<keyof P, unknown>>,
+  mapping: CssInteropPropMapping<P> & M,
 ): ComponentType<P & CssInteropProps<M>> {
-  if (mapping) {
-    propReMapping.set(component, createPropRemapper(mapping));
-  }
-  return component;
+  propMapping.set(component, createPropMapper(mapping));
+  return component as ComponentType<P & CssInteropProps<M>>;
 }
 
-/**
- * Components w/ CSS Interop
- */
-enableCSSInterop(ActivityIndicator, { style: "className" });
-enableCSSInterop(Image, { style: "className" });
-enableCSSInterop(Pressable, { style: "className" });
-enableCSSInterop(Text, { style: "className" });
-enableCSSInterop(View, { style: "className" });
-enableCSSInterop(
-  StatusBar,
-  {
-    barStyle: "barClassName",
-  },
-  "barStyle",
-);
+enableCSSInterop(ActivityIndicator, { className: "style" });
+enableCSSInterop(Image, { className: "style" });
+enableCSSInterop(Pressable, { className: "style" });
+enableCSSInterop(Text, { className: "style" });
+enableCSSInterop(View, { className: "style" });
+enableCSSInterop(StatusBar, { barClassName: "barStyle" });
 
-/**
- * Compones w/ className remapping
- */
-enableClassNameResolution(FlatList, {
-  style: "className",
-  ListFooterComponentStyle: "ListFooterComponentClassName",
-  ListHeaderComponentStyle: "ListHeaderComponentClassName",
-  columnWrapperStyle: "columnWrapperClassName",
-  contentContainerStyle: "contentContainerClassName",
-  indicatorStyle: "indicatorClassName",
+bindProps(FlatList, {
+  className: "style",
+  ListFooterComponentClassName: "ListFooterComponentStyle",
+  ListHeaderComponentClassName: "ListHeaderComponentStyle",
+  columnWrapperClassName: "columnWrapperStyle",
+  contentContainerClassName: "contentContainerStyle",
+  indicatorClassName: "indicatorStyle",
 });
-enableClassNameResolution(ImageBackground, {
-  style: "className",
-  imageStyle: "imageClassName",
+bindProps(ImageBackground, {
+  className: "style",
+  imageClassName: "imageStyle",
 });
-enableClassNameResolution(KeyboardAvoidingView, {
-  style: "className",
-  contentContainerStyle: "contentContainerClassName",
+bindProps(KeyboardAvoidingView, {
+  className: "style",
+  contentContainerClassName: "contentContainerStyle",
 });
-enableClassNameResolution(Modal, {
-  style: "className",
-  presentationStyle: "presentationClassName",
+bindProps(Modal, {
+  className: "style",
+  presentationClassName: "presentationStyle",
 });
-enableClassNameResolution(ScrollView, {
-  style: "className",
-  contentContainerStyle: "contentContainerClassName",
-  indicatorStyle: "indicatorClassName",
+bindProps(ScrollView, {
+  className: "style",
+  contentContainerClassName: "contentContainerStyle",
+  indicatorClassName: "indicatorStyle",
 });
-enableClassNameResolution(VirtualizedList, {
-  style: "className",
-  ListFooterComponentStyle: "ListFooterComponentClassName",
-  ListHeaderComponentStyle: "ListHeaderComponentClassName",
-  contentContainerStyle: "contentContainerClassName",
-  indicatorStyle: "indicatorClassName",
+bindProps(VirtualizedList, {
+  className: "style",
+  ListFooterComponentClassName: "ListFooterComponentStyle",
+  ListHeaderComponentClassName: "ListHeaderComponentStyle",
+  contentContainerClassName: "contentContainerStyle",
+  indicatorClassName: "indicatorStyle",
 });

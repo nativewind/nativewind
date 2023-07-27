@@ -156,7 +156,7 @@ describe("Layout - Overflow", () => {
   testCases(
     ["overflow-auto", invalidValue("overflow", "auto")],
     ["overflow-clip", invalidValue("overflow", "clip")],
-    // ["overflow-scroll", invalidValue("overflow", "scroll")],
+    ["overflow-scroll", invalidValue("overflow", "scroll")],
     ["overflow-x-auto", invalidProperty("overflow-x")],
     ["overflow-y-auto", invalidProperty("overflow-y")],
     ["overflow-x-hidden", invalidProperty("overflow-x")],

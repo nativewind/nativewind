@@ -18,7 +18,7 @@ import {
   Style,
   StyleMeta,
 } from "../types";
-import { createPropRemapper, render } from "../runtime/render";
+import { createPropMapper, render } from "../runtime/render";
 
 declare global {
   namespace jest {
@@ -43,12 +43,14 @@ type MockComponent = ForwardRefExoticComponent<
  */
 export function createMockComponent(
   Component: React.ComponentType<any> = View,
-  mapping = { style: "className" },
+  mapping = { className: "style" },
 ): MockComponent {
   const spy = jest.fn((props, ref) => <Component ref={ref} {...props} />);
 
   // We need to forward the ref through the mock that Jest creates
   const spyWithRef = forwardRef(spy);
+
+  const mappingMap = new Map(Object.entries(mapping));
 
   return Object.assign(
     // Create a wrapper that manually calls our jsxImportSource without changing the default jsxImportSource
@@ -61,8 +63,10 @@ export function createMockComponent(
         spyWithRef,
         props,
         props.key?.toString(),
-        createPropRemapper(mapping),
-        defaultCSSInterop,
+        undefined,
+        (jsx, type, props, key) => {
+          return defaultCSSInterop(jsx, type, props, key, mappingMap);
+        },
       );
     }),
     // Append the mock so we can access it

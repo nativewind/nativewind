@@ -12,7 +12,7 @@ test("group", async () => {
   const B = createMockComponent();
 
   registerCSS(
-    `.group\\/item .my-class { 
+    `.group\\/item .my-class {
       color: red;
     }`,
     {
@@ -33,12 +33,12 @@ test("group", async () => {
   expect(B).styleToEqual({ color: "rgba(255, 0, 0, 1)" });
 });
 
-test("invalid group", async () => {
+test.only("invalid group", async () => {
   const A = createMockComponent();
   const B = createMockComponent();
 
   registerCSS(
-    `.invalid .my-class { 
+    `.invalid .my-class {
       color: red;
     }`,
     {

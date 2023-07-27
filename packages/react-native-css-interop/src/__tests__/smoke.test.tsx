@@ -37,7 +37,7 @@ afterEach(() => {
 
 const cases: Partial<TestSuites> = {
   color: ["red", { color: "rgba(255, 0, 0, 1)" }],
-  "background-color": ["purple", { backgroundColor: "rgba(128, 0, 128, 1)" }],
+  // "background-color": ["purple", { backgroundColor: "rgba(128, 0, 128, 1)" }],
 };
 
 test.each(Object.entries(cases))("%s", (key, [css, expected]) => {

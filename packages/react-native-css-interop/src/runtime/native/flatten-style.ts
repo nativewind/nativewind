@@ -12,7 +12,7 @@ import {
   testMediaQuery,
   testPseudoClasses,
 } from "./conditions";
-import { globalStyles, rem, styleMetaMap, vh, vw } from "./globals";
+import { rem, styleMetaMap, vh, vw } from "./globals";
 
 export interface FlattenStyleOptions {
   variables: Record<string, any>;
@@ -20,6 +20,18 @@ export interface FlattenStyleOptions {
   containers?: Record<string, any>;
   ch?: number;
   cw?: number;
+}
+
+export function flattenStyleProps(
+  props: Record<string, any>,
+  options: FlattenStyleOptions,
+  flatProps: Map<string, Style> = new Map(),
+): Map<string, Style> {
+  for (const [key, value] of Object.entries(props)) {
+    flatProps.set(key, flattenStyle(value, options));
+  }
+
+  return flatProps;
 }
 
 /**
@@ -38,20 +50,20 @@ export interface FlattenStyleOptions {
 export function flattenStyle(
   style: StyleProp,
   options: FlattenStyleOptions,
-  flatProps: Map<string, Style> = new Map(),
-): Map<string, Style> {
+  flatStyle: Style = {},
+): Style {
+  if (!style) {
+    return flatStyle;
+  }
+
   if (Array.isArray(style)) {
     // We need to flatten in reverse order so that the last style in the array is the one defined
     for (let i = style.length - 1; i >= 0; i--) {
       if (style[i]) {
-        flattenStyle(style[i], options, flatProps);
+        flattenStyle(style[i], options, flatStyle);
       }
     }
-    return flatProps;
-  }
-
-  if (!style) {
-    return flatProps;
+    return flatStyle;
   }
 
   /*
@@ -59,18 +71,11 @@ export function flattenStyle(
    */
   const styleMeta: StyleMeta = styleMetaMap.get(style) ?? {};
 
-  let flatStyle: Style;
-  let flatStyleMeta: StyleMeta;
-  const [prop, propMapping] = styleMeta.prop ?? ["style", true];
+  let flatStyleMeta = styleMetaMap.get(flatStyle);
 
-  if (!flatProps.has(prop)) {
-    flatStyle = {};
+  if (!flatStyleMeta) {
     flatStyleMeta = {};
-    flatProps.set(prop, flatStyle);
     styleMetaMap.set(flatStyle, flatStyleMeta);
-  } else {
-    flatStyle = flatProps.get(prop)!;
-    flatStyleMeta = styleMetaMap.get(flatStyle)!;
   }
 
   /*
@@ -85,17 +90,17 @@ export function flattenStyle(
     };
 
     if (!testPseudoClasses(options.interaction, styleMeta.pseudoClasses)) {
-      return flatProps;
+      return flatStyle;
     }
   }
 
   // Skip failed media queries
   if (styleMeta.media && !styleMeta.media.every((m) => testMediaQuery(m))) {
-    return flatProps;
+    return flatStyle;
   }
 
   if (!testContainerQuery(styleMeta.containerQuery, options.containers)) {
-    return flatProps;
+    return flatStyle;
   }
   /*
    * END OF CONDITIONS CHECK
@@ -124,10 +129,6 @@ export function flattenStyle(
     if (styleMeta.container.type) {
       flatStyleMeta.container.type = styleMeta.container.type;
     }
-  }
-
-  if (styleMeta.prop) {
-    flatStyleMeta.prop = styleMeta.prop;
   }
 
   if (styleMeta.requiresLayout) {
@@ -161,11 +162,6 @@ export function flattenStyle(
   }
 
   for (const [key, value] of Object.entries(style)) {
-    // If there is propMapping, only map the specified styles
-    if (typeof propMapping === "string" && key !== propMapping) {
-      continue;
-    }
-
     // Skip already set keys
     if (key in flatStyle) continue;
 
@@ -247,7 +243,7 @@ export function flattenStyle(
     }
   }
 
-  return flatProps;
+  return flatStyle;
 }
 
 /**

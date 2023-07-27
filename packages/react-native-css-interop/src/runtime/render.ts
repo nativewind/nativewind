@@ -1,70 +1,61 @@
 import type { ComponentType } from "react";
 import { globalStyles } from "./shared/globals";
-
-export type JSXFunction = (
-  type: any,
-  props: Record<string | number, unknown>,
-  key?: string,
-) => any;
-
-export type InteropFunction = (
-  jsx: JSXFunction,
-  type: any,
-  props: Record<string | number, unknown>,
-  key?: string,
-) => any;
+import {
+  BasicInteropFunction,
+  InteropFunction,
+  JSXFunction,
+  PropMapperFunction,
+} from "../types";
 
 export const interopMapping = new WeakMap<
   ComponentType<any>,
-  InteropFunction
+  BasicInteropFunction
 >();
 
-export type PropRemaperFunction = (
-  props: Record<string | number, unknown>,
-) => Record<string | number, unknown>;
-
-export const propReMapping = new WeakMap<
+export const propMapping = new WeakMap<
   ComponentType<any>,
-  PropRemaperFunction
+  PropMapperFunction
 >();
 
-export function createPropRemapper(
-  mapping: Record<string | number, string | true>,
+export function createPropMapper(
+  mapping: Record<string | number, string | undefined | true>,
 ) {
   const entries = Object.entries(mapping);
 
   return ({ ...props }: Record<string | number, unknown>) => {
-    for (const [key, value] of entries) {
-      let classNames: unknown;
-      if (typeof value === "string") {
-        classNames = props[value];
-        delete props[value];
-      } else {
-        classNames = props[key];
+    for (const [alias, propOrBoolean] of entries) {
+      const className = props[alias];
+
+      if (!propOrBoolean || !className || typeof className !== "string") {
+        continue;
       }
 
-      if (typeof classNames === "string") {
-        // Split className string into an array of class names, then map each class
-        // name to its corresponding global style object, if one exists.
-        const classNameStyle = classNames
-          .split(/\s+/)
-          .map((s) => globalStyles.get(s))
-          .filter(Boolean);
+      const targetProp = propOrBoolean === true ? alias : propOrBoolean;
 
-        if (classNameStyle.length > 0) {
-          const existingStyles = props[key];
-          let newProp = Array.isArray(existingStyles)
-            ? [...classNameStyle, ...existingStyles]
-            : props[key]
-            ? [...classNameStyle, props[key]]
-            : classNameStyle;
+      // Split className string into an array of class names, then map each class
+      // name to its corresponding global style object, if one exists.
+      const newStyles = className
+        .split(/\s+/)
+        .map((s) => globalStyles.get(s))
+        .filter(Boolean);
 
-          // If there is only one style in the resulting array, replace the array with that single style.
-          if (Array.isArray(newProp) && newProp.length <= 1) {
-            newProp = newProp[0];
-          }
+      if (newStyles.length > 0) {
+        const existingStyles = props[targetProp];
 
-          props[key] = newProp;
+        let newProp = Array.isArray(existingStyles)
+          ? [...newStyles, ...existingStyles]
+          : existingStyles
+          ? [...newStyles, existingStyles]
+          : newStyles;
+
+        // If there is only one style in the resulting array, replace the array with that single style.
+        if (Array.isArray(newProp) && newProp.length <= 1) {
+          newProp = newProp[0];
+        }
+
+        props[targetProp] = newProp;
+        if (targetProp !== alias) {
+          delete props[alias];
         }
       }
     }
@@ -78,11 +69,11 @@ export function render(
   type: any,
   props: Record<string | number, unknown>,
   key?: string,
-  propRemapper = propReMapping.get(type),
+  propMapper = propMapping.get(type),
   cssInterop = interopMapping.get(type),
 ) {
-  if (propRemapper) {
-    props = propRemapper(props);
+  if (propMapper) {
+    props = propMapper(props);
   }
 
   return cssInterop ? cssInterop(jsx, type, props, key) : jsx(type, props, key);
