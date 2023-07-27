@@ -35,7 +35,7 @@
     "react-chartjs-2": "5.2.0",
     "react-twitter-embed": "4.0.4",
     "sass": "1.64.1",
-    "tailwindcss": "3.2.4",
+    "tailwindcss": "3.3.3",
     "unist-builder": "4.0.0",
     "unist-util-visit-parents": "6.0.1"
   },
