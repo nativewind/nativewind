@@ -2,7 +2,6 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "jsx": "react-jsx",
     "noEmit": false,
     "sourceMap": true
   },

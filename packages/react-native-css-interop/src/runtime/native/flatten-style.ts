@@ -1,6 +1,12 @@
-import { Platform, PlatformColor, StyleSheet } from "react-native";
+import {
+  Platform,
+  PlatformColor,
+  StyleSheet,
+  TransformsStyle,
+} from "react-native";
 import { isRuntimeValue } from "../../shared";
 import {
+  ContainerRuntime,
   Interaction,
   RuntimeValue,
   Style,
@@ -15,15 +21,15 @@ import {
 import { rem, styleMetaMap, vh, vw } from "./globals";
 
 export interface FlattenStyleOptions {
-  variables: Record<string, any>;
+  variables: Record<string, unknown>;
   interaction?: Interaction;
-  containers?: Record<string, any>;
+  containers?: Record<string, ContainerRuntime>;
   ch?: number;
   cw?: number;
 }
 
 export function flattenStyleProps(
-  props: Record<string, any>,
+  props: Record<string, StyleProp>,
   options: FlattenStyleOptions,
   flatProps: Map<string, Style> = new Map(),
 ): Map<string, Style> {
@@ -58,9 +64,9 @@ export function flattenStyle(
 
   if (Array.isArray(style)) {
     // We need to flatten in reverse order so that the last style in the array is the one defined
-    for (let i = style.length - 1; i >= 0; i--) {
-      if (style[i]) {
-        flattenStyle(style[i], options, flatStyle);
+    for (let index = style.length - 1; index >= 0; index--) {
+      if (style[index]) {
+        flattenStyle(style[index], options, flatStyle);
       }
     }
     return flatStyle;
@@ -194,7 +200,7 @@ export function flattenStyle(
           }
         } else {
           for (const [tKey, tValue] of Object.entries(transform)) {
-            const $transform: Record<string, any> = {};
+            const $transform: Record<string, unknown> = {};
 
             const getterOrValue = extractValue(
               tValue,
@@ -220,7 +226,8 @@ export function flattenStyle(
         }
       }
 
-      flatStyle.transform = transforms as any;
+      flatStyle.transform =
+        transforms as unknown as TransformsStyle["transform"];
     } else {
       const getterOrValue = extractValue(
         value,
@@ -266,11 +273,13 @@ function extractValue(
   }
 
   switch (value.name) {
-    case "vh":
+    case "vh": {
       return round((vh.get() / 100) * (value.arguments[0] as number));
-    case "vw":
+    }
+    case "vw": {
       return round((vw.get() / 100) * (value.arguments[0] as number));
-    case "var":
+    }
+    case "var": {
       return () => {
         const name = value.arguments[0] as string;
         const resolvedValue =
@@ -279,16 +288,19 @@ function extractValue(
           ? resolvedValue()
           : resolvedValue;
       };
-    case "rem":
+    }
+    case "rem": {
       return round(rem.get() * (value.arguments[0] as number));
-    case "em":
+    }
+    case "em": {
       return () => {
         const multiplier = value.arguments[0] as number;
         if ("fontSize" in flatStyle) {
           return round((flatStyle.fontSize || 0) * multiplier);
         }
-        return undefined;
+        return;
       };
+    }
     case "ch": {
       const multiplier = value.arguments[0] as number;
 
@@ -352,23 +364,26 @@ function extractValue(
     case "translateY":
     case "scaleX":
     case "scaleY":
-    case "scale":
+    case "scale": {
       return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
         wrap: false,
         parseFloat: true,
       });
+    }
     case "rotate":
     case "rotateX":
     case "rotateY":
     case "rotateZ":
     case "skewX":
-    case "skewY":
+    case "skewY": {
       return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
         wrap: false,
       });
-    case "hairlineWidth":
+    }
+    case "hairlineWidth": {
       return StyleSheet.hairlineWidth;
-    case "platformSelect":
+    }
+    case "platformSelect": {
       return createRuntimeFunction(
         {
           ...value,
@@ -381,13 +396,15 @@ function extractValue(
           wrap: false,
         },
       );
-    case "platformColor":
+    }
+    case "platformColor": {
       return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
         wrap: false,
         joinArgs: false,
         callback: PlatformColor,
         spreadCallbackArgs: true,
       });
+    }
     default: {
       return createRuntimeFunction(value, flatStyle, flatStyleMeta, options);
     }
@@ -413,8 +430,8 @@ function createRuntimeFunction(
   {
     wrap = true,
     parseFloat: shouldParseFloat = false,
-    joinArgs = true,
-    spreadCallbackArgs = false,
+    joinArgs: joinArguments = true,
+    spreadCallbackArgs: spreadCallbackArguments = false,
     callback,
   }: CreateRuntimeFunctionOptions = {},
 ) {
@@ -422,9 +439,9 @@ function createRuntimeFunction(
   const args: unknown[] = [];
 
   if (value.arguments) {
-    for (const arg of value.arguments) {
+    for (const argument of value.arguments) {
       const getterOrValue = extractValue(
-        arg,
+        argument,
         flatStyle,
         flatStyleMeta,
         options,
@@ -443,7 +460,7 @@ function createRuntimeFunction(
       .map((a) => (typeof a === "function" ? a() : a))
       .filter((a) => a !== undefined);
 
-    if (joinArgs) {
+    if (joinArguments) {
       $args = $args.join(", ");
 
       if ($args === "") {
@@ -455,7 +472,7 @@ function createRuntimeFunction(
     result = shouldParseFloat ? parseFloat(result) : result;
 
     if (callback) {
-      if (spreadCallbackArgs && Array.isArray(result)) {
+      if (spreadCallbackArguments && Array.isArray(result)) {
         return callback(...result);
       } else {
         return callback(result);

@@ -81,7 +81,7 @@ export function testCasesWithOptions(
     if (expected.style) {
       expect(A).styleToEqual(expected.style);
     } else {
-      expect(A).styleToEqual(undefined);
+      expect(A).styleToEqual({});
     }
 
     if (expected.warning) {

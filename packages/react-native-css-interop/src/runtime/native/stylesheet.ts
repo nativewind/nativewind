@@ -66,7 +66,10 @@ export const StyleSheet = Object.assign({}, RNStyleSheet, {
 
     if (options.declarations) {
       for (const [name, styles] of Object.entries(options.declarations)) {
-        globalStyles.set(name, tagStyles(name, styles));
+        const taggedStyles = tagStyles(name, styles);
+        if (taggedStyles) {
+          globalStyles.set(name, taggedStyles);
+        }
       }
     }
 
@@ -118,7 +121,7 @@ function tagStyles(
     let didTag = false;
     const taggedStyles = styles.map((s) => {
       const taggedStyle = tagStyles(name, s);
-      didTag ||= styleMetaMap.has(s.style);
+      didTag ||= Boolean(s.style && styleMetaMap.has(s.style));
       return taggedStyle;
     });
 
@@ -190,7 +193,7 @@ function tagStyles(
       warnings.set(name, styles.warnings);
     }
 
-    if (hasMeta) {
+    if (hasMeta && styles.style) {
       styleMetaMap.set(styles.style, meta);
     }
 

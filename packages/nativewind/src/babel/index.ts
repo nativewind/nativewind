@@ -1,7 +1,14 @@
-import ensureImportSource from "./ensure-import-source";
-
 export default function () {
   return {
-    plugins: [ensureImportSource],
+    plugins: [
+      "react-native-reanimated/plugin",
+      [
+        "@babel/plugin-transform-react-jsx",
+        {
+          runtime: "automatic",
+          importSource: "nativewind",
+        },
+      ],
+    ],
   };
 }

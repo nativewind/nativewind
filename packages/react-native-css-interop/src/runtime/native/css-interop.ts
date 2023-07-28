@@ -5,7 +5,6 @@ import {
   useMemo,
   useEffect,
   useReducer,
-  useState,
 } from "react";
 import { View, Pressable } from "react-native";
 
@@ -13,6 +12,7 @@ import {
   ContainerRuntime,
   CssInteropPropMapping,
   InteropMeta,
+  JSXFunction,
   StyleMeta,
   StyleProp,
 } from "../../types";
@@ -24,10 +24,12 @@ import { useComputation } from "../shared/signals";
 import { StyleSheet, VariableContext, useVariables } from "./stylesheet";
 
 type CSSInteropWrapperProps = {
-  __component: ComponentType<any>;
-  __jsx: Function;
-  __mapping: CssInteropPropMapping<any>;
-} & Record<string, any>;
+  __component: ComponentType<unknown>;
+  __jsx: JSXFunction;
+  __mapping: CssInteropPropMapping<object>;
+  __styledProps: Record<string, StyleProp>;
+  __dependencies: unknown[];
+} & Record<string, unknown>;
 
 /**
  * This is the default implementation of the CSS interop function. It is used to add CSS styles to React Native components.
@@ -35,20 +37,17 @@ type CSSInteropWrapperProps = {
  * @param type The React component type that should be rendered.
  * @param props The props object that should be passed to the component.
  * @param key The optional key to use for the component.
- * @returns The element rendered via the suppled JSX function
+ * @returns The element rendered via the supplied JSX function
  */
 export function defaultCSSInterop(
-  jsx: Function,
-  type: ComponentType<any>,
+  jsx: JSXFunction,
+  type: ComponentType<unknown>,
   { ...props }: Record<string | number, unknown>,
   key: string,
   mapping: Map<string, unknown>,
 ) {
-  /**
-   *
-   */
   let hasMeta = false;
-  const dependencies: any[] = [];
+  const dependencies: unknown[] = [];
   const styledProps: Record<string, StyleProp> = {};
 
   for (const [classNameKey, propKey] of mapping) {
@@ -64,9 +63,17 @@ export function defaultCSSInterop(
     }
 
     let styles: StyleProp = [];
-
     let targetKey: string | undefined;
 
+    /**
+     * This code checks if we can to bypass the CSSInteropWrapper
+     *
+     * If a style does not have any metadata, then it is completely static and the wrapper adds no value.
+     * Instead of splitting the styles both here and inside the wrapper, we extract them and pass them down
+     *
+     * INVESTIGATE: Currently we're passing the props by simply giving them unlikely names (underscore prefix)
+     *   Should we instead use a WeakMap?
+     */
     for (const className of classNames.split(/\s+/)) {
       const style = globalStyles.get(className);
       if (!style) continue;
@@ -74,13 +81,13 @@ export function defaultCSSInterop(
     }
 
     if (typeof propKey === "string") {
-      const style = props[propKey];
-      dependencies.push(style);
+      const existingStyle = props[propKey];
+      dependencies.push(existingStyle);
 
-      if (Array.isArray(style)) {
-        styles = [...styles, ...style];
-      } else if (style) {
-        styles = [...styles, style];
+      if (Array.isArray(existingStyle)) {
+        styles = [...styles, ...existingStyle];
+      } else if (existingStyle) {
+        styles = [...styles, existingStyle];
       }
 
       targetKey = propKey;
@@ -89,13 +96,12 @@ export function defaultCSSInterop(
     }
 
     if (styles.length > 0) {
-      styledProps[targetKey] = styles;
+      styledProps[targetKey] = styles.length === 1 ? styles[0] : styles;
     }
 
     hasMeta ||= stylePropHasMeta(styles);
   }
 
-  // The wrapper will affect performance, so skip if not needed
   if (!hasMeta) {
     return jsx(type, { ...props, ...styledProps }, key);
   }
@@ -113,9 +119,9 @@ export function defaultCSSInterop(
   );
 }
 
-function stylePropHasMeta(style: StyleProp) {
+function stylePropHasMeta(style: StyleProp): boolean {
   if (!style) return false;
-  if (Array.isArray(style)) return style.some((s) => stylePropHasMeta);
+  if (Array.isArray(style)) return style.some((s) => stylePropHasMeta(s));
   return styleMetaMap.has(style);
 }
 
@@ -244,7 +250,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
         hasFocus ||= hasInlineContainers || meta.hasFocus;
       }
 
-      let animationInteropKey: string | undefined = undefined;
+      let animationInteropKey: string | undefined;
       if (animatedProps.size > 0 || transitionProps.size > 0) {
         animationInteropKey = [...animatedProps, ...transitionProps].join(":");
       }
@@ -274,7 +280,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
     component === View &&
     (interopMeta.hasActive || interopMeta.hasHover || interopMeta.hasFocus)
   ) {
-    component = Pressable;
+    component = Pressable as ComponentType<unknown>;
   }
 
   /**
@@ -296,25 +302,35 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
   );
 
   // This doesn't need to be memoized as it's values will be spread across the component
-  const props: Record<string, any> = {
+  const props: Record<string, unknown> = {
     ...$props,
     ...interopMeta.styledProps,
     ...useInteractionHandlers($props, interaction, interopMeta),
     ref,
   };
 
-  let children: JSX.Element = props.children;
+  let children = props.children as ComponentType<unknown>;
 
   // Call `jsx` directly so we can bypass the polyfill render method
   if (interopMeta.hasInlineVariables) {
-    children = jsx(VariableContext.Provider, { value: variables, children });
+    children = jsx(
+      VariableContext.Provider,
+      { value: variables, children },
+      "variable",
+    );
   }
 
   if (interopMeta.hasInlineContainers) {
-    children = jsx(ContainerContext.Provider, { value: containers, children });
+    children = jsx(
+      ContainerContext.Provider,
+      { value: containers, children },
+      "container",
+    );
   }
 
-  props.children = children;
+  if (children) {
+    props.children = Array.isArray(children) ? children : [children];
+  }
 
   if (interopMeta.animationInteropKey) {
     return jsx(
@@ -336,7 +352,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
 
 /* Micro optimizations. Save these externally so they are not recreated every render  */
 const useRerender = () => useReducer(rerenderReducer, 0)[1];
-const rerenderReducer = (acc: number) => acc + 1;
+const rerenderReducer = (accumulator: number) => accumulator + 1;
 const defaultMeta: StyleMeta = { container: { names: [], type: "normal" } };
 const initialMeta: InteropMeta = {
   styledProps: {},

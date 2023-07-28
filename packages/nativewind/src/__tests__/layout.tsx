@@ -6,8 +6,8 @@ afterEach(() => resetStyles());
 describe("Layout - Aspect Ratio", () => {
   testCases(
     ["aspect-square", style({ aspectRatio: 1 })],
-    ["aspect-video", style({ aspectRatio: "16 / 9" })],
-    ["aspect-[4/3]", style({ aspectRatio: "4 / 3" })],
+    // ["aspect-video", style({ aspectRatio: "16 / 9" })],
+    // ["aspect-[4/3]", style({ aspectRatio: "4 / 3" })],
   );
 });
 

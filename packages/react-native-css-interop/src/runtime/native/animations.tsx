@@ -19,7 +19,7 @@ import {
   Style,
 } from "../../types";
 import { createAnimatedComponent } from "./animated-component";
-import { flattenStyle, flattenStyleProps } from "./flatten-style";
+import { flattenStyle } from "./flatten-style";
 import { animationMap, styleMetaMap } from "./globals";
 
 type AnimationInteropProps = Record<string, unknown> & {

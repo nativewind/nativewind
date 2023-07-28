@@ -45,7 +45,7 @@ export function cssToReactNativeRuntime(
   options: CssToReactNativeRuntimeOptions = { platform: "native" },
 ): StyleSheetRegisterOptions {
   code = typeof code === "string" ? code : code.toString("utf-8");
-  // I don't know why we need to remove this line, but we do :shug:
+  // I don't know why we need to remove this line, but we do
   // Issue: https://github.com/parcel-bundler/lightningcss/issues/484
   code = code.replaceAll("-webkit-text-size-adjust: 100%;", "");
   code = Buffer.from(code);
@@ -282,10 +282,10 @@ function setStyleForSelectorList(
       }
     }
 
-    const normalisedSelector = normaliseSelector(selector);
+    const normalizedSelector = normalizeSelector(selector);
 
     // This is an invalid selector
-    if (!normalisedSelector) {
+    if (!normalizedSelector) {
       continue;
     }
 
@@ -295,7 +295,7 @@ function setStyleForSelectorList(
       pseudoClasses,
       groupPseudoClasses,
       mapToProp,
-    } = normalisedSelector;
+    } = normalizedSelector;
 
     if (mapToProp) {
       style.prop = mapToProp;
@@ -352,7 +352,7 @@ function addDeclaration(
   }
 }
 
-function normaliseSelector(selectors: Selector) {
+function normalizeSelector(selectors: Selector) {
   let className: string | undefined;
   let groupClassName: string | undefined;
   let pseudoClasses: Record<string, true> | undefined;
@@ -411,16 +411,16 @@ function normaliseSelector(selectors: Selector) {
                 )
                 .map((token) => token.value);
 
-              const idents = tokenArgs.filter(
+              const identArray = tokenArgs.filter(
                 (token): token is Extract<Token, { type: "ident" }> => {
                   return token.type === "ident";
                 },
               );
 
-              if (idents.length === 1) {
-                mapToProp = [idents[0].value, true];
-              } else if (idents.length === 2) {
-                mapToProp = [idents[0].value, idents[1].value];
+              if (identArray.length === 1) {
+                mapToProp = [identArray[0].value, true];
+              } else if (identArray.length === 2) {
+                mapToProp = [identArray[0].value, identArray[1].value];
               } else {
                 return null;
               }
@@ -509,7 +509,7 @@ function getExtractedStyle(
   declarationBlock: DeclarationBlock<Declaration>,
   options: GetExtractedStyleOptions,
 ): ExtractedStyle {
-  const extrtactedStyle: ExtractedStyle = {
+  const extractedStyle: ExtractedStyle = {
     style: {},
   };
 
@@ -544,7 +544,7 @@ function getExtractedStyle(
 
     property = kebabToCamelCase(property);
 
-    const style = extrtactedStyle.style;
+    const style = extractedStyle.style;
 
     if (append) {
       const styleValue = style[property];
@@ -562,7 +562,7 @@ function getExtractedStyle(
     }
 
     if (isRuntimeValue(value)) {
-      extrtactedStyle.isDynamic = true;
+      extractedStyle.isDynamic = true;
     }
   }
 
@@ -575,8 +575,8 @@ function getExtractedStyle(
   }
 
   function addVariable(property: string, value: any) {
-    extrtactedStyle.variables ??= {};
-    extrtactedStyle.variables[property] = value;
+    extractedStyle.variables ??= {};
+    extractedStyle.variables[property] = value;
   }
 
   function addContainerProp(
@@ -614,13 +614,13 @@ function getExtractedStyle(
     }
 
     if (names) {
-      extrtactedStyle.container ??= {};
-      extrtactedStyle.container.names = names;
+      extractedStyle.container ??= {};
+      extractedStyle.container.names = names;
     }
 
     if (type) {
-      extrtactedStyle.container ??= {};
-      extrtactedStyle.container.type = type;
+      extractedStyle.container ??= {};
+      extractedStyle.container.type = type;
     }
   }
 
@@ -637,22 +637,22 @@ function getExtractedStyle(
       }
     >,
   ) {
-    extrtactedStyle.transition ??= {};
+    extractedStyle.transition ??= {};
 
     switch (declaration.property) {
       case "transition-property":
-        extrtactedStyle.transition.property = declaration.value.map((v) => {
+        extractedStyle.transition.property = declaration.value.map((v) => {
           return kebabToCamelCase(v.property) as AnimatableCSSProperty;
         });
         break;
       case "transition-duration":
-        extrtactedStyle.transition.duration = declaration.value;
+        extractedStyle.transition.duration = declaration.value;
         break;
       case "transition-delay":
-        extrtactedStyle.transition.delay = declaration.value;
+        extractedStyle.transition.delay = declaration.value;
         break;
       case "transition-timing-function":
-        extrtactedStyle.transition.timingFunction = declaration.value;
+        extractedStyle.transition.timingFunction = declaration.value;
         break;
       case "transition": {
         let setProperty = true;
@@ -663,45 +663,45 @@ function getExtractedStyle(
         // Shorthand properties cannot override the longhand property
         // So we skip setting the property if it already exists
         // Otherwise, we need to set the property to an empty array
-        if (extrtactedStyle.transition.property) {
+        if (extractedStyle.transition.property) {
           setProperty = false;
         } else {
-          extrtactedStyle.transition.property = [];
+          extractedStyle.transition.property = [];
         }
-        if (extrtactedStyle.transition.duration) {
+        if (extractedStyle.transition.duration) {
           setDuration = false;
         } else {
-          extrtactedStyle.transition.duration = [];
+          extractedStyle.transition.duration = [];
         }
-        if (extrtactedStyle.transition.delay) {
+        if (extractedStyle.transition.delay) {
           setDelay = false;
         } else {
-          extrtactedStyle.transition.delay = [];
+          extractedStyle.transition.delay = [];
         }
-        if (extrtactedStyle.transition.timingFunction) {
+        if (extractedStyle.transition.timingFunction) {
           setTiming = false;
         } else {
-          extrtactedStyle.transition.timingFunction = [];
+          extractedStyle.transition.timingFunction = [];
         }
 
         // Loop through each transition value and only set the properties that
         // were not already set by the longhand property
         for (const value of declaration.value) {
           if (setProperty) {
-            extrtactedStyle.transition.property?.push(
+            extractedStyle.transition.property?.push(
               kebabToCamelCase(
                 value.property.property,
               ) as AnimatableCSSProperty,
             );
           }
           if (setDuration) {
-            extrtactedStyle.transition.duration?.push(value.duration);
+            extractedStyle.transition.duration?.push(value.duration);
           }
           if (setDelay) {
-            extrtactedStyle.transition.delay?.push(value.delay);
+            extractedStyle.transition.delay?.push(value.delay);
           }
           if (setTiming) {
-            extrtactedStyle.transition.timingFunction?.push(
+            extractedStyle.transition.timingFunction?.push(
               value.timingFunction,
             );
           }
@@ -722,21 +722,21 @@ function getExtractedStyle(
         }
       }
 
-      extrtactedStyle.animations ??= {};
+      extractedStyle.animations ??= {};
       for (const [property, value] of Object.entries(groupedProperties)) {
         const key = property
           .replace("animation-", "")
           .replace(/-./g, (x) => x[1].toUpperCase()) as keyof Animation;
 
-        extrtactedStyle.animations[key] ??= value;
+        extractedStyle.animations[key] ??= value;
       }
     } else {
       const key = property
         .replace("animation-", "")
         .replace(/-./g, (x) => x[1].toUpperCase()) as keyof Animation;
 
-      extrtactedStyle.animations ??= {};
-      extrtactedStyle.animations[key] = value;
+      extractedStyle.animations ??= {};
+      extractedStyle.animations[key] = value;
     }
   }
 
@@ -751,12 +751,12 @@ function getExtractedStyle(
       if (match) return;
     }
 
-    extrtactedStyle.warnings ??= [];
-    extrtactedStyle.warnings.push(warning);
+    extractedStyle.warnings ??= [];
+    extractedStyle.warnings.push(warning);
   }
 
   function requiresLayout() {
-    extrtactedStyle.requiresLayout = true;
+    extractedStyle.requiresLayout = true;
   }
 
   const parseDeclarationOptions: ParseDeclarationOptions = {
@@ -774,7 +774,7 @@ function getExtractedStyle(
     parseDeclaration(declaration, parseDeclarationOptions);
   }
 
-  return extrtactedStyle;
+  return extractedStyle;
 }
 
 function kebabToCamelCase(str: string) {
@@ -862,5 +862,3 @@ function isDefaultDarkVariableSelector(
 
   return false;
 }
-
-function getRNPropPseudoClass(selector: Selector) {}

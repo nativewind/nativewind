@@ -13,6 +13,10 @@ import {
 } from "../../types";
 import { createSignal } from "./signals";
 
+declare global {
+  var window: Record<string, any>;
+}
+
 export const INTERNAL_SET = Symbol();
 
 export const styleMetaMap = new WeakMap<

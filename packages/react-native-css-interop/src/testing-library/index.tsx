@@ -12,13 +12,8 @@ import {
   CssToReactNativeRuntimeOptions,
   cssToReactNativeRuntime,
 } from "../css-to-rn";
-import {
-  CssInteropPropMapping,
-  ExtractionWarning,
-  Style,
-  StyleMeta,
-} from "../types";
-import { createPropMapper, render } from "../runtime/render";
+import { ExtractionWarning, Style, StyleMeta } from "../types";
+import { render } from "../runtime/render";
 
 declare global {
   namespace jest {

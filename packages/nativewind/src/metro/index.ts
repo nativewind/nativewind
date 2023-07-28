@@ -1,5 +1,4 @@
-import path from "path";
-import fs from "fs/promises";
+import path from "node:path";
 import type { GetTransformOptionsOpts } from "metro-config";
 import {
   withCssInterop,
@@ -16,11 +15,7 @@ interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
 
 export function withNativeWind(
   config: ComposableIntermediateConfigT,
-  {
-    input = "global.css",
-    output,
-    inlineRem,
-  }: WithNativeWindOptions = cssToReactNativeRuntimeOptions,
+  { input = "global.css", output, inlineRem = 14 }: WithNativeWindOptions = {},
 ) {
   if (!output) {
     output = path.resolve(
@@ -38,6 +33,7 @@ export function withNativeWind(
 
   // Override the transformerPath to NativeWind's.
   // It will manually call the react-native-css-interop transformer
+  // eslint-disable-next-line unicorn/prefer-module
   config.transformerPath = require.resolve("nativewind/dist/metro/transformer");
 
   let tailwindHasStarted = false;
@@ -70,20 +66,12 @@ export function withNativeWind(
       if (!tailwindHasStarted) {
         tailwindHasStarted = true;
 
-        // Run once to ensure the file exists
         await twBuild({
           "--input": input,
           "--output": output,
+          "--watch": options.dev ? "always" : undefined,
+          "--poll": true,
         });
-
-        if (options.dev) {
-          await twBuild({
-            "--input": input,
-            "--output": output,
-            "--watch": "always",
-            "--poll": true,
-          });
-        }
       }
 
       return previousTransformOptions?.(

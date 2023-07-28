@@ -318,6 +318,16 @@ export function Test() {
 }
 ```
 
+## New Troubleshooting
+
+Nativewind's setup isn't difficult, but it does require multiple plugins to be configured correctly and does not provide a clear troubleshooting guide when mistakes are made. To help with troubleshooting, simply add `import 'nativewind/doctor'` anywhere into your application and it will attempt to diagnose any setup issues.
+
+It verifies
+
+- That the jsx transform is present (invalid jsx setup)
+- Styles have been correctly injected (invalid metro setup)
+- If custom styles exist (invalid Tailwind setup)
+
 ## New API
 
 ### `vars()`

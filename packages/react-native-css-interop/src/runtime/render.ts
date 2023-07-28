@@ -24,7 +24,11 @@ export function render(
   propMapper = propMapping.get(type),
   cssInterop = interopMapping.get(type),
 ) {
-  if (__DEV__ && "react-native-css-interop-jsx-pragma-check" in type) {
+  if (
+    __DEV__ &&
+    typeof type === "function" &&
+    "react-native-css-interop-jsx-pragma-check" in type
+  ) {
     return true;
   }
 

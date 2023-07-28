@@ -11,7 +11,6 @@ export function defaultCSSInterop(
     if (!value) continue;
 
     // Extract the prop from the rest of the props
-    const targetKey = typeof value === "string" ? value : classNameKey;
     const { [classNameKey]: classNames, ...rest } = props;
 
     if (typeof classNames === "string" && classNames) {

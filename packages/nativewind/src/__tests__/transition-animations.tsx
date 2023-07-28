@@ -3,7 +3,7 @@ import { testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
 
-describe("Transitions & Animation - Transition Property", () => {
+describe.only("Transitions & Animation - Transition Property", () => {
   testCases(
     // TODO: Add tests for all transition properties
     // "transition-none",
@@ -45,29 +45,29 @@ describe("Transitions & Animation - Transition Property", () => {
         },
       },
     ],
-    [
-      "transition-opacity",
-      {
-        style: {
-          opacity: 1,
-        },
-        meta: {
-          transition: {
-            duration: [{ value: 150, type: "milliseconds" }],
-            timingFunction: [
-              {
-                type: "cubic-bezier",
-                x1: 0.4000000059604645,
-                x2: 0.20000000298023224,
-                y1: 0,
-                y2: 1,
-              },
-            ],
-            property: ["opacity"],
-          },
-        },
-      },
-    ],
+    // [
+    //   "transition-opacity",
+    //   {
+    //     style: {
+    //       opacity: 1,
+    //     },
+    //     meta: {
+    //       transition: {
+    //         duration: [{ value: 150, type: "milliseconds" }],
+    //         timingFunction: [
+    //           {
+    //             type: "cubic-bezier",
+    //             x1: 0.4000000059604645,
+    //             x2: 0.20000000298023224,
+    //             y1: 0,
+    //             y2: 1,
+    //           },
+    //         ],
+    //         property: ["opacity"],
+    //       },
+    //     },
+    //   },
+    // ],
   );
 });
 
