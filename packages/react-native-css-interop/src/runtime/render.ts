@@ -2,7 +2,6 @@ import type { ComponentType } from "react";
 import { globalStyles } from "./shared/globals";
 import {
   BasicInteropFunction,
-  InteropFunction,
   JSXFunction,
   PropMapperFunction,
 } from "../types";
@@ -16,6 +15,25 @@ export const propMapping = new WeakMap<
   ComponentType<any>,
   PropMapperFunction
 >();
+
+export function render(
+  jsx: JSXFunction,
+  type: any,
+  props: Record<string | number, unknown>,
+  key?: string,
+  propMapper = propMapping.get(type),
+  cssInterop = interopMapping.get(type),
+) {
+  if (__DEV__ && "react-native-css-interop-jsx-pragma-check" in type) {
+    return true;
+  }
+
+  if (propMapper) {
+    props = propMapper(props);
+  }
+
+  return cssInterop ? cssInterop(jsx, type, props, key) : jsx(type, props, key);
+}
 
 export function createPropMapper(
   mapping: Record<string | number, string | undefined | true>,
@@ -62,19 +80,4 @@ export function createPropMapper(
 
     return props;
   };
-}
-
-export function render(
-  jsx: JSXFunction,
-  type: any,
-  props: Record<string | number, unknown>,
-  key?: string,
-  propMapper = propMapping.get(type),
-  cssInterop = interopMapping.get(type),
-) {
-  if (propMapper) {
-    props = propMapper(props);
-  }
-
-  return cssInterop ? cssInterop(jsx, type, props, key) : jsx(type, props, key);
 }

@@ -186,7 +186,37 @@ export default withNativewind(config, {
 
 ### Container Queries
 
-TODO
+Container queries enable you to apply styles to an element based on the size of the element's container, making them extremely ideal for mobile styling. Nativewind 4.0 adds support for the (TailwindCSS Container Queries official plugin)[https://github.com/tailwindlabs/tailwindcss-container-queries].
+
+```tsx
+<View class="@container">
+  <Text class="@lg:underline">
+    <!-- This text will be underlined when the container is larger than `32rem` -->
+  </Text>
+</View>
+```
+
+A subset of the Container Query spec is also available within your CSS
+
+```css
+// The @container atRule with media based queries
+@container (min-width: 700px) {
+  .my-view {
+  }
+}
+
+// Named container contexts
+.my-container {
+  container-name: sidebar;
+}
+
+@container sidebar (min-width: 700px) {
+  .my-view {
+  }
+}
+```
+
+`container-type` and style-based container queries are not supported.
 
 ### Tailwind Groups and parent state modifiers
 
@@ -194,13 +224,26 @@ TODO
 
 https://tailwindcss.com/docs/hover-focus-and-other-states#differentiating-nested-groups
 
-### New Theme Functions
+### Theme Functions
 
 TODO
 
-### Nested Functions
+### Nested CSS Functions
 
-TODO
+Natvewind v4 now allows you to nest CSS functions to create complex rules
+
+```css
+.text {
+  color: var(
+    --text-color,
+    platformSelect(
+      ios/platformColor(label),
+      android/platformColor("?android:attr/textColor"),
+      default/var(--color, black)
+    )
+  );
+}
+```
 
 ### React 18 Improvements
 
