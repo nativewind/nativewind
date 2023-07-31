@@ -81,61 +81,25 @@ describe("Border - Border Width", () => {
 
 describe("Border - Border Color", () => {
   testCases(
-    [
-      "border-white",
-      {
-        ...style({ borderColor: "rgba(255, 255, 255, 1)" }),
-        meta: { variables: { "--tw-border-opacity": 1 } },
-      },
-    ],
+    ["border-white", style({ borderColor: "rgba(255, 255, 255, 1)" })],
     [
       "border-x-white",
-      {
-        ...style({
-          borderLeftColor: "rgba(255, 255, 255, 1)",
-          borderRightColor: "rgba(255, 255, 255, 1)",
-        }),
-        meta: { variables: { "--tw-border-opacity": 1 } },
-      },
+      style({
+        borderLeftColor: "rgba(255, 255, 255, 1)",
+        borderRightColor: "rgba(255, 255, 255, 1)",
+      }),
     ],
     [
       "border-y-white",
-      {
-        ...style({
-          borderTopColor: "rgba(255, 255, 255, 1)",
-          borderBottomColor: "rgba(255, 255, 255, 1)",
-        }),
-        meta: { variables: { "--tw-border-opacity": 1 } },
-      },
+      style({
+        borderTopColor: "rgba(255, 255, 255, 1)",
+        borderBottomColor: "rgba(255, 255, 255, 1)",
+      }),
     ],
-    [
-      "border-t-white",
-      {
-        ...style({ borderTopColor: "rgba(255, 255, 255, 1)" }),
-        meta: { variables: { "--tw-border-opacity": 1 } },
-      },
-    ],
-    [
-      "border-b-white",
-      {
-        ...style({ borderBottomColor: "rgba(255, 255, 255, 1)" }),
-        meta: { variables: { "--tw-border-opacity": 1 } },
-      },
-    ],
-    [
-      "border-l-white",
-      {
-        ...style({ borderLeftColor: "rgba(255, 255, 255, 1)" }),
-        meta: { variables: { "--tw-border-opacity": 1 } },
-      },
-    ],
-    [
-      "border-r-white",
-      {
-        ...style({ borderRightColor: "rgba(255, 255, 255, 1)" }),
-        meta: { variables: { "--tw-border-opacity": 1 } },
-      },
-    ],
+    ["border-t-white", style({ borderTopColor: "rgba(255, 255, 255, 1)" })],
+    ["border-b-white", style({ borderBottomColor: "rgba(255, 255, 255, 1)" })],
+    ["border-l-white", style({ borderLeftColor: "rgba(255, 255, 255, 1)" })],
+    ["border-r-white", style({ borderRightColor: "rgba(255, 255, 255, 1)" })],
     [
       "border-current",
       {

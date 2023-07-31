@@ -2,8 +2,10 @@ import { render } from "@testing-library/react-native";
 
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "../testing-library";
+import { View } from "react-native";
 
-const A = createMockComponent();
+const testID = "react-native-css-interop";
+const A = createMockComponent(View);
 
 afterEach(() => {
   StyleSheet.__reset();
@@ -12,9 +14,11 @@ afterEach(() => {
 test("translateX percentage", () => {
   registerCSS(`.my-class { width: 120px; transform: translateX(10%); }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     width: 120,
     transform: [{ translateX: 12 }],
   });
@@ -23,20 +27,24 @@ test("translateX percentage", () => {
 test("translateY percentage", () => {
   registerCSS(`.my-class { height: 120px; transform: translateY(10%); }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     height: 120,
     transform: [{ translateY: 12 }],
   });
 });
 
 test("rotate-180", () => {
-  registerCSS(`.rotate-180 { transform: rotate(180deg); }`);
+  registerCSS(`.my-class { transform: rotate(180deg); }`);
 
-  render(<A className="rotate-180" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     transform: [{ rotate: "180deg" }],
   });
 });

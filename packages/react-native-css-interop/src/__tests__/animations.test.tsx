@@ -1,9 +1,11 @@
+import { View } from "react-native";
 import { render } from "@testing-library/react-native";
 
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "../testing-library";
 
-const A = createMockComponent();
+const testID = "react-native-css-interop";
+const A = createMockComponent(View);
 
 jest.useFakeTimers();
 
@@ -29,23 +31,23 @@ test("basic animation", () => {
 }
 `);
 
-  const testComponent = render(
-    <A testID="test" className="my-class" />,
-  ).getByTestId("test");
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     marginLeft: "100%",
   });
 
   jest.advanceTimersByTime(1500);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     marginLeft: "50%",
   });
 
   jest.advanceTimersByTime(1500);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     marginLeft: "0%",
   });
 });
@@ -64,23 +66,23 @@ test("single frame", () => {
     }
 `);
 
-  const testComponent = render(
-    <A testID="test" className="my-class" />,
-  ).getByTestId("test");
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "0deg" }],
   });
 
   jest.advanceTimersByTime(1500);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "180deg" }],
   });
 
   jest.advanceTimersByTime(1500);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "360deg" }],
   });
 });
@@ -100,30 +102,30 @@ test("transform - starting", () => {
     }
 `);
 
-  const testComponent = render(
-    <A testID="test" className="my-class" />,
-  ).getByTestId("test");
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "180deg" }],
   });
 
   jest.advanceTimersByTime(1500);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "270deg" }],
   });
 
   jest.advanceTimersByTime(1500);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "360deg" }],
   });
 });
 
 test("bounce", () => {
   registerCSS(`
-    .animate-bounce {
+    .my-class {
       animation: bounce 1s infinite;
       height: 100px;
     }
@@ -141,11 +143,11 @@ test("bounce", () => {
     }
 `);
 
-  const testComponent = render(
-    <A testID="test" className="animate-bounce" />,
-  ).getByTestId("test");
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     height: 100,
     transform: [
       { translateY: -25 },
@@ -165,7 +167,7 @@ test("bounce", () => {
 
   jest.advanceTimersByTime(500);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     height: 100,
     transform: [
       { translateY: 0 },
@@ -185,7 +187,7 @@ test("bounce", () => {
 
   jest.advanceTimersByTime(500);
 
-  expect(testComponent).toHaveAnimatedStyle({
+  expect(component).toHaveAnimatedStyle({
     height: 100,
     transform: [
       { translateY: -25 },

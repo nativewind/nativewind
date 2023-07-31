@@ -28,7 +28,6 @@ describe("Backgrounds - Background Color", () => {
       "bg-white",
       {
         style: { backgroundColor: "rgba(255, 255, 255, 1)" },
-        meta: { variables: { "--tw-bg-opacity": 1 } },
       },
     ],
   );

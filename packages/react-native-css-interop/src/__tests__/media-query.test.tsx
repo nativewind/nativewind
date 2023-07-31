@@ -8,8 +8,10 @@ import {
 } from "../runtime/native/globals";
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "../testing-library";
+import { View } from "react-native";
 
-const A = createMockComponent();
+const testID = "react-native-css-interop";
+const A = createMockComponent(View);
 
 beforeEach(() => {
   StyleSheet.__reset();
@@ -23,9 +25,11 @@ test("color scheme", () => {
   .my-class { color: red; }
 }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
   });
 
@@ -33,7 +37,7 @@ test("color scheme", () => {
     colorScheme.set("dark");
   });
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(255, 0, 0, 1)",
   });
 });
@@ -47,9 +51,11 @@ test("prefers-reduced-motion", () => {
     }
   `);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
   });
 
@@ -57,7 +63,7 @@ test("prefers-reduced-motion", () => {
     isReduceMotionEnabled.set(true);
   });
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(255, 0, 0, 1)",
   });
 });
@@ -70,9 +76,11 @@ test("width (plain)", () => {
   .my-class { color: red; }
 }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
   });
 
@@ -80,7 +88,7 @@ test("width (plain)", () => {
     vw[INTERNAL_SET](500);
   });
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(255, 0, 0, 1)",
   });
 });
@@ -93,9 +101,11 @@ test("width (range)", () => {
   .my-class { color: red; }
 }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
   });
 
@@ -103,7 +113,7 @@ test("width (range)", () => {
     vw[INTERNAL_SET](500);
   });
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(255, 0, 0, 1)",
   });
 });
@@ -116,9 +126,11 @@ test("min-width", () => {
   .my-class { color: red; }
 }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(255, 0, 0, 1)",
   });
 
@@ -126,7 +138,7 @@ test("min-width", () => {
     vw[INTERNAL_SET](300);
   });
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
   });
 });
@@ -139,9 +151,11 @@ test("max-width", () => {
   .my-class { color: red; }
 }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
   });
 
@@ -149,7 +163,7 @@ test("max-width", () => {
     vw[INTERNAL_SET](300);
   });
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     color: "rgba(255, 0, 0, 1)",
   });
 });

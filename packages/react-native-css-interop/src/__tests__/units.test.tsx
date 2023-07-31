@@ -2,8 +2,10 @@ import { act, render } from "@testing-library/react-native";
 import { INTERNAL_SET, rem, vh, vw } from "../runtime/native/globals";
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "../testing-library";
+import { View } from "react-native";
 
-const A = createMockComponent();
+const testID = "react-native-css-interop";
+const A = createMockComponent(View);
 
 afterEach(() => {
   StyleSheet.__reset();
@@ -12,9 +14,11 @@ afterEach(() => {
 test("px", () => {
   registerCSS(`.my-class { width: 10px; }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     width: 10,
   });
 });
@@ -22,9 +26,11 @@ test("px", () => {
 test("%", () => {
   registerCSS(`.my-class { width: 10%; }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     width: "10%",
   });
 });
@@ -32,43 +38,47 @@ test("%", () => {
 test("vw", () => {
   registerCSS(`.my-class { width: 10vw; }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
   expect(vw.get()).toEqual(750);
-  expect(A).styleToEqual({
-    width: 75,
-  });
+  expect(component).toHaveStyle({ width: 75 });
 
   act(() => {
     vw[INTERNAL_SET](100);
   });
 
   expect(vw.get()).toEqual(100);
-  expect(A).styleToEqual({ width: 10 });
+  expect(component).toHaveStyle({ width: 10 });
 });
 
 test("vh", () => {
   registerCSS(`.my-class { height: 10vh; }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
   expect(vh.get()).toEqual(1334);
-  expect(A).styleToEqual({ height: 133.4 });
+  expect(component).toHaveStyle({ height: 133.4 });
 
   act(() => {
     vh[INTERNAL_SET](100);
   });
 
   expect(vh.get()).toEqual(100);
-  expect(A).styleToEqual({ height: 10 });
+  expect(component).toHaveStyle({ height: 10 });
 });
 
 test("rem - default", () => {
   registerCSS(`.my-class { font-size: 10rem; }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({ fontSize: 140 });
+  expect(component).toHaveStyle({ fontSize: 140 });
 });
 
 test("rem - override", () => {
@@ -76,9 +86,11 @@ test("rem - override", () => {
     inlineRem: 10,
   });
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({ fontSize: 100 });
+  expect(component).toHaveStyle({ fontSize: 100 });
 });
 
 test("rem - dynamic", () => {
@@ -86,15 +98,17 @@ test("rem - dynamic", () => {
     inlineRem: false,
   });
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
   expect(rem.get()).toEqual(14);
-  expect(A).styleToEqual({ fontSize: 140 });
+  expect(component).toHaveStyle({ fontSize: 140 });
 
   act(() => {
     rem.set(10);
   });
 
   expect(rem.get()).toEqual(10);
-  expect(A).styleToEqual({ fontSize: 100 });
+  expect(component).toHaveStyle({ fontSize: 100 });
 });

@@ -30,6 +30,10 @@ type AnimationInteropProps = Record<string, unknown> & {
   __interopMeta: InteropMeta;
 };
 
+/**
+ * TODO: We could probably half the amount of code if this was rewritten to use useAnimatedProps
+ */
+
 /*
  * This component breaks the rules of hooks, however is it safe to do so as the animatedProps are static
  * If they do change, the key for this component will be regenerated forcing a remount (a reset of hooks)
@@ -130,7 +134,7 @@ function useAnimationAndTransitions(
     isLayoutReady,
   );
 
-  return useAnimatedStyle(() => {
+  const animatedStyle = useAnimatedStyle(() => {
     const transformProps = new Set(Object.keys(defaultTransform));
     const result: Record<string, unknown> = { ...style };
 
@@ -164,6 +168,11 @@ function useAnimationAndTransitions(
     doAnimation(animationProps, animationValues);
     return result;
   }, [...transitionValues, ...animationValues]);
+
+  // This doesn't have a runtime purpose, it just makes the unit tests easier to write
+  styleMetaMap.set(animatedStyle, styleMetaMap.get(style)!);
+
+  return animatedStyle;
 }
 
 function useTransitions(
@@ -308,7 +317,8 @@ function useAnimations(
   const animationValues: SharedValue<AnimatableValue>[] = [];
   for (const [prop, [first]] of animations.entries()) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    animationValues.push(useSharedValue(getInitialValue(prop, first, style)));
+    const a = useSharedValue(getInitialValue(prop, first, style));
+    animationValues.push(a);
     animationProps.push(prop);
   }
 

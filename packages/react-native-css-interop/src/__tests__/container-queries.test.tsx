@@ -1,20 +1,21 @@
+import { View } from "react-native";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "../testing-library";
 
-const Parent = createMockComponent();
-const Child = createMockComponent();
+const Parent = createMockComponent(View);
+const Child = createMockComponent(View);
 
 beforeEach(() => {
   StyleSheet.__reset();
 });
 
 describe("size", () => {
-  test("width", async () => {
+  test("width", () => {
     registerCSS(`
-      .container { 
-        container-name: test; 
+      .container {
+        container-name: test;
         width: 200px;
       }
 
@@ -31,17 +32,18 @@ describe("size", () => {
 
     const { rerender } = render(
       <Parent testID="parent" className="container">
-        <Child className="child" />
+        <Child testID="child" className="child" />
       </Parent>,
     );
 
-    const parent = await screen.findByTestId("parent");
+    const parent = screen.getByTestId("parent");
+    const child = screen.getByTestId("child");
 
-    expect(Parent).styleToEqual({
+    expect(parent).toHaveStyle({
       width: 200,
     });
 
-    expect(Child).styleToEqual({
+    expect(child).toHaveStyle({
       color: "rgba(255, 0, 0, 1)",
     });
 
@@ -54,7 +56,7 @@ describe("size", () => {
       },
     });
 
-    expect(Child).styleToEqual({
+    expect(child).toHaveStyle({
       color: "rgba(255, 0, 0, 1)",
     });
 
@@ -73,11 +75,11 @@ describe("size", () => {
       },
     });
 
-    expect(Parent).styleToEqual({
+    expect(parent).toHaveStyle({
       width: 500,
     });
 
-    expect(Child).styleToEqual({
+    expect(child).toHaveStyle({
       color: "rgba(0, 0, 255, 1)",
     });
   });

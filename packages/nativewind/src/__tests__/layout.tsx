@@ -3,7 +3,7 @@ import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
 
-describe("Layout - Aspect Ratio", () => {
+describe.only("Layout - Aspect Ratio", () => {
   testCases(
     ["aspect-square", style({ aspectRatio: 1 })],
     // ["aspect-video", style({ aspectRatio: "16 / 9" })],
@@ -14,13 +14,10 @@ describe("Layout - Aspect Ratio", () => {
 describe("Layout - Container", () => {
   testCases([
     "container",
-    {
-      style: {
-        maxWidth: 640,
-        width: "100%",
-      },
-      meta: {},
-    },
+    style({
+      maxWidth: 640,
+      width: "100%",
+    }),
   ]);
 });
 

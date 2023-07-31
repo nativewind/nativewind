@@ -2,8 +2,10 @@ import { render, screen } from "@testing-library/react-native";
 
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "../testing-library";
+import { View } from "react-native";
 
-const A = createMockComponent();
+const testID = "react-native-css-interop";
+const A = createMockComponent(View);
 
 afterEach(() => {
   StyleSheet.__reset();
@@ -12,9 +14,11 @@ afterEach(() => {
 test("inline variable", () => {
   registerCSS(`.my-class { width: var(--my-var); --my-var: 10px; }`);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     width: 10,
   });
 });
@@ -28,20 +32,24 @@ test("combined inline variable", () => {
 
   render(<A className="my-class-1 my-class-2" />);
 
-  expect(A).styleToEqual({
+  const component = render(
+    <A testID={testID} className="my-class-1 my-class-2" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({
     width: 10,
   });
 
   // Prove that the order doesn't matter
   screen.rerender(<A className="my-class-3 my-class-1" />);
 
-  expect(A).styleToEqual({
+  expect(component).toHaveStyle({
     width: 20,
   });
 });
 
 test("inherit variables", () => {
-  const B = createMockComponent();
+  const B = createMockComponent(View);
 
   registerCSS(`
     .my-class-1 { width: var(--my-var); }
@@ -49,14 +57,17 @@ test("inherit variables", () => {
     .my-class-3 { --my-var: 20px; }
   `);
 
-  render(
-    <A className="my-class-2">
-      <B className="my-class-1" />
+  const { getByTestId } = render(
+    <A testID="a" className="my-class-2">
+      <B testID="b" className="my-class-1" />
     </A>,
   );
 
-  expect(A).styleToEqual({});
-  expect(B).styleToEqual({ width: 10 });
+  const a = getByTestId("a");
+  const b = getByTestId("b");
+
+  expect(a).toHaveStyle({});
+  expect(b).toHaveStyle({ width: 10 });
 
   screen.rerender(
     <A className="my-class-3">
@@ -64,8 +75,8 @@ test("inherit variables", () => {
     </A>,
   );
 
-  expect(A).styleToEqual({});
-  expect(B).styleToEqual({ width: 20 });
+  expect(a).toHaveStyle({});
+  expect(b).toHaveStyle({ width: 20 });
 });
 
 test(":root variables", () => {
@@ -74,7 +85,9 @@ test(":root variables", () => {
     .my-class { color: var(--my-var); }
   `);
 
-  render(<A className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({ color: "red" });
+  expect(component).toHaveStyle({ color: "red" });
 });

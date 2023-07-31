@@ -1,9 +1,13 @@
-import { act, fireEvent, render, screen } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "../testing-library";
+import { TextInput } from "react-native";
 
-const A = createMockComponent();
+const testID = "react-native-css-interop";
+
+// View's do not have a onFocus listener on iOS/Android
+const A = createMockComponent(TextInput);
 
 afterEach(() => {
   StyleSheet.__reset();
@@ -12,77 +16,69 @@ afterEach(() => {
 test("hover", () => {
   registerCSS(`.my-class:hover { width: 10px; }`);
 
-  render(<A testID="a" className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({});
+  expect(component).toHaveStyle({});
 
-  act(() => fireEvent(screen.getByTestId("a"), "hoverIn", {}));
+  fireEvent(component, "hoverIn");
+  expect(component).toHaveStyle({ width: 10 });
 
-  expect(A).styleToEqual({ width: 10 });
-
-  act(() => fireEvent(screen.getByTestId("a"), "hoverOut", {}));
-
-  expect(A).styleToEqual({});
+  fireEvent(component, "hoverOut");
+  expect(component).toHaveStyle({});
 });
 
 test("active", () => {
   registerCSS(`.my-class:active { width: 10px; }`);
 
-  render(<A testID="a" className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({});
+  expect(component).toHaveStyle({});
 
-  act(() => fireEvent(screen.getByTestId("a"), "PressIn", {}));
+  fireEvent(component, "pressIn");
+  expect(component).toHaveStyle({ width: 10 });
 
-  expect(A).styleToEqual({ width: 10 });
-
-  act(() => fireEvent(screen.getByTestId("a"), "PressOut", {}));
-
-  expect(A).styleToEqual({});
+  fireEvent(component, "pressOut");
+  expect(component).toHaveStyle({});
 });
 
 test("focus", () => {
   registerCSS(`.my-class:focus { width: 10px; }`);
 
-  render(<A testID="a" className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({});
+  expect(component).toHaveStyle({});
 
-  act(() => fireEvent(screen.getByTestId("a"), "Focus", {}));
+  fireEvent(component, "focus");
+  expect(component).toHaveStyle({ width: 10 });
 
-  expect(A).styleToEqual({ width: 10 });
-
-  act(() => fireEvent(screen.getByTestId("a"), "Blur", {}));
-
-  expect(A).styleToEqual({});
+  fireEvent(component, "blur");
+  expect(component).toHaveStyle({});
 });
 
 test(":hover:active:focus", () => {
   registerCSS(`.my-class:hover:active:focus { width: 10px; }`);
 
-  render(<A testID="a" className="my-class" />);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-  expect(A).styleToEqual({});
+  expect(component).toHaveStyle({});
 
-  act(() => {
-    fireEvent(screen.getByTestId("a"), "hoverIn", {});
-  });
+  fireEvent(component, "hoverIn", {});
+  expect(component).toHaveStyle({});
 
-  expect(A).styleToEqual({});
+  fireEvent(component, "pressIn", {});
+  expect(component).toHaveStyle({});
 
-  act(() => {
-    fireEvent(screen.getByTestId("a"), "PressIn", {});
-  });
+  fireEvent(component, "focus", {});
+  expect(component).toHaveStyle({ width: 10 });
 
-  expect(A).styleToEqual({});
-
-  act(() => {
-    fireEvent(screen.getByTestId("a"), "focus", {});
-  });
-
-  expect(A).styleToEqual({ width: 10 });
-
-  act(() => fireEvent(screen.getByTestId("a"), "hoverOut", {}));
-
-  expect(A).styleToEqual({});
+  fireEvent(component, "hoverOut", {});
+  expect(component).toHaveStyle({});
 });

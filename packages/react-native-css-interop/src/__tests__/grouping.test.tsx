@@ -1,15 +1,18 @@
-import { render } from "@testing-library/react-native";
+import { render, screen } from "@testing-library/react-native";
 
 import { StyleSheet } from "../runtime/native/stylesheet";
 import { createMockComponent, registerCSS } from "../testing-library";
+import { View } from "react-native";
 
 afterEach(() => {
   StyleSheet.__reset();
 });
 
 test("group", async () => {
-  const A = createMockComponent();
-  const B = createMockComponent();
+  const A = createMockComponent(View);
+  const B = createMockComponent(View);
+
+  const testID = "a";
 
   registerCSS(
     `.group\\/item .my-class {
@@ -20,22 +23,28 @@ test("group", async () => {
     },
   );
 
-  const { rerender } = render(<B className="my-class" />);
-
-  expect(B).styleToEqual({});
-
-  rerender(
-    <A testID="A" className="group/item">
-      <B testID="B" className="my-class" />
+  const { rerender, getByTestId } = render(
+    <A>
+      <B testID={testID} className="my-class" />
     </A>,
   );
 
-  expect(B).styleToEqual({ color: "rgba(255, 0, 0, 1)" });
+  expect(getByTestId(testID)).toHaveStyle({});
+
+  rerender(
+    <A className="group/item">
+      <B testID={testID} className="my-class" />
+    </A>,
+  );
+
+  expect(getByTestId(testID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
 });
 
-test.only("invalid group", async () => {
-  const A = createMockComponent();
-  const B = createMockComponent();
+test("invalid group", async () => {
+  const A = createMockComponent(View);
+  const B = createMockComponent(View);
+
+  const testID = "b";
 
   registerCSS(
     `.invalid .my-class {
@@ -46,15 +55,16 @@ test.only("invalid group", async () => {
     },
   );
 
-  const { rerender } = render(<B className="my-class" />);
+  const { rerender } = render(<B testID={testID} className="my-class" />);
+  const componentB = screen.findAllByTestId(testID);
 
-  expect(B).styleToEqual(undefined);
+  expect(componentB).toHaveStyle(undefined);
 
   rerender(
     <A testID="A" className="invalid">
-      <B className="my-class" />
+      <B testID={testID} className="my-class" />
     </A>,
   );
 
-  expect(B).styleToEqual(undefined);
+  expect(componentB).toHaveStyle(undefined);
 });

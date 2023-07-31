@@ -1,6 +1,7 @@
 import { resetStyles } from "react-native-css-interop/testing-library";
 import {
   invalidProperty,
+  style,
   testCases,
   testCasesWithOptions,
 } from "../test-utils";
@@ -14,131 +15,89 @@ describe("Transforms - Scale", () => {
     },
     [
       "scale-0",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 0 },
-            { scaleY: 0 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-scale-x": 0,
-            "--tw-scale-y": 0,
-          },
-        },
-      },
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 0 },
+          { scaleY: 0 },
+        ],
+      }),
     ],
     [
       "scale-x-0",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 0 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-scale-x": 0,
-          },
-        },
-      },
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 0 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "scale-y-0",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 0 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-scale-y": 0,
-          },
-        },
-      },
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 0 },
+        ],
+      }),
     ],
     [
       "scale-50",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 0.5 },
-            { scaleY: 0.5 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-scale-x": 0.5,
-            "--tw-scale-y": 0.5,
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 0.5 },
+          { scaleY: 0.5 },
+        ],
+      }),
     ],
     [
       "scale-x-50",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 0.5 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-scale-x": 0.5,
-          },
-        },
-      },
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 0.5 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "scale-y-50",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 0.5 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-scale-y": 0.5,
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 0.5 },
+        ],
+      }),
     ],
   );
 });
@@ -150,45 +109,32 @@ describe("Transforms - Rotate", () => {
     },
     [
       "rotate-0",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-rotate": "0deg",
-          },
-        },
-      },
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0deg" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "rotate-180",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "180deg" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-rotate": "180deg",
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "180deg" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
   );
 });
@@ -200,129 +146,89 @@ describe("Transforms - Translate", () => {
     },
     [
       "translate-x-0",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-translate-x": 0,
-          },
-        },
-      },
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "translate-y-0",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-translate-y": 0,
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "translate-x-px",
-      {
-        style: {
-          transform: [
-            { translateX: 1 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-translate-x": 1,
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 1 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "translate-y-px",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 1 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-translate-y": 1,
-          },
-        },
-      },
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 1 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "translate-x-1",
-      {
-        style: {
-          transform: [
-            { translateX: 3.5 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-translate-x": 3.5,
-          },
-        },
-      },
+      style({
+        transform: [
+          { translateX: 3.5 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "translate-y-1",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 3.5 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-translate-y": 3.5,
-          },
-        },
-      },
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 3.5 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
   );
 });
@@ -335,87 +241,62 @@ describe.skip("Transforms - Translate (%)", () => {
     },
     [
       "translate-x-1/2",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-translate-x": 3.5,
-          },
-        },
-      },
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "translate-y-1/2",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 3.5 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-translate-y": 3.5,
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 3.5 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "translate-x-full",
-      {
-        style: {
-          transform: [
-            { translateX: 3.5 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-translate-x": 3.5,
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 3.5 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "translate-y-full",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 3.5 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-translate-y": 3.5,
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 3.5 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
   );
 });
@@ -427,87 +308,63 @@ describe("Transforms - Skew", () => {
     },
     [
       "skew-x-0",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0deg" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-skew-x": "0deg",
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0deg" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "skew-y-0",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "0deg" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-skew-y": "0deg",
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "0deg" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "skew-x-1",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "1deg" },
-            { skewY: "0" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-skew-x": "1deg",
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "1deg" },
+          { skewY: "0" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
     [
       "skew-y-1",
-      {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0" },
-            { skewX: "0" },
-            { skewY: "1deg" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-        meta: {
-          variables: {
-            "--tw-skew-y": "1deg",
-          },
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "0" },
+          { skewX: "0" },
+          { skewY: "1deg" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
   );
 });
@@ -519,19 +376,18 @@ describe("Transforms - Mixed", () => {
     },
     [
       "rotate-90 skew-y-1 translate-x-1",
-      {
-        style: {
-          transform: [
-            { translateX: 3.5 },
-            { translateY: 0 },
-            { rotate: "90deg" },
-            { skewX: "0" },
-            { skewY: "1deg" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
-        },
-      },
+
+      style({
+        transform: [
+          { translateX: 3.5 },
+          { translateY: 0 },
+          { rotate: "90deg" },
+          { skewX: "0" },
+          { skewY: "1deg" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
     ],
   );
 });

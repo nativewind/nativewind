@@ -1,5 +1,5 @@
-import { ViewStyle, ImageStyle, TextStyle } from "react-native";
-import { RenderOptions, render } from "@testing-library/react-native";
+import { ViewStyle, ImageStyle, TextStyle, View } from "react-native";
+import { RenderOptions, render, screen } from "@testing-library/react-native";
 import postcss from "postcss";
 import {
   createMockComponent,
@@ -7,13 +7,13 @@ import {
 } from "react-native-css-interop/testing-library";
 import tailwind from "tailwindcss";
 import { cssToReactNativeRuntimeOptions } from "./metro/with-tailwind-options";
-import {
-  ExtractionWarning,
-  StyleMeta,
-} from "react-native-css-interop/dist/types";
+import { ExtractionWarning } from "react-native-css-interop/dist/types";
+import { warnings } from "react-native-css-interop";
 
 export interface RenderTailwindOptions extends RenderOptions {
   css?: string;
+  testID?: string;
+  animated?: boolean;
 }
 
 export async function renderTailwind<T extends { className: string }>(
@@ -41,7 +41,6 @@ type TestCase = [
   {
     style?: ReturnType<typeof style>["style"];
     warning?: (name: string) => Map<string, ExtractionWarning[]>;
-    meta?: StyleMeta;
   },
 ];
 
@@ -70,26 +69,30 @@ export function testCases(...cases: TestCase[]) {
 }
 
 export function testCasesWithOptions(
-  options: RenderTailwindOptions,
+  {
+    testID = "react-native-css-interop",
+    animated = false,
+    ...options
+  }: RenderTailwindOptions,
   ...cases: TestCase[]
 ) {
-  const A = createMockComponent();
+  const A = createMockComponent(View);
 
   test.each(cases)("%s", async (className, expected) => {
-    await renderTailwind(<A className={className} />, options);
+    await renderTailwind(<A testID={testID} className={className} />, options);
 
-    if (expected.style) {
-      expect(A).styleToEqual(expected.style);
+    const component = screen.getByTestId(testID);
+
+    if (animated) {
+      expect(component).toHaveAnimatedStyle(expected.style ?? {});
     } else {
-      expect(A).styleToEqual({});
+      expect(component).toHaveStyle(expected.style ?? {});
     }
 
     if (expected.warning) {
-      expect(A).toHaveStyleWarnings(expected.warning(className));
+      expect(warnings).toEqual(expected.warning(className));
     } else {
-      expect(A).toHaveStyleWarnings(new Map());
+      expect(warnings).toEqual(new Map());
     }
-
-    expect(className).styleMetaToEqual(expected.meta);
   });
 }

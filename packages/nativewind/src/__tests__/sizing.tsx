@@ -1,6 +1,6 @@
 import { Dimensions } from "react-native";
 import { resetStyles } from "react-native-css-interop/testing-library";
-import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
+import { invalidValue, style, testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
 
@@ -15,10 +15,7 @@ describe("Sizing - Width", () => {
     ["w-min", invalidValue("width", "min-content")],
     ["w-max", invalidValue("width", "max-content")],
     ["w-fit", invalidValue("width", "fit-content")],
-    [
-      "w-screen",
-      { ...style({ width: Dimensions.get("window").width }), meta: {} },
-    ],
+    ["w-screen", style({ width: Dimensions.get("window").width })],
   );
 });
 
@@ -53,10 +50,7 @@ describe("Sizing - Height", () => {
     ["h-min", invalidValue("height", "min-content")],
     ["h-max", invalidValue("height", "max-content")],
     ["h-fit", invalidValue("height", "fit-content")],
-    [
-      "h-screen",
-      { ...style({ height: Dimensions.get("window").height }), meta: {} },
-    ],
+    ["h-screen", style({ height: Dimensions.get("window").height })],
   );
 });
 
