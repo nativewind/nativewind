@@ -16,7 +16,6 @@ import {
   StyleMeta,
   StyleProp,
 } from "../../types";
-import { AnimationInterop } from "./animations";
 import { flattenStyleProps } from "./flatten-style";
 import { ContainerContext, globalStyles, styleMetaMap } from "./globals";
 import { useInteractionHandlers, useInteractionSignals } from "./interaction";
@@ -334,7 +333,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
 
   if (interopMeta.animationInteropKey) {
     return jsx(
-      AnimationInterop,
+      require("./animations").AnimationInterop,
       {
         ...props,
         __component: component,
