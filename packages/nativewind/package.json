@@ -40,8 +40,8 @@
   "files": [
     "babel/",
     "dist/",
-    "jx-dev-runtime/",
-    "jx-runtime/",
+    "jsx-dev-runtime/",
+    "jsx-runtime/",
     "metro",
     "tailwind/",
     "types.d.ts"
