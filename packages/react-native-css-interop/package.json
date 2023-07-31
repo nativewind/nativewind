@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0",
+  "version": "0.0.0-03c18f57",
   "name": "react-native-css-interop",
   "description": "",
   "main": "dist/index",
@@ -37,7 +37,13 @@
     "build:watch": "npm run build -- -w"
   },
   "files": [
-    "dist/"
+    "dist/",
+    "css-to-rn/",
+    "jsx-dev-runtime/",
+    "jsx-runtime/",
+    "metro/",
+    "testing-library/",
+    "react-native-css-interop-env.d.ts"
   ],
   "dependencies": {
     "lightningcss": "^1.21.5"
