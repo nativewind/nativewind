@@ -405,6 +405,19 @@ function extractValue(
         spreadCallbackArgs: true,
       });
     }
+    case "rgb": {
+      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
+        joinArgs: false,
+        callback(value: any) {
+          const args = value.slice(4, -1).split(",");
+
+          if (args.length === 4) {
+            return `rgba(${args.join(",")})`;
+          }
+          return value;
+        },
+      });
+    }
     default: {
       return createRuntimeFunction(value, flatStyle, flatStyleMeta, options);
     }

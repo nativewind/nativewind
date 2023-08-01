@@ -47,13 +47,17 @@ function createColorScheme(appearance: typeof Appearance) {
   );
 
   const set = (colorScheme: "light" | "dark" | "system") => {
+    let newColorScheme;
     if (colorScheme === "system") {
       isSystem = true;
-      signal.set(appearance.getColorScheme() ?? "light");
+      newColorScheme = appearance.getColorScheme() ?? "light";
     } else {
       isSystem = false;
-      signal.set(colorScheme);
+      newColorScheme = colorScheme;
     }
+
+    signal.set(newColorScheme);
+    appearance.setColorScheme(newColorScheme);
   };
 
   let listener = appearance.addChangeListener(({ colorScheme }) => {

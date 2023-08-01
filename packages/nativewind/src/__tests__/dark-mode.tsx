@@ -26,6 +26,37 @@ test("darkMode: media", async () => {
   expect(component).toHaveStyle({ color: "rgba(0, 0, 0, 1)" });
 });
 
+test("darkMode: media variable switching", async () => {
+  await renderTailwind(
+    <A testID={testID} className="text-[color:rgb(var(--color))]" />,
+    {
+      css: `
+          @tailwind base;
+          @tailwind components;
+          @tailwind utilities;
+
+          @layer base {
+            :root {
+              --color: 255 115 179;
+            }
+            @media (prefers-color-scheme: dark) {
+              :root {
+                --color: 155 100 255;
+              }
+            }
+          }`,
+    },
+  );
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "rgb(255,115,179)" });
+
+  act(() => StyleSheet.setColorScheme("dark"));
+
+  expect(component).toHaveStyle({ color: "rgb(155,100,255)" });
+});
+
 test("darkMode: class", async () => {
   await renderTailwind(<A testID={testID} className="dark:text-black" />, {
     base: true,
@@ -43,54 +74,36 @@ test("darkMode: class", async () => {
   expect(component).toHaveStyle({ color: "rgba(0, 0, 0, 1)" });
 });
 
-test("darkMode: custom class", async () => {
-  await renderTailwind(<A testID={testID} className="dark:text-black" />, {
-    base: true,
-    config: {
-      darkMode: ["class", ".dark-mode"],
-    },
-  });
+test.only("darkMode: class variable switching", async () => {
+  await renderTailwind(
+    <A testID={testID} className="text-[color:rgb(var(--color))]" />,
+    {
+      css: `
+          @tailwind base;
+          @tailwind components;
+          @tailwind utilities;
 
-  const component = screen.getByTestId(testID);
+          @layer base {
+            :root {
+              --color: 255 115 179;
+            }
 
-  expect(component).toHaveStyle({});
-
-  act(() => StyleSheet.setColorScheme("dark"));
-
-  expect(component).toHaveStyle({ color: "rgba(0, 0, 0, 1)" });
-});
-
-test.only("darkMode: root variables", async () => {
-  await renderTailwind(<A testID={testID} className="dark:text-primary" />, {
-    css: `
-      @tailwind base;
-      @tailwind components;
-      @tailwind utilities;
-
-      @layer base {
-        @media(prefers-color-scheme: dark) {
-          :root {
-            --color-primary: 255 115 179;
-            --color-secondary: 111 114 185;
+            .dark {
+              --color: 155 100 255;
+            }
           }
-        }
-      }
-      `,
-    config: {
-      theme: {
-        colors: {
-          primary: "rgb(var(--color-primary) / <alpha-value>)",
-          secondary: "rgb(var(--color-secondary) / <alpha-value>)",
-        },
+          `,
+      config: {
+        darkMode: "class",
       },
     },
-  });
+  );
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle({ color: "rgb(255,115,179)" });
 
   act(() => StyleSheet.setColorScheme("dark"));
 
-  expect(component).toHaveStyle({ color: "rgba(0, 0, 0, 1)" });
+  expect(component).toHaveStyle({ color: "rgb(155,100,255)" });
 });

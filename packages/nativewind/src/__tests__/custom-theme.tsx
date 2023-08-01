@@ -1,7 +1,8 @@
 import { View } from "react-native";
 import { createMockComponent, renderTailwind } from "../test-utils";
 import { resetStyles } from "react-native-css-interop/testing-library";
-import { screen } from "@testing-library/react-native";
+import { act, screen } from "@testing-library/react-native";
+import { StyleSheet } from "react-native-css-interop";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
@@ -19,7 +20,11 @@ test("Using css variables", async () => {
       @layer base {
         :root {
           --color-primary: 255 115 179;
-          --color-secondary: 111 114 185;
+        }
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --color-primary: 155 100 255;
+          }
         }
       }
     `,
@@ -35,5 +40,9 @@ test("Using css variables", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(0, 0, 0, 1)" });
+  expect(component).toHaveStyle({ color: "rgba(255,115,179,1)" });
+
+  act(() => StyleSheet.setColorScheme("dark"));
+
+  expect(component).toHaveStyle({ color: "rgba(155,100,255,1)" });
 });

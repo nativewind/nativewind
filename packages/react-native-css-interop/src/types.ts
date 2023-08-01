@@ -33,7 +33,6 @@ export interface ExtractRuleOptions {
   platform?: string;
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
   keyframes: Map<string, ExtractedAnimation>;
-  style?: Partial<ExtractedStyle>;
   grouping: RegExp[];
   darkMode?: DarkMode;
   rootVariables: StyleSheetRegisterOptions["rootVariables"];

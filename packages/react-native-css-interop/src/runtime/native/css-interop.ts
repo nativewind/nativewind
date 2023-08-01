@@ -20,7 +20,12 @@ import { flattenStyleProps } from "./flatten-style";
 import { ContainerContext, globalStyles, styleMetaMap } from "./globals";
 import { useInteractionHandlers, useInteractionSignals } from "./interaction";
 import { useComputation } from "../shared/signals";
-import { StyleSheet, VariableContext, useVariables } from "./stylesheet";
+import {
+  StyleSheet,
+  VariableContext,
+  defaultVariables,
+  rootVariables,
+} from "./stylesheet";
 import { DevHotReloadSubscription } from "../../shared";
 
 type CSSInteropWrapperProps = {
@@ -148,9 +153,26 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
   ref,
 ) {
   const rerender = useRerender();
-  const inheritedVariables = useVariables();
   const inheritedContainers = useContext(ContainerContext);
   const interaction = useInteractionSignals();
+
+  const $variables = useContext(VariableContext);
+
+  const inheritedVariables = useComputation(
+    () => {
+      // $variables will be null if this is a top-level component
+      if ($variables === null) {
+        return rootVariables.get();
+      } else {
+        return {
+          ...$variables,
+          ...defaultVariables.get(),
+        };
+      }
+    },
+    [$variables],
+    rerender,
+  );
 
   /**
    * If the development environment is enabled, we should rerender all components if the StyleSheet updates.

@@ -118,6 +118,7 @@ function extractRule(
   rule: Rule | CSSInteropAtRule,
   extractOptions: ExtractRuleOptions,
   parseOptions: CssToReactNativeRuntimeOptions,
+  partialStyle: Partial<ExtractedStyle> = {},
 ) {
   // Check the rule's type to determine which extraction function to call
   switch (rule.type) {
@@ -141,7 +142,7 @@ function extractRule(
       if (rule.value.declarations) {
         setStyleForSelectorList(
           {
-            ...extractOptions.style,
+            ...partialStyle,
             ...getExtractedStyle(rule.value.declarations, parseOptions),
           },
           rule.value.selectors,
@@ -215,16 +216,9 @@ function extractMedia(
     return;
   }
 
-  const newExtractOptions: ExtractRuleOptions = {
-    ...extractOptions,
-    style: {
-      media,
-    },
-  };
-
   // Iterate over all rules in the mediaRule and extract their styles using the updated ExtractRuleOptions
   for (const rule of mediaRule.rules) {
-    extractRule(rule, newExtractOptions, parseOptions);
+    extractRule(rule, extractOptions, parseOptions, { media });
   }
 }
 
@@ -238,22 +232,16 @@ function extractedContainer(
   extractOptions: ExtractRuleOptions,
   parseOptions: CssToReactNativeRuntimeOptions,
 ) {
-  // Create a new ExtractRuleOptions object with the updated container query information
-  const newExtractOptions: ExtractRuleOptions = {
-    ...extractOptions,
-    style: {
+  // Iterate over all rules inside the containerRule and extract their styles using the updated ExtractRuleOptions
+  for (const rule of containerRule.rules) {
+    extractRule(rule, extractOptions, parseOptions, {
       containerQuery: [
         {
           name: containerRule.name,
           condition: containerRule.condition,
         },
       ],
-    },
-  };
-
-  // Iterate over all rules inside the containerRule and extract their styles using the updated ExtractRuleOptions
-  for (const rule of containerRule.rules) {
-    extractRule(rule, newExtractOptions, parseOptions);
+    });
   }
 }
 
@@ -293,7 +281,7 @@ function setStyleForSelectorList(
         (!options.darkMode || options.darkMode?.type === "media")
       ) {
         // You can only have 1 media condition
-        if (style.media.length > 1) {
+        if (style.media.length !== 1) {
           continue;
         }
 
@@ -320,6 +308,7 @@ function setStyleForSelectorList(
       Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(options, {
         [key]: style.variables,
       });
+
       continue;
     }
 

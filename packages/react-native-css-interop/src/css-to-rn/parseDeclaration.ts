@@ -1496,6 +1496,12 @@ function parseUnparsed(
     }
     case "function": {
       switch (tokenOrValue.value.name) {
+        case "rgb":
+          tokenOrValue.value.name = "rgb";
+          return unparsedFunction(tokenOrValue, options);
+        case "hsl":
+          tokenOrValue.value.name = "hsla";
+          return unparsedFunction(tokenOrValue, options);
         case "translate":
           return unparsedKnownShorthand(
             {
@@ -1521,7 +1527,7 @@ function parseUnparsed(
         case "platformColor":
         case "getPixelSizeForLayoutSize":
         case "roundToNearestPixel":
-        case "getfontScale":
+        case "getFontScale":
         case "getPixelRatio":
           return unparsedFunction(tokenOrValue, options);
         case "hairlineWidth":

@@ -2,6 +2,7 @@ import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 
 import { darkModeAtRule } from "./dark-mode";
+import { ContentConfig } from "tailwindcss/types/config";
 
 export default function nativewindPreset() {
   const preset: Config = {
@@ -27,11 +28,24 @@ export default function nativewindPreset() {
         },
       },
     },
-    plugins: [platforms, darkModeAtRule],
+    plugins: [forceDark, platforms, darkModeAtRule],
   };
 
   return preset;
 }
+
+/**
+ * The native module requires the `.dark` selector to pickup darkMode variables
+ * when using darkMode: 'class'
+ *
+ * If the user never uses the word 'dark' the selector will never be processed
+ * This is an edge, but one we often encounter in testing (where .dark)
+ * will only contain CSS variables and never referenced directly
+ */
+const forceDark = plugin(function ({ config }) {
+  const content = config<Extract<ContentConfig, { files: any }>>("content");
+  content.files.push({ raw: "dark" });
+});
 
 const platforms = plugin(function ({ addVariant }) {
   const nativePlatforms = ["android", "ios", "windows", "macos"];

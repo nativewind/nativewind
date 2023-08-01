@@ -26,6 +26,7 @@ export function normalizeSelectors(
   for (let selector of selectorList) {
     // Ignore `:is()`, and just process its selectors
     if (isIsPseudoClass(selector)) {
+      console.log(selector[0].selectors);
       normalizeSelectors(selector[0].selectors, options, normalizedSelectors);
       continue;
     }
@@ -39,7 +40,7 @@ export function normalizeSelectors(
       continue;
     }
 
-    // Matches: :root .dark {}
+    // Matches: .dark {}
     if (isRootDarkVariableSelector(selector, options)) {
       normalizedSelectors.push({
         type: "variables",
@@ -210,20 +211,15 @@ function isDefaultVariableSelector([first, second]: Selector) {
 
 // Matches:  :root .dark {}
 function isRootDarkVariableSelector(
-  [first, second, third]: Selector,
+  [first, second]: Selector,
   options: ExtractRuleOptions,
 ) {
   return (
     options.darkMode?.type === "class" &&
     first &&
-    second &&
-    third &&
-    first.type === "pseudo-class" &&
-    first.kind === "root" &&
-    second.type === "combinator" &&
-    second.value === "descendant" &&
-    third.type === "class" &&
-    third.name === options.darkMode.value
+    !second &&
+    first.type === "class" &&
+    first.name === options.darkMode.value
   );
 }
 

@@ -3,7 +3,7 @@ import {
   StyleSheet as RNStyleSheet,
   Appearance,
 } from "react-native";
-import { createContext, useContext, useMemo } from "react";
+import { createContext } from "react";
 
 import {
   StyleSheetRegisterOptions,
@@ -28,12 +28,21 @@ import {
   DevHotReloadSubscription,
   INTERNAL_RESET,
 } from "../../shared";
+import { createSignal } from "../shared/signals";
 
 const subscriptions = new Set<() => void>();
-
+export const rootVariables = createSignal<Record<string, unknown>>({});
+export const defaultVariables = createSignal<Record<string, unknown>>({});
 export const VariableContext = createContext<Record<string, unknown> | null>(
   null,
 );
+
+let variables = {
+  rootVariables: {} as Record<string, unknown>,
+  rootDarkVariables: {} as Record<string, unknown>,
+  defaultVariables: {} as Record<string, unknown>,
+  defaultDarkVariables: {} as Record<string, unknown>,
+};
 
 const commonStyleSheet: CommonStyleSheet = {
   [DarkMode]: { type: "media" },
@@ -47,10 +56,14 @@ const commonStyleSheet: CommonStyleSheet = {
     vw[INTERNAL_RESET](dimensions);
     vh[INTERNAL_RESET](dimensions);
     colorScheme[INTERNAL_RESET](appearance);
-    rootVariables = {};
-    rootDarkVariables = {};
-    defaultVariables = {};
-    defaultDarkVariables = {};
+    rootVariables.set({});
+    defaultVariables.set({});
+    variables = {
+      rootVariables: {},
+      rootDarkVariables: {},
+      defaultVariables: {},
+      defaultDarkVariables: {},
+    };
   },
   classNameMergeStrategy(c) {
     return c;
@@ -77,36 +90,52 @@ const commonStyleSheet: CommonStyleSheet = {
       }
     }
 
-    if (options.defaultVariables) defaultVariables = options.defaultVariables;
-    if (options.defaultDarkVariables) {
-      defaultDarkVariables = {
-        ...options.defaultVariables,
-        ...options.defaultDarkVariables,
-      };
-    }
+    const currentColor = Appearance.getColorScheme() ?? "light";
+    let shouldResetRootVariables = false;
+    let shouldResetDefaultVariables = false;
+
     if (options.rootVariables) {
-      rootVariables = {
-        ...options.rootVariables,
-        ...defaultVariables,
-      };
+      Object.assign(variables.rootVariables, options.rootVariables);
+      shouldResetRootVariables = true;
     }
     if (options.rootDarkVariables) {
-      rootDarkVariables = {
-        ...options?.rootVariables,
-        ...options.rootDarkVariables,
-        ...defaultDarkVariables,
-      };
+      Object.assign(variables.rootDarkVariables, options.rootDarkVariables);
+      shouldResetRootVariables ||= currentColor === "dark";
     }
 
-    if (options.colorSchemeClass) {
+    if (options.defaultVariables) {
+      Object.assign(variables.defaultVariables, options.defaultVariables);
+      shouldResetRootVariables = true;
+      shouldResetDefaultVariables = true;
+    }
+
+    if (options.defaultDarkVariables) {
+      shouldResetRootVariables ||= currentColor === "dark";
+      shouldResetDefaultVariables ||= currentColor === "dark";
+      Object.assign(
+        variables.defaultDarkVariables,
+        options.defaultDarkVariables,
+      );
+    }
+
+    if (shouldResetRootVariables) {
+      resetRootVariables(currentColor);
+    }
+
+    if (shouldResetDefaultVariables) {
+      resetDefaultVariables(currentColor);
     }
 
     for (const subscription of subscriptions) {
       subscription();
     }
   },
+  setColorScheme(value) {
+    colorScheme.set(value);
+    resetRootVariables(colorScheme.get());
+    resetDefaultVariables(colorScheme.get());
+  },
   setDarkMode() {},
-  setColorScheme: colorScheme.set,
   setRem: rem.set,
   getRem: rem.get,
 };
@@ -201,29 +230,29 @@ function tagStyles(
   }
 }
 
-let rootVariables: Record<string, unknown> = {};
-let rootDarkVariables: Record<string, unknown> = {};
-let defaultVariables: Record<string, unknown> = {};
-let defaultDarkVariables: Record<string, unknown> = {};
+function resetRootVariables(currentColor: "light" | "dark") {
+  if (currentColor === "light") {
+    rootVariables.set({
+      ...variables.rootVariables,
+      ...variables.defaultVariables,
+    });
+  } else {
+    rootVariables.set({
+      ...variables.rootVariables,
+      ...variables.rootDarkVariables,
+      ...variables.defaultVariables,
+      ...variables.defaultDarkVariables,
+    });
+  }
+}
 
-export function useVariables() {
-  const $variables = useContext(VariableContext);
-  const colorScheme = Appearance.getColorScheme();
-
-  return useMemo(() => {
-    // $variables will be null if this is a top-level component
-    if ($variables === null) {
-      return colorScheme === "light" ? rootVariables : rootDarkVariables;
-    } else {
-      return colorScheme === "light"
-        ? {
-            ...$variables,
-            ...defaultVariables,
-          }
-        : {
-            ...$variables,
-            ...defaultDarkVariables,
-          };
-    }
-  }, [$variables, colorScheme]);
+function resetDefaultVariables(currentColor: "light" | "dark") {
+  if (currentColor === "light") {
+    defaultVariables.set(variables.defaultVariables);
+  } else {
+    defaultVariables.set({
+      ...variables.defaultVariables,
+      ...variables.defaultDarkVariables,
+    });
+  }
 }

@@ -149,7 +149,7 @@ Additionally these selectors have special syntax to enable their Dark Mode varia
 }
 
 /* If you have defined `darkMode: 'class'` in your tailwind.config.js` */
-:root .dark {
+.dark {
   /* ... */
 }
 .dark * {
