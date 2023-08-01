@@ -1,10 +1,10 @@
 import type { ComponentType } from "react";
-import { globalStyles } from "./shared/globals";
 import {
   BasicInteropFunction,
   JSXFunction,
   PropMapperFunction,
 } from "../types";
+import { globalStyles } from "./native/globals";
 
 export const interopMapping = new WeakMap<
   ComponentType<any>,

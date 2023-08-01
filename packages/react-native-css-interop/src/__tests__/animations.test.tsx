@@ -1,17 +1,18 @@
 import { View } from "react-native";
 import { render } from "@testing-library/react-native";
 
-import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "../testing-library";
+import {
+  createMockComponent,
+  registerCSS,
+  resetStyles,
+} from "../testing-library";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
 
 jest.useFakeTimers();
 
-beforeEach(() => {
-  StyleSheet.__reset();
-});
+beforeEach(() => resetStyles());
 
 test("basic animation", () => {
   registerCSS(`

@@ -1,15 +1,18 @@
 import { act, render } from "@testing-library/react-native";
-import { INTERNAL_SET, rem, vh, vw } from "../runtime/native/globals";
-import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "../testing-library";
 import { View } from "react-native";
+
+import { rem, vh, vw } from "../runtime/native/globals";
+import { INTERNAL_SET } from "../shared";
+import {
+  createMockComponent,
+  registerCSS,
+  resetStyles,
+} from "../testing-library";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
 
-afterEach(() => {
-  StyleSheet.__reset();
-});
+beforeEach(() => resetStyles());
 
 test("px", () => {
   registerCSS(`.my-class { width: 10px; }`);

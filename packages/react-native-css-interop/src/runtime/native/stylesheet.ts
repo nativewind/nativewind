@@ -10,6 +10,7 @@ import {
   ExtractedStyle,
   StyleProp,
   StyleMeta,
+  CommonStyleSheet,
 } from "../../types";
 import {
   animationMap,
@@ -22,6 +23,11 @@ import {
   warned,
   warnings,
 } from "./globals";
+import {
+  DarkMode,
+  DevHotReloadSubscription,
+  INTERNAL_RESET,
+} from "../../shared";
 
 const subscriptions = new Set<() => void>();
 
@@ -29,35 +35,33 @@ export const VariableContext = createContext<Record<string, unknown> | null>(
   null,
 );
 
-/**
- * This is a custom wrapper around the React Native Stylesheet.
- * It allows us to intercept the creation of styles and "tag" them wit the metadata
- */
-export const StyleSheet = Object.assign({}, RNStyleSheet, {
-  classNameMergeStrategy(c: string) {
-    return c;
-  },
-  __subscribe(subscription: () => void) {
-    subscriptions.add(subscription);
-    return () => {
-      subscriptions.delete(subscription);
-    };
-  },
-  __reset({ dimensions = Dimensions, appearance = Appearance } = {}) {
+const commonStyleSheet: CommonStyleSheet = {
+  [DarkMode]: { type: "media" },
+  [INTERNAL_RESET]({ dimensions = Dimensions, appearance = Appearance } = {}) {
     globalStyles.clear();
     animationMap.clear();
     warnings.clear();
     warned.clear();
-    rem.reset();
-    vw.reset(dimensions);
-    vh.reset(dimensions);
-    colorScheme.reset(appearance);
+    subscriptions.clear();
+    rem[INTERNAL_RESET]();
+    vw[INTERNAL_RESET](dimensions);
+    vh[INTERNAL_RESET](dimensions);
+    colorScheme[INTERNAL_RESET](appearance);
     rootVariables = {};
     rootDarkVariables = {};
     defaultVariables = {};
     defaultDarkVariables = {};
   },
-  register: (options: StyleSheetRegisterOptions) => {
+  classNameMergeStrategy(c) {
+    return c;
+  },
+  [DevHotReloadSubscription](subscription) {
+    subscriptions.add(subscription);
+    return () => {
+      subscriptions.delete(subscription);
+    };
+  },
+  register(options: StyleSheetRegisterOptions) {
     if (options.keyframes) {
       for (const [name, keyframes] of Object.entries(options.keyframes)) {
         animationMap.set(name, keyframes);
@@ -94,24 +98,20 @@ export const StyleSheet = Object.assign({}, RNStyleSheet, {
       };
     }
 
-    for (const subscription of subscriptions) {
-      subscription();
-    }
-  },
-  create: (styles: Record<string, ExtractedStyle>) => {
-    const namedStyles: Record<string, StyleProp> = {};
-
-    for (const [name, style] of Object.entries(styles)) {
-      namedStyles[name] = tagStyles(name, style);
+    if (options.colorSchemeClass) {
     }
 
     for (const subscription of subscriptions) {
       subscription();
     }
-
-    return namedStyles;
   },
-});
+  setDarkMode() {},
+  setColorScheme: colorScheme.set,
+  setRem: rem.set,
+  getRem: rem.get,
+};
+
+export const StyleSheet = Object.assign({}, commonStyleSheet, RNStyleSheet);
 
 function tagStyles(
   name: string,
@@ -207,16 +207,15 @@ let defaultVariables: Record<string, unknown> = {};
 let defaultDarkVariables: Record<string, unknown> = {};
 
 export function useVariables() {
-  let $variables = useContext(VariableContext);
+  const $variables = useContext(VariableContext);
+  const colorScheme = Appearance.getColorScheme();
 
   return useMemo(() => {
     // $variables will be null if this is a top-level component
     if ($variables === null) {
-      return Appearance.getColorScheme() === "light"
-        ? rootVariables
-        : rootDarkVariables;
+      return colorScheme === "light" ? rootVariables : rootDarkVariables;
     } else {
-      return Appearance.getColorScheme() === "light"
+      return colorScheme === "light"
         ? {
             ...$variables,
             ...defaultVariables,
@@ -226,5 +225,5 @@ export function useVariables() {
             ...defaultDarkVariables,
           };
     }
-  }, [$variables]);
+  }, [$variables, colorScheme]);
 }

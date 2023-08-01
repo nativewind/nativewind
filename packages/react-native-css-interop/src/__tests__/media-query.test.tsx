@@ -1,21 +1,22 @@
 import { act, render } from "@testing-library/react-native";
 
 import {
-  INTERNAL_SET,
   colorScheme,
   isReduceMotionEnabled,
   vw,
 } from "../runtime/native/globals";
-import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "../testing-library";
+import {
+  createMockComponent,
+  registerCSS,
+  resetStyles,
+} from "../testing-library";
+import { INTERNAL_SET } from "../shared";
 import { View } from "react-native";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
 
-beforeEach(() => {
-  StyleSheet.__reset();
-});
+beforeEach(() => resetStyles());
 
 test("color scheme", () => {
   registerCSS(`

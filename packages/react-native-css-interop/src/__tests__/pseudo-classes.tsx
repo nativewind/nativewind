@@ -1,17 +1,18 @@
 import { fireEvent, render } from "@testing-library/react-native";
-
-import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "../testing-library";
 import { TextInput } from "react-native";
+
+import {
+  createMockComponent,
+  registerCSS,
+  resetStyles,
+} from "../testing-library";
 
 const testID = "react-native-css-interop";
 
 // View's do not have a onFocus listener on iOS/Android
 const A = createMockComponent(TextInput);
 
-afterEach(() => {
-  StyleSheet.__reset();
-});
+beforeEach(() => resetStyles());
 
 test("hover", () => {
   registerCSS(`.my-class:hover { width: 10px; }`);

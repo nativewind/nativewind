@@ -1,6 +1,8 @@
 import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 
+import { darkModeAtRule } from "./dark-mode";
+
 export default function nativewindPreset() {
   const preset: Config = {
     content: [],
@@ -25,7 +27,7 @@ export default function nativewindPreset() {
         },
       },
     },
-    plugins: [platforms],
+    plugins: [platforms, darkModeAtRule],
   };
 
   return preset;

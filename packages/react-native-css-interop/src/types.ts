@@ -27,6 +27,24 @@ import {
   TranslateYTransform,
   ViewStyle,
 } from "react-native";
+import { DarkMode, DevHotReloadSubscription, INTERNAL_RESET } from "./shared";
+
+export interface ExtractRuleOptions {
+  platform?: string;
+  declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
+  keyframes: Map<string, ExtractedAnimation>;
+  style?: Partial<ExtractedStyle>;
+  grouping: RegExp[];
+  darkMode?: DarkMode;
+  rootVariables: StyleSheetRegisterOptions["rootVariables"];
+  rootDarkVariables: StyleSheetRegisterOptions["rootDarkVariables"];
+  defaultVariables: StyleSheetRegisterOptions["defaultVariables"];
+  defaultDarkVariables: StyleSheetRegisterOptions["defaultDarkVariables"];
+}
+
+declare global {
+  var window: Record<string, any>;
+}
 
 export type CssInteropPropMapping<P extends object> = {
   [K in keyof P]?: string | true;
@@ -229,6 +247,8 @@ export type StyleSheetRegisterOptions = {
   rootDarkVariables?: Record<string, ExtractedStyleValue>;
   defaultVariables?: Record<string, ExtractedStyleValue>;
   defaultDarkVariables?: Record<string, ExtractedStyleValue>;
+  colorSchemeClass?: string;
+  darkMode?: DarkMode;
 };
 
 export type Style = ViewStyle & TextStyle & ImageStyle;
@@ -295,6 +315,26 @@ export type ExtractionWarningFunctionValue = {
   property: string;
   value: any;
 };
+
+export type DarkMode =
+  | { type: "media" }
+  | { type: "class"; value: string }
+  | { type: "attribute"; value: string };
+
+export interface CommonStyleSheet {
+  [INTERNAL_RESET](options?: ResetOptions): void;
+  [DevHotReloadSubscription](subscription: () => void): () => void;
+  classNameMergeStrategy(c: string): string;
+  register(options: StyleSheetRegisterOptions): void;
+  /**
+   * Internal flag to signal if web should use a className to set Dark Mode.
+   */
+  [DarkMode]: DarkMode;
+  setColorScheme(colorScheme: "light" | "dark" | "system"): void;
+  setDarkMode(type: CommonStyleSheet[typeof DarkMode]): void;
+  setRem(value: number): void;
+  getRem(value: number): void;
+}
 
 /*
  * This is a list of all the CSS properties that can be animated

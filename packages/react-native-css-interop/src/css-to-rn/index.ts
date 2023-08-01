@@ -10,9 +10,6 @@ import {
   Rule,
   ContainerType,
   ContainerRule,
-  Selector,
-  TokenOrValue,
-  Token,
 } from "lightningcss";
 
 import { exhaustiveCheck, isRuntimeValue } from "../shared";
@@ -22,8 +19,10 @@ import {
   AnimatableCSSProperty,
   ExtractedAnimation,
   ExtractionWarning,
+  ExtractRuleOptions,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
+import { normalizeSelectors } from "./normalize-selectors";
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
@@ -31,6 +30,14 @@ export type CssToReactNativeRuntimeOptions = {
   grouping?: (string | RegExp)[];
   ignorePropertyWarningRegex?: (string | RegExp)[];
   platform?: string;
+};
+
+type CSSInteropAtRule = {
+  type: "custom";
+  value: {
+    name: string;
+    prelude: { value: { components: Array<{ value: string }> } };
+  };
 };
 
 /**
@@ -59,6 +66,7 @@ export function cssToReactNativeRuntime(
   // These will by mutated by `extractRule`
   const extractOptions: ExtractRuleOptions = {
     ...options,
+    darkMode: { type: "media" },
     grouping,
     declarations: new Map(),
     keyframes: new Map(),
@@ -80,6 +88,11 @@ export function cssToReactNativeRuntime(
         return [];
       },
     },
+    customAtRules: {
+      cssInterop: {
+        prelude: "<custom-ident>+",
+      },
+    },
   });
 
   // Convert the extracted style declarations and animations from maps to objects and return them
@@ -90,29 +103,8 @@ export function cssToReactNativeRuntime(
     rootDarkVariables: extractOptions.rootDarkVariables,
     defaultVariables: extractOptions.defaultVariables,
     defaultDarkVariables: extractOptions.defaultDarkVariables,
+    darkMode: extractOptions.darkMode,
   };
-}
-
-/**
- * Options object for extracting CSS rules from a stylesheet.
- *
- * @interface ExtractRuleOptions
- * @property {Map<string, ExtractedStyle | ExtractedStyle[]>} declarations - A map of extracted style declarations.
- * @property {Map<string, ExtractedAnimation>} keyframes - A map of extracted animation declarations.
- * @property {Partial<ExtractedStyle>} [style] - A partial style object representing the current rule. This should be built up as the tree is traversed.
- * @property {RegExp[]} [grouping] - An array of regular expressions for grouping related rules together.
- */
-interface ExtractRuleOptions {
-  platform?: string;
-  declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
-  keyframes: Map<string, ExtractedAnimation>;
-  style?: Partial<ExtractedStyle>;
-  grouping: RegExp[];
-  darkMode?: false | string;
-  rootVariables: StyleSheetRegisterOptions["rootVariables"];
-  rootDarkVariables: StyleSheetRegisterOptions["rootDarkVariables"];
-  defaultVariables: StyleSheetRegisterOptions["defaultVariables"];
-  defaultDarkVariables: StyleSheetRegisterOptions["defaultDarkVariables"];
 }
 
 /**
@@ -123,7 +115,7 @@ interface ExtractRuleOptions {
  * @param {CssToReactNativeRuntimeOptions} parseOptions - Options for parsing the CSS code, such as grouping related rules together.
  */
 function extractRule(
-  rule: Rule,
+  rule: Rule | CSSInteropAtRule,
   extractOptions: ExtractRuleOptions,
   parseOptions: CssToReactNativeRuntimeOptions,
 ) {
@@ -157,6 +149,32 @@ function extractRule(
         );
       }
       break;
+    }
+    case "custom": {
+      if (rule.value?.name !== "cssInterop") {
+        break;
+      }
+      const tokens = rule.value.prelude.value.components.map((c) => c.value);
+      extractRuleOptions(tokens, extractOptions);
+    }
+  }
+}
+
+function extractRuleOptions(
+  tokens: string[],
+  extractOptions: ExtractRuleOptions,
+) {
+  const [option, ...rest] = tokens;
+
+  switch (option) {
+    case "darkMode": {
+      if (rest[0] === "media") {
+        extractOptions.darkMode = { type: "media" };
+      } else if (rest[0] === "class") {
+        extractOptions.darkMode = { type: "class", value: rest[1] ?? "dark" };
+      } else if (rest[0] === "attribute" && rest[1]) {
+        extractOptions.darkMode = { type: "attribute", value: rest[1] };
+      }
     }
   }
 }
@@ -245,47 +263,63 @@ function extractedContainer(
  * @param declarations - The declarations object to use when adding declarations.
  */
 function setStyleForSelectorList(
-  style: ExtractedStyle,
+  extractedStyle: ExtractedStyle,
   selectorList: SelectorList,
   options: ExtractRuleOptions,
 ) {
-  const { declarations, grouping } = options;
+  const { declarations } = options;
 
-  for (const selector of selectorList) {
-    style = { ...style };
+  for (const selector of normalizeSelectors(selectorList, options)) {
+    const style = { ...extractedStyle };
 
-    if (style.variables) {
-      if (isRootVariableSelector(selector)) {
-        Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(
-          options,
-          { rootVariables: style.variables },
-        );
-        continue;
-      } else if (isRootDarkVariableSelector(selector, style, options)) {
-        Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(
-          options,
-          { rootDarkVariables: style.variables },
-        );
-        continue;
-      } else if (isDefaultVariableSelector(selector)) {
-        Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(
-          options,
-          { defaultVariables: style.variables },
-        );
-        continue;
-      } else if (isDefaultDarkVariableSelector(selector, style, options)) {
-        Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(
-          options,
-          { defaultDarkVariables: style.variables },
-        );
+    if (selector.type === "variables") {
+      if (!style.variables) {
         continue;
       }
-    }
 
-    const normalizedSelector = normalizeSelector(selector);
+      let key;
+      if (selector.darkMode) {
+        key = selector.rootVariables
+          ? "rootDarkVariables"
+          : "defaultDarkVariables";
+      } else {
+        key = selector.rootVariables ? "rootVariables" : "defaultVariables";
+      }
 
-    // This is an invalid selector
-    if (!normalizedSelector) {
+      // normalizeSelectorList will remove invalid dark mode selectors when using className
+      // But if we are using type media, then we need to check the media of the styles
+      if (
+        style.media &&
+        (!options.darkMode || options.darkMode?.type === "media")
+      ) {
+        // You can only have 1 media condition
+        if (style.media.length > 1) {
+          continue;
+        }
+
+        const media = style.media[0];
+        const condition = media.condition;
+        const isDarkMode = Boolean(
+          media.qualifier !== "not" &&
+            condition &&
+            condition.type === "feature" &&
+            condition.value.type === "plain" &&
+            condition.value.name === "prefers-color-scheme" &&
+            condition.value.value.type === "ident" &&
+            condition.value.value.value === "dark",
+        );
+
+        if (isDarkMode) {
+          key =
+            key === "rootVariables"
+              ? "rootDarkVariables"
+              : "defaultDarkVariables";
+        }
+      }
+
+      Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(options, {
+        [key]: style.variables,
+      });
       continue;
     }
 
@@ -294,24 +328,10 @@ function setStyleForSelectorList(
       groupClassName,
       pseudoClasses,
       groupPseudoClasses,
-      mapToProp,
-    } = normalizedSelector;
-
-    if (mapToProp) {
-      style.prop = mapToProp;
-    }
+      darkMode,
+    } = selector;
 
     if (groupClassName) {
-      // Check if the groupClassName are valid based on the grouping in the ExtractRuleOptions
-      const groupingValid = grouping.some((group) =>
-        group.test(groupClassName),
-      );
-
-      // If its invalid, dismiss the entire rule
-      if (!groupingValid) {
-        continue;
-      }
-
       // Add the conditions to the declarations object
       addDeclaration(
         groupClassName,
@@ -328,6 +348,21 @@ function setStyleForSelectorList(
       style.containerQuery.push({
         name: groupClassName,
         pseudoClasses: groupPseudoClasses,
+      });
+    }
+
+    if (darkMode) {
+      style.media ??= [];
+      style.media.push({
+        mediaType: "all",
+        condition: {
+          type: "feature",
+          value: {
+            type: "plain",
+            name: "prefers-color-scheme",
+            value: { type: "ident", value: "dark" },
+          },
+        },
       });
     }
 
@@ -350,101 +385,6 @@ function addDeclaration(
   } else {
     declarations.set(className, style);
   }
-}
-
-function normalizeSelector(selectors: Selector) {
-  let className: string | undefined;
-  let groupClassName: string | undefined;
-  let pseudoClasses: Record<string, true> | undefined;
-  let groupPseudoClasses: Record<string, true> | undefined;
-  let mapToProp: [string, true] | [string, string] | undefined;
-
-  let previousWasCombinator = true;
-
-  for (const selector of selectors) {
-    switch (selector.type) {
-      case "combinator":
-        previousWasCombinator = true;
-        break;
-      case "universal":
-      case "namespace":
-      case "type":
-      case "id":
-      case "pseudo-element":
-      case "nesting":
-      case "attribute":
-        previousWasCombinator = false;
-        break;
-      case "class":
-        // Selectors like .foo.bar are not valid
-        if (!previousWasCombinator) {
-          return null;
-        } else if (className) {
-          // You can only have 1 group className
-          if (groupClassName) {
-            return null;
-          } else {
-            // Move these values to the group
-            groupClassName = className;
-            groupPseudoClasses = pseudoClasses;
-            pseudoClasses = undefined;
-          }
-        }
-        className = selector.name;
-        break;
-      case "pseudo-class":
-        // There must be a class selector before a pseudo-class
-        if (!className) return null;
-        switch (selector.kind) {
-          case "hover":
-          case "active":
-          case "focus":
-            pseudoClasses ??= {};
-            pseudoClasses[selector.kind] = true;
-            break;
-          case "custom-function": {
-            if (selector.name === "rn-prop") {
-              const tokenArgs = selector.arguments
-                .filter(
-                  (token): token is Extract<TokenOrValue, { type: "token" }> =>
-                    token.type === "token",
-                )
-                .map((token) => token.value);
-
-              const identArray = tokenArgs.filter(
-                (token): token is Extract<Token, { type: "ident" }> => {
-                  return token.type === "ident";
-                },
-              );
-
-              if (identArray.length === 1) {
-                mapToProp = [identArray[0].value, true];
-              } else if (identArray.length === 2) {
-                mapToProp = [identArray[0].value, identArray[1].value];
-              } else {
-                return null;
-              }
-            }
-            break;
-          }
-        }
-        break;
-      default:
-        exhaustiveCheck(selector);
-    }
-  }
-
-  if (!className) {
-    return null;
-  }
-
-  return {
-    className,
-    pseudoClasses,
-    groupClassName,
-    groupPseudoClasses,
-    mapToProp,
-  };
 }
 
 function extractKeyFrames(
@@ -779,86 +719,4 @@ function getExtractedStyle(
 
 function kebabToCamelCase(str: string) {
   return str.replace(/-./g, (x) => x[1].toUpperCase());
-}
-
-function isRootVariableSelector(selector: Selector): boolean {
-  return (
-    selector.length === 1 &&
-    selector[0].type === "pseudo-class" &&
-    selector[0].kind === "root"
-  );
-}
-
-function isRootDarkVariableSelector(
-  selector: Selector,
-  style: ExtractedStyle,
-  { darkMode }: ExtractRuleOptions,
-): boolean {
-  if (darkMode) {
-    return (
-      selector.length === 2 &&
-      selector[0].type === "pseudo-class" &&
-      selector[0].kind === "root" &&
-      selector[1].type === "class" &&
-      selector[1].name === darkMode
-    );
-  } else if (
-    style.media &&
-    style.media.length === 1 &&
-    selector.length === 1 &&
-    selector[0].type === "pseudo-class" &&
-    selector[0].kind === "root"
-  ) {
-    const media = style.media[0];
-    const condition = media.condition;
-    return Boolean(
-      media.qualifier !== "not" &&
-        condition &&
-        condition.type === "feature" &&
-        condition.value.type === "plain" &&
-        condition.value.name === "prefers-color-scheme" &&
-        condition.value.value.type === "ident" &&
-        condition.value.value.value === "dark",
-    );
-  }
-
-  return false;
-}
-
-function isDefaultVariableSelector(selector: Selector): boolean {
-  return selector.length === 1 && selector[0].type === "universal";
-}
-
-function isDefaultDarkVariableSelector(
-  selector: Selector,
-  style: ExtractedStyle,
-  { darkMode }: ExtractRuleOptions,
-): boolean {
-  if (darkMode) {
-    return (
-      selector.length === 2 &&
-      selector[0].type === "class" &&
-      selector[0].name === darkMode &&
-      selector[1].type === "universal"
-    );
-  } else if (
-    style.media &&
-    style.media.length === 1 &&
-    selector.length === 1 &&
-    selector[0].type === "universal"
-  ) {
-    const media = style.media[0];
-    const condition = media.condition;
-    return Boolean(
-      media.qualifier !== "not" &&
-        condition &&
-        condition.type === "feature" &&
-        condition.value.type === "plain" &&
-        condition.value.name === "prefers-color-scheme" &&
-        condition.value.value.type === "ident" &&
-        condition.value.value.value === "dark",
-    );
-  }
-
-  return false;
 }

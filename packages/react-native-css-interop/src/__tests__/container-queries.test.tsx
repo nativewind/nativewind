@@ -1,15 +1,16 @@
 import { View } from "react-native";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 
-import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "../testing-library";
+import {
+  createMockComponent,
+  registerCSS,
+  resetStyles,
+} from "../testing-library";
 
 const Parent = createMockComponent(View);
 const Child = createMockComponent(View);
 
-beforeEach(() => {
-  StyleSheet.__reset();
-});
+beforeEach(() => resetStyles());
 
 describe("size", () => {
   test("width", () => {

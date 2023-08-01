@@ -1,4 +1,5 @@
 import path from "node:path";
+import postcss from "postcss";
 import type { GetTransformOptionsOpts } from "metro-config";
 import {
   withCssInterop,

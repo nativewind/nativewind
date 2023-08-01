@@ -1,12 +1,13 @@
 import { render, screen } from "@testing-library/react-native";
-
-import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "../testing-library";
 import { View } from "react-native";
 
-afterEach(() => {
-  StyleSheet.__reset();
-});
+import {
+  createMockComponent,
+  registerCSS,
+  resetStyles,
+} from "../testing-library";
+
+beforeEach(() => resetStyles());
 
 test("group", async () => {
   const A = createMockComponent(View);

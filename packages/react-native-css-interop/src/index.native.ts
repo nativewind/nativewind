@@ -1,8 +1,2 @@
-import React from "react";
-
+export * from "./exports";
 export { StyleSheet } from "./runtime/native/stylesheet";
-export { enableCSSInterop } from "./runtime/shared/enable-css-interop";
-
-export { globalStyles, styleMetaMap, warnings } from "./runtime/shared/globals";
-
-export const createElement = React.createElement;

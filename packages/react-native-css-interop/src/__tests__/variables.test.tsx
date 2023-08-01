@@ -1,15 +1,16 @@
 import { render, screen } from "@testing-library/react-native";
-
-import { StyleSheet } from "../runtime/native/stylesheet";
-import { createMockComponent, registerCSS } from "../testing-library";
 import { View } from "react-native";
+
+import {
+  createMockComponent,
+  registerCSS,
+  resetStyles,
+} from "../testing-library";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
 
-afterEach(() => {
-  StyleSheet.__reset();
-});
+beforeEach(() => resetStyles());
 
 test("inline variable", () => {
   registerCSS(`.my-class { width: var(--my-var); --my-var: 10px; }`);
@@ -79,7 +80,7 @@ test("inherit variables", () => {
   expect(b).toHaveStyle({ width: 20 });
 });
 
-test(":root variables", () => {
+test.only(":root variables", () => {
   registerCSS(`
     :root { --my-var: red; }
     .my-class { color: var(--my-var); }

@@ -21,6 +21,7 @@ import { ContainerContext, globalStyles, styleMetaMap } from "./globals";
 import { useInteractionHandlers, useInteractionSignals } from "./interaction";
 import { useComputation } from "../shared/signals";
 import { StyleSheet, VariableContext, useVariables } from "./stylesheet";
+import { DevHotReloadSubscription } from "../../shared";
 
 type CSSInteropWrapperProps = {
   __component: ComponentType<unknown>;
@@ -156,7 +157,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
    * This is because things like :root variables may have updated.
    */
   if (__DEV__) {
-    useEffect(() => StyleSheet.__subscribe(rerender), []);
+    useEffect(() => StyleSheet[DevHotReloadSubscription](rerender), []);
   }
 
   /**
