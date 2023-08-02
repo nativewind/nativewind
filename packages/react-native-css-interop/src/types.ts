@@ -184,7 +184,7 @@ export type Interaction = {
 };
 
 export type ExtractedContainer = {
-  names?: string[];
+  names?: string[] | false;
   type: ContainerType;
 };
 

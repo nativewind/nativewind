@@ -373,7 +373,6 @@ function extractValue(
             reference = 0;
           }
 
-          console.log({ multiplier, reference });
           return round(reference * multiplier);
         };
       }

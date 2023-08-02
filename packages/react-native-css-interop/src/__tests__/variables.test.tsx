@@ -6,6 +6,7 @@ import {
   registerCSS,
   resetStyles,
 } from "../testing-library";
+import { useUnstableNativeVariables } from "../runtime/native/stylesheet";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
@@ -91,4 +92,27 @@ test(":root variables", () => {
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({ color: "red" });
+});
+
+test("useUnsafeVariable", () => {
+  registerCSS(`
+    :root { --my-var: red; }
+    .my-class { color: var(--my-var); }
+  `);
+
+  let variables;
+
+  const Child = () => {
+    variables = useUnstableNativeVariables();
+    return null;
+  };
+
+  const component = render(
+    <A testID={testID} className="my-class">
+      <Child />
+    </A>,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "red" });
+  expect(variables).toEqual({ "--my-var": "red" });
 });

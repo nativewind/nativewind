@@ -14,7 +14,7 @@ import {
   PseudoClassesQuery,
   SignalLike,
 } from "../../types";
-import { colorScheme, isReduceMotionEnabled, vh, vw } from "./globals";
+import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { exhaustiveCheck } from "../../shared";
 import { Platform } from "react-native";
 
@@ -173,10 +173,14 @@ function getMediaFeatureValue(value: MediaFeatureValue) {
     return value.value;
   } else if (value.type === "length") {
     if (value.value.type === "value") {
-      if (value.value.value.unit === "px") {
-        return value.value.value.value;
-      } else {
-        return null;
+      const length = value.value.value;
+      switch (length.unit) {
+        case "px":
+          return length.value;
+        case "rem":
+          return length.value * rem.get();
+        default:
+          return null;
       }
     } else {
       return null;
@@ -209,12 +213,12 @@ function testRange(
 }
 
 function testComparison(
-  comparision: MediaFeatureComparison,
+  comparison: MediaFeatureComparison,
   ref: number | SignalLike<number>,
   value: unknown,
 ) {
   if (typeof value !== "number") return false;
-  switch (comparision) {
+  switch (comparison) {
     case "equal":
       return unwrap(ref) === value;
     case "greater-than":

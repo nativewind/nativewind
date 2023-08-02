@@ -1,5 +1,6 @@
 import { Platform, ViewStyle, ImageStyle, TextStyle, View } from "react-native";
 import { RenderOptions, render, screen } from "@testing-library/react-native";
+import tailwindcssContainerQueries from "@tailwindcss/container-queries";
 import postcss from "postcss";
 import {
   ExtractionWarning,
@@ -41,9 +42,12 @@ export async function renderTailwind<T extends { className: string }>(
       theme: {},
       ...config,
       presets: config.presets ? config.presets : [nativewindPlugin],
+      plugins: [tailwindcssContainerQueries],
       content: getClassNames(component),
     }),
   ]).process(css, { from: undefined });
+
+  // console.log(output);
 
   registerCSS(output, cssToReactNativeRuntimeOptions);
 

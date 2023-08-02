@@ -1,2 +1,5 @@
 export * from "./exports";
-export { StyleSheet } from "./runtime/web/stylesheet";
+export {
+  StyleSheet,
+  useUnstableNativeVariables,
+} from "./runtime/web/stylesheet";

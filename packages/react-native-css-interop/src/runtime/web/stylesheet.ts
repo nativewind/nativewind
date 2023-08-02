@@ -6,6 +6,8 @@ import {
   INTERNAL_RESET,
 } from "../../shared";
 
+export const useUnstableNativeVariables = () => ({});
+
 const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_RESET](_options) {
     return;

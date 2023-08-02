@@ -3,5 +3,6 @@
   "compilerOptions": {
     "declaration": true,
     "noUnusedLocals": true,
+    "removeComments": true
   }
 }

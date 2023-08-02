@@ -4,7 +4,6 @@ import {
   useContext,
   useMemo,
   useEffect,
-  useReducer,
 } from "react";
 import { View, Pressable } from "react-native";
 
@@ -23,8 +22,8 @@ import { useComputation } from "../shared/signals";
 import {
   StyleSheet,
   VariableContext,
-  defaultVariables,
-  rootVariables,
+  useNativeVariables,
+  useRerender,
 } from "./stylesheet";
 import { DevHotReloadSubscription } from "../../shared";
 
@@ -155,24 +154,7 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
   const rerender = useRerender();
   const inheritedContainers = useContext(ContainerContext);
   const interaction = useInteractionSignals();
-
-  const $variables = useContext(VariableContext);
-
-  const inheritedVariables = useComputation(
-    () => {
-      // $variables will be null if this is a top-level component
-      if ($variables === null) {
-        return rootVariables.get();
-      } else {
-        return {
-          ...$variables,
-          ...defaultVariables.get(),
-        };
-      }
-    },
-    [$variables],
-    rerender,
-  );
+  const inheritedVariables = useNativeVariables(rerender);
 
   /**
    * If the development environment is enabled, we should rerender all components if the StyleSheet updates.
@@ -222,10 +204,13 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
               transition: Boolean(meta.transition),
               requiresLayout: Boolean(meta.requiresLayout),
               variables: meta.variables,
-              containers: meta.container?.names,
               hasActive: meta.pseudoClasses?.active,
               hasHover: meta.pseudoClasses?.hover,
               hasFocus: meta.pseudoClasses?.focus,
+              containers:
+                meta.container?.names === false
+                  ? undefined
+                  : meta.container?.names,
             },
           },
         };
@@ -371,8 +356,6 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
 });
 
 /* Micro optimizations. Save these externally so they are not recreated every render  */
-const useRerender = () => useReducer(rerenderReducer, 0)[1];
-const rerenderReducer = (accumulator: number) => accumulator + 1;
 const defaultMeta: StyleMeta = { container: { names: [], type: "normal" } };
 const initialMeta: InteropMeta = {
   styledProps: {},

@@ -514,7 +514,7 @@ function getExtractedStyle(
       { property: "container" | "container-name" | "container-type" }
     >,
   ) {
-    let names: false | string[] = false;
+    let names: false | string[] = ["__default"];
     let type: ContainerType | undefined;
 
     switch (declaration.property) {
@@ -538,12 +538,15 @@ function getExtractedStyle(
         break;
     }
 
-    if (names === false) {
-      return;
-    }
+    extractedStyle.container ??= {};
 
-    if (names) {
-      extractedStyle.container ??= {};
+    if (names === false) {
+      extractedStyle.container.names = false;
+    } else if (Array.isArray(extractedStyle.container.names)) {
+      extractedStyle.container.names = [
+        ...new Set([...extractedStyle.container.names, ...names]),
+      ];
+    } else {
       extractedStyle.container.names = names;
     }
 

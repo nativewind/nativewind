@@ -3,7 +3,7 @@ import {
   StyleSheet as RNStyleSheet,
   Appearance,
 } from "react-native";
-import { createContext } from "react";
+import { createContext, useContext, useReducer } from "react";
 
 import {
   StyleSheetRegisterOptions,
@@ -28,7 +28,7 @@ import {
   DevHotReloadSubscription,
   INTERNAL_RESET,
 } from "../../shared";
-import { createSignal } from "../shared/signals";
+import { createSignal, useComputation } from "../shared/signals";
 
 const subscriptions = new Set<() => void>();
 export const rootVariables = createSignal<Record<string, unknown>>({});
@@ -36,6 +36,32 @@ export const defaultVariables = createSignal<Record<string, unknown>>({});
 export const VariableContext = createContext<Record<string, unknown> | null>(
   null,
 );
+
+export const useRerender = () => useReducer(rerenderReducer, 0)[1];
+const rerenderReducer = (accumulator: number) => accumulator + 1;
+
+export const useUnstableNativeVariables = () => {
+  return useNativeVariables(useRerender());
+};
+
+export const useNativeVariables = (rerender: () => void) => {
+  const variable = useContext(VariableContext);
+  return useComputation(
+    () => {
+      // $variables will be null if this is a top-level component
+      if (variable === null) {
+        return rootVariables.get();
+      } else {
+        return {
+          ...variable,
+          ...defaultVariables.get(),
+        };
+      }
+    },
+    [variable],
+    rerender,
+  );
+};
 
 let variables = {
   rootVariables: {} as Record<string, unknown>,
@@ -81,7 +107,7 @@ const commonStyleSheet: CommonStyleSheet = {
       }
     }
 
-    // console.log(JSON.stringify(options.declarations, null, 2));
+    console.log(JSON.stringify(options.declarations, null, 2));
 
     if (options.declarations) {
       for (const [name, styles] of Object.entries(options.declarations)) {
