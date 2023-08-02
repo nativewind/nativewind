@@ -41,11 +41,9 @@ export async function renderTailwind<T extends { className: string }>(
       theme: {},
       ...config,
       presets: config.presets ? config.presets : [nativewindPlugin],
-      content: [{ raw: component.props.className }],
+      content: getClassNames(component),
     }),
   ]).process(css, { from: undefined });
-
-  // console.log(output);
 
   registerCSS(output, cssToReactNativeRuntimeOptions);
 
@@ -60,6 +58,28 @@ type TestCase = [
     warning?: (name: string) => Map<string, ExtractionWarning[]>;
   },
 ];
+
+function getClassNames(
+  component: React.ReactElement<any>,
+): Array<{ raw: string; extension?: string }> {
+  const classNames: Array<{ raw: string; extension?: string }> = [];
+
+  if (component.props.className) {
+    classNames.push({ raw: component.props.className });
+  }
+
+  if (component.props.children) {
+    const children: React.ReactElement<any>[] = Array.isArray(
+      component.props.children,
+    )
+      ? component.props.children
+      : [component.props.children];
+
+    classNames.push(...children.flatMap((c) => getClassNames(c)));
+  }
+
+  return classNames;
+}
 
 export const style = (style: Style & Record<string, unknown>) => ({ style });
 export const invalidProperty = (...properties: string[]) => ({

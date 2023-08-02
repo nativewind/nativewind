@@ -16,6 +16,7 @@ import {
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, vh, vw } from "./globals";
 import { exhaustiveCheck } from "../../shared";
+import { Platform } from "react-native";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -146,20 +147,22 @@ function testPlainFeature(
   }
 
   switch (feature.name) {
+    case "display-mode":
+      return value === "native" || Platform.OS === value;
     case "prefers-color-scheme":
       return colorScheme.get() === value;
     case "width":
-      return testComparision("equal", ref.width, value);
+      return testComparison("equal", ref.width, value);
     case "min-width":
-      return testComparision("greater-than-equal", ref.width, value);
+      return testComparison("greater-than-equal", ref.width, value);
     case "max-width":
-      return testComparision("less-than-equal", ref.width, value);
+      return testComparison("less-than-equal", ref.width, value);
     case "height":
-      return testComparision("equal", ref.height, value);
+      return testComparison("equal", ref.height, value);
     case "min-height":
-      return testComparision("greater-than-equal", ref.height, value);
+      return testComparison("greater-than-equal", ref.height, value);
     case "max-height":
-      return testComparision("less-than-equal", ref.height, value);
+      return testComparison("less-than-equal", ref.height, value);
     default:
       return false;
   }
@@ -197,15 +200,15 @@ function testRange(
 
   switch (feature.name) {
     case "height":
-      return testComparision(feature.operator, ref.height, value);
+      return testComparison(feature.operator, ref.height, value);
     case "width":
-      return testComparision(feature.operator, ref.width, value);
+      return testComparison(feature.operator, ref.width, value);
     default:
       return false;
   }
 }
 
-function testComparision(
+function testComparison(
   comparision: MediaFeatureComparison,
   ref: number | SignalLike<number>,
   value: unknown,

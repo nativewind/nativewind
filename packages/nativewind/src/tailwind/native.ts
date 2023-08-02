@@ -51,16 +51,16 @@ const platforms = plugin(function ({ addVariant }) {
   const nativePlatforms = ["android", "ios", "windows", "macos"];
 
   for (const platform of nativePlatforms) {
-    addVariant(platform, `@media ${platform}`);
+    addVariant(platform, `@media (display-mode: ${platform})`);
   }
 
   addVariant(
     "native",
-    nativePlatforms.map((platform) => `@media ${platform}`),
+    nativePlatforms.map((platform) => `@media (display-mode: ${platform})`),
   );
 
   addVariant(
     "web",
-    nativePlatforms.map((platform) => `@media web`),
+    nativePlatforms.map((platform) => `@media (display-mode: browser)`),
   );
 });

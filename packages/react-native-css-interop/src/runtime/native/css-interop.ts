@@ -331,31 +331,11 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
     ref,
   };
 
-  let children = props.children as ComponentType<unknown>;
+  let finalComponent;
 
   // Call `jsx` directly so we can bypass the polyfill render method
-  if (interopMeta.hasInlineVariables) {
-    children = jsx(
-      VariableContext.Provider,
-      { value: variables, children },
-      "variable",
-    );
-  }
-
-  if (interopMeta.hasInlineContainers) {
-    children = jsx(
-      ContainerContext.Provider,
-      { value: containers, children },
-      "container",
-    );
-  }
-
-  if (children) {
-    props.children = Array.isArray(children) ? children : [children];
-  }
-
   if (interopMeta.animationInteropKey) {
-    return jsx(
+    finalComponent = jsx(
       require("./animations").AnimationInterop,
       {
         ...props,
@@ -368,8 +348,26 @@ const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
       interopMeta.animationInteropKey,
     );
   } else {
-    return jsx(component, props);
+    finalComponent = jsx(component, props, "react-native-css-interop");
   }
+
+  if (interopMeta.hasInlineVariables) {
+    finalComponent = jsx(
+      VariableContext.Provider,
+      { value: variables, children: [finalComponent] },
+      "variable",
+    );
+  }
+
+  if (interopMeta.hasInlineContainers) {
+    finalComponent = jsx(
+      ContainerContext.Provider,
+      { value: containers, children: [finalComponent] },
+      "container",
+    );
+  }
+
+  return finalComponent;
 });
 
 /* Micro optimizations. Save these externally so they are not recreated every render  */

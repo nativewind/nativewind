@@ -84,6 +84,21 @@ export function flattenStyle(
     styleMetaMap.set(flatStyle, flatStyleMeta);
   }
 
+  /**
+   * If any style (even ones that don't pass the condition check check)
+   * have variables, then we need to have a variable key. This is to ensure
+   * VariableProvider is always added to the render tree, even if the styles are
+   * not currently valid.
+   *
+   * This will prevent an unmount of components when styles with variables are suddenly valid
+   */
+  if (styleMeta.variables) {
+    flatStyleMeta.variables ??= {};
+  }
+
+  // TODO: We should probably do this for containers as well, but I'm not sure we even want to
+  //       support conditional containers.
+
   /*
    * START OF CONDITIONS CHECK
    *
@@ -108,6 +123,7 @@ export function flattenStyle(
   if (!testContainerQuery(styleMeta.containerQuery, options.containers)) {
     return flatStyle;
   }
+
   /*
    * END OF CONDITIONS CHECK
    */

@@ -2,7 +2,6 @@
 
 nativewind
 
-- [] Test platform selectors
 - [] Test native functions
   - [] platformSelect
   - [] platformColor
@@ -13,8 +12,6 @@ nativewind
 - [] container queries
 - [] elevation
 - [] responsive design
-- [] groups
-- [] state tests
 - [] svgs
 
 react-native-css-interop
@@ -22,6 +19,7 @@ react-native-css-interop
 - [] prop binding tests
 - [] useUnsafeVariable
 - [] nested function tests
+- [] refactor groups to be separate from container context
 
 web
 

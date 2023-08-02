@@ -220,9 +220,9 @@ A subset of the Container Query spec is also available within your CSS
 
 ### Tailwind Groups and parent state modifiers
 
-TODO
-
 https://tailwindcss.com/docs/hover-focus-and-other-states#differentiating-nested-groups
+
+Nativewind v4 now supports the `group` and `group/<name>` syntax.
 
 ### Theme Functions
 
@@ -230,7 +230,7 @@ TODO
 
 ### Nested CSS Functions
 
-Natvewind v4 now allows you to nest CSS functions to create complex rules
+Nativewind v4 now allows you to nest CSS functions to create complex rules
 
 ```css
 .text {
@@ -253,18 +253,23 @@ An upcoming minor version of Nativewind is set to support RSC in native applicat
 
 ## Experimental Features
 
-These features are part of v4, but to be considered experimental, possibly incomplete and will not follow semver. Do not expect these features to be 'stable' before the release of v4.
+Experimental features are glimpse into possible features that may be included in Nativewind. These features should be considered experimental, will not follow semver and will not be stable before the release of v4.
+
+These features will work in a limited capacity and you are welcome to test them. As they an active work-in-progress, please do not create bug reports for these features until we announce that we are ready to collect feedback.
 
 #### Animations & Transitions (experimental):
 
-Nativewind now supports Tailwind CSS animation classes along with custom key-frame animations defined in CSS.
+Nativewind add experimental support for Tailwind CSS animation & transition classes. This includes custom key-frame animations defined in CSS.
 
 The animation functionality is provided by the widely-used `react-native-reanimated` package, which integrates seamlessly with Nativewind without the need for additional configuration. Just apply an animation style, and Nativewind takes care of the rest.
 
+When using a transition you must specify all properties that can be transitioned, hence `transition-all`/`transition-property: all;`/`transition: all;` is not supported.
+
 ```jsx
+// Use an existing animation class
 <View className="animation-bounce" />
 
-// OR define a custom animation in your .css
+// Or define a custom animation in your .css
 
 @keyframes example {
   from { background-color: red; }
@@ -277,7 +282,6 @@ The animation functionality is provided by the widely-used `react-native-reanima
 }
 
 <View className="my-animation" />
-
 
 // The color will transition over 150ms when the color scheme changes
 <Text className="transition-colors text-black dark:text-white" />

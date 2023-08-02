@@ -61,7 +61,6 @@ export function useInteractionHandlers(
         signals.hover.set(false);
       },
       onFocus(event: NativeSyntheticEvent<TargetedEvent>) {
-        debugger;
         propsRef.current.onFocus?.(event);
         signals.focus.set(true);
       },

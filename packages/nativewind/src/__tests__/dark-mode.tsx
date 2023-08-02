@@ -74,7 +74,7 @@ test("darkMode: class", async () => {
   expect(component).toHaveStyle({ color: "rgba(0, 0, 0, 1)" });
 });
 
-test.only("darkMode: class variable switching", async () => {
+test("darkMode: class variable switching", async () => {
   await renderTailwind(
     <A testID={testID} className="text-[color:rgb(var(--color))]" />,
     {

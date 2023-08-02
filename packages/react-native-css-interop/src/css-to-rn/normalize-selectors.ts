@@ -26,7 +26,6 @@ export function normalizeSelectors(
   for (let selector of selectorList) {
     // Ignore `:is()`, and just process its selectors
     if (isIsPseudoClass(selector)) {
-      console.log(selector[0].selectors);
       normalizeSelectors(selector[0].selectors, options, normalizedSelectors);
       continue;
     }
@@ -129,6 +128,9 @@ export function normalizeSelectors(
               // Otherwise make the current className the group
               normalizedSelector.groupClassName = normalizedSelector.className;
               normalizedSelector.className = component.name;
+              normalizedSelector.groupPseudoClasses =
+                normalizedSelector.pseudoClasses;
+              normalizedSelector.pseudoClasses = {};
             }
           } else {
             normalizedSelector.className = component.name;
@@ -157,13 +159,13 @@ export function normalizeSelectors(
       if (!isValid) {
         break;
       }
-
-      normalizedSelectors.push(normalizedSelector);
     }
 
     if (!isValid) {
       continue;
     }
+
+    normalizedSelectors.push(normalizedSelector);
   }
 
   return normalizedSelectors;

@@ -81,6 +81,8 @@ const commonStyleSheet: CommonStyleSheet = {
       }
     }
 
+    // console.log(JSON.stringify(options.declarations, null, 2));
+
     if (options.declarations) {
       for (const [name, styles] of Object.entries(options.declarations)) {
         const taggedStyles = tagStyles(name, styles);
