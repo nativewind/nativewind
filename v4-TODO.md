@@ -2,13 +2,6 @@
 
 nativewind
 
-- [] Test native functions
-  - [] platformSelect
-  - [] platformColor
-  - [] pixelRatio
-  - [] pixelRatioSelect
-  - [] fontRatio
-  - [] fontRatioSelector
 - [] container queries
 - [] elevation
 - [] responsive design

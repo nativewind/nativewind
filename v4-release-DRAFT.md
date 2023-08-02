@@ -64,16 +64,13 @@ The `divide-` and `spacing-` utilities will be unavailable at the launch of v4 a
 
 The StyleSheet exported from Nativewind now extends `StyleSheet` from React Native and can be used a drop in replacement.
 
-### Custom Webpack support discontinued
-
-Maintenance issues led us to remove webpack support. With Expo sunsetting webpack and popular web frameworks also moving away from webpack, the userbase requiring a custom webpack configuration. If a community member want to take over support, we're open to linking to their solution in the docs.
-
 ### Miscellaneous Updates
 
-- Theme functions such as `hairlineWidth` and `platformSelect` are now exported from `nativewind/theme`, necessitating import updates.
+- Theme functions such as `hairlineWidth` and `platformSelect` are now exported from `nativewind/preset`
 - `aspect` no longer uses a polyfills and adopt native styling.
 - Nativewind no longer exports a PostCSS plugin. Use the Tailwind CLI if you wish to generate the `.css` file manually.
-- Control of `NativewindStyleSheet.setOutput()` is now determined by your Metro targeted platform.
+- `NativewindStyleSheet.setOutput()` has been removed. Output is now determined by your Metro targeted platform.
+- `border-0.5` has been renamed to `border-hairline`
 
 ## Breaking changes from v3 beta
 

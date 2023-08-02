@@ -33,6 +33,7 @@ import type {
   TokenOrValue,
   VerticalAlign,
   Transform,
+  Token,
 } from "lightningcss";
 
 import type {
@@ -1527,8 +1528,8 @@ function parseUnparsed(
         case "platformColor":
         case "getPixelSizeForLayoutSize":
         case "roundToNearestPixel":
-        case "getFontScale":
-        case "getPixelRatio":
+        case "pixelScale":
+        case "fontScale":
           return unparsedFunction(tokenOrValue, options);
         case "hairlineWidth":
           return {
@@ -1571,10 +1572,7 @@ function parseUnparsed(
           options.addValueWarning(`${tokenOrValue.value.value}%`);
           return;
         case "dimension":
-          options.addValueWarning(
-            `${tokenOrValue.value.value}${tokenOrValue.value.unit}`,
-          );
-          return;
+          return parseDimension(tokenOrValue.value, options);
         case "at-keyword":
         case "hash":
         case "id-hash":
@@ -2269,8 +2267,11 @@ function parseRNRuntimeSpecificsFunction(
 
   for (const token of args) {
     if (!key) {
-      if (token.type === "token" && token.value.type === "ident") {
-        key = token.value.value;
+      if (
+        token.type === "token" &&
+        (token.value.type === "ident" || token.value.type === "number")
+      ) {
+        key = token.value.value.toString();
         continue;
       }
     } else {
@@ -2492,6 +2493,28 @@ function parseTransform(
   }
 
   return records;
+}
+
+function parseDimension(
+  { unit, value }: Extract<Token, { type: "dimension" }>,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  switch (unit) {
+    case "px":
+      return value;
+    case "%":
+      return `${value}%`;
+    case "ch":
+    case "cw":
+      return {
+        type: "runtime",
+        name: unit,
+        arguments: [value / 100],
+      };
+    default: {
+      return options.addValueWarning(`${value}${unit}`);
+    }
+  }
 }
 
 function round(number: number) {

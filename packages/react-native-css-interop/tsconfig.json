@@ -7,6 +7,6 @@
   },
   "include": [
     "src/**/*",
-    "react-native-css-interop-env.d.ts"
+    "types.d.ts"
   ]
 }

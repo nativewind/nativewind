@@ -3,7 +3,7 @@ import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
 
-describe.only("Layout - Aspect Ratio", () => {
+describe("Layout - Aspect Ratio", () => {
   testCases(
     ["aspect-square", style({ aspectRatio: 1 })],
     // ["aspect-video", style({ aspectRatio: "16 / 9" })],

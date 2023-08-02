@@ -118,7 +118,9 @@ export function testCasesWithOptions(
   test.each(cases)("%s", async (className, expected) => {
     await renderTailwind(<A testID={testID} className={className} />, options);
 
-    const component = screen.getByTestId(testID);
+    const component = screen.getByTestId(testID, {
+      includeHiddenElements: true,
+    });
 
     if (animated) {
       expect(component).toHaveAnimatedStyle(expected.style ?? {});

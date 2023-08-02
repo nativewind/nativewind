@@ -90,8 +90,7 @@ describe("Typography - Font Variant Numeric", () => {
   );
 });
 
-// Needs the plugin to override the `em`
-describe.skip("Typography - Letter Spacing", () => {
+describe("Typography - Letter Spacing", () => {
   testCases(
     ["tracking-tighter", style({ letterSpacing: -0.5 })],
     ["tracking-tight", style({ letterSpacing: -0.25 })],

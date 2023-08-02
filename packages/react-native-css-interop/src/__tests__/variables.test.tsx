@@ -80,7 +80,7 @@ test("inherit variables", () => {
   expect(b).toHaveStyle({ width: 20 });
 });
 
-test.only(":root variables", () => {
+test(":root variables", () => {
   registerCSS(`
     :root { --my-var: red; }
     .my-class { color: var(--my-var); }

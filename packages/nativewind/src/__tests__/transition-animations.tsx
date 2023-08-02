@@ -33,7 +33,7 @@ describe("Transitions & Animation - Transition Property", () => {
   );
 });
 
-describe.only("Transitions & Animation - Transition Duration", () => {
+describe("Transitions & Animation - Transition Duration", () => {
   testCasesWithOptions(
     {
       animated: true,

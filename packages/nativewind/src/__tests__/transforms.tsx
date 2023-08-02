@@ -234,44 +234,14 @@ describe("Transforms - Translate", () => {
 });
 
 describe.skip("Transforms - Translate (%)", () => {
-  // TODO - These require the tailwind plugin
   testCasesWithOptions(
     {
-      css: "@tailwind base;@tailwind components;@tailwind utilities;",
+      base: true,
     },
     [
-      "translate-x-1/2",
+      "w-2 translate-x-1/2",
       style({
-        transform: [
-          { translateX: 0 },
-          { translateY: 0 },
-          { rotate: "0" },
-          { skewX: "0" },
-          { skewY: "0" },
-          { scaleX: 1 },
-          { scaleY: 1 },
-        ],
-      }),
-    ],
-    [
-      "translate-y-1/2",
-
-      style({
-        transform: [
-          { translateX: 0 },
-          { translateY: 3.5 },
-          { rotate: "0" },
-          { skewX: "0" },
-          { skewY: "0" },
-          { scaleX: 1 },
-          { scaleY: 1 },
-        ],
-      }),
-    ],
-    [
-      "translate-x-full",
-
-      style({
+        width: 7,
         transform: [
           { translateX: 3.5 },
           { translateY: 0 },
@@ -283,21 +253,50 @@ describe.skip("Transforms - Translate (%)", () => {
         ],
       }),
     ],
-    [
-      "translate-y-full",
+    // [
+    //   "translate-y-1/2",
+    //   style({
+    //     transform: [
+    //       { translateX: 0 },
+    //       { translateY: 3.5 },
+    //       { rotate: "0" },
+    //       { skewX: "0" },
+    //       { skewY: "0" },
+    //       { scaleX: 1 },
+    //       { scaleY: 1 },
+    //     ],
+    //   }),
+    // ],
+    // [
+    //   "translate-x-full",
 
-      style({
-        transform: [
-          { translateX: 0 },
-          { translateY: 3.5 },
-          { rotate: "0" },
-          { skewX: "0" },
-          { skewY: "0" },
-          { scaleX: 1 },
-          { scaleY: 1 },
-        ],
-      }),
-    ],
+    //   style({
+    //     transform: [
+    //       { translateX: 3.5 },
+    //       { translateY: 0 },
+    //       { rotate: "0" },
+    //       { skewX: "0" },
+    //       { skewY: "0" },
+    //       { scaleX: 1 },
+    //       { scaleY: 1 },
+    //     ],
+    //   }),
+    // ],
+    // [
+    //   "translate-y-full",
+
+    //   style({
+    //     transform: [
+    //       { translateX: 0 },
+    //       { translateY: 3.5 },
+    //       { rotate: "0" },
+    //       { skewX: "0" },
+    //       { skewY: "0" },
+    //       { scaleX: 1 },
+    //       { scaleY: 1 },
+    //     ],
+    //   }),
+    // ],
   );
 });
 

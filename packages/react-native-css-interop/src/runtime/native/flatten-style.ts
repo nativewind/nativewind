@@ -1,4 +1,5 @@
 import {
+  PixelRatio,
   Platform,
   PlatformColor,
   StyleSheet,
@@ -300,6 +301,7 @@ function extractValue(
         const name = value.arguments[0] as string;
         const resolvedValue =
           flatStyleMeta.variables?.[name] ?? options.variables[name];
+
         return typeof resolvedValue === "function"
           ? resolvedValue()
           : resolvedValue;
@@ -371,6 +373,7 @@ function extractValue(
             reference = 0;
           }
 
+          console.log({ multiplier, reference });
           return round(reference * multiplier);
         };
       }
@@ -383,7 +386,6 @@ function extractValue(
     case "scale": {
       return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
         wrap: false,
-        parseFloat: true,
       });
     }
     case "rotate":
@@ -394,16 +396,60 @@ function extractValue(
     case "skewY": {
       return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
         wrap: false,
+        parseFloat: false,
       });
     }
     case "hairlineWidth": {
       return StyleSheet.hairlineWidth;
     }
+
     case "platformSelect": {
       return createRuntimeFunction(
         {
           ...value,
           arguments: [Platform.select(value.arguments[0])],
+        },
+        flatStyle,
+        flatStyleMeta,
+        options,
+        {
+          wrap: false,
+        },
+      );
+    }
+    case "fontScaleSelect": {
+      const specifics = value.arguments[0];
+      const pixelRatio = PixelRatio.getFontScale();
+      const match =
+        specifics[pixelRatio] ?? specifics["native"] ?? specifics["default"];
+
+      if (match === undefined) return;
+
+      return createRuntimeFunction(
+        {
+          ...value,
+          arguments: [match],
+        },
+        flatStyle,
+        flatStyleMeta,
+        options,
+        {
+          wrap: false,
+        },
+      );
+    }
+    case "pixelScaleSelect": {
+      const specifics = value.arguments[0];
+      const pixelRatio = PixelRatio.get();
+      const match =
+        specifics[pixelRatio] ?? specifics["native"] ?? specifics["default"];
+
+      if (match === undefined) return;
+
+      return createRuntimeFunction(
+        {
+          ...value,
+          arguments: [match],
         },
         flatStyle,
         flatStyleMeta,
@@ -420,6 +466,39 @@ function extractValue(
         callback: PlatformColor,
         spreadCallbackArgs: true,
       });
+    }
+    case "pixelScale": {
+      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
+        wrap: false,
+        callback: (value: number) => PixelRatio.get() * value,
+      });
+    }
+    case "fontScale": {
+      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
+        wrap: false,
+        callback: (value: number) => PixelRatio.getFontScale() * value,
+      });
+    }
+    case "getPixelSizeForLayoutSize": {
+      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
+        wrap: false,
+        callback: (value: number) =>
+          PixelRatio.getPixelSizeForLayoutSize(value),
+      });
+    }
+    case "roundToNearestPixel": {
+      return createRuntimeFunction(
+        {
+          ...value,
+          arguments: [PixelRatio.roundToNearestPixel(value.arguments[0])],
+        },
+        flatStyle,
+        flatStyleMeta,
+        options,
+        {
+          wrap: false,
+        },
+      );
     }
     case "rgb": {
       return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
@@ -458,7 +537,7 @@ function createRuntimeFunction(
   options: FlattenStyleOptions,
   {
     wrap = true,
-    parseFloat: shouldParseFloat = false,
+    parseFloat: shouldParseFloat = true,
     joinArgs: joinArguments = true,
     spreadCallbackArgs: spreadCallbackArguments = false,
     callback,
@@ -498,7 +577,14 @@ function createRuntimeFunction(
     }
 
     let result = wrap ? `${value.name}(${$args})` : $args;
-    result = shouldParseFloat ? parseFloat(result) : result;
+
+    if (shouldParseFloat) {
+      const float = Number.parseFloat(result);
+
+      if (!Number.isNaN(float) && float.toString() === result) {
+        result = float;
+      }
+    }
 
     if (callback) {
       if (spreadCallbackArguments && Array.isArray(result)) {
