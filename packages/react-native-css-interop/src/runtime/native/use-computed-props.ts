@@ -1,14 +1,20 @@
 import {
+  GestureResponderEvent,
+  LayoutChangeEvent,
+  NativeSyntheticEvent,
   PixelRatio,
   Platform,
   PlatformColor,
   StyleSheet,
+  TargetedEvent,
   TransformsStyle,
 } from "react-native";
 import { isRuntimeValue } from "../../shared";
 import {
   ContainerRuntime,
   Interaction,
+  InteropFunctionOptions,
+  InteropMeta,
   RuntimeValue,
   Style,
   StyleMeta,
@@ -19,27 +25,231 @@ import {
   testMediaQuery,
   testPseudoClasses,
 } from "./conditions";
-import { rem, styleMetaMap, vh, vw } from "./globals";
+import { ContainerContext, rem, styleMetaMap, vh, vw } from "./globals";
+import { createSignal, useComputation } from "./signals";
+import { useContext, useMemo, useRef } from "react";
+import { VariableContext, defaultVariables, rootVariables } from "./stylesheet";
 
-export interface FlattenStyleOptions {
+type UseComputedPropsOptions = InteropFunctionOptions<Record<string, unknown>>;
+
+/**
+ * Create a computation that will flatten the className and generate a interopMeta
+ * Any signals read while the computation is running will be subscribed to.
+ *
+ * useComputation handles the reactivity/memoization
+ * flattenStyle handles converting the classNames collecting the metadata
+ */
+export function useComputedProps<P extends Record<string, StyleProp>>(
+  $props: P,
+  options: UseComputedPropsOptions,
+  rerender: () => void,
+) {
+  const propsRef = useRef<Record<string, any>>($props);
+  propsRef.current = $props;
+
+  const inheritedContainers = useContext(ContainerContext);
+  const inheritedVariables = useContext(VariableContext);
+
+  const computedVariables = useComputation(
+    () => {
+      // $variables will be null if this is a top-level component
+      if (inheritedVariables === null) {
+        return rootVariables.get();
+      } else {
+        return {
+          ...inheritedVariables,
+          ...defaultVariables.get(),
+        };
+      }
+    },
+    [inheritedVariables],
+    rerender,
+  );
+
+  const interaction = useMemo<Interaction>(
+    () => ({
+      active: createSignal(false),
+      hover: createSignal(false),
+      focus: createSignal(false),
+      layout: {
+        width: createSignal<number>(0),
+        height: createSignal<number>(0),
+      },
+    }),
+    [],
+  );
+
+  return useComputation(
+    () => {
+      const props: Record<string, any> = { ...propsRef.current };
+      const variables = { ...computedVariables };
+      const containers: Record<string, ContainerRuntime> = {};
+      const animatedProps = new Set<string>();
+      const transitionProps = new Set<string>();
+
+      let hasInlineVariables = false;
+      let hasInlineContainers = false;
+      let requiresLayout = false;
+      let hasActive: boolean | undefined = false;
+      let hasHover: boolean | undefined = false;
+      let hasFocus: boolean | undefined = false;
+
+      for (const [key, config] of options.configMap) {
+        if (config === false) {
+          continue;
+        }
+
+        const flatStyle = flattenStyle($props[key], {
+          ...options,
+          interaction,
+          variables: computedVariables,
+          containers: inheritedContainers,
+        });
+
+        const meta = styleMetaMap.get(flatStyle);
+
+        if (meta) {
+          if (meta.variables) {
+            Object.assign(variables, meta.variables);
+            hasInlineVariables = true;
+          }
+
+          if (meta.container?.names) {
+            hasInlineContainers = true;
+            const runtime: ContainerRuntime = {
+              type: "normal",
+              interaction,
+              style: flatStyle,
+            };
+
+            containers.__default = runtime;
+            for (const name of meta.container.names) {
+              containers[name] = runtime;
+            }
+          }
+
+          if (meta.animations) animatedProps.add(key);
+          if (meta.transition) transitionProps.add(key);
+
+          requiresLayout ||= Boolean(
+            hasInlineContainers || meta.requiresLayout,
+          );
+          hasActive ||= Boolean(
+            hasInlineContainers || meta.pseudoClasses?.active,
+          );
+          hasHover ||= Boolean(
+            hasInlineContainers || meta.pseudoClasses?.hover,
+          );
+          hasFocus ||= Boolean(
+            hasInlineContainers || meta.pseudoClasses?.focus,
+          );
+        }
+
+        if (
+          config === true ||
+          typeof config === "string" ||
+          config?.nativeStyleToProp === undefined
+        ) {
+          props[key] = flatStyle;
+        } else {
+          for (const [styleKey, targetProp] of Object.entries(
+            config.nativeStyleToProp,
+          ) as [keyof Style, boolean | keyof P][]) {
+            if (targetProp === true && flatStyle[styleKey]) {
+              props[styleKey] = flatStyle[styleKey];
+              delete flatStyle[styleKey];
+            }
+
+            if (config.target) {
+              if (config.target === true) {
+                props[key] = flatStyle;
+              } else {
+                props[config.target] = flatStyle;
+              }
+            }
+          }
+        }
+      }
+
+      let animationInteropKey: string | undefined;
+      if (animatedProps.size > 0 || transitionProps.size > 0) {
+        animationInteropKey = [...animatedProps, ...transitionProps].join(":");
+      }
+
+      if (requiresLayout) {
+        props.onLayout = (event: LayoutChangeEvent) => {
+          propsRef.current.onLayout?.(event);
+          interaction.layout.width.set(event.nativeEvent.layout.width);
+          interaction.layout.height.set(event.nativeEvent.layout.height);
+        };
+      }
+
+      let convertToPressable = false;
+      if (hasActive) {
+        convertToPressable = true;
+        props.onPressIn = (event: GestureResponderEvent) => {
+          propsRef.current.onPressIn?.(event);
+          interaction.active.set(true);
+        };
+        props.onPressOut = (event: GestureResponderEvent) => {
+          propsRef.current.onPressOut?.(event);
+          interaction.active.set(false);
+        };
+      }
+      if (hasHover) {
+        convertToPressable = true;
+        props.onHoverIn = (event: MouseEvent) => {
+          propsRef.current.onHoverIn?.(event);
+          interaction.hover.set(true);
+        };
+        props.onHoverOut = (event: MouseEvent) => {
+          propsRef.current.onHoverIn?.(event);
+          interaction.hover.set(false);
+        };
+      }
+      if (hasFocus) {
+        convertToPressable = true;
+        props.onFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
+          propsRef.current.onFocus?.(event);
+          interaction.focus.set(true);
+        };
+        props.onBlur = (event: NativeSyntheticEvent<TargetedEvent>) => {
+          propsRef.current.onBlur?.(event);
+          interaction.focus.set(false);
+        };
+      }
+
+      const meta: InteropMeta = {
+        animatedProps,
+        animationInteropKey,
+        containers,
+        convertToPressable,
+        hasInlineContainers,
+        hasInlineVariables,
+        inheritedContainers,
+        interaction,
+        transitionProps,
+        variables,
+        requiresLayout,
+      };
+
+      return {
+        props,
+        meta,
+      };
+    },
+    [computedVariables, inheritedContainers, ...options.dependencies],
+    rerender,
+  );
+}
+
+type FlattenStyleOptions = {
   variables: Record<string, unknown>;
-  interaction?: Interaction;
-  containers?: Record<string, ContainerRuntime>;
+  containers: Record<string, ContainerRuntime>;
+  interaction: Interaction;
   ch?: number;
   cw?: number;
-}
-
-export function flattenStyleProps(
-  props: Record<string, StyleProp>,
-  options: FlattenStyleOptions,
-  flatProps: Map<string, Style> = new Map(),
-): Map<string, Style> {
-  for (const [key, value] of Object.entries(props)) {
-    flatProps.set(key, flattenStyle(value, options));
-  }
-
-  return flatProps;
-}
+};
 
 /**
  * Reduce a StyleProp to a flat Style object.
@@ -279,7 +489,7 @@ export function flattenStyle(
  * @param options - Options for flattening the StyleProp.
  * @returns The extracted value.
  */
-function extractValue(
+function extractValue<T>(
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,

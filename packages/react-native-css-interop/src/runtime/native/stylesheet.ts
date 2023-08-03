@@ -28,7 +28,7 @@ import {
   DevHotReloadSubscription,
   INTERNAL_RESET,
 } from "../../shared";
-import { createSignal, useComputation } from "../shared/signals";
+import { createSignal, useComputation } from "./signals";
 
 const subscriptions = new Set<() => void>();
 export const rootVariables = createSignal<Record<string, unknown>>({});
@@ -45,20 +45,20 @@ export const useUnstableNativeVariables = () => {
 };
 
 export const useNativeVariables = (rerender: () => void) => {
-  const variable = useContext(VariableContext);
+  const variables = useContext(VariableContext);
   return useComputation(
     () => {
       // $variables will be null if this is a top-level component
-      if (variable === null) {
+      if (variables === null) {
         return rootVariables.get();
       } else {
         return {
-          ...variable,
+          ...variables,
           ...defaultVariables.get(),
         };
       }
     },
-    [variable],
+    [variables],
     rerender,
   );
 };
@@ -107,7 +107,7 @@ const commonStyleSheet: CommonStyleSheet = {
       }
     }
 
-    console.log(JSON.stringify(options.declarations, null, 2));
+    // console.log(JSON.stringify(options.declarations, null, 2));
 
     if (options.declarations) {
       for (const [name, styles] of Object.entries(options.declarations)) {

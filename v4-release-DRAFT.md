@@ -382,12 +382,22 @@ const StyledComponent = bindProps(MyComponent, {
 Nativewind automatically enables the interop for the following components:
 
 ```jsx
-enableCSSInterop(ActivityIndicator, { className: "style" });
 enableCSSInterop(Image, { className: "style" });
 enableCSSInterop(Pressable, { className: "style" });
 enableCSSInterop(Text, { className: "style" });
 enableCSSInterop(View, { className: "style" });
-enableCSSInterop(StatusBar, { barClassName: "barStyle" });
+enableCSSInterop(ActivityIndicator, {
+  className: {
+    target: "style"
+    nativeStyleToProp: { color: true }
+  }
+});
+enableCSSInterop(StatusBar, {
+  className: {
+    target: false
+    nativeStyleToProp: { backgroundColor: true }
+  }
+});
 ```
 
 > **Warning: Before using `enableCSSInterop`, carefully consider its potential performance impact. If an animation class is involved, the whole component will be animated.**

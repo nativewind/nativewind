@@ -12,23 +12,43 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
-import { createSignal } from "../shared/signals";
+import { createSignal } from "./signals";
 import { INTERNAL_RESET, INTERNAL_SET } from "../../shared";
 
+export const animationMap = new Map<string, ExtractedAnimation>();
+export const globalStyles = new Map<string, StyleProp>();
+export const opaqueStyles = new WeakMap<object, StyleProp>();
 export const styleMetaMap = new WeakMap<
   NonNullable<StyleProp> | NonNullable<StyleProp>[],
   StyleMeta
 >();
-export const animationMap = new Map<string, ExtractedAnimation>();
 
-export const globalStyles = new Map<string, StyleProp>();
-export function getGlobalStyle(name: string) {
-  if (warnings.has(name) && !warned.has(name)) {
-    warned.add(name);
-    console.log(warnings.get(name));
+export function getGlobalStyle(style?: string | object) {
+  if (!style) return;
+  if (typeof style === "string") {
+    if (warnings.has(style) && !warned.has(style)) {
+      warned.add(style);
+      if (process.env.NODE_ENV === "development") {
+        console.log(warnings.get(style));
+      }
+    }
+
+    return globalStyles.get(style);
+  } else {
+    return opaqueStyles.get(style) ?? style;
   }
+}
 
-  return globalStyles.get(name);
+export class OpaqueStyleToken {}
+
+export function getOpaqueStyle(name?: string | object) {
+  const style = getGlobalStyle(name);
+
+  if (!style) return;
+
+  const opaqueStyle = Object.freeze(new OpaqueStyleToken());
+  opaqueStyles.set(opaqueStyle, style);
+  return opaqueStyle;
 }
 
 export const warnings = new Map<string, ExtractionWarning[]>();

@@ -1,87 +1,30 @@
 import type { ComponentType } from "react";
-import {
-  BasicInteropFunction,
-  JSXFunction,
-  PropMapperFunction,
-} from "../types";
-import { globalStyles } from "./native/globals";
+import type { BasicInteropFunction, JSXFunction } from "../types";
 
-export const interopMapping = new WeakMap<
+export const interopFunctions = new WeakMap<
   ComponentType<any>,
   BasicInteropFunction
 >();
 
-export const propMapping = new WeakMap<
-  ComponentType<any>,
-  PropMapperFunction
->();
-
-export function render(
-  jsx: JSXFunction,
+export function render<P>(
+  jsx: JSXFunction<P>,
   type: any,
-  props: Record<string | number, unknown>,
+  props: P,
   key?: string,
-  propMapper = propMapping.get(type),
-  cssInterop = interopMapping.get(type),
+  cssInterop?: BasicInteropFunction,
 ) {
   if (
     __DEV__ &&
-    typeof type === "function" &&
-    "react-native-css-interop-jsx-pragma-check" in type
+    typeof type === "string" &&
+    type === "react-native-css-interop-jsx-pragma-check"
   ) {
     return true;
   }
 
-  if (propMapper) {
-    props = propMapper(props);
+  if (typeof type === "string") {
+    return jsx(type, props, key);
   }
 
+  cssInterop ??= interopFunctions.get(type);
   return cssInterop ? cssInterop(jsx, type, props, key) : jsx(type, props, key);
-}
-
-export function createPropMapper(
-  mapping: Record<string | number, string | undefined | true>,
-) {
-  const entries = Object.entries(mapping);
-
-  return ({ ...props }: Record<string | number, unknown>) => {
-    for (const [alias, propOrBoolean] of entries) {
-      const className = props[alias];
-
-      if (!propOrBoolean || !className || typeof className !== "string") {
-        continue;
-      }
-
-      const targetProp = propOrBoolean === true ? alias : propOrBoolean;
-
-      // Split className string into an array of class names, then map each class
-      // name to its corresponding global style object, if one exists.
-      const newStyles = className
-        .split(/\s+/)
-        .map((s) => globalStyles.get(s))
-        .filter(Boolean);
-
-      if (newStyles.length > 0) {
-        const existingStyles = props[targetProp];
-
-        let newProp = Array.isArray(existingStyles)
-          ? [...newStyles, ...existingStyles]
-          : existingStyles
-          ? [...newStyles, existingStyles]
-          : newStyles;
-
-        // If there is only one style in the resulting array, replace the array with that single style.
-        if (Array.isArray(newProp) && newProp.length <= 1) {
-          newProp = newProp[0];
-        }
-
-        props[targetProp] = newProp;
-        if (targetProp !== alias) {
-          delete props[alias];
-        }
-      }
-    }
-
-    return props;
-  };
 }

@@ -37,7 +37,7 @@ interface Computation<T = unknown> {
    * TODO: Is this needed?
    */
   snapshot(): T;
-  /** The subscriptions dependancies */
+  /** The subscriptions dependencies */
   dependencies: Set<Set<Computation | (() => void)>>;
   /** Manually subscribe to the computation outside of a context */
   subscribe(callback: () => void): () => void;

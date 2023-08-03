@@ -1,6 +1,6 @@
 import { AnimationIterationCount, AnimationName, Time } from "lightningcss";
 import { ComponentType, useMemo, forwardRef, useState, useEffect } from "react";
-import {
+import Animated, {
   AnimatableValue,
   SharedValue,
   useAnimatedStyle,
@@ -12,23 +12,27 @@ import {
 
 import {
   AnimatableCSSProperty,
-  ContainerRuntime,
   ExtractedAnimation,
-  Interaction,
   InteropMeta,
   Style,
 } from "../../types";
-import { createAnimatedComponent } from "./animated-component";
-import { flattenStyle } from "./flatten-style";
+import { flattenStyle } from "./use-computed-props";
 import { animationMap, styleMetaMap } from "./globals";
+import { Pressable, Text, View } from "react-native";
 
 type AnimationInteropProps = Record<string, unknown> & {
   __component: ComponentType<any>;
-  __interaction: Interaction;
-  __variables: Record<string, unknown>;
-  __containers: Record<string, ContainerRuntime>;
-  __interopMeta: InteropMeta;
+  __meta: InteropMeta;
 };
+
+const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>([
+  [View, Animated.View],
+  [Animated.View, Animated.View],
+  [Text, Animated.Text],
+  [Animated.Text, Animated.Text],
+  [Text, Animated.Text],
+  [Pressable, Animated.createAnimatedComponent(Pressable)],
+]);
 
 /**
  * TODO: We could probably half the amount of code if this was rewritten to use useAnimatedProps
@@ -39,30 +43,21 @@ type AnimationInteropProps = Record<string, unknown> & {
  * If they do change, the key for this component will be regenerated forcing a remount (a reset of hooks)
  */
 export const AnimationInterop = forwardRef(function Animated(
-  {
-    __component: Component,
-    __propEntries,
-    __interaction: interaction,
-    __variables,
-    __containers,
-    __interopMeta: interopMeta,
-    ...props
-  }: AnimationInteropProps,
+  { __component: Component, __meta: meta, ...props }: AnimationInteropProps,
   ref: unknown,
 ) {
   Component = createAnimatedComponent(Component);
 
-  const isLayoutReady = useIsLayoutReady(interopMeta, interaction);
+  const isLayoutReady = useIsLayoutReady(meta);
 
   for (const prop of new Set([
-    ...interopMeta.transitionProps,
-    ...interopMeta.animatedProps,
+    ...meta.transitionProps,
+    ...meta.animatedProps,
   ])) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     props[prop] = useAnimationAndTransitions(
       props[prop] as Record<string, AnimatableValue>,
-      __variables,
-      interaction,
+      meta,
       isLayoutReady,
     );
   }
@@ -73,9 +68,9 @@ export const AnimationInterop = forwardRef(function Animated(
 /**
  * Returns if the component layout is calculated. If layout is not required, this will always return true
  */
-function useIsLayoutReady(interopMeta: InteropMeta, interaction: Interaction) {
+function useIsLayoutReady({ requiresLayout, interaction }: InteropMeta) {
   const [layoutReady, setLayoutReady] = useState(
-    interopMeta.requiresLayout ? interaction.layout.width.get() !== 0 : true,
+    requiresLayout ? interaction.layout.width.get() !== 0 : true,
   );
 
   useEffect(() => {
@@ -102,8 +97,7 @@ type TimingFrameProperties = {
 
 function useAnimationAndTransitions(
   style: Record<string, AnimatableValue>,
-  variables: Record<string, unknown>,
-  interaction: Interaction,
+  meta: InteropMeta,
   isLayoutReady: boolean,
 ) {
   const {
@@ -129,13 +123,11 @@ function useAnimationAndTransitions(
     animationDurations,
     animationIterationCounts,
     style,
-    variables,
-    interaction,
+    meta,
     isLayoutReady,
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    const transformProps = new Set(Object.keys(defaultTransform));
     const result: Record<string, unknown> = { ...style };
 
     if (style.fontWeight) {
@@ -155,7 +147,7 @@ function useAnimationAndTransitions(
         const value = values[index].value;
 
         if (value !== undefined) {
-          if (transformProps.has(prop)) {
+          if (transformAttributes.has(prop)) {
             result.transform ??= [];
             (result.transform as any[]).push({ [prop]: value });
           } else {
@@ -196,8 +188,8 @@ function useTransitions(
     if (prop === "transform") {
       const valueObj = Object.assign({}, ...((value || []) as any[]));
 
-      for (const tProp of transformProps) {
-        const tValue = valueObj[tProp] ?? defaultTransform[tProp];
+      for (const tProp of transformAttributes) {
+        const tValue = valueObj[tProp] ?? defaultTransformValues[tProp];
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const sharedValue = useSharedValue(tValue);
         transitionProps.push(tProp);
@@ -221,8 +213,7 @@ function useAnimations(
   animationDurations: Time[],
   animationIterationCounts: AnimationIterationCount[],
   style: Record<string, unknown>,
-  variables: Record<string, unknown>,
-  interaction: Interaction,
+  { variables, inheritedContainers: containers, interaction }: InteropMeta,
   isLayoutReady: boolean,
 ) {
   const animations = useMemo(() => {
@@ -253,6 +244,7 @@ function useAnimations(
         const flatStyle = flattenStyle($style, {
           variables,
           interaction,
+          containers,
           ch: typeof style.height === "number" ? style.height : undefined,
           cw: typeof style.width === "number" ? style.width : undefined,
         });
@@ -261,7 +253,7 @@ function useAnimations(
         for (let [prop, value] of Object.entries(flatStyle)) {
           if (prop === "transform") {
             if (value.length === 0) {
-              value = defaultTransformEntries;
+              value = defaultTransformStyle;
             }
             for (const transformValue of value) {
               const [[$prop, $value]] = Object.entries(transformValue);
@@ -353,14 +345,14 @@ function getInitialValue(
   style: Style,
 ): AnimatableValue {
   if (frame.value === PLACEHOLDER) {
-    if (transformProps.has(prop)) {
+    if (transformAttributes.has(prop)) {
       const initialTransform = style.transform?.find((t) => {
         return t[prop as keyof typeof t] !== undefined;
       });
 
       return initialTransform
         ? initialTransform[prop as keyof typeof initialTransform]
-        : defaultTransform[prop];
+        : defaultTransformValues[prop];
     } else {
       return style[prop as keyof Style] as AnimatableValue;
     }
@@ -434,23 +426,51 @@ export const defaultValues: {
   top: 0,
   zIndex: 0,
 };
-export const defaultTransform: Record<string, AnimatableValue> = {
-  perspective: 1,
-  translateX: 0,
-  translateY: 0,
-  scaleX: 1,
-  scaleY: 1,
-  rotate: "0deg",
-  rotateX: "0deg",
-  rotateY: "0deg",
-  rotateZ: "0deg",
-  skewX: "0deg",
-  skewY: "0deg",
-  scale: 1,
-};
-export const transformProps = new Set(Object.keys(defaultTransform));
-export const defaultTransformEntries = Object.entries(defaultTransform).map(
-  ([key, value]) => ({
-    [key]: value,
-  }),
+
+const defaultTransformStyle = [
+  { perspective: 1 },
+  { translateX: 0 },
+  { translateY: 0 },
+  { scaleX: 1 },
+  { scaleY: 1 },
+  { rotate: "0deg" },
+  { rotateX: "0deg" },
+  { rotateY: "0deg" },
+  { rotateZ: "0deg" },
+  { skewX: "0deg" },
+  { skewY: "0deg" },
+  { scale: 1 },
+];
+const defaultTransformValues = Object.fromEntries(
+  defaultTransformStyle.flatMap((style) => Object.entries(style)),
 );
+const transformAttributes = new Set(Object.keys(defaultTransformValues));
+
+export function createAnimatedComponent(
+  Component: ComponentType<any>,
+): ComponentType<any> {
+  if (animatedCache.has(Component)) {
+    return animatedCache.get(Component)!;
+  } else if (Component.displayName?.startsWith("AnimatedComponent")) {
+    return Component;
+  }
+
+  if (
+    !(
+      typeof Component !== "function" ||
+      (Component.prototype && Component.prototype.isReactComponent)
+    )
+  ) {
+    throw new Error(
+      `Looks like you're passing an animation style to a function component \`${Component.name}\`. Please wrap your function component with \`React.forwardRef()\` or use a class component instead.`,
+    );
+  }
+
+  const AnimatedComponent = Animated.createAnimatedComponent(
+    Component as React.ComponentClass,
+  );
+
+  animatedCache.set(Component, AnimatedComponent);
+
+  return AnimatedComponent;
+}

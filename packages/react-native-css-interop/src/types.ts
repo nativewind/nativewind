@@ -28,6 +28,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { DarkMode, DevHotReloadSubscription, INTERNAL_RESET } from "./shared";
+import { ComponentType } from "react";
 
 export interface ExtractRuleOptions {
   platform?: string;
@@ -45,42 +46,56 @@ declare global {
   var window: Record<string, any>;
 }
 
-export type CssInteropPropMapping<P extends object> = {
-  [K in keyof P]?: string | true;
+export type EnableCssInteropOptions<P> = {
+  [K in string]?: CSSInteropClassNamePropConfig<P>;
 };
 
-export type NativeStyleToPropMapping<P extends object> = {
+export type CSSInteropClassNamePropConfig<P> =
+  | undefined
+  | (keyof P & string)
+  | boolean
+  | {
+      target: (keyof P & string) | boolean;
+      nativeStyleToProp: NativeStyleToProp<P>;
+    };
+
+export type NativeStyleToProp<P> = {
   [K in keyof Style & string]?: K extends keyof P ? keyof P | true : keyof P;
 };
 
-export type CssInteropProps<M> = {
-  [K in keyof M]?: M[K] extends string ? M[K] : M[K] extends true ? K : never;
+export type RemapClassNamePropsOptions<P> = {
+  [K in string]?: (keyof P & string) | true | undefined;
 };
 
-export type JSXFunction = (
-  type: any,
-  props: Record<string | number, unknown>,
-  key?: string,
-) => any;
+export type ComponentTypeWithMapping<P, M> = ComponentType<
+  P & { [K in keyof M]?: string }
+>;
 
-export type BasicInteropFunction = (
-  jsx: JSXFunction,
+export type JSXFunction<P> = (type: any, props: P, key?: string) => any;
+
+export type BasicInteropFunction = <P>(
+  jsx: JSXFunction<P>,
   type: any,
-  props: Record<string | number, unknown>,
+  props: P,
   key: string | undefined,
 ) => any;
 
-export type InteropFunction = (
-  jsx: JSXFunction,
+export type InteropFunction = <P>(
+  jsx: JSXFunction<P>,
   type: any,
-  props: Record<string | number, unknown>,
+  props: P,
   key: string | undefined,
-  styledProps: string[],
+  options: InteropFunctionOptions<P>,
 ) => any;
 
-export type PropMapperFunction = (
-  props: Record<string | number, unknown>,
-) => Record<string | number, unknown>;
+export type InteropFunctionOptions<P> = {
+  remappedProps: P;
+  configMap: Map<keyof P & string, CSSInteropClassNamePropConfig<P>>;
+  dependencies: unknown[];
+  hasMeta: boolean;
+};
+
+export type PropMapperFunction = <P>(props: P) => P;
 
 export type RuntimeValue = {
   type: "runtime";
@@ -107,35 +122,6 @@ export type ExtractedStyle = {
   transition?: ExtractedTransition;
   requiresLayout?: boolean;
   warnings?: ExtractionWarning[];
-};
-
-export type InteropMeta = {
-  /* The processed styled props */
-  styledProps: Record<string, Style>;
-  /* The processed styled props */
-  styledPropsMeta: Record<string, PropInteropMeta>;
-  /* Inline variables */
-  variables: Record<string, unknown>;
-  /* Inline container runtime info */
-  containers: Record<string, ContainerRuntime>;
-  /* A list of props that will be processed by useAnimated  */
-  animatedProps: Set<string>;
-  /* A list of props that will be processed by useTransition  */
-  transitionProps: Set<string>;
-  /* Does this component need the onLayout handler  */
-  requiresLayout: boolean;
-  /* Does variables have any values  */
-  hasInlineVariables: boolean;
-  /* Does variables have any values  */
-  hasInlineContainers: boolean;
-  /* If defined, we should wrap in the AnimationInterop */
-  animationInteropKey?: string;
-  /* Should we add press handlers */
-  hasActive?: boolean;
-  /* Should we add hover handlers */
-  hasHover?: boolean;
-  /* Should we add focus handlers */
-  hasFocus?: boolean;
 };
 
 export type PropInteropMeta = {
@@ -172,6 +158,20 @@ export interface Signal<T = unknown> {
   stale(change: 1 | -1, fresh: boolean): void;
   subscribe(callback: () => void): () => void;
 }
+
+export type InteropMeta = {
+  animatedProps: Set<string>;
+  animationInteropKey?: string;
+  containers: Record<string, ContainerRuntime>;
+  convertToPressable: boolean;
+  hasInlineContainers: boolean;
+  hasInlineVariables: boolean;
+  inheritedContainers: Record<string, ContainerRuntime>;
+  interaction: Interaction;
+  transitionProps: Set<string>;
+  requiresLayout: boolean;
+  variables: Record<string, unknown>;
+};
 
 export type Interaction = {
   active: Signal<boolean>;

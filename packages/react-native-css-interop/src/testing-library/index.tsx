@@ -2,15 +2,18 @@ import { forwardRef } from "react";
 import * as JSX from "react/jsx-runtime";
 import { Platform } from "react-native";
 
-import { Style } from "../types";
-import { StyleSheet } from "../index";
-import { defaultCSSInterop } from "../runtime/css-interop";
+import { StyleSheet, enableCSSInterop } from "../index";
 import { render } from "../runtime/render";
+import { INTERNAL_RESET } from "../shared";
+import {
+  ComponentTypeWithMapping,
+  EnableCssInteropOptions,
+  Style,
+} from "../types";
 import {
   CssToReactNativeRuntimeOptions,
   cssToReactNativeRuntime,
 } from "../css-to-rn";
-import { INTERNAL_RESET } from "../shared";
 
 export {
   globalStyles,
@@ -23,7 +26,7 @@ export * from "../types";
 declare global {
   namespace jest {
     interface Matchers<R> {
-      toHaveStyle(style?: Style): R;
+      toHaveStyle(style?: Style | Style[]): R;
       toHaveAnimatedStyle(style?: Style): R;
     }
   }
@@ -33,24 +36,23 @@ declare global {
  * Creates a mocked component that renders with the defaultCSSInterop WITHOUT needing
  * set the jsxImportSource.
  */
-export function createMockComponent(
-  Component: React.ComponentType<any>,
-  { mapping = { className: "style" } } = {},
-): typeof Component {
-  const mappingMap = new Map(Object.entries(mapping));
+export function createMockComponent<
+  P extends object,
+  M = { className: "style" },
+>(
+  Component: React.ComponentType<P>,
+  {
+    mapping = { className: "style" } as unknown as EnableCssInteropOptions<P> &
+      M,
+  }: {
+    mapping?: EnableCssInteropOptions<P> & M;
+  } = {},
+) {
+  enableCSSInterop<P, M>(Component, mapping);
 
-  return forwardRef((props, ref) => {
-    return render(
-      (JSX as any).jsx,
-      Component,
-      props as any,
-      "",
-      undefined,
-      (jsx, type, props, key) => {
-        return defaultCSSInterop(jsx, type, { ...props, ref }, key, mappingMap);
-      },
-    );
-  });
+  return forwardRef<unknown, P>((props, _ref) => {
+    return render((JSX as any).jsx, Component, props as any, "");
+  }) as unknown as ComponentTypeWithMapping<P, M>;
 }
 
 export const resetStyles = StyleSheet[INTERNAL_RESET].bind(StyleSheet);

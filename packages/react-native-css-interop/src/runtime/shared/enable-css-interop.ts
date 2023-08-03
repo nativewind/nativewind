@@ -15,42 +15,71 @@ import {
 } from "react-native";
 
 import { defaultCSSInterop } from "../css-interop";
+import { interopFunctions } from "../render";
 import {
-  createPropMapper as createPropMapper,
-  interopMapping,
-  propMapping,
-} from "../render";
-import { CssInteropPropMapping, CssInteropProps } from "../../types";
+  RemapClassNamePropsOptions,
+  ComponentTypeWithMapping,
+  EnableCssInteropOptions,
+  InteropFunction,
+} from "../../types";
+import { getInteropOptions } from "./prop-mapping";
+import { getGlobalStyle, getOpaqueStyle } from "../native/globals";
 
 export function enableCSSInterop<P extends object, M>(
   component: ComponentType<P>,
-  mapping: CssInteropPropMapping<P>,
-  interop = defaultCSSInterop,
-): ComponentType<P & CssInteropProps<M>> {
-  const mappingMap = new Map(Object.entries(mapping));
-  interopMapping.set(component, (jsx, type, props, key) => {
-    return interop(jsx, type, props, key, mappingMap);
+  mapping: EnableCssInteropOptions<P>,
+  interop: InteropFunction = defaultCSSInterop,
+) {
+  const map = new Map(Object.entries(mapping));
+
+  interopFunctions.set(component, (jsx, type, props, key) => {
+    const options = getInteropOptions(props, map as any, getGlobalStyle);
+
+    return interop<typeof props>(
+      jsx,
+      type,
+      options.remappedProps,
+      key,
+      options,
+    );
   });
 
-  return component as ComponentType<P & CssInteropProps<M>>;
+  return component as ComponentTypeWithMapping<P, M>;
 }
 
-export function bindProps<P extends object, M>(
+export function remapClassNameProps<P, M>(
   component: ComponentType<P>,
-  mapping: CssInteropPropMapping<P> & M,
-): ComponentType<P & CssInteropProps<M>> {
-  propMapping.set(component, createPropMapper(mapping));
-  return component as ComponentType<P & CssInteropProps<M>>;
+  options: RemapClassNamePropsOptions<P> & M,
+) {
+  const map = new Map(Object.entries(options));
+
+  interopFunctions.set(component, (jsx, type, props, key) => {
+    const options = getInteropOptions(props, map as any, getOpaqueStyle);
+
+    return jsx(type, options.remappedProps, key);
+  });
+
+  return component as ComponentTypeWithMapping<P, M>;
 }
 
-enableCSSInterop(ActivityIndicator, { className: "style" });
 enableCSSInterop(Image, { className: "style" });
 enableCSSInterop(Pressable, { className: "style" });
 enableCSSInterop(Text, { className: "style" });
 enableCSSInterop(View, { className: "style" });
-enableCSSInterop(StatusBar, { barClassName: "barStyle" });
+enableCSSInterop(ActivityIndicator, {
+  className: {
+    target: "style",
+    nativeStyleToProp: { color: true },
+  },
+});
+enableCSSInterop(StatusBar, {
+  className: {
+    target: false,
+    nativeStyleToProp: { backgroundColor: true },
+  },
+});
 
-bindProps(FlatList, {
+remapClassNameProps(FlatList, {
   className: "style",
   ListFooterComponentClassName: "ListFooterComponentStyle",
   ListHeaderComponentClassName: "ListHeaderComponentStyle",
@@ -58,24 +87,24 @@ bindProps(FlatList, {
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
-bindProps(ImageBackground, {
+remapClassNameProps(ImageBackground, {
   className: "style",
   imageClassName: "imageStyle",
 });
-bindProps(KeyboardAvoidingView, {
+remapClassNameProps(KeyboardAvoidingView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
 });
-bindProps(Modal, {
+remapClassNameProps(Modal, {
   className: "style",
   presentationClassName: "presentationStyle",
 });
-bindProps(ScrollView, {
+remapClassNameProps(ScrollView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
-bindProps(VirtualizedList, {
+remapClassNameProps(VirtualizedList, {
   className: "style",
   ListFooterComponentClassName: "ListFooterComponentStyle",
   ListHeaderComponentClassName: "ListHeaderComponentStyle",
