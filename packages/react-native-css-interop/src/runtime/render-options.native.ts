@@ -26,7 +26,6 @@ function getRenderOptions<P>(
 ): InteropFunctionOptions<P> {
   let hasMeta = false;
 
-  // Every prop has 2 dependencies, the className and the existing styles (including undefined values)
   const dependencies: unknown[] = [];
 
   const configMap: Map<
@@ -39,12 +38,6 @@ function getRenderOptions<P>(
 
     const classNames = remappedProps[classNameKey];
     delete remappedProps[classNameKey];
-
-    if (typeof classNames !== "string" || !classNames) {
-      // dependencies should always be the same size, even if the properties don't exist for this render
-      dependencies.push(undefined, undefined);
-      continue;
-    }
 
     let targetKey: (keyof P & string) | undefined;
     if (typeof config === "boolean") {
@@ -62,26 +55,29 @@ function getRenderOptions<P>(
     }
 
     const existingStyles = remappedProps[targetKey];
-    let styles: StyleProp = classNames
-      .split(/\s+/)
-      .map(getStyleFn)
-      .filter(Boolean);
+    let styles: StyleProp =
+      typeof classNames === "string"
+        ? classNames.split(/\s+/).map(getStyleFn).filter(Boolean)
+        : [];
 
     dependencies.push(classNames, existingStyles);
 
     if (Array.isArray(existingStyles)) {
-      styles = [...styles, ...existingStyles.map((style) => getStyleFn(style))];
+      styles = [
+        ...styles,
+        ...existingStyles.map((style) => getGlobalStyle(style)),
+      ];
     } else if (existingStyles) {
-      styles = [...styles, getStyleFn(existingStyles)];
-    } else {
-      styles = styles;
+      styles = [...styles, getGlobalStyle(existingStyles)];
     }
 
-    if (targetKey !== classNameKey) {
-      delete remappedProps[classNameKey];
+    if (styles.length === 1 && styles[0]) {
+      styles = styles[0];
+    } else if (styles.length === 0) {
+      styles = undefined;
     }
 
-    if (styles.length > 0 && styles[0] !== undefined) {
+    if (styles) {
       configMap.set(targetKey, config);
       remappedProps[targetKey] = styles as P[keyof P & string];
       hasMeta ||= stylePropHasMeta(styles);

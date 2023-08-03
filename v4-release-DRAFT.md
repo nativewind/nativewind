@@ -26,7 +26,7 @@ Among the major transformations in the Nativewind v4 library is the removal of t
 
 However, with v4, Nativewind has evolved to directly pass the `className` prop into components, allowing users to modify it more traditionally. This significant change paves the way for the inclusion of popular utility libraries, thereby broadening the versatility of Nativewind.
 
-For creating `styled()` components, a common practice was to rebind `style` props to `className` props. For the most part, this will now be handled automatically, however if you are using a 3rd party component with multiple `style` props you will need to bind these to a class prop. Please see the `bindProps` section the `New API` for more information.
+For creating `styled()` components, a common practice was to rebind `style` props to `className` props. For the most part, this will now be handled automatically, however if you are using a 3rd party component with multiple `style` props you will need to bind these to a class prop. Please see the `remapClassNameProps` section the `New API` for more information.
 
 ### Base Scaling Modifications
 
@@ -215,6 +215,34 @@ A subset of the Container Query spec is also available within your CSS
 
 `container-type` and style-based container queries are not supported.
 
+### Improved support for React Native core components (native only)
+
+Nativewind v4 adds more sensible defaults for the React Native core components. These includes automatically mapping some styles to props.
+
+```tsx
+// You write
+<ActivityIndicator className="bg-black text-white" />
+
+// ❌ Nativewind v2
+<ActivityIndicator style={{ backgroundColor: "rgba(0, 0, 0, 1)", color: "rgba(255, 255, 255, 1)" }}/>
+
+// ✅ Nativewind v4
+<ActivityIndicator color="rgba(255, 255, 255, 1)" style={{ backgroundColor: "rgba(0, 0, 0, 1)" }}/>
+```
+
+This also includes default "className" props for all core component style props
+
+```tsx
+<FlatList
+  className="<className>"
+  ListHeaderComponentClassName="<className>"
+  ListFooterComponentClassName="<className>"
+  columnWrapperClassName="<className>"
+  contentContainerClassName="<className>"
+  indicatorClassName="<className>"
+/>
+```
+
 ### Tailwind Groups and parent state modifiers
 
 https://tailwindcss.com/docs/hover-focus-and-other-states#differentiating-nested-groups
@@ -331,22 +359,18 @@ It verifies
 
 ## New API
 
-### `vars()`
+### `remapClassNameProps`
 
-TODO
+> `remapClassNameProps` is generally the replacement for `styled()`
 
-### `bindProps`
+In earlier versions, the `styled()` function was utilized to generate new `className` props when a component had multiple `style` props. Now, with Nativewind only converting the `className` on primitive components (e.g., `<View>`), it becomes necessary to communicate to Nativewind that a component is complex and requires appropriate style distribution. The `remapClassNameProps` wrapper serves this purpose.
 
-In earlier versions, the `styled()` function was utilized to generate new `className` props when a component had multiple `style` props. Now, with Nativewind only converting the `className` on primitive components (e.g., `<View>`), it becomes necessary to communicate to Nativewind that a component is complex and requires appropriate style distribution. The `bindProps` wrapper serves this purpose.
-
-`bindProps` accepts a `Component` as the first argument and a mapping as the second. The mapping is in the format `{ [existing prop]: [new prop] | true }`, and it returns a typed version of the component.
-
-> Note: While bindProps might seem like a direct replacement for styled(), the two function differently. bindProps transforms classes into an object, but this object is not a style object. It may lack properties and should not be altered.
+`remapClassNameProps` accepts a `Component` as the first argument and a mapping as the second. The mapping is in the format `{ [existing prop]: [new prop] | true }`, and it returns a typed version of the component.
 
 An example of how Nativewind binds `<FlatList />` is:
 
 ```jsx
-bindProps(FlatList, {
+remapClassNameProps(FlatList, {
   style: "className",
   ListFooterComponentStyle: "ListFooterComponentClassName",
   ListHeaderComponentStyle: "ListHeaderComponentClassName",
@@ -356,17 +380,27 @@ bindProps(FlatList, {
 });
 ```
 
-Following this binding, you can utilise the new props on **`<FlatList />`**:
+Following this binding, you can utilize the new props on **`<FlatList />`**:
 
 ```jsx
 <FlatList className="w-10" ListHeaderComponentClassName="bg-black" />
 ```
 
+It your render the props of the `<FlatList />` it will looks like this
+
+```jsx
+<FlatList style={OpaqueStyleToken() {}} ListHeaderComponentStyle={OpaqueStyleToken() {}} />
+```
+
+As you can see `remapClassNameProps` doesn't generate any styles, it simply converts the classNames to a `OpaqueStyleToken`. These tokens are readonly empty objects and should not be modified in any manner. It is not until the token is passed to a component with `enableCSSInterop` is the token converted into a style object.
+
+This makes components using `remapClassNameProps` very performant, as we can avoid creating the Nativewind component wrapper high in your render tree.
+
 For TypeScript users, guides on creating declaration files to type 3rd party components correctly will be available. Alternatively, you can directly use the returned component:
 
 ```jsx
 jsxCopy code
-const StyledComponent = bindProps(MyComponent, {
+const StyledComponent = remapClassNameProps(MyComponent, {
   props: {
     style: "className",
     otherStyle: "otherClassName",
@@ -379,7 +413,13 @@ const StyledComponent = bindProps(MyComponent, {
 
 `enableCSSInterop` signals to Nativewind that a specific component should be treated as a primitive. On this component, it sets up the dynamic style logic.
 
-Nativewind automatically enables the interop for the following components:
+Before using `enableCSSInterop` should could consider if `remapClassNameProps` would be more suitable. The main reasons to use `enableCSSInterop` are:
+
+- The component renders a Native Component (e.g `<View />`)
+- Moving a style property to an prop
+  - Note: If this is not a 3rd party component, you should consider simply using the style prop as this will not work on web.
+
+For reference, Nativewind enable's the CSS interop only for these Core Components, with all others using `remapClassNameProps`:
 
 ```jsx
 enableCSSInterop(Image, { className: "style" });
@@ -400,60 +440,47 @@ enableCSSInterop(StatusBar, {
 });
 ```
 
-> **Warning: Before using `enableCSSInterop`, carefully consider its potential performance impact. If an animation class is involved, the whole component will be animated.**
-
-One typical use case is with `react-native-svg`, where styles need to be mapped to props. Components like `Rect` are also leaf components and will not have performance impacts if re-rendered.
+An example use case on when to use `enableCSSInterop` is `react-native-svg`, which renders Native Components, needs styles mapped to props and is typically very low in the render tree.
 
 ```tsx
-
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Circle, Rect from } 'react-native-svg';
 
 enableCSSInterop(Svg, {
-  "className": {
+  className: {
     target: "style",
     nativeStyleToProp: { width: true, height: true }
   },
 });
 enableCSSInterop(Circle, {
-  "className": {
+  className: {
     target: "style",
-    nativeStyleToProp: { width: true, height: true, stroke: true, fill: tru }
+    nativeStyleToProp: { width: true, height: true, stroke: true, strokeWidth: true, fill: true }
   },
 });
 enableCSSInterop(Rect, {
-  "className": {
+  className: {
     target: "style",
-    nativeStyleToProp: { width: true, height: true, stroke: true, fill: tru }
+    nativeStyleToProp: { width: true, height: true, stroke: true, strokeWidth: true, fill: true }
   },
 });
 
-export default class SvgExample extends React.Component {
-  render() {
-    return (
-      <View className="inset-0 items-center content-center"      >
-        <Svg
-          className="h-1/2 w-1/2"
-          viewBox="0 0 100 100"
-        >
-          <Circle
-            cx="50"
-            cy="50"
-            r="45"
-            className="stroke-blue-500 stroke-2 fill-green-500"
-          />
-          <Rect
-            x="15"
-            y="15"
-            className="prop-width:w-16 prop-height:h-16 stroke-red-500 stroke-2 fill-yellow-500"
-          />
-        </Svg>
-      </View>
-    );
-  }
+export function SvgExample () {
+  return (
+    <View className="inset-0 items-center content-center">
+      <Svg className="h-1/2 w-1/2" viewBox="0 0 100 100" >
+        <Circle cx="50" cy="50" r="45" className="stroke-blue-500 stroke-2 fill-green-500" />
+        <Rect x="15" y="15" className="w-16 h-16 stroke-red-500 stroke-2 fill-yellow-500" />
+      </Svg>
+    </View>
+  );
 }
 ```
+
+### `vars()`
+
+TODO
 
 ### `useUnstableNativeVariables()`
 
@@ -463,7 +490,7 @@ Web components are conventionally styled using either the className or style att
 
 To provide a solution for native components that need to access a CSS variable’s value, we have useUnstableNativeVariables(). This hook can be more efficient than nativeStyleToProp because it bypasses the need to engage enableCSSInterop on the component.
 
-> It's crucial to avoid using this hook within a web component and restrict its use to .native.js files. Failure to heed this warning will result in an error.
+> It's crucial to avoid using this hook within a web component and restrict its use to .native.js files.
 
 Moreover, this hook is not intended for access to static theme values. If you need to reference a static theme value, the Tailwind documentation provides examples on how to accomplish this in JavaScript: https://tailwindcss.com/docs/configuration#referencing-in-java-script
 

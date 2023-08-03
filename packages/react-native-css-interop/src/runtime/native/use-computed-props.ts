@@ -31,7 +31,7 @@ import { createSignal, useComputation } from "./signals";
 import { ContainerContext, rem, styleMetaMap, vh, vw } from "./globals";
 import { VariableContext, defaultVariables, rootVariables } from "./stylesheet";
 
-type UseComputedPropsOptions = InteropFunctionOptions<Record<string, unknown>>;
+type UseStyledPropsOptions = InteropFunctionOptions<Record<string, unknown>>;
 
 /**
  * Create a computation that will flatten the className and generate a interopMeta
@@ -40,9 +40,9 @@ type UseComputedPropsOptions = InteropFunctionOptions<Record<string, unknown>>;
  * useComputation handles the reactivity/memoization
  * flattenStyle handles converting the classNames collecting the metadata
  */
-export function useComputedProps<P extends Record<string, any>>(
+export function useStyledProps<P extends Record<string, any>>(
   $props: P,
-  options: UseComputedPropsOptions,
+  options: UseStyledPropsOptions,
   rerender: () => void,
 ) {
   const propsRef = useRef<Record<string, any>>($props);
@@ -82,7 +82,7 @@ export function useComputedProps<P extends Record<string, any>>(
 
   return useComputation(
     () =>
-      getComputedProps(
+      getStyledProps(
         propsRef.current,
         computedVariables,
         inheritedContainers,
@@ -99,14 +99,14 @@ export function useComputedProps<P extends Record<string, any>>(
  *
  * It is separated so it can be tested outside of ReactJS
  */
-export function getComputedProps<P extends Record<string, any>>(
+export function getStyledProps<P extends Record<string, any>>(
   propsRef: P,
   computedVariables: Record<string, unknown>,
   inheritedContainers: Record<string, ContainerRuntime>,
   interaction: Interaction,
-  options: UseComputedPropsOptions,
+  options: UseStyledPropsOptions,
 ) {
-  const props: Record<string, any> = { ...propsRef };
+  const styledProps: Record<string, any> = {};
   const variables = { ...computedVariables };
   const containers: Record<string, ContainerRuntime> = {};
   const animatedProps = new Set<string>();
@@ -124,7 +124,7 @@ export function getComputedProps<P extends Record<string, any>>(
       continue;
     }
 
-    const flatStyle = flattenStyle(props[key], {
+    const flatStyle = flattenStyle(propsRef[key], {
       ...options,
       interaction,
       variables: computedVariables,
@@ -162,26 +162,32 @@ export function getComputedProps<P extends Record<string, any>>(
       hasFocus ||= Boolean(hasInlineContainers || meta.pseudoClasses?.focus);
     }
 
+    /**
+     * Map the flatStyle to the correct prop and/or move style properties to props (nativeStyleToProp)
+     *
+     * Note: We freeze the flatStyle as many of its props are getter's without a setter
+     *  Freezing the whole object keeps everything consistent
+     */
     if (
       config === true ||
       typeof config === "string" ||
       config?.nativeStyleToProp === undefined
     ) {
-      props[key] = flatStyle;
+      styledProps[key] = Object.freeze(flatStyle);
     } else {
       for (const [styleKey, targetProp] of Object.entries(
         config.nativeStyleToProp,
       ) as [keyof Style, boolean | keyof P][]) {
         if (targetProp === true && flatStyle[styleKey]) {
-          props[styleKey] = flatStyle[styleKey];
+          styledProps[styleKey] = flatStyle[styleKey];
           delete flatStyle[styleKey];
         }
 
         if (config.target) {
           if (config.target === true) {
-            props[key] = flatStyle;
+            styledProps[key] = Object.freeze(flatStyle);
           } else {
-            props[config.target] = flatStyle;
+            styledProps[config.target] = Object.freeze(flatStyle);
           }
         }
       }
@@ -194,7 +200,7 @@ export function getComputedProps<P extends Record<string, any>>(
   }
 
   if (requiresLayout) {
-    props.onLayout = (event: LayoutChangeEvent) => {
+    styledProps.onLayout = (event: LayoutChangeEvent) => {
       propsRef.onLayout?.(event);
       interaction.layout.width.set(event.nativeEvent.layout.width);
       interaction.layout.height.set(event.nativeEvent.layout.height);
@@ -204,33 +210,33 @@ export function getComputedProps<P extends Record<string, any>>(
   let convertToPressable = false;
   if (hasActive) {
     convertToPressable = true;
-    props.onPressIn = (event: GestureResponderEvent) => {
+    styledProps.onPressIn = (event: GestureResponderEvent) => {
       propsRef.onPressIn?.(event);
       interaction.active.set(true);
     };
-    props.onPressOut = (event: GestureResponderEvent) => {
+    styledProps.onPressOut = (event: GestureResponderEvent) => {
       propsRef.onPressOut?.(event);
       interaction.active.set(false);
     };
   }
   if (hasHover) {
     convertToPressable = true;
-    props.onHoverIn = (event: MouseEvent) => {
+    styledProps.onHoverIn = (event: MouseEvent) => {
       propsRef.onHoverIn?.(event);
       interaction.hover.set(true);
     };
-    props.onHoverOut = (event: MouseEvent) => {
+    styledProps.onHoverOut = (event: MouseEvent) => {
       propsRef.onHoverIn?.(event);
       interaction.hover.set(false);
     };
   }
   if (hasFocus) {
     convertToPressable = true;
-    props.onFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
+    styledProps.onFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
       propsRef.onFocus?.(event);
       interaction.focus.set(true);
     };
-    props.onBlur = (event: NativeSyntheticEvent<TargetedEvent>) => {
+    styledProps.onBlur = (event: NativeSyntheticEvent<TargetedEvent>) => {
       propsRef.onBlur?.(event);
       interaction.focus.set(false);
     };
@@ -251,7 +257,7 @@ export function getComputedProps<P extends Record<string, any>>(
   };
 
   return {
-    props,
+    styledProps,
     meta,
   };
 }
@@ -394,16 +400,14 @@ export function flattenStyle(
         options,
       );
 
-      if (typeof getterOrValue === "function") {
-        Object.defineProperty(flatStyleMeta.variables, key, {
-          enumerable: true,
-          get() {
-            return getterOrValue();
-          },
-        });
-      } else {
-        flatStyleMeta.variables[key] = getterOrValue;
-      }
+      Object.defineProperty(flatStyleMeta.variables, key, {
+        enumerable: true,
+        get() {
+          return typeof getterOrValue === "function"
+            ? getterOrValue()
+            : getterOrValue;
+        },
+      });
     }
   }
 
@@ -476,17 +480,15 @@ export function flattenStyle(
         options,
       );
 
-      if (typeof getterOrValue === "function") {
-        Object.defineProperty(flatStyle, key, {
-          configurable: true,
-          enumerable: true,
-          get() {
-            return getterOrValue();
-          },
-        });
-      } else {
-        flatStyle[key as keyof Style] = getterOrValue;
-      }
+      Object.defineProperty(flatStyle, key, {
+        configurable: true,
+        enumerable: true,
+        get() {
+          return typeof getterOrValue === "function"
+            ? getterOrValue()
+            : getterOrValue;
+        },
+      });
     }
   }
 

@@ -147,7 +147,7 @@ function useAnimationAndTransitions(
         const value = values[index].value;
 
         if (value !== undefined) {
-          if (transformAttributes.has(prop)) {
+          if (transformAttributes.includes(prop)) {
             result.transform ??= [];
             (result.transform as any[]).push({ [prop]: value });
           } else {
@@ -345,7 +345,7 @@ function getInitialValue(
   style: Style,
 ): AnimatableValue {
   if (frame.value === PLACEHOLDER) {
-    if (transformAttributes.has(prop)) {
+    if (transformAttributes.includes(prop)) {
       const initialTransform = style.transform?.find((t) => {
         return t[prop as keyof typeof t] !== undefined;
       });
@@ -444,7 +444,7 @@ const defaultTransformStyle = [
 const defaultTransformValues = Object.fromEntries(
   defaultTransformStyle.flatMap((style) => Object.entries(style)),
 );
-const transformAttributes = new Set(Object.keys(defaultTransformValues));
+const transformAttributes = Object.keys(defaultTransformValues);
 
 export function createAnimatedComponent(
   Component: ComponentType<any>,

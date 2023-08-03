@@ -8,6 +8,7 @@ nativewind
 
 react-native-css-interop
 
+- [] vars()
 - [] shadows
 - [] prop binding tests
 - [] refactor groups to be separate from container context

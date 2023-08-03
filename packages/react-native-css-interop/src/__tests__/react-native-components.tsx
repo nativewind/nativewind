@@ -49,16 +49,6 @@ test("Component types", () => {
       contentContainerClassName="bg-black"
       indicatorClassName="bg-black"
     />,
-    <FlatList
-      data={[]}
-      renderItem={() => null}
-      className="bg-black"
-      ListHeaderComponentClassName="bg-black"
-      ListFooterComponentClassName="bg-black"
-      columnWrapperClassName="bg-black"
-      contentContainerClassName="bg-black"
-      indicatorClassName="bg-black"
-    />,
     <VirtualizedList
       data={[]}
       renderItem={() => null}
@@ -71,7 +61,7 @@ test("Component types", () => {
   ];
 });
 
-test.skip("ActivityIndicator", () => {
+test("ActivityIndicator", () => {
   registerCSS(
     `.bg-black { background-color: black } .text-white { color: white }`,
   );
@@ -80,8 +70,6 @@ test.skip("ActivityIndicator", () => {
 
   const component = screen.getByTestId(testID);
 
-  screen.debug();
-
   // These should be removed
   expect(component.props).not.toEqual(
     expect.objectContaining({
@@ -89,21 +77,15 @@ test.skip("ActivityIndicator", () => {
     }),
   );
 
-  expect(component.props).toEqual({});
-  // expect.objectContaining({
-  //   style: new OpaqueStyleToken(),
-  //   ListFooterComponentStyle: [
-  //     new OpaqueStyleToken(),
-  //     new OpaqueStyleToken(),
-  //   ],
-  //   ListHeaderComponentStyle: [
-  //     new OpaqueStyleToken(),
-  //     new OpaqueStyleToken(),
-  //   ],
-  //   contentContainerStyle: new OpaqueStyleToken(),
-  //   indicatorStyle: new OpaqueStyleToken(),
-  // }),
-  // );
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      testID,
+      color: "rgba(255, 255, 255, 1)",
+      style: {
+        backgroundColor: "rgba(0, 0, 0, 1)",
+      },
+    }),
+  );
 });
 
 test("FlatList", () => {
@@ -144,6 +126,7 @@ test("FlatList", () => {
   // These should be added
   expect(flatList.props).toEqual(
     expect.objectContaining({
+      testID,
       style: new OpaqueStyleToken(),
       ListFooterComponentStyle: [
         new OpaqueStyleToken(),

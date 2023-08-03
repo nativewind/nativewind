@@ -39,7 +39,9 @@ export function getGlobalStyle(style?: string | object) {
   }
 }
 
-export class OpaqueStyleToken {}
+export class OpaqueStyleToken {
+  opaqueStyleToken = true;
+}
 
 export function getOpaqueStyle(name?: string | object) {
   const style = getGlobalStyle(name);

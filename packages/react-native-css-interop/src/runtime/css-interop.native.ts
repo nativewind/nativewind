@@ -4,7 +4,7 @@ import { View, Pressable } from "react-native";
 import { DevHotReloadSubscription } from "../shared";
 import { ContainerContext } from "./native/globals";
 import { StyleSheet, useRerender, VariableContext } from "./native/stylesheet";
-import { useComputedProps } from "./native/use-computed-props";
+import { useStyledProps } from "./native/use-computed-props";
 import type {
   InteropFunction,
   InteropFunctionOptions,
@@ -59,7 +59,12 @@ export const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
     useEffect(() => StyleSheet[DevHotReloadSubscription](rerender), []);
   }
 
-  const { props, meta } = useComputedProps($props, options, rerender);
+  const { styledProps, meta } = useStyledProps($props, options, rerender);
+
+  const props = {
+    ...$props,
+    ...styledProps,
+  };
 
   // View doesn't support the interaction props, so switch to a Pressable (which accepts ViewProps)
   if (component === View && meta.convertToPressable) {

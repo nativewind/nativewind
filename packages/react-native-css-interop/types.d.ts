@@ -48,7 +48,7 @@ declare module "react-native" {
     className?: string;
   }
   interface StatusBarProps {
-    barClassName?: string;
+    className?: string;
   }
   interface KeyboardAvoidingViewProps extends ViewProps {
     contentContainerClassName?: string;

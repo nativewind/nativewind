@@ -52,6 +52,8 @@ export function withNativeWind(
       options: GetTransformOptionsOpts,
       getDependenciesOf: (filePath: string) => Promise<string[]>,
     ) => {
+      if (!output) throw new Error("Nativewind output is not set");
+
       // Clear Metro's progress bar and move to the start of the line
       // We will print out own output before letting Metro print again
       if (process.stdout.isTTY) {
@@ -66,12 +68,15 @@ export function withNativeWind(
       if (!tailwindHasStarted) {
         tailwindHasStarted = true;
 
-        await twBuild({
-          "--input": input,
-          "--output": output,
-          "--watch": options.dev ? "always" : undefined,
-          "--poll": true,
-        });
+        await twBuild({ "--input": input, "--output": output });
+        if (options.dev) {
+          twBuild({
+            "--input": input,
+            "--output": output,
+            "--watch": "always",
+            "--poll": true,
+          });
+        }
       }
 
       return previousTransformOptions?.(
