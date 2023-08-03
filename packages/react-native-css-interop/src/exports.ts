@@ -8,4 +8,4 @@ export { checkJsxPragma } from "./runtime/check-render";
 export {
   enableCSSInterop,
   remapClassNameProps as bindProps,
-} from "./runtime/shared/enable-css-interop";
+} from "./runtime/render";

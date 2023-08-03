@@ -66,6 +66,7 @@ export const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
     component = Pressable as ComponentType<unknown>;
   }
 
+  // Depending on the meta, we may be required to surround the component in other components (like VariableProvider)
   let finalComponent;
 
   // We call `jsx` directly so we can bypass the polyfill render method

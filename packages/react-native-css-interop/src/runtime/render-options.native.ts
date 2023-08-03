@@ -1,18 +1,25 @@
-import { ComponentType } from "react";
-import { styleMetaMap } from "../native/globals";
+import { getGlobalStyle, getOpaqueStyle, styleMetaMap } from "./native/globals";
 import {
   CSSInteropClassNamePropConfig,
   InteropFunctionOptions,
-  PropMapperFunction,
   StyleProp,
-} from "../../types";
+} from "../types";
 
-export const propMapping = new WeakMap<
-  ComponentType<any>,
-  PropMapperFunction
->();
+export function getInteropFunctionOptions<P>(
+  props: P,
+  options: Map<keyof P & string, CSSInteropClassNamePropConfig<P>>,
+): InteropFunctionOptions<P> {
+  return getRenderOptions(props, options, getGlobalStyle);
+}
 
-export function getInteropOptions<P>(
+export function getRemappedProps<P>(
+  props: P,
+  options: Map<keyof P & string, CSSInteropClassNamePropConfig<P>>,
+) {
+  return getRenderOptions(props, options, getOpaqueStyle).remappedProps;
+}
+
+function getRenderOptions<P>(
   { ...remappedProps }: P,
   options: Map<keyof P & string, CSSInteropClassNamePropConfig<P>>,
   getStyleFn: (style?: string | object) => object | undefined,

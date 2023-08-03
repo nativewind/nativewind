@@ -12,14 +12,10 @@ import {
   ActivityIndicator,
 } from "react-native";
 import * as JSX from "react/jsx-runtime";
-
 import { render as tlRender, screen } from "@testing-library/react-native";
 
-import { render as renderJSX } from "../runtime/render";
-
 import { registerCSS, resetStyles } from "../testing-library";
-
-import "../runtime/shared/enable-css-interop";
+import { render as renderJSX } from "../runtime/render";
 import { OpaqueStyleToken } from "../runtime/native/globals";
 
 const testID = "react-native-css-interop";

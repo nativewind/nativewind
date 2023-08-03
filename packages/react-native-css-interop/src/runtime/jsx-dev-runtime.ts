@@ -1,11 +1,7 @@
-import React from "react";
 import ReactJSXRuntime from "react/jsx-dev-runtime";
-
 import { render } from "./render";
 
-export const Fragment = React.Fragment;
-
-console.warn("---");
+export { Fragment } from "react";
 
 export function jsx(type: any, props: any, key: any) {
   return render((ReactJSXRuntime as any).jsx, type, props, key);

@@ -95,8 +95,6 @@ export type InteropFunctionOptions<P> = {
   hasMeta: boolean;
 };
 
-export type PropMapperFunction = <P>(props: P) => P;
-
 export type RuntimeValue = {
   type: "runtime";
   name: string;
