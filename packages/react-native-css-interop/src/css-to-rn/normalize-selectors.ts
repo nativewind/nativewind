@@ -13,8 +13,8 @@ export type NormalizeSelector =
       darkMode?: boolean;
       className: string;
       groupClassName?: string;
-      pseudoClasses: Record<string, true>;
-      groupPseudoClasses: Record<string, true>;
+      pseudoClasses?: Record<string, true>;
+      groupPseudoClasses?: Record<string, true>;
     };
 
 export function normalizeSelectors(
@@ -83,8 +83,6 @@ export function normalizeSelectors(
       ...defaults,
       type: "className",
       className: "",
-      pseudoClasses: {},
-      groupPseudoClasses: {},
     };
 
     let previousWasCombinator = true;
@@ -147,6 +145,7 @@ export function normalizeSelectors(
             case "hover":
             case "active":
             case "focus":
+              normalizedSelector.pseudoClasses ??= {};
               normalizedSelector.pseudoClasses[component.kind] = true;
               break;
             default: {

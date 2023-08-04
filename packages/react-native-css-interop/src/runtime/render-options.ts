@@ -50,8 +50,8 @@ export function getRemappedProps<P>(
 
     const existingStyles = props[targetKey];
     let styles: StyleProp = [
-      { $$css: true, [classNames]: classNames },
-    ] as Style[];
+      { $$css: true, [classNames]: classNames } as Style,
+    ];
 
     if (Array.isArray(existingStyles)) {
       styles = [...styles, ...existingStyles];

@@ -13,9 +13,11 @@ import {
   CommonStyleSheet,
 } from "../../types";
 import {
+  OpaqueStyleToken,
   animationMap,
   colorScheme,
   globalStyles,
+  opaqueStyles,
   rem,
   styleMetaMap,
   vh,
@@ -101,6 +103,7 @@ const commonStyleSheet: CommonStyleSheet = {
     };
   },
   register(options: StyleSheetRegisterOptions) {
+    console.log(options.declarations?.["my-class"]);
     if (options.keyframes) {
       for (const [name, keyframes] of Object.entries(options.keyframes)) {
         animationMap.set(name, keyframes);
@@ -283,4 +286,26 @@ function resetDefaultVariables(currentColor: "light" | "dark") {
       ...variables.defaultDarkVariables,
     });
   }
+}
+
+export function vars(variables: Record<string, string | number>) {
+  // Create an empty style prop with meta
+  const styleProp = {};
+
+  const $variables: Record<string, string | number> = {};
+
+  for (const [key, value] of Object.entries(variables)) {
+    if (key.startsWith("--")) {
+      $variables[key] = value;
+    } else {
+      $variables[`--${key}`] = value;
+    }
+  }
+  styleMetaMap.set(styleProp, { variables: $variables });
+
+  // Assign it an OpaqueStyleToken
+  const opaqueStyle = new OpaqueStyleToken();
+  opaqueStyles.set(opaqueStyle, styleProp);
+
+  return opaqueStyle as StyleProp;
 }

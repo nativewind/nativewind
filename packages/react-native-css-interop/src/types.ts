@@ -248,9 +248,7 @@ export type StyleSheetRegisterOptions = {
   darkMode?: DarkMode;
 };
 
-export type Style =
-  | (ViewStyle & TextStyle & ImageStyle)
-  | ({ $$css: true } & { [k in string]: string });
+export type Style = ViewStyle & TextStyle & ImageStyle;
 export type StyleProp = Style | StyleProp[] | undefined;
 
 export type NamedStyles<T> = {

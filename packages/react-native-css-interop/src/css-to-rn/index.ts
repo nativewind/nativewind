@@ -356,7 +356,11 @@ function setStyleForSelectorList(
     }
 
     // Add the className selector and its pseudo-classes to the declarations object, with the extracted style and container queries
-    addDeclaration(className, { ...style, pseudoClasses }, declarations);
+    if (pseudoClasses) {
+      addDeclaration(className, { ...style, pseudoClasses }, declarations);
+    } else {
+      addDeclaration(className, style, declarations);
+    }
   }
 }
 

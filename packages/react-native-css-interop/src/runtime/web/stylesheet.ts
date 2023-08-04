@@ -7,6 +7,9 @@ import {
 } from "../../shared";
 
 export const useUnstableNativeVariables = () => ({});
+export function vars(variables: Record<`--${string}`, string | number>) {
+  return variables;
+}
 
 const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_RESET](_options) {
