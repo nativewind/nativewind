@@ -52,7 +52,7 @@ export function withNativeWind(
       options: GetTransformOptionsOpts,
       getDependenciesOf: (filePath: string) => Promise<string[]>,
     ) => {
-      if (!output) throw new Error("Nativewind output is not set");
+      if (!output) throw new Error("NativeWind output is not set");
 
       // Clear Metro's progress bar and move to the start of the line
       // We will print out own output before letting Metro print again

@@ -28,6 +28,7 @@ import {
 import {
   DarkMode,
   DevHotReloadSubscription,
+  INTERNAL_VERIFICATION_FLAGS as INTERNAL_VERIFICATION_FLAGS,
   INTERNAL_RESET,
 } from "../../shared";
 import { createSignal, useComputation } from "./signals";
@@ -74,6 +75,7 @@ let variables = {
 
 const commonStyleSheet: CommonStyleSheet = {
   [DarkMode]: { type: "media" },
+  [INTERNAL_VERIFICATION_FLAGS]: {},
   [INTERNAL_RESET]({ dimensions = Dimensions, appearance = Appearance } = {}) {
     globalStyles.clear();
     animationMap.clear();
@@ -103,6 +105,14 @@ const commonStyleSheet: CommonStyleSheet = {
     };
   },
   register(options: StyleSheetRegisterOptions) {
+    this[INTERNAL_VERIFICATION_FLAGS]["receivedData"] = true;
+    if (options.verificationFlags) {
+      Object.assign(
+        this[INTERNAL_VERIFICATION_FLAGS],
+        options.verificationFlags,
+      );
+    }
+
     if (options.keyframes) {
       for (const [name, keyframes] of Object.entries(options.keyframes)) {
         animationMap.set(name, keyframes);

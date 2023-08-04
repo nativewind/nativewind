@@ -16,7 +16,7 @@ Configuration is now performed by calling methods on `NativeWindStyleSheet`. Ple
 
 ## CSS is the default for web
 
-Nativewind defaults to CSS for web if using React Native Web >=0.18
+NativeWind defaults to CSS for web if using React Native Web >=0.18
 
 You can control this setting via the `NativeWindStyleSheet.setOutput({ web: 'native' })`
 

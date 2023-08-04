@@ -27,7 +27,12 @@ import {
   TranslateYTransform,
   ViewStyle,
 } from "react-native";
-import { DarkMode, DevHotReloadSubscription, INTERNAL_RESET } from "./shared";
+import {
+  DarkMode,
+  DevHotReloadSubscription,
+  INTERNAL_VERIFICATION_FLAGS,
+  INTERNAL_RESET,
+} from "./shared";
 import { ComponentType } from "react";
 
 export interface ExtractRuleOptions {
@@ -246,6 +251,7 @@ export type StyleSheetRegisterOptions = {
   defaultDarkVariables?: Record<string, ExtractedStyleValue>;
   colorSchemeClass?: string;
   darkMode?: DarkMode;
+  verificationFlags?: Record<string, unknown>;
 };
 
 export type Style = ViewStyle & TextStyle & ImageStyle;
@@ -320,6 +326,7 @@ export type DarkMode =
 
 export interface CommonStyleSheet {
   [INTERNAL_RESET](options?: ResetOptions): void;
+  [INTERNAL_VERIFICATION_FLAGS]: Record<string, unknown>;
   [DevHotReloadSubscription](subscription: () => void): () => void;
   classNameMergeStrategy(c: string): string;
   register(options: StyleSheetRegisterOptions): void;

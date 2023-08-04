@@ -8,6 +8,7 @@ nativewind
 
 react-native-css-interop
 
+- [] font family
 - [] shadows
 - [] prop binding tests
 - [] refactor groups to be separate from container context

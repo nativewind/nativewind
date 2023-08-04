@@ -8,6 +8,7 @@ export const DarkMode = Symbol();
 export const DevHotReloadSubscription = Symbol();
 export const INTERNAL_RESET = Symbol();
 export const INTERNAL_SET = Symbol();
+export const INTERNAL_VERIFICATION_FLAGS = Symbol();
 
 export function isRuntimeValue(value: unknown): value is RuntimeValue {
   if (!value) {
