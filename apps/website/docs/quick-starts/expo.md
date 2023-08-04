@@ -93,7 +93,7 @@ module.exports = function (api) {
 ## 6. Enable CSS Support in Expo's Metro Config
 
 ```js
-// metro.confgi.js
+// metro.config.js
 const { getDefaultConfig } = require("expo/metro-config");
 
 const config = getDefaultConfig(__dirname, {
