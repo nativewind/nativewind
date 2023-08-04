@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-alpha.0",
+  "version": "4.0.0-alpha.1",
   "name": "nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "main": "dist/index.js",
@@ -47,7 +47,7 @@
     "types.d.ts"
   ],
   "dependencies": {
-    "react-native-css-interop": "0.0.0-03c18f57"
+    "react-native-css-interop": "0.0.0-alpha.1"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
