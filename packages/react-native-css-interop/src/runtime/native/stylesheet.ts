@@ -103,7 +103,6 @@ const commonStyleSheet: CommonStyleSheet = {
     };
   },
   register(options: StyleSheetRegisterOptions) {
-    console.log(options.declarations?.["my-class"]);
     if (options.keyframes) {
       for (const [name, keyframes] of Object.entries(options.keyframes)) {
         animationMap.set(name, keyframes);
