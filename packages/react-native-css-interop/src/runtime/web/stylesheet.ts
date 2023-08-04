@@ -4,6 +4,7 @@ import {
   DarkMode,
   DevHotReloadSubscription,
   INTERNAL_RESET,
+  INTERNAL_VERIFICATION_FLAGS,
 } from "../../shared";
 
 export const useUnstableNativeVariables = () => ({});
@@ -12,6 +13,7 @@ export function vars(variables: Record<`--${string}`, string | number>) {
 }
 
 const commonStyleSheet: CommonStyleSheet = {
+  [INTERNAL_VERIFICATION_FLAGS]: {},
   [INTERNAL_RESET](_options) {
     return;
   },
