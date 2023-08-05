@@ -25,7 +25,7 @@ export default function TabOneScreen() {
   return (
     <FlatList
       data={DATA}
-      className="bg-green-500 transition-colors"
+      className="bg-orange-500 transition-colors"
       renderItem={({ item }) => <Text>{item.title}</Text>}
       keyExtractor={(item) => item.id}
     />
