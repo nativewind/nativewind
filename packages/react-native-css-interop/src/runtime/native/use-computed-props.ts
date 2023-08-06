@@ -16,6 +16,7 @@ import {
   Interaction,
   InteropFunctionOptions,
   InteropMeta,
+  JSXFunction,
   RuntimeValue,
   Style,
   StyleMeta,
@@ -42,10 +43,11 @@ type UseStyledPropsOptions = InteropFunctionOptions<Record<string, unknown>>;
  */
 export function useStyledProps<P extends Record<string, any>>(
   $props: P,
+  jsx: JSXFunction<P>,
   options: UseStyledPropsOptions,
   rerender: () => void,
 ) {
-  const propsRef = useRef<Record<string, any>>($props);
+  const propsRef = useRef<P>($props);
   propsRef.current = $props;
 
   const inheritedContainers = useContext(ContainerContext);
@@ -87,6 +89,7 @@ export function useStyledProps<P extends Record<string, any>>(
         computedVariables,
         inheritedContainers,
         interaction,
+        jsx,
         options,
       ),
     [computedVariables, inheritedContainers, ...options.dependencies],
@@ -104,6 +107,7 @@ export function getStyledProps<P extends Record<string, any>>(
   computedVariables: Record<string, unknown>,
   inheritedContainers: Record<string, ContainerRuntime>,
   interaction: Interaction,
+  jsx: JSXFunction<P>,
   options: UseStyledPropsOptions,
 ) {
   const styledProps: Record<string, any> = {};
@@ -254,6 +258,7 @@ export function getStyledProps<P extends Record<string, any>>(
     transitionProps,
     variables,
     requiresLayout,
+    jsx,
   };
 
   return {

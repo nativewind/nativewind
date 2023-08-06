@@ -59,7 +59,7 @@ export const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
     useEffect(() => StyleSheet[DevHotReloadSubscription](rerender), []);
   }
 
-  const { styledProps, meta } = useStyledProps($props, options, rerender);
+  const { styledProps, meta } = useStyledProps($props, jsx, options, rerender);
 
   const props = {
     ...$props,

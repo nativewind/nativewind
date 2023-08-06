@@ -7,6 +7,7 @@ import type {
   ContainerCondition,
   Declaration,
 } from "lightningcss";
+import { ComponentType } from "react";
 import {
   Appearance,
   Dimensions,
@@ -33,7 +34,6 @@ import {
   INTERNAL_VERIFICATION_FLAGS,
   INTERNAL_RESET,
 } from "./shared";
-import { ComponentType } from "react";
 
 export interface ExtractRuleOptions {
   platform?: string;
@@ -175,6 +175,7 @@ export type InteropMeta = {
   transitionProps: Set<string>;
   requiresLayout: boolean;
   variables: Record<string, unknown>;
+  jsx: JSXFunction<any>;
 };
 
 export type Interaction = {

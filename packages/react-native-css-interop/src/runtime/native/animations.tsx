@@ -39,7 +39,11 @@ const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>([
 ]);
 
 /**
- * TODO: We could probably half the amount of code if this was rewritten to use useAnimatedProps
+ * The big list of TODOs:
+ *
+ *  - Switch to using useAnimatedProps instead of useAnimatedStyle
+ *  - Animation should follow prop mapping
+ *
  */
 
 /*
@@ -66,7 +70,7 @@ export const AnimationInterop = forwardRef(function Animated(
     );
   }
 
-  return <Component ref={ref} {...props} />;
+  return meta.jsx(Component, { ...props, ref }, meta.animationInteropKey);
 });
 
 /**

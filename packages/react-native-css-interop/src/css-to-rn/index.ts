@@ -169,8 +169,6 @@ function extractRuleOptions(
 ) {
   const [option, ...rest] = tokens;
 
-  console.error(option);
-
   switch (option) {
     case "darkMode": {
       if (rest[0] === "media") {
