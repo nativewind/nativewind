@@ -45,6 +45,7 @@ export interface ExtractRuleOptions {
   rootDarkVariables: StyleSheetRegisterOptions["rootDarkVariables"];
   defaultVariables: StyleSheetRegisterOptions["defaultVariables"];
   defaultDarkVariables: StyleSheetRegisterOptions["defaultDarkVariables"];
+  verify: Record<string, unknown>;
 }
 
 declare global {
@@ -251,7 +252,7 @@ export type StyleSheetRegisterOptions = {
   defaultDarkVariables?: Record<string, ExtractedStyleValue>;
   colorSchemeClass?: string;
   darkMode?: DarkMode;
-  verificationFlags?: Record<string, unknown>;
+  verify?: Record<string, unknown>;
 };
 
 export type Style = ViewStyle & TextStyle & ImageStyle;

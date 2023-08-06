@@ -1,7 +1,7 @@
 import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 
-const isNative = process.env.NATIVEWIND_NATIVE ?? true;
+const isNative = Boolean(process.env.NATIVEWIND_NATIVE);
 
 export const darkModeAtRule = plugin(function ({ config, addBase }) {
   const darkMode = config<Config["darkMode"]>("darkMode");

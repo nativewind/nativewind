@@ -74,6 +74,7 @@ export function cssToReactNativeRuntime(
     rootDarkVariables: {},
     defaultVariables: {},
     defaultDarkVariables: {},
+    verify: {},
   };
 
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
@@ -104,6 +105,7 @@ export function cssToReactNativeRuntime(
     defaultVariables: extractOptions.defaultVariables,
     defaultDarkVariables: extractOptions.defaultDarkVariables,
     darkMode: extractOptions.darkMode,
+    verify: extractOptions.verify,
   };
 }
 
@@ -167,6 +169,8 @@ function extractRuleOptions(
 ) {
   const [option, ...rest] = tokens;
 
+  console.error(option);
+
   switch (option) {
     case "darkMode": {
       if (rest[0] === "media") {
@@ -176,6 +180,12 @@ function extractRuleOptions(
       } else if (rest[0] === "attribute" && rest[1]) {
         extractOptions.darkMode = { type: "attribute", value: rest[1] };
       }
+      break;
+    }
+    case "verify": {
+      const [name, ...other] = rest;
+      const value = other.length === 0 ? true : other;
+      extractOptions.verify[name] = value;
     }
   }
 }

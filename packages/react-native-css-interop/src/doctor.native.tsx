@@ -1,6 +1,6 @@
+import { globalStyles } from "./runtime/native/globals";
 import { StyleSheet } from "./runtime/native/stylesheet";
 import { INTERNAL_VERIFICATION_FLAGS } from "./shared";
-import { globalStyles } from "./testing-library";
 
 export function verifyJSX() {
   // @ts-expect-error

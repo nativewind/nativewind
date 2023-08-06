@@ -105,12 +105,9 @@ const commonStyleSheet: CommonStyleSheet = {
     };
   },
   register(options: StyleSheetRegisterOptions) {
-    this[INTERNAL_VERIFICATION_FLAGS]["receivedData"] = true;
-    if (options.verificationFlags) {
-      Object.assign(
-        this[INTERNAL_VERIFICATION_FLAGS],
-        options.verificationFlags,
-      );
+    this[INTERNAL_VERIFICATION_FLAGS]["$$receivedData"] = true;
+    if (options.verify) {
+      Object.assign(this[INTERNAL_VERIFICATION_FLAGS], options.verify);
     }
 
     if (options.keyframes) {

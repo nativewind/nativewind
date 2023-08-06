@@ -1,10 +1,12 @@
 import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
-import createUtilityPlugin from "tailwindcss/lib/util/createUtilityPlugin";
 
 import { darkModeAtRule } from "./dark-mode";
 import { ContentConfig, PluginUtils } from "tailwindcss/types/config";
 import { hairlineWidth } from "./functions";
+import { color } from "./color";
+import { verify } from "./verify";
+import { translateX, translateY } from "./translate";
 
 export default function nativewindPreset() {
   const preset: Config = {
@@ -53,9 +55,17 @@ export default function nativewindPreset() {
         },
       },
     },
-    plugins: [forceDark, platforms, darkModeAtRule, translateX, translateY],
+    plugins: [
+      forceDark,
+      platforms,
+      darkModeAtRule,
+      translateX,
+      translateY,
+      color,
+      verify,
+    ],
     corePlugins: {
-      translate: false,
+      translate: false, // We use a custom translateX & translateY
     },
   };
 
@@ -67,7 +77,7 @@ export default function nativewindPreset() {
  * when using darkMode: 'class'
  *
  * If the user never uses the word 'dark' the selector will never be processed
- * This is an edge, but one we often encounter in testing (where .dark)
+ * This is an edge case, but one we often encounter in testing (where .dark)
  * will only contain CSS variables and never referenced directly
  */
 const forceDark = plugin(function ({ config }) {
@@ -78,6 +88,14 @@ const forceDark = plugin(function ({ config }) {
 const platforms = plugin(function ({ addVariant }) {
   const nativePlatforms = ["android", "ios", "windows", "macos"];
 
+  /**
+   * `display-mode` is a valid media query, but the ${platform} values are not.
+   *
+   * We need to either add a new Media Condition or hijack an existing one,
+   * display-mode seems good enough?
+   *
+   * https://developer.mozilla.org/en-US/docs/Web/CSS/@media/display-mode
+   */
   for (const platform of nativePlatforms) {
     addVariant(platform, `@media (display-mode: ${platform})`);
   }
@@ -86,56 +104,4 @@ const platforms = plugin(function ({ addVariant }) {
     "native",
     nativePlatforms.map((platform) => `@media (display-mode: ${platform})`),
   );
-
-  addVariant(
-    "web",
-    nativePlatforms.map((platform) => `@media (display-mode: browser)`),
-  );
 });
-
-/**
- * React Native doesn't support % values for translate styles.
- * We need to change Tailwindcss to use the `react-native-css-interop` ch and cw units
- */
-let cssTransformValue = [
-  "translate(var(--tw-translate-x), var(--tw-translate-y))",
-  "rotate(var(--tw-rotate))",
-  "skewX(var(--tw-skew-x))",
-  "skewY(var(--tw-skew-y))",
-  "scaleX(var(--tw-scale-x))",
-  "scaleY(var(--tw-scale-y))",
-].join(" ");
-
-const translateX = createUtilityPlugin(
-  "translateX",
-  [
-    [
-      [
-        "translate-x",
-        [
-          ["@defaults transform", {}],
-          "--tw-translate-x",
-          ["transform", cssTransformValue],
-        ],
-      ],
-    ],
-  ],
-  { supportsNegativeValues: true },
-);
-
-const translateY = createUtilityPlugin(
-  "translateY",
-  [
-    [
-      [
-        "translate-y",
-        [
-          ["@defaults transform", {}],
-          "--tw-translate-y",
-          ["transform", cssTransformValue],
-        ],
-      ],
-    ],
-  ],
-  { supportsNegativeValues: true },
-);

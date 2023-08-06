@@ -2,21 +2,22 @@
 
 nativewind
 
-- [] elevation
-- [] responsive design
-- [] svgs
+- [ ] elevation
+- [ ] responsive design tests
+- [ ] svgs
 
 react-native-css-interop
 
-- [] font family
-- [] shadows
-- [] prop binding tests
-- [] refactor groups to be separate from container context
+- [ ] font family
+- [ ] shadows
+- [ ] complete tests
+- [ ] refactor groups to be separate from container context
 
 doctor
 
-- [] implement
+- [ ] implement
 
 docs
 
-- [] everything
+- [ ] everything
+- [ ] compiler

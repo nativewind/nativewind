@@ -1,11 +1,5 @@
-import {
-  ActivityIndicator,
-  FlatList,
-  Modal,
-  StatusBar,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, Text } from "react-native";
+import { verifyInstallation } from "nativewind";
 const DATA = [
   {
     id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
@@ -22,10 +16,11 @@ const DATA = [
 ];
 
 export default function TabOneScreen() {
+  verifyInstallation();
   return (
     <FlatList
       data={DATA}
-      className="bg-orange-500 transition-colors"
+      className="bg-blue-500 transition-colors"
       renderItem={({ item }) => <Text>{item.title}</Text>}
       keyExtractor={(item) => item.id}
     />

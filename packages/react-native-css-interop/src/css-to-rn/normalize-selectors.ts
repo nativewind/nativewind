@@ -1,4 +1,4 @@
-import { Selector, SelectorList } from "lightningcss";
+import type { Selector, SelectorList } from "lightningcss";
 import { ExtractRuleOptions } from "../types";
 
 export type NormalizeSelector =

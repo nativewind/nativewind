@@ -13,8 +13,6 @@ import { cssToReactNativeRuntimeOptions } from "./metro/with-tailwind-options";
 
 export { createMockComponent } from "react-native-css-interop/testing-library";
 
-import nativewindPlugin from "./tailwind";
-
 export interface RenderTailwindOptions extends RenderOptions {
   config?: Omit<Config, "content">;
   base?: boolean;
@@ -37,11 +35,12 @@ export async function renderTailwind<T extends { className: string }>(
     ...options
   }: RenderTailwindOptions = {},
 ): Promise<ReturnType<typeof render>> {
+  console.log(require("./tailwind").preset);
   let { css: output } = await postcss([
     tailwind({
       theme: {},
       ...config,
-      presets: config.presets ? config.presets : [nativewindPlugin],
+      presets: config.presets ? config.presets : [require("./tailwind").preset],
       plugins: [tailwindcssContainerQueries],
       content: getClassNames(component),
     }),

@@ -16,17 +16,11 @@ export function verifyJSX() {
 }
 
 export function verifyFlag(name: string, value: unknown = "true") {
-  return computedStyles.getPropertyValue(`--${name}`) === value;
+  return (
+    computedStyles.getPropertyValue(`--css-interop-verify-${name}`) === value
+  );
 }
 
 export function verifyReceivedData() {
-  return (
-    computedStyles.getPropertyValue(`--react-native-css-interop`) === "true"
-  );
-}
-
-export function verifyHasStyles() {
-  return (
-    computedStyles.getPropertyValue(`--react-native-css-interop`) === "true"
-  );
+  return computedStyles.getPropertyValue(`--css-interop`) === "true";
 }

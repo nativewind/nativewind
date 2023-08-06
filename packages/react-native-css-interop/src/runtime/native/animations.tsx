@@ -1,4 +1,8 @@
-import { AnimationIterationCount, AnimationName, Time } from "lightningcss";
+import type {
+  AnimationIterationCount,
+  AnimationName,
+  Time,
+} from "lightningcss";
 import { ComponentType, useMemo, forwardRef, useState, useEffect } from "react";
 import Animated, {
   AnimatableValue,
