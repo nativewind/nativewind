@@ -64,6 +64,36 @@ The `divide-` and `spacing-` utilities will be unavailable at the launch of v4 a
 
 The StyleSheet exported from NativeWind now extends `StyleSheet` from React Native and can be used a drop in replacement.
 
+### New `fontFamily` defaults
+
+NativeWind v4 adds new defaults for the font family class names. You can override these defaults in your `tailwind.config.js`. We
+
+```jsx
+import { platformSelect } from "nativewind/plugin"
+
+module.exports = {
+  theme: {
+    fontFamily: {
+      sans: platformSelect({
+        android: 'san-serif',
+        ios: 'system font',
+        web: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"'
+      }),
+      serif: platformSelect({
+        android: 'serif',
+        ios: 'Georgia'
+        web: 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif'
+      }),
+      mono: platformSelect({
+        android: 'mono',
+        ios: 'Courier New'
+        web: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
+      }),
+    }
+  }
+}
+```
+
 ### Miscellaneous Updates
 
 - Theme functions such as `hairlineWidth` and `platformSelect` are now exported from `nativewind/preset`

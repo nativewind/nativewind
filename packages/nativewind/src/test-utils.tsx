@@ -35,7 +35,6 @@ export async function renderTailwind<T extends { className: string }>(
     ...options
   }: RenderTailwindOptions = {},
 ): Promise<ReturnType<typeof render>> {
-  console.log(require("./tailwind").preset);
   let { css: output } = await postcss([
     tailwind({
       theme: {},

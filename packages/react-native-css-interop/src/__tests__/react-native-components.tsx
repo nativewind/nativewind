@@ -32,7 +32,7 @@ test("Component types", () => {
   [
     <Modal className="bg-black" presentationClassName="bg-black" />,
     <Pressable className="bg-black" />,
-    <StatusBar barClassName="bg-black" />,
+    <StatusBar className="bg-black" />,
     <Text className="bg-black" />,
     <View className="bg-black" />,
     <ImageBackground

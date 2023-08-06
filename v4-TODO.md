@@ -4,20 +4,16 @@ nativewind
 
 - [ ] elevation
 - [ ] responsive design tests
-- [ ] svgs
+- [ ] svg tests
 
 react-native-css-interop
 
-- [ ] font family
 - [ ] shadows
 - [ ] complete tests
 - [ ] refactor groups to be separate from container context
 
-doctor
-
-- [ ] implement
-
 docs
 
 - [ ] everything
+- [ ] troubleshooting
 - [ ] compiler

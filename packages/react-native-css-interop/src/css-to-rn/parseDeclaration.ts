@@ -2133,12 +2133,7 @@ function parseVerticalAlign(
 }
 
 function parseFontFamily(fontFamily: FontFamily[]) {
-  const nativeFont = fontFamily.find((f) => f.startsWith("react-native"));
-
-  if (nativeFont) {
-    return nativeFont.replace("react-native", "");
-  }
-
+  // React Native only allows one font family - better hope this is the right one :)
   return fontFamily[0];
 }
 
@@ -2284,6 +2279,8 @@ function parseRNRuntimeSpecificsFunction(
         key = undefined;
       } else {
         switch (token.value.type) {
+          case "string":
+          case "number":
           case "ident": {
             if (key) {
               runtimeArgs[key] = parseUnparsed(token, options);
@@ -2295,8 +2292,6 @@ function parseRNRuntimeSpecificsFunction(
           case "delim":
           case "comma":
             continue;
-          case "string":
-          case "number":
           case "function":
           case "at-keyword":
           case "hash":

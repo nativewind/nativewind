@@ -3,8 +3,12 @@ import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
 
-describe.skip("Typography - Font Family", () => {
-  testCases();
+describe("Typography - Font Family", () => {
+  testCases(
+    ["font-sans", style({ fontFamily: "system font" })],
+    ["font-serif", style({ fontFamily: "Georgia" })],
+    ["font-mono", style({ fontFamily: "Courier New" })],
+  );
 });
 
 describe("Typography - Font Size", () => {

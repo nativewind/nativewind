@@ -3,7 +3,7 @@ import plugin from "tailwindcss/plugin";
 
 import { darkModeAtRule } from "./dark-mode";
 import { ContentConfig, PluginUtils } from "tailwindcss/types/config";
-import { hairlineWidth } from "./functions";
+import { hairlineWidth, platformSelect } from "./functions";
 import { color } from "./color";
 import { verify } from "./verify";
 import { translateX, translateY } from "./translate";
@@ -13,6 +13,11 @@ export default function nativewindPreset() {
     content: [],
     theme: {
       extend: {
+        fontFamily: {
+          sans: platformSelect({ android: "san-serif", ios: "'system font'" }),
+          serif: platformSelect({ android: "serif", ios: "Georgia" }),
+          mono: platformSelect({ android: "mono", ios: "'Courier New'" }),
+        },
         translateX: ({ theme }: PluginUtils) => ({
           ...theme("spacing"),
           "1/2": "50cw",
