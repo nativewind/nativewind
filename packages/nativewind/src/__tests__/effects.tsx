@@ -1,11 +1,53 @@
 import { resetStyles } from "react-native-css-interop/testing-library";
-import { invalidProperty, style, testCases } from "../test-utils";
+import {
+  invalidProperty,
+  style,
+  testCases,
+  testCasesWithOptions,
+} from "../test-utils";
 
 afterEach(() => resetStyles());
 
-describe.skip("Effects - Box Shadow", () => {
-  // TODO
-  testCases();
+describe("Effects - Box Shadow", () => {
+  testCasesWithOptions(
+    { base: true },
+    [
+      "shadow-sm",
+      style({
+        elevation: 1.5,
+        shadowColor: "rgba(0, 0, 0, 0.05098039284348488)",
+        shadowOffset: {
+          height: 1,
+          width: 0,
+        },
+        shadowRadius: 1,
+      }),
+    ],
+    [
+      "shadow",
+      style({
+        elevation: 2,
+        shadowColor: "rgba(0, 0, 0, 0.10196078568696976)",
+        shadowOffset: {
+          height: 1,
+          width: 0,
+        },
+        shadowRadius: 2,
+      }),
+    ],
+    [
+      "shadow-none",
+      style({
+        elevation: 0,
+        shadowColor: "rgba(0, 0, 0, 0)",
+        shadowOffset: {
+          height: 0,
+          width: 0,
+        },
+        shadowRadius: 0,
+      }),
+    ],
+  );
 });
 
 describe.skip("Effects - Box Shadow Color", () => {

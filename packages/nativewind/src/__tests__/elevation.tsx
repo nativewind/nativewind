@@ -1,6 +1,18 @@
-import { testCases } from "../test-utils";
+import { style, testCases } from "../test-utils";
 
-describe.skip("Custom - Elevation", () => {
-  // TODO
-  testCases();
+describe("Custom - Elevation", () => {
+  testCases(
+    [
+      "elevation",
+      style({
+        elevation: 3,
+      }),
+    ],
+    [
+      "elevation-sm",
+      style({
+        elevation: 1.5,
+      }),
+    ],
+  );
 });

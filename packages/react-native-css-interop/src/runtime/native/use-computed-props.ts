@@ -416,76 +416,129 @@ export function flattenStyle(
     }
   }
 
-  for (const [key, value] of Object.entries(style)) {
+  for (let [key, value] of Object.entries(style)) {
     // Skip already set keys
     if (key in flatStyle) continue;
 
-    if (key === "transform") {
-      const transforms: Record<string, unknown>[] = [];
+    switch (key) {
+      case "transform": {
+        const transforms: Record<string, unknown>[] = [];
 
-      for (const transform of value) {
-        // Transform is either an React Native transform object OR
-        // A extracted value with type: "function"
-        if ("type" in transform) {
-          const getterOrValue = extractValue(
-            transform,
-            flatStyle,
-            flatStyleMeta,
-            options,
-          );
-
-          if (getterOrValue === undefined) {
-            continue;
-          } else if (typeof getterOrValue === "function") {
-            transforms.push(
-              Object.defineProperty({}, transform.name, {
-                configurable: true,
-                enumerable: true,
-                get() {
-                  return getterOrValue();
-                },
-              }),
-            );
-          }
-        } else {
-          for (const [tKey, tValue] of Object.entries(transform)) {
-            const $transform: Record<string, unknown> = {};
-
+        for (const transform of value) {
+          // Transform is either an React Native transform object OR
+          // A extracted value with type: "function"
+          if ("type" in transform) {
             const getterOrValue = extractValue(
-              tValue,
+              transform,
               flatStyle,
               flatStyleMeta,
               options,
             );
 
-            if (typeof getterOrValue === "function") {
-              Object.defineProperty($transform, tKey, {
-                configurable: true,
-                enumerable: true,
-                get() {
-                  return getterOrValue();
-                },
-              });
-            } else {
-              $transform[tKey] = getterOrValue;
+            if (getterOrValue === undefined) {
+              continue;
+            } else if (typeof getterOrValue === "function") {
+              transforms.push(
+                Object.defineProperty({}, transform.name, {
+                  configurable: true,
+                  enumerable: true,
+                  get() {
+                    return getterOrValue();
+                  },
+                }),
+              );
             }
+          } else {
+            for (const [tKey, tValue] of Object.entries(transform)) {
+              const $transform: Record<string, unknown> = {};
 
-            transforms.push($transform);
+              const getterOrValue = extractValue(
+                tValue,
+                flatStyle,
+                flatStyleMeta,
+                options,
+              );
+
+              if (typeof getterOrValue === "function") {
+                Object.defineProperty($transform, tKey, {
+                  configurable: true,
+                  enumerable: true,
+                  get() {
+                    return getterOrValue();
+                  },
+                });
+              } else {
+                $transform[tKey] = getterOrValue;
+              }
+
+              transforms.push($transform);
+            }
           }
         }
+
+        flatStyle.transform =
+          transforms as unknown as TransformsStyle["transform"];
+        break;
       }
+      case "textShadow": {
+        extractAndDefineProperty(
+          "textShadow.width",
+          value[0],
+          flatStyle,
+          flatStyleMeta,
+          options,
+        );
+        extractAndDefineProperty(
+          "textShadow.height",
+          value[1],
+          flatStyle,
+          flatStyleMeta,
+          options,
+        );
+        break;
+      }
+      case "shadowOffset": {
+        extractAndDefineProperty(
+          "shadowOffset.width",
+          value[0],
+          flatStyle,
+          flatStyleMeta,
+          options,
+        );
+        extractAndDefineProperty(
+          "shadowOffset.height",
+          value[1],
+          flatStyle,
+          flatStyleMeta,
+          options,
+        );
+        break;
+      }
+      default:
+        extractAndDefineProperty(key, value, flatStyle, flatStyleMeta, options);
+    }
+  }
 
-      flatStyle.transform =
-        transforms as unknown as TransformsStyle["transform"];
-    } else {
-      const getterOrValue = extractValue(
-        value,
-        flatStyle,
-        flatStyleMeta,
-        options,
-      );
+  return flatStyle;
+}
 
-      Object.defineProperty(flatStyle, key, {
+function extractAndDefineProperty(
+  key: string,
+  value: unknown,
+  flatStyle: Style,
+  flatStyleMeta: StyleMeta,
+  options: FlattenStyleOptions,
+) {
+  const getterOrValue = extractValue(value, flatStyle, flatStyleMeta, options);
+
+  if (getterOrValue === undefined) return;
+
+  const tokens = key.split(".");
+  let target = flatStyle as any;
+
+  for (const [index, token] of tokens.entries()) {
+    if (index === tokens.length - 1) {
+      Object.defineProperty(target, token, {
         configurable: true,
         enumerable: true,
         get() {
@@ -494,21 +547,13 @@ export function flattenStyle(
             : getterOrValue;
         },
       });
+    } else {
+      target[token] ??= {};
+      target = target[token];
     }
   }
-
-  return flatStyle;
 }
 
-/**
- * Extracts a value from a StyleProp.
- * If the value is a dynamic value, it will be resolved.
- * @param value - The value to extract.
- * @param flatStyle - The flat Style object being built.
- * @param flatStyleMeta - Metadata for the flat Style object.
- * @param options - Options for flattening the StyleProp.
- * @returns The extracted value.
- */
 function extractValue<T>(
   value: unknown,
   flatStyle: Style,

@@ -7,6 +7,7 @@ import { hairlineWidth, platformSelect } from "./functions";
 import { color } from "./color";
 import { verify } from "./verify";
 import { translateX, translateY } from "./translate";
+import { shadows } from "./shadows";
 
 export default function nativewindPreset() {
   const preset: Config = {
@@ -17,6 +18,15 @@ export default function nativewindPreset() {
           sans: platformSelect({ android: "san-serif", ios: "'system font'" }),
           serif: platformSelect({ android: "serif", ios: "Georgia" }),
           mono: platformSelect({ android: "mono", ios: "'Courier New'" }),
+        },
+        boxShadow: {
+          sm: "0 1px 1px rgb(0 0 0 / 0.05)",
+          DEFAULT: "0 1px 2px rgb(0 0 0 / 0.1)",
+          md: "0 4px 3px rgb(0 0 0 / 0.1)",
+          lg: "0 10px 8px rgb(0 0 0 / 0.1)",
+          xl: "0 20px 13px rgb(0 0 0 / 0.1)",
+          "2xl": "0 25px 25px rgb(0 0 0 / 0.15)",
+          none: "0 0 #0000",
         },
         translateX: ({ theme }: PluginUtils) => ({
           ...theme("spacing"),
@@ -61,16 +71,18 @@ export default function nativewindPreset() {
       },
     },
     plugins: [
+      color,
+      darkModeAtRule,
+      shadows,
       forceDark,
       platforms,
-      darkModeAtRule,
       translateX,
       translateY,
-      color,
       verify,
     ],
     corePlugins: {
       translate: false, // We use a custom translateX & translateY
+      boxShadow: false, // We use a custom plugin to add elevation for android
     },
   };
 

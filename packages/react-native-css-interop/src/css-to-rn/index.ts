@@ -722,5 +722,9 @@ function getExtractedStyle(
 }
 
 function kebabToCamelCase(str: string) {
+  if (str.startsWith("-rn-")) {
+    str = str.slice("-rn-".length);
+  }
+
   return str.replace(/-./g, (x) => x[1].toUpperCase());
 }

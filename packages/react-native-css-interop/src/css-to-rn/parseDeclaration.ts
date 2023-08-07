@@ -34,6 +34,7 @@ import type {
   VerticalAlign,
   Transform,
   Token,
+  BoxShadow,
 } from "lightningcss";
 
 import type {
@@ -135,36 +136,39 @@ export function parseDeclaration(
       parseUnparsed(declaration.value.value, parseOptions),
     );
   } else if (declaration.property === "custom") {
+    const property = declaration.value.name;
     if (
-      !validPropertiesLoose.has(declaration.value.name) &&
-      !declaration.value.name.startsWith("--")
+      validPropertiesLoose.has(property) ||
+      property.startsWith("--") ||
+      property.startsWith("-rn-")
     ) {
+      // console.log(property, declaration.value.value);
+      return addStyleProp(
+        property,
+        parseUnparsed(declaration.value.value, {
+          ...options,
+          addValueWarning(value: any) {
+            return addWarning({
+              type: "IncompatibleNativeValue",
+              property,
+              value,
+            });
+          },
+          addFunctionValueWarning(value: any) {
+            return addWarning({
+              type: "IncompatibleNativeFunctionValue",
+              property,
+              value,
+            });
+          },
+        }),
+      );
+    } else {
       return addWarning({
         type: "IncompatibleNativeProperty",
         property: declaration.value.name,
       });
     }
-
-    return addStyleProp(
-      declaration.value.name,
-      parseUnparsed(declaration.value.value, {
-        ...options,
-        addValueWarning(value: any) {
-          return addWarning({
-            type: "IncompatibleNativeValue",
-            property: declaration.value.name,
-            value,
-          });
-        },
-        addFunctionValueWarning(value: any) {
-          return addWarning({
-            type: "IncompatibleNativeFunctionValue",
-            property: declaration.value.name,
-            value,
-          });
-        },
-      }),
-    );
   }
 
   const parseOptions = {
@@ -1219,6 +1223,12 @@ export function parseDeclaration(
         declaration.property,
         parseTextAlign(declaration.value, parseOptions),
       );
+    case "box-shadow": {
+      return addStyleProp(
+        declaration.property,
+        parseBoxShadow(declaration.value, parseOptions),
+      );
+    }
     default: {
       const $declaration = declaration as any;
 
@@ -1264,6 +1274,7 @@ const validProperties = [
   "bottom",
   "left",
   "right",
+  "box-shadow",
   "inset-block-start",
   "inset-block-end",
   "inset-inline-start",
@@ -1446,9 +1457,13 @@ function unparsedKnownShorthand(
  * This function best efforts parsing it into a function that we can evaluate at runtime
  */
 function parseUnparsed(
-  tokenOrValue: TokenOrValue | TokenOrValue[] | string | number,
+  tokenOrValue: TokenOrValue | TokenOrValue[] | string | number | undefined,
   options: ParseDeclarationOptionsWithValueWarning,
 ): string | number | object | undefined {
+  if (tokenOrValue === undefined) {
+    return;
+  }
+
   if (typeof tokenOrValue === "string") {
     return tokenOrValue;
   }
@@ -1530,6 +1545,7 @@ function parseUnparsed(
         case "roundToNearestPixel":
         case "pixelScale":
         case "fontScale":
+        case "shadow":
           return unparsedFunction(tokenOrValue, options);
         case "hairlineWidth":
           return {
@@ -1605,6 +1621,7 @@ function parseUnparsed(
         }
       }
     case "color":
+      return parseColor(tokenOrValue.value, options);
     case "url":
     case "env":
     case "time":
@@ -2007,16 +2024,16 @@ function parseFontWeight(
 }
 
 function parseTextShadow(
-  [textshadow]: TextShadow[],
+  [textShadow]: TextShadow[],
   addStyleProp: AddStyleProp,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
-  addStyleProp("textShadowColor", parseColor(textshadow.color, options));
-  addStyleProp("textShadowOffset", {
-    width: parseLength(textshadow.xOffset, options),
-    height: parseLength(textshadow.yOffset, options),
-  });
-  addStyleProp("textShadowRadius", parseLength(textshadow.blur, options));
+  addStyleProp("textShadowColor", parseColor(textShadow.color, options));
+  addStyleProp("textShadowOffset", [
+    parseLength(textShadow.xOffset, options),
+    parseLength(textShadow.yOffset, options),
+  ]);
+  addStyleProp("textShadowRadius", parseLength(textShadow.blur, options));
 }
 
 function parseTextDecorationStyle(
@@ -2342,6 +2359,25 @@ function parseTextAlign(
 
   options.addValueWarning(textAlign);
   return undefined;
+}
+
+function parseBoxShadow(
+  boxShadows: BoxShadow[],
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  if (boxShadows.length > 1) {
+    options.addValueWarning("multiple box shadows");
+    return;
+  }
+
+  const boxShadow = boxShadows[0];
+
+  options.addStyleProp("shadowColor", parseColor(boxShadow.color, options));
+  options.addStyleProp("shadowRadius", parseLength(boxShadow.spread, options));
+  options.addStyleProp("shadowOffset", {
+    width: parseLength(boxShadow.xOffset, options),
+    height: parseLength(boxShadow.yOffset, options),
+  });
 }
 
 function parseDisplay(

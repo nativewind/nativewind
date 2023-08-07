@@ -146,6 +146,6 @@ test("FlatList", () => {
 
   expect(columnWrapper).toHaveStyle([
     { flexDirection: "row" },
-    new OpaqueStyleToken(),
+    new OpaqueStyleToken() as any,
   ]);
 });

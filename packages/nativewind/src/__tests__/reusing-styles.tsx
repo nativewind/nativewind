@@ -37,5 +37,12 @@ test("@apply", async () => {
     paddingLeft: 14,
     paddingRight: 14,
     paddingTop: 7,
+    elevation: 3,
+    shadowColor: "rgba(0, 0, 0, 0.10196078568696976)",
+    shadowOffset: {
+      height: 4,
+      width: 0,
+    },
+    shadowRadius: 3,
   });
 });
