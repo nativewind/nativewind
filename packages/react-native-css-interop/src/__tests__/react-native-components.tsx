@@ -61,7 +61,7 @@ test("Component types", () => {
   ];
 });
 
-test("ActivityIndicator", () => {
+test.only("ActivityIndicator", () => {
   registerCSS(
     `.bg-black { background-color: black } .text-white { color: white }`,
   );

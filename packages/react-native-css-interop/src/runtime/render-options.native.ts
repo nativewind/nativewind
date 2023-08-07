@@ -24,7 +24,7 @@ function getRenderOptions<P>(
   options: Map<keyof P & string, CSSInteropClassNamePropConfig<P>>,
   getStyleFn: (style?: string | object) => object | undefined,
 ): InteropFunctionOptions<P> {
-  let hasMeta = false;
+  let useWrapper = false;
 
   const dependencies: unknown[] = [];
 
@@ -46,8 +46,10 @@ function getRenderOptions<P>(
       targetKey = config;
     } else if (typeof config.target === "boolean") {
       targetKey = classNameKey;
+      useWrapper ||= Boolean(config.nativeStyleToProp);
     } else if (typeof config.target === "string") {
       targetKey = config.target;
+      useWrapper ||= Boolean(config.nativeStyleToProp);
     } else {
       throw new Error(
         `Unknown cssInterop target from config: ${JSON.stringify(config)}`,
@@ -80,7 +82,7 @@ function getRenderOptions<P>(
     if (styles) {
       configMap.set(targetKey, config);
       remappedProps[targetKey] = styles as P[keyof P & string];
-      hasMeta ||= stylePropHasMeta(styles);
+      useWrapper ||= stylePropHasMeta(styles);
     }
   }
 
@@ -88,7 +90,7 @@ function getRenderOptions<P>(
     remappedProps,
     configMap,
     dependencies,
-    hasMeta,
+    useWrapper,
   };
 }
 

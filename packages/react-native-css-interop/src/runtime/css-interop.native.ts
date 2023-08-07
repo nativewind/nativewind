@@ -18,7 +18,7 @@ export const defaultCSSInterop: InteropFunction = (
   key,
   options,
 ) => {
-  if (!options.hasMeta) {
+  if (!options.useWrapper) {
     return jsx(type, props, key);
   }
 

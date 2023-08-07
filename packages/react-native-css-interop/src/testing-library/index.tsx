@@ -21,8 +21,9 @@ export {
   warnings,
 } from "../runtime/native/globals";
 
-export * from "../types";
+import "../core-components";
 
+export * from "../types";
 declare global {
   namespace jest {
     interface Matchers<R> {

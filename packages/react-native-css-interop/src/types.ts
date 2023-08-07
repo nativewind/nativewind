@@ -98,7 +98,7 @@ export type InteropFunctionOptions<P> = {
   remappedProps: P;
   configMap: Map<keyof P & string, CSSInteropClassNamePropConfig<P>>;
   dependencies: unknown[];
-  hasMeta: boolean;
+  useWrapper: boolean;
 };
 
 export type RuntimeValue = {

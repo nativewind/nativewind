@@ -8,7 +8,7 @@ import {
 const interopOptions = {
   configMap: new Map(),
   dependencies: [],
-  hasMeta: false,
+  useWrapper: false,
 };
 
 export function getInteropFunctionOptions<P>(
