@@ -1,1 +1,1 @@
-/// <ref types="react-native-css-interop-env/types"
+/// <reference types="react-native-css-interop/types" />

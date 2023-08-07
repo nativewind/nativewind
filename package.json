@@ -10,7 +10,7 @@
     "test:nativewind": "npm run test --workspace=nativewind --",
     "test:css": "npm run test --workspace=react-native-css-interop --",
     "build": "npm run build --workspace=nativewind --",
-    "example": "npm start --workspace=example --",
+    "example": "npm start --workspace=examples/test --",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i"
   },
   "devDependencies": {

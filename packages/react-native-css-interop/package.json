@@ -43,7 +43,7 @@
     "jsx-runtime/",
     "metro/",
     "testing-library/",
-    "react-native-css-interop-env.d.ts"
+    "types.d.ts"
   ],
   "dependencies": {
     "lightningcss": "^1.21.5"
