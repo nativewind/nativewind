@@ -331,6 +331,7 @@ export interface CommonStyleSheet {
   [INTERNAL_VERIFICATION_FLAGS]: Record<string, unknown>;
   [DevHotReloadSubscription](subscription: () => void): () => void;
   classNameMergeStrategy(c: string): string;
+  dangerouslyCompileStyles(c: string): void;
   register(options: StyleSheetRegisterOptions): void;
   /**
    * Internal flag to signal if web should use a className to set Dark Mode.

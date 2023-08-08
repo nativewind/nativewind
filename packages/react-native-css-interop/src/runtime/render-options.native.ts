@@ -1,9 +1,10 @@
-import { getGlobalStyle, getOpaqueStyle, styleMetaMap } from "./native/globals";
+import { styleMetaMap } from "./native/globals";
 import {
   CSSInteropClassNamePropConfig,
   InteropFunctionOptions,
   StyleProp,
 } from "../types";
+import { getGlobalStyle, getOpaqueStyle } from "./native/stylesheet";
 
 export function getInteropFunctionOptions<P>(
   props: P,

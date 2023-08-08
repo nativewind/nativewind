@@ -98,6 +98,7 @@ const commonStyleSheet: CommonStyleSheet = {
   classNameMergeStrategy(c) {
     return c;
   },
+  dangerouslyCompileStyles() {},
   [DevHotReloadSubscription](subscription) {
     subscriptions.add(subscription);
     return () => {
@@ -314,4 +315,30 @@ export function vars(variables: Record<string, string | number>) {
   opaqueStyles.set(opaqueStyle, styleProp);
 
   return opaqueStyle as StyleProp;
+}
+
+export function getGlobalStyle(style?: string | object) {
+  if (!style) return;
+  if (typeof style === "string") {
+    if (warnings.has(style) && !warned.has(style)) {
+      warned.add(style);
+      if (process.env.NODE_ENV === "development") {
+        console.log(warnings.get(style));
+      }
+    }
+
+    return globalStyles.get(style);
+  } else {
+    return opaqueStyles.get(style) ?? style;
+  }
+}
+
+export function getOpaqueStyle(name?: string | object) {
+  const style = getGlobalStyle(name);
+
+  if (!style) return;
+
+  const opaqueStyle = Object.freeze(new OpaqueStyleToken());
+  opaqueStyles.set(opaqueStyle, style);
+  return opaqueStyle;
 }

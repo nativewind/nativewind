@@ -25,7 +25,6 @@ const sidebars = {
       collapsed: false,
       items: [
         "overview/overview",
-        "overview/how-it-works",
         "guides/goals",
         // "overview/benchmarks",
       ],
@@ -46,40 +45,6 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Advanced Setup",
-      collapsed: false,
-      items: [
-        "guides/babel",
-        "guides/babel-compile-only",
-        "guides/babel-transform-only",
-        "guides/postcss",
-        "guides/cli-native",
-      ],
-    },
-    {
-      type: "category",
-      label: "Guides",
-      collapsed: false,
-      items: [
-        "guides/theme-values",
-        "guides/custom-components",
-        "guides/troubleshooting",
-        "guides/tailwindcss-react-native",
-      ],
-    },
-    {
-      type: "category",
-      label: "API",
-      collapsed: false,
-      items: [
-        "api/styled",
-        "api/StyledComponent",
-        "api/use-color-scheme",
-        "api/native-wind-style-sheet",
-      ],
-    },
-    {
-      type: "category",
       label: "Core concepts",
       collapsed: false,
       items: [
@@ -94,6 +59,16 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "Guides",
+      collapsed: false,
+      items: [
+        "guides/troubleshooting",
+        "guides/custom-components",
+        "guides/theme-values",
+      ],
+    },
+    {
+      type: "category",
       label: "Customization",
       collapsed: false,
       items: [
@@ -101,8 +76,13 @@ const sidebars = {
         "customization/content",
         "customization/theme",
         "customization/colors",
-        "customization/babel",
       ],
+    },
+    {
+      type: "category",
+      label: "API",
+      collapsed: false,
+      items: ["api/use-color-scheme", "api/native-wind-style-sheet"],
     },
     {
       type: "category",

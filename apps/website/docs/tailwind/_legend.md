@@ -10,8 +10,10 @@
 
 :white_check_mark: Full support
 
-:heavy_check_mark: Partial support
+:heavy_check_mark: Partial support on native
 
-:x: Not supported
+:iphone: Native only
+
+:globe_with_meridians: Web only
 
 </details>

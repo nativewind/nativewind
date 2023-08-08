@@ -20,6 +20,7 @@ const commonStyleSheet: CommonStyleSheet = {
   classNameMergeStrategy(c) {
     return c;
   },
+  dangerouslyCompileStyles() {},
   [DevHotReloadSubscription]() {
     return () => {};
   },

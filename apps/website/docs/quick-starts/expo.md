@@ -4,7 +4,7 @@ import StartCoding from "../\_start-coding.md"
 
 :::tip
 
-A example of an Expo project can be found on [Github](https://github.com/marklawlor/nativewind/tree/next/examples/expo)
+A example of an Expo project can be found on [Github](https://github.com/marklawlor/nativewind/tree/v4/examples/expo)
 
 :::
 
@@ -68,10 +68,9 @@ When running on web, NativeWind is a compatability layer between [Tailwind CSS](
 
 You will need follow a [Tailwind CSS installation guide](https://tailwindcss.com/docs/installation) and ensure NativeWind is transpiled.
 
-
 ### Example webpack setup
 
-A complete setup can be found on the [Expo project example](https://github.com/marklawlor/nativewind/tree/next/examples/expo) 
+A complete setup can be found on the [Expo project example](https://github.com/marklawlor/nativewind/tree/next/examples/expo)
 
 :::caution
 
@@ -97,7 +96,7 @@ module.exports = async function (env, argv) {
         dangerouslyAddModulePathsToTranspile: ["nativewind"],
       },
     },
-    argv
+    argv,
   );
 
   config.module.rules.push({

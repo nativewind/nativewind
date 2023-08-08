@@ -1,25 +1,40 @@
 # Troubleshooting
 
-## Styles randomly not working
+NativeWind is built on top of Tailwind CSS CLI, so before you suspect an issue with NativeWind you should ensure that Tailwind CSS is working as expected. You can see the Tailwind CSS output by inspecting the file `node_modules/.cache/nativewind/<input-css-filename>.<platform>.css`.
 
-NativeWind adds code to each file which is cached by Webpack/Metro. As each file is cache individually, changes to your `tailwind.config.js` or other files may not be reflected across your project.
+For example, are suspect that your custom class `text-brand` is not working. You have verified that your `tailwind.config.js` has color's correctly configured, but it appears NativeWind is not working.
 
-To fix this issue, simply clear your project's cache either by `expo start -c` or `react-native start --reset-cache`.
+1. Open `node_modules/.cache/nativewind/<input-css-filename>.<platform>.css`
+2. Look for the CSS class `.text-brand`
 
-## Native styles not working at all
+In this hypothetical scenario, we're unable to find the CSS rule for `.text-brand`. \*\*Therefor there is a problem with our `tailwind.config.js`. We can verify this by running `npx tailwindcss --input <input.css>` and seeing that it too doesn't contain `.text-brand`. After following (Tailwind CSS' Troubleshooting guide)[https://tailwindcss.com/docs/content-configuration#troubleshooting] you find that you forgot to include `.jsx` files in your `content` glob.
 
-### Follow the official troubleshooting guide
+**Only once you see the expected CSS being generated should you start this troubleshooting guide.**
 
-Please read the [Tailwind content troubleshooting](https://tailwindcss.com/docs/content-configuration#classes-aren-t-generated)
+:::tip
 
-### Verify your configuration
+While troubleshooting, always start your application without the cache!
 
-If you are 100% your files are covered by `content`, try running
+- Expo `npx expo start --clear`
+- RN CLI `npx react-native start --reset-cache`
 
-`npx tailwind -o output.css`
+:::
 
-This will generate a `output.css` file with your projects styles written as `css`. Verify that it includes your expected styles (it may include extra styles).
+## Running `verifyInstallation()`
 
-### Manually generate the output
+NativeWind includes a helper function called `verifyInstallation()` to verify it has been installed correctly. You should run `verifyInstallation` inside a React component (not on the global scope)
 
-Follow the [Native Tailwind CLI setup guide](https://www.nativewind.dev/guides/cli-native#native) to generate `nativewind-output.js`. This file includes the generated NativeWind styles.
+```tsx
+import { verifyInstallation } from "nativewind";
+
+export function App() {
+  // Make this you run this inside a component
+  verifyInstallation();
+
+  return <View />;
+}
+```
+
+`verifyInstallation()` will `error` if there is a problem and `warn` on success. If you do not receive any message, please verify it was run correctly. You can use this both on native and web to verify either platform.
+
+Please follow any instructions provided by `verifyInstallation`.
