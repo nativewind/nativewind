@@ -40,10 +40,11 @@
   "files": [
     "babel/",
     "dist/",
+    "expo-snack",
     "jsx-dev-runtime/",
     "jsx-runtime/",
     "metro",
-    "tailwind/",
+    "preset/",
     "types.d.ts"
   ],
   "dependencies": {

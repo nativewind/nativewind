@@ -42,6 +42,7 @@
     "jsx-dev-runtime/",
     "jsx-runtime/",
     "metro/",
+    "doctor/",
     "testing-library/",
     "types.d.ts"
   ],
