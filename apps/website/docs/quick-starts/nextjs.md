@@ -2,51 +2,54 @@
 
 NativeWind can be used in a Next.js project that is already configured to use Expo or vanilla React Native Web.
 
+Setting up a new Next.js project to use React Native Web is out of scope for these instructions.
+
 ## 1. Setup Tailwind CSS
 
 Simply configure Next.js as per [the Tailwind CSS Next.js setup guide](https://tailwindcss.com/docs/guides/nextjs)
 
-## 2. Add the NativeWind plugin
+## 2. Add the NativeWind preset
 
-NativeWind adds some extra Tailwind features such as platform variants. You will need to add the `nativewind/tailwind/css` if you use these features.
+NativeWind adds some extra Tailwind features such as platform variants.
 
-```diff
+```diff title=tailwind.config.js
+
 module.exports = {
   content: [
     './pages/**/*.{js,jsx,ts,tsx}',
   ],
-+ plugins: [require('nativewind/tailwind/css')],
++ presets: [require('nativewind/preset')],
   theme: {
     extend: {},
   },
 }
 ```
 
-## 3. Choose a compiler
+## Update import source
 
-### Via SWC
+Next.js uses a `jsconfig.json`/`tsconfig.json` file to configure the `jsxImportSource`.
 
-NativeWind does not yet have an SWC transformer. If you wish to use SWC you will need to wrap your components in `styled()`
-
-### Via Babel
-
-As Next.js is compiling your styles, you can run the Babel plugin in 'transformOnly' mode.
-
-```diff
-// babel.config.js
-module.exports = {
-- plugins: [],
-+ plugins: ['nativewind/babel', { mode: 'transformOnly' }],
-};
+```json title=tsconfig.json
+{
+  "compilerOptions": {
+    "jsxImportSource": "nativewind"
+  }
+}
 ```
 
-## 4. Common issues
+## Common issues
 
-A common issue with Next.js is your styles are imported, but are being overridden by React Native Wind. This is due to the order stylesheet imports.
+### Errors about package imports.
+
+This signals that you have incorrectly setup React Native Web and most likely need to add additional packages to `transpilePackages`. This is out of scope for NativeWind.
+
+### Styles are not being applied
+
+A common issue with Next.js is your styles are imported, but are being overridden by another StyleSheet due to the order stylesheet imports.
 
 A simple fix is simply make the Tailwind styles a higher specificity.
 
-```diff
+```diff title=tailwind.config.json
 module.exports = {
   content: [
     './pages/**/*.{js,jsx,ts,tsx}',

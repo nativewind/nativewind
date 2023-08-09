@@ -35,15 +35,15 @@ module.exports = {
 }
 ```
 
-## 3. Add the Babel plugin
+## 3. Add the Babel preset
 
 Modify your `babel.config.js`
 
 ```diff
 // babel.config.js
 module.exports = {
-  presets: ['module:metro-react-native-babel-preset'],
-+ plugins: ["nativewind/babel"],
+- presets: ['module:metro-react-native-babel-preset'],
++ presets: ['module:metro-react-native-babel-preset', 'nativewind/babel'],
 };
 ```
 

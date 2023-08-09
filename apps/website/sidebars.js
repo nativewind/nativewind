@@ -15,11 +15,6 @@
 const sidebars = {
   docs: [
     {
-      type: "doc",
-      id: "home",
-      className: "home",
-    },
-    {
       type: "category",
       label: "Overview",
       collapsed: false,

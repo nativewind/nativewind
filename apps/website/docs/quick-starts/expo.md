@@ -2,12 +2,6 @@ import StartCoding from "../\_start-coding.md"
 
 # Expo
 
-:::tip
-
-A example of an Expo project can be found on [Github](https://github.com/marklawlor/nativewind/tree/v4/examples/expo)
-
-:::
-
 ## 1. Create the project
 
 Create the project with the Expo CLI
@@ -35,6 +29,7 @@ Add the paths to all of your component files in your tailwind.config.js file. Re
 // tailwind.config.js
 
 module.exports = {
++ presets: [require("nativewind/preset")],
 - content: [],
 + content: ["./App.{js,jsx,ts,tsx}", "./<custom directory>/**/*.{js,jsx,ts,tsx}"],
   theme: {
@@ -44,7 +39,34 @@ module.exports = {
 }
 ```
 
-## 3. Add the Babel plugin
+Create a CSS file
+
+```css
+// global.css
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+## 3. Add the Metro preset
+
+Make sure `<your-css-file>.css` matches path relative to the CSS file you created in the last step.
+
+```diff
++ const { getDefaultConfig } = require("expo/metro-config");
++ const { withNativeWind } = require('nativewind/metro');
+
++ const config = getDefaultConfig(__dirname, {
++   isCSSEnabled: true,
++ });
+
++ module.exports = withNativeWind(config, {
++   input: '<your-css-file>.css'
++ })
+```
+
+## 4. Add the Babel preset
 
 Modify your `babel.config.js`
 
@@ -53,71 +75,40 @@ Modify your `babel.config.js`
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ["babel-preset-expo"],
-+   plugins: ["nativewind/babel"],
+-   presets: ["babel-preset-expo"],
++   plugins: ["babel-preset-expo", "nativewind/babel"],
   };
 };
+```
 
+## 5. Input your CSS file
+
+Input your `<your-css-file>.css` that you created in step 3.
+
+```diff
+// App.tsx
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View } from 'react-native';
+
++ import "./global.css"
+
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Text>Open up App.js to start working on your app!</Text>
+      <StatusBar style="auto" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 ```
 
 <StartCoding />
-
-## Expo Web
-
-When running on web, NativeWind is a compatability layer between [Tailwind CSS](http://www.tailwindcss.com) and React Native.
-
-You will need follow a [Tailwind CSS installation guide](https://tailwindcss.com/docs/installation) and ensure NativeWind is transpiled.
-
-### Example webpack setup
-
-A complete setup can be found on the [Expo project example](https://github.com/marklawlor/nativewind/tree/next/examples/expo)
-
-:::caution
-
-Expo Web only supports Webpack 4, please ensure you are only installing webpack loaders that that support Webpack 4. For example, The latest version of `postcss-loader` is not compatible with Webpack 4 and instead, `postcss-loader@4.2.0` should be used.
-
-https://github.com/expo/expo-cli/pull/3763
-
-:::
-
-Expo Web uses webpack, so one possible setup is adding `PostCSS` to your `webpack.config.js` and adding [Tailwind CSS as a PostCSS plugin](https://tailwindcss.com/docs/installation/using-postcss).
-
-You can also add `nativewind` to your transpilation list through the `@expo/webpack-config` babel options.
-
-```tsx
-// webpack.config.js
-const createExpoWebpackConfigAsync = require("@expo/webpack-config");
-
-module.exports = async function (env, argv) {
-  const config = await createExpoWebpackConfigAsync(
-    {
-      ...env,
-      babel: {
-        dangerouslyAddModulePathsToTranspile: ["nativewind"],
-      },
-    },
-    argv,
-  );
-
-  config.module.rules.push({
-    test: /\.css$/i,
-    use: ["postcss-loader"],
-  });
-
-  return config;
-};
-```
-
-### Expo SDK <=45
-
-Expo SDK <=45 supports React Native Web <=0.17 which cannot output classNames. You need to change the NativeWindStyleSheet output to use `native` for all platforms.
-
-```tsx
-// App.js
-
-import { NativeWindStyleSheet } from "nativewind";
-
-NativeWindStyleSheet.setOutput({
-  default: "native",
-});
-```
