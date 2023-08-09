@@ -91,13 +91,16 @@ export function normalizeSelectors(
       switch (component.type) {
         case "universal":
         case "namespace":
-        case "type":
         case "id":
         case "attribute":
         case "pseudo-element":
         case "nesting":
           isValid = false;
           break;
+        case "type": {
+          isValid = component.name === options.selectorPrefix;
+          break;
+        }
         case "combinator": {
           if (component.value !== "descendant") {
             isValid = false;
@@ -130,6 +133,9 @@ export function normalizeSelectors(
                 normalizedSelector.pseudoClasses;
               normalizedSelector.pseudoClasses = {};
             }
+          } else if (component.name === options.selectorPrefix?.slice(1)) {
+            // Need to remove the leading `.`
+            break;
           } else {
             normalizedSelector.className = component.name;
           }

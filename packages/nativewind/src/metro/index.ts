@@ -1,4 +1,5 @@
 import type { GetTransformOptionsOpts } from "metro-config";
+import loadConfig from "tailwindcss/loadConfig";
 
 import path from "node:path";
 import {
@@ -13,13 +14,19 @@ import { tailwindCli } from "./tailwind-cli";
 interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
   input?: string;
   output?: string;
+  configPath?: string;
 }
 
 const outputDir = ["node_modules", ".cache", "nativewind"].join(path.sep);
 
 export function withNativeWind(
-  config: ComposableIntermediateConfigT,
-  { input, output, inlineRem = 14 }: WithNativeWindOptions,
+  metroConfig: ComposableIntermediateConfigT,
+  {
+    input,
+    output,
+    inlineRem = 14,
+    configPath: tailwindConfigPath = "tailwind.config",
+  }: WithNativeWindOptions,
 ) {
   if (!input) {
     throw new Error(
@@ -38,13 +45,19 @@ export function withNativeWind(
     output = path.resolve(output);
   }
 
-  config = withCssInterop(config, {
+  metroConfig = withCssInterop(metroConfig, {
     ...cssToReactNativeRuntimeOptions,
     inlineRem,
   });
 
+  const { important: importantConfig } = loadConfig(
+    path.resolve(tailwindConfigPath),
+  );
+
   // eslint-disable-next-line unicorn/prefer-module
-  config.transformerPath = require.resolve("nativewind/dist/metro/transformer");
+  metroConfig.transformerPath = require.resolve(
+    "nativewind/dist/metro/transformer",
+  );
 
   let tailwindHasStarted: Record<string, boolean> = {
     native: false,
@@ -53,12 +66,16 @@ export function withNativeWind(
 
   // Use getTransformOptions to bootstrap the Tailwind CLI, but ensure
   // we still call the original
-  const previousTransformOptions = config.transformer?.getTransformOptions;
-  config.transformer = {
-    ...config.transformer,
+  const previousTransformOptions = metroConfig.transformer?.getTransformOptions;
+  metroConfig.transformer = {
+    ...metroConfig.transformer,
     nativewind: {
       input,
       output,
+    },
+    cssToReactNativeRuntime: {
+      selectorPrefix:
+        typeof importantConfig === "string" ? importantConfig : undefined,
     },
     getTransformOptions: async (
       entryPoints: ReadonlyArray<string>,
@@ -98,5 +115,5 @@ export function withNativeWind(
     },
   };
 
-  return config;
+  return metroConfig;
 }

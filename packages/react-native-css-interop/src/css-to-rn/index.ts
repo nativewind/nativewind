@@ -29,7 +29,7 @@ export type CssToReactNativeRuntimeOptions = {
   darkMode?: false | string;
   grouping?: (string | RegExp)[];
   ignorePropertyWarningRegex?: (string | RegExp)[];
-  platform?: string;
+  selectorPrefix?: string;
 };
 
 type CSSInteropAtRule = {
@@ -49,7 +49,7 @@ type CSSInteropAtRule = {
  */
 export function cssToReactNativeRuntime(
   code: Buffer | string,
-  options: CssToReactNativeRuntimeOptions = { platform: "native" },
+  options: CssToReactNativeRuntimeOptions = {},
 ): StyleSheetRegisterOptions {
   code = typeof code === "string" ? code : code.toString("utf-8");
   // I don't know why we need to remove this line, but we do
@@ -454,12 +454,7 @@ function getExtractedStyle(
     style: {},
   };
 
-  const declarationArray = [
-    declarationBlock.declarations,
-    declarationBlock.importantDeclarations,
-  ]
-    .flat()
-    .filter((d): d is Declaration => !!d);
+  let processingImportant = false;
 
   /*
    * Adds a style property to the rule record.
@@ -504,6 +499,11 @@ function getExtractedStyle(
 
     if (isRuntimeValue(value)) {
       extractedStyle.isDynamic = true;
+    }
+
+    if (processingImportant) {
+      extractedStyle.importantStyles ??= [];
+      extractedStyle.importantStyles.push(property);
     }
   }
 
@@ -714,8 +714,17 @@ function getExtractedStyle(
     ...options,
   };
 
-  for (const declaration of declarationArray) {
-    parseDeclaration(declaration, parseDeclarationOptions);
+  if (declarationBlock.declarations) {
+    for (const declaration of declarationBlock.declarations) {
+      parseDeclaration(declaration, parseDeclarationOptions);
+    }
+  }
+
+  if (declarationBlock.importantDeclarations) {
+    processingImportant = true;
+    for (const declaration of declarationBlock.importantDeclarations) {
+      parseDeclaration(declaration, parseDeclarationOptions);
+    }
   }
 
   return extractedStyle;

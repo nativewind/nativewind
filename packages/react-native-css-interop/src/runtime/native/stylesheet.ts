@@ -255,6 +255,10 @@ function tagStyles(
       meta.requiresLayout = styles.requiresLayout;
       hasMeta = true;
     }
+    if (styles.importantStyles) {
+      meta.importantStyles = styles.importantStyles;
+      hasMeta = true;
+    }
 
     if (process.env.NODE_ENV !== "production" && styles.warnings) {
       warnings.set(name, styles.warnings);

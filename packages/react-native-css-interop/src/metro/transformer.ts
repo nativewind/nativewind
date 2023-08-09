@@ -33,10 +33,7 @@ export function transform(
   }
 
   const runtimeData = JSON.stringify(
-    cssToReactNativeRuntime(data, {
-      ...config.cssToReactNativeRuntime,
-      platform: options.platform ?? "native",
-    }),
+    cssToReactNativeRuntime(data, config.cssToReactNativeRuntime),
   );
 
   data = Buffer.from(

@@ -1,6 +1,5 @@
 import { forwardRef } from "react";
 import * as JSX from "react/jsx-runtime";
-import { Platform } from "react-native";
 
 import { StyleSheet, enableCSSInterop } from "../index";
 import { render } from "../runtime/render";
@@ -62,7 +61,5 @@ export function registerCSS(
   css: string,
   options?: CssToReactNativeRuntimeOptions,
 ) {
-  StyleSheet.register(
-    cssToReactNativeRuntime(css, { ...options, platform: Platform.OS }),
-  );
+  StyleSheet.register(cssToReactNativeRuntime(css, options));
 }

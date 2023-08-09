@@ -417,8 +417,8 @@ export function flattenStyle(
   }
 
   for (let [key, value] of Object.entries(style)) {
-    // Skip already set keys
-    if (key in flatStyle) continue;
+    const isImportant = styleMeta.importantStyles?.includes(key);
+    if (!isImportant && key in flatStyle) continue;
 
     switch (key) {
       case "transform": {

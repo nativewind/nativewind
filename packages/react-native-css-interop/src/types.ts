@@ -36,7 +36,6 @@ import {
 } from "./shared";
 
 export interface ExtractRuleOptions {
-  platform?: string;
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
   keyframes: Map<string, ExtractedAnimation>;
   grouping: RegExp[];
@@ -46,6 +45,7 @@ export interface ExtractRuleOptions {
   defaultVariables: StyleSheetRegisterOptions["defaultVariables"];
   defaultDarkVariables: StyleSheetRegisterOptions["defaultDarkVariables"];
   verify: Record<string, unknown>;
+  selectorPrefix?: string;
 }
 
 declare global {
@@ -126,6 +126,7 @@ export type ExtractedStyle = {
   transition?: ExtractedTransition;
   requiresLayout?: boolean;
   warnings?: ExtractionWarning[];
+  importantStyles?: string[];
 };
 
 export type PropInteropMeta = {
@@ -149,6 +150,7 @@ export type StyleMeta = {
   containerQuery?: ExtractedContainerQuery[];
   transition?: ExtractedTransition;
   requiresLayout?: boolean;
+  importantStyles?: string[];
 };
 
 export interface SignalLike<T = unknown> {
