@@ -126,7 +126,7 @@ We had introduced variant support for `styled()` in the cancelled v3 beta, based
 
 ### setVariables() has been removed
 
-Simply add the variables to a component’s style tag to set the variables for the subtree. See the New Features for more information.
+Simply add the variables to a component’s style tag using the new `vars()` function. See the New Features for more information.
 
 ### Misc
 
@@ -461,7 +461,7 @@ const StyledComponent = remapClassNameProps(MyComponent, {
 
 `enableCSSInterop` signals to NativeWind that a specific component should be treated as a primitive. On this component, it sets up the dynamic style logic.
 
-Before using `enableCSSInterop` should could consider if `remapClassNameProps` would be more suitable. The main reasons to use `enableCSSInterop` are:
+Before using `enableCSSInterop` you should could consider if `remapClassNameProps` would be more suitable. The main reasons to use `enableCSSInterop` are:
 
 - The component renders a Native Component (e.g `<View />`)
 - Moving a style property to an prop

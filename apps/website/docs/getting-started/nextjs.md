@@ -25,7 +25,7 @@ module.exports = {
 }
 ```
 
-## Update import source
+## 3. Update import source
 
 Next.js uses a `jsconfig.json`/`tsconfig.json` file to configure the `jsxImportSource`.
 

@@ -39,4 +39,4 @@ import Legend from "./_legend.md";
   </tbody>
 </table>
 
-<Legend />
+<>{props.legend || props.legend === undefined ? <Legend /> : <></>}</>
