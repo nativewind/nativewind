@@ -4,6 +4,7 @@ import { INTERNAL_VERIFICATION_FLAGS } from "./shared";
 
 export function verifyJSX() {
   // @ts-expect-error
+  console.warn(typeof (<react-native-css-interop-jsx-pragma-check />));
   return <react-native-css-interop-jsx-pragma-check /> === true;
 }
 

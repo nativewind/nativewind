@@ -24,4 +24,6 @@ export function verifyInstallation() {
       );
     }
   }
+
+  console.warn("NativeWind verifyInstallation() found no errors");
 }
