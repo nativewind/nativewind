@@ -69,7 +69,7 @@ The StyleSheet exported from NativeWind now extends `StyleSheet` from React Nati
 NativeWind v4 adds new defaults for the font family class names. You can override these defaults in your `tailwind.config.js`. We
 
 ```jsx
-import { platformSelect } from "nativewind/plugin"
+import { platformSelect } from "nativewind/theme"
 
 module.exports = {
   theme: {
@@ -111,7 +111,6 @@ pixelRatioSelect({
 
 ### Miscellaneous Updates
 
-- Theme functions such as `hairlineWidth` and `platformSelect` are now exported from `nativewind/preset`
 - `aspect` no longer uses a polyfills and adopt native styling.
 - NativeWind no longer exports a PostCSS plugin. Use the Tailwind CLI if you wish to generate the `.css` file manually.
 - `NativeWindStyleSheet.setOutput()` has been removed. Output is now determined by your Metro targeted platform.

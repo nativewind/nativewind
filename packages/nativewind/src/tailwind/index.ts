@@ -7,5 +7,3 @@ export default function preset({ ...options }: Record<string, unknown> = {}) {
 }
 
 export { preset };
-
-export * from "./functions";

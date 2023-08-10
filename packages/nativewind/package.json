@@ -40,11 +40,11 @@
   "files": [
     "babel/",
     "dist/",
-    "expo-snack",
     "jsx-dev-runtime/",
     "jsx-runtime/",
-    "metro",
+    "metro/",
     "preset/",
+    "theme/",
     "types.d.ts"
   ],
   "dependencies": {
@@ -59,6 +59,12 @@
     "tailwindcss": "^3.3.3"
   },
   "peerDependencies": {
-    "tailwindcss": "~3"
+    "tailwindcss": "~3",
+    "react-native-reanimated": ">=3.3.0"
+  },
+  "peerDependenciesMeta": {
+    "react-native-reanimated": {
+      "optional": true
+    }
   }
 }

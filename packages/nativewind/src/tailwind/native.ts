@@ -3,7 +3,7 @@ import plugin from "tailwindcss/plugin";
 
 import { darkModeAtRule } from "./dark-mode";
 import { ContentConfig, PluginUtils } from "tailwindcss/types/config";
-import { hairlineWidth, platformSelect } from "./functions";
+import { hairlineWidth, platformSelect } from "../theme";
 import { color } from "./color";
 import { verify } from "./verify";
 import { translateX, translateY } from "./translate";

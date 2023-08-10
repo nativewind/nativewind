@@ -16,7 +16,7 @@ import {
   platformColor,
   platformSelect,
   roundToNearestPixel,
-} from "../tailwind/functions";
+} from "../theme";
 
 const A = createMockComponent(View);
 const testA = "a";
