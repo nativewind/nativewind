@@ -297,8 +297,8 @@ describe("Layout - Top Right Bottom Left", () => {
 
 describe("Layout - Visibility", () => {
   testCases(
-    ["visible", invalidProperty("visibility")],
-    ["invisible", invalidProperty("visibility")],
+    ["visible", style({ opacity: 1 })],
+    ["invisible", style({ opacity: 0 })],
   );
 });
 

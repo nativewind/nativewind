@@ -78,11 +78,13 @@ export default function nativewindPreset() {
       platforms,
       translateX,
       translateY,
+      visibility,
       verify,
     ],
     corePlugins: {
-      translate: false, // We use a custom translateX & translateY
-      boxShadow: false, // We use a custom plugin to add elevation for android
+      translate: false,
+      boxShadow: false,
+      visibility: false,
     },
   };
 
@@ -100,6 +102,13 @@ export default function nativewindPreset() {
 const forceDark = plugin(function ({ config }) {
   const content = config<Extract<ContentConfig, { files: any }>>("content");
   content.files.push({ raw: "dark" });
+});
+
+const visibility = plugin(({ addUtilities }) => {
+  addUtilities({
+    ".visible": { opacity: 1 },
+    ".invisible": { opacity: 0 },
+  } as any);
 });
 
 const platforms = plugin(function ({ addVariant }) {
