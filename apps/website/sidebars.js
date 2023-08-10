@@ -59,6 +59,7 @@ const sidebars = {
       items: [
         "guides/troubleshooting",
         "guides/custom-components",
+        "guides/theming",
         "guides/theme-values",
       ],
     },
@@ -180,6 +181,18 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "Transitions & Animation",
+      collapsed: false,
+      items: [
+        "tailwind/transitions-animation/transition-property",
+        "tailwind/transitions-animation/transition-duration",
+        "tailwind/transitions-animation/transition-timing-function",
+        "tailwind/transitions-animation/transition-delay",
+        "tailwind/transitions-animation/animation",
+      ],
+    },
+    {
+      type: "category",
       label: "Transforms",
       collapsed: false,
       items: [
@@ -192,6 +205,28 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "Interactivity",
+      collapsed: false,
+      items: [
+        "tailwind/interactivity/appearance",
+        "tailwind/interactivity/appearance",
+        "tailwind/interactivity/cursor",
+        "tailwind/interactivity/caret-color",
+        "tailwind/interactivity/pointer-events",
+        "tailwind/interactivity/resize",
+        "tailwind/interactivity/scroll-behaviour",
+        "tailwind/interactivity/scroll-margin",
+        "tailwind/interactivity/scroll-padding",
+        "tailwind/interactivity/scroll-snap-align",
+        "tailwind/interactivity/scroll-snap-stop",
+        "tailwind/interactivity/scroll-snap-type",
+        "tailwind/interactivity/touch-action",
+        "tailwind/interactivity/user-select",
+        "tailwind/interactivity/will-change",
+      ],
+    },
+    {
+      type: "category",
       label: "SVG",
       collapsed: false,
       items: [
@@ -199,6 +234,18 @@ const sidebars = {
         "tailwind/svg/stroke",
         "tailwind/svg/stroke-width",
       ],
+    },
+    {
+      type: "category",
+      label: "Accessibility",
+      collapsed: false,
+      items: ["tailwind/accessibility/screen-readers"],
+    },
+    {
+      type: "category",
+      label: "Plugins",
+      collapsed: false,
+      items: ["tailwind/plugins/container-queries"],
     },
   ],
 };

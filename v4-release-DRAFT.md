@@ -94,6 +94,21 @@ module.exports = {
 }
 ```
 
+### `pixelRatio` / `fontScale()`
+
+`pixelRatio` and `fontScale` have been updated so they now return the respective value. If a number is passed as an argument, it will be multiplied by the value.
+
+`pixelRadio(2) = PixelRatio.get() * 2`
+
+There are two new functions `pixelRatioSelect` and `fontScaleSelect`. These work similar to `Platform.select`
+
+```
+pixelRatioSelect({
+  2: '1.2rem'
+  default: '1rem'
+})
+```
+
 ### Miscellaneous Updates
 
 - Theme functions such as `hairlineWidth` and `platformSelect` are now exported from `nativewind/preset`
@@ -305,6 +320,10 @@ NativeWind v4 now allows you to nest CSS functions to create complex rules
 The emergence of React 18 has significantly altered our approach to React applications. New features like React Server Components and the Suspense APIs necessitated a more strategic viewpoint from library authors. In response to this, NativeWind v4 has been upgraded to ensure compatibility with Suspense APIs, such as `startTransition`, and is fully prepared for React Server Components (RSC) when building for the web.
 
 An upcoming minor version of NativeWind is set to support RSC in native applications. This proactive step ensures that as soon as a native framework offers support for RSC, NativeWind users will be ready to utilize the new capabilities.
+
+### React Native Web improvements
+
+React Native Web has upcoming "compiler-less" mode which removes the built in CSS StyleSheet compiler. As NativeWind pre-builds your CSS, you'll be able to take advantage of this from day 1, reducing the size of your bundle and improving rendering times.
 
 ## Experimental Features
 

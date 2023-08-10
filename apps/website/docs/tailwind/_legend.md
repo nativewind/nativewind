@@ -8,12 +8,14 @@
 
 ### Icon
 
-:white_check_mark: Full support
+✅ Full support
 
-:heavy_check_mark: Partial support on native
+✔️ Partial support on native
+
+🧪 Experimental support on native
 
 :iphone: Native only
 
-:globe_with_meridians: Web only
+🌐 Web only
 
 </details>

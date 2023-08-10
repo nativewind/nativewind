@@ -47,7 +47,7 @@ export default withExpoSnack(App);
       const preview = params.preview || "true";
       const loading = params.loading || "lazy";
       const dependencies =
-        params.dependencies || "react,react-native,nativewind@4.0.0-alpha.4";
+        params.dependencies || "react,react-native,nativewind@2.0.11";
 
       // Generate Node for SnackPlayer
       // See https://github.com/expo/snack/blob/main/docs/embedding-snacks.md

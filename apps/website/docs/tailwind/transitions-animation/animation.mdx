@@ -1,0 +1,36 @@
+import Compatibility from "../_compatibility.mdx";
+import Usage from "../_usage.mdx";
+
+# Animation
+
+## Usage
+
+<Usage />
+
+:::caution
+
+Animation support is experimental!
+
+NativeWind uses `react-native-reanimated` on native for its animation driver. You will need to follow the `react-native-reanimated` [installation steps](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/#installation)
+
+:::
+
+## Compatibility
+
+<Compatibility
+  experimental={[
+    "animate-none",
+    "animate-spin",
+    "animate-ping",
+    "animate-bounce",
+    "animate-[n]",
+  ]}
+/>
+
+## Contributors
+
+NativeWind's animation is still experimental and very basic. We are looking for contributors to help with
+
+- Animated all mapped props (currently only works with `style`)
+- Improve performance
+- Update code to support new Reanimated v3 features (currently written in v2 style)

@@ -1,0 +1,29 @@
+import Compatibility from "../_compatibility.mdx";
+import Usage from "../_usage.mdx";
+
+# Caret
+
+## Usage
+
+<Usage />
+
+## Compatibility
+
+<Compatibility
+  supported={[
+    "caret-{n}",
+    "caret-[n]",
+    "caret-black",
+    "caret-white",
+    "caret-transparent",
+  ]}
+  none={["caret-inherit", "caret-current"]}
+/>
+
+## Contributors
+
+We are looking for contributors for the following:
+
+### Add `pointer-events-none`
+
+`caretColor` should map to [`cursorColor`](https://reactnative.dev/docs/textinput#cursorcolor-android)

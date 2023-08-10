@@ -65,6 +65,12 @@ const config = {
       colorMode: {
         respectPrefersColorScheme: true,
       },
+
+      announcementBar: {
+        content:
+          '<a href="/next/overview">NativeWind v4.0 is currently in alpha. Click here to see the docs</a>',
+        isCloseable: true,
+      },
       navbar: {
         title: "NativeWind",
         logo: {
