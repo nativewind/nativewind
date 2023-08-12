@@ -13,16 +13,16 @@ export function getSSRStyles() {
 
 export function setVariables(properties: Record<`--${string}`, VariableValue>) {
   for (const [name, value] of Object.entries(properties)) {
-    // eslint-disable-next-line unicorn/no-array-for-each
-    variableSubscriptions.get(name)?.forEach((callback) => {
-      callback();
-    });
-
     variables.set(name, value);
 
     if (typeof window !== "undefined") {
       window.document.documentElement.style.setProperty(name, value.toString());
     }
+
+    // eslint-disable-next-line unicorn/no-array-for-each
+    variableSubscriptions.get(name)?.forEach((callback) => {
+      callback();
+    });
   }
 }
 
