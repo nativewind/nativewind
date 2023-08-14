@@ -42,7 +42,6 @@ import type {
   RuntimeValue,
   TransformRecord,
 } from "../types";
-import { exhaustiveCheck } from "../shared";
 
 type AddStyleProp = (
   property: string,
@@ -1244,7 +1243,7 @@ export function parseDeclaration(
       //  - NOT a validProperty and
       //  - NOT handled by the switch
       // Then this will error as `declaration` will be type `never`
-      exhaustiveCheck(declaration);
+      declaration satisfies never;
     }
   }
 }
@@ -1616,7 +1615,7 @@ function parseUnparsed(
         case "close-curly-bracket":
           return;
         default: {
-          exhaustiveCheck(tokenOrValue.value);
+          tokenOrValue.value satisfies never;
           return;
         }
       }
@@ -1628,12 +1627,9 @@ function parseUnparsed(
     case "resolution":
     case "dashed-ident":
       return;
-    default: {
-      exhaustiveCheck(tokenOrValue);
-    }
   }
 
-  return undefined;
+  tokenOrValue satisfies never;
 }
 
 export function parseLength(
@@ -1719,10 +1715,9 @@ export function parseLength(
       case "cqmax":
         options.addValueWarning(`${length.value}${length.unit}`);
         return undefined;
-      default: {
-        exhaustiveCheck(length.unit);
-      }
     }
+
+    length.unit satisfies never;
   } else {
     switch (length.type) {
       case "calc": {
@@ -1785,12 +1780,9 @@ function parseSize(
     case "contain":
       options.addValueWarning(size.type);
       return undefined;
-    default: {
-      exhaustiveCheck(size);
-    }
   }
 
-  return undefined;
+  size satisfies never;
 }
 
 function parseColor(
@@ -1820,11 +1812,9 @@ function parseColor(
     case "hwb":
       options.addValueWarning(`Invalid color unit ${color.type}`);
       return undefined;
-    default: {
-      exhaustiveCheck(color);
-    }
   }
-  return undefined;
+
+  color satisfies never;
 }
 
 function parseLengthPercentageOrAuto(
@@ -1837,11 +1827,8 @@ function parseLengthPercentageOrAuto(
       return;
     case "length-percentage":
       return parseLength(lengthPercentageOrAuto.value, options);
-    default: {
-      exhaustiveCheck(lengthPercentageOrAuto);
-    }
   }
-  return undefined;
+  lengthPercentageOrAuto satisfies never;
 }
 
 function parseJustifyContent(
@@ -1870,7 +1857,7 @@ function parseJustifyContent(
       value = justifyContent.value;
       break;
     default: {
-      exhaustiveCheck(justifyContent);
+      justifyContent satisfies never;
     }
   }
 
@@ -1883,7 +1870,7 @@ function parseJustifyContent(
 }
 
 function parseAlignContent(
-  alignItems: AlignContent,
+  alignContent: AlignContent,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
   const allowed = new Set([
@@ -1897,17 +1884,17 @@ function parseAlignContent(
 
   let value: string | undefined;
 
-  switch (alignItems.type) {
+  switch (alignContent.type) {
     case "normal":
     case "baseline-position":
-      value = alignItems.type;
+      value = alignContent.type;
       break;
     case "content-distribution":
     case "content-position":
-      value = alignItems.value;
+      value = alignContent.value;
       break;
     default: {
-      exhaustiveCheck(alignItems);
+      alignContent satisfies never;
     }
   }
 
@@ -1948,7 +1935,7 @@ function parseAlignItems(
       value = alignItems.value;
       break;
     default: {
-      exhaustiveCheck(alignItems);
+      alignItems satisfies never;
     }
   }
 
@@ -1961,7 +1948,7 @@ function parseAlignItems(
 }
 
 function parseAlignSelf(
-  alignItems: AlignSelf,
+  alignSelf: AlignSelf,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
   const allowed = new Set([
@@ -1975,21 +1962,21 @@ function parseAlignSelf(
 
   let value: string | undefined;
 
-  switch (alignItems.type) {
+  switch (alignSelf.type) {
     case "normal":
     case "auto":
       value = "auto";
     case "stretch":
-      value = alignItems.type;
+      value = alignSelf.type;
       break;
     case "baseline-position":
       value = "baseline";
       break;
     case "self-position":
-      value = alignItems.value;
+      value = alignSelf.value;
       break;
     default: {
-      exhaustiveCheck(alignItems);
+      alignSelf satisfies never;
     }
   }
 
@@ -2016,11 +2003,9 @@ function parseFontWeight(
     case "lighter":
       options.addValueWarning(fontWeight.type);
       return;
-    default: {
-      exhaustiveCheck(fontWeight);
-    }
   }
-  return undefined;
+
+  fontWeight satisfies never;
 }
 
 function parseTextShadow(
@@ -2159,6 +2144,8 @@ function parseLineHeight(
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
   switch (lineHeight.type) {
+    case "normal":
+      return undefined;
     case "number":
       return {
         type: "runtime",
@@ -2175,14 +2162,13 @@ function parseLineHeight(
         case "calc":
           options.addValueWarning(length.value);
           return undefined;
-        default: {
-          exhaustiveCheck(length);
-        }
       }
+
+      length satisfies never;
     }
   }
 
-  return undefined;
+  lineHeight satisfies never;
 }
 
 function parseFontSize(
@@ -2196,11 +2182,8 @@ function parseFontSize(
     case "relative":
       options.addValueWarning(fontSize.value);
       return undefined;
-    default: {
-      exhaustiveCheck(fontSize);
-    }
   }
-  return undefined;
+  fontSize satisfies never;
 }
 
 function parseFontStyle(
@@ -2214,11 +2197,9 @@ function parseFontStyle(
     case "oblique":
       options.addValueWarning(fontStyle.type);
       return undefined;
-    default: {
-      exhaustiveCheck(fontStyle);
-    }
   }
-  return undefined;
+
+  fontStyle satisfies never;
 }
 
 function parseFontVariantCaps(

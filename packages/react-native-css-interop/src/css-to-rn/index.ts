@@ -12,7 +12,7 @@ import {
   ContainerRule,
 } from "lightningcss";
 
-import { exhaustiveCheck, isRuntimeValue } from "../shared";
+import { isRuntimeValue } from "../shared";
 import {
   ExtractedStyle,
   StyleSheetRegisterOptions,
@@ -434,7 +434,7 @@ function extractKeyFrames(
           frames.push({ selector: 1, style });
           break;
         default:
-          exhaustiveCheck(selector);
+          selector satisfies never;
       }
     }
   }

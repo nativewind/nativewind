@@ -15,7 +15,6 @@ import {
   SignalLike,
 } from "../../types";
 import { isReduceMotionEnabled, rem, vh, vw } from "./globals";
-import { exhaustiveCheck } from "../../shared";
 import { Platform } from "react-native";
 import { colorScheme } from "./color-scheme";
 
@@ -131,7 +130,7 @@ function testFeature(
     case "interval":
       return false;
     default:
-      exhaustiveCheck(feature);
+      feature satisfies never;
   }
 
   return false;

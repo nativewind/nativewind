@@ -1,9 +1,5 @@
 import { RuntimeValue } from "./types";
 
-export function exhaustiveCheck(value: never) {
-  throw new Error(`Unhandled case: ${value}`);
-}
-
 export const DevHotReloadSubscription = Symbol();
 export const INTERNAL_RESET = Symbol();
 export const INTERNAL_SET = Symbol();
