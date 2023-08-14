@@ -21,7 +21,7 @@ import {
   Style,
 } from "../../types";
 import { flattenStyle } from "./use-computed-props";
-import { animationMap, styleMetaMap } from "./globals";
+import { animationMap, styleMetaMap } from "./misc";
 import { Pressable, Text, View } from "react-native";
 
 type AnimationInteropProps = Record<string, unknown> & {

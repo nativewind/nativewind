@@ -29,8 +29,9 @@ import {
 } from "./conditions";
 import { isRuntimeValue } from "../../shared";
 import { createSignal, useComputation } from "../signals";
-import { ContainerContext, rem, styleMetaMap, vh, vw } from "./globals";
+import { ContainerContext, styleMetaMap, vh, vw } from "./misc";
 import { VariableContext, defaultVariables, rootVariables } from "./variables";
+import { rem } from "./rem";
 
 type UseStyledPropsOptions = InteropFunctionOptions<Record<string, unknown>>;
 

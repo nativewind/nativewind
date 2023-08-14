@@ -16,7 +16,7 @@ import { render as tlRender, screen } from "@testing-library/react-native";
 
 import { registerCSS, resetStyles } from "../testing-library";
 import { render as renderJSX } from "../runtime/render";
-import { OpaqueStyleToken } from "../runtime/native/globals";
+import { OpaqueStyleToken } from "../runtime/native/misc";
 
 const testID = "react-native-css-interop";
 

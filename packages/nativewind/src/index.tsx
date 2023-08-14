@@ -6,6 +6,8 @@ export {
   vars,
   cssInterop,
   remapProps,
+  StyleSheet,
+  rem,
 } from "react-native-css-interop";
 
-export { useColorScheme, StyleSheet } from "./stylesheet";
+export { useColorScheme } from "./stylesheet";

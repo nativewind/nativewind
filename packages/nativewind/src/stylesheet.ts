@@ -1,17 +1,15 @@
 import {
-  StyleSheet as CSSStyleSheet,
-  colorScheme,
+  StyleSheet,
+  colorScheme as cssColorScheme,
   useColorScheme as useCSSColorScheme,
 } from "react-native-css-interop";
 
-const nativewindStyleSheet = {
-  getColorScheme: () => colorScheme.get(),
-  toggleColorScheme: () => {
-    return nativewindStyleSheet.setColorScheme(
-      colorScheme.get() === "dark" ? "light" : "dark",
-    );
+const colorScheme = {
+  ...cssColorScheme,
+  toggle: () => {
+    return colorScheme.set(colorScheme.get() === "dark" ? "light" : "dark");
   },
-  setColorScheme: (scheme: "dark" | "light" | "system") => {
+  set: (scheme: "dark" | "light" | "system") => {
     const darkMode = StyleSheet.getFlag("darkMode") ?? "media";
     if (darkMode.indexOf("media") === 0) {
       throw new Error(
@@ -23,16 +21,10 @@ const nativewindStyleSheet = {
   },
 };
 
-export const StyleSheet = Object.assign(
-  {},
-  CSSStyleSheet,
-  nativewindStyleSheet,
-);
-
 export function useColorScheme() {
   return {
     ...useCSSColorScheme(),
-    setColorScheme: StyleSheet.setColorScheme,
-    toggleColorScheme: StyleSheet.toggleColorScheme,
+    setColorScheme: colorScheme.set,
+    toggleColorScheme: colorScheme.toggle,
   };
 }

@@ -18,7 +18,7 @@ import { Signal } from "../types";
  * - https://medium.com/hackernoon/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254
  * - https://github.com/fabiospampinato/flimsy
  *
- * Batching is not implemented. Nesting computations is supported but not used.
+ * Batching is not implemented.
  */
 
 interface Computation<T = unknown> {

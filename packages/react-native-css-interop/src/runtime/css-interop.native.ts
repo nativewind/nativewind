@@ -2,7 +2,7 @@ import { ComponentType, forwardRef, useEffect, useReducer } from "react";
 import { View, Pressable } from "react-native";
 
 import { DevHotReloadSubscription } from "../shared";
-import { ContainerContext } from "./native/globals";
+import { ContainerContext } from "./native/misc";
 import { StyleSheet } from "./native/stylesheet";
 import { useStyledProps } from "./native/use-computed-props";
 import type {

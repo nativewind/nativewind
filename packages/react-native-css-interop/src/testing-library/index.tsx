@@ -14,11 +14,8 @@ import {
   cssToReactNativeRuntime,
 } from "../css-to-rn";
 
-export {
-  globalStyles,
-  styleMetaMap,
-  warnings,
-} from "../runtime/native/globals";
+export { globalStyles, styleMetaMap } from "../runtime/native/misc";
+export { warnings } from "../runtime/native/stylesheet";
 
 import "../core-components";
 

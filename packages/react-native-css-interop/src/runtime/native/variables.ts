@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer } from "react";
 import { createSignal, useComputation } from "../signals";
-import { OpaqueStyleToken, opaqueStyles, styleMetaMap } from "./globals";
+import { OpaqueStyleToken, opaqueStyles, styleMetaMap } from "./misc";
 import { StyleProp } from "../../types";
 
 export const rootVariables = createSignal<Record<string, unknown>>({});

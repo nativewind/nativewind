@@ -1,7 +1,7 @@
 import { act, render } from "@testing-library/react-native";
 import { View } from "react-native";
 
-import { rem, vh, vw } from "../runtime/native/globals";
+import { rem, vh, vw } from "../runtime/native/misc";
 import { INTERNAL_SET } from "../shared";
 import {
   createMockComponent,

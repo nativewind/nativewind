@@ -10,19 +10,17 @@ import {
   StyleProp,
   StyleMeta,
   CommonStyleSheet,
+  ExtractionWarning,
 } from "../../types";
 import {
   OpaqueStyleToken,
   animationMap,
   globalStyles,
   opaqueStyles,
-  rem,
   styleMetaMap,
   vh,
   vw,
-  warned,
-  warnings,
-} from "./globals";
+} from "./misc";
 import {
   DevHotReloadSubscription,
   INTERNAL_FLAGS as INTERNAL_FLAGS,
@@ -35,8 +33,12 @@ import {
   resetRootVariables,
   resetVariables,
 } from "./variables";
+import { rem } from "./rem";
 
 const subscriptions = new Set<() => void>();
+
+export const warnings = new Map<string, ExtractionWarning[]>();
+export const warned = new Set<string>();
 
 const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_FLAGS]: {},
@@ -128,8 +130,6 @@ const commonStyleSheet: CommonStyleSheet = {
       subscription();
     }
   },
-  setRem: rem.set,
-  getRem: rem.get,
 };
 
 export const StyleSheet = Object.assign({}, commonStyleSheet, RNStyleSheet);

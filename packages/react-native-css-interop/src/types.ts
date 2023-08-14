@@ -329,8 +329,6 @@ export interface CommonStyleSheet {
   classNameMergeStrategy(c: string): string;
   dangerouslyCompileStyles(c: string): void;
   register(options: StyleSheetRegisterOptions): void;
-  setRem(value: number): void;
-  getRem(value: number): void;
   getFlag(name: string): string | undefined;
 }
 

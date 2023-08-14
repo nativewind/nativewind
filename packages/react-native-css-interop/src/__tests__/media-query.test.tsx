@@ -1,6 +1,6 @@
 import { act, render } from "@testing-library/react-native";
 
-import { isReduceMotionEnabled, vw } from "../runtime/native/globals";
+import { isReduceMotionEnabled, vw } from "../runtime/native/misc";
 import {
   createMockComponent,
   registerCSS,

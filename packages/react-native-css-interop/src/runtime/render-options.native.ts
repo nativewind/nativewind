@@ -1,4 +1,4 @@
-import { styleMetaMap } from "./native/globals";
+import { styleMetaMap } from "./native/misc";
 import {
   CSSInteropClassNamePropConfig,
   InteropFunctionOptions,
