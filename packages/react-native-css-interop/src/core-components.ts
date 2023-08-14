@@ -20,7 +20,7 @@ import {
   getRemappedProps,
 } from "./runtime/render-options";
 import type {
-  RemapClassNamePropsOptions,
+  RemapProps,
   ComponentTypeWithMapping,
   EnableCssInteropOptions,
   InteropFunction,
@@ -48,9 +48,9 @@ export function enableCSSInterop<P extends object, M>(
   return component as ComponentTypeWithMapping<P, M>;
 }
 
-export function remapClassNameProps<P, M>(
+export function remapProps<P, M>(
   component: ComponentType<P>,
-  options: RemapClassNamePropsOptions<P> & M,
+  options: RemapProps<P> & M,
 ) {
   const map = new Map(Object.entries(options));
 
@@ -83,7 +83,7 @@ enableCSSInterop(ScrollView, {
   indicatorClassName: "indicatorStyle",
 });
 
-remapClassNameProps(FlatList, {
+remapProps(FlatList, {
   className: "style",
   ListFooterComponentClassName: "ListFooterComponentStyle",
   ListHeaderComponentClassName: "ListHeaderComponentStyle",
@@ -91,15 +91,15 @@ remapClassNameProps(FlatList, {
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
-remapClassNameProps(ImageBackground, {
+remapProps(ImageBackground, {
   className: "style",
   imageClassName: "imageStyle",
 });
-remapClassNameProps(KeyboardAvoidingView, {
+remapProps(KeyboardAvoidingView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
 });
-remapClassNameProps(VirtualizedList, {
+remapProps(VirtualizedList, {
   className: "style",
   ListFooterComponentClassName: "ListFooterComponentStyle",
   ListHeaderComponentClassName: "ListHeaderComponentStyle",

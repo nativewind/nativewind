@@ -5,4 +5,7 @@
 export { createElement } from "react";
 
 export { checkJsxPragma } from "./runtime/check-render";
-export { enableCSSInterop, remapClassNameProps } from "./core-components";
+export {
+  enableCSSInterop,
+  remapProps as remapClassNameProps,
+} from "./core-components";

@@ -10,11 +10,38 @@ We're well aware it's been some time since our last update, and in recognition o
 
 ## The Updated Architecture
 
-NativeWind v4 is distinguished by its transition to a `jsxImportSource` transform, making the previous babel plugin redundant. In the older architecture, babel wrapped every component with a `className` in the `StyledComponent` wrapper (or it was manually wrapped using `styled()`). This wrapper converted the `className` prop into the injected `StyleSheet` styles. Now, with the `jsxImportSource` transform, this conversion happens at the `jsx` level, **allowing for the `className` prop to be accessed inside a component, and permitting it to be passed or altered for child components**. This change eradicates a major limitation of NativeWind and encourages component styling via widely used tools like `classnames`, `clsx`, or `cva`.
+NativeWind v4 is distinguished by its transition to a `jsxImportSource` transform, which greatly improves upon the previous babel plugin. In the older architecture, babel wrapped every component with a `className` prop in the `StyledComponent` wrapper (or you manually wrapped the component using `styled()`). With the `jsxImportSource` transform we can automatically detect if the wrapper is needed on a per-component basis, which has major advantages:
 
-This `jsx` transform also substantially enhances performance, applying the transform only to leaf components (e.g., `View`, `Text`) rather than higher-level custom components. For example, in the case of the `FlatList` component, which comprises several sub-components, dynamic style changes will only re-render the `View` within your `ListFooterComponent`. This improvement is especially crucial as NativeWind v4 introduces a host of new dynamic styles!
+1. **The `className` prop can accessed inside a component**.
+1. NativeWind will wrap less components and generally only components which are leaf nodes in the render tree, greatly improving performance
+1. NativeWind can distinguish between static & dynamic styles and can alternate between a lightweight or full featured wrapper.
 
-This architectural revision also solves NativeWind's second major issue - compatibility with Metro and Babel cache. With the new architecture, NativeWind now seamlessly integrates with the Metro cache, speeding up build times and **supporting fast refresh when updates are made to your theme in `tailwind.config.js`**. These enhancements emphasize our dedication to delivering a more efficient and streamlined development experience.
+Preserving the `className` prop fixes the biggest limitation and source of confusion with NativeWind, and adds:
+
+1. Better support for web libraries
+1. Allows you to use 3rd party `className` management libraries (`tailwind-variants`/`classnames`/`clsx`/`cva`/etc)
+
+The `className` is preserved, as NativeWind no longer "rewrites" every component. For the majority of components, `className` prop is simply just another prop! The JSX transform uses a 'tagging' system - if the component has not been tagged, it is rendered as normal. Only tagged components are evaluated and have their styles altered.
+
+```tsx title=MyApp.js
+// There is no need to wrap this component! `className` is accessible inside the component!
+export function MyText({ className, ...props }: TextProps) {
+  return <Text className=`text-black ${className}` {...props} />
+}
+```
+
+There are two forms of 'tagging':
+
+- `cssInterop`: enables style evaluation and may wrap your component in additional context/hooks. Can accept performance and should be use sparingly
+- `propRemap`: a lightweight wrapper that changes `className` props to `style` objects, but does not resolve styles or add any hooks
+
+Users should generally use `enablePropRemap`, and only use `enableCSSInterop` when rendering native components or as an escape hatch for incompatible 3rd party components.
+
+Ideally, now that `className` is passed as a prop, you should rarely need these wrappers.
+
+## Improved compilation
+
+NativeWind v4 resolves the vast majority of caching issues! Often resetting the cache is a large sore point for NativeWind users, and we are happy to report that hot reloading issues have been resolved. **This includes hot reloading when you make change to your `tailwind.config.js` theme!**
 
 ## Breaking Changes from v2
 
@@ -22,11 +49,29 @@ The introduction of a new architecture inevitably brings some breaking changes.
 
 ### Removal of `styled()`
 
-Among the major transformations in the NativeWind v4 library is the removal of the `styled()` helper function. Previously, the `styled()` function served a dual role, assisting users who chose not to use the Babel plugin while offering a simple way to create styled components.
+There are two reasons for the removal of `styled()`. As explained above NativeWind no longer needs to wrap every component removing the primary need for the `styled()` wrapper. While the new APIs `enablePropRemap`/`enableCSSInterop` serve similar purposes, you should be using them significantly less than `styled()`.
 
-However, with v4, NativeWind has evolved to directly pass the `className` prop into components, allowing users to modify it more traditionally. This significant change paves the way for the inclusion of popular utility libraries, thereby broadening the versatility of NativeWind.
+Secondly, NativeWind v4 is making a philosophical choice to be a _styling_ library, not a _component_ library. The difference is small, but there is a important distinction in terms of API coverage. `styled()` allowed you to create components because _NativeWind incompatible with popular 3rd party component/variant libraries_ and we believed that restriction greatly reduced the development experience when using NativeWind. NativeWind v4 has now "fixed" `className`, removing that restriction and allowing you to use which ever library best fits your use-case.
 
-For creating `styled()` components, a common practice was to rebind `style` props to `className` props. For the most part, this will now be handled automatically, however if you are using a 3rd party component with multiple `style` props you will need to bind these to a class prop. Please see the `remapClassNameProps` section the `New API` for more information.
+NativeWind does not offer a migration path for components using `styled()`, however the library [tw-classed](https://tw-classed.vercel.app/docs/guide/react-native) offers a very similar API and should provide you with a straight forward migration (**note**: You can now skip step 2)
+
+```tsx title=App.js"
+import { Text as RNText } from "react-native";
+import { classed } from "@tw-classed/react";
+
+export const Text = classed(RNText, "text-black", {
+  variants: {
+    color: {
+      blue: "text-blue-500",
+      green: "text-green-500",
+    },
+  },
+});
+
+const App = () => {
+  return <Text color="blue">Hello, tw-classed!</Text>;
+};
+```
 
 ### Base Scaling Modifications
 
@@ -122,7 +167,7 @@ If you were using the v3 beta, these are some additional breaking changes
 
 ### Variant API Discontinuation
 
-We had introduced variant support for `styled()` in the cancelled v3 beta, based on the `class-variance-authority` library. We recommend users to shift to `cva`, enhancing control over styling and aligning NativeWind with evolving coding practices.
+We had introduced variant support for `styled()` in the cancelled v3 beta, based on the `class-variance-authority` library. We recommend users to shift to (`tailwind-variants`)[https://www.tailwind-variants.org/], enhancing control over styling and aligning NativeWind with evolving coding practices.
 
 ### setVariables() has been removed
 
@@ -407,18 +452,14 @@ It verifies
 
 ## New API
 
-### `remapClassNameProps`
+### `propRemap`
 
-> `remapClassNameProps` is generally the replacement for `styled()`
+`propRemap` accepts a `Component` as the first argument and a mapping as the second. The mapping is in the format `{ [existing prop]: [new prop] | true }`, and it returns a typed version of the component.
 
-In earlier versions, the `styled()` function was utilized to generate new `className` props when a component had multiple `style` props. Now, with NativeWind only converting the `className` on primitive components (e.g., `<View>`), it becomes necessary to communicate to NativeWind that a component is complex and requires appropriate style distribution. The `remapClassNameProps` wrapper serves this purpose.
-
-`remapClassNameProps` accepts a `Component` as the first argument and a mapping as the second. The mapping is in the format `{ [existing prop]: [new prop] | true }`, and it returns a typed version of the component.
-
-An example of how NativeWind binds `<FlatList />` is:
+An example of how NativeWind maps `<FlatList />` is:
 
 ```jsx
-remapClassNameProps(FlatList, {
+propRemap(FlatList, {
   style: "className",
   ListFooterComponentStyle: "ListFooterComponentClassName",
   ListHeaderComponentStyle: "ListHeaderComponentClassName",
@@ -426,23 +467,12 @@ remapClassNameProps(FlatList, {
   contentContainerStyle: "contentContainerClassName",
   indicatorStyle: "indicatorClassName",
 });
+
+// Now you can use FlatList with the added props
+<FlatList className="w-10" ListHeaderComponentClassName="bg-black" />;
 ```
 
-Following this binding, you can utilize the new props on **`<FlatList />`**:
-
-```jsx
-<FlatList className="w-10" ListHeaderComponentClassName="bg-black" />
-```
-
-It your render the props of the `<FlatList />` it will looks like this
-
-```jsx
-<FlatList style={OpaqueStyleToken() {}} ListHeaderComponentStyle={OpaqueStyleToken() {}} />
-```
-
-As you can see `remapClassNameProps` doesn't generate any styles, it simply converts the classNames to a `OpaqueStyleToken`. These tokens are readonly empty objects and should not be modified in any manner. It is not until the token is passed to a component with `enableCSSInterop` is the token converted into a style object.
-
-This makes components using `remapClassNameProps` very performant, as we can avoid creating the NativeWind component wrapper high in your render tree.
+`propRemap` is a lightweight wrapper which doesn't generate any styles. Instead it converts Tailwind CSS strings to `OpaqueStyleTokens` (readonly empty objects). These tokens should be treat just any other other style object, and once passed to a component tagged with `cssInterop`, they will be converted into styles.
 
 For TypeScript users, guides on creating declaration files to type 3rd party components correctly will be available. Alternatively, you can directly use the returned component:
 

@@ -69,7 +69,7 @@ export type NativeStyleToProp<P> = {
   [K in keyof Style & string]?: K extends keyof P ? keyof P | true : keyof P;
 };
 
-export type RemapClassNamePropsOptions<P> = {
+export type RemapProps<P> = {
   [K in string]?: (keyof P & string) | true | undefined;
 };
 
