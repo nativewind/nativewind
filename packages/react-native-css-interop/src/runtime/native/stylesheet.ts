@@ -3,7 +3,6 @@ import {
   StyleSheet as RNStyleSheet,
   Appearance,
 } from "react-native";
-import { createContext, useContext, useReducer } from "react";
 
 import {
   StyleSheetRegisterOptions,
@@ -15,7 +14,6 @@ import {
 import {
   OpaqueStyleToken,
   animationMap,
-  colorScheme,
   globalStyles,
   opaqueStyles,
   rem,
@@ -26,56 +24,22 @@ import {
   warnings,
 } from "./globals";
 import {
-  DarkMode,
   DevHotReloadSubscription,
-  INTERNAL_VERIFICATION_FLAGS as INTERNAL_VERIFICATION_FLAGS,
+  INTERNAL_FLAGS as INTERNAL_FLAGS,
   INTERNAL_RESET,
 } from "../../shared";
-import { createSignal, useComputation } from "./signals";
+import { colorScheme } from "./color-scheme";
+import {
+  getVariables,
+  resetDefaultVariables,
+  resetRootVariables,
+  resetVariables,
+} from "./variables";
 
 const subscriptions = new Set<() => void>();
-export const rootVariables = createSignal<Record<string, unknown>>({});
-export const defaultVariables = createSignal<Record<string, unknown>>({});
-export const VariableContext = createContext<Record<string, unknown> | null>(
-  null,
-);
-
-export const useRerender = () => useReducer(rerenderReducer, 0)[1];
-const rerenderReducer = (accumulator: number) => accumulator + 1;
-
-export const useUnstableNativeVariables = () => {
-  return useNativeVariables(useRerender());
-};
-
-export const useNativeVariables = (rerender: () => void) => {
-  const variables = useContext(VariableContext);
-  return useComputation(
-    () => {
-      // $variables will be null if this is a top-level component
-      if (variables === null) {
-        return rootVariables.get();
-      } else {
-        return {
-          ...variables,
-          ...defaultVariables.get(),
-        };
-      }
-    },
-    [variables],
-    rerender,
-  );
-};
-
-let variables = {
-  rootVariables: {} as Record<string, unknown>,
-  rootDarkVariables: {} as Record<string, unknown>,
-  defaultVariables: {} as Record<string, unknown>,
-  defaultDarkVariables: {} as Record<string, unknown>,
-};
 
 const commonStyleSheet: CommonStyleSheet = {
-  [DarkMode]: { type: "media" },
-  [INTERNAL_VERIFICATION_FLAGS]: {},
+  [INTERNAL_FLAGS]: {},
   [INTERNAL_RESET]({ dimensions = Dimensions, appearance = Appearance } = {}) {
     globalStyles.clear();
     animationMap.clear();
@@ -86,14 +50,10 @@ const commonStyleSheet: CommonStyleSheet = {
     vw[INTERNAL_RESET](dimensions);
     vh[INTERNAL_RESET](dimensions);
     colorScheme[INTERNAL_RESET](appearance);
-    rootVariables.set({});
-    defaultVariables.set({});
-    variables = {
-      rootVariables: {},
-      rootDarkVariables: {},
-      defaultVariables: {},
-      defaultDarkVariables: {},
-    };
+    resetVariables();
+  },
+  getFlag(name) {
+    return this[INTERNAL_FLAGS][name];
   },
   classNameMergeStrategy(c) {
     return c;
@@ -106,9 +66,9 @@ const commonStyleSheet: CommonStyleSheet = {
     };
   },
   register(options: StyleSheetRegisterOptions) {
-    this[INTERNAL_VERIFICATION_FLAGS]["$$receivedData"] = true;
-    if (options.verify) {
-      Object.assign(this[INTERNAL_VERIFICATION_FLAGS], options.verify);
+    this[INTERNAL_FLAGS]["$$receivedData"] = "true";
+    if (options.flags) {
+      Object.assign(this[INTERNAL_FLAGS], options.flags);
     }
 
     if (options.keyframes) {
@@ -116,8 +76,6 @@ const commonStyleSheet: CommonStyleSheet = {
         animationMap.set(name, keyframes);
       }
     }
-
-    // console.log(JSON.stringify(options.declarations, null, 2));
 
     if (options.declarations) {
       for (const [name, styles] of Object.entries(options.declarations)) {
@@ -128,9 +86,11 @@ const commonStyleSheet: CommonStyleSheet = {
       }
     }
 
-    const currentColor = Appearance.getColorScheme() ?? "light";
+    const currentColor = colorScheme.get();
     let shouldResetRootVariables = false;
     let shouldResetDefaultVariables = false;
+
+    const variables = getVariables();
 
     if (options.rootVariables) {
       Object.assign(variables.rootVariables, options.rootVariables);
@@ -168,12 +128,6 @@ const commonStyleSheet: CommonStyleSheet = {
       subscription();
     }
   },
-  setColorScheme(value) {
-    colorScheme.set(value);
-    resetRootVariables(colorScheme.get());
-    resetDefaultVariables(colorScheme.get());
-  },
-  setDarkMode() {},
   setRem: rem.set,
   getRem: rem.get,
 };
@@ -270,55 +224,6 @@ function tagStyles(
 
     return styles.style;
   }
-}
-
-function resetRootVariables(currentColor: "light" | "dark") {
-  if (currentColor === "light") {
-    rootVariables.set({
-      ...variables.rootVariables,
-      ...variables.defaultVariables,
-    });
-  } else {
-    rootVariables.set({
-      ...variables.rootVariables,
-      ...variables.rootDarkVariables,
-      ...variables.defaultVariables,
-      ...variables.defaultDarkVariables,
-    });
-  }
-}
-
-function resetDefaultVariables(currentColor: "light" | "dark") {
-  if (currentColor === "light") {
-    defaultVariables.set(variables.defaultVariables);
-  } else {
-    defaultVariables.set({
-      ...variables.defaultVariables,
-      ...variables.defaultDarkVariables,
-    });
-  }
-}
-
-export function vars(variables: Record<string, string | number>) {
-  // Create an empty style prop with meta
-  const styleProp = {};
-
-  const $variables: Record<string, string | number> = {};
-
-  for (const [key, value] of Object.entries(variables)) {
-    if (key.startsWith("--")) {
-      $variables[key] = value;
-    } else {
-      $variables[`--${key}`] = value;
-    }
-  }
-  styleMetaMap.set(styleProp, { variables: $variables });
-
-  // Assign it an OpaqueStyleToken
-  const opaqueStyle = new OpaqueStyleToken();
-  opaqueStyles.set(opaqueStyle, styleProp);
-
-  return opaqueStyle as StyleProp;
 }
 
 export function getGlobalStyle(style?: string | object) {

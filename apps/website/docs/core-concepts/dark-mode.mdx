@@ -5,48 +5,37 @@ NativeWind includes a `dark` variant that lets you style your site differently w
 By default this uses `Appearance.getColorScheme()` on native and `prefers-color-scheme` on web.
 
 :::caution
+
 Expo apps do not follow the system appearance unless `userInterfaceStyle` is set to automatic. [Please see the Expo docs for more information.](https://docs.expo.dev/guides/color-schemes/)
+
 :::
 
 ## Toggling dark mode manually
 
-The `dark:` variant is controlled by the [`useColorScheme()`](../../api/use-color-scheme) hook.
+To manualy toggle dark mode on web, you will need to enable the [`class` strategy](https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually).
 
-```SnackPlayer name=Dark Mode
-import { Pressable, Text } from "react-native"
-import { styled, useColorScheme } from "nativewind";
-
-const StyledPressable = styled(Pressable)
-const StyledText = styled(Text)
-
-function App() {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
-
-  return (
-    <StyledPressable
-      onPress={toggleColorScheme}
-      className="flex-1 items-center justify-center dark:bg-slate-800"
-    >
-      <StyledText
-        selectable={false}
-        className="dark:text-white"
-      >
-        {`Try clicking me! ${colorScheme === "dark" ? "🌙" : "🌞"}`}
-      </StyledText>
-    </StyledPressable>
-  );
-}
-```
-
-### CSS
-
-To manualy toggle dark mode on web, you will need to enable the [`class` strategy](https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually). This is all you need to do, we implement the logic to support both system preference and manual selection
-
-```
-// tailwind.config.js
-
+```tsx title="tailwind.config.js"
 module.exports = {
-  darkMode: 'class',
+  darkMode: "class",
   // ...
+};
+```
+
+React Native Web does not support `Appearance.setColorScheme`, so we recommend you either use:
+
+```tsx title="App.tsx"
+import { colorScheme, useColorScheme } from "nativewind";
+
+// Use imperatively
+colorScheme.set("dark" | "light" | "system");
+
+export default function App() {
+  // Or as a hook
+  const { setColorScheme } = useColorScheme();
+  setColorScheme("dark" | "light" | "system");
 }
 ```
+
+## Supporting system preference and manual selection
+
+You can follows the [Supporting system preference and manual selection](https://tailwindcss.com/docs/dark-mode#supporting-system-preference-and-manual-selection) instructions to support both system preference and manual selection. Instead of `localstorage`, we recommend using universal storage solution such as [React Native Async Storage](https://react-native-async-storage.github.io/async-storage/)

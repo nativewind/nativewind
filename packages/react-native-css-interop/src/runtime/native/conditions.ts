@@ -14,9 +14,10 @@ import {
   PseudoClassesQuery,
   SignalLike,
 } from "../../types";
-import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
+import { isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { exhaustiveCheck } from "../../shared";
 import { Platform } from "react-native";
+import { colorScheme } from "./color-scheme";
 
 interface ConditionReference {
   width: number | SignalLike<number>;

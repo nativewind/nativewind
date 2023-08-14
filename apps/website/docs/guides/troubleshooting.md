@@ -1,8 +1,19 @@
 # Troubleshooting
 
-NativeWind is built on top of the Tailwind CSS CLI. Before troubleshooting NativeWind, it's crucial to ensure that Tailwind CSS itself is functioning correctly. You can inspect the Tailwind CSS output at the following location: `node_modules/.cache/nativewind/<input-css-filename>.<platform>.css`.
+:::tip
 
-For instance, if you've observed that a custom class, `text-brand`, isn't behaving as expected. You can proceed as follows:
+While troubleshooting, always start your application without the cache!
+
+**This is the most common cause of issues**
+
+- Expo `npx expo start --clear`
+- React Native CLI `npx react-native start --reset-cache`
+
+:::
+
+Before troubleshooting NativeWind, it's crucial to ensure that Tailwind CSS itself is functioning correctly. NativeWind uses the Tailwind CSS CLI to compile your styles, so any issues with Tailwind CLI should be resolved first. You can inspect the Tailwind CSS output at the following location: `node_modules/.cache/nativewind/<input-css-filename>.<platform>.css`, or by simply running `npx tailwindcss --input <input.css>`.
+
+For instance, if you've observed that a custom class `text-brand` isn't behaving as expected. You can proceed as follows:
 
 1. First, ensure that your `tailwind.config.js` has the necessary configurations for the color.
 2. Navigate to `node_modules/.cache/nativewind/<input-css-filename>.<platform>.css` and search for the CSS class `.text-brand {}`
@@ -19,20 +30,11 @@ To troubleshoot Tailwind CSS, refer to their [Troubleshooting Guide](https://tai
 
 **Only once you see the expected CSS being generated should you start this troubleshooting guide.**
 
-:::tip
-
-While troubleshooting, always start your application without the cache!
-
-- Expo `npx expo start --clear`
-- RN CLI `npx react-native start --reset-cache`
-
-:::
-
 ## Verifying NativeWind Installation
 
 NativeWind provides a utility function, `verifyInstallation()`, designed to help confirm that the package has been correctly installed.
 
-Import the `verifyInstallation` function from the NativeWind package and run within the scope of a React component. It's crucial to ensure that you do not invoke this function on the global scope.
+Import the `verifyInstallation` function from the NativeWind package and run within the scope of a React component. **It's crucial to ensure that you do not invoke this function on the global scope.**
 
 :::tip
 
@@ -56,15 +58,28 @@ function App() {
 export default App;
 ```
 
-:::caution
+## Common Issues
 
-`verifyInstallation()` will not work within a server context. If using React Server components or Server Side Rendering make sure `verifyInstallation` is called on the client.
+### Your cache is loading old data
 
-:::
+Always reset your cache before troubleshooting an issue.
 
-## A specific class name does not work
+### Colors are not working
 
-1. Reset your cache
-1. Does the class name work on the [Tailwind CSS Playground](https://play.tailwindcss.com/)?
-1. Ensure NativeWind supports the style
-1. Ensure the component you are applying the style to supports the style or the required props (e.g `hover:text-white` - does the component support an `onHover` prop?)
+React Native styling is much more restrictive than the web. This code will work on the web, but not on React Native:
+
+```jsx title=App.tsx
+export function App() {
+  return (
+    <View className="text-red-500">
+      <Text>Hello, World!</Text>
+    </View>
+  );
+}
+```
+
+The reason is that `<View />` does not accept a `color` style and will not cascade the style! Instead, you must move the color classes to the `<Text />` element
+
+### Modifiers are not working
+
+Ensure the component you are applying the style to supports both the style and the required props (e.g `hover:text-white` - does the component support `color` styles and have an `onHover` prop?)

@@ -6,13 +6,8 @@ import {
   StyleMeta,
   StyleProp,
 } from "../../types";
-import {
-  AccessibilityInfo,
-  Appearance,
-  Dimensions,
-  Platform,
-} from "react-native";
-import { createSignal } from "./signals";
+import { AccessibilityInfo, Dimensions, Platform } from "react-native";
+import { createSignal } from "../signals";
 import { INTERNAL_RESET, INTERNAL_SET } from "../../shared";
 
 export const animationMap = new Map<string, ExtractedAnimation>();
@@ -33,48 +28,6 @@ export const warned = new Set<string>();
 export const ContainerContext = createContext<Record<string, ContainerRuntime>>(
   {},
 );
-
-export const colorScheme = createColorScheme(Appearance);
-
-function createColorScheme(appearance: typeof Appearance) {
-  let isSystem = true;
-  const signal = createSignal<"light" | "dark">(
-    appearance.getColorScheme() ?? "light",
-  );
-
-  const set = (colorScheme: "light" | "dark" | "system") => {
-    let newColorScheme;
-    if (colorScheme === "system") {
-      isSystem = true;
-      newColorScheme = appearance.getColorScheme() ?? "light";
-    } else {
-      isSystem = false;
-      newColorScheme = colorScheme;
-    }
-
-    signal.set(newColorScheme);
-    appearance.setColorScheme(newColorScheme);
-  };
-
-  let listener = appearance.addChangeListener(({ colorScheme }) => {
-    if (isSystem) {
-      signal.set(colorScheme ?? "light");
-    }
-  });
-
-  const reset = (appearance: typeof Appearance) => {
-    listener.remove();
-    listener = appearance.addChangeListener(({ colorScheme }) => {
-      if (isSystem) {
-        signal.set(colorScheme ?? "light");
-      }
-    });
-    isSystem = true;
-    signal.set(appearance.getColorScheme() ?? "light");
-  };
-
-  return { get: signal.get, set, [INTERNAL_RESET]: reset };
-}
 
 export const rem = createRem(14);
 export const vw = viewportUnit("width", Dimensions);

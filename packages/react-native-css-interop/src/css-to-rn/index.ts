@@ -74,7 +74,7 @@ export function cssToReactNativeRuntime(
     rootDarkVariables: {},
     defaultVariables: {},
     defaultDarkVariables: {},
-    verify: {},
+    flags: {},
   };
 
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
@@ -104,8 +104,7 @@ export function cssToReactNativeRuntime(
     rootDarkVariables: extractOptions.rootDarkVariables,
     defaultVariables: extractOptions.defaultVariables,
     defaultDarkVariables: extractOptions.defaultDarkVariables,
-    darkMode: extractOptions.darkMode,
-    verify: extractOptions.verify,
+    flags: extractOptions.flags,
   };
 }
 
@@ -154,37 +153,45 @@ function extractRule(
       break;
     }
     case "custom": {
-      if (rule.value?.name !== "cssInterop") {
-        break;
+      if (rule.value && rule.value?.name === "cssInterop") {
+        extractCSSInteropFlag(rule, extractOptions);
       }
-      const tokens = rule.value.prelude.value.components.map((c) => c.value);
-      extractRuleOptions(tokens, extractOptions);
     }
   }
 }
 
-function extractRuleOptions(
-  tokens: string[],
+function extractCSSInteropFlag(
+  rule: CSSInteropAtRule,
   extractOptions: ExtractRuleOptions,
 ) {
-  const [option, ...rest] = tokens;
+  if (rule.value.prelude.value.components[0].value !== "set") {
+    return;
+  }
+  const [_, name, type, ...other] = rule.value.prelude.value.components.map(
+    (c) => c.value,
+  );
 
-  switch (option) {
-    case "darkMode": {
-      if (rest[0] === "media") {
-        extractOptions.darkMode = { type: "media" };
-      } else if (rest[0] === "class") {
-        extractOptions.darkMode = { type: "class", value: rest[1] ?? "dark" };
-      } else if (rest[0] === "attribute" && rest[1]) {
-        extractOptions.darkMode = { type: "attribute", value: rest[1] };
+  if (name === "darkMode") {
+    let value: string | undefined;
+
+    if (other.length === 0 || other[0] === "media") {
+      extractOptions.darkMode = { type: "media" };
+    } else {
+      value = other[0];
+
+      if (value.startsWith(".")) {
+        value = value.slice(1);
+        extractOptions.darkMode = { type: "class", value };
+      } else if (value.startsWith("[")) {
+        extractOptions.darkMode = { type: "attribute", value };
+      } else if (value === "dark") {
+        extractOptions.darkMode = { type: "class", value };
       }
-      break;
     }
-    case "verify": {
-      const [name, ...other] = rest;
-      const value = other.length === 0 ? true : other;
-      extractOptions.verify[name] = value;
-    }
+    extractOptions.flags.darkMode = `${type} ${value}`.trim();
+  } else {
+    const value = other.length === 0 ? "true" : other;
+    extractOptions.flags[name] = value;
   }
 }
 

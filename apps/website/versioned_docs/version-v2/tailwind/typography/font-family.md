@@ -21,7 +21,7 @@ NativeWind will not load/link fonts into your app. If you have any issues with t
 
 :::
 
-```tsx
+```tsx title="tailwind.config.js"
 module.exports = {
   theme: {
     extend: {

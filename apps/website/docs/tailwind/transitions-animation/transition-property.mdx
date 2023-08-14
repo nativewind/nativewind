@@ -1,5 +1,6 @@
 import Compatibility from "../_compatibility.mdx";
 import Usage from "../_usage.mdx";
+import AnimationWarning from "./_animation-warning.mdx";
 
 # Transition Property
 
@@ -7,18 +8,12 @@ import Usage from "../_usage.mdx";
 
 <Usage />
 
-:::caution
-
-Transition support is experimental!
-
-NativeWind uses `react-native-reanimated` on native for its animation driver. You will need to follow the `react-native-reanimated` [installation steps](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/#installation)
-
-:::
+<AnimationWarning />
 
 ## Compatibility
 
 <Compatibility
-  supported={[
+  experimental={[
     "transition",
     "transition-colors",
     "transition-opacity",

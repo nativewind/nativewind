@@ -28,9 +28,9 @@ import {
   testPseudoClasses,
 } from "./conditions";
 import { isRuntimeValue } from "../../shared";
-import { createSignal, useComputation } from "./signals";
+import { createSignal, useComputation } from "../signals";
 import { ContainerContext, rem, styleMetaMap, vh, vw } from "./globals";
-import { VariableContext, defaultVariables, rootVariables } from "./stylesheet";
+import { VariableContext, defaultVariables, rootVariables } from "./variables";
 
 type UseStyledPropsOptions = InteropFunctionOptions<Record<string, unknown>>;
 

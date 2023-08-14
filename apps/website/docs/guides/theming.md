@@ -1,10 +1,10 @@
 # Themes
 
-NativeWind uses Tailwind CSS's theme configuration. By default, this is a static them with preset colors for light/dark mode.
+NativeWind leverages Tailwind CSS's theme settings. Out of the box, it provides a static theme equipped with predefined colors for both light and dark modes.
 
 ## Dynamic themes
 
-It is common for native apps to be more personalized and allow for users to pick a theme. So, we need to change our static them to be dynamic by using [CSS Variables as colors](https://tailwindcss.com/docs/customizing-colors#using-css-variables).
+Modern native applications often prioritize personalization, allowing users to select their preferred themes. To transition from a static theme to a dynamic one in NativeWind, utilize [CSS Variables as colors](https://tailwindcss.com/docs/customizing-colors#using-css-variables). This approach ensures flexibility and adaptability in theme application, catering to user preferences.
 
 ```js title=tailwind.config.js
 module.exports = {
@@ -24,8 +24,17 @@ module.exports = {
 ```tsx title=App.tsx
 import { vars } from 'nativewind'
 
+const userTheme = vars({
+  '--color-primary': 'black'
+  '--color-secondary': 'white'
+});
+
 export default App() {
-  return <View className="bg-primary" />
+  return (
+    <View style={userTheme}>
+      <View className="bg-primary" />
+    </View>
+  )
 }
 ```
 
@@ -64,9 +73,9 @@ export default App() {
 
 ## Creating custom themes with logic
 
-NativeWind is un-opinionated on the logic behind your app's theme. It simply provides the building blocks for you to use.
+NativeWind remains agnostic about the thematic logic underpinning your application, instead offering you foundational tools to craft and shape according to your needs.
 
-This is one possible way that you could implement a theme system that uses 'named' themes with light & dark modes.
+To guide you on your journey, here's a suggested method to implement a thematic system that employs 'named' themes complemented by light and dark modes:
 
 ```tsx title=Theme.tsx
 import { vars, useColorScheme } from 'nativewind'

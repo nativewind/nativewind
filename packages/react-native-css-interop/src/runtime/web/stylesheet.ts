@@ -1,10 +1,9 @@
 import { StyleSheet as RNStyleSheet } from "react-native";
 import { CommonStyleSheet } from "../../types";
 import {
-  DarkMode,
   DevHotReloadSubscription,
   INTERNAL_RESET,
-  INTERNAL_VERIFICATION_FLAGS,
+  INTERNAL_FLAGS,
 } from "../../shared";
 
 export const useUnstableNativeVariables = () => ({});
@@ -12,8 +11,16 @@ export function vars(variables: Record<`--${string}`, string | number>) {
   return variables;
 }
 
+const documentStyle: CSSStyleDeclaration | undefined =
+  globalThis.window?.getComputedStyle(
+    globalThis.window?.document.documentElement,
+  );
+
 const commonStyleSheet: CommonStyleSheet = {
-  [INTERNAL_VERIFICATION_FLAGS]: {},
+  [INTERNAL_FLAGS]: {},
+  getFlag(name) {
+    return documentStyle?.getPropertyValue(`--css-interop-${name}`);
+  },
   [INTERNAL_RESET](_options) {
     return;
   },
@@ -27,37 +34,8 @@ const commonStyleSheet: CommonStyleSheet = {
   register(_options) {
     throw new Error("Stylesheet.register is not available on web");
   },
-  [DarkMode]: { type: "media" },
-  setColorScheme(colorScheme) {
-    if (this[DarkMode].type === "media") {
-      throw new Error(
-        "Cannot manually set color scheme, as dark mode is type 'media'. Please use setDarkModeClass first",
-      );
-    }
-
-    let newColorScheme: "light" | "dark" | undefined;
-
-    if (colorScheme === "system") {
-      if (typeof window !== undefined) {
-        newColorScheme = window.matchMedia("(prefers-color-scheme: dark)")
-          ? "dark"
-          : "light";
-      }
-    } else {
-      newColorScheme = colorScheme;
-    }
-
-    if (newColorScheme === "dark") {
-      globalThis?.window.document.classList.add(this[DarkMode]);
-    } else {
-      globalThis?.window.document.classList.remove(this[DarkMode]);
-    }
-  },
-  setDarkMode(type) {
-    this[DarkMode] = type;
-  },
   setRem(value) {
-    const document = globalThis.window?.document;
+    const document = globalThis.window?.document.documentElement;
     if (document) {
       document.style.fontSize = `${value}px`;
     } else {
@@ -67,7 +45,7 @@ const commonStyleSheet: CommonStyleSheet = {
     }
   },
   getRem(value) {
-    const document = globalThis.window?.document;
+    const document = globalThis.window?.document.documentElement;
     if (document) {
       document.style.fontSize = `${value}px`;
     } else {

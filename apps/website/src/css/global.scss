@@ -4,7 +4,7 @@
   --ifm-footer-link-color: #ffffff;
   --ifm-code-font-size: 16px;
   --ifm-line-height-base: 1.5;
-  --ifm-menu-link-padding-vertical: 8px;
+  --ifm-menu-link-padding-vertical: 4px;
   --ifm-menu-link-padding-horizontal: 20px;
   --ifm-heading-font-weight: 500;
   --ifm-toc-padding-vertical: 16px;
@@ -175,10 +175,6 @@ html[data-theme="dark"] {
     &:active {
       color: $color-gray-9;
     }
-
-    &::before {
-      // background-image: url('/img/github-white.svg');
-    }
   }
 
   .docusaurus-highlight-code-line {
@@ -214,10 +210,6 @@ html[data-theme="light"] {
 
     &:active {
       color: $color-gray-9;
-    }
-
-    &::before {
-      // background-image: url('/img/github-black.svg');
     }
   }
 }

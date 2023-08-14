@@ -2,7 +2,7 @@
 
 ## Passing styles to components
 
-Just pass the className prop down to your custom component
+Pass the `className` prop down to your custom component
 
 ```tsx
 function MyComponent({ className }) {
@@ -35,7 +35,13 @@ function MyComponent({ variant }) {
 }
 ```
 
-We recommend using a class name management library such as [cva](https://cva.style/docs) create custom variants
+Creating your own variants and quickly become complex. We recommend using a class name management library to simplify the process
+
+- [tailwind-variants](https://www.tailwind-variants.org/)
+- [cva](https://cva.style/docs)
+- [tw-classed](https://tw-classed.vercel.app)
+- [clsx](https://www.npmjs.com/package/clsx)
+- [classnames](https://www.npmjs.com/package/classnames)
 
 ## Merging with inline styles
 
@@ -203,6 +209,6 @@ declare module "react-native" {
 
 :::caution
 
-Please do not create issues asking for help with global style declarations. Either use the return value of `remapClassNameProps`/`enableCSSInterop`, or ask for help on sites such as [stackoverflow.com](http://stackoverflow.com)
+Please do not create issues asking for help with global style declarations. Either use the return value of `remapProps`/`cssInterop`, or ask for help on sites such as [stackoverflow.com](http://stackoverflow.com)
 
 :::

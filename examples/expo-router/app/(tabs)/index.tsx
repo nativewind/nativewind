@@ -1,4 +1,5 @@
-import { FlatList, Text } from "react-native";
+import { FlatList, Pressable, Text } from "react-native";
+import { useColorScheme } from "nativewind";
 
 const DATA = [
   {
@@ -16,12 +17,14 @@ const DATA = [
 ];
 
 export default function TabOneScreen() {
+  const a = useColorScheme();
+
   return (
-    <FlatList
-      data={DATA}
-      className="bg-yellow-500 transition-colors duration-[3000ms]"
-      renderItem={({ item }) => <Text>{item.title}</Text>}
-      keyExtractor={(item) => item.id}
-    />
+    <Pressable
+      className="bg-white dark:bg-black"
+      onPress={() => a.toggleColorScheme()}
+    >
+      <Text className="text-black dark:text-red-500">test</Text>
+    </Pressable>
   );
 }

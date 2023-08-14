@@ -4,11 +4,10 @@ export function exhaustiveCheck(value: never) {
   throw new Error(`Unhandled case: ${value}`);
 }
 
-export const DarkMode = Symbol();
 export const DevHotReloadSubscription = Symbol();
 export const INTERNAL_RESET = Symbol();
 export const INTERNAL_SET = Symbol();
-export const INTERNAL_VERIFICATION_FLAGS = Symbol();
+export const INTERNAL_FLAGS = Symbol();
 
 export function isRuntimeValue(value: unknown): value is RuntimeValue {
   if (!value) {

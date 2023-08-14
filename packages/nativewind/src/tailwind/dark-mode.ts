@@ -13,7 +13,9 @@ export const darkModeAtRule = plugin(function ({ config, addBase }) {
     type = "media";
   } else if (darkMode === "class") {
     type = "class";
+    value = "dark";
   } else if (darkMode[0] === "class") {
+    type = "class";
     value = darkMode[1];
 
     if (!value) {
@@ -24,13 +26,12 @@ export const darkModeAtRule = plugin(function ({ config, addBase }) {
       type = "attribute";
       value = value.slice(1, -1);
     } else if (value.startsWith(".")) {
-      type = "class";
       value = value.slice(1);
     }
   }
 
   if (isNative) {
-    const atRule = ["@cssInterop darkMode", type, value]
+    const atRule = ["@cssInterop set darkMode", type, value]
       .filter(Boolean)
       .join(" ");
 

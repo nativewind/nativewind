@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import * as JSX from "react/jsx-runtime";
 
-import { StyleSheet, enableCSSInterop } from "../index";
+import { StyleSheet, cssInterop } from "../index";
 import { render } from "../runtime/render";
 import { INTERNAL_RESET } from "../shared";
 import {
@@ -48,7 +48,7 @@ export function createMockComponent<
     mapping?: EnableCssInteropOptions<P> & M;
   } = {},
 ) {
-  enableCSSInterop<P, M>(Component, mapping);
+  cssInterop<P, M>(Component, mapping);
 
   return forwardRef<unknown, P>((props, _ref) => {
     return render((JSX as any).jsx, Component, props as any, "");

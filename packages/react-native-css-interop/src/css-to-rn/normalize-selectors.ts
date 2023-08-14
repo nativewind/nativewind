@@ -216,17 +216,18 @@ function isDefaultVariableSelector([first, second]: Selector) {
   return first && !second && first.type === "universal";
 }
 
-// Matches:  :root .dark {}
+// Matches:  .dark:root  {}
 function isRootDarkVariableSelector(
   [first, second]: Selector,
   options: ExtractRuleOptions,
 ) {
   return (
     options.darkMode?.type === "class" &&
-    first &&
-    !second &&
     first.type === "class" &&
-    first.name === options.darkMode.value
+    first.name === options.darkMode.value &&
+    second &&
+    second.type === "pseudo-class" &&
+    second.kind === "root"
   );
 }
 

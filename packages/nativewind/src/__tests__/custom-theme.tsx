@@ -2,7 +2,7 @@ import { View } from "react-native";
 import { createMockComponent, renderTailwind } from "../test-utils";
 import { resetStyles } from "react-native-css-interop/testing-library";
 import { act, screen } from "@testing-library/react-native";
-import { StyleSheet } from "react-native-css-interop";
+import { StyleSheet } from "../stylesheet";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
@@ -21,14 +21,13 @@ test("Using css variables", async () => {
         :root {
           --color-primary: 255 115 179;
         }
-        @media (prefers-color-scheme: dark) {
-          :root {
-            --color-primary: 155 100 255;
-          }
+        .dark:root {
+          --color-primary: 155 100 255;
         }
       }
     `,
     config: {
+      darkMode: "class",
       theme: {
         colors: {
           primary: "rgb(var(--color-primary) / <alpha-value>)",

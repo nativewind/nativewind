@@ -29,9 +29,8 @@ import {
   ViewStyle,
 } from "react-native";
 import {
-  DarkMode,
   DevHotReloadSubscription,
-  INTERNAL_VERIFICATION_FLAGS,
+  INTERNAL_FLAGS,
   INTERNAL_RESET,
 } from "./shared";
 
@@ -44,12 +43,8 @@ export interface ExtractRuleOptions {
   rootDarkVariables: StyleSheetRegisterOptions["rootDarkVariables"];
   defaultVariables: StyleSheetRegisterOptions["defaultVariables"];
   defaultDarkVariables: StyleSheetRegisterOptions["defaultDarkVariables"];
-  verify: Record<string, unknown>;
+  flags: Record<string, unknown>;
   selectorPrefix?: string;
-}
-
-declare global {
-  var window: Record<string, any>;
 }
 
 export type EnableCssInteropOptions<P> = {
@@ -254,8 +249,7 @@ export type StyleSheetRegisterOptions = {
   defaultVariables?: Record<string, ExtractedStyleValue>;
   defaultDarkVariables?: Record<string, ExtractedStyleValue>;
   colorSchemeClass?: string;
-  darkMode?: DarkMode;
-  verify?: Record<string, unknown>;
+  flags?: Record<string, unknown>;
 };
 
 export type Style = ViewStyle & TextStyle & ImageStyle;
@@ -330,19 +324,14 @@ export type DarkMode =
 
 export interface CommonStyleSheet {
   [INTERNAL_RESET](options?: ResetOptions): void;
-  [INTERNAL_VERIFICATION_FLAGS]: Record<string, unknown>;
+  [INTERNAL_FLAGS]: Record<string, string>;
   [DevHotReloadSubscription](subscription: () => void): () => void;
   classNameMergeStrategy(c: string): string;
   dangerouslyCompileStyles(c: string): void;
   register(options: StyleSheetRegisterOptions): void;
-  /**
-   * Internal flag to signal if web should use a className to set Dark Mode.
-   */
-  [DarkMode]: DarkMode;
-  setColorScheme(colorScheme: "light" | "dark" | "system"): void;
-  setDarkMode(type: CommonStyleSheet[typeof DarkMode]): void;
   setRem(value: number): void;
   getRem(value: number): void;
+  getFlag(name: string): string | undefined;
 }
 
 /*

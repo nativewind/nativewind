@@ -1,6 +1,6 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useReducer } from "react";
 
-import { Signal } from "../../types";
+import { Signal } from "../types";
 /*
  * This file handles the style reactivity.
  *
@@ -181,11 +181,14 @@ function createComputation<T = unknown>(fn: () => T) {
  */
 export function useComputation<T>(
   fn: () => T,
-  dependencies: unknown[],
-  rerender: () => void,
+  dependencies: unknown[] = [],
+  rerender: () => void = useRerender(),
 ): T {
   const [computation] = useState(() => createComputation(fn));
   useMemo(() => computation.update(fn), dependencies);
   useEffect(() => computation.subscribe(rerender), [computation]);
   return computation.snapshot();
 }
+
+export const useRerender = () => useReducer(rerenderReducer, 0)[1];
+const rerenderReducer = (accumulator: number) => accumulator + 1;

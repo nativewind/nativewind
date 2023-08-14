@@ -26,7 +26,7 @@ import type {
   InteropFunction,
 } from "./types";
 
-export function enableCSSInterop<P extends object, M>(
+export function cssInterop<P extends object, M>(
   component: ComponentType<P>,
   mapping: EnableCssInteropOptions<P>,
   interop: InteropFunction = defaultCSSInterop,
@@ -61,23 +61,23 @@ export function remapProps<P, M>(
   return component as ComponentTypeWithMapping<P, M>;
 }
 
-enableCSSInterop(Image, { className: "style" });
-enableCSSInterop(Pressable, { className: "style" });
-enableCSSInterop(Text, { className: "style" });
-enableCSSInterop(View, { className: "style" });
-enableCSSInterop(ActivityIndicator, {
+cssInterop(Image, { className: "style" });
+cssInterop(Pressable, { className: "style" });
+cssInterop(Text, { className: "style" });
+cssInterop(View, { className: "style" });
+cssInterop(ActivityIndicator, {
   className: {
     target: "style",
     nativeStyleToProp: { color: true },
   },
 });
-enableCSSInterop(StatusBar, {
+cssInterop(StatusBar, {
   className: {
     target: false,
     nativeStyleToProp: { backgroundColor: true },
   },
 });
-enableCSSInterop(ScrollView, {
+cssInterop(ScrollView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",

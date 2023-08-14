@@ -1,15 +1,16 @@
-import { ComponentType, forwardRef, useEffect } from "react";
+import { ComponentType, forwardRef, useEffect, useReducer } from "react";
 import { View, Pressable } from "react-native";
 
 import { DevHotReloadSubscription } from "../shared";
 import { ContainerContext } from "./native/globals";
-import { StyleSheet, useRerender, VariableContext } from "./native/stylesheet";
+import { StyleSheet } from "./native/stylesheet";
 import { useStyledProps } from "./native/use-computed-props";
 import type {
   InteropFunction,
   InteropFunctionOptions,
   JSXFunction,
 } from "../types";
+import { VariableContext } from "./native/variables";
 
 export const defaultCSSInterop: InteropFunction = (
   jsx,
@@ -107,3 +108,6 @@ export const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
 
   return finalComponent;
 });
+
+export const useRerender = () => useReducer(rerenderReducer, 0)[1];
+const rerenderReducer = (accumulator: number) => accumulator + 1;
