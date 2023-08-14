@@ -10,7 +10,3 @@ react-native-css-interop
 - [ ] complete tests
 - [ ] refactor groups to be separate from container context
 - [ ] device orientation
-
-docs
-
-- [ ] everything
