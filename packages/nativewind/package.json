@@ -32,10 +32,12 @@
   },
   "scripts": {
     "test": "jest",
+    "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
-    "build": "rm -rf dist && tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput"
   },
   "files": [
     "babel/",

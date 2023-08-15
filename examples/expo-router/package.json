@@ -6,8 +6,7 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "test": "jest --watchAll"
+    "web": "expo start --web"
   },
   "jest": {
     "preset": "jest-expo"
@@ -18,7 +17,7 @@
     "expo": "~49.0.3",
     "expo-font": "~11.4.0",
     "expo-linking": "~5.0.2",
-    "expo-router": "2.0.0",
+    "expo-router": "2.0.1",
     "expo-splash-screen": "~0.20.4",
     "expo-status-bar": "~1.6.0",
     "expo-system-ui": "~2.4.0",

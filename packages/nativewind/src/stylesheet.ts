@@ -17,7 +17,7 @@ const colorScheme = {
       );
     }
 
-    colorScheme.set(scheme);
+    cssColorScheme.set(scheme);
   },
 };
 

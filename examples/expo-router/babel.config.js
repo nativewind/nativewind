@@ -5,13 +5,14 @@ module.exports = function (api) {
     plugins: [
       // Required for expo-router
       "expo-router/babel",
-      // [
-      //   "@babel/plugin-transform-react-jsx",
-      //   {
-      //     runtime: "automatic",
-      //     importSource: "nativewind",
-      //   },
-      // ],
+      "react-native-reanimated/plugin",
+      [
+        "@babel/plugin-transform-react-jsx",
+        {
+          runtime: "automatic",
+          importSource: "nativewind",
+        },
+      ],
     ],
   };
 };

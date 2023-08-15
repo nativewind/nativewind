@@ -83,7 +83,7 @@ function getRenderOptions<P>(
     if (styles) {
       configMap.set(targetKey, config);
       remappedProps[targetKey] = styles as P[keyof P & string];
-      useWrapper ||= stylePropHasMeta(styles);
+      useWrapper ||= shouldUseWrapper(styles);
     }
   }
 
@@ -95,8 +95,9 @@ function getRenderOptions<P>(
   };
 }
 
-function stylePropHasMeta(style: StyleProp): boolean {
+function shouldUseWrapper(style: StyleProp): boolean {
   if (!style) return false;
-  if (Array.isArray(style)) return style.some((s) => stylePropHasMeta(s));
-  return styleMetaMap.has(style);
+  if (Array.isArray(style)) return style.some((s) => shouldUseWrapper(s));
+  const meta = styleMetaMap.get(style);
+  return meta ? meta.alreadyProcessed !== true : false;
 }

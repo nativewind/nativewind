@@ -68,8 +68,11 @@ export const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
   };
 
   // View doesn't support the interaction props, so switch to a Pressable (which accepts ViewProps)
-  if (component === View && meta.convertToPressable) {
-    component = Pressable as ComponentType<unknown>;
+  if (meta.convertToPressable && !props.$$pressable) {
+    props.$$pressable = true;
+    if (component === View) {
+      component = Pressable as ComponentType<unknown>;
+    }
   }
 
   // Depending on the meta, we may be required to surround the component in other components (like VariableProvider)

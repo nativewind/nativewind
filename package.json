@@ -6,10 +6,9 @@
     "examples/*"
   ],
   "scripts": {
-    "test": "jest",
-    "test:nativewind": "npm run test --workspace=nativewind --",
-    "test:css": "npm run test --workspace=react-native-css-interop --",
-    "build": "npm run build --workspace=nativewind --",
+    "test": "turbo test --continue",
+    "build": "turbo run build --filter='./packages/*'",
+    "dev": "npm_config_loglevel=silent turbo dev",
     "example": "npm start --workspace=examples/expo-router --",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i",
     "website": "vercel dev"
@@ -19,12 +18,14 @@
     "@tsconfig/react-native": "^3.0.2",
     "@types/node": "18.16.19",
     "@vercel/node": "^2.15.8",
+    "@welldone-software/why-did-you-render": "^7.0.1",
     "eslint": "8.44.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-unicorn": "47.0.0",
     "jest": "^29.3.1",
     "jest-expo": "^49.0.0",
     "prettier": "3.0.0",
+    "turbo": "^1.10.12",
     "typescript": "5.1.6",
     "vercel": "^31.2.2"
   }

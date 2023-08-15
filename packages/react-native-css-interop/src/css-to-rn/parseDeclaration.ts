@@ -141,7 +141,6 @@ export function parseDeclaration(
       property.startsWith("--") ||
       property.startsWith("-rn-")
     ) {
-      // console.log(property, declaration.value.value);
       return addStyleProp(
         property,
         parseUnparsed(declaration.value.value, {

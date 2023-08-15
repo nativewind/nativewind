@@ -1,4 +1,4 @@
-import { FlatList, Pressable, Text } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { useColorScheme } from "nativewind";
 
 const DATA = [
@@ -20,11 +20,8 @@ export default function TabOneScreen() {
   const a = useColorScheme();
 
   return (
-    <Pressable
-      className="bg-white dark:bg-black"
-      onPress={() => a.toggleColorScheme()}
-    >
-      <Text className="text-black dark:text-red-500">test</Text>
-    </Pressable>
+    <View className="bg-white active:bg-black">
+      <Text>test2</Text>
+    </View>
   );
 }

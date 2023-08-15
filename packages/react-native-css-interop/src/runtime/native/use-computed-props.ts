@@ -312,11 +312,10 @@ export function flattenStyle(
    * TODO: Investigate if we early exit if there is no styleMeta.
    */
   const styleMeta: StyleMeta = styleMetaMap.get(style) ?? {};
-
   let flatStyleMeta = styleMetaMap.get(flatStyle);
 
   if (!flatStyleMeta) {
-    flatStyleMeta = {};
+    flatStyleMeta = { alreadyProcessed: true };
     styleMetaMap.set(flatStyle, flatStyleMeta);
   }
 

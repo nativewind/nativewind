@@ -136,6 +136,7 @@ export type PropInteropMeta = {
 };
 
 export type StyleMeta = {
+  alreadyProcessed?: true;
   variableProps?: Set<string>;
   media?: MediaQuery[];
   variables?: Record<string, unknown>;
