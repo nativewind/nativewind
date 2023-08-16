@@ -31,6 +31,7 @@ function createColorScheme(appearance: typeof Appearance) {
     }
 
     signal.set(newColorScheme);
+    console.log(newColorScheme);
     appearance.setColorScheme(newColorScheme);
     resetRootVariables(newColorScheme);
     resetDefaultVariables(newColorScheme);

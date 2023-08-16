@@ -1,4 +1,4 @@
-import { FlatList, Pressable, Text, View } from "react-native";
+import { Appearance, FlatList, Pressable, Text, View } from "react-native";
 import { useColorScheme } from "nativewind";
 
 const DATA = [
@@ -20,7 +20,7 @@ export default function TabOneScreen() {
   const a = useColorScheme();
 
   return (
-    <View className="bg-white active:bg-black">
+    <View className="bg-white active:bg-black hover:bg-green-500">
       <Text>test2</Text>
     </View>
   );
