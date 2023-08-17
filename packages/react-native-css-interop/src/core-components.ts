@@ -8,6 +8,7 @@ import {
   ScrollView,
   StatusBar,
   Text,
+  TextInput
   View,
   VirtualizedList,
   Image,
@@ -82,6 +83,26 @@ cssInterop(ScrollView, {
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
+cssInterop(TextInput, {
+  className: {
+    target: "style",
+    nativeStyleToProp: {
+      textAlign: true
+    }
+  },
+  placeholderClassName: {
+    target: false,
+    nativeStyleToProp: {
+      color: "placeholderTextColor"
+    }
+  },
+  selectionClassName: {
+    target: false,
+    nativeStyleToProp: {
+      color: "selectionColor"
+    }
+  }
+})
 
 remapProps(FlatList, {
   className: "style",

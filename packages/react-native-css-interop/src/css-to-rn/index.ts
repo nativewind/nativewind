@@ -20,17 +20,11 @@ import {
   ExtractedAnimation,
   ExtractionWarning,
   ExtractRuleOptions,
+  CSSSpecificity,
+  CssToReactNativeRuntimeOptions,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import { normalizeSelectors } from "./normalize-selectors";
-
-export type CssToReactNativeRuntimeOptions = {
-  inlineRem?: number | false;
-  darkMode?: false | string;
-  grouping?: (string | RegExp)[];
-  ignorePropertyWarningRegex?: (string | RegExp)[];
-  selectorPrefix?: string;
-};
 
 type CSSInteropAtRule = {
   type: "custom";
@@ -75,6 +69,7 @@ export function cssToReactNativeRuntime(
     defaultVariables: {},
     defaultDarkVariables: {},
     flags: {},
+    appearanceOrder: 0,
   };
 
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
@@ -84,7 +79,7 @@ export function cssToReactNativeRuntime(
     visitor: {
       Rule(rule) {
         // Extract the style declarations and animations from the current rule
-        extractRule(rule, extractOptions, options);
+        extractRule(rule, extractOptions);
         // We have processed this rule, so now delete it from the AST
         return [];
       },
@@ -118,37 +113,39 @@ export function cssToReactNativeRuntime(
 function extractRule(
   rule: Rule | CSSInteropAtRule,
   extractOptions: ExtractRuleOptions,
-  parseOptions: CssToReactNativeRuntimeOptions,
   partialStyle: Partial<ExtractedStyle> = {},
 ) {
   // Check the rule's type to determine which extraction function to call
   switch (rule.type) {
     case "keyframes": {
       // If the rule is a keyframe animation, extract it with the `extractKeyFrames` function
-      extractKeyFrames(rule.value, extractOptions, parseOptions);
+      extractKeyFrames(rule.value, extractOptions);
       break;
     }
     case "container": {
       // If the rule is a container, extract it with the `extractedContainer` function
-      extractedContainer(rule.value, extractOptions, parseOptions);
+      extractedContainer(rule.value, extractOptions);
       break;
     }
     case "media": {
       // If the rule is a media query, extract it with the `extractMedia` function
-      extractMedia(rule.value, extractOptions, parseOptions);
+      extractMedia(rule.value, extractOptions);
       break;
     }
     case "style": {
       // If the rule is a style declaration, extract it with the `getExtractedStyle` function and store it in the `declarations` map
       if (rule.value.declarations) {
-        setStyleForSelectorList(
-          {
-            ...partialStyle,
-            ...getExtractedStyle(rule.value.declarations, parseOptions),
-          },
-          rule.value.selectors,
+        for (const style of getExtractedStyles(
+          rule.value.declarations,
           extractOptions,
-        );
+        )) {
+          setStyleForSelectorList(
+            { ...partialStyle, ...style },
+            rule.value.selectors,
+            extractOptions,
+          );
+        }
+        extractOptions.appearanceOrder++;
       }
       break;
     }
@@ -208,7 +205,6 @@ function extractCSSInteropFlag(
 function extractMedia(
   mediaRule: MediaRule,
   extractOptions: ExtractRuleOptions,
-  parseOptions: CssToReactNativeRuntimeOptions,
 ) {
   // Initialize an empty array to store screen media queries
   const media: MediaQuery[] = [];
@@ -233,7 +229,7 @@ function extractMedia(
 
   // Iterate over all rules in the mediaRule and extract their styles using the updated ExtractRuleOptions
   for (const rule of mediaRule.rules) {
-    extractRule(rule, extractOptions, parseOptions, { media });
+    extractRule(rule, extractOptions, { media });
   }
 }
 
@@ -245,11 +241,10 @@ function extractMedia(
 function extractedContainer(
   containerRule: ContainerRule,
   extractOptions: ExtractRuleOptions,
-  parseOptions: CssToReactNativeRuntimeOptions,
 ) {
   // Iterate over all rules inside the containerRule and extract their styles using the updated ExtractRuleOptions
   for (const rule of containerRule.rules) {
-    extractRule(rule, extractOptions, parseOptions, {
+    extractRule(rule, extractOptions, {
       containerQuery: [
         {
           name: containerRule.name,
@@ -335,12 +330,18 @@ function setStyleForSelectorList(
       darkMode,
     } = selector;
 
+    const specificity = {
+      ...extractedStyle.specificity,
+      ...selector.specificity,
+    };
+
     if (groupClassName) {
       // Add the conditions to the declarations object
       addDeclaration(
         groupClassName,
         {
           style: {},
+          specificity,
           container: {
             names: [groupClassName],
           },
@@ -370,12 +371,11 @@ function setStyleForSelectorList(
       });
     }
 
-    // Add the className selector and its pseudo-classes to the declarations object, with the extracted style and container queries
-    if (pseudoClasses) {
-      addDeclaration(className, { ...style, pseudoClasses }, declarations);
-    } else {
-      addDeclaration(className, style, declarations);
-    }
+    addDeclaration(
+      className,
+      { ...style, specificity, pseudoClasses },
+      declarations,
+    );
   }
 }
 
@@ -398,18 +398,30 @@ function addDeclaration(
 function extractKeyFrames(
   keyframes: KeyframesRule<Declaration>,
   extractOptions: ExtractRuleOptions,
-  options: CssToReactNativeRuntimeOptions,
 ) {
   const extractedAnimation: ExtractedAnimation = { frames: [] };
   const frames = extractedAnimation.frames;
 
   for (const frame of keyframes.keyframes) {
-    const { style } = getExtractedStyle(frame.declarations, {
-      ...options,
-      requiresLayout() {
-        extractedAnimation.requiresLayout = true;
+    if (!frame.declarations.declarations) continue;
+
+    /**
+     *  Animations ignore !important declarations
+     */
+    const { style } = declarationsToStyle(
+      frame.declarations.declarations,
+      {
+        ...extractOptions,
+        requiresLayout() {
+          extractedAnimation.requiresLayout = true;
+        },
       },
-    });
+      {
+        I: 4,
+        S: 1,
+        O: extractOptions.appearanceOrder,
+      },
+    );
 
     for (const selector of frame.selectors) {
       const keyframe =
@@ -449,16 +461,50 @@ function extractKeyFrames(
   extractOptions.keyframes.set(keyframes.name.value, extractedAnimation);
 }
 
-interface GetExtractedStyleOptions extends CssToReactNativeRuntimeOptions {
+interface GetExtractedStyleOptions extends ExtractRuleOptions {
   requiresLayout?: () => void;
 }
 
-function getExtractedStyle(
+function getExtractedStyles(
   declarationBlock: DeclarationBlock<Declaration>,
   options: GetExtractedStyleOptions,
+): ExtractedStyle[] {
+  const extractedStyles = [];
+
+  if (declarationBlock.declarations && declarationBlock.declarations.length) {
+    extractedStyles.push(
+      declarationsToStyle(declarationBlock.declarations, options, {
+        I: 2,
+        S: 1,
+        O: options.appearanceOrder,
+      }),
+    );
+  }
+
+  if (
+    declarationBlock.importantDeclarations &&
+    declarationBlock.importantDeclarations.length
+  ) {
+    extractedStyles.push(
+      declarationsToStyle(declarationBlock.importantDeclarations, options, {
+        I: 6,
+        S: 1,
+        O: options.appearanceOrder,
+      }),
+    );
+  }
+
+  return extractedStyles;
+}
+
+function declarationsToStyle(
+  declarations: Declaration[],
+  options: GetExtractedStyleOptions,
+  specificity: Pick<CSSSpecificity, "I" | "S" | "O">,
 ): ExtractedStyle {
   const extractedStyle: ExtractedStyle = {
     style: {},
+    specificity: { A: 0, B: 0, C: 0, ...specificity },
   };
 
   let processingImportant = false;
@@ -721,17 +767,8 @@ function getExtractedStyle(
     ...options,
   };
 
-  if (declarationBlock.declarations) {
-    for (const declaration of declarationBlock.declarations) {
-      parseDeclaration(declaration, parseDeclarationOptions);
-    }
-  }
-
-  if (declarationBlock.importantDeclarations) {
-    processingImportant = true;
-    for (const declaration of declarationBlock.importantDeclarations) {
-      parseDeclaration(declaration, parseDeclarationOptions);
-    }
+  for (const declaration of declarations) {
+    parseDeclaration(declaration, parseDeclarationOptions);
   }
 
   return extractedStyle;

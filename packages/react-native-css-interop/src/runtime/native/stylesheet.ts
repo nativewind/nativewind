@@ -18,6 +18,7 @@ import {
   globalStyles,
   opaqueStyles,
   styleMetaMap,
+  styleSpecificity,
   vh,
   vw,
 } from "./misc";
@@ -222,6 +223,11 @@ function tagStyles(
       styleMetaMap.set(styles.style, meta);
     }
 
+    styleSpecificity.set(styles.style, {
+      ...styles.specificity,
+      D: globalStyles.size,
+    });
+
     return styles.style;
   }
 }
@@ -249,5 +255,15 @@ export function getOpaqueStyle(name?: string | object) {
 
   const opaqueStyle = Object.freeze(new OpaqueStyleToken());
   opaqueStyles.set(opaqueStyle, style);
+  styleSpecificity.set(opaqueStyle, getSpecificity(style));
+
   return opaqueStyle;
+}
+
+export function getSpecificity(style?: object) {
+  if (style) {
+    return styleSpecificity.get(style) ?? { inline: 1 };
+  } else {
+    return { inline: 1 };
+  }
 }

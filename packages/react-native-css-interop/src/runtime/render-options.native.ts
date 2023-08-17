@@ -5,6 +5,7 @@ import {
   StyleProp,
 } from "../types";
 import { getGlobalStyle, getOpaqueStyle } from "./native/stylesheet";
+import { styleSpecificityCompareFn } from "./specificity";
 
 export function getInteropFunctionOptions<P>(
   props: P,
@@ -82,8 +83,14 @@ function getRenderOptions<P>(
 
     if (styles) {
       configMap.set(targetKey, config);
+      const useWrapperForStyles = shouldUseWrapper(styles);
+
+      if (!useWrapperForStyles && Array.isArray(styles)) {
+        styles = styles.sort(styleSpecificityCompareFn);
+      }
+
+      useWrapper ||= useWrapperForStyles;
       remappedProps[targetKey] = styles as P[keyof P & string];
-      useWrapper ||= shouldUseWrapper(styles);
     }
   }
 

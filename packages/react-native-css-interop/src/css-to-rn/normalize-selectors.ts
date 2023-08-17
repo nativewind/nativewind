@@ -1,5 +1,5 @@
 import type { Selector, SelectorList } from "lightningcss";
-import { ExtractRuleOptions } from "../types";
+import { CSSSpecificity, ExtractRuleOptions } from "../types";
 
 export type NormalizeSelector =
   | {
@@ -15,24 +15,25 @@ export type NormalizeSelector =
       groupClassName?: string;
       pseudoClasses?: Record<string, true>;
       groupPseudoClasses?: Record<string, true>;
+      specificity: Pick<CSSSpecificity, "A" | "B" | "C">;
     };
 
 export function normalizeSelectors(
   selectorList: SelectorList,
   options: ExtractRuleOptions,
-  normalizedSelectors: NormalizeSelector[] = [],
+  selectors: NormalizeSelector[] = [],
   defaults: Partial<NormalizeSelector> = {},
 ) {
-  for (let selector of selectorList) {
+  for (let lightningCssSelector of selectorList) {
     // Ignore `:is()`, and just process its selectors
-    if (isIsPseudoClass(selector)) {
-      normalizeSelectors(selector[0].selectors, options, normalizedSelectors);
+    if (isIsPseudoClass(lightningCssSelector)) {
+      normalizeSelectors(lightningCssSelector[0].selectors, options, selectors);
       continue;
     }
 
     // Matches: :root {}
-    if (isRootVariableSelector(selector)) {
-      normalizedSelectors.push({
+    if (isRootVariableSelector(lightningCssSelector)) {
+      selectors.push({
         type: "variables",
         rootVariables: true,
       });
@@ -40,8 +41,8 @@ export function normalizeSelectors(
     }
 
     // Matches: .dark {}
-    if (isRootDarkVariableSelector(selector, options)) {
-      normalizedSelectors.push({
+    if (isRootDarkVariableSelector(lightningCssSelector, options)) {
+      selectors.push({
         type: "variables",
         darkMode: true,
         rootVariables: true,
@@ -50,8 +51,8 @@ export function normalizeSelectors(
     }
 
     // Matches:   * {}
-    if (isDefaultVariableSelector(selector)) {
-      normalizedSelectors.push({
+    if (isDefaultVariableSelector(lightningCssSelector)) {
+      selectors.push({
         type: "variables",
         defaultVariables: true,
       });
@@ -59,8 +60,8 @@ export function normalizeSelectors(
     }
 
     // Matches:  .dark * {}
-    if (isDarkDefaultVariableSelector(selector, options)) {
-      normalizedSelectors.push({
+    if (isDarkDefaultVariableSelector(lightningCssSelector, options)) {
+      selectors.push({
         type: "variables",
         darkMode: true,
         defaultVariables: true,
@@ -69,9 +70,9 @@ export function normalizeSelectors(
     }
 
     // Matches:  .dark <selector> {}
-    if (isDarkClassSelector(selector, options)) {
-      const [_, __, third, ...rest] = selector;
-      normalizeSelectors([[third, ...rest]], options, normalizedSelectors, {
+    if (isDarkClassSelector(lightningCssSelector, options)) {
+      const [_, __, third, ...rest] = lightningCssSelector;
+      normalizeSelectors([[third, ...rest]], options, selectors, {
         darkMode: true,
       });
       continue;
@@ -79,25 +80,36 @@ export function normalizeSelectors(
 
     let isValid = true;
 
-    const normalizedSelector: NormalizeSelector = {
+    const selector: NormalizeSelector = {
       ...defaults,
       type: "className",
       className: "",
+      specificity: { A: 0, B: 0, C: 0 },
     };
 
     let previousWasCombinator = true;
 
-    for (const component of selector) {
+    for (const component of lightningCssSelector) {
       switch (component.type) {
         case "universal":
         case "namespace":
-        case "id":
-        case "attribute":
-        case "pseudo-element":
         case "nesting":
           isValid = false;
           break;
+        case "id":
+          selector.specificity.A++;
+          isValid = false;
+          break;
+        case "attribute":
+          selector.specificity.B++;
+          isValid = false;
+          break;
+        case "pseudo-element":
+          selector.specificity.C++;
+          isValid = false;
+          break;
         case "type": {
+          selector.specificity.C++;
           isValid = component.name === options.selectorPrefix;
           break;
         }
@@ -116,10 +128,12 @@ export function normalizeSelectors(
             break;
           }
 
+          selector.specificity.B++;
+
           // We can only have two classnames in a selector if the first one is a valid group
-          if (normalizedSelector.className) {
+          if (selector.className) {
             const groupingValid = options.grouping.some((group) =>
-              group.test(normalizedSelector.className),
+              group.test(selector.className),
             );
 
             if (!groupingValid) {
@@ -127,32 +141,33 @@ export function normalizeSelectors(
               isValid = false;
             } else {
               // Otherwise make the current className the group
-              normalizedSelector.groupClassName = normalizedSelector.className;
-              normalizedSelector.className = component.name;
-              normalizedSelector.groupPseudoClasses =
-                normalizedSelector.pseudoClasses;
-              normalizedSelector.pseudoClasses = {};
+              selector.groupClassName = selector.className;
+              selector.className = component.name;
+              selector.groupPseudoClasses = selector.pseudoClasses;
+              selector.pseudoClasses = {};
             }
           } else if (component.name === options.selectorPrefix?.slice(1)) {
             // Need to remove the leading `.`
             break;
           } else {
-            normalizedSelector.className = component.name;
+            selector.className = component.name;
           }
           break;
         }
         case "pseudo-class": {
-          if (!normalizedSelector.className) {
+          if (!selector.className) {
             isValid = false;
             break;
           }
+
+          selector.specificity.B++;
 
           switch (component.kind) {
             case "hover":
             case "active":
             case "focus":
-              normalizedSelector.pseudoClasses ??= {};
-              normalizedSelector.pseudoClasses[component.kind] = true;
+              selector.pseudoClasses ??= {};
+              selector.pseudoClasses[component.kind] = true;
               break;
             default: {
               isValid = false;
@@ -170,10 +185,10 @@ export function normalizeSelectors(
       continue;
     }
 
-    normalizedSelectors.push(normalizedSelector);
+    selectors.push(selector);
   }
 
-  return normalizedSelectors;
+  return selectors;
 }
 
 function isIsPseudoClass(

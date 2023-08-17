@@ -6,13 +6,11 @@ import { render } from "../runtime/render";
 import { INTERNAL_RESET } from "../shared";
 import {
   ComponentTypeWithMapping,
+  CssToReactNativeRuntimeOptions,
   EnableCssInteropOptions,
   Style,
 } from "../types";
-import {
-  CssToReactNativeRuntimeOptions,
-  cssToReactNativeRuntime,
-} from "../css-to-rn";
+import { cssToReactNativeRuntime } from "../css-to-rn";
 
 export { globalStyles, styleMetaMap } from "../runtime/native/misc";
 export { warnings } from "../runtime/native/stylesheet";

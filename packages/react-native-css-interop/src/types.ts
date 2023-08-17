@@ -34,7 +34,15 @@ import {
   INTERNAL_RESET,
 } from "./shared";
 
-export interface ExtractRuleOptions {
+export type CssToReactNativeRuntimeOptions = {
+  inlineRem?: number | false;
+  grouping?: (string | RegExp)[];
+  ignorePropertyWarningRegex?: (string | RegExp)[];
+  selectorPrefix?: string;
+  stylesheetOrder?: number;
+};
+
+export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
   keyframes: Map<string, ExtractedAnimation>;
   grouping: RegExp[];
@@ -45,6 +53,7 @@ export interface ExtractRuleOptions {
   defaultDarkVariables: StyleSheetRegisterOptions["defaultDarkVariables"];
   flags: Record<string, unknown>;
   selectorPrefix?: string;
+  appearanceOrder: number;
 }
 
 export type EnableCssInteropOptions<P> = {
@@ -109,6 +118,7 @@ export type ExtractedStyleValue =
   | ExtractedStyleValue[];
 
 export type ExtractedStyle = {
+  specificity: Specificity;
   isDynamic?: boolean;
   media?: MediaQuery[];
   variables?: Record<string, ExtractedStyleValue>;
@@ -122,6 +132,23 @@ export type ExtractedStyle = {
   requiresLayout?: boolean;
   warnings?: ExtractionWarning[];
   importantStyles?: string[];
+};
+
+export type Specificity = { inline?: number } | CSSSpecificity;
+
+export type CSSSpecificity = {
+  /** IDs - https://drafts.csswg.org/selectors/#specificity-rules */
+  A: number;
+  /** Classes, Attributes, Pseudo-Classes - https://drafts.csswg.org/selectors/#specificity-rules */
+  B: number;
+  /** Elements, Pseudo-Elements - https://drafts.csswg.org/selectors/#specificity-rules */
+  C: number;
+  /** Importance - https://developer.mozilla.org/en-US/docs/Web/CSS/Cascade#cascading_order */
+  I: number;
+  /** StyleSheet Order */
+  S: number;
+  /** Appearance Order */
+  O: number;
 };
 
 export type PropInteropMeta = {
@@ -147,6 +174,7 @@ export type StyleMeta = {
   transition?: ExtractedTransition;
   requiresLayout?: boolean;
   importantStyles?: string[];
+  specificity?: Specificity;
 };
 
 export interface SignalLike<T = unknown> {

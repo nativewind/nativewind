@@ -32,6 +32,7 @@ import { createSignal, useComputation } from "../signals";
 import { ContainerContext, styleMetaMap, vh, vw } from "./misc";
 import { VariableContext, defaultVariables, rootVariables } from "./variables";
 import { rem } from "./rem";
+import { styleSpecificityCompareFn } from "../specificity";
 
 type UseStyledPropsOptions = InteropFunctionOptions<Record<string, unknown>>;
 
@@ -299,11 +300,8 @@ export function flattenStyle(
   }
 
   if (Array.isArray(style)) {
-    // We need to flatten in reverse order so that the last style in the array is the one defined
-    for (let index = style.length - 1; index >= 0; index--) {
-      if (style[index]) {
-        flattenStyle(style[index], options, flatStyle);
-      }
+    for (const s of style.flat().sort(styleSpecificityCompareFn)) {
+      flattenStyle(s, options, flatStyle);
     }
     return flatStyle;
   }
@@ -311,11 +309,13 @@ export function flattenStyle(
   /*
    * TODO: Investigate if we early exit if there is no styleMeta.
    */
-  const styleMeta: StyleMeta = styleMetaMap.get(style) ?? {};
+  const styleMeta: StyleMeta = styleMetaMap.get(style) ?? {
+    specificity: { inline: 1 },
+  };
   let flatStyleMeta = styleMetaMap.get(flatStyle);
 
   if (!flatStyleMeta) {
-    flatStyleMeta = { alreadyProcessed: true };
+    flatStyleMeta = { alreadyProcessed: true, specificity: { inline: 1 } };
     styleMetaMap.set(flatStyle, flatStyleMeta);
   }
 
@@ -417,9 +417,6 @@ export function flattenStyle(
   }
 
   for (let [key, value] of Object.entries(style)) {
-    const isImportant = styleMeta.importantStyles?.includes(key);
-    if (!isImportant && key in flatStyle) continue;
-
     switch (key) {
       case "transform": {
         const transforms: Record<string, unknown>[] = [];
