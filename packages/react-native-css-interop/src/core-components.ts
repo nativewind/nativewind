@@ -8,7 +8,7 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  TextInput
+  TextInput,
   View,
   VirtualizedList,
   Image,
@@ -87,22 +87,22 @@ cssInterop(TextInput, {
   className: {
     target: "style",
     nativeStyleToProp: {
-      textAlign: true
-    }
+      textAlign: true,
+    },
   },
   placeholderClassName: {
     target: false,
     nativeStyleToProp: {
-      color: "placeholderTextColor"
-    }
+      color: "placeholderTextColor",
+    },
   },
   selectionClassName: {
     target: false,
     nativeStyleToProp: {
-      color: "selectionColor"
-    }
-  }
-})
+      color: "selectionColor",
+    },
+  },
+});
 
 remapProps(FlatList, {
   className: "style",

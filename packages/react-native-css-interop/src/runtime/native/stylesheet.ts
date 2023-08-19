@@ -223,10 +223,7 @@ function tagStyles(
       styleMetaMap.set(styles.style, meta);
     }
 
-    styleSpecificity.set(styles.style, {
-      ...styles.specificity,
-      D: globalStyles.size,
-    });
+    styleSpecificity.set(styles.style, styles.specificity);
 
     return styles.style;
   }

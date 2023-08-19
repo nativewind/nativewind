@@ -4,10 +4,8 @@ import worker, {
   TransformResponse,
 } from "metro-transform-worker";
 
-import {
-  cssToReactNativeRuntime,
-  CssToReactNativeRuntimeOptions,
-} from "../css-to-rn";
+import { cssToReactNativeRuntime } from "../css-to-rn";
+import { CssToReactNativeRuntimeOptions } from "../types";
 
 interface CssInteropJsTransformerConfig extends JsTransformerConfig {
   transformerPath?: string;

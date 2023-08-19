@@ -4,7 +4,7 @@ import type {
   TransformerConfigT,
 } from "metro-config";
 import { expoColorSchemeWarning } from "./expo";
-import { CssToReactNativeRuntimeOptions } from "../css-to-rn";
+import { CssToReactNativeRuntimeOptions } from "../types";
 
 export type { CssToReactNativeRuntimeOptions };
 
