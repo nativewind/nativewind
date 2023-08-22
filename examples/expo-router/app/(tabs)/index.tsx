@@ -20,7 +20,7 @@ export default function TabOneScreen() {
   const a = useColorScheme();
 
   return (
-    <View className="bg-white active:bg-black hover:bg-green-500">
+    <View className="bg-white active:bg-black bg-yellow-500">
       <Text>test2</Text>
     </View>
   );

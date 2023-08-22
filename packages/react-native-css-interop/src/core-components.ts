@@ -1,4 +1,4 @@
-import { ComponentType } from "react";
+import { ComponentType, forwardRef } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -34,6 +34,27 @@ export function cssInterop<P extends object, M>(
 ) {
   const map = new Map(Object.entries(mapping));
 
+  return forwardRef(function (props: P, ref) {
+    (props as any).ref = ref;
+    const options = getInteropFunctionOptions(props, map as any);
+
+    return interop<typeof props>(
+      jsx,
+      component,
+      options.remappedProps,
+      "",
+      options,
+    );
+  });
+}
+
+export function globalCssInterop<P extends object, M>(
+  component: ComponentType<P>,
+  mapping: EnableCssInteropOptions<P>,
+  interop: InteropFunction = defaultCSSInterop,
+) {
+  const map = new Map(Object.entries(mapping));
+
   interopFunctions.set(component, (jsx, type, props, key) => {
     const options = getInteropFunctionOptions(props, map as any);
 
@@ -62,28 +83,28 @@ export function remapProps<P, M>(
   return component as ComponentTypeWithMapping<P, M>;
 }
 
-cssInterop(Image, { className: "style" });
-cssInterop(Pressable, { className: "style" });
-cssInterop(Text, { className: "style" });
-cssInterop(View, { className: "style" });
-cssInterop(ActivityIndicator, {
+globalCssInterop(Image, { className: "style" });
+globalCssInterop(Pressable, { className: "style" });
+globalCssInterop(Text, { className: "style" });
+globalCssInterop(View, { className: "style" });
+globalCssInterop(ActivityIndicator, {
   className: {
     target: "style",
     nativeStyleToProp: { color: true },
   },
 });
-cssInterop(StatusBar, {
+globalCssInterop(StatusBar, {
   className: {
     target: false,
     nativeStyleToProp: { backgroundColor: true },
   },
 });
-cssInterop(ScrollView, {
+globalCssInterop(ScrollView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
-cssInterop(TextInput, {
+globalCssInterop(TextInput, {
   className: {
     target: "style",
     nativeStyleToProp: {
