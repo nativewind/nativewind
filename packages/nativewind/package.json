@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-alpha.4",
+  "version": "4.0.0-alpha.5",
   "name": "nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "main": "dist/index.js",
@@ -50,7 +50,7 @@
     "types.d.ts"
   ],
   "dependencies": {
-    "react-native-css-interop": "0.0.0-alpha.3"
+    "react-native-css-interop": "0.0.0-alpha.5"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
@@ -61,7 +61,7 @@
     "tailwindcss": "^3.3.3"
   },
   "peerDependencies": {
-    "tailwindcss": "~3",
+    "tailwindcss": ">3.3.0",
     "react-native-reanimated": ">=3.3.0"
   },
   "peerDependenciesMeta": {

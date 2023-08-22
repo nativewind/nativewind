@@ -571,8 +571,12 @@ function extractValue<T>(
     case "var": {
       return () => {
         const name = value.arguments[0] as string;
-        const resolvedValue =
-          flatStyleMeta.variables?.[name] ?? options.variables[name];
+        const resolvedValue = extractValue(
+          flatStyleMeta.variables?.[name] ?? options.variables[name],
+          flatStyle,
+          flatStyleMeta,
+          options,
+        );
 
         return typeof resolvedValue === "function"
           ? resolvedValue()
