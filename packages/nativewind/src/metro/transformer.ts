@@ -32,10 +32,7 @@ export async function transform(
       config,
       projectRoot,
       filename,
-      Buffer.from(
-        `require("react-native-css-interop");module.exports=require("${output}");`,
-        "utf8",
-      ),
+      Buffer.from(`import '${output}'`, "utf8"),
       options,
     );
   }

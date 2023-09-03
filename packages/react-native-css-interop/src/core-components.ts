@@ -1,4 +1,4 @@
-import { ComponentType, forwardRef } from "react";
+import { ComponentType } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -27,27 +27,6 @@ import type {
   InteropFunction,
 } from "./types";
 
-export function cssInterop<P extends object, M>(
-  component: ComponentType<P>,
-  mapping: EnableCssInteropOptions<P>,
-  interop: InteropFunction = defaultCSSInterop,
-) {
-  const map = new Map(Object.entries(mapping));
-
-  return forwardRef(function (props: P, ref) {
-    (props as any).ref = ref;
-    const options = getInteropFunctionOptions(props, map as any);
-
-    return interop<typeof props>(
-      jsx,
-      component,
-      options.remappedProps,
-      "",
-      options,
-    );
-  });
-}
-
 export function globalCssInterop<P extends object, M>(
   component: ComponentType<P>,
   mapping: EnableCssInteropOptions<P>,
@@ -59,11 +38,11 @@ export function globalCssInterop<P extends object, M>(
     const options = getInteropFunctionOptions(props, map as any);
 
     return interop<typeof props>(
+      options,
       jsx,
       type,
       options.remappedProps,
       key,
-      options,
     );
   });
 

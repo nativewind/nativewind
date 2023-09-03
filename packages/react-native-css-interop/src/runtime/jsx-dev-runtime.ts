@@ -1,16 +1,17 @@
 import ReactJSXRuntime from "react/jsx-dev-runtime";
 import { render } from "./render";
+import { JSXFunction } from "../types";
 
 export { Fragment } from "react";
 
-export function jsx(...args: any[]) {
+export function jsx<P>(...args: Parameters<JSXFunction<P>>) {
   return render((ReactJSXRuntime as any).jsx, ...args);
 }
 
-export function jsxs(type: any, props: any, key: any) {
-  return render((ReactJSXRuntime as any).jsxs, type, props, key);
+export function jsxs<P>(...args: Parameters<JSXFunction<P>>) {
+  return render((ReactJSXRuntime as any).jsxs, ...args);
 }
 
-export function jsxDEV(type: any, props: any, key: any) {
-  return render((ReactJSXRuntime as any).jsxDEV, type, props, key);
+export function jsxDEV<P>(...args: Parameters<JSXFunction<P>>) {
+  return render((ReactJSXRuntime as any).jsxDEV, ...args);
 }

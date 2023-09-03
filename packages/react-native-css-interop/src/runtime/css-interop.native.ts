@@ -1,9 +1,7 @@
-import { ComponentType, forwardRef, useEffect, useReducer } from "react";
+import { ComponentType, forwardRef, useReducer } from "react";
 import { View, Pressable } from "react-native";
 
-import { DevHotReloadSubscription } from "../shared";
 import { ContainerContext } from "./native/misc";
-import { StyleSheet } from "./native/stylesheet";
 import { useStyledProps } from "./native/use-computed-props";
 import type {
   InteropFunction,
@@ -13,11 +11,12 @@ import type {
 import { VariableContext } from "./native/variables";
 
 export const defaultCSSInterop: InteropFunction = (
+  options,
   jsx,
   type,
   props,
   key,
-  options,
+  ...args
 ) => {
   if (!options.useWrapper) {
     return jsx(type, props, key);
@@ -32,10 +31,11 @@ export const defaultCSSInterop: InteropFunction = (
       __options: options,
     },
     key,
+    ...args,
   );
 };
 
-type CSSInteropWrapperProps<P> = {
+type CSSInteropWrapperProps<P = any> = {
   __component: ComponentType<P>;
   __jsx: JSXFunction<P>;
   __options: InteropFunctionOptions<P>;
@@ -47,7 +47,7 @@ export const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
     __jsx: jsx,
     __options: options,
     ...$props
-  }: CSSInteropWrapperProps<Record<string, any>>,
+  }: CSSInteropWrapperProps,
   ref,
 ) {
   const rerender = useRerender();
@@ -56,15 +56,12 @@ export const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
    * If the development environment is enabled, we should rerender all components if the StyleSheet updates.
    * This is because things like :root variables may have updated.
    */
-  if (__DEV__) {
-    useEffect(() => StyleSheet[DevHotReloadSubscription](rerender), []);
-  }
-
   const { styledProps, meta } = useStyledProps($props, jsx, options, rerender);
 
   const props = {
     ...$props,
     ...styledProps,
+    ref,
   };
 
   // View doesn't support the interaction props, so switch to a Pressable (which accepts ViewProps)
@@ -96,7 +93,7 @@ export const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
   if (meta.hasInlineVariables) {
     finalComponent = jsx(
       VariableContext.Provider,
-      { value: meta.variables, children: [finalComponent] },
+      { value: meta.variables, children: [finalComponent] } as const,
       "variable",
     );
   }

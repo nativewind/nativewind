@@ -10,13 +10,15 @@ export const interopFunctions = new WeakMap<
 
 export function render<P>(
   jsx: JSXFunction<P>,
-  type: any,
+  type: Parameters<JSXFunction<P>>[0],
   ...args: Tail<Parameters<JSXFunction<P>>>
 ) {
   if (typeof type === "string") {
+    // Used by the doctor to check if the interop is working
     if (__DEV__ && type === "react-native-css-interop-jsx-pragma-check") {
       return true;
     }
+    // String components are not supported by the interop
     return jsx(type, ...args);
   }
   const cssInterop = interopFunctions.get(type);
