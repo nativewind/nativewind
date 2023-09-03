@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, Pressable } from "react-native";
-import { vars } from "nativewind";
 
 const textColors = [
   "text-black",

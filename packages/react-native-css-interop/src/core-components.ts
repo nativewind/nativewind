@@ -27,7 +27,7 @@ import type {
   InteropFunction,
 } from "./types";
 
-export function cssInterop<P extends object, M>(
+export function globalCssInterop<P extends object, M>(
   component: ComponentType<P>,
   mapping: EnableCssInteropOptions<P>,
   interop: InteropFunction = defaultCSSInterop,
@@ -38,11 +38,11 @@ export function cssInterop<P extends object, M>(
     const options = getInteropFunctionOptions(props, map as any);
 
     return interop<typeof props>(
+      options,
       jsx,
       type,
       options.remappedProps,
       key,
-      options,
     );
   });
 
@@ -62,28 +62,28 @@ export function remapProps<P, M>(
   return component as ComponentTypeWithMapping<P, M>;
 }
 
-cssInterop(Image, { className: "style" });
-cssInterop(Pressable, { className: "style" });
-cssInterop(Text, { className: "style" });
-cssInterop(View, { className: "style" });
-cssInterop(ActivityIndicator, {
+globalCssInterop(Image, { className: "style" });
+globalCssInterop(Pressable, { className: "style" });
+globalCssInterop(Text, { className: "style" });
+globalCssInterop(View, { className: "style" });
+globalCssInterop(ActivityIndicator, {
   className: {
     target: "style",
     nativeStyleToProp: { color: true },
   },
 });
-cssInterop(StatusBar, {
+globalCssInterop(StatusBar, {
   className: {
     target: false,
     nativeStyleToProp: { backgroundColor: true },
   },
 });
-cssInterop(ScrollView, {
+globalCssInterop(ScrollView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
-cssInterop(TextInput, {
+globalCssInterop(TextInput, {
   className: {
     target: "style",
     nativeStyleToProp: {

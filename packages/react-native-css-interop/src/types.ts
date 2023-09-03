@@ -7,7 +7,11 @@ import type {
   ContainerCondition,
   Declaration,
 } from "lightningcss";
-import { ComponentType } from "react";
+import {
+  ComponentClass,
+  ForwardRefExoticComponent,
+  FunctionComponent,
+} from "react";
 import {
   Appearance,
   Dimensions,
@@ -81,21 +85,34 @@ export type ComponentTypeWithMapping<P, M> = ComponentType<
   P & { [K in keyof M]?: string }
 >;
 
-export type JSXFunction<P> = (type: any, props: P, key?: string) => any;
+export type ComponentType<P> =
+  | ForwardRefExoticComponent<P>
+  | FunctionComponent<P>
+  | ComponentClass<P>
+  | string;
+
+export type JSXFunction<P> = (
+  type: ComponentType<P>,
+  props: P,
+  key: string | undefined,
+  ...args: unknown[]
+) => any;
 
 export type BasicInteropFunction = <P>(
   jsx: JSXFunction<P>,
-  type: any,
+  type: ComponentType<P>,
   props: P,
   key: string | undefined,
+  ...args: unknown[]
 ) => any;
 
 export type InteropFunction = <P>(
-  jsx: JSXFunction<P>,
-  type: any,
+  options: InteropFunctionOptions<P>,
+  jsx: JSXFunction<any>,
+  type: ComponentType<P>,
   props: P,
   key: string | undefined,
-  options: InteropFunctionOptions<P>,
+  ...args: unknown[]
 ) => any;
 
 export type InteropFunctionOptions<P> = {
