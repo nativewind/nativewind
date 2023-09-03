@@ -1,33 +1,49 @@
 # Units
 
-## Viewport Units
+## Polyfilled Units
 
-NativeWind supports the `vw` and `vh` viewport units.
+You can use these units within your `tailwind.config.js`
 
-```SnackPlayer name=Units
-import { Text, View } from 'react-native';
-import { styled } from 'nativewind';
+<table>
+  <tbody style={{ display: "table", width: "100%" }}>
+    <tr>
+      <th>Unit</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>vw</td>
+      <td>View Width</td>
+      <td>Polyfilled using Dimensions.get('window')</td>
+    </tr>
+    <tr>
+      <td>vh</td>
+      <td>View height</td>
+      <td>Polyfilled using Dimensions.get('window')</td>
+    </tr>
+  </tbody>
+</table>
 
-const StyledView = styled(View)
-const StyledText = styled(Text)
+## New Units
 
-const App = () => {
-  return (
-    <StyledView className={`
-      items-center
-      justify-center
-      bg-slate-300
-      m-auto
-      h-[25vh]
-      w-[50vh]
-    `}>
-      <StyledText
-        selectable={false}
-        className="text-slate-800"
-      >
-        Rotate me! 🎉
-      </StyledText>
-    </StyledView>
-  );
-}
-```
+These are new units that you available to use within your `tailwind.config.js`
+
+<table>
+  <tbody style={{ display: "table", width: "100%" }}>
+    <tr>
+      <th>Unit</th>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>cw</td>
+      <td>Component width percentage</td>
+      <td>Polyfills percentage values based on the component width, e.g `translateX` does not accept a percentage on native. Uses onLayout to measure the component. Non-fiber apps may see a flicker until the component is measured</td>
+    </tr>
+    <tr>
+      <td>ch</td>
+      <td>Component height percentage</td>
+      <td>Polyfills percentage values based on the component height, e.g `translateY` does not accept a percentage on native. Uses onLayout to measure the component. Non-fiber apps may see a flicker until the component is measured</td>
+    </tr>
+  </tbody>
+</table>

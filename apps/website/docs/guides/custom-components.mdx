@@ -1,45 +1,16 @@
 # Custom Components
 
-NativeWind's strength really shines with writing your own custom components.
-
 ## Passing styles to components
 
-When passing styles between components, they are compiled on the parent and passed as a `style` prop to the child.
-
-:::caution
- You need to use style, className is not passed down!
-:::
-
+Pass the `className` prop down to your custom component
 
 ```tsx
-function MyComponent({ style }) {
-  return <Text style={style} />;
+function MyComponent({ className }) {
+  const defaultStyles = "text-black dark:text-white";
+  return <Text className={`${defaultStyles} ${className}`} />;
 }
 
-<MyComponent className="font-bold" />
-```
-
-If you want to pass the className as a string use a different prop.
-
-```tsx
-function A({ style }) {
-  return <B textClassName="font-bold" />;
-}
-
-function B({ textClassName }) {
-  return <Text className={textClassName} />;
-}
-```
-
-## Merging styles
-
-NativeWind doesn't require you to merge or provide styles as an array. You can simply append the two classNames strings together
-
-```tsx
-function MyComponent() {
-  const classes = `text-black`;
-  return <Text className={`font-bold ${classes}`} />;
-}
+<MyComponent className="font-bold" />;
 ```
 
 This pattern is very useful for creating components with variants
@@ -64,61 +35,180 @@ function MyComponent({ variant }) {
 }
 ```
 
+Creating your own variants and quickly become complex. We recommend using a class name management library to simplify the process
+
+- [tailwind-variants](https://www.tailwind-variants.org/)
+- [cva](https://cva.style/docs)
+- [tw-classed](https://tw-classed.vercel.app)
+- [clsx](https://www.npmjs.com/package/clsx)
+- [classnames](https://www.npmjs.com/package/classnames)
+
 ## Merging with inline styles
 
 NativeWind will automatically merge with inline-styles. Inline styles have a higher priority.
 
 ```tsx
-function MyText({ style }) {
-  // style is [{ fontWeight: "bold" }, { color: "black" }]
-  return <Text style={style} />;
-}
-
-<MyText className={`font-bold`} style={{ color: "black" }} />;
+<Text className="text-whtie" style={{ color: "black" }} /> // Will be black
 ```
 
-## Typescript
+## Handling components with multiple style props
 
-`styled()` handles the Typescript complexity for you. Simply write your components as normal.
+In React Native, some components may require style props for their internal child components. If you're designing such a component using NativeWind, we have a couple of recommended simply creating multiple class name props
 
-```tsx
-interface MyButtonProps extends PressableProps {
-  textStyle: TextProps["style"]
-}
-
-function MyButton({ textStyle, children, ...props }: MyButtonProps) {
+```tsx title=MyComponent.tsx
+Copy code
+function MyComponent({ outerClass, innerClass }) {
   return (
-    <Pressable {...props}>
-      <Text style={textStyle}>{children}</Text>
-    </Pressable>
-  )
+      <View className={outerClass}>
+          <Text className={innerClass}>Hello, NativeWind!</Text>
+      </View>
+  );
 }
-
-export default styled(MyButton, {
-  props: {
-    textStyle: true
-  }
-})
-
-<MyButton textStyle="font-bold">This text will be bold</MyButton>
-
-
-
 ```
 
-## Complex logic
-
-If you have complex styling logic consider using a library the className merging like [clsx](https://www.npmjs.com/package/clsx).
+If you're working with a third-party component that you can't modify directly, NativeWind provides a utility, remapClassNameProps. This function allows you to create and map className props for the component.
 
 ```tsx
-function A({ rounded, className }) {
-  const className = clsx(
-    "font-bold",
-    { rounded },
-    variant === "primary" && "bg-blue-500 text-white",
-    variant === "secondary" && "bg-blue-500 text-white",
-    className
-  );
-  return <B className={className} />;
+import { remapClassNameProps } from "nativewind";
+
+const CustomizedButton = remapClassNameProps(ThirdPartyButton, {
+  buttonClass: "nativeButtonClass",
+  labelClass: "nativeLabelClass",
+});
+
+// Usage
+<CustomizedButton buttonClass="bg-blue-500" labelClass="text-white" />;
+```
+
+This utility makes it easy to style third-party components using NativeWind.
+
+`remapClassNameProps` can be used with the following options
+
+```tsx
+// Create a new prop and map it to an existing prop
+remapClassNameProps(component, { "new-prop": "existing-prop" });
+
+// Override an existing prop.
+remapClassNameProps(component, { prop: true });
+```
+
+## Handling components with style attribute props
+
+**Choosing Between `enableCSSInterop` and `remapClassNameProps`**
+
+Before opting to use `enableCSSInterop`, it's worth evaluating if `remapClassNameProps` might be a more suitable choice for your needs.
+
+Reasons to choose `enableCSSInterop`:
+
+- Native Components: Your component is a custom Native Component
+- Prop Style transfer: When you need to transfer a style property to a prop.
+
+** Usage**
+
+The `enableCSSInterop` function takes two arguments: a component and a mapping configuration.
+
+```tsx
+// Create a new prop and map it to an existing prop
+enableCSSInterop(component, { "<new-prop">: "<existing-prop>" });
+
+ // Or override an existing prop.
+enableCSSInterop(component, { "<prop>": true });
+
+// Complex mapping
+enableCSSInterop(component, {
+  "<new-prop>": {
+    // If a prop, maps to the specified prop
+    // If true, overrides the prop.
+    // If false will not map to a prop
+    target: "<prop>" | true | false
+    nativeStyleToProp: {
+      // If true, move the style attribute to a prop
+      // If a prop, move the style attribute to the specified prop
+      "<style-attribute">:  true | "<prop>"
+    }
+  }
+});
+```
+
+**Examples**
+
+```tsx
+// Map 'className' to 'style'
+enableCSSInterop(Text, { className: "style" });
+
+// Map 'className' to style, but move any 'color' values to the 'color' prop
+enableCSSInterop(ActivityIndicator, {
+  className: {
+    target: "style"
+    nativeStyleToProp: { color: true }
+  }
+});
+
+// StatusBar does not accept any styles!
+// Maps `backgroundColor` values to `backgroundColor`. Other values are ignored.
+enableCSSInterop(StatusBar, {
+  className: {
+    target: false
+    nativeStyleToProp: { backgroundColor: true }
+  }
+});
+```
+
+## TypeScript
+
+Both `remapClassNameProps` and `enableCSSInterop` will return a typed version of your component. Alternatively, you can globally defined the types in a new declaration file.
+
+```tsx title=custom-components-env.d.ts
+declare module "<3rd party package>" {
+  interface 3rdPartyComponentProps {
+    customClassName?: string;
+  }
 }
 ```
+
+**Example**
+
+Setting global types requires in-depth knowledge of TypeScript. Your interface declaration needs to **exactly match** the 3rd party declaration (including `extends` and generics).
+
+For example, NativeWind uses the follow types for React Native's `<FlatList />`, which uses multiple interfaces for its props, across multiple packages.
+
+```tsx title=custom-components-env.d.ts
+import {
+  ScrollViewProps,
+  ScrollViewPropsAndroid,
+  ScrollViewPropsIOS,
+  Touchable,
+  VirtualizedListProps,
+} from "react-native";
+
+declare module "@react-native/virtualized-lists" {
+  export interface VirtualizedListWithoutRenderItemProps<ItemT>
+    extends ScrollViewProps {
+    ListFooterComponentClassName?: string;
+    ListHeaderComponentClassName?: string;
+  }
+}
+
+declare module "react-native" {
+  interface ScrollViewProps
+    extends ViewProps,
+      ScrollViewPropsIOS,
+      ScrollViewPropsAndroid,
+      Touchable {
+    contentContainerClassName?: string;
+    indicatorClassName?: string;
+  }
+  interface FlatListProps<ItemT> extends VirtualizedListProps<ItemT> {
+    columnWrapperClassName?: string;
+  }
+  interface ViewProps {
+    className?: string;
+  }
+}
+```
+
+:::caution
+
+Please do not create issues asking for help with global style declarations. Either use the return value of `remapProps`/`cssInterop`, or ask for help on sites such as [stackoverflow.com](http://stackoverflow.com)
+
+:::

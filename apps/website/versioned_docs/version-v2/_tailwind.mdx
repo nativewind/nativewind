@@ -1,0 +1,17 @@
+Tailwindcss requires a `tailwind.config.js` file with the content section configured to include the paths to all of your components and any other source files that contain Tailwind class names.
+
+If you are not already familiar with Tailwind CSS, we recommend reading its [configuration documentation](https://tailwindcss.com/docs/configuration)
+
+You will need to customise `content` to match your project's folder structure.
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: [
+    "./screens/**/*.{js,ts,jsx,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
+  // ...
+};
+```

@@ -1,34 +1,42 @@
 import Legend from "./_legend.md";
 
 <table>
-  <tbody>
+  <tbody style={{ display: "table", width: "100%" }}>
     <tr>
-      <th>Class</th>
-      <th>Native (StyleSheet)</th>
-      <th>Web (CSS)</th>
+      <th style={{ width: "40%", whiteSpace: "nowrap" }}>Class</th>
+      <th>Support</th>
     </tr>
     {(props.supported || []).map((value, index) => (
       <tr key={`supported-${index}`}>
         <td>{value}</td>
-        <td>✅</td>
-        <td>✅</td>
+        <td>✅ Full Support</td>
+      </tr>
+    ))}
+    {(props.experimental || []).map((value, index) => (
+      <tr key={`supported-${index}`}>
+        <td>{value}</td>
+        <td>🧪 Experimental Support</td>
+      </tr>
+    ))}
+    {(props.native || []).map((value, index) => (
+      <tr key={`supported-${index}`}>
+        <td>{value}</td>
+        <td>📱 Native only</td>
       </tr>
     ))}
     {(props.partial || []).map((value, index) => (
       <tr key={`partial-${index}`}>
         <td>{value}</td>
-        <td>✔️</td>
-        <td>✅</td>
+        <td>✔️ Partial Support</td>
       </tr>
     ))}
     {(props.none || []).map((value, index) => (
       <tr key={`partial-${index}`}>
         <td>{value}</td>
-        <td>❌</td>
-        <td>✅</td>
+        <td>🌐 Web only</td>
       </tr>
     ))}
   </tbody>
 </table>
 
-<Legend />
+<>{props.legend || props.legend === undefined ? <Legend /> : <></>}</>

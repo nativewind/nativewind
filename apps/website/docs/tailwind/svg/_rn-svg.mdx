@@ -1,3 +1,44 @@
-Universally supported SVG's are possible through libraries such as [react-native-svg](https://github.com/react-native-svg/react-native-svg). While these docs use `react-native-svg`, the concept applies to all libraries.
+React Native does not have SVG components but universal SVG support can be achieved with 3rd party libraries such as [react-native-svg](https://github.com/react-native-svg/react-native-svg). While these docs use `react-native-svg`, the concept applies to all libraries.
 
-Using the `classProp` option of `styled()`, `react-native-svg` components can be universally styled.
+You will need to `enableCSSInterop()` on these components to properly style them for native.
+
+<details><summary>Example usage</summary>
+
+```tsx title=App.js
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import Svg, { Circle, Rect from } 'react-native-svg';
+import { enableCSSInterop } from 'nativewind'
+
+enableCSSInterop(Svg, {
+  className: {
+    target: "style",
+    nativeStyleToProp: { width: true, height: true }
+  },
+});
+enableCSSInterop(Circle, {
+  className: {
+    target: "style",
+    nativeStyleToProp: { width: true, height: true, stroke: true, strokeWidth: true, fill: true }
+  },
+});
+enableCSSInterop(Rect, {
+  className: {
+    target: "style",
+    nativeStyleToProp: { width: true, height: true, stroke: true, strokeWidth: true, fill: true }
+  },
+});
+
+export function SvgExample () {
+  return (
+    <View className="inset-0 items-center content-center">
+      <Svg className="h-1/2 w-1/2" viewBox="0 0 100 100" >
+        <Circle cx="50" cy="50" r="45" className="stroke-blue-500 stroke-2 fill-green-500" />
+        <Rect x="15" y="15" className="w-16 h-16 stroke-red-500 stroke-2 fill-yellow-500" />
+      </Svg>
+    </View>
+  );
+}
+```
+
+</details>

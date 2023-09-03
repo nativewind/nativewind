@@ -1,0 +1,165 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import NPM from "../_npm.mdx";
+
+# Using Metro
+
+## 1. Install NativeWind
+
+You will need to install `nativewind` and it's peer dependency `tailwindcss`.
+
+<NPM deps={["nativewind"]} devDeps={["tailwindcss"]} />
+
+## 2. Setup Tailwind CSS
+
+Run `npx tailwindcss init` to create a `tailwind.config.js` file
+
+** Configure your config **
+
+Add the paths to all of your component files in your tailwind.config.js file.
+
+```diff title=tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+- content: [],
++ content: ["./App.{js,jsx,ts,tsx}", "./<custom-folder>/**/*.{js,jsx,ts,tsx}"],
++ preset: [require("nativewind/preset")],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+** Add the Tailwind directives to your CSS **
+
+```css title=global.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+## 3. Add the Babel preset
+
+Modify your `babel.config.js`
+
+<Tabs groupId="framework">
+<TabItem value="generic" label="Generic">
+
+```diff title=babel.config.js
+module.exports = {
+- presets: ['<existing presets>'],
++ presets: ['<existing presets>', 'nativewind/babel'],
+};
+```
+
+</TabItem>
+  <TabItem value="expo" label="Expo">
+
+```diff title=babel.config.js
+module.exports = {
+- presets: ['babel-preset-expo'],
++ presets: ['babel-preset-expo', 'nativewind/babel'],
+};
+```
+
+</TabItem>
+<TabItem value="expo-router" label="Expo Router">
+
+```diff name=metro.config.js
+module.exports = function (api) {
+  api.cache(true);
+  return {
+-   presets: ["babel-preset-expo"],
++   presets: ["babel-preset-expo", "nativewind/babel"],
+-   plugins: ["expo-router/babel"],
++   plugins: ["expo-router/babel", [ "@babel/plugin-transform-react-jsx", { runtime: "automatic", importSource: "nativewind" } ]]
+  };
+};
+```
+
+</TabItem>
+</Tabs>
+
+## 4. Modify your metro.config.js
+
+Import `withNativeWind` and pass it your Metro config.
+
+Make sure `./your-css-file.css` is the relative path to the CSS file with the Tailwind CSS directives you created in the second step
+
+<Tabs groupId="framework">
+  <TabItem value="generic" label="Generic">
+
+```diff title=metro.config.js
++ const { withNativeWind } = require('nativewind/metro')
+
+const config = {/* your config */}
+
+- module.exports = config
++ module.exports = withNativeWind(config, { input: './your-css-file.css'})
+```
+
+</TabItem>
+<TabItem value="expo" label="Expo">
+
+If your project does not have a `metro.config.js` run `npx expo customize metro.config.js`
+
+Then enable `isCSSEnabled` and wrap the final config with `withNativeWind`
+
+```diff title=metro.config.js
+const { getDefaultConfig } = require("expo/metro-config");
++ const { withNativeWind } = require('nativewind/metro');
+
+- const config = getDefaultConfig(__dirname)
++ const config = getDefaultConfig(__dirname, { isCSSEnabled: true });
+
+- module.exports = config
++ module.exports = withNativeWind(config, { input: './your-css-file.css' })
+```
+
+</TabItem>
+<TabItem value="expo-router" label="Expo Router">
+
+Wrap the final config with `withNativeWind`
+
+```diff title=metro.config.js
+const { getDefaultConfig } = require("expo/metro-config");
++ const { withNativeWind } = require('nativewind/metro');
+
+const config = getDefaultConfig(__dirname, { isCSSEnabled: true });
+
+- module.exports = config
++ module.exports = withNativeWind(config, { input: './your-css-file.css' })
+```
+
+</TabItem>
+</Tabs>
+
+## 5. Import your CSS file
+
+<Tabs groupId="framework">
+<TabItem value="generic" label="Generic">
+
+```diff title=App.js
++ import "./<your-css-file>.css"
+
+export default App() {
+  /* Your App */
+}
+```
+
+</TabItem>
+<TabItem value="expo-router" label="Expo Router">
+
+Add the `.css` import to your root `_layout` file
+
+```diff title=app/_layout.js
+ import { Slot } from 'expo-router'
+
++ import "./<your-css-file>.css"
+
+export default Slot
+```
+
+</TabItem>
+</Tabs>

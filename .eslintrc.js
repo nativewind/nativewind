@@ -18,6 +18,7 @@ module.exports = {
       "error",
       { ignoreRestSiblings: true },
     ],
+    "unicorn/prefer-ternary": ["error", "only-single-line"],
     "unicorn/numeric-separators-style": "off",
     "unicorn/prevent-abbreviations": [
       "error",

@@ -1,0 +1,141 @@
+import Compatibility from "../tailwind/_compatibility.mdx";
+
+# Hover, Focus and Other States
+
+Please refer to the [documentation on the Tailwind CSS website](https://tailwindcss.com/docs/hover-focus-and-other-states) for more information.
+
+## Pseudo-classes
+
+### Hover, focus, and active
+
+NativeWind implements a subset of the Tailwind pseudo-classes by adding event listeners on your components, hence they will only work on components that can accept the listener.
+
+The supported pseudo-classes and their related listeners are:
+
+| Variant  | Event Listeners            |
+| -------- | -------------------------- |
+| `hover`  | `onHoverIn`, `onHoverOut`  |
+| `focus`  | `onBlur`, `onFocus`        |
+| `active` | `onPressIn`, `onPressOut`, |
+
+### Opt in Pointer Events
+
+React Native 0.71 supports opt-in [Pointer Events](https://reactnative.dev/blog/2023/01/12/version-071#events). If enabled NativeWind will use these instead, allowing for hover support on native.
+
+| Variant  | Event Listeners                 |
+| -------- | ------------------------------- |
+| `hover`  | `onPointerOver`, `onPointerOut` |
+| `focus`  | `onBlur`, `onFocus`             |
+| `active` | `onPressIn`, `onPressOut`,      |
+
+## Styling based on parent state
+
+**Styling based on parent state (group-{modifier})**
+
+NativeWind supports the [`group`](https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state) class name and it can be used with any supported modifier.
+
+**Differentiating nested groups**
+
+NativeWind supports the [`group/{name}`](https://tailwindcss.com/docs/hover-focus-and-other-states#differentiating-nested-groups) class name and it can be used with any supported modifier
+
+## Media and feature queries
+
+### Responsive breakpoints
+
+To style an element at a specific breakpoint, use responsive modifiers like `md` and `lg`.
+
+Check out the [Responsive Design](./responsive-design) documentation for an in-depth look at how these features work.
+
+### Prefers color scheme
+
+Please read the [Dark Mode](./dark-mode) documentation for an in-depth look at how this feature works.
+
+<Compatibility supported={["dark:"]} legend={false} />
+
+### Prefers reduced motion
+
+<Compatibility supported={["motion-reduce:"]} legend={false} />
+
+### Viewport orientation
+
+Use the portrait and landscape modifiers to conditionally add styles when the viewport is in a specific orientation.
+
+<Compatibility supported={["portrait:", "landscape:"]} legend={false} />
+
+### Print styles
+
+Use the print modifier to conditionally add styles that only apply when the document is being printed:
+
+<Compatibility none={["portrait:", "landscape:"]} legend={false} />
+
+### Supports rules
+
+Use the supports-[...] modifier to style things based on whether a certain feature is supported in the user’s browser.
+
+<Compatibility none={["supports-[n]:"]} legend={false} />
+
+### Attribute selectors
+
+Use the aria-\* modifier to conditionally style things based on ARIA attributes.
+
+<Compatibility none={["aria-[n]:"]} legend={false} />
+
+### Data selectors
+
+Use the data-\* modifier to conditionally style things based on data attributes.
+
+<Compatibility none={["data-[n]:"]} legend={false} />
+
+### RTL support
+
+Use the data-\* modifier to conditionally style things based on data attributes.
+
+<Compatibility none={["data-[n]:"]} legend={false} />
+
+### Open/closed state
+
+Use the open modifier to conditionally add styles when a `<details/>` or `<dialog/>` element is in an open state:
+
+<Compatibility none={["open:"]} legend={false} />
+
+## Custom modifiers
+
+Custom modifiers are possible, but are not yet documented. More information to come.
+
+## Contributors
+
+<details><summary>We are looking for contributors for the following</summary>
+
+**Responsive breakpoints**
+
+What are good responsive breakpoints for mobile devices?
+
+**Add `placeholder:`**
+
+`placeholder:text-color` should support mapping to `placeholderTextColor`
+
+**Add `selection:`**
+
+NativeWind could export a custom `<em>` component. `selection:` will style this component.
+
+**Add `first-line:`**
+
+`first-line:` should map to `<Text numberOfLines={1} style={styles}>{letter}</Text>`
+
+**Add `first-letter:`**
+
+`first-letter:` should map to `<Text style={styles}>{letter}</Text>`
+
+**Explore `backdrop:`**
+
+Could this be used with `<Modal />`?
+
+**Explore `aria-[n]:`**
+
+Could this be used with the accessibility props?
+
+**Explore `data-[n]:`**
+
+Could this be used with the data props? Should we auto strip these props on native?
+
+</details>

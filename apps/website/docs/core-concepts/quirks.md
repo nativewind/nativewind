@@ -10,11 +10,11 @@ For example, instead of only applying a text color for dark mode, provide both a
 
 ## dp vs px
 
-React Native's default unit is density-independent pixels (dp) while the web's default is pixels (px). These two units are different, however NativeWind treats them as if they are equivalent. Additionally, the NativeWind's compiler requires a unit for most numeric values forcing some styles to use a `px` unit.
+React Native's default unit is density-independent pixels (dp) while the web's default is pixels (px). These two units are different, however NativeWind treats them as if they are equivalent. This can cause confusion in your theme, do you use `10` or `10px`? The general rule of theme is use `10px`, and NativeWind will fix it for you.
 
 ## Flex
 
-React Native uses a different base flex definition to the web. This can be fixed by adding `flex-1` to your classes, which forces the platforms to align.
+React Native uses a different base flex definition to the web. This can be fixed by adding `flex-1` to your classes which fixes most issues. If other cases, you can use platform selectors to selectively fix platform.
 
 ## Flex Direction
 

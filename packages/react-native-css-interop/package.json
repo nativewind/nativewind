@@ -1,0 +1,73 @@
+{
+  "version": "0.0.0-alpha.5",
+  "name": "react-native-css-interop",
+  "description": "",
+  "main": "dist/index",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "keywords": [
+    "react-native",
+    "react",
+    "native",
+    "theme",
+    "style"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marklawlor/nativewind.git"
+  },
+  "author": {
+    "name": "Mark Lawlor",
+    "url": "https://github.com/marklawlor"
+  },
+  "homepage": "https://nativewind.dev",
+  "bugs": {
+    "url": "https://github.com/marklawlor/nativewind/issues"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "lint": "eslint .",
+    "prepublishOnly": "npm run build",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput"
+  },
+  "files": [
+    "dist/",
+    "css-to-rn/",
+    "jsx-dev-runtime/",
+    "jsx-runtime/",
+    "metro/",
+    "doctor/",
+    "testing-library/",
+    "types.d.ts"
+  ],
+  "dependencies": {
+    "lightningcss": "^1.21.5"
+  },
+  "devDependencies": {
+    "@testing-library/react-native": "^12.0.1",
+    "@types/jest": "^29.5.1",
+    "@types/react": "^18.2.14",
+    "metro-react-native-babel-preset": "^0.77.0",
+    "react": "^18.2.0",
+    "react-native": "0.72.3",
+    "react-native-reanimated": "~3.3.0"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": "*",
+    "react-native-reanimated": ">=3.3.0",
+    "tailwindcss": "~3"
+  },
+  "peerDependenciesMeta": {
+    "react-native-reanimated": {
+      "optional": true
+    }
+  }
+}

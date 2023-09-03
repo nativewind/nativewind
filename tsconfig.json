@@ -1,18 +1,8 @@
 {
+  "extends": "@tsconfig/react-native/tsconfig.json",
   "compilerOptions": {
-    // Recommended settings for Node 14
-    // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
-    "lib": ["esnext"],
-    "module": "commonjs",
-    "target": "ES2019",
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "jsx": "react",
-    "moduleResolution": "node",
-    "strict": true,
-    "skipLibCheck": true,
-    "declaration": true
+    "declaration": true,
+    "noUnusedLocals": true,
+    "removeComments": true
   }
 }

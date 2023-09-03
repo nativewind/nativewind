@@ -1,6 +1,0 @@
-{
-  "allowModuleTransform": ["react-native"],
-  "tailwindConfig": {
-    "content": ["./allow-modules/code.{js,ts,jsx,tsx}"]
-  }
-}

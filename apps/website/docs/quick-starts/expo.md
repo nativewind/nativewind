@@ -1,6 +1,6 @@
 import StartCoding from "../\_start-coding.md"
 
-# Expo Router
+# Expo
 
 ## 1. Create the project
 
@@ -44,6 +44,7 @@ This is the same as follow the `Using PostCSS` instructions: https://tailwindcss
 // tailwind.config.js
 
 module.exports = {
++ presets: [require("nativewind/preset")],
 - content: [],
 + content: ["./app/**/*.{js,jsx,ts,tsx}", "./<custom directory>/**/*.{js,jsx,ts,tsx}"],
   theme: {
@@ -53,23 +54,34 @@ module.exports = {
 }
 ```
 
+Create a CSS file
+
 ```css
 // global.css
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 ```
 
-```js
-// postcss.config.js
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-  },
-};
+## 3. Add the Metro preset
+
+Make sure `<your-css-file>.css` matches path relative to the CSS file you created in the last step.
+
+```diff
++ const { getDefaultConfig } = require("expo/metro-config");
++ const { withNativeWind } = require('nativewind/metro');
+
++ const config = getDefaultConfig(__dirname, {
++   isCSSEnabled: true,
++ });
+
++ module.exports = withNativeWind(config, {
++   input: '<your-css-file>.css'
++ })
 ```
 
-## 5. Add the Babel plugin
+## 4. Add the Babel preset
 
 Modify your `babel.config.js`
 
@@ -78,41 +90,40 @@ Modify your `babel.config.js`
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ["babel-preset-expo"],
-    plugins: [
-      "@babel/plugin-proposal-export-namespace-from",
-      "react-native-reanimated/plugin",
-      require.resolve("expo-router/babel"),
-+     "nativewind/babel",
-    ],
+-   presets: ["babel-preset-expo"],
++   plugins: ["babel-preset-expo", "nativewind/babel"],
   };
 };
-
 ```
 
-## 6. Enable CSS Support in Expo's Metro Config
+## 5. Input your CSS file
 
-```js
-// metro.config.js
-const { getDefaultConfig } = require("expo/metro-config");
+Input your `<your-css-file>.css` that you created in step 3.
 
-const config = getDefaultConfig(__dirname, {
-  isCSSEnabled: true,
-});
+```diff
+// App.tsx
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View } from 'react-native';
 
-module.exports = config;
-```
++ import "./global.css"
 
-## 7. Create a `app/_layout` file
-
-```js
-import { Slot } from "expo-router";
-
-import "../global.css";
-
-export default function () {
-  return <Slot />;
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Text>Open up App.js to start working on your app!</Text>
+      <StatusBar style="auto" />
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 ```
 
 <StartCoding />

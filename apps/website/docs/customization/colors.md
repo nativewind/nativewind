@@ -6,12 +6,12 @@ You can customize your colors in the same manner as Tailwind CSS. Please refer t
 
 Unlike the web, which uses a common color palette, native platforms have their own unique system colors which as access through [PlatformColor](https://reactnative.dev/docs/platformcolor)
 
-NativeWind allows you to use access PlatformColor via the special `platformColor()` syntax in your theme.
+NativeWind allows you to use access PlatformColor via the `platformColor()` utility.
 
 ```js
 // tailwind.config.js
 
-const { platformSelect } = require("nativewind");
+const { platformSelect, platformColor } = require("nativewind/theme");
 
 module.exports = {
   theme: {
@@ -19,8 +19,8 @@ module.exports = {
       colors: {
         error: platformSelect({
           // Now you can provide platform specific values
-          ios: "platformColor(systemRed)",
-          android: "platformColor(?android:colorError)",
+          ios: platformColor("systemRed"),
+          android: platformColor("?android:colorError"),
           default: "red",
         }),
       },
@@ -28,9 +28,3 @@ module.exports = {
   },
 };
 ```
-
-:::note
-
-There are no quotes between the brackets in `platformColor(systemRed)`
-
-:::

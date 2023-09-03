@@ -39,6 +39,17 @@ const config = {
           remarkPlugins: [require("./src/remark-snackplayer")],
           routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),
+          lastVersion: "v2",
+          versions: {
+            current: {
+              label: "v4 alpha",
+              path: "v4",
+            },
+            v2: {
+              label: "v2",
+              path: "",
+            },
+          },
         },
         blog: false,
         theme: {
@@ -65,6 +76,12 @@ const config = {
       colorMode: {
         respectPrefersColorScheme: true,
       },
+
+      // announcementBar: {
+      //   content:
+      //     '<a href="/v4/overview">NativeWind v4.0 is currently in alpha. Click here to see the docs</a>',
+      //   isCloseable: true,
+      // },
       navbar: {
         title: "NativeWind",
         logo: {

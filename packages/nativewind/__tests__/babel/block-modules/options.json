@@ -1,6 +1,0 @@
-{
-  "blockModuleTransform": ["moti"],
-  "tailwindConfig": {
-    "content": ["./block-modules/code.{js,ts,jsx,tsx}"]
-  }
-}

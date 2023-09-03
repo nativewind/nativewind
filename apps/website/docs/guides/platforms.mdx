@@ -1,0 +1,70 @@
+import Compatibility from "../tailwind/_compatibility.mdx";
+
+# Handling platform differences
+
+## Styling per platform
+
+Styles can be applied selectively per platform using a platform variant. Additionally the `native` variant can be used to target all platforms except for web.
+
+<Compatibility
+  supported={["ios:", "android:", "web:", "windows:", "osx:", "native:"]}
+  legend={false}
+/>
+
+## Style resolution differences between Native & Web
+
+### Flexbox algorithm
+
+React Native uses a different Flexbox algorithm to the web. You can fix the differences by adding `flex-1` and a `flex-direction` to your classes which fixes most issues. If other cases, you can use platform selectors to selectively fix platform.
+
+### Style resolution order
+
+React Native will resolve your styles right->left, while web will use CSS specificity. To avoid any issues, we generally recommend writing your styles in CSS specificity order - or [automating it with Prettier](https://tailwindcss.com/blog/automatic-class-sorting-with-prettier).
+
+However there are times when you cannot guarantee the order
+
+```tsx title=Component.tsx
+function MyComponent({ className }) {
+  return <View className={`m-5 ${className}`}>
+}
+
+<MyComponent className="m-3"> // Will be rendered with `m-5` on web!
+```
+
+The simplest solution is to use the [`!important` modifier](https://tailwindcss.com/docs/configuration#important-modifier).
+
+```tsx
+<MyComponent className="!m-3"> // Will be rendered with `m-3` on all platforms
+```
+
+The important modifier will generally fix most scenarios, but may get frustrating to use on larger applications. A more advanced solution is to use libraries such as [`tailwind-merge`](https://github.com/dcastil/tailwind-merge) to handle conflicts for you.
+
+```tsx
+import twMerge from "tailwind-merge"
+
+function ComponentDefault(props) {
+    const className = `px-2 py-1 ${props.className || ''}`
+    return <input {...props} className={className} />
+}
+
+function ComponentTWMerge(props) {
+ const className = twMerge('px-2 py-1', props.className)
+    return <input {...props} className={className} />
+}
+
+<ComponentDefault className="p-3" />  // Rendered with "px-2 py-1
+<ComponentTWMerge className="p-3" />  // Rendered with "p-3
+```
+
+You can either use per component, or enable it globally
+
+```tsx
+import { StyleSheet } from "nativewind";
+import twMerge from "tailwind-merge";
+
+StyleSheet.classNameMergeStrategy = twMerge;
+```
+
+## Pointer Events
+
+We highly recommend you enable [Pointer Events](https://reactnative.dev/blog/2023/01/12/version-071#events) for improved consistency in your styling. Even if you only plan to release your app on mobile devices, it is possible that your users may [use your iPhone app on OSX](https://support.apple.com/en-au/guide/app-store/fird2c7092da/mac), or your Play Store app on a Chromebook. Its best to just assume that some percentage of your users will be using a pointer device.
