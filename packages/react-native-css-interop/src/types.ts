@@ -373,7 +373,7 @@ export interface CommonStyleSheet {
   [INTERNAL_FLAGS]: Record<string, string>;
   [DevHotReloadSubscription](subscription: () => void): () => void;
   classNameMergeStrategy(c: string): string;
-  dangerouslyCompileStyles(c: string): void;
+  unstable_hook_onClassName(c: string): void;
   register(options: StyleSheetRegisterOptions): void;
   getFlag(name: string): string | undefined;
 }

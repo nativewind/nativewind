@@ -22,7 +22,7 @@ const commonStyleSheet: CommonStyleSheet = {
   classNameMergeStrategy(c) {
     return c;
   },
-  dangerouslyCompileStyles() {},
+  unstable_hook_onClassName() {},
   [DevHotReloadSubscription]() {
     return () => {};
   },

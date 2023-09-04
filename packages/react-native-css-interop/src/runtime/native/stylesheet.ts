@@ -61,7 +61,7 @@ const commonStyleSheet: CommonStyleSheet = {
   classNameMergeStrategy(c) {
     return c;
   },
-  dangerouslyCompileStyles() {},
+  unstable_hook_onClassName() {},
   [DevHotReloadSubscription](subscription) {
     subscriptions.add(subscription);
     return () => {
@@ -232,6 +232,8 @@ function tagStyles(
 export function getGlobalStyle(style?: string | object) {
   if (!style) return;
   if (typeof style === "string") {
+    StyleSheet.unstable_hook_onClassName(style);
+
     if (warnings.has(style) && !warned.has(style)) {
       warned.add(style);
       if (process.env.NODE_ENV === "development") {

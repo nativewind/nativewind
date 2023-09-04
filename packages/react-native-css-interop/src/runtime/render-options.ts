@@ -4,6 +4,7 @@ import {
   Style,
   StyleProp,
 } from "../types";
+import { StyleSheet } from "./web/stylesheet";
 
 const interopOptions = {
   configMap: new Map(),
@@ -32,6 +33,7 @@ export function getRemappedProps<P>(
     delete props[classNameKey];
 
     if (typeof classNames !== "string") continue;
+    if (!classNames) continue;
 
     let targetKey: (keyof P & string) | undefined;
     if (typeof config === "boolean") {
@@ -47,6 +49,8 @@ export function getRemappedProps<P>(
         `Unknown cssInterop target from config: ${JSON.stringify(config)}`,
       );
     }
+
+    StyleSheet.unstable_hook_onClassName(classNames);
 
     const existingStyles = props[targetKey];
     let styles: StyleProp = [

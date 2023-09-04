@@ -1,4 +1,4 @@
-import { ComponentType } from "react";
+import { ComponentType, forwardRef } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -15,7 +15,7 @@ import {
 } from "react-native";
 
 import { defaultCSSInterop } from "./runtime/css-interop";
-import { interopFunctions } from "./runtime/render";
+import { interopFunctions, render } from "./runtime/render";
 import {
   getInteropFunctionOptions,
   getRemappedProps,
@@ -25,7 +25,23 @@ import type {
   ComponentTypeWithMapping,
   EnableCssInteropOptions,
   InteropFunction,
+  JSXFunction,
 } from "./types";
+
+export function unstable_styled<P extends object, M>(
+  component: ComponentType<P>,
+  jsx: JSXFunction<P>,
+  mapping?: EnableCssInteropOptions<P>,
+  interop: InteropFunction = defaultCSSInterop,
+) {
+  if (mapping) {
+    globalCssInterop(component, mapping, interop);
+  }
+
+  return forwardRef<unknown, P>((props, _ref) => {
+    return render(jsx, component, props as any, "");
+  }) as unknown as ComponentTypeWithMapping<P, M>;
+}
 
 export function globalCssInterop<P extends object, M>(
   component: ComponentType<P>,

@@ -30,7 +30,7 @@ export default function Page() {
 
   if (isPartyTime) {
     textClassNames += ` animate-bounce animate-spin`;
-    buttonClassNames += ` animate-spin`;
+    buttonClassNames += ` animate-bounce`;
   }
 
   return (

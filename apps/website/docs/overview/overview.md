@@ -22,6 +22,16 @@ const App = () => {
 };
 ```
 
+```SnackPlayer name=Hello%20World&version=4
+const App = () => {
+  return (
+    <View className="flex-1 items-center justify-center">
+      <Text className="text-slate-800">Try editing me! 🎉</Text>
+    </View>
+  );
+}
+```
+
 ## Key Features
 
 🌐 **Universal** Uses the best style system for each platform.
