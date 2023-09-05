@@ -1,1 +1,1 @@
-GET https://snackager.expo.io/bundle/nativewind@latest?platforms=ios,android,web&version_snackager=true&bypassCache=true
+GET https://snackager.expo.io/bundle/nativewind@4.0.0-alpha.5?platforms=ios,android,web&version_snackager=true&bypassCache=true

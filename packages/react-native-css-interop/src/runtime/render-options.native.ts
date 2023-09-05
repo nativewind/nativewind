@@ -26,7 +26,7 @@ function getRenderOptions<P>(
   options: Map<keyof P & string, CSSInteropClassNamePropConfig<P>>,
   getStyleFn: (style?: string | object) => object | undefined,
 ): InteropFunctionOptions<P> {
-  let useWrapper = false;
+  let useWrapper = Boolean((globalThis as any).isExpoSnack);
 
   const dependencies: unknown[] = [];
 
@@ -92,6 +92,10 @@ function getRenderOptions<P>(
       useWrapper ||= useWrapperForStyles;
       remappedProps[targetKey] = styles as P[keyof P & string];
     }
+  }
+
+  if (!useWrapper) {
+    console.log("what");
   }
 
   return {

@@ -1,10 +1,6 @@
 import { StyleSheet as RNStyleSheet } from "react-native";
 import { CommonStyleSheet } from "../../types";
-import {
-  DevHotReloadSubscription,
-  INTERNAL_RESET,
-  INTERNAL_FLAGS,
-} from "../../shared";
+import { INTERNAL_RESET, INTERNAL_FLAGS } from "../../shared";
 
 const documentStyle: CSSStyleDeclaration | undefined =
   globalThis.window?.getComputedStyle(
@@ -23,9 +19,6 @@ const commonStyleSheet: CommonStyleSheet = {
     return c;
   },
   unstable_hook_onClassName() {},
-  [DevHotReloadSubscription]() {
-    return () => {};
-  },
   register(_options) {
     throw new Error("Stylesheet.register is not available on web");
   },

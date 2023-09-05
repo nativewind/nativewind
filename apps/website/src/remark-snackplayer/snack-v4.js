@@ -20,16 +20,17 @@ const processNodeV4 = (node, parent) => {
       const preview = params.preview || "true";
       const loading = params.loading || "eager";
       const dependencies =
-        params.dependencies || "react,react-native,nativewind@2.0.11";
+        params.dependencies ||
+        "react,react-native,react-native-reanimated,nativewind@4.0.0-alpha.5,react-native-css-interop@0.0.0-alpha.5";
 
       const appCode = `import React from 'react';
-import { View, Text, Pressable } from "./expo-snack"
+import { View, Text, Pressable, withExpoSnack } from "./expo-snack"
 
 ${sampleCode}
 
-export default App;`;
+export default withExpoSnack(App);`;
 
-      const snackJS = `import { createElement } from "react";
+      const snackJS = `import { createElement, useState, useEffect } from "react";
 import { StyleSheet } from "nativewind"
 import { unstable_styled } from "react-native-css-interop"
 import {
@@ -51,21 +52,15 @@ import {
   * 
   * Please do not use these APIs in your own projects.
   */
-const render = (element, { children, ...props }, key) => {
-  return createElement(element, { key, ...props }, ...children)
-}
-
-export const View = unstable_styled(RNView, render);
-export const Text = unstable_styled(RNText, render);
-export const Pressable = unstable_styled(RNPressable, render);
-
+var tailwindScriptLoaded = false;
 if (Platform.OS === "web") {
   var tailwindScript = document.createElement('script');
+  tailwindScript.addEventListener('load', () => { tailwindScriptLoaded = true });
   tailwindScript.setAttribute('src','https://cdn.tailwindcss.com');
-  document.head.appendChild(tailwindScript);
+  document.body.appendChild(tailwindScript);
 } else {
-  StyleSheet.unstable_hook_onClassName = (className) => {
-    fetch(\`\${globalThis.window.location.origin}/api/compile?classNames=\${classNames.join(" ")}\`)
+  StyleSheet.unstable_hook_onClassName = (classNames) => {
+    fetch(\`${process.env.VERCEL_URL}/api/compile?classNames=\${classNames}\`)
       .then((response) => response.json())
       .then(({ body }) => {
         StyleSheet.register(body);
@@ -74,6 +69,24 @@ if (Platform.OS === "web") {
         console.error(error);
       });
   }
+}
+
+const render = (element: any, { children, ...props }: any, key?: string) => {
+  children = Array.isArray(children) ? children : [children];
+  return createElement(element, { key, ...props }, ...children)
+}
+export const View = unstable_styled(RNView, render);
+export const Text = unstable_styled(RNText, render);
+export const Pressable = unstable_styled(RNPressable, render);
+
+export function withExpoSnack(Component: any) {
+  return function () {
+    const [, rerender] = useState(false);
+    useEffect(() => {
+      return tailwindScript?.addEventListener('load', () => { rerender(true) })
+    }, [])
+    return tailwindScriptLoaded ? <Component /> : <></>
+  };
 }`;
 
       const files = JSON.stringify({
@@ -81,7 +94,7 @@ if (Platform.OS === "web") {
           type: "CODE",
           contents: appCode,
         },
-        "expo-snack.ts": {
+        "expo-snack.tsx": {
           type: "CODE",
           contents: snackJS,
         },

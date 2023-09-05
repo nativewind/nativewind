@@ -22,11 +22,7 @@ import {
   vh,
   vw,
 } from "./misc";
-import {
-  DevHotReloadSubscription,
-  INTERNAL_FLAGS as INTERNAL_FLAGS,
-  INTERNAL_RESET,
-} from "../../shared";
+import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
 import { colorScheme } from "./color-scheme";
 import {
   getVariables,
@@ -35,11 +31,12 @@ import {
   resetVariables,
 } from "./variables";
 import { rem } from "./rem";
-
-const subscriptions = new Set<() => void>();
+import { createSignal } from "../signals";
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
+
+export const devForceReload = createSignal({});
 
 const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_FLAGS]: {},
@@ -48,7 +45,6 @@ const commonStyleSheet: CommonStyleSheet = {
     animationMap.clear();
     warnings.clear();
     warned.clear();
-    subscriptions.clear();
     rem[INTERNAL_RESET]();
     vw[INTERNAL_RESET](dimensions);
     vh[INTERNAL_RESET](dimensions);
@@ -62,12 +58,6 @@ const commonStyleSheet: CommonStyleSheet = {
     return c;
   },
   unstable_hook_onClassName() {},
-  [DevHotReloadSubscription](subscription) {
-    subscriptions.add(subscription);
-    return () => {
-      subscriptions.delete(subscription);
-    };
-  },
   register(options: StyleSheetRegisterOptions) {
     this[INTERNAL_FLAGS]["$$receivedData"] = "true";
     if (options.flags) {
@@ -127,9 +117,7 @@ const commonStyleSheet: CommonStyleSheet = {
       resetDefaultVariables(currentColor);
     }
 
-    for (const subscription of subscriptions) {
-      subscription();
-    }
+    devForceReload.set({});
   },
 };
 

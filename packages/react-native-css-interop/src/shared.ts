@@ -1,6 +1,5 @@
 import { RuntimeValue } from "./types";
 
-export const DevHotReloadSubscription = Symbol();
 export const INTERNAL_RESET = Symbol();
 export const INTERNAL_SET = Symbol();
 export const INTERNAL_FLAGS = Symbol();

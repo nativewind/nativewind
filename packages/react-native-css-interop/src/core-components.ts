@@ -31,7 +31,7 @@ import type {
 export function unstable_styled<P extends object, M>(
   component: ComponentType<P>,
   jsx: JSXFunction<P>,
-  mapping?: EnableCssInteropOptions<P>,
+  mapping?: EnableCssInteropOptions<P> & M,
   interop: InteropFunction = defaultCSSInterop,
 ) {
   if (mapping) {
@@ -45,7 +45,7 @@ export function unstable_styled<P extends object, M>(
 
 export function globalCssInterop<P extends object, M>(
   component: ComponentType<P>,
-  mapping: EnableCssInteropOptions<P>,
+  mapping: EnableCssInteropOptions<P> & M,
   interop: InteropFunction = defaultCSSInterop,
 ) {
   const map = new Map(Object.entries(mapping));

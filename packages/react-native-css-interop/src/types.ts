@@ -32,11 +32,7 @@ import {
   TranslateYTransform,
   ViewStyle,
 } from "react-native";
-import {
-  DevHotReloadSubscription,
-  INTERNAL_FLAGS,
-  INTERNAL_RESET,
-} from "./shared";
+import { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
@@ -371,7 +367,6 @@ export type DarkMode =
 export interface CommonStyleSheet {
   [INTERNAL_RESET](options?: ResetOptions): void;
   [INTERNAL_FLAGS]: Record<string, string>;
-  [DevHotReloadSubscription](subscription: () => void): () => void;
   classNameMergeStrategy(c: string): string;
   unstable_hook_onClassName(c: string): void;
   register(options: StyleSheetRegisterOptions): void;

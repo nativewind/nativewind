@@ -1,51 +1,79 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Pressable } from "react-native";
+import React from "react";
+import { createElement, useState, useEffect } from "react";
+import { StyleSheet } from "nativewind";
+import { unstable_styled } from "react-native-css-interop";
+import {
+  Platform,
+  Text as RNText,
+  View as RNView,
+  Pressable as RNPressable,
+} from "react-native";
 
-const textColors = [
-  "text-black",
-  "text-red-500",
-  "text-green-500",
-  "text-blue-500",
-];
+/**
+ * 🗣️ Do as I say 📝, not as I do 🚫🤷‍♂️.
+ *
+ * Expo Snack does not allow setting the JSX runtime to automatic, or running a custom server.
+ * Therefore these demos utilise undocumented & unstable APIs that should not be used!
+ *
+ * These examples are for demonstrative purposes only. They have known bugs/issues and are not
+ * representative of NativeWind.
+ *
+ * Please do not use these APIs in your own projects.
+ */
+var tailwindScriptLoaded = Platform.OS !== "web";
+if (Platform.OS === "web") {
+  var tailwindScript = document.createElement("script");
+  tailwindScript.addEventListener("load", () => {
+    tailwindScriptLoaded = true;
+  });
+  tailwindScript.setAttribute("src", "https://cdn.tailwindcss.com");
+  document.body.appendChild(tailwindScript);
+} else {
+  StyleSheet.unstable_hook_onClassName = (content) => {
+    fetch(`http://localhost:3000/api/compile`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ content }),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        StyleSheet.register(body);
+      })
+      .catch((error) => {
+        console.warn(error.message);
+      });
+  };
+}
 
-export default function Page() {
-  let [isPartyTime, setParty] = useState(false);
-  let [textColor, setTextColor] = useState(0);
+(globalThis as any).isExpoSnack = true;
+const render = (element: any, { children, ...props }: any, key?: string) => {
+  children = Array.isArray(children) ? children : [children];
+  return createElement(element, { key, ...props }, ...children);
+};
+export const View = unstable_styled(RNView, render);
+export const Text = unstable_styled(RNText, render);
+export const Pressable = unstable_styled(RNPressable, render);
 
-  useEffect(() => {
-    if (isPartyTime) {
-      const textInterval = setInterval(
-        () => setTextColor((color) => ++color % textColors.length),
-        1000,
-      );
-      return () => clearInterval(textInterval);
-    } else {
-      setTextColor(0);
-    }
-  }, [isPartyTime]);
+export function withExpoSnack(Component: any) {
+  return function () {
+    const [, rerender] = useState(false);
+    useEffect(() => {
+      return tailwindScript?.addEventListener("load", () => {
+        rerender(true);
+      });
+    }, []);
+    return tailwindScriptLoaded ? <Component /> : <></>;
+  };
+}
 
-  let textClassNames = `text-6xl font-bold transition-colors ${textColors[textColor]}`;
-  let buttonClassNames =
-    "rounded-md bg-indigo-500 mt-6 self-start flex-column flex-shrink";
-
-  if (isPartyTime) {
-    textClassNames += ` animate-bounce animate-spin`;
-    buttonClassNames += ` animate-bounce`;
-  }
-
+const App = () => {
   return (
-    <View className="p-4 flex-1 items-center">
-      <View className="flex-1 max-w-4xl justify-center">
-        <Text className={textClassNames}>Hello, Expo!</Text>
-        <Pressable
-          className={buttonClassNames}
-          onPress={() => setParty(!isPartyTime)}
-        >
-          <Text className="text-white p-4">
-            {isPartyTime ? "Stop the party 🛑" : "Start the party 🎉"}
-          </Text>
-        </Pressable>
-      </View>
+    <View className="flex-1 items-center justify-center">
+      <Text className="text-blue-500">Try editing me! 🎉</Text>
     </View>
   );
-}
+};
+
+export default withExpoSnack(App);

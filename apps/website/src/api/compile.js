@@ -8,12 +8,12 @@ const allowCors = (fn) => async (req, res) => {
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader(
     "Access-Control-Allow-Origin",
-    "https://snack-web-player.s3.us-west-1.amazonaws.com"
+    "https://snack-web-player.s3.us-west-1.amazonaws.com",
   );
   res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
   );
   if (req.method === "OPTIONS") {
     res.status(200).end();
@@ -23,7 +23,7 @@ const allowCors = (fn) => async (req, res) => {
 };
 
 async function handler(request, response) {
-  if (!request.query.css) return response.status(400);
+  if (!request.query.classNames) return response.status(400);
 
   const { styles, atRules, topics, masks, childClasses } = extractStyles({
     theme: {},

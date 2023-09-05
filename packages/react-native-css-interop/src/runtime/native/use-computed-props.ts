@@ -33,6 +33,7 @@ import { ContainerContext, styleMetaMap, vh, vw } from "./misc";
 import { VariableContext, defaultVariables, rootVariables } from "./variables";
 import { rem } from "./rem";
 import { styleSpecificityCompareFn } from "../specificity";
+import { devForceReload } from "./stylesheet";
 
 type UseStyledPropsOptions = InteropFunctionOptions<Record<string, unknown>>;
 
@@ -57,6 +58,7 @@ export function useStyledProps<P extends Record<string, any>>(
 
   const computedVariables = useComputation(
     () => {
+      devForceReload.get();
       // $variables will be null if this is a top-level component
       if (inheritedVariables === null) {
         return rootVariables.get();
@@ -85,15 +87,17 @@ export function useStyledProps<P extends Record<string, any>>(
   );
 
   return useComputation(
-    () =>
-      getStyledProps(
+    () => {
+      devForceReload.get();
+      return getStyledProps(
         propsRef.current,
         computedVariables,
         inheritedContainers,
         interaction,
         jsx,
         options,
-      ),
+      );
+    },
     [computedVariables, inheritedContainers, ...options.dependencies],
     rerender,
   );
