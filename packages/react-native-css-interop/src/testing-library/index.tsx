@@ -5,7 +5,6 @@ import { StyleSheet, cssInterop } from "../index";
 import { render } from "../runtime/render";
 import { INTERNAL_RESET } from "../shared";
 import {
-  ComponentTypeWithMapping,
   CssToReactNativeRuntimeOptions,
   EnableCssInteropOptions,
   Style,
@@ -45,9 +44,13 @@ export function createMockComponent<
 ) {
   cssInterop<P, M>(Component, mapping);
 
-  return forwardRef<unknown, P>((props, _ref) => {
+  const mock = jest.fn((props: P & { [K in keyof M]?: string }, _ref) => {
     return render((JSX as any).jsx, Component, props as any, "");
-  }) as unknown as ComponentTypeWithMapping<P, M>;
+  });
+
+  const component = forwardRef(mock);
+
+  return Object.assign(component, { mock });
 }
 
 export const resetStyles = StyleSheet[INTERNAL_RESET].bind(StyleSheet);

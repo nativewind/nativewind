@@ -23,7 +23,7 @@ test("inline styles", () => {
   // Ascending specificity order
   expect(component).toHaveStyle([
     { backgroundColor: "rgba(255, 0, 0, 1)" },
-    { backgroundColor: "blue" }, // .blue
+    { backgroundColor: "blue" },
   ]);
 });
 
@@ -37,8 +37,8 @@ test("specificity order", () => {
   // RN merges styles RTL, so we need to make sure the array is in
   // Ascending specificity order
   expect(component).toHaveStyle([
-    { color: "rgba(255, 0, 0, 1)" }, // .red
-    { color: "rgba(0, 0, 255, 1)" }, // .blue
+    { color: "rgba(255, 0, 0, 1)" },
+    { color: "rgba(0, 0, 255, 1)" },
   ]);
 });
 
@@ -71,8 +71,8 @@ test("important - no wrapper", () => {
   ).getByTestId(testID);
 
   expect(component).toHaveStyle([
-    { color: "rgba(255, 0, 0, 1)" }, // Red
-    { color: "rgba(0, 0, 255, 1)" }, // Blue
+    { color: "rgba(255, 0, 0, 1)" },
+    { color: "rgba(0, 0, 255, 1)" },
   ]);
 });
 

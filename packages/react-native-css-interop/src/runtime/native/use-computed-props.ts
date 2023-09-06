@@ -1,4 +1,3 @@
-import { useContext, useMemo, useRef } from "react";
 import {
   GestureResponderEvent,
   LayoutChangeEvent,
@@ -6,147 +5,247 @@ import {
   PixelRatio,
   Platform,
   PlatformColor,
-  StyleSheet,
   TargetedEvent,
   TransformsStyle,
 } from "react-native";
 
 import {
   ContainerRuntime,
-  Interaction,
-  InteropFunctionOptions,
+  ExtractedStyleValue,
   InteropMeta,
-  JSXFunction,
   RuntimeValue,
   Style,
   StyleMeta,
   StyleProp,
 } from "../../types";
+import { StyleSheet, getGlobalStyle } from "./stylesheet";
 import {
   testContainerQuery,
   testMediaQuery,
   testPseudoClasses,
 } from "./conditions";
 import { isRuntimeValue } from "../../shared";
-import { createSignal, useComputation } from "../signals";
-import { ContainerContext, styleMetaMap, vh, vw } from "./misc";
-import { VariableContext, defaultVariables, rootVariables } from "./variables";
+import { styleMetaMap, vh, vw } from "./misc";
 import { rem } from "./rem";
+import {
+  ComponentContext,
+  componentContext,
+  createComponentContext,
+} from "./proxy";
+import { NormalizedOptions } from "./prop-mapping";
+import { useContext, useEffect, useRef, useSyncExternalStore } from "react";
+import {
+  EffectStore,
+  createEffectStore,
+  reactGlobal,
+  setupStore,
+  teardownStore,
+} from "../signals";
 import { styleSpecificityCompareFn } from "../specificity";
-import { devForceReload } from "./stylesheet";
 
-type UseStyledPropsOptions = InteropFunctionOptions<Record<string, unknown>>;
-
-/**
- * Create a computation that will flatten the className and generate a interopMeta
- * Any signals read while the computation is running will be subscribed to.
- *
- * useComputation handles the reactivity/memoization
- * flattenStyle handles converting the classNames collecting the metadata
- */
-export function useStyledProps<P extends Record<string, any>>(
-  $props: P,
-  jsx: JSXFunction<P>,
-  options: UseStyledPropsOptions,
-  rerender: () => void,
-) {
-  const propsRef = useRef<P>($props);
-  propsRef.current = $props;
-
-  const inheritedContainers = useContext(ContainerContext);
-  const inheritedVariables = useContext(VariableContext);
-
-  const computedVariables = useComputation(
-    () => {
-      devForceReload.get();
-      // $variables will be null if this is a top-level component
-      if (inheritedVariables === null) {
-        return rootVariables.get();
-      } else {
-        return {
-          ...inheritedVariables,
-          ...defaultVariables.get(),
-        };
-      }
-    },
-    [inheritedVariables],
-    rerender,
-  );
-
-  const interaction = useMemo<Interaction>(
-    () => ({
-      active: createSignal(false),
-      hover: createSignal(false),
-      focus: createSignal(false),
-      layout: {
-        width: createSignal<number>(0),
-        height: createSignal<number>(0),
-      },
-    }),
-    [],
-  );
-
-  return useComputation(
-    () => {
-      devForceReload.get();
-      return getStyledProps(
-        propsRef.current,
-        computedVariables,
-        inheritedContainers,
-        interaction,
-        jsx,
-        options,
-      );
-    },
-    [computedVariables, inheritedContainers, ...options.dependencies],
-    rerender,
-  );
+export interface StyledEffectStore<P extends Record<string, unknown>>
+  extends Omit<EffectStore, "getSnapshot"> {
+  (): void;
+  props: P;
+  checkDependencies(inheritedContext: ComponentContext): void;
+  context: ComponentContext;
+  inheritedContext: ComponentContext;
+  lastDependencies: P[string][];
+  lastSnapshot: number;
+  getSnapshot: () => ReturnType<typeof processStyles>;
+  regenerateStyles: boolean;
+  snapshot: ReturnType<typeof processStyles<P>>;
 }
 
-/**
- * TODO: This is the main logic for the library, we should unit test this function directly
- *
- * It is separated so it can be tested outside of ReactJS
- */
-export function getStyledProps<P extends Record<string, any>>(
-  propsRef: P,
-  computedVariables: Record<string, unknown>,
-  inheritedContainers: Record<string, ContainerRuntime>,
-  interaction: Interaction,
-  jsx: JSXFunction<P>,
-  options: UseStyledPropsOptions,
+export function useStyledProps<P extends Record<string, unknown>>(
+  props: P,
+  options: NormalizedOptions<P>,
 ) {
-  const styledProps: Record<string, any> = {};
-  const variables = { ...computedVariables };
-  const containers: Record<string, ContainerRuntime> = {};
-  const animatedProps = new Set<string>();
-  const transitionProps = new Set<string>();
+  const inheritedContext = useContext(componentContext);
 
-  let hasInlineVariables = false;
-  let hasInlineContainers = false;
-  let requiresLayout = false;
+  // Create a single store per component
+  const storeRef = useRef<StyledEffectStore<P>>();
+  if (storeRef.current == null) {
+    storeRef.current = createStyledEffectStore(
+      options,
+      inheritedContext,
+      (props as any).testID,
+    );
+  }
+  const store = storeRef.current;
+  store.props = props;
+
+  // If the context changes, or we unmount we need to cleanup the store's subscribers
+  useEffect(() => () => store.cleanup(), [store.context]);
+
+  // If a dependency has changed, mark the store as dirty
+  store.checkDependencies(inheritedContext);
+
+  // If there are any delayedEffects, run them
+  useEffect(() => {
+    if (reactGlobal.delayedEffects.size) {
+      for (const sub of reactGlobal.delayedEffects) {
+        sub();
+      }
+      reactGlobal.delayedEffects.clear();
+    }
+  }, [reactGlobal.delayedEffects.size]);
+
+  // Sync with the store. If the store is dirty, it will recompute the styles
+  const value = useSyncExternalStore(
+    store.subscribe,
+    store.getSnapshot,
+    store.getSnapshot,
+  );
+
+  return {
+    store,
+    ...value,
+  };
+}
+
+function createStyledEffectStore<P extends Record<string, unknown>>(
+  options: NormalizedOptions<P>,
+  inheritedContext: ComponentContext,
+  debugName?: string,
+) {
+  const store: StyledEffectStore<P> = Object.assign(
+    createEffectStore(debugName) as any,
+    {
+      regenerateStyles: true,
+      lastSnapshot: 0,
+      lastDependencies: [],
+      snapshot: undefined,
+      context: createComponentContext(inheritedContext),
+      inheritedContext,
+      checkDependencies(currentContext: ComponentContext) {
+        let failed = reactGlobal.shouldRerender.has(store);
+        reactGlobal.shouldRerender.delete(store);
+        reactGlobal.delayedEffects.delete(store);
+
+        if (store.inheritedContext !== currentContext) {
+          store.inheritedContext = currentContext;
+          store.context = createComponentContext(currentContext);
+          failed = true;
+        }
+
+        failed ||= options.dependencies.some((k, index) => {
+          return store.props[k] !== store.lastDependencies[index];
+        });
+
+        if (failed) {
+          store.regenerateStyles = true;
+          store.lastDependencies = options.dependencies.map(
+            (k) => store.props[k],
+          );
+        }
+      },
+      getSnapshot() {
+        if (!store.regenerateStyles && store.lastSnapshot === store.version) {
+          return store.snapshot;
+        }
+
+        // Setup the store to be the current signal context
+        setupStore(store);
+
+        store.regenerateStyles = false;
+        store.snapshot = processStyles<P>(store.props, store, options);
+        store.lastSnapshot = store.version;
+
+        teardownStore();
+
+        return store.snapshot;
+      },
+    },
+  );
+
+  return store;
+}
+
+function processStyles<P extends Record<string, unknown>>(
+  props: P,
+  store: StyledEffectStore<P>,
+  options: NormalizedOptions<P>,
+): {
+  styledProps: Record<string, StyleProp>;
+  meta: InteropMeta<P>;
+} {
+  const styledProps: Record<string, any> = {};
+  const animatedProps = new Set<keyof P>();
+  const transitionProps = new Set<keyof P>();
+
+  const context = store.context;
+  const interaction = store.context.interaction;
+
   let hasActive: boolean | undefined = false;
   let hasHover: boolean | undefined = false;
   let hasFocus: boolean | undefined = false;
+  let hasInlineContainers = false;
+  let hasInlineVariables = false;
+  let requiresLayout = false;
+  let variables: Record<string, ExtractedStyleValue> = {};
 
-  for (const [key, config] of options.configMap) {
-    if (config === false) {
-      continue;
+  let dynamicStyles = false;
+
+  for (const [key, { sources, nativeStyleToProp }] of options.config) {
+    let rawStyles = [];
+    let stylesToFlatten;
+    dynamicStyles ||= Boolean(nativeStyleToProp);
+
+    for (const sourceProp of sources) {
+      const source = props?.[sourceProp];
+      if (typeof source !== "string") continue;
+
+      StyleSheet.unstable_hook_onClassName?.(source);
+
+      for (const className of source.split(/\s+/)) {
+        const style = getGlobalStyle(className);
+        if (style !== undefined) {
+          if (Array.isArray(style)) {
+            rawStyles.push(...style);
+            dynamicStyles ||= style.some((s: any) => styleMetaMap.has(s));
+          } else {
+            rawStyles.push(style);
+            dynamicStyles ||= styleMetaMap.has(style as any);
+          }
+        }
+      }
     }
 
-    const flatStyle = flattenStyle(propsRef[key], {
-      ...options,
-      interaction,
-      variables: computedVariables,
-      containers: inheritedContainers,
-    });
+    const prop = props[key];
+    const existingStyles = Array.isArray(prop) ? prop : [prop];
 
-    const meta = styleMetaMap.get(flatStyle);
+    for (const existingStyle of existingStyles) {
+      const style = getGlobalStyle(existingStyle);
+      if (style !== undefined) {
+        if (Array.isArray(style)) {
+          rawStyles.push(...style);
+          dynamicStyles ||= style.some((s: any) => styleMetaMap.has(s));
+        } else {
+          rawStyles.push(style);
+          dynamicStyles ||= styleMetaMap.has(style as any);
+        }
+      }
+    }
+
+    if (rawStyles.length > 1) {
+      stylesToFlatten = rawStyles.sort(styleSpecificityCompareFn);
+    } else {
+      stylesToFlatten = rawStyles[0];
+    }
+
+    const style = dynamicStyles
+      ? flattenStyle(stylesToFlatten, store)
+      : stylesToFlatten;
+
+    if (!style || Array.isArray(style)) continue;
+
+    const meta = styleMetaMap.get(style);
 
     if (meta) {
       if (meta.variables) {
-        Object.assign(variables, meta.variables);
         hasInlineVariables = true;
+        variables = { ...variables, ...meta.variables };
       }
 
       if (meta.container?.names) {
@@ -154,12 +253,12 @@ export function getStyledProps<P extends Record<string, any>>(
         const runtime: ContainerRuntime = {
           type: "normal",
           interaction,
-          style: flatStyle,
+          style,
         };
 
-        containers.__default = runtime;
+        context.containers.__default.set(runtime);
         for (const name of meta.container.names) {
-          containers[name] = runtime;
+          context.containers[name].set(runtime);
         }
       }
 
@@ -178,29 +277,28 @@ export function getStyledProps<P extends Record<string, any>>(
      * Note: We freeze the flatStyle as many of its props are getter's without a setter
      *  Freezing the whole object keeps everything consistent
      */
-    if (
-      config === true ||
-      typeof config === "string" ||
-      config?.nativeStyleToProp === undefined
-    ) {
-      styledProps[key] = Object.freeze(flatStyle);
-    } else {
-      for (const [styleKey, targetProp] of Object.entries(
-        config.nativeStyleToProp,
-      ) as [keyof Style, boolean | keyof P][]) {
-        if (targetProp === true && flatStyle[styleKey]) {
-          styledProps[styleKey] = flatStyle[styleKey];
-          delete flatStyle[styleKey];
-        }
-
-        if (config.target) {
-          if (config.target === true) {
-            styledProps[key] = Object.freeze(flatStyle);
-          } else {
-            styledProps[config.target] = Object.freeze(flatStyle);
-          }
+    if (nativeStyleToProp) {
+      for (const [key, targetProp] of Object.entries(nativeStyleToProp)) {
+        const styleKey = key as keyof Style;
+        if (targetProp === true && style[styleKey]) {
+          styledProps[styleKey] = style[styleKey];
+          delete style[styleKey];
         }
       }
+    }
+
+    styledProps[key] = Object.freeze(style);
+  }
+
+  if (hasInlineVariables) {
+    const existingKeys = new Set(Object.keys(context.variables));
+    for (const [key, value] of Object.entries(variables)) {
+      existingKeys.delete(key);
+      context.variables[key].set(value);
+    }
+
+    for (const key of existingKeys) {
+      context.variables[key].set(undefined);
     }
   }
 
@@ -211,9 +309,9 @@ export function getStyledProps<P extends Record<string, any>>(
 
   if (requiresLayout) {
     styledProps.onLayout = (event: LayoutChangeEvent) => {
-      propsRef.onLayout?.(event);
-      interaction.layout.width.set(event.nativeEvent.layout.width);
-      interaction.layout.height.set(event.nativeEvent.layout.height);
+      (props as any).onLayout?.(event);
+      interaction.layoutWidth.set(event.nativeEvent.layout.width);
+      interaction.layoutHeight.set(event.nativeEvent.layout.height);
     };
   }
 
@@ -221,50 +319,45 @@ export function getStyledProps<P extends Record<string, any>>(
   if (hasActive) {
     convertToPressable = true;
     styledProps.onPressIn = (event: GestureResponderEvent) => {
-      propsRef.onPressIn?.(event);
+      (props as any).onPressIn?.(event);
       interaction.active.set(true);
     };
     styledProps.onPressOut = (event: GestureResponderEvent) => {
-      propsRef.onPressOut?.(event);
+      (props as any).onPressOut?.(event);
       interaction.active.set(false);
     };
   }
   if (hasHover) {
     convertToPressable = true;
     styledProps.onHoverIn = (event: MouseEvent) => {
-      propsRef.onHoverIn?.(event);
+      (props as any).onHoverIn?.(event);
       interaction.hover.set(true);
     };
     styledProps.onHoverOut = (event: MouseEvent) => {
-      propsRef.onHoverIn?.(event);
+      (props as any).onHoverIn?.(event);
       interaction.hover.set(false);
     };
   }
   if (hasFocus) {
     convertToPressable = true;
     styledProps.onFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
-      propsRef.onFocus?.(event);
-      interaction.focus.set(true);
+      (props as any).onFocus?.(event);
+      context.interaction.focus.set(true);
     };
     styledProps.onBlur = (event: NativeSyntheticEvent<TargetedEvent>) => {
-      propsRef.onBlur?.(event);
-      interaction.focus.set(false);
+      (props as any).onBlur?.(event);
+      context.interaction.focus.set(false);
     };
   }
 
-  const meta: InteropMeta = {
+  const meta: InteropMeta<P> = {
+    interopMeta: true,
     animatedProps,
     animationInteropKey,
-    containers,
     convertToPressable,
-    hasInlineContainers,
-    hasInlineVariables,
-    inheritedContainers,
-    interaction,
     transitionProps,
-    variables,
     requiresLayout,
-    jsx,
+    componentContext: context,
   };
 
   return {
@@ -274,9 +367,6 @@ export function getStyledProps<P extends Record<string, any>>(
 }
 
 type FlattenStyleOptions = {
-  variables: Record<string, unknown>;
-  containers: Record<string, ContainerRuntime>;
-  interaction: Interaction;
   ch?: number;
   cw?: number;
 };
@@ -294,9 +384,10 @@ type FlattenStyleOptions = {
  * @param flatStyle The flat style object to add the flattened styles to.
  * @returns The flattened style object.
  */
-export function flattenStyle(
+export function flattenStyle<P extends Record<string, unknown>>(
   style: StyleProp,
-  options: FlattenStyleOptions,
+  store: StyledEffectStore<P>,
+  options: FlattenStyleOptions = {},
   flatStyle: Style = {},
 ): Style {
   if (!style) {
@@ -304,8 +395,8 @@ export function flattenStyle(
   }
 
   if (Array.isArray(style)) {
-    for (const s of style.flat().sort(styleSpecificityCompareFn)) {
-      flattenStyle(s, options, flatStyle);
+    for (const s of style) {
+      flattenStyle(s, store, options, flatStyle);
     }
     return flatStyle;
   }
@@ -323,21 +414,6 @@ export function flattenStyle(
     styleMetaMap.set(flatStyle, flatStyleMeta);
   }
 
-  /**
-   * If any style (even ones that don't pass the condition check check)
-   * have variables, then we need to have a variable key. This is to ensure
-   * VariableProvider is always added to the render tree, even if the styles are
-   * not currently valid.
-   *
-   * This will prevent an unmount of components when styles with variables are suddenly valid
-   */
-  if (styleMeta.variables) {
-    flatStyleMeta.variables ??= {};
-  }
-
-  // TODO: We should probably do this for containers as well, but I'm not sure we even want to
-  //       support conditional containers.
-
   /*
    * START OF CONDITIONS CHECK
    *
@@ -349,7 +425,9 @@ export function flattenStyle(
       ...flatStyleMeta.pseudoClasses,
     };
 
-    if (!testPseudoClasses(options.interaction, styleMeta.pseudoClasses)) {
+    if (
+      !testPseudoClasses(store.context.interaction, styleMeta.pseudoClasses)
+    ) {
       return flatStyle;
     }
   }
@@ -359,7 +437,13 @@ export function flattenStyle(
     return flatStyle;
   }
 
-  if (!testContainerQuery(styleMeta.containerQuery, options.containers)) {
+  if (
+    styleMeta.containerQuery &&
+    !testContainerQuery(
+      styleMeta.containerQuery,
+      store.inheritedContext.containers,
+    )
+  ) {
     return flatStyle;
   }
 
@@ -397,30 +481,22 @@ export function flattenStyle(
   }
 
   if (styleMeta.variables) {
-    flatStyleMeta.variables ??= {};
     for (const [key, value] of Object.entries(styleMeta.variables)) {
-      // Skip already set variables
-      if (key in flatStyleMeta.variables) continue;
-
       const getterOrValue = extractValue(
         value,
         flatStyle,
         flatStyleMeta,
+        store,
         options,
       );
 
-      Object.defineProperty(flatStyleMeta.variables, key, {
-        enumerable: true,
-        get() {
-          return typeof getterOrValue === "function"
-            ? getterOrValue()
-            : getterOrValue;
-        },
-      });
+      flatStyleMeta.variables ??= {};
+      flatStyleMeta.variables[key] = getterOrValue;
     }
   }
 
   for (let [key, value] of Object.entries(style)) {
+    if (value === undefined) continue;
     switch (key) {
       case "transform": {
         const transforms: Record<string, unknown>[] = [];
@@ -433,6 +509,7 @@ export function flattenStyle(
               transform,
               flatStyle,
               flatStyleMeta,
+              store,
               options,
             );
 
@@ -457,6 +534,7 @@ export function flattenStyle(
                 tValue,
                 flatStyle,
                 flatStyleMeta,
+                store,
                 options,
               );
 
@@ -487,6 +565,7 @@ export function flattenStyle(
           value[0],
           flatStyle,
           flatStyleMeta,
+          store,
           options,
         );
         extractAndDefineProperty(
@@ -494,6 +573,7 @@ export function flattenStyle(
           value[1],
           flatStyle,
           flatStyleMeta,
+          store,
           options,
         );
         break;
@@ -504,6 +584,7 @@ export function flattenStyle(
           value[0],
           flatStyle,
           flatStyleMeta,
+          store,
           options,
         );
         extractAndDefineProperty(
@@ -511,26 +592,41 @@ export function flattenStyle(
           value[1],
           flatStyle,
           flatStyleMeta,
+          store,
           options,
         );
         break;
       }
       default:
-        extractAndDefineProperty(key, value, flatStyle, flatStyleMeta, options);
+        extractAndDefineProperty(
+          key,
+          value,
+          flatStyle,
+          flatStyleMeta,
+          store,
+          options,
+        );
     }
   }
 
   return flatStyle;
 }
 
-function extractAndDefineProperty(
+function extractAndDefineProperty<P extends Record<string, unknown>>(
   key: string,
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  options: FlattenStyleOptions,
+  store: StyledEffectStore<P>,
+  options: FlattenStyleOptions = {},
 ) {
-  const getterOrValue = extractValue(value, flatStyle, flatStyleMeta, options);
+  const getterOrValue = extractValue(
+    value,
+    flatStyle,
+    flatStyleMeta,
+    store,
+    options,
+  );
 
   if (getterOrValue === undefined) return;
 
@@ -539,15 +635,15 @@ function extractAndDefineProperty(
 
   for (const [index, token] of tokens.entries()) {
     if (index === tokens.length - 1) {
-      Object.defineProperty(target, token, {
-        configurable: true,
-        enumerable: true,
-        get() {
-          return typeof getterOrValue === "function"
-            ? getterOrValue()
-            : getterOrValue;
-        },
-      });
+      if (typeof getterOrValue === "function") {
+        Object.defineProperty(target, token, {
+          configurable: true,
+          enumerable: true,
+          get: getterOrValue,
+        });
+      } else {
+        target[token] = getterOrValue;
+      }
     } else {
       target[token] ??= {};
       target = target[token];
@@ -555,37 +651,54 @@ function extractAndDefineProperty(
   }
 }
 
-function extractValue<T>(
+function extractValue<P extends Record<string, unknown>>(
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  options: FlattenStyleOptions,
+  store: StyledEffectStore<P>,
+  options: FlattenStyleOptions = {},
 ): any {
   if (!isRuntimeValue(value)) {
     return value;
   }
 
+  const context = store.context;
+
   switch (value.name) {
+    case "var": {
+      const name = value.arguments[0] as string;
+
+      let cache: any;
+
+      return () => {
+        if (cache) return cache;
+
+        const signal = store.context.variables[name];
+        if (!signal) return;
+
+        return store.runInEffect(() => {
+          const resolvedValue = extractValue(
+            signal.get(),
+            flatStyle,
+            flatStyleMeta,
+            store,
+            options,
+          );
+
+          cache =
+            typeof resolvedValue === "function"
+              ? resolvedValue()
+              : resolvedValue;
+
+          return cache;
+        });
+      };
+    }
     case "vh": {
       return round((vh.get() / 100) * (value.arguments[0] as number));
     }
     case "vw": {
       return round((vw.get() / 100) * (value.arguments[0] as number));
-    }
-    case "var": {
-      return () => {
-        const name = value.arguments[0] as string;
-        const resolvedValue = extractValue(
-          flatStyleMeta.variables?.[name] ?? options.variables[name],
-          flatStyle,
-          flatStyleMeta,
-          options,
-        );
-
-        return typeof resolvedValue === "function"
-          ? resolvedValue()
-          : resolvedValue;
-      };
     }
     case "rem": {
       return round(rem.get() * (value.arguments[0] as number));
@@ -606,20 +719,20 @@ function extractValue<T>(
 
       if (options.ch) {
         reference = options.ch;
-      } else if (options.interaction?.layout.height.get()) {
-        reference = options.interaction.layout.height.get();
       } else if (typeof flatStyle.height === "number") {
         reference = flatStyle.height;
+      } else if (context.interaction?.layoutHeight) {
+        reference = context.interaction.layoutHeight.get();
       }
 
       if (reference) {
         return round(reference * multiplier);
       } else {
         return () => {
-          if (options.interaction?.layout.height.get()) {
-            reference = options.interaction.layout.height.get();
-          } else if (typeof flatStyle.height === "number") {
+          if (typeof flatStyle.height === "number") {
             reference = flatStyle.height;
+          } else if (context.interaction.layoutHeight) {
+            reference = context.interaction.layoutHeight.get();
           } else {
             reference = 0;
           }
@@ -635,20 +748,20 @@ function extractValue<T>(
 
       if (options.cw) {
         reference = options.cw;
-      } else if (options.interaction?.layout.width.get()) {
-        reference = options.interaction.layout.width.get();
       } else if (typeof flatStyle.width === "number") {
         reference = flatStyle.width;
+      } else if (context.interaction.layoutWidth) {
+        reference = context.interaction.layoutWidth.get();
       }
 
       if (reference) {
         return round(reference * multiplier);
       } else {
         return () => {
-          if (options.interaction?.layout.width.get()) {
-            reference = options.interaction.layout.width.get();
-          } else if (typeof flatStyle.width === "number") {
+          if (typeof flatStyle.width === "number") {
             reference = flatStyle.width;
+          } else if (context.interaction?.layoutWidth) {
+            reference = context.interaction.layoutWidth.get();
           } else {
             reference = 0;
           }
@@ -663,9 +776,16 @@ function extractValue<T>(
     case "scaleX":
     case "scaleY":
     case "scale": {
-      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-        wrap: false,
-      });
+      return createRuntimeFunction(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        store,
+        options,
+        {
+          wrap: false,
+        },
+      );
     }
     case "rotate":
     case "rotateX":
@@ -673,10 +793,17 @@ function extractValue<T>(
     case "rotateZ":
     case "skewX":
     case "skewY": {
-      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-        wrap: false,
-        parseFloat: false,
-      });
+      return createRuntimeFunction(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        store,
+        options,
+        {
+          wrap: false,
+          parseFloat: false,
+        },
+      );
     }
     case "hairlineWidth": {
       return StyleSheet.hairlineWidth;
@@ -690,6 +817,7 @@ function extractValue<T>(
         },
         flatStyle,
         flatStyleMeta,
+        store,
         options,
         {
           wrap: false,
@@ -711,6 +839,7 @@ function extractValue<T>(
         },
         flatStyle,
         flatStyleMeta,
+        store,
         options,
         {
           wrap: false,
@@ -732,6 +861,7 @@ function extractValue<T>(
         },
         flatStyle,
         flatStyleMeta,
+        store,
         options,
         {
           wrap: false,
@@ -739,31 +869,59 @@ function extractValue<T>(
       );
     }
     case "platformColor": {
-      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-        wrap: false,
-        joinArgs: false,
-        callback: PlatformColor,
-        spreadCallbackArgs: true,
-      });
+      return createRuntimeFunction(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        store,
+        options,
+        {
+          wrap: false,
+          joinArgs: false,
+          callback: PlatformColor,
+          spreadCallbackArgs: true,
+        },
+      );
     }
     case "pixelScale": {
-      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-        wrap: false,
-        callback: (value: number) => PixelRatio.get() * value,
-      });
+      return createRuntimeFunction(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        store,
+        options,
+        {
+          wrap: false,
+          callback: (value: number) => PixelRatio.get() * value,
+        },
+      );
     }
     case "fontScale": {
-      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-        wrap: false,
-        callback: (value: number) => PixelRatio.getFontScale() * value,
-      });
+      return createRuntimeFunction(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        store,
+        options,
+        {
+          wrap: false,
+          callback: (value: number) => PixelRatio.getFontScale() * value,
+        },
+      );
     }
     case "getPixelSizeForLayoutSize": {
-      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-        wrap: false,
-        callback: (value: number) =>
-          PixelRatio.getPixelSizeForLayoutSize(value),
-      });
+      return createRuntimeFunction(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        store,
+        options,
+        {
+          wrap: false,
+          callback: (value: number) =>
+            PixelRatio.getPixelSizeForLayoutSize(value),
+        },
+      );
     }
     case "roundToNearestPixel": {
       return createRuntimeFunction(
@@ -773,6 +931,7 @@ function extractValue<T>(
         },
         flatStyle,
         flatStyleMeta,
+        store,
         options,
         {
           wrap: false,
@@ -780,20 +939,33 @@ function extractValue<T>(
       );
     }
     case "rgb": {
-      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options, {
-        joinArgs: false,
-        callback(value: any) {
-          const args = value.slice(4, -1).split(",");
+      return createRuntimeFunction(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        store,
+        options,
+        {
+          joinArgs: false,
+          callback(value: any) {
+            const args = value.slice(4, -1).split(",");
 
-          if (args.length === 4) {
-            return `rgba(${args.join(",")})`;
-          }
-          return value;
+            if (args.length === 4) {
+              return `rgba(${args.join(",")})`;
+            }
+            return value;
+          },
         },
-      });
+      );
     }
     default: {
-      return createRuntimeFunction(value, flatStyle, flatStyleMeta, options);
+      return createRuntimeFunction(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        store,
+        options,
+      );
     }
   }
 }
@@ -809,10 +981,11 @@ interface CreateRuntimeFunctionOptions {
 /**
  * TODO: This function is overloaded with functionality
  */
-function createRuntimeFunction(
+function createRuntimeFunction<P extends Record<string, unknown>>(
   value: RuntimeValue,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
+  store: StyledEffectStore<P>,
   options: FlattenStyleOptions,
   {
     wrap = true,
@@ -831,6 +1004,7 @@ function createRuntimeFunction(
         argument,
         flatStyle,
         flatStyleMeta,
+        store,
         options,
       );
 

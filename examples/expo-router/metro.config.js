@@ -18,8 +18,7 @@ config.resolver.nodeModulesPaths = [
 
 // 2. Enable NativeWind
 const { withNativeWind } = require("nativewind/metro");
-// module.exports = withNativeWind(config, {
-//   // 3. Set `input` to your CSS file with the Tailwind at-rules
-//   input: "global.css",
-// });
-module.exports = config;
+module.exports = withNativeWind(config, {
+  // 3. Set `input` to your CSS file with the Tailwind at-rules
+  input: "global.css",
+});

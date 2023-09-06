@@ -132,9 +132,9 @@ export function normalizeSelectors(
 
           // We can only have two classnames in a selector if the first one is a valid group
           if (selector.className) {
-            const groupingValid = options.grouping.some((group) =>
-              group.test(selector.className),
-            );
+            const groupingValid = options.grouping.some((group) => {
+              return group.test(selector.className);
+            });
 
             if (!groupingValid) {
               // If its invalid, dismiss the entire rule

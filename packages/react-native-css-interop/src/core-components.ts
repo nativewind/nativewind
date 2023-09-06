@@ -1,4 +1,9 @@
-import { ComponentType, forwardRef } from "react";
+import {
+  ComponentType,
+  PropsWithChildren,
+  createElement,
+  forwardRef,
+} from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -15,11 +20,7 @@ import {
 } from "react-native";
 
 import { defaultCSSInterop } from "./runtime/css-interop";
-import { interopFunctions, render } from "./runtime/render";
-import {
-  getInteropFunctionOptions,
-  getRemappedProps,
-} from "./runtime/render-options";
+import { InteropTypeCheck, interopComponents, render } from "./runtime/render";
 import type {
   RemapProps,
   ComponentTypeWithMapping,
@@ -27,6 +28,9 @@ import type {
   InteropFunction,
   JSXFunction,
 } from "./types";
+import { getNormalizeConfig } from "./runtime/native/prop-mapping";
+import { getGlobalStyle } from "./runtime/native/stylesheet";
+import { opaqueStyles, styleMetaMap } from "./runtime/native/misc";
 
 export function unstable_styled<P extends object, M>(
   component: ComponentType<P>,
@@ -43,39 +47,128 @@ export function unstable_styled<P extends object, M>(
   }) as unknown as ComponentTypeWithMapping<P, M>;
 }
 
-export function globalCssInterop<P extends object, M>(
-  component: ComponentType<P>,
-  mapping: EnableCssInteropOptions<P> & M,
+export function globalCssInterop<T extends {}, M>(
+  component: ComponentType<T>,
+  mapping: EnableCssInteropOptions<T> & M,
   interop: InteropFunction = defaultCSSInterop,
 ) {
-  const map = new Map(Object.entries(mapping));
+  const config = getNormalizeConfig(mapping);
 
-  interopFunctions.set(component, (jsx, type, props, key) => {
-    const options = getInteropFunctionOptions(props, map as any);
+  let render: any = <P extends { ___pressable?: true }>(
+    { children, ___pressable, ...props }: PropsWithChildren<P>,
+    ref: unknown,
+  ) => {
+    if (ref) {
+      (props as any).ref = ref;
+    }
 
-    return interop<typeof props>(
-      options,
-      jsx,
-      type,
-      options.remappedProps,
-      key,
-    );
-  });
+    if (___pressable) {
+      return createElement(component, props as unknown as T, children);
+    } else {
+      return createElement(
+        ...interop(component, config, props as unknown as T, children),
+      );
+    }
+  };
 
-  return component as ComponentTypeWithMapping<P, M>;
+  if (__DEV__) {
+    render.displayName = `CSSInterop.${
+      component.displayName ?? component.name ?? "unknown"
+    }`;
+  }
+
+  render = forwardRef(render);
+
+  const checkArray = (props: any[]) =>
+    props.some((prop): boolean => {
+      return Array.isArray(prop) ? checkArray(prop) : styleMetaMap.has(prop);
+    });
+
+  const interopComponent: InteropTypeCheck<T> = {
+    type: render,
+    check(props) {
+      for (const [
+        targetProp,
+        { sources, nativeStyleToProp },
+      ] of config.config) {
+        if (nativeStyleToProp) return true;
+
+        for (const source of sources) {
+          if (typeof props[source] === "string") {
+            return true;
+          }
+        }
+
+        const target: any = props[targetProp];
+
+        if (Array.isArray(target)) {
+          if (checkArray(target)) {
+            return true;
+          }
+        } else if (styleMetaMap.has(target)) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+  };
+
+  interopComponents.set(component, interopComponent);
 }
 
 export function remapProps<P, M>(
   component: ComponentType<P>,
-  options: RemapProps<P> & M,
+  mapping: RemapProps<P> & M,
 ) {
-  const map = new Map(Object.entries(options));
+  const { config } = getNormalizeConfig(mapping);
 
-  interopFunctions.set(component, (jsx, type, props, key) => {
-    return jsx(type, getRemappedProps(props, map as any), key);
+  let render: any = <P extends Record<string, unknown>>(
+    { ...props }: PropsWithChildren<P>,
+    ref: unknown,
+  ) => {
+    for (const [key, { sources }] of config) {
+      let rawStyles = [];
+
+      for (const sourceProp of sources) {
+        const source = props?.[sourceProp];
+
+        if (typeof source !== "string") continue;
+        delete props[sourceProp];
+
+        for (const className of source.split(/\s+/)) {
+          const style = getGlobalStyle(className);
+
+          if (style !== undefined) {
+            const opaqueStyle = {};
+            opaqueStyles.set(opaqueStyle, style);
+            rawStyles.push(opaqueStyle);
+          }
+        }
+      }
+
+      const existingStyle = props[key];
+
+      if (Array.isArray(existingStyle)) {
+        rawStyles.push(...existingStyle);
+      } else if (existingStyle) {
+        rawStyles.push(existingStyle);
+      }
+
+      if (rawStyles.length !== 0) {
+        (props as any)[key] = rawStyles.length === 1 ? rawStyles[0] : rawStyles;
+      }
+    }
+
+    (props as any).ref = ref;
+
+    return createElement(component as any, props, props.children);
+  };
+
+  interopComponents.set(component, {
+    type: forwardRef(render),
+    check: () => true,
   });
-
-  return component as ComponentTypeWithMapping<P, M>;
 }
 
 globalCssInterop(Image, { className: "style" });

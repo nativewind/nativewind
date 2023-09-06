@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react-native";
+import { render, screen } from "@testing-library/react-native";
 import { View } from "react-native";
 
 import {
@@ -20,11 +20,21 @@ test("vars", () => {
       }`,
   );
 
-  const component = render(
+  render(
     <A testID={testID} className="my-class" style={vars({ test: "black" })} />,
-  ).getByTestId(testID);
+  );
+
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
     color: "black",
+  });
+
+  screen.rerender(
+    <A testID={testID} className="my-class" style={vars({ test: "blue" })} />,
+  );
+
+  expect(component).toHaveStyle({
+    color: "blue",
   });
 });

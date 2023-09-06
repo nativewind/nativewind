@@ -1,10 +1,10 @@
-import { View, Pressable } from "react-native";
+import { View } from "react-native";
 import { createMockComponent, renderTailwind } from "../test-utils";
 import { fireEvent, screen } from "@testing-library/react-native";
 import { resetStyles } from "react-native-css-interop/testing-library";
 
-const Grandparent = createMockComponent(Pressable);
-const Parent = createMockComponent(Pressable);
+const Grandparent = createMockComponent(View);
+const Parent = createMockComponent(View);
 const Child = createMockComponent(View);
 const grandparentID = "grandparentID";
 const parentID = "parent";
@@ -20,7 +20,7 @@ test("Styling based on parent state (group-{modifier})", async () => {
   );
 
   const parent = screen.getByTestId(parentID);
-  let child = screen.getByTestId(childID);
+  const child = screen.getByTestId(childID);
 
   expect(parent).toHaveStyle({});
   expect(child).toHaveStyle({});
@@ -34,7 +34,6 @@ test("Differentiating nested groups", async () => {
   await renderTailwind(
     <Grandparent testID={grandparentID} className="group/grandparent">
       <Parent testID={parentID} className="group/parent">
-        {/* Make sure grandparent styles are generated */}
         <Child className="group-hover/grandparent:text-white" />
         <Child testID={childID} className="group-hover/parent:text-white" />
       </Parent>

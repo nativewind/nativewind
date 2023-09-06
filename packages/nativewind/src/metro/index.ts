@@ -45,21 +45,23 @@ export function withNativeWind(
     output = path.resolve(output);
   }
 
-  metroConfig = withCssInterop(metroConfig, {
-    ...cssToReactNativeRuntimeOptions,
-    inlineRem,
-  });
-
   const { important: importantConfig } = loadConfig(
     path.resolve(tailwindConfigPath),
   );
+
+  metroConfig = withCssInterop(metroConfig, {
+    ...cssToReactNativeRuntimeOptions,
+    inlineRem,
+    selectorPrefix:
+      typeof importantConfig === "string" ? importantConfig : undefined,
+  });
 
   // eslint-disable-next-line unicorn/prefer-module
   metroConfig.transformerPath = require.resolve(
     "nativewind/dist/metro/transformer",
   );
 
-  let tailwindHasStarted: Record<string, boolean> = {
+  const tailwindHasStarted: Record<string, boolean> = {
     native: false,
     web: false,
   };
@@ -72,10 +74,6 @@ export function withNativeWind(
     nativewind: {
       input,
       output,
-    },
-    cssToReactNativeRuntime: {
-      selectorPrefix:
-        typeof importantConfig === "string" ? importantConfig : undefined,
     },
     getTransformOptions: async (
       entryPoints: ReadonlyArray<string>,

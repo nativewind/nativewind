@@ -3,7 +3,15 @@ import type {
   AnimationName,
   Time,
 } from "lightningcss";
-import { ComponentType, useMemo, forwardRef, useState, useEffect } from "react";
+import {
+  ComponentType,
+  useMemo,
+  forwardRef,
+  useState,
+  useEffect,
+  createElement,
+  PropsWithChildren,
+} from "react";
 import Animated, {
   AnimatableValue,
   SharedValue,
@@ -20,13 +28,13 @@ import {
   InteropMeta,
   Style,
 } from "../../types";
-import { flattenStyle } from "./use-computed-props";
+import { StyledEffectStore, flattenStyle } from "./use-computed-props";
 import { animationMap, styleMetaMap } from "./misc";
 import { Pressable, Text, View } from "react-native";
 
-type AnimationInteropProps = Record<string, unknown> & {
-  __component: ComponentType<any>;
-  __meta: InteropMeta;
+type AnimationInteropProps<P extends Record<string, unknown>> = P & {
+  __component: ComponentType<P>;
+  __store: StyledEffectStore<P>;
 };
 
 const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>([
@@ -50,35 +58,58 @@ const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>([
  * This component breaks the rules of hooks, however is it safe to do so as the animatedProps are static
  * If they do change, the key for this component will be regenerated forcing a remount (a reset of hooks)
  */
-export const AnimationInterop = forwardRef(function Animated(
-  { __component: Component, __meta: meta, ...props }: AnimationInteropProps,
+export const AnimationInterop = forwardRef(function Animated<
+  P extends Record<string, unknown>,
+>(
+  {
+    __component: Component,
+    __store: store,
+    children,
+    ...$props
+  }: AnimationInteropProps<PropsWithChildren<P>>,
   ref: unknown,
 ) {
+  const props = $props as unknown as P;
   Component = createAnimatedComponent(Component);
+
+  const meta = store.snapshot.meta;
 
   const isLayoutReady = useIsLayoutReady(meta);
 
-  for (const prop of new Set([
+  for (const prop of new Set<keyof P>([
     ...meta.transitionProps,
     ...meta.animatedProps,
   ])) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     props[prop] = useAnimationAndTransitions(
       props[prop] as Record<string, AnimatableValue>,
-      meta,
+      store,
       isLayoutReady,
-    );
+    ) as P[keyof P];
   }
 
-  return meta.jsx(Component, { ...props, ref }, meta.animationInteropKey);
+  return createElement(
+    Component,
+    {
+      ...props,
+      ref,
+      key: meta.animationInteropKey,
+    },
+    children,
+  );
 });
 
 /**
  * Returns if the component layout is calculated. If layout is not required, this will always return true
  */
-function useIsLayoutReady({ requiresLayout, interaction }: InteropMeta) {
+function useIsLayoutReady<P extends Record<string, unknown>>({
+  requiresLayout,
+  componentContext,
+}: InteropMeta<P>) {
   const [layoutReady, setLayoutReady] = useState(
-    requiresLayout ? interaction.layout.width.get() !== 0 : true,
+    requiresLayout
+      ? componentContext.interaction.layoutWidth.get() !== 0
+      : true,
   );
 
   useEffect(() => {
@@ -87,11 +118,9 @@ function useIsLayoutReady({ requiresLayout, interaction }: InteropMeta) {
     }
 
     // We only need to listen for a single layout change
-    const subscription = interaction.layout.width.subscribe(() => {
+    return componentContext.interaction.layoutWidth.subscribe(() => {
       setLayoutReady(true);
-      subscription();
     });
-    return () => subscription();
   }, [layoutReady]);
 
   return layoutReady;
@@ -103,9 +132,9 @@ type TimingFrameProperties = {
   value: AnimatableValue;
 };
 
-function useAnimationAndTransitions(
+function useAnimationAndTransitions<P extends Record<string, unknown>>(
   style: Record<string, AnimatableValue>,
-  meta: InteropMeta,
+  store: StyledEffectStore<P>,
   isLayoutReady: boolean,
 ) {
   const {
@@ -131,12 +160,15 @@ function useAnimationAndTransitions(
     animationDurations,
     animationIterationCounts,
     style,
-    meta,
+    store,
     isLayoutReady,
   );
 
+  const sharedStyle = useSharedValue(style);
+  sharedStyle.value = style;
+
   const animatedStyle = useAnimatedStyle(() => {
-    const result: Record<string, unknown> = { ...style };
+    const result: Record<string, unknown> = { ...sharedStyle.value };
 
     if (style.fontWeight) {
       // Reanimated crashes if the fontWeight is numeric
@@ -166,8 +198,10 @@ function useAnimationAndTransitions(
     }
     doAnimation(transitionProps, transitionValues);
     doAnimation(animationProps, animationValues);
+
+    console.log(JSON.stringify(result));
     return result;
-  }, [...transitionValues, ...animationValues]);
+  }, [...transitionValues, ...animationValues, sharedStyle]);
 
   // This doesn't have a runtime purpose, it just makes the unit tests easier to write
   styleMetaMap.set(animatedStyle, styleMetaMap.get(style)!);
@@ -216,12 +250,12 @@ function useTransitions(
   return [transitionProps, transitionValues] as const;
 }
 
-function useAnimations(
+function useAnimations<P extends Record<string, unknown>>(
   animationNames: AnimationName[],
   animationDurations: Time[],
   animationIterationCounts: AnimationIterationCount[],
   style: Record<string, unknown>,
-  { variables, inheritedContainers: containers, interaction }: InteropMeta,
+  store: StyledEffectStore<P>,
   isLayoutReady: boolean,
 ) {
   const animations = useMemo(() => {
@@ -249,10 +283,7 @@ function useAnimations(
       > = {};
 
       for (const { style: $style, selector: progress } of keyframes.frames) {
-        const flatStyle = flattenStyle($style, {
-          variables,
-          interaction,
-          containers,
+        const flatStyle = flattenStyle($style, store, {
           ch: typeof style.height === "number" ? style.height : undefined,
           cw: typeof style.width === "number" ? style.width : undefined,
         });

@@ -14,12 +14,7 @@ export const animationMap = new Map<string, ExtractedAnimation>();
 export const globalStyles = new Map<string, StyleProp>();
 export const opaqueStyles = new WeakMap<object, StyleProp>();
 export const styleSpecificity = new WeakMap<object, Specificity>();
-export const styleMetaMap = new WeakMap<
-  NonNullable<StyleProp> | NonNullable<StyleProp>[],
-  StyleMeta
->();
-
-export class OpaqueStyleToken {}
+export const styleMetaMap = new WeakMap<NonNullable<StyleProp>, StyleMeta>();
 
 export const ContainerContext = createContext<Record<string, ContainerRuntime>>(
   {},

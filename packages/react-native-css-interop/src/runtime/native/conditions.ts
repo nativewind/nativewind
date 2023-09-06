@@ -18,6 +18,7 @@ import { isReduceMotionEnabled, vh, vw } from "./misc";
 import { Platform } from "react-native";
 import { colorScheme } from "./color-scheme";
 import { rem } from "./rem";
+import { Signal } from "../signals";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -39,18 +40,18 @@ export function testMediaQuery(
 }
 
 export function testPseudoClasses(
-  interaction: Interaction | undefined,
+  interaction: Interaction,
   meta: PseudoClassesQuery,
 ) {
-  if (meta.active && !interaction?.active.get()) return false;
-  if (meta.hover && !interaction?.hover.get()) return false;
-  if (meta.focus && !interaction?.focus.get()) return false;
+  if (meta.active && !interaction.active.get()) return false;
+  if (meta.hover && !interaction.hover.get()) return false;
+  if (meta.focus && !interaction.focus.get()) return false;
   return true;
 }
 
 export function testContainerQuery(
   containerQuery: ExtractedContainerQuery[] | undefined,
-  containers: Record<string, ContainerRuntime> = {},
+  containers: Record<string, Signal<ContainerRuntime>> = {},
 ) {
   // If there is no query, we passed
   if (!containerQuery || containerQuery.length === 0) {
@@ -63,9 +64,9 @@ export function testContainerQuery(
 
     // If the query has a name, we use the container with that name
     // Otherwise default to the last container
-    const container = query.name
-      ? containers[query.name]
-      : containers.__default;
+    const container = (
+      query.name ? containers[query.name] : containers.__default
+    ).get();
 
     // We failed if the container doesn't exist (e.g no default container)
     if (!container) return false;
@@ -79,10 +80,11 @@ export function testContainerQuery(
 
     // If there is no condition, we passed (maybe only named as specified)
     if (!query.condition) return true;
+    (container.interaction as any).test;
 
     return testCondition(query.condition, {
-      width: container.interaction.layout.width,
-      height: container.interaction.layout.height,
+      width: container.interaction.layoutWidth.get(),
+      height: container.interaction.layoutHeight.get(),
     });
   });
 }

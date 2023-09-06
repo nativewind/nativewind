@@ -7,5 +7,5 @@ export const cssToReactNativeRuntimeOptions = {
    * will flood the user with invalid warnings
    */
   ignorePropertyWarningRegex: ["^--tw-"],
-  grouping: ["^group$", "^group/"],
+  grouping: ["^group(/.*)?"],
 };

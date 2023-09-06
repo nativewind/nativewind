@@ -1,28 +1,31 @@
 import type { ComponentType } from "react";
 import type { BasicInteropFunction, JSXFunction } from "../types";
 
-type Tail<T extends any[]> = T extends [any, ...infer R] ? R : never;
-
-export const interopFunctions = new WeakMap<
-  ComponentType<any>,
-  BasicInteropFunction
->();
+export type InteropTypeCheck<T> = {
+  type: ComponentType<T>;
+  check: (props: T) => boolean;
+};
+export const interopComponents = new WeakMap<object, InteropTypeCheck<any>>();
 
 export function render<P>(
   jsx: JSXFunction<P>,
-  type: Parameters<JSXFunction<P>>[0],
-  ...args: Tail<Parameters<JSXFunction<P>>>
+  type: any,
+  props: any,
+  ...args: Parameters<JSXFunction<P>> extends [any, any, ...infer R] ? R : never
 ) {
-  if (typeof type === "string") {
-    // Used by the doctor to check if the interop is working
-    if (__DEV__ && type === "react-native-css-interop-jsx-pragma-check") {
+  if (__DEV__) {
+    if (type === "react-native-css-interop-jsx-pragma-check") {
       return true;
     }
-    // String components are not supported by the interop
-    return jsx(type, ...args);
   }
-  const cssInterop = interopFunctions.get(type);
-  return cssInterop ? cssInterop(jsx, type, ...args) : jsx(type, ...args);
+
+  const interop = interopComponents.get(type) as
+    | InteropTypeCheck<P>
+    | undefined;
+
+  if (!interop || !interop.check(props)) return jsx(type, props, ...args);
+
+  return jsx(interop.type, props, ...args);
 }
 
 export function renderWithInterop<P>(

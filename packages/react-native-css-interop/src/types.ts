@@ -11,13 +11,15 @@ import {
   ComponentClass,
   ForwardRefExoticComponent,
   FunctionComponent,
+  ReactNode,
+  createElement,
 } from "react";
 import {
   Appearance,
   Dimensions,
   ImageStyle,
   MatrixTransform,
-  PerpectiveTransform,
+  PerpectiveTransform as PerspectiveTransform,
   RotateTransform,
   RotateXTransform,
   RotateYTransform,
@@ -33,6 +35,9 @@ import {
   ViewStyle,
 } from "react-native";
 import { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
+import type { NormalizedOptions } from "./runtime/native/prop-mapping";
+import { ComponentContext } from "./runtime/native/proxy";
+import { Signal } from "./runtime/signals";
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
@@ -60,14 +65,16 @@ export type EnableCssInteropOptions<P> = {
   [K in string]?: CSSInteropClassNamePropConfig<P>;
 };
 
+export type NormalizedCSSInteropClassNamePropConfig<P> = {
+  target: (keyof P & string) | boolean;
+  nativeStyleToProp?: NativeStyleToProp<P>;
+};
+
 export type CSSInteropClassNamePropConfig<P> =
   | undefined
   | (keyof P & string)
   | boolean
-  | {
-      target: (keyof P & string) | boolean;
-      nativeStyleToProp: NativeStyleToProp<P>;
-    };
+  | NormalizedCSSInteropClassNamePropConfig<P>;
 
 export type NativeStyleToProp<P> = {
   [K in keyof Style & string]?: K extends keyof P ? keyof P | true : keyof P;
@@ -102,10 +109,15 @@ export type BasicInteropFunction = <P>(
   ...args: unknown[]
 ) => any;
 
-export type InteropFunction = <P>(
-  options: InteropFunctionOptions<P>,
-  jsx: JSXFunction<any>,
-  type: ComponentType<P>,
+export type InteropFunction = (
+  type: any,
+  options: NormalizedOptions<any>,
+  props: Record<string, any>,
+  children: ReactNode,
+) => Parameters<typeof createElement>;
+
+export type NewInteropFunction = <P extends Record<string, any>>(
+  options: NormalizedOptions<P>,
   props: P,
   key: string | undefined,
   ...args: unknown[]
@@ -113,7 +125,7 @@ export type InteropFunction = <P>(
 
 export type InteropFunctionOptions<P> = {
   remappedProps: P;
-  configMap: Map<keyof P & string, CSSInteropClassNamePropConfig<P>>;
+  options: NormalizedOptions<P>;
   dependencies: unknown[];
   useWrapper: boolean;
 };
@@ -128,7 +140,8 @@ export type ExtractedStyleValue =
   | string
   | number
   | RuntimeValue
-  | ExtractedStyleValue[];
+  | ExtractedStyleValue[]
+  | (() => ExtractedStyleValue);
 
 export type ExtractedStyle = {
   specificity: Specificity;
@@ -165,7 +178,6 @@ export type CSSSpecificity = {
 };
 
 export type PropInteropMeta = {
-  variables?: Record<string, unknown>;
   containers?: string[];
   animated: boolean;
   transition: boolean;
@@ -173,13 +185,14 @@ export type PropInteropMeta = {
   hasActive?: boolean;
   hasHover?: boolean;
   hasFocus?: boolean;
+  hasVariables?: boolean;
 };
 
 export type StyleMeta = {
   alreadyProcessed?: true;
   variableProps?: Set<string>;
   media?: MediaQuery[];
-  variables?: Record<string, unknown>;
+  variables?: Record<string, ExtractedStyleValue>;
   pseudoClasses?: PseudoClassesQuery;
   animations?: ExtractedAnimations;
   container?: ExtractedContainer;
@@ -194,37 +207,22 @@ export interface SignalLike<T = unknown> {
   get(): T;
 }
 
-export interface Signal<T = unknown> {
-  get(): T;
-  snapshot(): T;
-  set(value: T): void;
-  stale(change: 1 | -1, fresh: boolean): void;
-  subscribe(callback: () => void): () => void;
-}
-
-export type InteropMeta = {
-  animatedProps: Set<string>;
+export type InteropMeta<P extends Record<string, unknown>> = {
+  interopMeta: true;
+  animatedProps: Set<keyof P>;
   animationInteropKey?: string;
-  containers: Record<string, ContainerRuntime>;
   convertToPressable: boolean;
-  hasInlineContainers: boolean;
-  hasInlineVariables: boolean;
-  inheritedContainers: Record<string, ContainerRuntime>;
-  interaction: Interaction;
-  transitionProps: Set<string>;
+  transitionProps: Set<keyof P>;
   requiresLayout: boolean;
-  variables: Record<string, unknown>;
-  jsx: JSXFunction<any>;
+  componentContext: ComponentContext;
 };
 
 export type Interaction = {
   active: Signal<boolean>;
   hover: Signal<boolean>;
   focus: Signal<boolean>;
-  layout: {
-    width: Signal<number>;
-    height: Signal<number>;
-  };
+  layoutWidth: Signal<number>;
+  layoutHeight: Signal<number>;
 };
 
 export type ExtractedContainer = {
@@ -302,7 +300,7 @@ export type NamedStyles<T> = {
 };
 
 export type TransformRecord = Partial<
-  PerpectiveTransform &
+  PerspectiveTransform &
     RotateTransform &
     RotateXTransform &
     RotateYTransform &
@@ -368,7 +366,7 @@ export interface CommonStyleSheet {
   [INTERNAL_RESET](options?: ResetOptions): void;
   [INTERNAL_FLAGS]: Record<string, string>;
   classNameMergeStrategy(c: string): string;
-  unstable_hook_onClassName(c: string): void;
+  unstable_hook_onClassName?(c: string): void;
   register(options: StyleSheetRegisterOptions): void;
   getFlag(name: string): string | undefined;
 }

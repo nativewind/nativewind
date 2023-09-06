@@ -1,113 +1,66 @@
-import { ComponentType, forwardRef, useReducer } from "react";
-import { View, Pressable } from "react-native";
+import { createElement } from "react";
 
-import { ContainerContext } from "./native/misc";
 import { useStyledProps } from "./native/use-computed-props";
-import type {
-  InteropFunction,
-  InteropFunctionOptions,
-  JSXFunction,
-} from "../types";
-import { VariableContext } from "./native/variables";
+import { ComponentContextProvider } from "./native/proxy";
+import { InteropFunction } from "../testing-library";
+import { reactGlobal } from "./signals";
+import { Pressable, View } from "react-native";
 
 export const defaultCSSInterop: InteropFunction = (
+  component,
   options,
-  jsx,
-  type,
   props,
-  key,
-  ...args
+  children,
 ) => {
-  if (!options.useWrapper) {
-    return jsx(type, props, key);
-  }
+  reactGlobal.isInComponent = true;
+  reactGlobal.currentStore = null;
 
-  return jsx(
-    CSSInteropWrapper,
-    {
-      ...props,
-      __component: type,
-      __jsx: jsx,
-      __options: options,
-    },
-    key,
-    ...args,
-  );
-};
+  const { store } = useStyledProps(props, options);
+  const { meta, styledProps } = store.snapshot;
 
-type CSSInteropWrapperProps<P = any> = {
-  __component: ComponentType<P>;
-  __jsx: JSXFunction<P>;
-  __options: InteropFunctionOptions<P>;
-} & P;
-
-export const CSSInteropWrapper = forwardRef(function CSSInteropWrapper(
-  {
-    __component: component,
-    __jsx: jsx,
-    __options: options,
-    ...$props
-  }: CSSInteropWrapperProps,
-  ref,
-) {
-  const rerender = useRerender();
-
-  /**
-   * If the development environment is enabled, we should rerender all components if the StyleSheet updates.
-   * This is because things like :root variables may have updated.
-   */
-  const { styledProps, meta } = useStyledProps($props, jsx, options, rerender);
-
-  const props = {
-    ...$props,
+  props = {
+    ...props,
     ...styledProps,
-    ref,
   };
 
-  // View doesn't support the interaction props, so switch to a Pressable (which accepts ViewProps)
-  if (meta.convertToPressable && !props.$$pressable) {
-    props.$$pressable = true;
-    if (component === View) {
-      component = Pressable as ComponentType<unknown>;
+  for (const source of options.sources) {
+    delete props[source];
+  }
+
+  // View doesn't support the interaction props, so force the component to be a Pressable (which accepts ViewProps)
+  if (meta.convertToPressable) {
+    Object.assign(props, { ___pressable: true });
+    if ((component as any) === View) {
+      component = Pressable;
     }
   }
 
   // Depending on the meta, we may be required to surround the component in other components (like VariableProvider)
   let finalComponent;
 
-  // We call `jsx` directly so we can bypass the polyfill render method
   if (meta.animationInteropKey) {
-    finalComponent = jsx(
+    props = Object.assign(props, {
+      key: meta.animationInteropKey,
+      __component: component,
+      __store: store,
+    });
+
+    finalComponent = createElement(
       require("./native/animations").AnimationInterop,
-      {
-        ...props,
-        __component: component,
-        __meta: meta,
-      },
-      meta.animationInteropKey,
+      props,
+      children,
     );
   } else {
-    finalComponent = jsx(component, props, "react-native-css-interop");
+    finalComponent = createElement(component, props, children);
   }
 
-  if (meta.hasInlineVariables) {
-    finalComponent = jsx(
-      VariableContext.Provider,
-      { value: meta.variables, children: [finalComponent] } as const,
-      "variable",
-    );
-  }
+  reactGlobal.isInComponent = false;
 
-  if (meta.hasInlineContainers) {
-    finalComponent = jsx(
-      ContainerContext.Provider,
-      { value: meta.containers, children: [finalComponent] },
-      "container",
-    );
-  }
-
-  return finalComponent;
-});
-
-export const useRerender = () => useReducer(rerenderReducer, 0)[1];
-const rerenderReducer = (accumulator: number) => accumulator + 1;
+  return [
+    ComponentContextProvider,
+    {
+      value: store.context,
+    },
+    finalComponent,
+  ] as any;
+};

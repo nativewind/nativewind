@@ -6,7 +6,8 @@ import {
   registerCSS,
   resetStyles,
 } from "../testing-library";
-import { useUnstableNativeVariables } from "../runtime/native/variables";
+import { useUnstableNativeVariable } from "../runtime/native/proxy";
+import { memo } from "react";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
@@ -31,8 +32,6 @@ test("combined inline variable", () => {
     .my-class-2 { --my-var: 10px; }
     .my-class-3 { --my-var: 20px; }
   `);
-
-  render(<A className="my-class-1 my-class-2" />);
 
   const component = render(
     <A testID={testID} className="my-class-1 my-class-2" />,
@@ -66,16 +65,53 @@ test("inherit variables", () => {
   );
 
   const a = getByTestId("a");
-  const b = getByTestId("b");
+  let b = getByTestId("b");
+
+  expect(a).toHaveStyle({});
+  expect(b).toHaveStyle({ width: 10 });
+  expect(B.mock).toHaveBeenCalledTimes(1);
+
+  screen.rerender(
+    <A testID="a" className="my-class-3">
+      <B testID="b" className="my-class-1" />
+    </A>,
+  );
+
+  b = getByTestId("b");
+
+  expect(B.mock).toHaveBeenCalledTimes(2);
+  expect(a).toHaveStyle({});
+  expect(b).toHaveStyle({ width: 20 });
+});
+
+test("inherit variables - memo", () => {
+  const B = memo(createMockComponent(View));
+
+  registerCSS(`
+    .my-class-1 { width: var(--my-var); }
+    .my-class-2 { --my-var: 10px; }
+    .my-class-3 { --my-var: 20px; }
+  `);
+
+  const { getByTestId } = render(
+    <A testID="a" className="my-class-2">
+      <B testID="b" className="my-class-1" />
+    </A>,
+  );
+
+  const a = getByTestId("a");
+  let b = getByTestId("b");
 
   expect(a).toHaveStyle({});
   expect(b).toHaveStyle({ width: 10 });
 
   screen.rerender(
-    <A className="my-class-3">
-      <B className="my-class-1" />
+    <A testID="a" className="my-class-3">
+      <B testID="b" className="my-class-1" />
     </A>,
   );
+
+  b = getByTestId("b");
 
   expect(a).toHaveStyle({});
   expect(b).toHaveStyle({ width: 20 });
@@ -100,10 +136,10 @@ test("useUnsafeVariable", () => {
     .my-class { color: var(--my-var); }
   `);
 
-  let variables;
+  let myVar;
 
   const Child = () => {
-    variables = useUnstableNativeVariables();
+    myVar = useUnstableNativeVariable("--my-var");
     return null;
   };
 
@@ -114,5 +150,5 @@ test("useUnsafeVariable", () => {
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({ color: "red" });
-  expect(variables).toEqual({ "--my-var": "red" });
+  expect(myVar).toEqual("red");
 });

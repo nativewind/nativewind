@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react-native";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 import { View } from "react-native";
 
 import {
@@ -8,6 +8,8 @@ import {
 } from "../testing-library";
 
 beforeEach(() => resetStyles());
+
+const grouping = ["^group(/.*)?"];
 
 test("group", async () => {
   const A = createMockComponent(View);
@@ -20,7 +22,7 @@ test("group", async () => {
       color: red;
     }`,
     {
-      grouping: ["^group\\/.*"],
+      grouping,
     },
   );
 
@@ -41,6 +43,38 @@ test("group", async () => {
   expect(getByTestId(testID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
 });
 
+test("group - active", async () => {
+  const A = createMockComponent(View);
+  const B = createMockComponent(View);
+
+  const parentID = "parent";
+  const childID = "child";
+
+  registerCSS(
+    `.group\\/item:active .my-class {
+      color: red;
+    }`,
+    {
+      grouping,
+    },
+  );
+
+  render(
+    <A testID={parentID} className="group/item">
+      <B testID={childID} className="my-class" />
+    </A>,
+  );
+
+  const parent = screen.getByTestId(parentID);
+  const child = screen.getByTestId(childID);
+
+  expect(child).toHaveStyle({});
+
+  fireEvent(parent, "pressIn");
+
+  expect(child).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+});
+
 test("invalid group", async () => {
   const A = createMockComponent(View);
   const B = createMockComponent(View);
@@ -52,7 +86,7 @@ test("invalid group", async () => {
       color: red;
     }`,
     {
-      grouping: ["^group\\/.*"],
+      grouping,
     },
   );
 

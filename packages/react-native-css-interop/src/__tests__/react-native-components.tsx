@@ -16,7 +16,6 @@ import { render as tlRender, screen } from "@testing-library/react-native";
 
 import { registerCSS, resetStyles } from "../testing-library";
 import { render as renderJSX } from "../runtime/render";
-import { OpaqueStyleToken } from "../runtime/native/misc";
 
 const testID = "react-native-css-interop";
 
@@ -61,7 +60,7 @@ test("Component types", () => {
   ];
 });
 
-test.only("ActivityIndicator", () => {
+test("ActivityIndicator", () => {
   registerCSS(
     `.bg-black { background-color: black } .text-white { color: white }`,
   );
@@ -127,25 +126,16 @@ test("FlatList", () => {
   expect(flatList.props).toEqual(
     expect.objectContaining({
       testID,
-      style: new OpaqueStyleToken(),
-      ListFooterComponentStyle: [
-        new OpaqueStyleToken(),
-        new OpaqueStyleToken(),
-      ],
-      ListHeaderComponentStyle: [
-        new OpaqueStyleToken(),
-        new OpaqueStyleToken(),
-      ],
-      contentContainerStyle: new OpaqueStyleToken(),
-      indicatorStyle: new OpaqueStyleToken(),
+      style: {},
+      ListFooterComponentStyle: [{}, {}],
+      ListHeaderComponentStyle: [{}, {}],
+      contentContainerStyle: {},
+      indicatorStyle: {},
     }),
   );
 
   const columnWrapper = screen.UNSAFE_getByProps({ style: null }).props
     .children[0];
 
-  expect(columnWrapper).toHaveStyle([
-    { flexDirection: "row" },
-    new OpaqueStyleToken() as any,
-  ]);
+  expect(columnWrapper).toHaveStyle([{ flexDirection: "row" }, {}]);
 });
