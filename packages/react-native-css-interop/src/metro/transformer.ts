@@ -34,11 +34,21 @@ export function transform(
     cssToReactNativeRuntime(data, config.cssToReactNativeRuntime),
   );
 
-  data = Buffer.from(
-    matchCssModule(filename)
-      ? `module.exports = require("react-native-css-interop").StyleSheet.create(${runtimeData});`
-      : `require("react-native-css-interop").StyleSheet.register(${runtimeData})`,
-  );
+  const isCSSModule = matchCssModule(filename);
+
+  let output = isCSSModule
+    ? `module.exports = require("react-native-css-interop").StyleSheet.create(${runtimeData});`
+    : `require("react-native-css-interop").StyleSheet.register(${runtimeData})`;
+
+  if (options.dev && options.hot && !isCSSModule) {
+    output += `
+const { hostname, protocol } = require("url").parse(require("react-native/Libraries/Core/Devtools/getDevServer")().url,);
+new globalThis.WebSocket(\`\${protocol}//\${hostname}:8089\`).addEventListener("message", (event) => {
+  require("react-native-css-interop").StyleSheet.register(JSON.parse(event.data))
+});`;
+  }
+
+  data = Buffer.from(output);
 
   return worker.transform(config, projectRoot, filename, data, options);
 }

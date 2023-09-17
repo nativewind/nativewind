@@ -1,5 +1,6 @@
 import type { GetTransformOptionsOpts } from "metro-config";
 import loadConfig from "tailwindcss/loadConfig";
+import type { ServerOptions } from "ws";
 
 import path from "node:path";
 import {
@@ -15,6 +16,7 @@ interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
   input?: string;
   output?: string;
   configPath?: string;
+  hotServerOptions?: ServerOptions;
 }
 
 const outputDir = ["node_modules", ".cache", "nativewind"].join(path.sep);
@@ -26,6 +28,9 @@ export function withNativeWind(
     output,
     inlineRem = 14,
     configPath: tailwindConfigPath = "tailwind.config",
+    hotServerOptions = {
+      port: 8089,
+    },
   }: WithNativeWindOptions,
 ) {
   if (!input) {
@@ -96,13 +101,11 @@ export function withNativeWind(
         tailwindHasStarted[platform] = true;
 
         // Generate the styles
-        tailwindCli(input, output, options, true);
-
-        // Watch for style changes. Do this after the initial generation so we can ensure
-        // the output file will always exist
-        if (options.dev && options.hot) {
-          tailwindCli(input, output, options, false);
-        }
+        await tailwindCli(input, {
+          ...options,
+          output,
+          hotServerOptions,
+        });
       }
 
       return previousTransformOptions?.(

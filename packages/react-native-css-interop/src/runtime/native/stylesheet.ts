@@ -25,9 +25,12 @@ import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
 import { colorScheme } from "./color-scheme";
 import { rem } from "./rem";
 import { setDefaultVariable, setRootVariable } from "./proxy";
+import { createSignal } from "../signals";
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
+
+export const forceRerenderSignal = createSignal(0);
 
 const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_FLAGS]: {},
@@ -92,6 +95,8 @@ const commonStyleSheet: CommonStyleSheet = {
         setDefaultVariable(...entry, "dark");
       }
     }
+
+    forceRerenderSignal.set(forceRerenderSignal.get() + 1);
   },
 };
 

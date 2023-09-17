@@ -6,7 +6,9 @@ import { Text, View } from "react-native";
 const App = () => {
   return (
     <View className="flex-1 items-center justify-center bg-[--theme-bg]">
-      <Text className="text-2xl text-[--theme-fg]">Try editing me! 🎉</Text>
+      <Text className="text-2xl text-[--theme-fg] text-bold">
+        Try editing me!! 🎉
+      </Text>
     </View>
   );
 };

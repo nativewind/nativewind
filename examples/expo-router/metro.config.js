@@ -1,5 +1,5 @@
-const { getDefaultConfig } = require("expo/metro-config");
 const path = require("path");
+const { getDefaultConfig } = require("expo/metro-config");
 
 // 1. Enable CSS for Expo.
 const config = getDefaultConfig(__dirname, {

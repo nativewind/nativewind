@@ -198,8 +198,6 @@ function useAnimationAndTransitions<P extends Record<string, unknown>>(
     }
     doAnimation(transitionProps, transitionValues);
     doAnimation(animationProps, animationValues);
-
-    console.log(JSON.stringify(result));
     return result;
   }, [...transitionValues, ...animationValues, sharedStyle]);
 

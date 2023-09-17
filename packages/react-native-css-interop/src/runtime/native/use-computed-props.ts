@@ -18,7 +18,7 @@ import {
   StyleMeta,
   StyleProp,
 } from "../../types";
-import { StyleSheet, getGlobalStyle } from "./stylesheet";
+import { StyleSheet, forceRerenderSignal, getGlobalStyle } from "./stylesheet";
 import {
   testContainerQuery,
   testMediaQuery,
@@ -147,6 +147,7 @@ function createStyledEffectStore<P extends Record<string, unknown>>(
 
         // Setup the store to be the current signal context
         setupStore(store);
+        forceRerenderSignal.get();
 
         store.regenerateStyles = false;
         store.snapshot = processStyles<P>(store.props, store, options);

@@ -1,75 +1,27 @@
-import { spawn, spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
+import { ServerOptions, WebSocketServer, WebSocket } from "ws";
 import type { GetTransformOptionsOpts } from "metro-config";
+import {
+  cssToReactNativeRuntime,
+  CssToReactNativeRuntimeOptions,
+} from "react-native-css-interop/css-to-rn";
+import { writeFileSync } from "node:fs";
 
-export function tailwindCli(
-  input: string,
-  output: string,
-  options: GetTransformOptionsOpts,
-  watch: boolean,
-) {
-  const spawnCommands = [
-    "tailwindcss",
-    "--input",
-    input,
-    "--output",
-    getOutput(output, options),
-  ];
+export interface TailwindCliOptions extends GetTransformOptionsOpts {
+  output: string;
+  hotServerOptions: ServerOptions;
+  cssToReactNativeRuntime?: CssToReactNativeRuntimeOptions;
+}
+
+export function tailwindCli(input: string, options: TailwindCliOptions) {
+  let done: () => void;
+  const deferred = new Promise<void>((resolve) => (done = resolve));
 
   const env = {
     ...process.env,
     NATIVEWIND_NATIVE: options.platform !== "web" ? "1" : undefined,
   };
 
-  if (watch) {
-    spawnCommands.push("--watch", "--poll");
-    watchCli(spawnCommands, env, options);
-  } else {
-    cli(spawnCommands, env, options);
-  }
-}
-
-function watchCli(
-  spawnCommands: string[],
-  env: NodeJS.ProcessEnv,
-  options: GetTransformOptionsOpts,
-) {
-  const platform = options.platform === "web" ? "web" : "native";
-  const cli = spawn("npx", spawnCommands, {
-    shell: true,
-    env,
-  });
-  let skipFirst = true;
-  cli.stderr.on("data", (data: Buffer) => {
-    const start = Date.now();
-
-    const message = data.toString().trim();
-    const isDone = message.includes("Done");
-
-    if (!message) return;
-    if (isDone) {
-      if (skipFirst) {
-        skipFirst = false;
-        return;
-      }
-
-      const timeMatch = message.match(/\d+/);
-      const time = Number.parseInt(timeMatch ? timeMatch[0] : "0", 10);
-      const total = time + (Date.now() - start);
-      console.error(`tailwindcss(${platform}) rebuilt in ${total}ms`);
-    } else if (
-      !message.startsWith("[Browserslist] Could not parse") &&
-      !message.includes("Rebuilding")
-    ) {
-      console.error(`tailwindcss(${platform}) ${message}`);
-    }
-  });
-}
-
-function cli(
-  spawnCommands: string[],
-  env: NodeJS.ProcessEnv,
-  options: GetTransformOptionsOpts,
-) {
   const platform = options.platform === "web" ? "web" : "native";
   process.stdout.write(`tailwindcss(${platform}) rebuilding... `);
 
@@ -82,12 +34,53 @@ function cli(
     // 1 minute.
   }, 60000);
 
-  const { stderr } = spawnSync("npx", spawnCommands, {
+  const spawnCommands = ["tailwindcss", "--input", input];
+
+  const connections = new Set<WebSocket>();
+  let latestData: string | undefined;
+
+  if (options.dev && options.platform !== "web") {
+    spawnCommands.push("--watch", "--poll");
+    const wss = new WebSocketServer(options.hotServerOptions);
+    wss.on("connection", (ws) => {
+      connections.add(ws);
+      ws.on("close", () => connections.delete(ws));
+      if (latestData) {
+        ws.send(latestData);
+      }
+    });
+  }
+
+  const now = Date.now();
+  const { stdout } = spawn("npx", spawnCommands, {
     shell: true,
     env,
   });
-  clearTimeout(timeout);
-  console.log(`${stderr.toString().replace("\nRebuilding...\n\n", "").trim()}`);
+
+  let firstRun = true;
+
+  stdout.on("data", (css) => {
+    clearTimeout(timeout);
+
+    const runtimeData = JSON.stringify(
+      cssToReactNativeRuntime(css, options.cssToReactNativeRuntime),
+    );
+
+    latestData = runtimeData;
+
+    if (firstRun) {
+      console.log(`done in ${Date.now() - now}ms`);
+      firstRun = false;
+      writeFileSync(getOutput(options.output, options), css, "utf-8");
+      done();
+    } else {
+      for (const ws of connections) {
+        ws.send(runtimeData);
+      }
+    }
+  });
+
+  return deferred;
 }
 
 export function getOutput(output: string, options: GetTransformOptionsOpts) {

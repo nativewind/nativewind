@@ -34,6 +34,8 @@ type CSSInteropAtRule = {
   };
 };
 
+export type { CssToReactNativeRuntimeOptions };
+
 /**
  * Converts a CSS file to a collection of style declarations that can be used with the StyleSheet API
  *
