@@ -1,4 +1,4 @@
-POST localhost:3000/api/compile
+POST nativewind.dev/api/compile
 content-type: application/json
 
 {

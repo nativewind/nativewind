@@ -4,7 +4,7 @@ import tailwindcssContainerQueries from "@tailwindcss/container-queries";
 import { preset } from "nativewind/preset";
 import { cssToReactNativeRuntime } from "react-native-css-interop/css-to-rn";
 
-import "lightningcss-linux-x64-gnu/lightningcss.linux-x64-gnu.node";
+import "lightningcss/lightningcss.linux-x64-gnu.node";
 
 const handler: VercelApiHandler = async (request, response) => {
   if (request.method !== "POST") {
@@ -24,7 +24,7 @@ const handler: VercelApiHandler = async (request, response) => {
       plugins: [tailwindcssContainerQueries],
       content: [{ raw: request.body.content, extension: "html" }],
     }),
-  ]).process("@tailwind base;@tailwind components;@tailwind utilities;", {
+  ]).process("@tailwind components;@tailwind utilities;", {
     from: undefined,
   });
 
