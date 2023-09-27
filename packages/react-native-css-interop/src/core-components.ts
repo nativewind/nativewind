@@ -26,7 +26,6 @@ import type {
   ComponentTypeWithMapping,
   EnableCssInteropOptions,
   InteropFunction,
-  JSXFunction,
 } from "./types";
 import { getNormalizeConfig } from "./runtime/native/prop-mapping";
 import { getGlobalStyle } from "./runtime/native/stylesheet";
@@ -34,7 +33,6 @@ import { opaqueStyles, styleMetaMap } from "./runtime/native/misc";
 
 export function unstable_styled<P extends object, M>(
   component: ComponentType<P>,
-  jsx: JSXFunction<P>,
   mapping?: EnableCssInteropOptions<P> & M,
   interop: InteropFunction = defaultCSSInterop,
 ) {
@@ -42,8 +40,16 @@ export function unstable_styled<P extends object, M>(
     globalCssInterop(component, mapping, interop);
   }
 
-  return forwardRef<unknown, P>((props, _ref) => {
-    return render(jsx, component, props as any, "");
+  return forwardRef<unknown, any>((props, _ref) => {
+    return render<any>(
+      (element, { children, ...props }, key) => {
+        children = Array.isArray(children) ? children : [children];
+        return createElement(element, { key, ...props }, ...children);
+      },
+      component,
+      props as any,
+      props.key,
+    );
   }) as unknown as ComponentTypeWithMapping<P, M>;
 }
 

@@ -53,31 +53,22 @@ if (Platform.OS === "web") {
   };
 }
 
-const render = (element, { children, ...props }, key) => {
-  children = Array.isArray(children) ? children : [children];
-  return createElement(element, { key, ...props }, ...children);
-};
-export const View = unstable_styled(RNView, render);
-export const Text = unstable_styled(RNText, render);
-export const Pressable = unstable_styled(RNPressable, render);
+export const View = unstable_styled(RNView, { className: "style" });
+export const Text = unstable_styled(RNText, { className: "style" });
+export const Pressable = unstable_styled(RNPressable, { className: "style" });
 
 export function withExpoSnack(Component) {
   return function WithExpoSnack() {
     const [, rerender] = useState(false);
-    useEffect(() => {
-      return tailwindScript?.addEventListener("load", () => {
-        rerender(true);
-      });
-    }, []);
-
-    return Platform.OS === "web" ? (
-      tailwindScriptLoaded ? (
-        <Component />
-      ) : (
-        <></>
-      )
-    ) : (
-      <Component />
+    useEffect(
+      () => tailwindScript?.addEventListener("load", () => rerender(true)),
+      [],
     );
+
+    if (Platform.OS !== "web") {
+      return <Component />;
+    } else {
+      return tailwindScriptLoaded ? <Component /> : <></>;
+    }
   };
 }
