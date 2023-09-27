@@ -6,27 +6,16 @@ import tailwindcssContainerQueries from "@tailwindcss/container-queries";
 import { preset } from "nativewind/preset";
 import { cssToReactNativeRuntime } from "react-native-css-interop/css-to-rn";
 
-const lightningcss = path.join(
+const forceLightningcssToBeBundled = path.join(
   process.cwd(),
   "node_modules/lightningcss/lightningcss.linux-x64-gnu.node",
 );
 
-const preflight = path.join(
-  process.cwd(),
-  "node_modules/tailwindcss/lib/css/preflight.css",
-);
-
 const handler: VercelApiHandler = async (request, response) => {
   if (request.method !== "POST") {
-    if (!existsSync(lightningcss)) {
+    if (!existsSync(forceLightningcssToBeBundled)) {
       response.status(200).json({
         error: "lightningcss",
-      });
-    }
-
-    if (!existsSync(preflight)) {
-      response.status(200).json({
-        error: "preflight",
       });
     }
 
