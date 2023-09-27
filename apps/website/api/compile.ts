@@ -1,13 +1,25 @@
+import path from "path";
+import { existsSync } from "fs";
 import postcss from "postcss";
 import tailwind from "tailwindcss";
 import tailwindcssContainerQueries from "@tailwindcss/container-queries";
 import { preset } from "nativewind/preset";
 import { cssToReactNativeRuntime } from "react-native-css-interop/css-to-rn";
 
-import "lightningcss/lightningcss.linux-x64-gnu.node";
+const file = path.join(
+  process.cwd(),
+  "node_modules",
+  "lightningcss/lightningcss.linux-x64-gnu.node",
+);
 
 const handler: VercelApiHandler = async (request, response) => {
   if (request.method !== "POST") {
+    if (!existsSync(file)) {
+      response.status(200).json({
+        error: true,
+      });
+    }
+
     response.status(400).end();
     return;
   }
