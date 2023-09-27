@@ -1,6 +1,5 @@
 const snackJS = `import { createElement, useState, useEffect } from "react";
-import { StyleSheet } from "nativewind"
-import { unstable_styled } from "react-native-css-interop"
+import { StyleSheet, unstable_styled } from "react-native-css-interop"
 import {
   Platform,
   Text as RNText,

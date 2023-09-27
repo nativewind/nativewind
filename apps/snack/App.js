@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text, Pressable, withExpoSnack } from "./expo-snack";
 import { vars } from "nativewind";
 

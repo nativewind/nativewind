@@ -1,16 +1,14 @@
+import React from "react";
 import { parse } from "url";
 import { createElement, useState, useEffect } from "react";
-import { StyleSheet } from "nativewind";
+import { StyleSheet, unstable_styled } from "react-native-css-interop";
 import getDevServer from "react-native/Libraries/Core/Devtools/getDevServer";
-import { unstable_styled } from "react-native-css-interop";
 import {
   Platform,
   Text as RNText,
   View as RNView,
   Pressable as RNPressable,
 } from "react-native";
-
-const { hostname } = parse(getDevServer().url);
 
 /*
 Expo Snack does not allow setting the JSX runtime to automatic, or running a custom server.
@@ -39,21 +37,26 @@ if (Platform.OS === "web") {
 
     if (!content) return;
 
-    fetch(`http:${hostname}:3000/api/compile`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    fetch(
+      `https://nativewind.nativewind-1gheteii1-mwlawlor.vercel.app/api/compile`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content }),
       },
-      body: JSON.stringify({ content }),
-    })
-      .then((response) => response.json())
+    )
+      .then((response) => response.text())
       .then((body) => {
+        console.log(body);
         content.split(" ").forEach((c) => alreadyProcessed.add(c));
         StyleSheet.register(body);
       })
-      .catch(() =>
-        console.error("Error connecting to NativeWind snack server"),
-      );
+      .catch((error) => {
+        console.log(error);
+        console.error("Error connecting to NativeWind snack server");
+      });
   };
 }
 

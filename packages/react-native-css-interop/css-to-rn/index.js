@@ -1,1 +1,1 @@
-module.exports = require("../dist/css-to-rn");
+module.exports = require("../dist/css-to-rn/index");
