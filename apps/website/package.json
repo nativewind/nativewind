@@ -41,5 +41,8 @@
     "@types/babel__standalone": "7.1.4",
     "@types/lodash.debounce": "4.0.7",
     "sass": "^1.64.1"
+  },
+  "peerDependencies": {
+    "react-native-css-interop": "*"
   }
 }
