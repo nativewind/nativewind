@@ -1,8 +1,6 @@
 import React from "react";
-import { parse } from "url";
 import { createElement, useState, useEffect } from "react";
 import { StyleSheet, unstable_styled } from "react-native-css-interop";
-import getDevServer from "react-native/Libraries/Core/Devtools/getDevServer";
 import {
   Platform,
   Text as RNText,
