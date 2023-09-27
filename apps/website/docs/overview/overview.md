@@ -6,27 +6,22 @@ NativeWind allows you to use [Tailwind CSS](https://tailwindcss.com) to style yo
 
 NativeWind processes your styles during your application's build step and uses a minimal runtime to selectively apply responsive styles (eg changes to device orientation, color scheme).
 
-```tsx
-import { Text, View } from "react-native";
-import { Component } from "third-party-library";
-
-const App = () => {
-  return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-slate-800">Styling just works! 🎉</Text>
-      <Component className="text-slate-800">
-        You can style 3rd party components
-      </Component>
-    </View>
-  );
-};
-```
-
 ```SnackPlayer name=Hello%20World&version=4
+import { vars } from "nativewind"
+
+const theme = vars({
+  "--theme-fg": "black",
+});
+
 const App = () => {
   return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-slate-800">Try editing me! 🎉</Text>
+    <View
+      className="flex-1 items-center justify-center"
+      style={theme}
+    >
+      <Text className="text-[--theme-fg]">
+        Try editing me! 🎉
+      </Text>
     </View>
   );
 }

@@ -1,4 +1,4 @@
-POST http://localhost:3000/api/test HTTP/1.1
+POST https://trauma-arg-matrix-warranties.trycloudflare.com/api/compile
 content-type: application/json
 
 {

@@ -1,4 +1,5 @@
-<details style={{ width: 500 }}><summary>Legend</summary>
+<details style={{ width: 500 }}>
+  <summary>Legend</summary>
 
 ### Class
 

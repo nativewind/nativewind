@@ -225,3 +225,7 @@ html[data-theme="light"] {
     width: var(--ifm-scrollbar-size);
   }
 }
+
+html:where([data-theme='dark']) {
+  --docusaurus-highlighted-code-line-bg: rgba(100 100 100/ 25%);
+}

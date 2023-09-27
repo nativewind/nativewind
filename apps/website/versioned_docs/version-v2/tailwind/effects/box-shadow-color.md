@@ -1,4 +1,4 @@
-mport Compatibility from "../\_compatibility.mdx"
+import Compatibility from "../\_compatibility.mdx"
 import Usage from "../\_usage.mdx"
 
 # Box Shadow Color

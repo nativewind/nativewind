@@ -2,8 +2,8 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
+const vsLight = require("prism-react-renderer/themes/vsLight");
+const vsDark = require("prism-react-renderer/themes/vsDark");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -68,6 +68,12 @@ const config = {
         indexName: "nativewind",
         contextualSearch: true,
       },
+      prism: {
+        defaultLanguage: "tsx",
+        theme: vsLight,
+        darkTheme: vsDark,
+        additionalLanguages: ["css", "diff"],
+      },
       docs: {
         sidebar: {
           autoCollapseCategories: false,
@@ -76,7 +82,6 @@ const config = {
       colorMode: {
         respectPrefersColorScheme: true,
       },
-
       // announcementBar: {
       //   content:
       //     '<a href="/v4/overview">NativeWind v4.0 is currently in alpha. Click here to see the docs</a>',
@@ -110,10 +115,6 @@ const config = {
           },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Mark Lawlor. Built with Docusaurus.`,
-      },
-      prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
       },
     }),
 };

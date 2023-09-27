@@ -1,9 +1,9 @@
 # Other bundlers
 
-NativeWind provides installation instructions for the two most common bundlers, Metro and Next.js. However, you can use NativeWind with any bundler. To use NativeWind, three conditions need to be met:
+NativeWind provides installation instructions for the two most common React Native bundlers, Metro and Next.js. but you can use NativeWind with any bundler. To use NativeWind, three conditions need to be met:
 
-1. Tailwind CSS is setup, with the NativeWind preset
-1. React Native is working correctly (using React Native Web >=0.17 for web)
+1. Tailwind CSS is setup with the NativeWind preset
+1. React Native is setup and you are using React Native Web >=0.17
 1. The JSX runtime is changed to `'automatic'` and `jsxImportSource` set to `'nativewind'`
 
 ## Troubleshooting Web bundlers
@@ -29,7 +29,3 @@ Replace your `View` with
 ```tsx
 <View className="w-10 h-10 bg-blue-500" />
 ```
-
-## Native bundlers
-
-Metro is the only supported native bundler.

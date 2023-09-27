@@ -2,15 +2,7 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import NPM from "../_npm.mdx";
 
-# React Native
-
-:::info
-
-NativeWind works with both Expo and Vanilla React Native projects but Expo provides a more streamlined experience.
-
-**Web**: If you wish to use Metro to bundle for website or App Clip and you are **not** using Expo, you will need either: Expo's Metro config `@expo/metro-config` or manually use Tailwind CLI to generate a CSS file.
-
-:::
+# Expo Router
 
 ## Installation
 
@@ -30,7 +22,7 @@ Add the paths to all of your component files in your tailwind.config.js file.
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 - content: [],
-+ content: ["./App.{js,jsx,ts,tsx}", "./<custom-folder>/**/*.{js,jsx,ts,tsx}"],
++ content: ["./app/**/*.{js,jsx,ts,tsx}", "./<custom-folder>/**/*.{js,jsx,ts,tsx}"],
 + preset: [require("nativewind/preset")],
   theme: {
     extend: {},
@@ -55,9 +47,6 @@ From here onwards, replace `./your-css-file.css` with the relative path to the C
 
 ### 3. Add the Babel preset
 
-<Tabs groupId="framework">
-  <TabItem value="expo" label="Expo">
-
 ```diff title="babel.config.js"
 module.exports = {
 - presets: ['babel-preset-expo'],
@@ -65,23 +54,12 @@ module.exports = {
 };
 ```
 
-</TabItem>
-<TabItem value="vanilla" label="Vanilla">
-
-```diff title="babel.config.js"
-module.exports = {
-- presets: ['<existing presets>'],
-+ presets: ['<existing presets>', 'nativewind/babel'],
-};
-```
-
-</TabItem>
-</Tabs>
-
 ### 4. Modify your metro.config.js
 
-<Tabs groupId="framework">
-<TabItem value="Expo SDK 50">
+If your project does not have a `metro.config.js` run `npx expo customize metro.config.js`
+
+<Tabs>
+<TabItem value="SDK 50+">
 
 ```diff title="metro.config.js"
 const { getDefaultConfig } = require("expo/metro-config");
@@ -94,7 +72,7 @@ const config = getDefaultConfig(__dirname)
 ```
 
 </TabItem >
-<TabItem value="Expo SDK 49">
+<TabItem value="SDK <= 49">
 
 ```diff title="metro.config.js"
 const { getDefaultConfig } = require("expo/metro-config");
@@ -108,26 +86,15 @@ const { getDefaultConfig } = require("expo/metro-config");
 ```
 
 </TabItem>
-  <TabItem value="vanilla" label="Vanilla">
 
-```diff title="metro.config.js"
-+ const { withNativeWind } = require('nativewind/metro')
-
-const config = {/* your config */}
-
-- module.exports = config
-+ module.exports = withNativeWind(config, { input: './your-css-file.css'})
-```
-
-</TabItem>
 </Tabs>
 
 ### 5. Import your CSS file
 
-```diff title=App.js
+```diff title="app/_layout.js"
+import Slot from "expo-router/Slot";
 + import "./<your-css-file>.css"
 
-export default App() {
-  /* Your App */
-}
+export default Slot
+
 ```

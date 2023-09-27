@@ -10,9 +10,7 @@ Simply configure Next.js as per [the Tailwind CSS Next.js setup guide](https://t
 
 ## 2. Add the NativeWind preset
 
-NativeWind adds some extra Tailwind features such as platform variants.
-
-```diff title=tailwind.config.js
+```diff title="tailwind.config.js"
 
 module.exports = {
   content: [
@@ -29,7 +27,7 @@ module.exports = {
 
 Next.js uses a `jsconfig.json`/`tsconfig.json` file to configure the `jsxImportSource`.
 
-```json title=tsconfig.json
+```json title="tsconfig.json"
 {
   "compilerOptions": {
     "jsxImportSource": "nativewind"
@@ -45,7 +43,7 @@ This signals that you have incorrectly setup React Native Web and most likely ne
 
 ### Styles are not being applied
 
-A common issue with Next.js is your styles are imported, but are being overridden by another StyleSheet due to the order stylesheet imports.
+A common issue with Next.js is your styles are imported, but are being overridden by another StyleSheet due to the stylesheet import order.
 
 A simple fix is simply make the Tailwind styles a higher specificity.
 

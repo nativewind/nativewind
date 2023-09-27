@@ -5,12 +5,9 @@
  */
 
 "use strict";
-const visit = require("unist-util-visit-parents");
-const u = require("unist-builder");
-const dedent = require("dedent");
 
-const { processNodeV2 } = require("./snack-v2");
-const { processNodeV4 } = require("./snack-v4");
+const processNodeV2 = require("./snack-v2");
+const processNodeV4 = require("./snack-v4");
 
 const processNode = (node, parent) => {
   const searchParams = new URLSearchParams(node.meta);
@@ -20,20 +17,18 @@ const processNode = (node, parent) => {
 };
 
 const SnackPlayer = () => {
-  return (tree) =>
-    new Promise(async (resolve, reject) => {
-      const nodesToProcess = [];
-      // Parse all CodeBlocks
-      visit(tree, "code", (node, parent) => {
-        // Add SnackPlayer CodeBlocks to processing queue
-        if (node.lang == "SnackPlayer") {
-          nodesToProcess.push(processNode(node, parent));
-        }
-      });
-
-      // Wait for all promises to be resolved
-      Promise.all(nodesToProcess).then(resolve()).catch(reject());
+  return async (tree) => {
+    const { visitParents: visit } = await import(
+      "unist-util-visit-parents/lib/index.js"
+    );
+    const nodesToProcess = [];
+    visit(tree, "code", (node, parent) => {
+      if (node.lang === "SnackPlayer") {
+        nodesToProcess.push(processNode(node, parent));
+      }
     });
+    await Promise.all(nodesToProcess);
+  };
 };
 
 module.exports = SnackPlayer;

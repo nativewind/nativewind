@@ -26,6 +26,7 @@ const sidebars = {
       collapsed: false,
       items: [
         "getting-started/metro",
+        "getting-started/expo-router",
         "getting-started/nextjs",
         "getting-started/typescript",
         "getting-started/other-bundlers",
