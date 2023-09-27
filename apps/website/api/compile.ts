@@ -41,10 +41,13 @@ const handler: VercelApiHandler = async (request, response) => {
 
   let { css: output } = await postcss([
     tailwind({
-      theme: {},
+      theme: {,
       presets: [preset as any],
       plugins: [tailwindcssContainerQueries],
       content: [{ raw: request.body.content, extension: "html" }],
+      corePlugins: {
+        preflight: false
+      }
     }),
   ]).process("@tailwind components;@tailwind utilities;", {
     from: undefined,
