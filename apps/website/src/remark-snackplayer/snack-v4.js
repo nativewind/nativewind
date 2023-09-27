@@ -32,9 +32,7 @@ if (Platform.OS === "web") {
 
     if (!content) return;
 
-    fetch(\`https://${
-      process.env.TUNNEL ?? process.env.VERCEL_URL
-    }/api/compile\`, {
+    fetch("https://${process.env.VERCEL_URL}/api/compile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,9 +44,9 @@ if (Platform.OS === "web") {
         content.split(" ").forEach((c) => alreadyProcessed.add(c));
         StyleSheet.register(body);
       })
-      .catch(() =>
-        console.error("Error connecting to NativeWind snack server"),
-      );
+      .catch((error) => {
+        console.error("Error connecting to NativeWind snack server");
+      });
   }
 }
 

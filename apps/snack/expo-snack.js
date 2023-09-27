@@ -37,24 +37,19 @@ if (Platform.OS === "web") {
 
     if (!content) return;
 
-    fetch(
-      `https://nativewind.nativewind-1gheteii1-mwlawlor.vercel.app/api/compile`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content }),
+    fetch(`https://nativewind.dev/api/compile`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    )
-      .then((response) => response.text())
+      body: JSON.stringify({ content }),
+    })
+      .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         content.split(" ").forEach((c) => alreadyProcessed.add(c));
         StyleSheet.register(body);
       })
       .catch((error) => {
-        console.log(error);
         console.error("Error connecting to NativeWind snack server");
       });
   };
