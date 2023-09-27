@@ -33,7 +33,9 @@ if (Platform.OS === "web") {
 
     if (!content) return;
 
-    fetch(\`${process.env.TUNNEL ?? process.env.VERCEL_URL}/api/compile\`, {
+    fetch(\`https://${
+      process.env.TUNNEL ?? process.env.VERCEL_URL
+    }/api/compile\`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
