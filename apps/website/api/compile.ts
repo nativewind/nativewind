@@ -4,7 +4,7 @@ import tailwindcssContainerQueries from "@tailwindcss/container-queries";
 import { preset } from "nativewind/preset";
 import { cssToReactNativeRuntime } from "react-native-css-interop/css-to-rn";
 
-import "lightningcss/node/lightningcss.linux-x64-gnu.node";
+import "lightningcss-linux-x64-gnu/lightningcss.linux-x64-gnu.node";
 
 const handler: VercelApiHandler = async (request, response) => {
   if (request.method !== "POST") {
