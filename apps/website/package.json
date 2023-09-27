@@ -16,11 +16,13 @@
   "dependencies": {
     "@docusaurus/core": "3.0.0-beta.0",
     "@docusaurus/preset-classic": "3.0.0-beta.0",
-    "docusaurus-plugin-sass": "0.2.3",
     "@mdx-js/react": "2.3.0",
+    "docusaurus-plugin-sass": "0.2.3",
+    "lightningcss-linux-x64-gnu": "1.21.5",
     "nativewind": "4.0.0-alpha.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-native-css-interop": "0.0.0-alpha.6",
     "react-twitter-embed": "4.0.4",
     "sass": "1.63.6",
     "tailwindcss": "3.3.3"
@@ -41,9 +43,5 @@
     "@types/babel__standalone": "7.1.4",
     "@types/lodash.debounce": "4.0.7",
     "sass": "^1.64.1"
-  },
-  "peerDependencies": {
-    "lightningcss-linux-x64-gnu": "*",
-    "react-native-css-interop": "*"
   }
 }
