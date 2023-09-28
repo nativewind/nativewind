@@ -141,7 +141,7 @@ export default withExpoSnack(App);`;
   const deviceIos = params.deviceIos || "iphone12";
   const dependencies =
     params.dependencies ||
-    "react,react-native,react-native-reanimated@3.3.0,nativewind@4.0.0-alpha.7";
+    "react,react-native,react-native-reanimated@3.3.0,nativewind@4.0.0-alpha.8";
 
   // Need help constructing this AST node?
   // Use the MDX Playground and explore what your output mdast should look like
