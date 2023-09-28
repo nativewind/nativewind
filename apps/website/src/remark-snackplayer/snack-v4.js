@@ -1,4 +1,4 @@
-import { version } from "nativewind/package.json";
+const { version } = require("nativewind/package.json");
 const snackJS = `import { createElement, useState, useEffect } from "react";
 import { StyleSheet, unstable_styled } from "nativewind"
 import {
