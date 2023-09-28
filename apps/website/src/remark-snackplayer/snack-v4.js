@@ -105,7 +105,8 @@ async function toJsxNode(node) {
     node.value = `\n${node.value}`;
   }
 
-  const appCode = `import { View, Text, withExpoSnack } from "./expo-snack"
+  const appCode = `// In your own projects, import from 'react-native' instead.
+import { View, Text, withExpoSnack } from "./expo-snack"
 ${node.value}
 
 /*
