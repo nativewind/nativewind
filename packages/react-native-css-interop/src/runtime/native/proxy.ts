@@ -114,12 +114,13 @@ export function createCSSVariableSignal<T = ExtractedStyleValue>(
       );
     },
     set(nextValue: T | undefined) {
-      if (nextValue !== undefined && signal.peek() === undefined) {
+      if (nextValue !== undefined) {
         for (const subscription of signal.subscriptions) {
           defaultVariables[key]?.unsubscribe(subscription);
           parent.variables[key]?.unsubscribe(subscription);
         }
       }
+      console.log("---", nextValue);
       signal.set(nextValue);
     },
   };

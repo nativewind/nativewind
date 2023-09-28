@@ -81,6 +81,13 @@ export function useStyledProps<P extends Record<string, unknown>>(
   // If a dependency has changed, mark the store as dirty
   store.checkDependencies(inheritedContext);
 
+  // Sync with the store. If the store is dirty, it will recompute the styles
+  const value = useSyncExternalStore(
+    store.subscribe,
+    store.getSnapshot,
+    store.getSnapshot,
+  );
+
   // If there are any delayedEffects, run them
   useEffect(() => {
     if (reactGlobal.delayedEffects.size) {
@@ -90,13 +97,6 @@ export function useStyledProps<P extends Record<string, unknown>>(
       reactGlobal.delayedEffects.clear();
     }
   }, [reactGlobal.delayedEffects.size]);
-
-  // Sync with the store. If the store is dirty, it will recompute the styles
-  const value = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getSnapshot,
-  );
 
   return {
     store,

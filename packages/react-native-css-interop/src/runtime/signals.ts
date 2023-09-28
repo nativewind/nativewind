@@ -29,6 +29,7 @@ export function createSignal<T = unknown>(value: T) {
       return value;
     },
     set(nextValue: T) {
+      console.log(nextValue, signal.subscriptions.size);
       if (Object.is(value, nextValue)) return;
       value = nextValue;
       if (reactGlobal.isInComponent) {
