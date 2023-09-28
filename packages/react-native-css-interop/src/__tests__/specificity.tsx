@@ -6,11 +6,26 @@ import {
   registerCSS,
   resetStyles,
 } from "../testing-library";
+import { specificityCompare } from "../runtime/specificity";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
 
 beforeEach(() => resetStyles());
+
+test(specificityCompare.name, () => {
+  expect(
+    [
+      { A: 0, B: 1, C: 0, I: 0, S: 1, O: 0 },
+      { A: 0, B: 1, C: 0, I: 0, S: 1, O: 1 },
+      { inline: 1 },
+    ].sort(specificityCompare),
+  ).toEqual([
+    { A: 0, B: 1, C: 0, I: 0, S: 1, O: 0 },
+    { A: 0, B: 1, C: 0, I: 0, S: 1, O: 1 },
+    { inline: 1 },
+  ]);
+});
 
 test("inline styles", () => {
   registerCSS(`.red { background-color: red; }`);
@@ -73,6 +88,21 @@ test("important - no wrapper", () => {
   expect(component).toHaveStyle([
     { color: "rgba(255, 0, 0, 1)" },
     { color: "rgba(0, 0, 255, 1)" },
+  ]);
+});
+
+test("important - inline", () => {
+  registerCSS(`
+    .blue { background-color: blue !important; }
+  `);
+
+  const component = render(
+    <A testID={testID} className="blue" style={{ backgroundColor: "red" }} />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle([
+    { backgroundColor: "red" },
+    { backgroundColor: "rgba(0, 0, 255, 1)" },
   ]);
 });
 

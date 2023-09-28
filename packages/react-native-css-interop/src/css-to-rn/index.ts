@@ -476,7 +476,7 @@ function getExtractedStyles(
   if (declarationBlock.declarations && declarationBlock.declarations.length) {
     extractedStyles.push(
       declarationsToStyle(declarationBlock.declarations, options, {
-        I: 2,
+        I: 0,
         S: 1,
         O: options.appearanceOrder,
       }),
@@ -489,7 +489,7 @@ function getExtractedStyles(
   ) {
     extractedStyles.push(
       declarationsToStyle(declarationBlock.importantDeclarations, options, {
-        I: 6,
+        I: 1,
         S: 1,
         O: options.appearanceOrder,
       }),

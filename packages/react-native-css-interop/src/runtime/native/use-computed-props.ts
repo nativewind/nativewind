@@ -189,9 +189,11 @@ function processStyles<P extends Record<string, unknown>>(
   let dynamicStyles = false;
 
   for (const [key, { sources, nativeStyleToProp }] of options.config) {
-    let rawStyles = [];
-    let stylesToFlatten;
     dynamicStyles ||= Boolean(nativeStyleToProp);
+
+    const prop = props[key] as StyleProp;
+    let stylesToFlatten: StyleProp = [];
+    if (prop) stylesToFlatten.push(prop);
 
     for (const sourceProp of sources) {
       const source = props?.[sourceProp];
@@ -200,47 +202,37 @@ function processStyles<P extends Record<string, unknown>>(
       StyleSheet.unstable_hook_onClassName?.(source);
 
       for (const className of source.split(/\s+/)) {
-        const style = getGlobalStyle(className);
-        if (style !== undefined) {
-          if (Array.isArray(style)) {
-            rawStyles.push(...style);
-            dynamicStyles ||= style.some((s: any) => styleMetaMap.has(s));
-          } else {
-            rawStyles.push(style);
-            dynamicStyles ||= styleMetaMap.has(style as any);
-          }
+        let styles = getGlobalStyle(className);
+        if (!styles) continue;
+
+        if (!Array.isArray(styles)) {
+          styles = [styles];
+        }
+
+        for (const style of styles) {
+          stylesToFlatten.push(style);
         }
       }
     }
 
-    const prop = props[key];
-    const existingStyles = Array.isArray(prop) ? prop : [prop];
+    dynamicStyles ||= stylesToFlatten.some((s) => s && styleMetaMap.has(s));
 
-    for (const existingStyle of existingStyles) {
-      const style = getGlobalStyle(existingStyle);
-      if (style !== undefined) {
-        if (Array.isArray(style)) {
-          rawStyles.push(...style);
-          dynamicStyles ||= style.some((s: any) => styleMetaMap.has(s));
-        } else {
-          rawStyles.push(style);
-          dynamicStyles ||= styleMetaMap.has(style as any);
-        }
-      }
+    stylesToFlatten = stylesToFlatten.sort(
+      styleSpecificityCompareFn(dynamicStyles ? "desc" : "asc"),
+    );
+
+    if (stylesToFlatten.length === 1) {
+      stylesToFlatten = stylesToFlatten[0] as StyleProp;
     }
 
-    if (rawStyles.length > 1) {
-      stylesToFlatten = rawStyles.sort(styleSpecificityCompareFn);
-    } else {
-      stylesToFlatten = rawStyles[0];
+    if (!stylesToFlatten) continue;
+
+    if (!dynamicStyles) {
+      styledProps[key] = Object.freeze(stylesToFlatten);
+      continue;
     }
 
-    const style = dynamicStyles
-      ? flattenStyle(stylesToFlatten, store)
-      : stylesToFlatten;
-
-    if (!style || Array.isArray(style)) continue;
-
+    const style = flattenStyle(stylesToFlatten, store);
     const meta = styleMetaMap.get(style);
 
     if (meta) {
@@ -390,6 +382,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
   store: StyledEffectStore<P>,
   options: FlattenStyleOptions = {},
   flatStyle: Style = {},
+  depth = 0,
 ): Style {
   if (!style) {
     return flatStyle;
@@ -397,7 +390,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
 
   if (Array.isArray(style)) {
     for (const s of style) {
-      flattenStyle(s, store, options, flatStyle);
+      flattenStyle(s, store, options, flatStyle, depth + 1);
     }
     return flatStyle;
   }
@@ -497,7 +490,17 @@ export function flattenStyle<P extends Record<string, unknown>>(
   }
 
   for (let [key, value] of Object.entries(style)) {
-    if (value === undefined) continue;
+    if (
+      // Items at this depth are in reverse order (due to specificityCompareFn sorting)
+      // We can shortcut setting a value if it already exists
+      depth <= 1 &&
+      (value === undefined ||
+        (key in flatStyle &&
+          flatStyle[key as keyof typeof flatStyle] !== undefined))
+    ) {
+      continue;
+    }
+
     switch (key) {
       case "transform": {
         const transforms: Record<string, unknown>[] = [];

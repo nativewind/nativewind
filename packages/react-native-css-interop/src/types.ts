@@ -160,7 +160,7 @@ export type ExtractedStyle = {
   importantStyles?: string[];
 };
 
-export type Specificity = { inline?: number } | CSSSpecificity;
+export type Specificity = { inline?: number; I?: undefined } | CSSSpecificity;
 
 export type CSSSpecificity = {
   /** IDs - https://drafts.csswg.org/selectors/#specificity-rules */
