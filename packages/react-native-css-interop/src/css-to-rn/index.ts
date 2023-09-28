@@ -419,7 +419,7 @@ function extractKeyFrames(
         },
       },
       {
-        I: 4,
+        I: 99,
         S: 1,
         O: extractOptions.appearanceOrder,
       },

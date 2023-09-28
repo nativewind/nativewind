@@ -120,7 +120,6 @@ export function createCSSVariableSignal<T = ExtractedStyleValue>(
           parent.variables[key]?.unsubscribe(subscription);
         }
       }
-      console.log("---", nextValue);
       signal.set(nextValue);
     },
   };

@@ -8,9 +8,11 @@ import {
 } from "../testing-library";
 import { useUnstableNativeVariable } from "../runtime/native/proxy";
 import { memo } from "react";
+import { vars } from "../runtime/native/variables";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
+const B = createMockComponent(View);
 
 beforeEach(() => resetStyles());
 

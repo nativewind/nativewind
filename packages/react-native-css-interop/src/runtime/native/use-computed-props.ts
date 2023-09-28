@@ -644,6 +644,9 @@ function extractAndDefineProperty<P extends Record<string, unknown>>(
           configurable: true,
           enumerable: true,
           get: getterOrValue,
+          set(value) {
+            target[token] = value;
+          },
         });
       } else {
         target[token] = getterOrValue;
