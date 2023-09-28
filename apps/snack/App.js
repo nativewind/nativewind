@@ -9,7 +9,7 @@ const theme = vars({
 const App = () => {
   return (
     <View className="flex-1 items-center justify-center" style={theme}>
-      <Text className="text-[--theme-fg]">Try editing me! 🎉</Text>
+      <Text className="text-[--theme-fg] animate-spin">Try editing me! 🎉</Text>
     </View>
   );
 };

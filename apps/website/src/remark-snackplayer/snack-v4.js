@@ -50,13 +50,9 @@ if (Platform.OS === "web") {
   }
 }
 
-const render = (element, { children, ...props }, key) => {
-  children = Array.isArray(children) ? children : [children];
-  return createElement(element, { key, ...props }, ...children)
-}
-export const View = unstable_styled(RNView, render, { className: "style" });
-export const Text = unstable_styled(RNText, render, { className: "style" });
-export const Pressable = unstable_styled(RNPressable, render, { className: "style" });
+export const View = unstable_styled(RNView, { className: "style" });
+export const Text = unstable_styled(RNText, { className: "style" });
+export const Pressable = unstable_styled(RNPressable, { className: "style" });
 
 export function withExpoSnack(Component) {
   return function WithExpoSnack() {
@@ -145,7 +141,7 @@ export default withExpoSnack(App);`;
   const deviceIos = params.deviceIos || "iphone12";
   const dependencies =
     params.dependencies ||
-    "react,react-native,react-native-reanimated,nativewind@4.0.0-alpha.7";
+    "react,react-native,react-native-reanimated@3.3.0,nativewind@4.0.0-alpha.7";
 
   // Need help constructing this AST node?
   // Use the MDX Playground and explore what your output mdast should look like

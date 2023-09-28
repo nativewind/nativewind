@@ -1,5 +1,5 @@
 import React from "react";
-import { createElement, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { StyleSheet, unstable_styled } from "react-native-css-interop";
 import {
   Platform,
