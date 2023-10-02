@@ -22,7 +22,7 @@
     "expo-status-bar": "~1.6.0",
     "expo-system-ui": "~2.4.0",
     "expo-web-browser": "~12.3.2",
-    "nativewind": "4.0.0-alpha.5",
+    "nativewind": "*",
     "tailwindcss": "3.3.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",

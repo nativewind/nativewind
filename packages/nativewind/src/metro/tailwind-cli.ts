@@ -5,7 +5,7 @@ import {
   cssToReactNativeRuntime,
   CssToReactNativeRuntimeOptions,
 } from "react-native-css-interop/css-to-rn";
-import { writeFileSync } from "node:fs";
+import { writeFileSync, mkdirSync } from "node:fs";
 
 export interface TailwindCliOptions extends GetTransformOptionsOpts {
   output: string;
@@ -71,6 +71,7 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
     if (firstRun) {
       console.log(`done in ${Date.now() - now}ms`);
       firstRun = false;
+      mkdirSync(options.output, { recursive: true });
       writeFileSync(getOutput(options.output, options), css, "utf-8");
       done();
     } else {

@@ -16,6 +16,7 @@ interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
   input?: string;
   output?: string;
   configPath?: string;
+  projectRoot?: string;
   hotServerOptions?: ServerOptions;
 }
 
@@ -26,6 +27,7 @@ export function withNativeWind(
   {
     input,
     output,
+    projectRoot = process.cwd(),
     inlineRem = 14,
     configPath: tailwindConfigPath = "tailwind.config",
     hotServerOptions = {
@@ -43,7 +45,7 @@ export function withNativeWind(
 
   if (!output) {
     output = path.resolve(
-      process.cwd(),
+      projectRoot,
       path.join(outputDir, path.basename(input)),
     );
   } else if (!path.isAbsolute(output)) {
