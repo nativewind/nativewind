@@ -6,10 +6,6 @@ import tailwindcssContainerQueries from "@tailwindcss/container-queries";
 import { preset } from "nativewind/preset";
 import { cssToReactNativeRuntime } from "react-native-css-interop/dist/css-to-rn/index";
 
-export const config = {
-  runtime: "edge",
-};
-
 const forceLightningcssToBeBundled = path.join(
   process.cwd(),
   "node_modules/lightningcss/lightningcss.linux-x64-gnu.node",
