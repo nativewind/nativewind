@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Just wait a short amount for the package to be available
+sleep(30)
+
 PACKAGE_VERSION=$(cat package.json \
   | grep version \
   | head -1 \
