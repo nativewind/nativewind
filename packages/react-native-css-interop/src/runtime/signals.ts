@@ -2,21 +2,22 @@ import { useRef, useSyncExternalStore } from "react";
 
 export const reactGlobal: {
   isInComponent: boolean;
-  currentStore: EffectStore | null;
-  delayedEffects: Set<() => void>;
-  shouldRerender: Set<() => void>;
+  currentStore: Effect | null;
+  delayedEvents: Set<() => void>;
 } = {
   isInComponent: false,
   currentStore: null,
-  delayedEffects: new Set(),
-  shouldRerender: new Set(),
+  delayedEvents: new Set(),
 };
 
 export type Signal<T> = ReturnType<typeof createSignal<T>>;
 
-export function createSignal<T = unknown>(value: T) {
+export function createSignal<T = unknown>(value: T | undefined) {
   const signal = {
     subscriptions: new Set<() => void>(),
+    /**
+     * Get the value and subscribe if we are in an effect
+     */
     get() {
       const running = context[context.length - 1];
       if (running) {
@@ -25,16 +26,23 @@ export function createSignal<T = unknown>(value: T) {
       }
       return value;
     },
+    /**
+     * Get the value without subscribing
+     */
     peek() {
       return value;
     },
-    set(nextValue: T) {
+    /**
+     * Set the value if it has changed and notify subscribers
+     * If we are in a component, delay the update until the component is done rendering
+     * as React cannot handle state updates during rendering
+     */
+    set(nextValue: T | undefined) {
       if (Object.is(value, nextValue)) return;
       value = nextValue;
       if (reactGlobal.isInComponent) {
         for (const sub of signal.subscriptions) {
-          reactGlobal.shouldRerender.add(sub);
-          reactGlobal.delayedEffects.add(sub);
+          reactGlobal.delayedEvents.add(sub);
         }
       } else {
         for (const sub of Array.from(signal.subscriptions)) {
@@ -54,84 +62,106 @@ export function createSignal<T = unknown>(value: T) {
   return signal;
 }
 
-export type EffectStore<T = unknown> = {
+export type Effect<T = unknown> = {
   (): void;
+  debugName?: string;
   version: number;
   dependencies: Set<Signal<any>>;
   getSnapshot(): T;
+  setup(): void;
+  teardown(): void;
   runInEffect<T>(fn: () => T): T;
   subscribe(callback: () => void): () => void;
   cleanup: () => void;
 };
 
-const context: EffectStore[] = [];
-export function createEffectStore(debugName?: string) {
-  let subscription: () => void | undefined;
+const context: Effect[] = [];
+export function createEffect(debugName?: string) {
+  let subscription: (() => void) | undefined;
 
-  const store: EffectStore = Object.assign(
+  const effect: Effect = Object.assign(
     function () {
-      store.version++;
+      effect.version++;
       subscription?.();
     },
     {
       debugName,
       version: 0,
+      dependencies: new Set(),
+      /**
+       * The version will change if any of the dependencies change
+       */
       getSnapshot() {
-        return store.version;
+        return effect.version;
       },
-      dependencies: new Set<Signal<any>>(),
-      runInEffect<T>(fn: () => T): T {
-        context.push(store);
+      /**
+       * Setup this effect to the be the global effect
+       */
+      setup() {
+        context.push(effect);
+        reactGlobal.delayedEvents.delete(effect);
+        reactGlobal.currentStore = effect;
+        effect.cleanup();
+      },
+      teardown() {
+        context.pop();
+      },
+      /**
+       * Run a function in the effect context
+       * Don't run cleanup as we don't want to clear the subscriptions, just add to them
+       */
+      runInEffect<T>(fn: () => T) {
+        context.push(effect);
         let value = fn();
         context.pop();
         return value;
       },
-      subscribe(callback: () => void) {
+      /**
+       * Effects should only have one subscription, either:
+       *  - useComputedProps
+       *  - useSignals (which only runs once)
+       */
+      subscribe(callback) {
         subscription = callback;
         return () => {
-          subscription === undefined;
+          subscription = undefined;
         };
       },
+      /**
+       * Remove all tracking of this effect
+       */
       cleanup() {
-        for (const dep of store.dependencies) {
-          dep.subscriptions.delete(store);
+        for (const dep of effect.dependencies) {
+          dep.subscriptions.delete(effect);
         }
-        store.dependencies.clear();
-        reactGlobal.shouldRerender.delete(store);
-        reactGlobal.delayedEffects.delete(store);
+        effect.dependencies.clear();
+        reactGlobal.delayedEvents.delete(effect);
       },
-    },
+    } satisfies { [K in keyof Effect]: Effect[K] },
   );
 
-  return store;
-}
-
-export function setupStore(store: EffectStore) {
-  context.push(store);
-  reactGlobal.delayedEffects.delete(store);
-  reactGlobal.currentStore = store;
-  store.cleanup();
-}
-
-export function teardownStore() {
-  context.pop();
+  return effect;
 }
 
 export function useSignals() {
+  // This hook should only run once.
   if (reactGlobal.currentStore) {
     return reactGlobal.currentStore;
   }
 
-  teardownStore();
+  // Clear the last context if present
+  context.pop();
 
-  const storeRef = useRef<EffectStore>();
-  if (storeRef.current == null) {
-    storeRef.current = createEffectStore();
+  const effectRef = useRef<Effect>();
+  if (effectRef.current == null) {
+    effectRef.current = createEffect();
   }
-
-  const store = storeRef.current;
-  useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
-  setupStore(store);
-
-  return store;
+  // Sync with the effect
+  useSyncExternalStore(
+    effectRef.current.subscribe,
+    effectRef.current.getSnapshot,
+    effectRef.current.getSnapshot,
+  );
+  // Run the effect
+  effectRef.current.setup();
 }

@@ -8,9 +8,7 @@ import type {
 } from "lightningcss";
 
 import {
-  ContainerRuntime,
   ExtractedContainerQuery,
-  Interaction,
   PseudoClassesQuery,
   SignalLike,
 } from "../../types";
@@ -18,7 +16,7 @@ import { isReduceMotionEnabled, vh, vw } from "./misc";
 import { Platform } from "react-native";
 import { colorScheme } from "./color-scheme";
 import { rem } from "./rem";
-import { Signal } from "../signals";
+import { InteropEffect } from "./interop-effect";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -40,18 +38,18 @@ export function testMediaQuery(
 }
 
 export function testPseudoClasses(
-  interaction: Interaction,
+  effect: InteropEffect,
   meta: PseudoClassesQuery,
 ) {
-  if (meta.active && !interaction.active.get()) return false;
-  if (meta.hover && !interaction.hover.get()) return false;
-  if (meta.focus && !interaction.focus.get()) return false;
+  if (meta.active && !effect.getInteraction("active")) return false;
+  if (meta.hover && !effect.getInteraction("hover")) return false;
+  if (meta.focus && !effect.getInteraction("focus")) return false;
   return true;
 }
 
 export function testContainerQuery(
   containerQuery: ExtractedContainerQuery[] | undefined,
-  containers: Record<string, Signal<ContainerRuntime>> = {},
+  effect: InteropEffect,
 ) {
   // If there is no query, we passed
   if (!containerQuery || containerQuery.length === 0) {
@@ -60,31 +58,28 @@ export function testContainerQuery(
 
   return containerQuery.every((query) => {
     // If the query has a name, but the container doesn't exist, we failed
-    if (query.name && !containers[query.name]) return false;
+    if (query.name && !effect.inheritedContainers.has(query.name)) return false;
 
     // If the query has a name, we use the container with that name
     // Otherwise default to the last container
-    const container = (
-      query.name ? containers[query.name] : containers.__default
-    ).get();
+    const container = effect.inheritedContainers.get(query.name || "__default");
 
     // We failed if the container doesn't exist (e.g no default container)
     if (!container) return false;
 
     if (
       query.pseudoClasses &&
-      !testPseudoClasses(container.interaction, query.pseudoClasses)
+      !testPseudoClasses(effect, query.pseudoClasses)
     ) {
       return false;
     }
 
     // If there is no condition, we passed (maybe only named as specified)
     if (!query.condition) return true;
-    (container.interaction as any).test;
 
     return testCondition(query.condition, {
-      width: container.interaction.layoutWidth.get(),
-      height: container.interaction.layoutHeight.get(),
+      width: effect.getInteraction("layoutWidth").get() ?? 0,
+      height: effect.getInteraction("layoutHeight").get() ?? 0,
     });
   });
 }
@@ -116,7 +111,7 @@ export function testCondition(
     return false;
   }
 
-  return testFeature(condition.value, conditionReference);
+  return Boolean(testFeature(condition.value, conditionReference));
 }
 
 function testFeature(

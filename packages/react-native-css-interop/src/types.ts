@@ -36,7 +36,6 @@ import {
 } from "react-native";
 import { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
 import type { NormalizedOptions } from "./runtime/native/prop-mapping";
-import { ComponentContext } from "./runtime/native/proxy";
 import { Signal } from "./runtime/signals";
 
 export type CssToReactNativeRuntimeOptions = {
@@ -214,15 +213,14 @@ export type InteropMeta<P extends Record<string, unknown>> = {
   convertToPressable: boolean;
   transitionProps: Set<keyof P>;
   requiresLayout: boolean;
-  componentContext: ComponentContext;
 };
 
 export type Interaction = {
-  active: Signal<boolean>;
-  hover: Signal<boolean>;
-  focus: Signal<boolean>;
-  layoutWidth: Signal<number>;
-  layoutHeight: Signal<number>;
+  active?: Signal<boolean>;
+  hover?: Signal<boolean>;
+  focus?: Signal<boolean>;
+  layoutWidth?: Signal<number>;
+  layoutHeight?: Signal<number>;
 };
 
 export type ExtractedContainer = {
@@ -230,10 +228,14 @@ export type ExtractedContainer = {
   type: ContainerType;
 };
 
+export type GetInteraction = <T extends keyof Interaction>(
+  name: T,
+) => NonNullable<Interaction[T]>;
+
 export type ContainerRuntime = {
   type: ContainerType;
-  interaction: Interaction;
   style: Style;
+  getInteraction: GetInteraction;
 };
 
 export type ExtractedContainerQuery = {

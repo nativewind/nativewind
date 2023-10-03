@@ -1,190 +1,42 @@
 import {
-  GestureResponderEvent,
   LayoutChangeEvent,
+  GestureResponderEvent,
   NativeSyntheticEvent,
-  PixelRatio,
-  Platform,
-  PlatformColor,
   TargetedEvent,
   TransformsStyle,
+  Platform,
+  PixelRatio,
+  PlatformColor,
 } from "react-native";
-
-import {
-  ContainerRuntime,
-  ExtractedStyleValue,
-  InteropMeta,
-  RuntimeValue,
-  Style,
-  StyleMeta,
-  StyleProp,
-} from "../../types";
-import { StyleSheet, forceRerenderSignal, getGlobalStyle } from "./stylesheet";
-import {
-  testContainerQuery,
-  testMediaQuery,
-  testPseudoClasses,
-} from "./conditions";
 import { isRuntimeValue } from "../../shared";
-import { styleMetaMap, vh, vw } from "./misc";
-import { rem } from "./rem";
-import {
-  ComponentContext,
-  componentContext,
-  createComponentContext,
-} from "./proxy";
-import { NormalizedOptions } from "./prop-mapping";
-import { useContext, useEffect, useRef, useSyncExternalStore } from "react";
-import {
-  EffectStore,
-  createEffectStore,
-  reactGlobal,
-  setupStore,
-  teardownStore,
-} from "../signals";
+import { RuntimeValue, Style, StyleMeta, StyleProp } from "../../types";
 import { styleSpecificityCompareFn } from "../specificity";
+import {
+  testPseudoClasses,
+  testMediaQuery,
+  testContainerQuery,
+} from "./conditions";
+import type { InteropEffect } from "./interop-effect";
+import { styleMetaMap, vh, vw } from "./misc";
+import { NormalizedOptions } from "./prop-mapping";
+import { rem } from "./rem";
+import { StyleSheet, getGlobalStyle } from "./stylesheet";
+import { getInheritedVariable } from "./inheritance";
 
-export interface StyledEffectStore<P extends Record<string, unknown>>
-  extends Omit<EffectStore, "getSnapshot"> {
-  (): void;
-  props: P;
-  checkDependencies(inheritedContext: ComponentContext): void;
-  context: ComponentContext;
-  inheritedContext: ComponentContext;
-  lastDependencies: P[string][];
-  lastSnapshot: number;
-  getSnapshot: () => ReturnType<typeof processStyles>;
-  regenerateStyles: boolean;
-  snapshot: ReturnType<typeof processStyles<P>>;
-}
-
-export function useStyledProps<P extends Record<string, unknown>>(
-  props: P,
-  options: NormalizedOptions<P>,
+export function processStyles(
+  props: Record<string, unknown>,
+  effect: InteropEffect,
+  options: NormalizedOptions<Record<string, unknown>>,
 ) {
-  const inheritedContext = useContext(componentContext);
-
-  // Create a single store per component
-  const storeRef = useRef<StyledEffectStore<P>>();
-  if (storeRef.current == null) {
-    storeRef.current = createStyledEffectStore(
-      options,
-      inheritedContext,
-      (props as any).testID,
-    );
-  }
-  const store = storeRef.current;
-  store.props = props;
-
-  // If the context changes, or we unmount we need to cleanup the store's subscribers
-  useEffect(() => () => store.cleanup(), [store.context]);
-
-  // If a dependency has changed, mark the store as dirty
-  store.checkDependencies(inheritedContext);
-
-  // Sync with the store. If the store is dirty, it will recompute the styles
-  const value = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getSnapshot,
-  );
-
-  // If there are any delayedEffects, run them
-  useEffect(() => {
-    if (reactGlobal.delayedEffects.size) {
-      for (const sub of reactGlobal.delayedEffects) {
-        sub();
-      }
-      reactGlobal.delayedEffects.clear();
-    }
-  }, [reactGlobal.delayedEffects.size]);
-
-  return {
-    store,
-    ...value,
-  };
-}
-
-function createStyledEffectStore<P extends Record<string, unknown>>(
-  options: NormalizedOptions<P>,
-  inheritedContext: ComponentContext,
-  debugName?: string,
-) {
-  const store: StyledEffectStore<P> = Object.assign(
-    createEffectStore(debugName) as any,
-    {
-      regenerateStyles: true,
-      lastSnapshot: 0,
-      lastDependencies: [],
-      snapshot: undefined,
-      context: createComponentContext(inheritedContext),
-      inheritedContext,
-      checkDependencies(currentContext: ComponentContext) {
-        let failed = reactGlobal.shouldRerender.has(store);
-        reactGlobal.shouldRerender.delete(store);
-        reactGlobal.delayedEffects.delete(store);
-
-        if (store.inheritedContext !== currentContext) {
-          store.inheritedContext = currentContext;
-          store.context = createComponentContext(currentContext);
-          failed = true;
-        }
-
-        failed ||= options.dependencies.some((k, index) => {
-          return store.props[k] !== store.lastDependencies[index];
-        });
-
-        if (failed) {
-          store.regenerateStyles = true;
-          store.lastDependencies = options.dependencies.map(
-            (k) => store.props[k],
-          );
-        }
-      },
-      getSnapshot() {
-        if (!store.regenerateStyles && store.lastSnapshot === store.version) {
-          return store.snapshot;
-        }
-
-        // Setup the store to be the current signal context
-        setupStore(store);
-        forceRerenderSignal.get();
-
-        store.regenerateStyles = false;
-        store.snapshot = processStyles<P>(store.props, store, options);
-        store.lastSnapshot = store.version;
-
-        teardownStore();
-
-        return store.snapshot;
-      },
-    },
-  );
-
-  return store;
-}
-
-function processStyles<P extends Record<string, unknown>>(
-  props: P,
-  store: StyledEffectStore<P>,
-  options: NormalizedOptions<P>,
-): {
-  styledProps: Record<string, StyleProp>;
-  meta: InteropMeta<P>;
-} {
   const styledProps: Record<string, any> = {};
-  const animatedProps = new Set<keyof P>();
-  const transitionProps = new Set<keyof P>();
-
-  const context = store.context;
-  const interaction = store.context.interaction;
+  const animatedProps = new Set<string>();
+  const transitionProps = new Set<string>();
 
   let hasActive: boolean | undefined = false;
   let hasHover: boolean | undefined = false;
   let hasFocus: boolean | undefined = false;
   let hasInlineContainers = false;
-  let hasInlineVariables = false;
   let requiresLayout = false;
-  let variables: Record<string, ExtractedStyleValue> = {};
 
   let dynamicStyles = false;
 
@@ -227,31 +79,26 @@ function processStyles<P extends Record<string, unknown>>(
 
     if (!stylesToFlatten) continue;
 
+    // If the styles are not dynamic, then we can avoid flattenStyle
     if (!dynamicStyles) {
       styledProps[key] = Object.freeze(stylesToFlatten);
       continue;
     }
 
-    const style = flattenStyle(stylesToFlatten, store);
+    const style = flattenStyle(stylesToFlatten, effect);
     const meta = styleMetaMap.get(style);
 
     if (meta) {
       if (meta.variables) {
-        hasInlineVariables = true;
-        variables = { ...variables, ...meta.variables };
+        for (const entry of Object.entries(meta.variables)) {
+          effect.setVariable(...entry);
+        }
       }
 
       if (meta.container?.names) {
         hasInlineContainers = true;
-        const runtime: ContainerRuntime = {
-          type: "normal",
-          interaction,
-          style,
-        };
-
-        context.containers.__default.set(runtime);
         for (const name of meta.container.names) {
-          context.containers[name].set(runtime);
+          effect.setContainer(name);
         }
       }
 
@@ -283,18 +130,6 @@ function processStyles<P extends Record<string, unknown>>(
     styledProps[key] = Object.freeze(style);
   }
 
-  if (hasInlineVariables) {
-    const existingKeys = new Set(Object.keys(context.variables));
-    for (const [key, value] of Object.entries(variables)) {
-      existingKeys.delete(key);
-      context.variables[key].set(value);
-    }
-
-    for (const key of existingKeys) {
-      context.variables[key].set(undefined);
-    }
-  }
-
   let animationInteropKey: string | undefined;
   if (animatedProps.size > 0 || transitionProps.size > 0) {
     animationInteropKey = [...animatedProps, ...transitionProps].join(":");
@@ -303,8 +138,8 @@ function processStyles<P extends Record<string, unknown>>(
   if (requiresLayout) {
     styledProps.onLayout = (event: LayoutChangeEvent) => {
       (props as any).onLayout?.(event);
-      interaction.layoutWidth.set(event.nativeEvent.layout.width);
-      interaction.layoutHeight.set(event.nativeEvent.layout.height);
+      effect.setInteraction("layoutWidth", event.nativeEvent.layout.width);
+      effect.setInteraction("layoutHeight", event.nativeEvent.layout.height);
     };
   }
 
@@ -313,49 +148,39 @@ function processStyles<P extends Record<string, unknown>>(
     convertToPressable = true;
     styledProps.onPressIn = (event: GestureResponderEvent) => {
       (props as any).onPressIn?.(event);
-      interaction.active.set(true);
+      effect.setInteraction("active", true);
     };
     styledProps.onPressOut = (event: GestureResponderEvent) => {
       (props as any).onPressOut?.(event);
-      interaction.active.set(false);
+      effect.setInteraction("active", false);
     };
   }
   if (hasHover) {
     convertToPressable = true;
     styledProps.onHoverIn = (event: MouseEvent) => {
       (props as any).onHoverIn?.(event);
-      interaction.hover.set(true);
+      effect.setInteraction("hover", true);
     };
     styledProps.onHoverOut = (event: MouseEvent) => {
       (props as any).onHoverIn?.(event);
-      interaction.hover.set(false);
+      effect.setInteraction("hover", false);
     };
   }
   if (hasFocus) {
     convertToPressable = true;
     styledProps.onFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
       (props as any).onFocus?.(event);
-      context.interaction.focus.set(true);
+      effect.setInteraction("focus", true);
     };
     styledProps.onBlur = (event: NativeSyntheticEvent<TargetedEvent>) => {
       (props as any).onBlur?.(event);
-      context.interaction.focus.set(false);
+      effect.setInteraction("focus", false);
     };
   }
 
-  const meta: InteropMeta<P> = {
-    interopMeta: true,
-    animatedProps,
-    animationInteropKey,
-    convertToPressable,
-    transitionProps,
-    requiresLayout,
-    componentContext: context,
-  };
-
   return {
     styledProps,
-    meta,
+    convertToPressable,
   };
 }
 
@@ -377,9 +202,9 @@ type FlattenStyleOptions = {
  * @param flatStyle The flat style object to add the flattened styles to.
  * @returns The flattened style object.
  */
-export function flattenStyle<P extends Record<string, unknown>>(
+export function flattenStyle(
   style: StyleProp,
-  store: StyledEffectStore<P>,
+  effect: InteropEffect,
   options: FlattenStyleOptions = {},
   flatStyle: Style = {},
   depth = 0,
@@ -390,7 +215,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
 
   if (Array.isArray(style)) {
     for (const s of style) {
-      flattenStyle(s, store, options, flatStyle, depth + 1);
+      flattenStyle(s, effect, options, flatStyle, depth + 1);
     }
     return flatStyle;
   }
@@ -419,9 +244,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
       ...flatStyleMeta.pseudoClasses,
     };
 
-    if (
-      !testPseudoClasses(store.context.interaction, styleMeta.pseudoClasses)
-    ) {
+    if (!testPseudoClasses(effect, styleMeta.pseudoClasses)) {
       return flatStyle;
     }
   }
@@ -433,10 +256,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
 
   if (
     styleMeta.containerQuery &&
-    !testContainerQuery(
-      styleMeta.containerQuery,
-      store.inheritedContext.containers,
-    )
+    !testContainerQuery(styleMeta.containerQuery, effect)
   ) {
     return flatStyle;
   }
@@ -480,7 +300,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
       );
 
@@ -513,7 +333,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
               transform,
               flatStyle,
               flatStyleMeta,
-              store,
+              effect,
               options,
             );
 
@@ -538,7 +358,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
                 tValue,
                 flatStyle,
                 flatStyleMeta,
-                store,
+                effect,
                 options,
               );
 
@@ -569,7 +389,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
           value[0],
           flatStyle,
           flatStyleMeta,
-          store,
+          effect,
           options,
         );
         extractAndDefineProperty(
@@ -577,7 +397,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
           value[1],
           flatStyle,
           flatStyleMeta,
-          store,
+          effect,
           options,
         );
         break;
@@ -588,7 +408,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
           value[0],
           flatStyle,
           flatStyleMeta,
-          store,
+          effect,
           options,
         );
         extractAndDefineProperty(
@@ -596,7 +416,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
           value[1],
           flatStyle,
           flatStyleMeta,
-          store,
+          effect,
           options,
         );
         break;
@@ -607,7 +427,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
           value,
           flatStyle,
           flatStyleMeta,
-          store,
+          effect,
           options,
         );
     }
@@ -616,19 +436,19 @@ export function flattenStyle<P extends Record<string, unknown>>(
   return flatStyle;
 }
 
-function extractAndDefineProperty<P extends Record<string, unknown>>(
+function extractAndDefineProperty(
   key: string,
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  store: StyledEffectStore<P>,
+  effect: InteropEffect,
   options: FlattenStyleOptions = {},
 ) {
   const getterOrValue = extractValue(
     value,
     flatStyle,
     flatStyleMeta,
-    store,
+    effect,
     options,
   );
 
@@ -659,18 +479,16 @@ function extractAndDefineProperty<P extends Record<string, unknown>>(
   }
 }
 
-function extractValue<P extends Record<string, unknown>>(
+function extractValue(
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  store: StyledEffectStore<P>,
+  effect: InteropEffect,
   options: FlattenStyleOptions = {},
 ): any {
   if (!isRuntimeValue(value)) {
     return value;
   }
-
-  const context = store.context;
 
   switch (value.name) {
     case "var": {
@@ -681,15 +499,12 @@ function extractValue<P extends Record<string, unknown>>(
       return () => {
         if (cache) return cache;
 
-        const signal = store.context.variables[name];
-        if (!signal) return;
-
-        return store.runInEffect(() => {
+        return effect.runInEffect(() => {
           const resolvedValue = extractValue(
-            signal.get(),
+            getInheritedVariable(name, effect),
             flatStyle,
             flatStyleMeta,
-            store,
+            effect,
             options,
           );
 
@@ -729,8 +544,8 @@ function extractValue<P extends Record<string, unknown>>(
         reference = options.ch;
       } else if (typeof flatStyle.height === "number") {
         reference = flatStyle.height;
-      } else if (context.interaction?.layoutHeight) {
-        reference = context.interaction.layoutHeight.get();
+      } else {
+        reference = effect.getInteraction("layoutHeight").get();
       }
 
       if (reference) {
@@ -739,10 +554,8 @@ function extractValue<P extends Record<string, unknown>>(
         return () => {
           if (typeof flatStyle.height === "number") {
             reference = flatStyle.height;
-          } else if (context.interaction.layoutHeight) {
-            reference = context.interaction.layoutHeight.get();
           } else {
-            reference = 0;
+            reference = effect.getInteraction("layoutHeight").get() ?? 0;
           }
 
           return round(reference * multiplier);
@@ -758,8 +571,8 @@ function extractValue<P extends Record<string, unknown>>(
         reference = options.cw;
       } else if (typeof flatStyle.width === "number") {
         reference = flatStyle.width;
-      } else if (context.interaction.layoutWidth) {
-        reference = context.interaction.layoutWidth.get();
+      } else {
+        reference = effect.getInteraction("layoutWidth").get();
       }
 
       if (reference) {
@@ -768,10 +581,8 @@ function extractValue<P extends Record<string, unknown>>(
         return () => {
           if (typeof flatStyle.width === "number") {
             reference = flatStyle.width;
-          } else if (context.interaction?.layoutWidth) {
-            reference = context.interaction.layoutWidth.get();
           } else {
-            reference = 0;
+            reference = effect.getInteraction("layoutWidth").get() ?? 0;
           }
 
           return round(reference * multiplier);
@@ -788,7 +599,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -805,7 +616,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -825,7 +636,7 @@ function extractValue<P extends Record<string, unknown>>(
         },
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -847,7 +658,7 @@ function extractValue<P extends Record<string, unknown>>(
         },
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -869,7 +680,7 @@ function extractValue<P extends Record<string, unknown>>(
         },
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -881,7 +692,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -896,7 +707,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -909,7 +720,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -922,7 +733,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -939,7 +750,7 @@ function extractValue<P extends Record<string, unknown>>(
         },
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -951,7 +762,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           joinArgs: false,
@@ -971,7 +782,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
       );
     }
@@ -989,11 +800,11 @@ interface CreateRuntimeFunctionOptions {
 /**
  * TODO: This function is overloaded with functionality
  */
-function createRuntimeFunction<P extends Record<string, unknown>>(
+function createRuntimeFunction(
   value: RuntimeValue,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  store: StyledEffectStore<P>,
+  effect: InteropEffect,
   options: FlattenStyleOptions,
   {
     wrap = true,
@@ -1012,7 +823,7 @@ function createRuntimeFunction<P extends Record<string, unknown>>(
         argument,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
       );
 
