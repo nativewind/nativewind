@@ -36,6 +36,7 @@
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
+    "postpublish": "./post-publish.sh",
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput"
   },
