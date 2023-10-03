@@ -643,11 +643,14 @@ function extractAndDefineProperty<P extends Record<string, unknown>>(
         Object.defineProperty(target, token, {
           configurable: true,
           enumerable: true,
-          writable: true,
           get: getterOrValue,
         });
       } else {
-        target[token] = getterOrValue;
+        Object.defineProperty(target, token, {
+          configurable: true,
+          enumerable: true,
+          value: getterOrValue,
+        });
       }
     } else {
       target[token] ??= {};
