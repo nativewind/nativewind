@@ -16,7 +16,7 @@
     "website": "vercel dev"
   },
   "devDependencies": {
-    "@changesets/cli": "2.26.2",
+    "@changesets/cli": "^2.26.2",
     "@tsconfig/react-native": "^3.0.2",
     "@types/node": "18.16.19",
     "@vercel/node": "^2.15.8",

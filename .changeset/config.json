@@ -5,5 +5,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["benchmarks", "website", "examples", "demo-compiler"]
+  "ignore": []
 }

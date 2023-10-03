@@ -1,0 +1,12 @@
+{
+  "mode": "pre",
+  "tag": "alpha.12",
+  "initialVersions": {
+    "snack": "1.0.0",
+    "website": "0.0.0",
+    "nativewind-expo-router": "1.0.0",
+    "nativewind": "4.0.0-alpha.11",
+    "react-native-css-interop": "0.0.0-alpha.11"
+  },
+  "changesets": []
+}
