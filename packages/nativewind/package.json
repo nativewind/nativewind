@@ -38,6 +38,7 @@
     "prepublishOnly": "npm run build",
     "postpublish": "./post-publish.sh",
     "build": "tsc -p tsconfig.build.json",
+    "build:watch": "tsc -p tsconfig.build.json -w",
     "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput"
   },
   "files": [

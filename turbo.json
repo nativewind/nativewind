@@ -4,6 +4,10 @@
     "build": {
       "cache": false
     },
+    "build:watch": {
+      "cache": false,
+      "persistent": true
+    },
     "test": {},
     "test:watch": {
       "cache": false

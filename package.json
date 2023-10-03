@@ -8,9 +8,11 @@
   "scripts": {
     "test": "turbo test --continue",
     "build": "turbo run build --filter='./packages/*'",
+    "build:watch": "turbo run build:watch --filter='./packages/*'",
     "dev": "npm_config_loglevel=silent turbo dev",
     "example": "npm start --workspace=examples/expo-router --",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i",
+    "publish-packages": "turbo run build lint test && changeset version && changeset publish",
     "website": "vercel dev"
   },
   "devDependencies": {
