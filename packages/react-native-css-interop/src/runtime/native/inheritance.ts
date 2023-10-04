@@ -1,23 +1,20 @@
-import { createContext, useContext } from "react";
+import { createContext } from "react";
 import { ExtractedStyleValue } from "../../types";
-import { Signal, createSignal, useSignals } from "../signals";
+import { Signal, createSignal } from "../signals";
 import { colorScheme } from "./color-scheme";
 import type { InteropEffect } from "./interop-effect";
 
-const rootInheritance = {
-  getContainers() {
-    return {};
-  },
-};
-
 export const rootVariables: Map<string, ColorSchemeSignal> = new Map();
 export const universalVariables: Map<string, ColorSchemeSignal> = new Map();
-export const effectContext = createContext(
-  rootInheritance as unknown as InteropEffect,
-);
+export const effectContext = createContext({
+  inheritedVariables: new Map(),
+  inlineVariables: rootVariables,
+  inheritedContainers: new Map(),
+  inlineContainers: new Map(),
+} as unknown as InteropEffect);
 export const InheritanceProvider = effectContext.Provider;
 
-function createRootVariableSetter(map: typeof rootVariables) {
+function createVariableSetter(map: typeof rootVariables) {
   return function (
     light?: Record<string, ExtractedStyleValue>,
     dark?: Record<string, ExtractedStyleValue>,
@@ -46,15 +43,18 @@ function createRootVariableSetter(map: typeof rootVariables) {
   };
 }
 
-export const setRootVariables = createRootVariableSetter(rootVariables);
-export const setUniversalVariables =
-  createRootVariableSetter(universalVariables);
+export const setRootVariables = createVariableSetter(rootVariables);
+export const setUniversalVariables = createVariableSetter(universalVariables);
 
 export type ColorSchemeSignal = Signal<ExtractedStyleValue> & {
   setLight: (value: ExtractedStyleValue) => void;
   setDark: (value: ExtractedStyleValue) => void;
 };
 
+/**
+ * A special signal that can be used to set a value for both light and dark color schemes.
+ * Currently only used for root and universal variables.
+ */
 export function createColorSchemeSignal(
   lightValue: ExtractedStyleValue | undefined = undefined,
   darkValue = lightValue,
@@ -85,50 +85,3 @@ export function createColorSchemeSignal(
     unsubscribe,
   };
 }
-
-/**
- * Replicate CSS's inheritance model for variables.
- */
-export function getInheritedVariable(name: string, effect: InteropEffect) {}
-
-export function setInlineVariable() {}
-
-export function createInheritableSignal<T = ExtractedStyleValue>(
-  value: T | undefined,
-  parent?: Signal<T>,
-) {
-  let signal = createSignal(value);
-
-  const inheritableSignal = {
-    ...signal,
-    get() {
-      return signal.get() ?? parent?.get();
-    },
-    set(nextValue: T | undefined) {
-      if (nextValue !== undefined && signal.peek() === undefined) {
-        if (parent) {
-          for (const subscription of signal.subscriptions) {
-            parent.unsubscribe(subscription);
-          }
-        }
-      }
-      signal.set(nextValue);
-    },
-    unsubscribe(callback: () => void) {
-      signal.unsubscribe(callback);
-      if (parent) {
-        parent.unsubscribe(callback);
-      }
-    },
-  };
-
-  return inheritableSignal;
-}
-
-export const useUnstableNativeVariable = (name: string) => {
-  useSignals();
-  const effect = useContext(effectContext);
-  return (
-    effect.inlineVariables.get(name) ?? effect.inheritedVariables.get(name)
-  )?.get();
-};

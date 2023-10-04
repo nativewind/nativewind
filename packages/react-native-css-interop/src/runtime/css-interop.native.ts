@@ -15,17 +15,11 @@ export const defaultCSSInterop: InteropFunction = (
   reactGlobal.isInComponent = true;
   reactGlobal.currentStore = null;
 
-  const {
-    contextValue,
-    convertToPressable,
-    styledProps,
-    animationInteropKey,
-    effect,
-  } = useInteropEffect(props, options);
+  const effect = useInteropEffect(props, options);
 
   props = {
     ...props,
-    ...styledProps,
+    ...effect.styledProps,
   };
 
   for (const source of options.sources) {
@@ -33,7 +27,7 @@ export const defaultCSSInterop: InteropFunction = (
   }
 
   // View doesn't support the interaction props, so force the component to be a Pressable (which accepts ViewProps)
-  if (convertToPressable) {
+  if (effect.convertToPressable) {
     Object.assign(props, { ___pressable: true });
     if ((component as any) === View) {
       component = Pressable;
@@ -47,9 +41,9 @@ export const defaultCSSInterop: InteropFunction = (
     children,
   ];
 
-  if (animationInteropKey) {
+  if (effect.animationInteropKey) {
     props = Object.assign(props, {
-      key: animationInteropKey,
+      key: effect.animationInteropKey,
       __component: component,
       __store: effect,
     });
@@ -63,11 +57,11 @@ export const defaultCSSInterop: InteropFunction = (
 
   reactGlobal.isInComponent = false;
 
-  if (contextValue) {
+  if (effect.contextValue) {
     return [
       InheritanceProvider,
       {
-        value: contextValue,
+        value: effect.contextValue,
       },
       createElement(...createElementParams),
     ] as any;

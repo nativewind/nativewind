@@ -34,32 +34,35 @@ import { ExtractedStyleValue, GetInteraction, Interaction } from "../../types";
  * Then the effect will be saved in React Context and accessible to child components.
  *
  * TODO: As InteropEffects also store all inheritable dynamic information for their subtree (variables/containers)
- * they also provide a shareable cache for styles
+ * they can provide a shareable cache for styles
  */
 export interface InteropEffect extends Effect {
   run(props: Record<string, unknown>, parent: InteropEffect): void;
   // tracking
   props: Record<string, unknown>;
-  parent: InteropEffect | null;
+  parent: InteropEffect;
   lastDependencies: unknown[];
   lastVersion: number;
   // Rendering
   styledProps: Record<string, unknown>;
   contextValue?: InteropEffect;
   shouldUpdateContext: boolean;
-  shouldAddContext: boolean;
+  convertToPressable: boolean;
+  requiresLayout: boolean;
   // variables
   inlineVariables: Map<string, Signal<ExtractedStyleValue>>;
   inheritedVariables: Map<string, Signal<ExtractedStyleValue>>;
-  variablesToClear: Set<string>;
-  trackedVariables: Map<string, Signal<ExtractedStyleValue>>;
+  variablesSetDuringRender: Set<string>;
+  variablesAccessedDuringRender: Map<string, Signal<ExtractedStyleValue>>;
   getVariable: (name: string) => ExtractedStyleValue;
   setVariable: (name: string, value: ExtractedStyleValue) => void;
   // containers
-  inlineContainers: Map<string, Signal<InteropEffect>>;
+  containerSignal?: Signal<InteropEffect>;
   inheritedContainers: Map<string, Signal<InteropEffect>>;
-  containersToClear: Set<string>;
-  trackedContainers: Map<string, Signal<InteropEffect>>;
+  inlineContainers: Map<string, Signal<InteropEffect>>;
+  containerNamesSetDuringRender: Set<string>;
+  containersAccessedDuringRender: Map<string, Signal<InteropEffect>>;
+  getContainer: (name: string) => InteropEffect | undefined;
   setContainer: (name: string) => void;
   // interaction
   getInteraction: GetInteraction;
@@ -71,7 +74,6 @@ export interface InteropEffect extends Effect {
   animationInteropKey?: string;
   transitionProps: Set<string>;
   animatedProps: Set<string>;
-  requiresLayout: boolean;
 }
 
 export function useInteropEffect(
@@ -82,7 +84,7 @@ export function useInteropEffect(
 
   // Create a single store per component
   const effectRef = useRef<InteropEffect>();
-  if (effectRef.current === null) {
+  if (!effectRef.current) {
     effectRef.current = createInteropEffect(
       options,
       inheritance,
@@ -114,13 +116,7 @@ export function useInteropEffect(
     }
   });
 
-  return {
-    effect,
-    animationInteropKey: "",
-    contextValue: effect.contextValue,
-    styledProps: {},
-    convertToPressable: false,
-  };
+  return effect;
 }
 
 export function createInteropEffect(
@@ -131,32 +127,37 @@ export function createInteropEffect(
   const interaction: Interaction = {};
 
   const effect: InteropEffect = Object.assign(createEffect(debugName), {
-    parent: initialParent,
     props: {},
-    styledProps: {},
+    // tracking
+    parent: initialParent,
     lastDependencies: [],
     lastVersion: 0,
+    // rendering
+    styledProps: {},
+    shouldUpdateContext: false,
     requiresLayout: false,
-    inheritedVariables: new Map(),
+    convertToPressable: false,
+    // variables
     inlineVariables: new Map(),
+    inheritedVariables: new Map(),
+    variablesSetDuringRender: new Set(),
+    variablesAccessedDuringRender: new Map(),
+    // containers
     inlineContainers: new Map(),
     inheritedContainers: new Map(),
-    variablesToClear: new Set(),
-    containersToClear: new Set(),
-    trackedVariables: new Map(),
-    trackedContainers: new Map(),
-    transitionProps: new Set(),
+    containerNamesSetDuringRender: new Set(),
+    containersAccessedDuringRender: new Map(),
+    // animations
     animatedProps: new Set(),
-    shouldUpdateContext: false,
-    shouldAddContext: false,
+    transitionProps: new Set(),
     run(props, parent) {
-      const currentInheritedVariables = new Map([
+      effect.inheritedVariables = new Map([
         ...parent.inheritedVariables,
         ...universalVariables,
         ...parent.inlineVariables,
       ]);
 
-      const currentInheritedContainers = new Map([
+      effect.inheritedContainers = new Map([
         ...parent.inheritedContainers,
         ...parent.inlineContainers,
       ]);
@@ -172,14 +173,18 @@ export function createInteropEffect(
         options.dependencies.some((k, index) => {
           return props![k] !== effect.lastDependencies[index];
         }) ||
-        // The tracked variables have changed
-        Array.from(effect.trackedVariables).some((tracked) => {
-          return currentInheritedVariables.get(tracked[0]) !== tracked[1];
-        }) ||
-        // The tracked containers have changed
-        Array.from(effect.trackedContainers).some((tracked) => {
-          return currentInheritedContainers.get(tracked[0]) !== tracked[1];
-        });
+        // A variable we accessed has changed to a new signal
+        Array.from(effect.variablesAccessedDuringRender).some(
+          ([name, signal]) => {
+            return signal !== effect.inheritedVariables.get(name);
+          },
+        ) ||
+        // A container we accessed has changed to a new signal
+        Array.from(effect.containersAccessedDuringRender).some(
+          ([name, signal]) => {
+            return signal !== effect.inheritedContainers.get(name);
+          },
+        );
 
       if (!shouldRun) {
         return;
@@ -190,22 +195,30 @@ export function createInteropEffect(
       reactGlobal.delayedEvents.delete(effect);
       effect.lastDependencies = options.dependencies.map((k) => props![k]);
       effect.parent = parent;
-      effect.inheritedVariables = currentInheritedVariables;
-      effect.inheritedContainers = currentInheritedContainers;
       effect.requiresLayout = false;
       effect.animationInteropKey = undefined;
 
       effect.setup(); // Setup the signal effect tracking
-      // Track if we need to update the context. We try to avoid this if possible
       effect.shouldUpdateContext = false;
-      // These will be updated in the "getVariables" and "getContainers" functions
-      effect.variablesToClear = new Set(effect.inlineVariables.keys());
-      effect.containersToClear = new Set(effect.inlineContainers.keys());
+      // Track variables set/accessed during render
+      effect.variablesSetDuringRender.clear();
+      effect.variablesAccessedDuringRender.clear();
+      // Track containers set/accessed during render
+      effect.containerNamesSetDuringRender.clear();
+      effect.containersAccessedDuringRender.clear();
 
       // Listen for fast-reload
       // TODO: This should be improved...
       fastReloadSignal.get();
 
+      /**
+       * Sets these attributes on the effect
+       *  - styledProps
+       *  - convertToPressable
+       *  - animationInteropKey
+       *  - transitionProps
+       *  - animatedProps
+       */
       processStyles(props, effect, options);
 
       /**
@@ -217,18 +230,30 @@ export function createInteropEffect(
        * Note: we don't need to worry about garbage collection, as the effects
        *   will remove themselves from the signal when they re-run, leaving no references
        */
+
       effect.shouldUpdateContext ||=
-        effect.variablesToClear.size > 0 || effect.containersToClear.size > 0;
-      for (const variable of effect.variablesToClear) {
-        effect.inlineVariables.get(variable)?.set(undefined);
-        effect.inlineVariables.delete(variable);
-      }
-      for (const container of effect.containersToClear) {
-        effect.inlineContainers.get(container)?.set(undefined);
-        effect.inlineContainers.delete(container);
+        effect.inlineVariables.size !== effect.variablesSetDuringRender.size;
+      for (const variable of effect.inlineVariables.keys()) {
+        if (!effect.variablesSetDuringRender.has(variable)) {
+          effect.inlineVariables.delete(variable);
+          effect.shouldUpdateContext = true;
+        }
       }
 
-      if (this.shouldUpdateContext) {
+      effect.shouldUpdateContext ||=
+        effect.inheritedContainers.size !==
+        effect.containerNamesSetDuringRender.size;
+      for (const container of effect.inlineContainers.keys()) {
+        if (
+          container !== "__default" &&
+          !effect.containerNamesSetDuringRender.has(container)
+        ) {
+          effect.inlineContainers.delete(container);
+          effect.shouldUpdateContext = true;
+        }
+      }
+
+      if (effect.shouldUpdateContext) {
         // Duplicate this object, making it identify different
         effect.contextValue = Object.assign({}, effect);
       }
@@ -237,6 +262,8 @@ export function createInteropEffect(
       effect.teardown();
     },
     setVariable(name, value) {
+      effect.variablesSetDuringRender.add(name);
+
       let signal = effect.inlineVariables.get(name);
 
       if (!signal) {
@@ -246,8 +273,6 @@ export function createInteropEffect(
       } else {
         signal.set(value);
       }
-
-      effect.variablesToClear.delete(name);
     },
     getVariable(name) {
       // Try the inline variables
@@ -272,7 +297,7 @@ export function createInteropEffect(
       if (signal) {
         value = signal.get();
         if (value !== undefined) {
-          effect.trackedVariables.set(name, signal);
+          effect.variablesAccessedDuringRender.set(name, signal);
           return value;
         }
       }
@@ -286,19 +311,21 @@ export function createInteropEffect(
         // Also subscribe to it, incase fast-refresh adds a value
       }
 
-      effect.trackedVariables.set(name, signal);
+      effect.variablesAccessedDuringRender.set(name, signal);
       return signal.get();
     },
-    setContainer(name) {
-      let signal = effect.inlineContainers.get(name);
-
-      if (!signal) {
-        signal = createSignal(effect);
-        effect.shouldUpdateContext = true;
-        effect.inlineContainers.set(name, signal);
+    getContainer(name) {
+      const signal = effect.inheritedContainers.get(name);
+      if (signal) {
+        effect.containersAccessedDuringRender.set(name, signal);
+        return signal.get();
       }
-
-      effect.containersToClear.delete(name);
+    },
+    setContainer(name) {
+      effect.containerNamesSetDuringRender.add(name);
+      effect.containerSignal ??= createSignal(effect);
+      effect.inlineContainers.set(name, effect.containerSignal);
+      effect.inlineContainers.set("__default", effect.containerSignal);
     },
     getInteraction(name) {
       if (!interaction[name]) {
@@ -312,7 +339,7 @@ export function createInteropEffect(
       return interaction[name]!;
     },
     setInteraction(name, value) {
-      if ("name" in interaction) {
+      if (name in interaction) {
         interaction[name]!.set(value as any);
       } else {
         interaction[name] = createSignal(value) as any;

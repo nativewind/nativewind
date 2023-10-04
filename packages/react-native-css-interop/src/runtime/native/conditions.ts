@@ -41,10 +41,11 @@ export function testPseudoClasses(
   effect: InteropEffect,
   meta: PseudoClassesQuery,
 ) {
-  if (meta.active && !effect.getInteraction("active")) return false;
-  if (meta.hover && !effect.getInteraction("hover")) return false;
-  if (meta.focus && !effect.getInteraction("focus")) return false;
-  return true;
+  let fail = false;
+  if (meta.active) fail ||= effect.getInteraction("active").get() !== true;
+  if (meta.hover) fail ||= effect.getInteraction("hover").get() !== true;
+  if (meta.focus) fail ||= effect.getInteraction("focus").get() !== true;
+  return !fail;
 }
 
 export function testContainerQuery(
@@ -57,19 +58,20 @@ export function testContainerQuery(
   }
 
   return containerQuery.every((query) => {
+    let container = query.name ? effect.getContainer(query.name) : null;
     // If the query has a name, but the container doesn't exist, we failed
-    if (query.name && !effect.inheritedContainers.has(query.name)) return false;
+    if (query.name && !container) return false;
 
     // If the query has a name, we use the container with that name
     // Otherwise default to the last container
-    const container = effect.inheritedContainers.get(query.name || "__default");
+    if (!container) container = effect.getContainer("__default");
 
     // We failed if the container doesn't exist (e.g no default container)
     if (!container) return false;
 
     if (
       query.pseudoClasses &&
-      !testPseudoClasses(effect, query.pseudoClasses)
+      !testPseudoClasses(container, query.pseudoClasses)
     ) {
       return false;
     }
@@ -78,8 +80,8 @@ export function testContainerQuery(
     if (!query.condition) return true;
 
     return testCondition(query.condition, {
-      width: effect.getInteraction("layoutWidth").get() ?? 0,
-      height: effect.getInteraction("layoutHeight").get() ?? 0,
+      width: container.getInteraction("layoutWidth").get() ?? 0,
+      height: container.getInteraction("layoutHeight").get() ?? 0,
     });
   });
 }

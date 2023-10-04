@@ -200,6 +200,7 @@ export type StyleMeta = {
   requiresLayout?: boolean;
   importantStyles?: string[];
   specificity?: Specificity;
+  wrapInContext?: boolean;
 };
 
 export interface SignalLike<T = unknown> {

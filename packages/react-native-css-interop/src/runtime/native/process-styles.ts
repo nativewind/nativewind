@@ -21,21 +21,20 @@ import { styleMetaMap, vh, vw } from "./misc";
 import { NormalizedOptions } from "./prop-mapping";
 import { rem } from "./rem";
 import { StyleSheet, getGlobalStyle } from "./stylesheet";
-import { getInheritedVariable } from "./inheritance";
 
 export function processStyles(
   props: Record<string, unknown>,
   effect: InteropEffect,
   options: NormalizedOptions<Record<string, unknown>>,
 ) {
-  const styledProps: Record<string, any> = {};
-  const animatedProps = new Set<string>();
-  const transitionProps = new Set<string>();
+  const styledProps: Record<string, unknown> = {};
+  effect.styledProps = styledProps;
+  effect.animatedProps.clear();
+  effect.transitionProps.clear();
 
   let hasActive: boolean | undefined = false;
   let hasHover: boolean | undefined = false;
   let hasFocus: boolean | undefined = false;
-  let hasInlineContainers = false;
   let requiresLayout = false;
 
   let dynamicStyles = false;
@@ -81,29 +80,27 @@ export function processStyles(
 
     // If the styles are not dynamic, then we can avoid flattenStyle
     if (!dynamicStyles) {
-      styledProps[key] = Object.freeze(stylesToFlatten);
+      styledProps[key] = stylesToFlatten;
       continue;
     }
 
     const style = flattenStyle(stylesToFlatten, effect);
     const meta = styleMetaMap.get(style);
 
+    const hasInlineContainers = effect.containerNamesSetDuringRender.size > 0;
+
     if (meta) {
-      if (meta.variables) {
-        for (const entry of Object.entries(meta.variables)) {
-          effect.setVariable(...entry);
-        }
-      }
+      if (meta.animations) effect.animatedProps.add(key);
+      if (meta.transition) effect.transitionProps.add(key);
 
-      if (meta.container?.names) {
-        hasInlineContainers = true;
-        for (const name of meta.container.names) {
-          effect.setContainer(name);
-        }
+      /**
+       * If the style could possibly add variables or containers (even if not currently),
+       * we the effect should create a context. This stop children unmounting
+       * when the variables/containers become active
+       */
+      if (meta.wrapInContext && !effect.contextValue) {
+        effect.shouldUpdateContext = true;
       }
-
-      if (meta.animations) animatedProps.add(key);
-      if (meta.transition) transitionProps.add(key);
 
       requiresLayout ||= Boolean(hasInlineContainers || meta.requiresLayout);
       hasActive ||= Boolean(hasInlineContainers || meta.pseudoClasses?.active);
@@ -130,9 +127,13 @@ export function processStyles(
     styledProps[key] = Object.freeze(style);
   }
 
-  let animationInteropKey: string | undefined;
-  if (animatedProps.size > 0 || transitionProps.size > 0) {
-    animationInteropKey = [...animatedProps, ...transitionProps].join(":");
+  if (effect.animatedProps.size > 0 || effect.transitionProps.size > 0) {
+    effect.animationInteropKey = [
+      ...effect.animatedProps,
+      ...effect.transitionProps,
+    ].join(":");
+  } else {
+    effect.animationInteropKey = undefined;
   }
 
   if (requiresLayout) {
@@ -178,10 +179,8 @@ export function processStyles(
     };
   }
 
-  return {
-    styledProps,
-    convertToPressable,
-  };
+  effect.styledProps = styledProps;
+  effect.convertToPressable = convertToPressable;
 }
 
 type FlattenStyleOptions = {
@@ -214,6 +213,12 @@ export function flattenStyle(
   }
 
   if (Array.isArray(style)) {
+    // Only inline styles are at depth > 1
+    // We can shortcut processing them by reversing the array
+    // Styles at depth=1 are already reversed due to specificity sorting
+    if (depth > 1 && style.length > 1) {
+      style.reverse();
+    }
     for (const s of style) {
       flattenStyle(s, effect, options, flatStyle, depth + 1);
     }
@@ -232,6 +237,11 @@ export function flattenStyle(
     flatStyleMeta = { alreadyProcessed: true, specificity: { inline: 1 } };
     styleMetaMap.set(flatStyle, flatStyleMeta);
   }
+
+  // If the style can have variables or containers, we need to wrap it in a context
+  flatStyleMeta.wrapInContext ||= Boolean(
+    styleMeta.variables || styleMeta.container,
+  );
 
   /*
    * START OF CONDITIONS CHECK
@@ -279,14 +289,10 @@ export function flattenStyle(
     };
   }
 
-  if (styleMeta.container) {
-    flatStyleMeta.container ??= { type: "normal", names: [] };
-
-    if (styleMeta.container.names) {
-      flatStyleMeta.container.names = styleMeta.container.names;
-    }
-    if (styleMeta.container.type) {
-      flatStyleMeta.container.type = styleMeta.container.type;
+  if (styleMeta.container?.names) {
+    flatStyleMeta.requiresLayout = true;
+    for (const name of styleMeta.container.names) {
+      effect.setContainer(name);
     }
   }
 
@@ -296,6 +302,10 @@ export function flattenStyle(
 
   if (styleMeta.variables) {
     for (const [key, value] of Object.entries(styleMeta.variables)) {
+      if (depth <= 1 && effect.variablesSetDuringRender.has(key)) {
+        continue;
+      }
+
       const getterOrValue = extractValue(
         value,
         flatStyle,
@@ -304,19 +314,15 @@ export function flattenStyle(
         options,
       );
 
-      flatStyleMeta.variables ??= {};
-      flatStyleMeta.variables[key] = getterOrValue;
+      effect.setVariable(key, getterOrValue);
     }
   }
 
   for (let [key, value] of Object.entries(style)) {
     if (
-      // Items at this depth are in reverse order (due to specificityCompareFn sorting)
       // We can shortcut setting a value if it already exists
-      depth <= 1 &&
-      (value === undefined ||
-        (key in flatStyle &&
-          flatStyle[key as keyof typeof flatStyle] !== undefined))
+      value === undefined ||
+      flatStyle[key as keyof typeof flatStyle] !== undefined
     ) {
       continue;
     }
@@ -454,28 +460,45 @@ function extractAndDefineProperty(
 
   if (getterOrValue === undefined) return;
 
-  const tokens = key.split(".");
-  let target = flatStyle as any;
+  if (key.includes(".")) {
+    // Some native props can be nested in objects
+    const tokens = key.split(".");
+    let target = flatStyle as any;
 
-  for (const [index, token] of tokens.entries()) {
-    if (index === tokens.length - 1) {
-      if (typeof getterOrValue === "function") {
-        Object.defineProperty(target, token, {
-          configurable: true,
-          enumerable: true,
-          get: getterOrValue,
-        });
+    for (const [index, token] of tokens.entries()) {
+      if (index === tokens.length - 1) {
+        if (typeof getterOrValue === "function") {
+          Object.defineProperty(target, token, {
+            configurable: true,
+            enumerable: true,
+            get: getterOrValue,
+          });
+        } else {
+          Object.defineProperty(target, token, {
+            configurable: true,
+            enumerable: true,
+            value: getterOrValue,
+          });
+        }
       } else {
-        Object.defineProperty(target, token, {
-          configurable: true,
-          enumerable: true,
-          value: getterOrValue,
-        });
+        target[token] ??= {};
+        target = target[token];
       }
-    } else {
-      target[token] ??= {};
-      target = target[token];
     }
+
+    return flatStyle;
+  } else if (typeof getterOrValue === "function") {
+    Object.defineProperty(flatStyle, key, {
+      configurable: true,
+      enumerable: true,
+      get: getterOrValue,
+    });
+  } else {
+    Object.defineProperty(flatStyle, key, {
+      configurable: true,
+      enumerable: true,
+      value: getterOrValue,
+    });
   }
 }
 
@@ -501,7 +524,7 @@ function extractValue(
 
         return effect.runInEffect(() => {
           const resolvedValue = extractValue(
-            getInheritedVariable(name, effect),
+            effect.getVariable(name),
             flatStyle,
             flatStyleMeta,
             effect,
