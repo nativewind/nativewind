@@ -1227,21 +1227,19 @@ export function parseDeclaration(
         parseBoxShadow(declaration.value, parseOptions),
       );
     }
+    case "aspect-ratio": {
+      return addStyleProp(
+        declaration.property,
+        parseAspectRatio(declaration.value),
+      );
+    }
     default: {
-      const $declaration = declaration as any;
-
-      // This is missing from the types
-      if ($declaration.property === "aspect-ratio") {
-        return addStyleProp(
-          $declaration.property,
-          parseAspectRatio($declaration.value),
-        );
-      }
-
-      // The if declaration is
-      //  - NOT a validProperty and
-      //  - NOT handled by the switch
-      // Then this will error as `declaration` will be type `never`
+      /**
+       * This is used to know when lightningcss has added a new property and we need to add it to the
+       * switch.
+       *
+       * If your build fails here, its because you have a newer version of lightningcss installed.
+       */
       declaration satisfies never;
     }
   }
