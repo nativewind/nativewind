@@ -1,6 +1,6 @@
 import { Appearance } from "react-native";
 import { StyleSheet } from "./stylesheet";
-import { createSignal, useSignals } from "../signals";
+import { createSignal, useComputed } from "../signals";
 
 const manualColorScheme = createSignal("light");
 
@@ -26,12 +26,11 @@ if (darkMode === "media") {
 }
 
 export function useColorScheme() {
-  useSignals();
-  return {
+  return useComputed(() => ({
     colorScheme: manualColorScheme.get(),
     setColorScheme: colorScheme.set,
     toggleColorScheme: colorScheme.toggle,
-  };
+  }));
 }
 
 export const colorScheme = {

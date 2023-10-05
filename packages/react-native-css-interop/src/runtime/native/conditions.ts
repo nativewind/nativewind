@@ -16,7 +16,7 @@ import { isReduceMotionEnabled, vh, vw } from "./misc";
 import { Platform } from "react-native";
 import { colorScheme } from "./color-scheme";
 import { rem } from "./rem";
-import { InteropEffect } from "./interop-effect";
+import { InteropComputed } from "./interop";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -38,7 +38,7 @@ export function testMediaQuery(
 }
 
 export function testPseudoClasses(
-  effect: InteropEffect,
+  effect: InteropComputed,
   meta: PseudoClassesQuery,
 ) {
   let fail = false;
@@ -50,7 +50,7 @@ export function testPseudoClasses(
 
 export function testContainerQuery(
   containerQuery: ExtractedContainerQuery[] | undefined,
-  effect: InteropEffect,
+  effect: InteropComputed,
 ) {
   // If there is no query, we passed
   if (!containerQuery || containerQuery.length === 0) {

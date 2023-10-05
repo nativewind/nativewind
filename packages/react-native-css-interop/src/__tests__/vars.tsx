@@ -31,7 +31,11 @@ test("vars", () => {
   });
 
   screen.rerender(
-    <A testID={testID} className="my-class" style={vars({ test: "blue" })} />,
+    <A
+      testID={testID + 1}
+      className="my-class"
+      style={vars({ test: "blue" })}
+    />,
   );
 
   expect(component).toHaveStyle({

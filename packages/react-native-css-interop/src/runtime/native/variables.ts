@@ -1,6 +1,6 @@
 import { styleMetaMap } from "./misc";
 import { StyleProp } from "../../types";
-import { useSignals } from "../signals";
+import { useComputed } from "../signals";
 import { useContext } from "react";
 import { effectContext } from "./inheritance";
 
@@ -22,9 +22,6 @@ export function vars(variables: Record<string, string | number>) {
 }
 
 export const useUnstableNativeVariable = (name: string) => {
-  useSignals();
-  const effect = useContext(effectContext);
-  return (
-    effect.inlineVariables.get(name) ?? effect.inheritedVariables.get(name)
-  )?.get();
+  const interop = useContext(effectContext);
+  return useComputed(() => interop.variables.get(name)?.get(), interop);
 };

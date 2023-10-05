@@ -2,16 +2,14 @@ import { createContext } from "react";
 import { ExtractedStyleValue } from "../../types";
 import { Signal, createSignal } from "../signals";
 import { colorScheme } from "./color-scheme";
-import type { InteropEffect } from "./interop-effect";
+import type { InteropComputed } from "./interop";
 
 export const rootVariables: Map<string, ColorSchemeSignal> = new Map();
 export const universalVariables: Map<string, ColorSchemeSignal> = new Map();
 export const effectContext = createContext({
-  inheritedVariables: new Map(),
-  inlineVariables: rootVariables,
-  inheritedContainers: new Map(),
-  inlineContainers: new Map(),
-} as unknown as InteropEffect);
+  variables: rootVariables,
+  containers: new Map(),
+} as unknown as InteropComputed);
 export const InheritanceProvider = effectContext.Provider;
 
 function createVariableSetter(map: typeof rootVariables) {

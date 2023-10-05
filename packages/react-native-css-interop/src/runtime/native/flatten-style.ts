@@ -1,187 +1,20 @@
 import {
-  LayoutChangeEvent,
-  GestureResponderEvent,
-  NativeSyntheticEvent,
-  TargetedEvent,
   TransformsStyle,
   Platform,
   PixelRatio,
   PlatformColor,
 } from "react-native";
-import { isRuntimeValue } from "../../shared";
-import { RuntimeValue, Style, StyleMeta, StyleProp } from "../../types";
-import { styleSpecificityCompareFn } from "../specificity";
 import {
   testPseudoClasses,
   testMediaQuery,
   testContainerQuery,
 } from "./conditions";
-import type { InteropEffect } from "./interop-effect";
-import { styleMetaMap, vh, vw } from "./misc";
-import { NormalizedOptions } from "./prop-mapping";
+import type { InteropComputed } from "./interop";
+import { RuntimeValue, Style, StyleMeta, StyleProp } from "../../types";
+import { StyleSheet } from "./stylesheet";
+import { isRuntimeValue } from "../../shared";
 import { rem } from "./rem";
-import { StyleSheet, getGlobalStyle } from "./stylesheet";
-
-export function processStyles(
-  props: Record<string, unknown>,
-  effect: InteropEffect,
-  options: NormalizedOptions<Record<string, unknown>>,
-) {
-  const styledProps: Record<string, unknown> = {};
-  effect.styledProps = styledProps;
-  effect.animatedProps.clear();
-  effect.transitionProps.clear();
-
-  let hasActive: boolean | undefined = false;
-  let hasHover: boolean | undefined = false;
-  let hasFocus: boolean | undefined = false;
-  let requiresLayout = false;
-
-  let dynamicStyles = false;
-
-  for (const [key, { sources, nativeStyleToProp }] of options.config) {
-    dynamicStyles ||= Boolean(nativeStyleToProp);
-
-    const prop = props[key] as StyleProp;
-    let stylesToFlatten: StyleProp = [];
-    if (prop) stylesToFlatten.push(prop);
-
-    for (const sourceProp of sources) {
-      const source = props?.[sourceProp];
-      if (typeof source !== "string") continue;
-
-      StyleSheet.unstable_hook_onClassName?.(source);
-
-      for (const className of source.split(/\s+/)) {
-        let styles = getGlobalStyle(className);
-        if (!styles) continue;
-
-        if (!Array.isArray(styles)) {
-          styles = [styles];
-        }
-
-        for (const style of styles) {
-          stylesToFlatten.push(style);
-        }
-      }
-    }
-
-    dynamicStyles ||= stylesToFlatten.some((s) => s && styleMetaMap.has(s));
-
-    stylesToFlatten = stylesToFlatten.sort(
-      styleSpecificityCompareFn(dynamicStyles ? "desc" : "asc"),
-    );
-
-    if (stylesToFlatten.length === 1) {
-      stylesToFlatten = stylesToFlatten[0] as StyleProp;
-    }
-
-    if (!stylesToFlatten) continue;
-
-    // If the styles are not dynamic, then we can avoid flattenStyle
-    if (!dynamicStyles) {
-      styledProps[key] = stylesToFlatten;
-      continue;
-    }
-
-    const style = flattenStyle(stylesToFlatten, effect);
-    const meta = styleMetaMap.get(style);
-
-    const hasInlineContainers = effect.containerNamesSetDuringRender.size > 0;
-
-    if (meta) {
-      if (meta.animations) effect.animatedProps.add(key);
-      if (meta.transition) effect.transitionProps.add(key);
-
-      /**
-       * If the style could possibly add variables or containers (even if not currently),
-       * we the effect should create a context. This stop children unmounting
-       * when the variables/containers become active
-       */
-      if (meta.wrapInContext && !effect.contextValue) {
-        effect.shouldUpdateContext = true;
-      }
-
-      requiresLayout ||= Boolean(hasInlineContainers || meta.requiresLayout);
-      hasActive ||= Boolean(hasInlineContainers || meta.pseudoClasses?.active);
-      hasHover ||= Boolean(hasInlineContainers || meta.pseudoClasses?.hover);
-      hasFocus ||= Boolean(hasInlineContainers || meta.pseudoClasses?.focus);
-    }
-
-    /**
-     * Map the flatStyle to the correct prop and/or move style properties to props (nativeStyleToProp)
-     *
-     * Note: We freeze the flatStyle as many of its props are getter's without a setter
-     *  Freezing the whole object keeps everything consistent
-     */
-    if (nativeStyleToProp) {
-      for (const [key, targetProp] of Object.entries(nativeStyleToProp)) {
-        const styleKey = key as keyof Style;
-        if (targetProp === true && style[styleKey]) {
-          styledProps[styleKey] = style[styleKey];
-          delete style[styleKey];
-        }
-      }
-    }
-
-    styledProps[key] = Object.freeze(style);
-  }
-
-  if (effect.animatedProps.size > 0 || effect.transitionProps.size > 0) {
-    effect.animationInteropKey = [
-      ...effect.animatedProps,
-      ...effect.transitionProps,
-    ].join(":");
-  } else {
-    effect.animationInteropKey = undefined;
-  }
-
-  if (requiresLayout) {
-    styledProps.onLayout = (event: LayoutChangeEvent) => {
-      (props as any).onLayout?.(event);
-      effect.setInteraction("layoutWidth", event.nativeEvent.layout.width);
-      effect.setInteraction("layoutHeight", event.nativeEvent.layout.height);
-    };
-  }
-
-  let convertToPressable = false;
-  if (hasActive) {
-    convertToPressable = true;
-    styledProps.onPressIn = (event: GestureResponderEvent) => {
-      (props as any).onPressIn?.(event);
-      effect.setInteraction("active", true);
-    };
-    styledProps.onPressOut = (event: GestureResponderEvent) => {
-      (props as any).onPressOut?.(event);
-      effect.setInteraction("active", false);
-    };
-  }
-  if (hasHover) {
-    convertToPressable = true;
-    styledProps.onHoverIn = (event: MouseEvent) => {
-      (props as any).onHoverIn?.(event);
-      effect.setInteraction("hover", true);
-    };
-    styledProps.onHoverOut = (event: MouseEvent) => {
-      (props as any).onHoverIn?.(event);
-      effect.setInteraction("hover", false);
-    };
-  }
-  if (hasFocus) {
-    convertToPressable = true;
-    styledProps.onFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
-      (props as any).onFocus?.(event);
-      effect.setInteraction("focus", true);
-    };
-    styledProps.onBlur = (event: NativeSyntheticEvent<TargetedEvent>) => {
-      (props as any).onBlur?.(event);
-      effect.setInteraction("focus", false);
-    };
-  }
-
-  effect.styledProps = styledProps;
-  effect.convertToPressable = convertToPressable;
-}
+import { styleMetaMap, vh, vw } from "./misc";
 
 type FlattenStyleOptions = {
   ch?: number;
@@ -203,7 +36,7 @@ type FlattenStyleOptions = {
  */
 export function flattenStyle(
   style: StyleProp,
-  effect: InteropEffect,
+  interop: InteropComputed,
   options: FlattenStyleOptions = {},
   flatStyle: Style = {},
   depth = 0,
@@ -220,7 +53,7 @@ export function flattenStyle(
       style.reverse();
     }
     for (const s of style) {
-      flattenStyle(s, effect, options, flatStyle, depth + 1);
+      flattenStyle(s, interop, options, flatStyle, depth + 1);
     }
     return flatStyle;
   }
@@ -254,7 +87,7 @@ export function flattenStyle(
       ...flatStyleMeta.pseudoClasses,
     };
 
-    if (!testPseudoClasses(effect, styleMeta.pseudoClasses)) {
+    if (!testPseudoClasses(interop, styleMeta.pseudoClasses)) {
       return flatStyle;
     }
   }
@@ -266,7 +99,7 @@ export function flattenStyle(
 
   if (
     styleMeta.containerQuery &&
-    !testContainerQuery(styleMeta.containerQuery, effect)
+    !testContainerQuery(styleMeta.containerQuery, interop)
   ) {
     return flatStyle;
   }
@@ -292,7 +125,7 @@ export function flattenStyle(
   if (styleMeta.container?.names) {
     flatStyleMeta.requiresLayout = true;
     for (const name of styleMeta.container.names) {
-      effect.setContainer(name);
+      interop.setContainer(name);
     }
   }
 
@@ -302,7 +135,7 @@ export function flattenStyle(
 
   if (styleMeta.variables) {
     for (const [key, value] of Object.entries(styleMeta.variables)) {
-      if (depth <= 1 && effect.variablesSetDuringRender.has(key)) {
+      if (depth <= 1 && interop.hasVariable(key)) {
         continue;
       }
 
@@ -310,11 +143,11 @@ export function flattenStyle(
         value,
         flatStyle,
         flatStyleMeta,
-        effect,
+        interop,
         options,
       );
 
-      effect.setVariable(key, getterOrValue);
+      interop.setVariable(key, getterOrValue);
     }
   }
 
@@ -339,7 +172,7 @@ export function flattenStyle(
               transform,
               flatStyle,
               flatStyleMeta,
-              effect,
+              interop,
               options,
             );
 
@@ -364,7 +197,7 @@ export function flattenStyle(
                 tValue,
                 flatStyle,
                 flatStyleMeta,
-                effect,
+                interop,
                 options,
               );
 
@@ -395,7 +228,7 @@ export function flattenStyle(
           value[0],
           flatStyle,
           flatStyleMeta,
-          effect,
+          interop,
           options,
         );
         extractAndDefineProperty(
@@ -403,7 +236,7 @@ export function flattenStyle(
           value[1],
           flatStyle,
           flatStyleMeta,
-          effect,
+          interop,
           options,
         );
         break;
@@ -414,7 +247,7 @@ export function flattenStyle(
           value[0],
           flatStyle,
           flatStyleMeta,
-          effect,
+          interop,
           options,
         );
         extractAndDefineProperty(
@@ -422,7 +255,7 @@ export function flattenStyle(
           value[1],
           flatStyle,
           flatStyleMeta,
-          effect,
+          interop,
           options,
         );
         break;
@@ -433,7 +266,7 @@ export function flattenStyle(
           value,
           flatStyle,
           flatStyleMeta,
-          effect,
+          interop,
           options,
         );
     }
@@ -447,7 +280,7 @@ function extractAndDefineProperty(
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  effect: InteropEffect,
+  effect: InteropComputed,
   options: FlattenStyleOptions = {},
 ) {
   const getterOrValue = extractValue(
@@ -506,7 +339,7 @@ function extractValue(
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  effect: InteropEffect,
+  effect: InteropComputed,
   options: FlattenStyleOptions = {},
 ): any {
   if (!isRuntimeValue(value)) {
@@ -517,11 +350,7 @@ function extractValue(
     case "var": {
       const name = value.arguments[0] as string;
 
-      let cache: any;
-
       return () => {
-        if (cache) return cache;
-
         return effect.runInEffect(() => {
           const resolvedValue = extractValue(
             effect.getVariable(name),
@@ -531,12 +360,9 @@ function extractValue(
             options,
           );
 
-          cache =
-            typeof resolvedValue === "function"
-              ? resolvedValue()
-              : resolvedValue;
-
-          return cache;
+          return typeof resolvedValue === "function"
+            ? resolvedValue()
+            : resolvedValue;
         });
       };
     }
@@ -827,7 +653,7 @@ function createRuntimeFunction(
   value: RuntimeValue,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  effect: InteropEffect,
+  effect: InteropComputed,
   options: FlattenStyleOptions,
   {
     wrap = true,

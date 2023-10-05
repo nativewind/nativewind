@@ -25,12 +25,12 @@ import Animated, {
 import { AnimatableCSSProperty, ExtractedAnimation, Style } from "../../types";
 import { animationMap, styleMetaMap } from "./misc";
 import { Pressable, Text, View } from "react-native";
-import { InteropEffect } from "./interop-effect";
-import { flattenStyle } from "./process-styles";
+import { InteropComputed } from "./interop";
+import { flattenStyle } from "./flatten-style";
 
 type AnimationInteropProps<P extends Record<string, unknown>> = P & {
   __component: ComponentType<P>;
-  __store: InteropEffect;
+  __store: InteropComputed;
 };
 
 const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>([
@@ -96,7 +96,7 @@ export const AnimationInterop = forwardRef(function Animated<
 /**
  * Returns if the component layout is calculated. If layout is not required, this will always return true
  */
-function useIsLayoutReady(effect: InteropEffect) {
+function useIsLayoutReady(effect: InteropComputed) {
   const [layoutReady, setLayoutReady] = useState(
     effect.requiresLayout
       ? effect.getInteraction("layoutWidth").get() !== 0
@@ -125,7 +125,7 @@ type TimingFrameProperties = {
 
 function useAnimationAndTransitions(
   style: Record<string, AnimatableValue>,
-  store: InteropEffect,
+  store: InteropComputed,
   isLayoutReady: boolean,
 ) {
   const {
@@ -244,7 +244,7 @@ function useAnimations(
   animationDurations: Time[],
   animationIterationCounts: AnimationIterationCount[],
   style: Record<string, unknown>,
-  store: InteropEffect,
+  store: InteropComputed,
   isLayoutReady: boolean,
 ) {
   const animations = useMemo(() => {

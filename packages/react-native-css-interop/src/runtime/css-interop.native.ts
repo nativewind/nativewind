@@ -4,7 +4,7 @@ import { InteropFunction } from "../testing-library";
 import { reactGlobal } from "./signals";
 import { Pressable, View } from "react-native";
 import { InheritanceProvider } from "./native/inheritance";
-import { useInteropEffect } from "./native/interop-effect";
+import { useInteropComputed } from "./native/interop";
 
 export const defaultCSSInterop: InteropFunction = (
   component,
@@ -15,7 +15,7 @@ export const defaultCSSInterop: InteropFunction = (
   reactGlobal.isInComponent = true;
   reactGlobal.currentStore = null;
 
-  const effect = useInteropEffect(props, options);
+  const effect = useInteropComputed(props, options);
 
   props = {
     ...props,
