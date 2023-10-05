@@ -1,10 +1,10 @@
 import { createElement } from "react";
 
-import { useStyledProps } from "./native/use-computed-props";
-import { ComponentContextProvider } from "./native/proxy";
 import { InteropFunction } from "../testing-library";
 import { reactGlobal } from "./signals";
 import { Pressable, View } from "react-native";
+import { InheritanceProvider } from "./native/inheritance";
+import { useInteropComputed } from "./native/interop";
 
 export const defaultCSSInterop: InteropFunction = (
   component,
@@ -15,12 +15,11 @@ export const defaultCSSInterop: InteropFunction = (
   reactGlobal.isInComponent = true;
   reactGlobal.currentStore = null;
 
-  const { store } = useStyledProps(props, options);
-  const { meta, styledProps } = store.snapshot;
+  const effect = useInteropComputed(props, options);
 
   props = {
     ...props,
-    ...styledProps,
+    ...effect.styledProps,
   };
 
   for (const source of options.sources) {
@@ -28,7 +27,7 @@ export const defaultCSSInterop: InteropFunction = (
   }
 
   // View doesn't support the interaction props, so force the component to be a Pressable (which accepts ViewProps)
-  if (meta.convertToPressable) {
+  if (effect.convertToPressable) {
     Object.assign(props, { ___pressable: true });
     if ((component as any) === View) {
       component = Pressable;
@@ -36,31 +35,37 @@ export const defaultCSSInterop: InteropFunction = (
   }
 
   // Depending on the meta, we may be required to surround the component in other components (like VariableProvider)
-  let finalComponent;
+  let createElementParams: Parameters<typeof createElement> = [
+    component,
+    props,
+    children,
+  ];
 
-  if (meta.animationInteropKey) {
+  if (effect.animationInteropKey) {
     props = Object.assign(props, {
-      key: meta.animationInteropKey,
+      key: effect.animationInteropKey,
       __component: component,
-      __store: store,
+      __store: effect,
     });
 
-    finalComponent = createElement(
+    createElementParams = [
       require("./native/animations").AnimationInterop,
       props,
       children,
-    );
-  } else {
-    finalComponent = createElement(component, props, children);
+    ];
   }
 
   reactGlobal.isInComponent = false;
 
-  return [
-    ComponentContextProvider,
-    {
-      value: store.context,
-    },
-    finalComponent,
-  ] as any;
+  if (effect.contextValue) {
+    return [
+      InheritanceProvider,
+      {
+        value: effect.contextValue,
+      },
+      createElement(...createElementParams),
+    ] as any;
+  } else {
+    return createElementParams;
+  }
 };

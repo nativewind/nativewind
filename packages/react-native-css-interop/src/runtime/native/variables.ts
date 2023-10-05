@@ -1,5 +1,8 @@
 import { styleMetaMap } from "./misc";
 import { StyleProp } from "../../types";
+import { useComputed } from "../signals";
+import { useContext } from "react";
+import { effectContext } from "./inheritance";
 
 export function vars(variables: Record<string, string | number>) {
   const $variables: Record<string, string | number> = {};
@@ -17,3 +20,8 @@ export function vars(variables: Record<string, string | number>) {
   styleMetaMap.set(style, { variables: $variables });
   return style;
 }
+
+export const useUnstableNativeVariable = (name: string) => {
+  const interop = useContext(effectContext);
+  return useComputed(() => interop.variables.get(name)?.get(), interop);
+};

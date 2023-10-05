@@ -1,363 +1,20 @@
 import {
-  GestureResponderEvent,
-  LayoutChangeEvent,
-  NativeSyntheticEvent,
-  PixelRatio,
-  Platform,
-  PlatformColor,
-  TargetedEvent,
   TransformsStyle,
+  Platform,
+  PixelRatio,
+  PlatformColor,
 } from "react-native";
-
 import {
-  ContainerRuntime,
-  ExtractedStyleValue,
-  InteropMeta,
-  RuntimeValue,
-  Style,
-  StyleMeta,
-  StyleProp,
-} from "../../types";
-import { StyleSheet, forceRerenderSignal, getGlobalStyle } from "./stylesheet";
-import {
-  testContainerQuery,
-  testMediaQuery,
   testPseudoClasses,
+  testMediaQuery,
+  testContainerQuery,
 } from "./conditions";
+import type { InteropComputed } from "./interop";
+import { RuntimeValue, Style, StyleMeta, StyleProp } from "../../types";
+import { StyleSheet } from "./stylesheet";
 import { isRuntimeValue } from "../../shared";
-import { styleMetaMap, vh, vw } from "./misc";
 import { rem } from "./rem";
-import {
-  ComponentContext,
-  componentContext,
-  createComponentContext,
-} from "./proxy";
-import { NormalizedOptions } from "./prop-mapping";
-import { useContext, useEffect, useRef, useSyncExternalStore } from "react";
-import {
-  EffectStore,
-  createEffectStore,
-  reactGlobal,
-  setupStore,
-  teardownStore,
-} from "../signals";
-import { styleSpecificityCompareFn } from "../specificity";
-
-export interface StyledEffectStore<P extends Record<string, unknown>>
-  extends Omit<EffectStore, "getSnapshot"> {
-  (): void;
-  props: P;
-  checkDependencies(inheritedContext: ComponentContext): void;
-  context: ComponentContext;
-  inheritedContext: ComponentContext;
-  lastDependencies: P[string][];
-  lastSnapshot: number;
-  getSnapshot: () => ReturnType<typeof processStyles>;
-  regenerateStyles: boolean;
-  snapshot: ReturnType<typeof processStyles<P>>;
-}
-
-export function useStyledProps<P extends Record<string, unknown>>(
-  props: P,
-  options: NormalizedOptions<P>,
-) {
-  const inheritedContext = useContext(componentContext);
-
-  // Create a single store per component
-  const storeRef = useRef<StyledEffectStore<P>>();
-  if (storeRef.current == null) {
-    storeRef.current = createStyledEffectStore(
-      options,
-      inheritedContext,
-      (props as any).testID,
-    );
-  }
-  const store = storeRef.current;
-  store.props = props;
-
-  // If the context changes, or we unmount we need to cleanup the store's subscribers
-  useEffect(() => () => store.cleanup(), [store.context]);
-
-  // If a dependency has changed, mark the store as dirty
-  store.checkDependencies(inheritedContext);
-
-  // Sync with the store. If the store is dirty, it will recompute the styles
-  const value = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getSnapshot,
-  );
-
-  // If there are any delayedEffects, run them
-  useEffect(() => {
-    if (reactGlobal.delayedEffects.size) {
-      for (const sub of reactGlobal.delayedEffects) {
-        sub();
-      }
-      reactGlobal.delayedEffects.clear();
-    }
-  }, [reactGlobal.delayedEffects.size]);
-
-  return {
-    store,
-    ...value,
-  };
-}
-
-function createStyledEffectStore<P extends Record<string, unknown>>(
-  options: NormalizedOptions<P>,
-  inheritedContext: ComponentContext,
-  debugName?: string,
-) {
-  const store: StyledEffectStore<P> = Object.assign(
-    createEffectStore(debugName) as any,
-    {
-      regenerateStyles: true,
-      lastSnapshot: 0,
-      lastDependencies: [],
-      snapshot: undefined,
-      context: createComponentContext(inheritedContext),
-      inheritedContext,
-      checkDependencies(currentContext: ComponentContext) {
-        let failed = reactGlobal.shouldRerender.has(store);
-        reactGlobal.shouldRerender.delete(store);
-        reactGlobal.delayedEffects.delete(store);
-
-        if (store.inheritedContext !== currentContext) {
-          store.inheritedContext = currentContext;
-          store.context = createComponentContext(currentContext);
-          failed = true;
-        }
-
-        failed ||= options.dependencies.some((k, index) => {
-          return store.props[k] !== store.lastDependencies[index];
-        });
-
-        if (failed) {
-          store.regenerateStyles = true;
-          store.lastDependencies = options.dependencies.map(
-            (k) => store.props[k],
-          );
-        }
-      },
-      getSnapshot() {
-        if (!store.regenerateStyles && store.lastSnapshot === store.version) {
-          return store.snapshot;
-        }
-
-        // Setup the store to be the current signal context
-        setupStore(store);
-        forceRerenderSignal.get();
-
-        store.regenerateStyles = false;
-        store.snapshot = processStyles<P>(store.props, store, options);
-        store.lastSnapshot = store.version;
-
-        teardownStore();
-
-        return store.snapshot;
-      },
-    },
-  );
-
-  return store;
-}
-
-function processStyles<P extends Record<string, unknown>>(
-  props: P,
-  store: StyledEffectStore<P>,
-  options: NormalizedOptions<P>,
-): {
-  styledProps: Record<string, StyleProp>;
-  meta: InteropMeta<P>;
-} {
-  const styledProps: Record<string, any> = {};
-  const animatedProps = new Set<keyof P>();
-  const transitionProps = new Set<keyof P>();
-
-  const context = store.context;
-  const interaction = store.context.interaction;
-
-  let hasActive: boolean | undefined = false;
-  let hasHover: boolean | undefined = false;
-  let hasFocus: boolean | undefined = false;
-  let hasInlineContainers = false;
-  let hasInlineVariables = false;
-  let requiresLayout = false;
-  let variables: Record<string, ExtractedStyleValue> = {};
-
-  let dynamicStyles = false;
-
-  for (const [key, { sources, nativeStyleToProp }] of options.config) {
-    dynamicStyles ||= Boolean(nativeStyleToProp);
-
-    const prop = props[key] as StyleProp;
-    let stylesToFlatten: StyleProp = [];
-    if (prop) stylesToFlatten.push(prop);
-
-    for (const sourceProp of sources) {
-      const source = props?.[sourceProp];
-      if (typeof source !== "string") continue;
-
-      StyleSheet.unstable_hook_onClassName?.(source);
-
-      for (const className of source.split(/\s+/)) {
-        let styles = getGlobalStyle(className);
-        if (!styles) continue;
-
-        if (!Array.isArray(styles)) {
-          styles = [styles];
-        }
-
-        for (const style of styles) {
-          stylesToFlatten.push(style);
-        }
-      }
-    }
-
-    dynamicStyles ||= stylesToFlatten.some((s) => s && styleMetaMap.has(s));
-
-    stylesToFlatten = stylesToFlatten.sort(
-      styleSpecificityCompareFn(dynamicStyles ? "desc" : "asc"),
-    );
-
-    if (stylesToFlatten.length === 1) {
-      stylesToFlatten = stylesToFlatten[0] as StyleProp;
-    }
-
-    if (!stylesToFlatten) continue;
-
-    if (!dynamicStyles) {
-      styledProps[key] = Object.freeze(stylesToFlatten);
-      continue;
-    }
-
-    const style = flattenStyle(stylesToFlatten, store);
-    const meta = styleMetaMap.get(style);
-
-    if (meta) {
-      if (meta.variables) {
-        hasInlineVariables = true;
-        variables = { ...variables, ...meta.variables };
-      }
-
-      if (meta.container?.names) {
-        hasInlineContainers = true;
-        const runtime: ContainerRuntime = {
-          type: "normal",
-          interaction,
-          style,
-        };
-
-        context.containers.__default.set(runtime);
-        for (const name of meta.container.names) {
-          context.containers[name].set(runtime);
-        }
-      }
-
-      if (meta.animations) animatedProps.add(key);
-      if (meta.transition) transitionProps.add(key);
-
-      requiresLayout ||= Boolean(hasInlineContainers || meta.requiresLayout);
-      hasActive ||= Boolean(hasInlineContainers || meta.pseudoClasses?.active);
-      hasHover ||= Boolean(hasInlineContainers || meta.pseudoClasses?.hover);
-      hasFocus ||= Boolean(hasInlineContainers || meta.pseudoClasses?.focus);
-    }
-
-    /**
-     * Map the flatStyle to the correct prop and/or move style properties to props (nativeStyleToProp)
-     *
-     * Note: We freeze the flatStyle as many of its props are getter's without a setter
-     *  Freezing the whole object keeps everything consistent
-     */
-    if (nativeStyleToProp) {
-      for (const [key, targetProp] of Object.entries(nativeStyleToProp)) {
-        const styleKey = key as keyof Style;
-        if (targetProp === true && style[styleKey]) {
-          styledProps[styleKey] = style[styleKey];
-          delete style[styleKey];
-        }
-      }
-    }
-
-    styledProps[key] = Object.freeze(style);
-  }
-
-  if (hasInlineVariables) {
-    const existingKeys = new Set(Object.keys(context.variables));
-    for (const [key, value] of Object.entries(variables)) {
-      existingKeys.delete(key);
-      context.variables[key].set(value);
-    }
-
-    for (const key of existingKeys) {
-      context.variables[key].set(undefined);
-    }
-  }
-
-  let animationInteropKey: string | undefined;
-  if (animatedProps.size > 0 || transitionProps.size > 0) {
-    animationInteropKey = [...animatedProps, ...transitionProps].join(":");
-  }
-
-  if (requiresLayout) {
-    styledProps.onLayout = (event: LayoutChangeEvent) => {
-      (props as any).onLayout?.(event);
-      interaction.layoutWidth.set(event.nativeEvent.layout.width);
-      interaction.layoutHeight.set(event.nativeEvent.layout.height);
-    };
-  }
-
-  let convertToPressable = false;
-  if (hasActive) {
-    convertToPressable = true;
-    styledProps.onPressIn = (event: GestureResponderEvent) => {
-      (props as any).onPressIn?.(event);
-      interaction.active.set(true);
-    };
-    styledProps.onPressOut = (event: GestureResponderEvent) => {
-      (props as any).onPressOut?.(event);
-      interaction.active.set(false);
-    };
-  }
-  if (hasHover) {
-    convertToPressable = true;
-    styledProps.onHoverIn = (event: MouseEvent) => {
-      (props as any).onHoverIn?.(event);
-      interaction.hover.set(true);
-    };
-    styledProps.onHoverOut = (event: MouseEvent) => {
-      (props as any).onHoverIn?.(event);
-      interaction.hover.set(false);
-    };
-  }
-  if (hasFocus) {
-    convertToPressable = true;
-    styledProps.onFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
-      (props as any).onFocus?.(event);
-      context.interaction.focus.set(true);
-    };
-    styledProps.onBlur = (event: NativeSyntheticEvent<TargetedEvent>) => {
-      (props as any).onBlur?.(event);
-      context.interaction.focus.set(false);
-    };
-  }
-
-  const meta: InteropMeta<P> = {
-    interopMeta: true,
-    animatedProps,
-    animationInteropKey,
-    convertToPressable,
-    transitionProps,
-    requiresLayout,
-    componentContext: context,
-  };
-
-  return {
-    styledProps,
-    meta,
-  };
-}
+import { styleMetaMap, vh, vw } from "./misc";
 
 type FlattenStyleOptions = {
   ch?: number;
@@ -377,9 +34,9 @@ type FlattenStyleOptions = {
  * @param flatStyle The flat style object to add the flattened styles to.
  * @returns The flattened style object.
  */
-export function flattenStyle<P extends Record<string, unknown>>(
+export function flattenStyle(
   style: StyleProp,
-  store: StyledEffectStore<P>,
+  interop: InteropComputed,
   options: FlattenStyleOptions = {},
   flatStyle: Style = {},
   depth = 0,
@@ -389,8 +46,14 @@ export function flattenStyle<P extends Record<string, unknown>>(
   }
 
   if (Array.isArray(style)) {
+    // Only inline styles are at depth > 1
+    // We can shortcut processing them by reversing the array
+    // Styles at depth=1 are already reversed due to specificity sorting
+    if (depth > 1 && style.length > 1) {
+      style.reverse();
+    }
     for (const s of style) {
-      flattenStyle(s, store, options, flatStyle, depth + 1);
+      flattenStyle(s, interop, options, flatStyle, depth + 1);
     }
     return flatStyle;
   }
@@ -408,6 +71,11 @@ export function flattenStyle<P extends Record<string, unknown>>(
     styleMetaMap.set(flatStyle, flatStyleMeta);
   }
 
+  // If the style can have variables or containers, we need to wrap it in a context
+  flatStyleMeta.wrapInContext ||= Boolean(
+    styleMeta.variables || styleMeta.container,
+  );
+
   /*
    * START OF CONDITIONS CHECK
    *
@@ -419,9 +87,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
       ...flatStyleMeta.pseudoClasses,
     };
 
-    if (
-      !testPseudoClasses(store.context.interaction, styleMeta.pseudoClasses)
-    ) {
+    if (!testPseudoClasses(interop, styleMeta.pseudoClasses)) {
       return flatStyle;
     }
   }
@@ -433,10 +99,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
 
   if (
     styleMeta.containerQuery &&
-    !testContainerQuery(
-      styleMeta.containerQuery,
-      store.inheritedContext.containers,
-    )
+    !testContainerQuery(styleMeta.containerQuery, interop)
   ) {
     return flatStyle;
   }
@@ -459,14 +122,10 @@ export function flattenStyle<P extends Record<string, unknown>>(
     };
   }
 
-  if (styleMeta.container) {
-    flatStyleMeta.container ??= { type: "normal", names: [] };
-
-    if (styleMeta.container.names) {
-      flatStyleMeta.container.names = styleMeta.container.names;
-    }
-    if (styleMeta.container.type) {
-      flatStyleMeta.container.type = styleMeta.container.type;
+  if (styleMeta.container?.names) {
+    flatStyleMeta.requiresLayout = true;
+    for (const name of styleMeta.container.names) {
+      interop.setContainer(name);
     }
   }
 
@@ -476,27 +135,27 @@ export function flattenStyle<P extends Record<string, unknown>>(
 
   if (styleMeta.variables) {
     for (const [key, value] of Object.entries(styleMeta.variables)) {
+      if (depth <= 1 && interop.hasVariable(key)) {
+        continue;
+      }
+
       const getterOrValue = extractValue(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        interop,
         options,
       );
 
-      flatStyleMeta.variables ??= {};
-      flatStyleMeta.variables[key] = getterOrValue;
+      interop.setVariable(key, getterOrValue);
     }
   }
 
   for (let [key, value] of Object.entries(style)) {
     if (
-      // Items at this depth are in reverse order (due to specificityCompareFn sorting)
       // We can shortcut setting a value if it already exists
-      depth <= 1 &&
-      (value === undefined ||
-        (key in flatStyle &&
-          flatStyle[key as keyof typeof flatStyle] !== undefined))
+      value === undefined ||
+      flatStyle[key as keyof typeof flatStyle] !== undefined
     ) {
       continue;
     }
@@ -513,7 +172,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
               transform,
               flatStyle,
               flatStyleMeta,
-              store,
+              interop,
               options,
             );
 
@@ -538,7 +197,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
                 tValue,
                 flatStyle,
                 flatStyleMeta,
-                store,
+                interop,
                 options,
               );
 
@@ -569,7 +228,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
           value[0],
           flatStyle,
           flatStyleMeta,
-          store,
+          interop,
           options,
         );
         extractAndDefineProperty(
@@ -577,7 +236,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
           value[1],
           flatStyle,
           flatStyleMeta,
-          store,
+          interop,
           options,
         );
         break;
@@ -588,7 +247,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
           value[0],
           flatStyle,
           flatStyleMeta,
-          store,
+          interop,
           options,
         );
         extractAndDefineProperty(
@@ -596,7 +255,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
           value[1],
           flatStyle,
           flatStyleMeta,
-          store,
+          interop,
           options,
         );
         break;
@@ -607,7 +266,7 @@ export function flattenStyle<P extends Record<string, unknown>>(
           value,
           flatStyle,
           flatStyleMeta,
-          store,
+          interop,
           options,
         );
     }
@@ -616,89 +275,94 @@ export function flattenStyle<P extends Record<string, unknown>>(
   return flatStyle;
 }
 
-function extractAndDefineProperty<P extends Record<string, unknown>>(
+function extractAndDefineProperty(
   key: string,
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  store: StyledEffectStore<P>,
+  effect: InteropComputed,
   options: FlattenStyleOptions = {},
 ) {
   const getterOrValue = extractValue(
     value,
     flatStyle,
     flatStyleMeta,
-    store,
+    effect,
     options,
   );
 
   if (getterOrValue === undefined) return;
 
-  const tokens = key.split(".");
-  let target = flatStyle as any;
+  if (key.includes(".")) {
+    // Some native props can be nested in objects
+    const tokens = key.split(".");
+    let target = flatStyle as any;
 
-  for (const [index, token] of tokens.entries()) {
-    if (index === tokens.length - 1) {
-      if (typeof getterOrValue === "function") {
-        Object.defineProperty(target, token, {
-          configurable: true,
-          enumerable: true,
-          get: getterOrValue,
-        });
+    for (const [index, token] of tokens.entries()) {
+      if (index === tokens.length - 1) {
+        if (typeof getterOrValue === "function") {
+          Object.defineProperty(target, token, {
+            configurable: true,
+            enumerable: true,
+            get: getterOrValue,
+          });
+        } else {
+          Object.defineProperty(target, token, {
+            configurable: true,
+            enumerable: true,
+            value: getterOrValue,
+          });
+        }
       } else {
-        Object.defineProperty(target, token, {
-          configurable: true,
-          enumerable: true,
-          value: getterOrValue,
-        });
+        target[token] ??= {};
+        target = target[token];
       }
-    } else {
-      target[token] ??= {};
-      target = target[token];
     }
+
+    return flatStyle;
+  } else if (typeof getterOrValue === "function") {
+    Object.defineProperty(flatStyle, key, {
+      configurable: true,
+      enumerable: true,
+      get: getterOrValue,
+    });
+  } else {
+    Object.defineProperty(flatStyle, key, {
+      configurable: true,
+      enumerable: true,
+      value: getterOrValue,
+    });
   }
 }
 
-function extractValue<P extends Record<string, unknown>>(
+function extractValue(
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  store: StyledEffectStore<P>,
+  effect: InteropComputed,
   options: FlattenStyleOptions = {},
 ): any {
   if (!isRuntimeValue(value)) {
     return value;
   }
 
-  const context = store.context;
-
   switch (value.name) {
     case "var": {
       const name = value.arguments[0] as string;
 
-      let cache: any;
-
       return () => {
-        if (cache) return cache;
-
-        const signal = store.context.variables[name];
-        if (!signal) return;
-
-        return store.runInEffect(() => {
+        return effect.runInEffect(() => {
           const resolvedValue = extractValue(
-            signal.get(),
+            effect.getVariable(name),
             flatStyle,
             flatStyleMeta,
-            store,
+            effect,
             options,
           );
 
-          cache =
-            typeof resolvedValue === "function"
-              ? resolvedValue()
-              : resolvedValue;
-
-          return cache;
+          return typeof resolvedValue === "function"
+            ? resolvedValue()
+            : resolvedValue;
         });
       };
     }
@@ -729,8 +393,8 @@ function extractValue<P extends Record<string, unknown>>(
         reference = options.ch;
       } else if (typeof flatStyle.height === "number") {
         reference = flatStyle.height;
-      } else if (context.interaction?.layoutHeight) {
-        reference = context.interaction.layoutHeight.get();
+      } else {
+        reference = effect.getInteraction("layoutHeight").get();
       }
 
       if (reference) {
@@ -739,10 +403,8 @@ function extractValue<P extends Record<string, unknown>>(
         return () => {
           if (typeof flatStyle.height === "number") {
             reference = flatStyle.height;
-          } else if (context.interaction.layoutHeight) {
-            reference = context.interaction.layoutHeight.get();
           } else {
-            reference = 0;
+            reference = effect.getInteraction("layoutHeight").get() ?? 0;
           }
 
           return round(reference * multiplier);
@@ -758,8 +420,8 @@ function extractValue<P extends Record<string, unknown>>(
         reference = options.cw;
       } else if (typeof flatStyle.width === "number") {
         reference = flatStyle.width;
-      } else if (context.interaction.layoutWidth) {
-        reference = context.interaction.layoutWidth.get();
+      } else {
+        reference = effect.getInteraction("layoutWidth").get();
       }
 
       if (reference) {
@@ -768,10 +430,8 @@ function extractValue<P extends Record<string, unknown>>(
         return () => {
           if (typeof flatStyle.width === "number") {
             reference = flatStyle.width;
-          } else if (context.interaction?.layoutWidth) {
-            reference = context.interaction.layoutWidth.get();
           } else {
-            reference = 0;
+            reference = effect.getInteraction("layoutWidth").get() ?? 0;
           }
 
           return round(reference * multiplier);
@@ -788,7 +448,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -805,7 +465,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -825,7 +485,7 @@ function extractValue<P extends Record<string, unknown>>(
         },
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -847,7 +507,7 @@ function extractValue<P extends Record<string, unknown>>(
         },
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -869,7 +529,7 @@ function extractValue<P extends Record<string, unknown>>(
         },
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -881,7 +541,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -896,7 +556,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -909,7 +569,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -922,7 +582,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -939,7 +599,7 @@ function extractValue<P extends Record<string, unknown>>(
         },
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           wrap: false,
@@ -951,7 +611,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
         {
           joinArgs: false,
@@ -971,7 +631,7 @@ function extractValue<P extends Record<string, unknown>>(
         value,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
       );
     }
@@ -989,11 +649,11 @@ interface CreateRuntimeFunctionOptions {
 /**
  * TODO: This function is overloaded with functionality
  */
-function createRuntimeFunction<P extends Record<string, unknown>>(
+function createRuntimeFunction(
   value: RuntimeValue,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
-  store: StyledEffectStore<P>,
+  effect: InteropComputed,
   options: FlattenStyleOptions,
   {
     wrap = true,
@@ -1012,7 +672,7 @@ function createRuntimeFunction<P extends Record<string, unknown>>(
         argument,
         flatStyle,
         flatStyleMeta,
-        store,
+        effect,
         options,
       );
 

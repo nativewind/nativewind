@@ -22,19 +22,15 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import {
-  AnimatableCSSProperty,
-  ExtractedAnimation,
-  InteropMeta,
-  Style,
-} from "../../types";
-import { StyledEffectStore, flattenStyle } from "./use-computed-props";
+import { AnimatableCSSProperty, ExtractedAnimation, Style } from "../../types";
 import { animationMap, styleMetaMap } from "./misc";
 import { Pressable, Text, View } from "react-native";
+import { InteropComputed } from "./interop";
+import { flattenStyle } from "./flatten-style";
 
 type AnimationInteropProps<P extends Record<string, unknown>> = P & {
   __component: ComponentType<P>;
-  __store: StyledEffectStore<P>;
+  __store: InteropComputed;
 };
 
 const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>([
@@ -72,13 +68,11 @@ export const AnimationInterop = forwardRef(function Animated<
   const props = $props as unknown as P;
   Component = createAnimatedComponent(Component);
 
-  const meta = store.snapshot.meta;
-
-  const isLayoutReady = useIsLayoutReady(meta);
+  const isLayoutReady = useIsLayoutReady(store);
 
   for (const prop of new Set<keyof P>([
-    ...meta.transitionProps,
-    ...meta.animatedProps,
+    ...store.transitionProps,
+    ...store.animatedProps,
   ])) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     props[prop] = useAnimationAndTransitions(
@@ -93,7 +87,7 @@ export const AnimationInterop = forwardRef(function Animated<
     {
       ...props,
       ref,
-      key: meta.animationInteropKey,
+      key: store.animationInteropKey,
     },
     children,
   );
@@ -102,13 +96,10 @@ export const AnimationInterop = forwardRef(function Animated<
 /**
  * Returns if the component layout is calculated. If layout is not required, this will always return true
  */
-function useIsLayoutReady<P extends Record<string, unknown>>({
-  requiresLayout,
-  componentContext,
-}: InteropMeta<P>) {
+function useIsLayoutReady(effect: InteropComputed) {
   const [layoutReady, setLayoutReady] = useState(
-    requiresLayout
-      ? componentContext.interaction.layoutWidth.get() !== 0
+    effect.requiresLayout
+      ? effect.getInteraction("layoutWidth").get() !== 0
       : true,
   );
 
@@ -118,7 +109,7 @@ function useIsLayoutReady<P extends Record<string, unknown>>({
     }
 
     // We only need to listen for a single layout change
-    return componentContext.interaction.layoutWidth.subscribe(() => {
+    return effect.getInteraction("layoutWidth").subscribe(() => {
       setLayoutReady(true);
     });
   }, [layoutReady]);
@@ -132,9 +123,9 @@ type TimingFrameProperties = {
   value: AnimatableValue;
 };
 
-function useAnimationAndTransitions<P extends Record<string, unknown>>(
+function useAnimationAndTransitions(
   style: Record<string, AnimatableValue>,
-  store: StyledEffectStore<P>,
+  store: InteropComputed,
   isLayoutReady: boolean,
 ) {
   const {
@@ -248,12 +239,12 @@ function useTransitions(
   return [transitionProps, transitionValues] as const;
 }
 
-function useAnimations<P extends Record<string, unknown>>(
+function useAnimations(
   animationNames: AnimationName[],
   animationDurations: Time[],
   animationIterationCounts: AnimationIterationCount[],
   style: Record<string, unknown>,
-  store: StyledEffectStore<P>,
+  store: InteropComputed,
   isLayoutReady: boolean,
 ) {
   const animations = useMemo(() => {

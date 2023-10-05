@@ -24,13 +24,13 @@ import {
 import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
 import { colorScheme } from "./color-scheme";
 import { rem } from "./rem";
-import { setDefaultVariable, setRootVariable } from "./proxy";
 import { createSignal } from "../signals";
+import { setRootVariables, setUniversalVariables } from "./inheritance";
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
 
-export const forceRerenderSignal = createSignal(0);
+export const fastReloadSignal = createSignal(0);
 
 const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_FLAGS]: {},
@@ -73,30 +73,13 @@ const commonStyleSheet: CommonStyleSheet = {
       }
     }
 
-    if (options.rootVariables) {
-      for (const entry of Object.entries(options.rootVariables)) {
-        setRootVariable(...entry);
-      }
-    }
-    if (options.rootDarkVariables) {
-      for (const entry of Object.entries(options.rootDarkVariables)) {
-        setRootVariable(...entry, "dark");
-      }
-    }
+    setRootVariables(options.rootVariables, options.rootDarkVariables);
+    setUniversalVariables(
+      options.defaultVariables,
+      options.defaultDarkVariables,
+    );
 
-    if (options.defaultVariables) {
-      for (const entry of Object.entries(options.defaultVariables)) {
-        setDefaultVariable(...entry);
-      }
-    }
-
-    if (options.defaultDarkVariables) {
-      for (const entry of Object.entries(options.defaultDarkVariables)) {
-        setDefaultVariable(...entry, "dark");
-      }
-    }
-
-    forceRerenderSignal.set(forceRerenderSignal.get() + 1);
+    fastReloadSignal.set((fastReloadSignal.get() ?? 0) + 1);
   },
 };
 

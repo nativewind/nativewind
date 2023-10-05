@@ -4,7 +4,7 @@ import { createSignal } from "../signals";
 export const rem = (function createRem(defaultValue: number = 14) {
   const signal = createSignal<number>(defaultValue);
 
-  const get = () => signal.get();
+  const get = () => signal.get() ?? defaultValue;
   const set = (nextValue: number) => signal.set(nextValue || defaultValue);
   const reset = () => set(defaultValue);
 

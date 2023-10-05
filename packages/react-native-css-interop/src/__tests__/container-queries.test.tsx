@@ -31,7 +31,7 @@ describe("size", () => {
       }
     `);
 
-    const { rerender } = render(
+    render(
       <Parent testID="parent" className="container">
         <Child testID="child" className="child" />
       </Parent>,
@@ -61,7 +61,7 @@ describe("size", () => {
       color: "rgba(255, 0, 0, 1)",
     });
 
-    rerender(
+    screen.rerender(
       <Parent className="container" style={{ width: 500 }}>
         <Child className="child" />
       </Parent>,

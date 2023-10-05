@@ -2,21 +2,25 @@ import { useRef, useSyncExternalStore } from "react";
 
 export const reactGlobal: {
   isInComponent: boolean;
-  currentStore: EffectStore | null;
-  delayedEffects: Set<() => void>;
-  shouldRerender: Set<() => void>;
+  currentStore: Computed<any> | null;
+  delayedEvents: Set<() => void>;
 } = {
   isInComponent: false,
   currentStore: null,
-  delayedEffects: new Set(),
-  shouldRerender: new Set(),
+  delayedEvents: new Set(),
 };
 
-export type Signal<T> = ReturnType<typeof createSignal<T>>;
+const context: Computed<any>[] = [];
 
-export function createSignal<T = unknown>(value: T) {
+export type Signal<T> = ReturnType<typeof createSignal<T>>;
+type SignalSetFn<T> = (previous?: T) => T;
+
+export function createSignal<T = unknown>(value: T | undefined) {
   const signal = {
     subscriptions: new Set<() => void>(),
+    /**
+     * Get the value and subscribe if we are in an effect
+     */
     get() {
       const running = context[context.length - 1];
       if (running) {
@@ -25,16 +29,27 @@ export function createSignal<T = unknown>(value: T) {
       }
       return value;
     },
+    /**
+     * Get the value without subscribing
+     */
     peek() {
       return value;
     },
-    set(nextValue: T) {
+    /**
+     * Set the value if it has changed and notify subscribers
+     * If we are in a component, delay the update until the component is done rendering
+     * as React cannot handle state updates during rendering
+     */
+    set(nextValue: T | undefined | SignalSetFn<T>) {
+      if (typeof nextValue === "function") {
+        nextValue = (nextValue as any)(value);
+      }
+
       if (Object.is(value, nextValue)) return;
-      value = nextValue;
+      value = nextValue as T;
       if (reactGlobal.isInComponent) {
         for (const sub of signal.subscriptions) {
-          reactGlobal.shouldRerender.add(sub);
-          reactGlobal.delayedEffects.add(sub);
+          reactGlobal.delayedEvents.add(sub);
         }
       } else {
         for (const sub of Array.from(signal.subscriptions)) {
@@ -54,84 +69,90 @@ export function createSignal<T = unknown>(value: T) {
   return signal;
 }
 
-export type EffectStore<T = unknown> = {
+export interface Computed<T = unknown> extends Signal<T> {
   (): void;
-  version: number;
-  dependencies: Set<Signal<any>>;
-  getSnapshot(): T;
+  debugName?: string;
+  dependencies: Set<Signal<any> | (() => void)>;
+  fn: SignalSetFn<T>;
   runInEffect<T>(fn: () => T): T;
-  subscribe(callback: () => void): () => void;
-  cleanup: () => void;
-};
+}
 
-const context: EffectStore[] = [];
-export function createEffectStore(debugName?: string) {
-  let subscription: () => void | undefined;
+function setup(effect: Computed<any>) {
+  // Clean up the previous run
+  cleanup(effect);
+  // Setup the new run
+  context.push(effect);
+  reactGlobal.delayedEvents.delete(effect);
+  reactGlobal.currentStore = effect;
+}
 
-  const store: EffectStore = Object.assign(
+function teardown(effect: Computed<any>) {
+  context.pop();
+}
+
+export function cleanup(effect: Computed<any>) {
+  for (const dep of effect.dependencies) {
+    if ("subscriptions" in dep) {
+      dep.subscriptions.delete(effect);
+    }
+  }
+  effect.dependencies.clear();
+  reactGlobal.delayedEvents.delete(effect);
+}
+
+export function createComputed<T>(
+  fn: SignalSetFn<T>,
+  runOnInitialization = true,
+  debugName?: string,
+): Computed<T> {
+  const effect: Computed<T> = Object.assign(
     function () {
-      store.version++;
-      subscription?.();
+      setup(effect);
+      effect.set(effect.fn);
+      teardown(effect);
     },
+    createSignal<T>(undefined),
     {
       debugName,
-      version: 0,
-      getSnapshot() {
-        return store.version;
-      },
-      dependencies: new Set<Signal<any>>(),
-      runInEffect<T>(fn: () => T): T {
-        context.push(store);
+      dependencies: new Set(),
+      fn: fn,
+      /**
+       * Run a function in context, without cleaning up the dependencies
+       */
+      runInEffect<T>(fn: () => T) {
+        context.push(effect);
         let value = fn();
         context.pop();
         return value;
       },
-      subscribe(callback: () => void) {
-        subscription = callback;
-        return () => {
-          subscription === undefined;
-        };
-      },
-      cleanup() {
-        for (const dep of store.dependencies) {
-          dep.subscriptions.delete(store);
-        }
-        store.dependencies.clear();
-        reactGlobal.shouldRerender.delete(store);
-        reactGlobal.delayedEffects.delete(store);
-      },
+    } satisfies {
+      [K in keyof Omit<Computed, keyof Signal<any>>]: Computed<T>[K];
     },
   );
-
-  return store;
+  if (runOnInitialization) {
+    effect();
+  }
+  return effect;
 }
 
-export function setupStore(store: EffectStore) {
-  context.push(store);
-  reactGlobal.delayedEffects.delete(store);
-  reactGlobal.currentStore = store;
-  store.cleanup();
-}
+/*
+ * We only ever track one dependency
+ */
+export function useComputed<T>(fn: () => T, fnDependency?: any) {
+  const computedRef = useRef<Computed<T> & { fnDependency: any }>();
 
-export function teardownStore() {
-  context.pop();
-}
-
-export function useSignals() {
-  if (reactGlobal.currentStore) {
-    return reactGlobal.currentStore;
+  if (computedRef.current == null) {
+    computedRef.current = Object.assign(createComputed<T>(fn), {
+      fnDependency,
+    });
+  } else if (computedRef.current.fnDependency !== fnDependency) {
+    computedRef.current.fn = fn;
+    computedRef.current();
   }
 
-  teardownStore();
-
-  const storeRef = useRef<EffectStore>();
-  if (storeRef.current == null) {
-    storeRef.current = createEffectStore();
-  }
-
-  const store = storeRef.current;
-  useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
-  setupStore(store);
-
-  return store;
+  return useSyncExternalStore(
+    computedRef.current.subscribe,
+    computedRef.current.peek,
+    computedRef.current.peek,
+  );
 }
