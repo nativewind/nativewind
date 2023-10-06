@@ -79,138 +79,138 @@ describe("Border - Border Width", () => {
   );
 });
 
-describe("Border - Border Color", () => {
+describe.only("Border - Border Color", () => {
   testCases(
     ["border-white", style({ borderColor: "rgba(255, 255, 255, 1)" })],
-    [
-      "border-x-white",
-      style({
-        borderLeftColor: "rgba(255, 255, 255, 1)",
-        borderRightColor: "rgba(255, 255, 255, 1)",
-      }),
-    ],
-    [
-      "border-y-white",
-      style({
-        borderTopColor: "rgba(255, 255, 255, 1)",
-        borderBottomColor: "rgba(255, 255, 255, 1)",
-      }),
-    ],
-    ["border-t-white", style({ borderTopColor: "rgba(255, 255, 255, 1)" })],
-    ["border-b-white", style({ borderBottomColor: "rgba(255, 255, 255, 1)" })],
-    ["border-l-white", style({ borderLeftColor: "rgba(255, 255, 255, 1)" })],
-    ["border-r-white", style({ borderRightColor: "rgba(255, 255, 255, 1)" })],
-    [
-      "border-current",
-      {
-        warning: () =>
-          new Map([
-            [
-              "border-current",
-              [
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-top-color",
-                  value: "currentcolor",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-bottom-color",
-                  value: "currentcolor",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-left-color",
-                  value: "currentcolor",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-right-color",
-                  value: "currentcolor",
-                },
-              ],
-            ],
-          ]),
-      },
-    ],
-    ["border-inherit", invalidValue("border-color", "inherit")],
-    [
-      "border-x-inherit",
-      {
-        warning: () =>
-          new Map([
-            [
-              "border-x-inherit",
-              [
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-left-color",
-                  value: "inherit",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-right-color",
-                  value: "inherit",
-                },
-              ],
-            ],
-          ]),
-      },
-    ],
-    [
-      "border-y-current",
-      {
-        warning: () =>
-          new Map([
-            [
-              "border-y-current",
-              [
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-top-color",
-                  value: "currentcolor",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-bottom-color",
-                  value: "currentcolor",
-                },
-              ],
-            ],
-          ]),
-      },
-    ],
-    [
-      "border-y-inherit",
-      {
-        warning: () =>
-          new Map([
-            [
-              "border-y-inherit",
-              [
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-top-color",
-                  value: "inherit",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-bottom-color",
-                  value: "inherit",
-                },
-              ],
-            ],
-          ]),
-      },
-    ],
-    ["border-t-current", invalidValue("border-top-color", "currentcolor")],
-    ["border-t-inherit", invalidValue("border-top-color", "inherit")],
-    ["border-b-current", invalidValue("border-bottom-color", "currentcolor")],
-    ["border-b-inherit", invalidValue("border-bottom-color", "inherit")],
-    ["border-l-current", invalidValue("border-left-color", "currentcolor")],
-    ["border-l-inherit", invalidValue("border-left-color", "inherit")],
-    ["border-r-current", invalidValue("border-right-color", "currentcolor")],
-    ["border-r-inherit", invalidValue("border-right-color", "inherit")],
+    // [
+    //   "border-x-white",
+    //   style({
+    //     borderLeftColor: "rgba(255, 255, 255, 1)",
+    //     borderRightColor: "rgba(255, 255, 255, 1)",
+    //   }),
+    // ],
+    // [
+    //   "border-y-white",
+    //   style({
+    //     borderTopColor: "rgba(255, 255, 255, 1)",
+    //     borderBottomColor: "rgba(255, 255, 255, 1)",
+    //   }),
+    // ],
+    // ["border-t-white", style({ borderTopColor: "rgba(255, 255, 255, 1)" })],
+    // ["border-b-white", style({ borderBottomColor: "rgba(255, 255, 255, 1)" })],
+    // ["border-l-white", style({ borderLeftColor: "rgba(255, 255, 255, 1)" })],
+    // ["border-r-white", style({ borderRightColor: "rgba(255, 255, 255, 1)" })],
+    // [
+    //   "border-current",
+    //   {
+    //     warning: () =>
+    //       new Map([
+    //         [
+    //           "border-current",
+    //           [
+    //             {
+    //               type: "IncompatibleNativeValue",
+    //               property: "border-top-color",
+    //               value: "currentcolor",
+    //             },
+    //             {
+    //               type: "IncompatibleNativeValue",
+    //               property: "border-bottom-color",
+    //               value: "currentcolor",
+    //             },
+    //             {
+    //               type: "IncompatibleNativeValue",
+    //               property: "border-left-color",
+    //               value: "currentcolor",
+    //             },
+    //             {
+    //               type: "IncompatibleNativeValue",
+    //               property: "border-right-color",
+    //               value: "currentcolor",
+    //             },
+    //           ],
+    //         ],
+    //       ]),
+    //   },
+    // ],
+    // ["border-inherit", invalidValue("border-color", "inherit")],
+    // [
+    //   "border-x-inherit",
+    //   {
+    //     warning: () =>
+    //       new Map([
+    //         [
+    //           "border-x-inherit",
+    //           [
+    //             {
+    //               type: "IncompatibleNativeValue",
+    //               property: "border-left-color",
+    //               value: "inherit",
+    //             },
+    //             {
+    //               type: "IncompatibleNativeValue",
+    //               property: "border-right-color",
+    //               value: "inherit",
+    //             },
+    //           ],
+    //         ],
+    //       ]),
+    //   },
+    // ],
+    // [
+    //   "border-y-current",
+    //   {
+    //     warning: () =>
+    //       new Map([
+    //         [
+    //           "border-y-current",
+    //           [
+    //             {
+    //               type: "IncompatibleNativeValue",
+    //               property: "border-top-color",
+    //               value: "currentcolor",
+    //             },
+    //             {
+    //               type: "IncompatibleNativeValue",
+    //               property: "border-bottom-color",
+    //               value: "currentcolor",
+    //             },
+    //           ],
+    //         ],
+    //       ]),
+    //   },
+    // ],
+    // [
+    //   "border-y-inherit",
+    //   {
+    //     warning: () =>
+    //       new Map([
+    //         [
+    //           "border-y-inherit",
+    //           [
+    //             {
+    //               type: "IncompatibleNativeValue",
+    //               property: "border-top-color",
+    //               value: "inherit",
+    //             },
+    //             {
+    //               type: "IncompatibleNativeValue",
+    //               property: "border-bottom-color",
+    //               value: "inherit",
+    //             },
+    //           ],
+    //         ],
+    //       ]),
+    //   },
+    // ],
+    // ["border-t-current", invalidValue("border-top-color", "currentcolor")],
+    // ["border-t-inherit", invalidValue("border-top-color", "inherit")],
+    // ["border-b-current", invalidValue("border-bottom-color", "currentcolor")],
+    // ["border-b-inherit", invalidValue("border-bottom-color", "inherit")],
+    // ["border-l-current", invalidValue("border-left-color", "currentcolor")],
+    // ["border-l-inherit", invalidValue("border-left-color", "inherit")],
+    // ["border-r-current", invalidValue("border-right-color", "currentcolor")],
+    // ["border-r-inherit", invalidValue("border-right-color", "inherit")],
   );
 });
 

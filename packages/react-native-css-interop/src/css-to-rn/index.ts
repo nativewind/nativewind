@@ -520,11 +520,7 @@ function declarationsToStyle(
    * The `append` option allows the same property to be added multiple times
    * E.g. `transform` accepts an array of transforms
    */
-  function addStyleProp(
-    property: string,
-    value: any,
-    { shortHand = false, append = false } = {},
-  ) {
+  function addStyleProp(property: string, value: any, { append = false } = {}) {
     if (value === undefined) {
       return;
     }
@@ -544,10 +540,6 @@ function declarationsToStyle(
       } else {
         style[property] = [value];
       }
-    } else if (shortHand) {
-      // If the shorthand property has already been set, don't overwrite it
-      // The longhand property always have priority
-      style[property] ??= value;
     } else {
       style[property] = value;
     }
@@ -562,12 +554,17 @@ function declarationsToStyle(
     }
   }
 
-  function addShortHandStyleProp(
-    property: string,
-    value: any,
-    { append = false } = {},
+  function handleStyleShorthand(
+    name: string,
+    options: Record<string, unknown>,
   ) {
-    return addStyleProp(property, value, { shortHand: true, append });
+    if (allEqual(...Object.values(options))) {
+      return addStyleProp(name, Object.values(options)[0]);
+    } else {
+      for (const [name, value] of Object.entries(options)) {
+        addStyleProp(name, value);
+      }
+    }
   }
 
   function addVariable(property: string, value: any) {
@@ -760,7 +757,7 @@ function declarationsToStyle(
 
   const parseDeclarationOptions: ParseDeclarationOptions = {
     addStyleProp,
-    addShortHandStyleProp,
+    handleStyleShorthand,
     addAnimationProp,
     addContainerProp,
     addTransitionProp,
@@ -782,4 +779,38 @@ function kebabToCamelCase(str: string) {
   }
 
   return str.replace(/-./g, (x) => x[1].toUpperCase());
+}
+
+function allEqual(...params: unknown[]) {
+  return params.every((param, index, array) => {
+    return index === 0 ? true : equal(array[0], param);
+  });
+}
+
+function equal(a: unknown, b: unknown) {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (a === null || b === null) return false;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (!equal(a[i], b[i])) return false;
+    }
+    return true;
+  }
+  if (typeof a === "object" && typeof b === "object") {
+    if (Object.keys(a).length !== Object.keys(b).length) return false;
+    for (const key in a) {
+      if (
+        !equal(
+          (a as Record<string, unknown>)[key],
+          (b as Record<string, unknown>)[key],
+        )
+      )
+        return false;
+    }
+    return true;
+  }
+
+  return false;
 }

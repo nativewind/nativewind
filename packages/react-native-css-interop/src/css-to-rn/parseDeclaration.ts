@@ -52,6 +52,11 @@ type AddStyleProp = (
   },
 ) => void;
 
+type HandleStyleShorthand = (
+  property: string,
+  options: Record<string, unknown>,
+) => void;
+
 type AddAnimationDefaultProp = (property: string, value: unknown[]) => void;
 type AddContainerProp = (
   declaration: Extract<
@@ -77,7 +82,7 @@ type AddWarning = (warning: ExtractionWarning) => undefined;
 export interface ParseDeclarationOptions {
   inlineRem?: number | false;
   addStyleProp: AddStyleProp;
-  addShortHandStyleProp: AddStyleProp;
+  handleStyleShorthand: HandleStyleShorthand;
   addAnimationProp: AddAnimationDefaultProp;
   addContainerProp: AddContainerProp;
   addTransitionProp: AddTransitionProp;
@@ -97,7 +102,7 @@ export function parseDeclaration(
 ) {
   const {
     addStyleProp,
-    addShortHandStyleProp,
+    handleStyleShorthand,
     addAnimationProp,
     addContainerProp,
     addTransitionProp,
@@ -319,32 +324,30 @@ export function parseDeclaration(
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "inset-block":
-      addShortHandStyleProp(
-        "inset-block-start",
-        parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
-      );
-      addShortHandStyleProp(
-        "inset-block-end",
-        parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
-      );
-      return;
+      return handleStyleShorthand("inset-block", {
+        "inset-block-start": parseLengthPercentageOrAuto(
+          declaration.value.blockStart,
+          parseOptions,
+        ),
+        "inset-block-end": parseLengthPercentageOrAuto(
+          declaration.value.blockEnd,
+          parseOptions,
+        ),
+      });
     case "inset-inline":
-      addShortHandStyleProp(
-        "inset-block-start",
-        parseLengthPercentageOrAuto(
+      return handleStyleShorthand("inset-inline", {
+        "inset-block-start": parseLengthPercentageOrAuto(
           declaration.value.inlineStart,
           parseOptions,
         ),
-      );
-      addShortHandStyleProp(
-        "inset-block-end",
-        parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
-      );
-      return;
+        "inset-block-end": parseLengthPercentageOrAuto(
+          declaration.value.inlineEnd,
+          parseOptions,
+        ),
+      });
     case "inset":
-      addShortHandStyleProp(
-        "top",
-        parseLengthPercentageOrAuto(declaration.value.top, {
+      handleStyleShorthand("inset", {
+        top: parseLengthPercentageOrAuto(declaration.value.top, {
           ...parseOptions,
           addValueWarning(value: any) {
             addWarning({
@@ -361,10 +364,7 @@ export function parseDeclaration(
             });
           },
         }),
-      );
-      addShortHandStyleProp(
-        "bottom",
-        parseLengthPercentageOrAuto(declaration.value.bottom, {
+        bottom: parseLengthPercentageOrAuto(declaration.value.bottom, {
           ...parseOptions,
           addValueWarning(value: any) {
             addWarning({
@@ -381,10 +381,7 @@ export function parseDeclaration(
             });
           },
         }),
-      );
-      addShortHandStyleProp(
-        "left",
-        parseLengthPercentageOrAuto(declaration.value.left, {
+        left: parseLengthPercentageOrAuto(declaration.value.left, {
           ...parseOptions,
           addValueWarning(value: any) {
             addWarning({
@@ -401,10 +398,7 @@ export function parseDeclaration(
             });
           },
         }),
-      );
-      addShortHandStyleProp(
-        "right",
-        parseLengthPercentageOrAuto(declaration.value.right, {
+        right: parseLengthPercentageOrAuto(declaration.value.right, {
           ...parseOptions,
           addValueWarning(value: any) {
             addWarning({
@@ -421,7 +415,7 @@ export function parseDeclaration(
             });
           },
         }),
-      );
+      });
       return;
     case "border-top-color":
       return addStyleProp(
@@ -544,27 +538,28 @@ export function parseDeclaration(
         parseLength(declaration.value[0], parseOptions),
       );
     case "border-radius":
-      addShortHandStyleProp(
-        "border-bottom-left-radius",
-        parseLength(declaration.value.bottomLeft[0], parseOptions),
-      );
-      addShortHandStyleProp(
-        "border-bottom-right-radius",
-        parseLength(declaration.value.bottomRight[0], parseOptions),
-      );
-      addShortHandStyleProp(
-        "border-top-left-radius",
-        parseLength(declaration.value.topLeft[0], parseOptions),
-      );
-      addShortHandStyleProp(
-        "border-top-right-radius",
-        parseLength(declaration.value.topRight[0], parseOptions),
-      );
+      handleStyleShorthand("border-radius", {
+        "border-bottom-left-radius": parseLength(
+          declaration.value.bottomLeft[0],
+          parseOptions,
+        ),
+        "border-bottom-right-radius": parseLength(
+          declaration.value.bottomRight[0],
+          parseOptions,
+        ),
+        "border-top-left-radius": parseLength(
+          declaration.value.topLeft[0],
+          parseOptions,
+        ),
+        "border-top-right-radius": parseLength(
+          declaration.value.topRight[0],
+          parseOptions,
+        ),
+      });
       return;
     case "border-color":
-      addShortHandStyleProp(
-        "border-top-color",
-        parseColor(declaration.value.top, {
+      handleStyleShorthand("border-color", {
+        "border-top-color": parseColor(declaration.value.top, {
           ...parseOptions,
           addValueWarning(value: any) {
             addWarning({
@@ -581,10 +576,7 @@ export function parseDeclaration(
             });
           },
         }),
-      );
-      addShortHandStyleProp(
-        "border-bottom-color",
-        parseColor(declaration.value.bottom, {
+        "border-bottom-color": parseColor(declaration.value.bottom, {
           ...parseOptions,
           addValueWarning(value: any) {
             addWarning({
@@ -601,10 +593,7 @@ export function parseDeclaration(
             });
           },
         }),
-      );
-      addShortHandStyleProp(
-        "border-left-color",
-        parseColor(declaration.value.left, {
+        "border-left-color": parseColor(declaration.value.left, {
           ...parseOptions,
           addValueWarning(value: any) {
             addWarning({
@@ -621,10 +610,7 @@ export function parseDeclaration(
             });
           },
         }),
-      );
-      addShortHandStyleProp(
-        "border-right-color",
-        parseColor(declaration.value.right, {
+        "border-right-color": parseColor(declaration.value.right, {
           ...parseOptions,
           addValueWarning(value: any) {
             addWarning({
@@ -641,7 +627,7 @@ export function parseDeclaration(
             });
           },
         }),
-      );
+      });
       return;
     case "border-style":
       return addStyleProp(
@@ -649,22 +635,24 @@ export function parseDeclaration(
         parseBorderStyle(declaration.value, parseOptions),
       );
     case "border-width":
-      addShortHandStyleProp(
-        "border-top-width",
-        parseBorderSideWidth(declaration.value.top, parseOptions),
-      );
-      addShortHandStyleProp(
-        "border-bottom-width",
-        parseBorderSideWidth(declaration.value.bottom, parseOptions),
-      );
-      addShortHandStyleProp(
-        "border-left-width",
-        parseBorderSideWidth(declaration.value.left, parseOptions),
-      );
-      addShortHandStyleProp(
-        "border-right-width",
-        parseBorderSideWidth(declaration.value.right, parseOptions),
-      );
+      handleStyleShorthand("border-width", {
+        "border-top-width": parseBorderSideWidth(
+          declaration.value.top,
+          parseOptions,
+        ),
+        "border-bottom-width": parseBorderSideWidth(
+          declaration.value.bottom,
+          parseOptions,
+        ),
+        "border-left-width": parseBorderSideWidth(
+          declaration.value.left,
+          parseOptions,
+        ),
+        "border-right-width": parseBorderSideWidth(
+          declaration.value.right,
+          parseOptions,
+        ),
+      });
       return;
     case "border-block-color":
       addStyleProp(
@@ -707,14 +695,13 @@ export function parseDeclaration(
       );
       return;
     case "border":
-      addShortHandStyleProp(
-        "border-width",
-        parseBorderSideWidth(declaration.value.width, parseOptions),
-      );
-      addShortHandStyleProp(
-        "border-style",
-        parseBorderStyle(declaration.value.style, parseOptions),
-      );
+      handleStyleShorthand("border", {
+        "border-width": parseBorderSideWidth(
+          declaration.value.width,
+          parseOptions,
+        ),
+        "border-style": parseBorderStyle(declaration.value.style, parseOptions),
+      });
       return;
     case "border-top":
       addStyleProp(
@@ -888,6 +875,14 @@ export function parseDeclaration(
         parseGap(declaration.value.column, parseOptions),
       );
       return;
+    case "margin":
+      handleStyleShorthand("margin", {
+        "margin-top": parseSize(declaration.value.top, parseOptions),
+        "margin-bottom": parseSize(declaration.value.bottom, parseOptions),
+        "margin-left": parseSize(declaration.value.left, parseOptions),
+        "margin-right": parseSize(declaration.value.right, parseOptions),
+      });
+      return;
     case "margin-top":
       return addStyleProp(
         declaration.property,
@@ -929,46 +924,37 @@ export function parseDeclaration(
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "margin-block":
-      addShortHandStyleProp(
-        "margin-start",
-        parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
-      );
-      addShortHandStyleProp(
-        "margin-end",
-        parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
-      );
+      handleStyleShorthand("margin-block", {
+        "margin-start": parseLengthPercentageOrAuto(
+          declaration.value.blockStart,
+          parseOptions,
+        ),
+        "margin-end": parseLengthPercentageOrAuto(
+          declaration.value.blockEnd,
+          parseOptions,
+        ),
+      });
       return;
     case "margin-inline":
-      addShortHandStyleProp(
-        "margin-start",
-        parseLengthPercentageOrAuto(
+      handleStyleShorthand("margin-inline", {
+        "margin-start": parseLengthPercentageOrAuto(
           declaration.value.inlineStart,
           parseOptions,
         ),
-      );
-      addShortHandStyleProp(
-        "margin-end",
-        parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
-      );
+        "margin-end": parseLengthPercentageOrAuto(
+          declaration.value.inlineEnd,
+          parseOptions,
+        ),
+      });
       return;
-    case "margin":
-      addStyleProp(
-        "margin-left",
-        parseSize(declaration.value.left, parseOptions),
-      );
-      addStyleProp(
-        "margin-right",
-        parseSize(declaration.value.right, parseOptions),
-      );
-      addStyleProp(
-        "margin-bottom",
-        parseSize(declaration.value.bottom, parseOptions),
-      );
-      addStyleProp(
-        "margin-top",
-        parseSize(declaration.value.top, parseOptions),
-      );
-      return;
+    case "padding":
+      handleStyleShorthand("padding", {
+        "padding-top": parseSize(declaration.value.top, parseOptions),
+        "padding-left": parseSize(declaration.value.left, parseOptions),
+        "padding-right": parseSize(declaration.value.right, parseOptions),
+        "padding-bottom": parseSize(declaration.value.bottom, parseOptions),
+      });
+      break;
     case "padding-top":
       return addStyleProp(
         declaration.property,
@@ -1010,46 +996,29 @@ export function parseDeclaration(
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-block":
-      addShortHandStyleProp(
-        "padding-start",
-        parseLengthPercentageOrAuto(declaration.value.blockStart, parseOptions),
-      );
-      addShortHandStyleProp(
-        "padding-end",
-        parseLengthPercentageOrAuto(declaration.value.blockEnd, parseOptions),
-      );
+      handleStyleShorthand("padding-block", {
+        "padding-start": parseLengthPercentageOrAuto(
+          declaration.value.blockStart,
+          parseOptions,
+        ),
+        "padding-end": parseLengthPercentageOrAuto(
+          declaration.value.blockEnd,
+          parseOptions,
+        ),
+      });
       return;
     case "padding-inline":
-      addShortHandStyleProp(
-        "padding-start",
-        parseLengthPercentageOrAuto(
+      handleStyleShorthand("padding-inline", {
+        "padding-start": parseLengthPercentageOrAuto(
           declaration.value.inlineStart,
           parseOptions,
         ),
-      );
-      addShortHandStyleProp(
-        "padding-end",
-        parseLengthPercentageOrAuto(declaration.value.inlineEnd, parseOptions),
-      );
+        "padding-end": parseLengthPercentageOrAuto(
+          declaration.value.inlineEnd,
+          parseOptions,
+        ),
+      });
       return;
-    case "padding":
-      addStyleProp(
-        "padding-top",
-        parseSize(declaration.value.top, parseOptions),
-      );
-      addStyleProp(
-        "padding-left",
-        parseSize(declaration.value.left, parseOptions),
-      );
-      addStyleProp(
-        "padding-right",
-        parseSize(declaration.value.right, parseOptions),
-      );
-      addStyleProp(
-        "paddingBottom",
-        parseSize(declaration.value.bottom, parseOptions),
-      );
-      break;
     case "font-weight":
       return addStyleProp(
         declaration.property,
@@ -1081,27 +1050,27 @@ export function parseDeclaration(
         parseLineHeight(declaration.value, parseOptions),
       );
     case "font":
-      addShortHandStyleProp(
+      addStyleProp(
         declaration.property + "-family",
         parseFontFamily(declaration.value.family),
       );
-      addShortHandStyleProp(
+      addStyleProp(
         "line-height",
         parseLineHeight(declaration.value.lineHeight, parseOptions),
       );
-      addShortHandStyleProp(
+      addStyleProp(
         declaration.property + "-size",
         parseFontSize(declaration.value.size, parseOptions),
       );
-      addShortHandStyleProp(
+      addStyleProp(
         declaration.property + "-style",
         parseFontStyle(declaration.value.style, parseOptions),
       );
-      addShortHandStyleProp(
+      addStyleProp(
         declaration.property + "-variant",
         parseFontVariantCaps(declaration.value.variantCaps, parseOptions),
       );
-      addShortHandStyleProp(
+      addStyleProp(
         declaration.property + "-weight",
         parseFontWeight(declaration.value.weight, parseOptions),
       );

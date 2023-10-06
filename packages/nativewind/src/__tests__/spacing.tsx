@@ -5,15 +5,7 @@ afterEach(() => resetStyles());
 
 describe("Spacing - Padding", () => {
   testCases(
-    [
-      "p-0",
-      style({
-        paddingLeft: 0,
-        paddingTop: 0,
-        paddingRight: 0,
-        paddingBottom: 0,
-      }),
-    ],
+    ["p-0", style({ padding: 0 })],
     ["px-0", style({ paddingLeft: 0, paddingRight: 0 })],
     ["py-0", style({ paddingTop: 0, paddingBottom: 0 })],
     ["pt-0", style({ paddingTop: 0 })],
@@ -27,10 +19,7 @@ describe("Spacing - Padding", () => {
 
 describe("Spacing - Margin", () => {
   testCases(
-    [
-      "m-0",
-      style({ marginLeft: 0, marginTop: 0, marginRight: 0, marginBottom: 0 }),
-    ],
+    ["m-0", style({ margin: 0 })],
     ["mx-0", style({ marginLeft: 0, marginRight: 0 })],
     ["my-0", style({ marginTop: 0, marginBottom: 0 })],
     ["mt-0", style({ marginTop: 0 })],

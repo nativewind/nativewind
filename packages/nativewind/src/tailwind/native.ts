@@ -92,7 +92,6 @@ export default function nativewindPreset() {
       backgroundOpacity: false,
       placeholderOpacity: false,
       ringOpacity: false,
-      backdropOpacity: false,
     },
   };
 
