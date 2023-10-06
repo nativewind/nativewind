@@ -82,9 +82,17 @@ export default function nativewindPreset() {
       verify,
     ],
     corePlugins: {
+      preflight: false,
       translate: false,
       boxShadow: false,
       visibility: false,
+      textOpacity: false,
+      divideOpacity: false,
+      borderOpacity: false,
+      backgroundOpacity: false,
+      placeholderOpacity: false,
+      ringOpacity: false,
+      backdropOpacity: false,
     },
   };
 
