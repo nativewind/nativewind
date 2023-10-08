@@ -40,7 +40,7 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
   let latestData: string | undefined;
 
   if (options.dev && options.platform !== "web") {
-    spawnCommands.push("--watch", "--poll");
+    spawnCommands.push("--watch");
     const wss = new WebSocketServer(options.hotServerOptions);
     wss.on("connection", (ws) => {
       connections.add(ws);
@@ -51,15 +51,19 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
     });
   }
 
-  const now = Date.now();
-  const { stdout } = spawn("npx", spawnCommands, {
+  const { stdout, stderr } = spawn("npx", spawnCommands, {
     shell: true,
     env,
   });
 
   let firstRun = true;
 
-  stdout.on("data", (css) => {
+  let chunks: Buffer[] = [];
+
+  stderr.on("data", () => {
+    const css = chunks.reduce((acc, chunk) => acc + chunk.toString(), "");
+    chunks = [];
+
     clearTimeout(timeout);
 
     const runtimeData = JSON.stringify(
@@ -69,7 +73,7 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
     latestData = runtimeData;
 
     if (firstRun) {
-      console.log(`done in ${Date.now() - now}ms`);
+      console.log(`done`);
       firstRun = false;
       mkdirSync(options.output, { recursive: true });
       writeFileSync(getOutput(options.output, options), css, "utf-8");
@@ -79,6 +83,10 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
         ws.send(runtimeData);
       }
     }
+  });
+
+  stdout.on("data", (css: Buffer) => {
+    chunks.push(css);
   });
 
   return deferred;
