@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo "Waiting for package to be available on snackager.expo.io..."
+
 # Just wait a short amount for the package to be available
 sleep 15
 
