@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { ServerOptions, WebSocketServer, WebSocket } from "ws";
+import { ServerOptions, Server, WebSocket } from "ws";
 import type { GetTransformOptionsOpts } from "metro-config";
 import {
   cssToReactNativeRuntime,
@@ -46,7 +46,7 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
   const startWebSocketServer = options.dev && options.platform !== "web";
 
   if (startWebSocketServer) {
-    const wss = new WebSocketServer(options.hotServerOptions);
+    const wss = new Server(options.hotServerOptions);
     wss.on("connection", (ws) => {
       connections.add(ws);
       ws.on("close", () => connections.delete(ws));
@@ -98,7 +98,6 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
   });
 
   stdout.on("data", (css: Buffer) => {
-    console.log(4);
     chunks.push(css);
   });
 
