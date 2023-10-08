@@ -68,7 +68,10 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
 
   let chunks: Buffer[] = [];
 
-  stderr.on("data", () => {
+  stderr.on("data", (data) => {
+    if (data.toString().includes("Rebuilding") || chunks.length === 0) {
+      return;
+    }
     clearTimeout(timeout);
 
     if (options.platform === "web") {
@@ -97,9 +100,7 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
     }
   });
 
-  stdout.on("data", (css: Buffer) => {
-    chunks.push(css);
-  });
+  stdout.on("data", (css: Buffer) => chunks.push(css));
 
   return deferred;
 }
