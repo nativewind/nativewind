@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { dirname } from "node:path";
 import { ServerOptions, Server, WebSocket } from "ws";
 import type { GetTransformOptionsOpts } from "metro-config";
 import {
@@ -89,7 +90,7 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
       if (firstRun) {
         console.log(`done`);
         firstRun = false;
-        mkdirSync(options.output, { recursive: true });
+        mkdirSync(dirname(options.output), { recursive: true });
         writeFileSync(getOutput(options.output, options), css, "utf-8");
         done();
       } else if (startWebSocketServer) {
