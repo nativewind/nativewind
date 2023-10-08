@@ -50,7 +50,15 @@ From here onwards, replace `./your-css-file.css` with the relative path to the C
 ```diff title="babel.config.js"
 module.exports = {
 - presets: ['babel-preset-expo'],
-+ presets: ['babel-preset-expo', 'nativewind/babel'],
++ presets: [
++   ["babel-preset-expo", { jsxImportSource: "nativewind" }],
++   "nativewind/babel",
++ ],
+  plugins: [
+    // Required for expo-router
+    "expo-router/babel",
+    "react-native-reanimated/plugin",
+  ],
 };
 ```
 
