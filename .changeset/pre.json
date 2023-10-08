@@ -9,6 +9,7 @@
     "react-native-css-interop": "0.0.0-alpha.11"
   },
   "changesets": [
-    "five-countries-fold"
+    "five-countries-fold",
+    "silver-bulldogs-peel"
   ]
 }
