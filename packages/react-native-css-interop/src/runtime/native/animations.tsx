@@ -373,7 +373,10 @@ function getInitialValue(
   style: Style,
 ): AnimatableValue {
   if (frame.value === PLACEHOLDER) {
-    if (transformAttributes.includes(prop)) {
+    if (
+      transformAttributes.includes(prop) &&
+      typeof style.transform !== "string"
+    ) {
       const initialTransform = style.transform?.find((t) => {
         return t[prop as keyof typeof t] !== undefined;
       });

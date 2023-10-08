@@ -2,7 +2,7 @@ import type { GetTransformOptionsOpts } from "metro-config";
 import loadConfig from "tailwindcss/loadConfig";
 import type { ServerOptions } from "ws";
 
-import path from "node:path";
+import path from "path";
 import {
   withCssInterop,
   CssToReactNativeRuntimeOptions,

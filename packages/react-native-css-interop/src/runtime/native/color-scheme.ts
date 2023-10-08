@@ -1,21 +1,15 @@
 import { Appearance } from "react-native";
 import { createSignal, useComputed } from "../signals";
 import { INTERNAL_RESET } from "../../shared";
-import { useContext } from "react";
-import { effectContext } from "./inheritance";
 
 export const colorScheme = createColorScheme(Appearance);
 
 export function useColorScheme() {
-  const interop = useContext(effectContext);
-  return useComputed(
-    () => ({
-      colorScheme: colorScheme.get(),
-      setColorScheme: colorScheme.set,
-      toggleColorScheme: colorScheme.toggle,
-    }),
-    interop,
-  );
+  return useComputed(() => ({
+    colorScheme: colorScheme.get(),
+    setColorScheme: colorScheme.set,
+    toggleColorScheme: colorScheme.toggle,
+  }));
 }
 
 function createColorScheme(appearance: typeof Appearance) {
