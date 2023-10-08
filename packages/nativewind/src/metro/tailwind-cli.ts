@@ -39,8 +39,13 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
   const connections = new Set<WebSocket>();
   let latestData: string | undefined;
 
-  if (options.dev && options.platform !== "web") {
+  if (options.dev) {
     spawnCommands.push("--watch");
+  }
+
+  const startWebSocketServer = options.dev && options.platform !== "web";
+
+  if (startWebSocketServer) {
     const wss = new WebSocketServer(options.hotServerOptions);
     wss.on("connection", (ws) => {
       connections.add(ws);
@@ -51,6 +56,9 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
     });
   }
 
+  if (options.platform === "web") {
+    spawnCommands.push("--output", getOutput(options.output, options));
+  }
   const { stdout, stderr } = spawn("npx", spawnCommands, {
     shell: true,
     env,
@@ -61,31 +69,36 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
   let chunks: Buffer[] = [];
 
   stderr.on("data", () => {
-    const css = chunks.reduce((acc, chunk) => acc + chunk.toString(), "");
-    chunks = [];
-
     clearTimeout(timeout);
 
-    const runtimeData = JSON.stringify(
-      cssToReactNativeRuntime(css, options.cssToReactNativeRuntime),
-    );
-
-    latestData = runtimeData;
-
-    if (firstRun) {
-      console.log(`done`);
-      firstRun = false;
-      mkdirSync(options.output, { recursive: true });
-      writeFileSync(getOutput(options.output, options), css, "utf-8");
+    if (options.platform === "web") {
       done();
     } else {
-      for (const ws of connections) {
-        ws.send(runtimeData);
+      const css = chunks.reduce((acc, chunk) => acc + chunk.toString(), "");
+      chunks = [];
+
+      const runtimeData = JSON.stringify(
+        cssToReactNativeRuntime(css, options.cssToReactNativeRuntime),
+      );
+
+      latestData = runtimeData;
+
+      if (firstRun) {
+        console.log(`done`);
+        firstRun = false;
+        mkdirSync(options.output, { recursive: true });
+        writeFileSync(getOutput(options.output, options), css, "utf-8");
+        done();
+      } else if (startWebSocketServer) {
+        for (const ws of connections) {
+          ws.send(runtimeData);
+        }
       }
     }
   });
 
   stdout.on("data", (css: Buffer) => {
+    console.log(4);
     chunks.push(css);
   });
 
