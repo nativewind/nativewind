@@ -1,5 +1,11 @@
 # nativewind
 
+## 4.0.0
+
+### Patch Changes
+
+- fix existing directory error
+
 ## 2.0.11
 
 ### Patch Changes
