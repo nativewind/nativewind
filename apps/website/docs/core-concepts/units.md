@@ -4,7 +4,7 @@ NativeWind works
 
 ## Polyfilled Units
 
-You can use these units within your `tailwind.config.js`
+You can use these units within classes or `tailwind.config.js`.
 
 <table>
   <tbody style={{ display: "table", width: "100%" }}>

@@ -6,6 +6,12 @@ Please refer to the [documentation on the Tailwind CSS website](https://tailwind
 
 ## Pseudo-classes
 
+:::tip
+
+If a `<View />` has a class which requires an event listener, it will be automatically upgraded to `<Pressable />`.
+
+:::
+
 ### Hover, focus, and active
 
 NativeWind implements a subset of the Tailwind pseudo-classes by adding event listeners on your components, hence they will only work on components that can accept the listener.
@@ -20,7 +26,7 @@ The supported pseudo-classes and their related listeners are:
 
 ### Opt in Pointer Events
 
-React Native 0.71 supports opt-in [Pointer Events](https://reactnative.dev/blog/2023/01/12/version-071#events). If enabled NativeWind will use these instead, allowing for hover support on native.
+React Native 0.71 supports opt-in [Pointer Events](https://reactnative.dev/blog/2023/01/12/version-071#events). If enabled NativeWind will use these instead, allowing for hover support on native when used with a pointer device.
 
 | Variant  | Event Listeners                 |
 | -------- | ------------------------------- |
@@ -66,7 +72,7 @@ Use the portrait and landscape modifiers to conditionally add styles when the vi
 
 Use the print modifier to conditionally add styles that only apply when the document is being printed:
 
-<Compatibility none={["portrait:", "landscape:"]} legend={false} />
+<Compatibility none={["print:"]} legend={false} />
 
 ### Supports rules
 
@@ -88,9 +94,9 @@ Use the data-\* modifier to conditionally style things based on data attributes.
 
 ### RTL support
 
-Use the data-\* modifier to conditionally style things based on data attributes.
+Use the rtl and ltr modifiers to conditionally add styles in right-to-left and left-to-right modes respectively when building multi-directional layouts:
 
-<Compatibility none={["data-[n]:"]} legend={false} />
+<Compatibility supported={["rtl:"]} legend={false} />
 
 ### Open/closed state
 
@@ -105,7 +111,7 @@ Custom modifiers are possible, but are not yet documented. More information to c
 ## Contributors
 
 <details>
-  <summary>We are looking for contributors for the following</summary>
+  <summary>We are looking for contributors for the following:</summary>
 
 **Responsive breakpoints**
 

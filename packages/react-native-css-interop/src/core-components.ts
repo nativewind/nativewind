@@ -37,7 +37,7 @@ export function unstable_styled<P extends object, M>(
   interop: InteropFunction = defaultCSSInterop,
 ) {
   if (mapping) {
-    globalCssInterop(component, mapping, interop);
+    cssInterop(component, mapping, interop);
   }
 
   return forwardRef<unknown, any>((props, _ref) => {
@@ -53,7 +53,7 @@ export function unstable_styled<P extends object, M>(
   }) as unknown as ComponentTypeWithMapping<P, M>;
 }
 
-export function globalCssInterop<T extends {}, M>(
+export function cssInterop<T extends {}, M>(
   component: ComponentType<T>,
   mapping: EnableCssInteropOptions<T> & M,
   interop: InteropFunction = defaultCSSInterop,
@@ -177,28 +177,28 @@ export function remapProps<P, M>(
   });
 }
 
-globalCssInterop(Image, { className: "style" });
-globalCssInterop(Pressable, { className: "style" });
-globalCssInterop(Text, { className: "style" });
-globalCssInterop(View, { className: "style" });
-globalCssInterop(ActivityIndicator, {
+cssInterop(Image, { className: "style" });
+cssInterop(Pressable, { className: "style" });
+cssInterop(Text, { className: "style" });
+cssInterop(View, { className: "style" });
+cssInterop(ActivityIndicator, {
   className: {
     target: "style",
     nativeStyleToProp: { color: true },
   },
 });
-globalCssInterop(StatusBar, {
+cssInterop(StatusBar, {
   className: {
     target: false,
     nativeStyleToProp: { backgroundColor: true },
   },
 });
-globalCssInterop(ScrollView, {
+cssInterop(ScrollView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
-globalCssInterop(TextInput, {
+cssInterop(TextInput, {
   className: {
     target: "style",
     nativeStyleToProp: {

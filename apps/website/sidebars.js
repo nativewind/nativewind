@@ -42,7 +42,7 @@ const sidebars = {
         "core-concepts/responsive-design",
         "core-concepts/dark-mode",
         "core-concepts/units",
-        "core-concepts/quirks",
+        "core-concepts/differences",
       ],
     },
     {

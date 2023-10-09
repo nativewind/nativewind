@@ -43,12 +43,16 @@ Creating your own variants and quickly become complex. We recommend using a clas
 - [clsx](https://www.npmjs.com/package/clsx)
 - [classnames](https://www.npmjs.com/package/classnames)
 
+NativeWind previously exported a `styled()` helper function, but it has been removed in favor of these libraries.
+
+Each of these library has multiple "component" variants, so you can choose the one that best fits your needs.
+
 ## Merging with inline styles
 
 NativeWind will automatically merge with inline-styles. Inline styles have a higher priority.
 
 ```tsx
-<Text className="text-whtie" style={{ color: "black" }} /> // Will be black
+<Text className="text-white" style={{ color: "black" }} /> // Will be black
 ```
 
 ## Handling components with multiple style props
@@ -66,12 +70,12 @@ function MyComponent({ outerClass, innerClass }) {
 }
 ```
 
-If you're working with a third-party component that you can't modify directly, NativeWind provides a utility, remapClassNameProps. This function allows you to create and map className props for the component.
+If you're working with a third-party component that you can't modify directly, NativeWind provides a utility, `remapProps`. This function allows you to create and map className props for the component.
 
 ```tsx
-import { remapClassNameProps } from "nativewind";
+import { remapProps } from "nativewind";
 
-const CustomizedButton = remapClassNameProps(ThirdPartyButton, {
+const CustomizedButton = remapProps(ThirdPartyButton, {
   buttonClass: "nativeButtonClass",
   labelClass: "nativeLabelClass",
 });
@@ -80,83 +84,19 @@ const CustomizedButton = remapClassNameProps(ThirdPartyButton, {
 <CustomizedButton buttonClass="bg-blue-500" labelClass="text-white" />;
 ```
 
-This utility makes it easy to style third-party components using NativeWind.
-
-`remapClassNameProps` can be used with the following options
-
-```tsx
-// Create a new prop and map it to an existing prop
-remapClassNameProps(component, { "new-prop": "existing-prop" });
-
-// Override an existing prop.
-remapClassNameProps(component, { prop: true });
-```
+See the [remapProps](/api/remapProps) documentation for more information.
 
 ## Handling components with style attribute props
 
-**Choosing Between `enableCSSInterop` and `remapClassNameProps`**
+Some components may require style attributes to be passed as props. For example, React Native's `<StatusBar />` component accepts a `backgroundColor` prop.
 
-Before opting to use `enableCSSInterop`, it's worth evaluating if `remapClassNameProps` might be a more suitable choice for your needs.
+NativeWind can automatically move style attributes to props, but it requires the styles to be resolved. You will need to "tag" your component using `cssInterop` and create a mapping configuration
 
-Reasons to choose `enableCSSInterop`:
-
-- Native Components: Your component is a custom Native Component
-- Prop Style transfer: When you need to transfer a style property to a prop.
-
-** Usage**
-
-The `enableCSSInterop` function takes two arguments: a component and a mapping configuration.
-
-```tsx
-// Create a new prop and map it to an existing prop
-enableCSSInterop(component, { "<new-prop">: "<existing-prop>" });
-
- // Or override an existing prop.
-enableCSSInterop(component, { "<prop>": true });
-
-// Complex mapping
-enableCSSInterop(component, {
-  "<new-prop>": {
-    // If a prop, maps to the specified prop
-    // If true, overrides the prop.
-    // If false will not map to a prop
-    target: "<prop>" | true | false
-    nativeStyleToProp: {
-      // If true, move the style attribute to a prop
-      // If a prop, move the style attribute to the specified prop
-      "<style-attribute">:  true | "<prop>"
-    }
-  }
-});
-```
-
-**Examples**
-
-```tsx
-// Map 'className' to 'style'
-enableCSSInterop(Text, { className: "style" });
-
-// Map 'className' to style, but move any 'color' values to the 'color' prop
-enableCSSInterop(ActivityIndicator, {
-  className: {
-    target: "style"
-    nativeStyleToProp: { color: true }
-  }
-});
-
-// StatusBar does not accept any styles!
-// Maps `backgroundColor` values to `backgroundColor`. Other values are ignored.
-enableCSSInterop(StatusBar, {
-  className: {
-    target: false
-    nativeStyleToProp: { backgroundColor: true }
-  }
-});
-```
+See the [cssInterop](/api/cssInterop) documentation for more information.
 
 ## TypeScript
 
-Both `remapClassNameProps` and `enableCSSInterop` will return a typed version of your component. Alternatively, you can globally defined the types in a new declaration file.
+Both `remapProps` and `cssInterop` will return a typed version of your component. However, you can globally defined the types in a new declaration file.
 
 ```tsx title=custom-components-env.d.ts
 declare module "<3rd party package>" {
@@ -206,9 +146,3 @@ declare module "react-native" {
   }
 }
 ```
-
-:::caution
-
-Please do not create issues asking for help with global style declarations. Either use the return value of `remapProps`/`cssInterop`, or ask for help on sites such as [stackoverflow.com](http://stackoverflow.com)
-
-:::

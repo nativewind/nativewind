@@ -3,8 +3,4 @@
  */
 
 export { createElement } from "react";
-export {
-  globalCssInterop as cssInterop,
-  remapProps,
-  unstable_styled as unstable_styled,
-} from "./core-components";
+export { cssInterop, remapProps, unstable_styled } from "./core-components";
