@@ -70,9 +70,8 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
   let chunks: Buffer[] = [];
 
   stderr.on("data", (data) => {
-    if (data.toString().includes("Rebuilding") || chunks.length === 0) {
-      return;
-    }
+    if (data.toString().includes("Rebuilding")) return;
+
     clearTimeout(timeout);
 
     if (options.platform === "web") {

@@ -1,9 +1,9 @@
 import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
+import { PluginUtils } from "tailwindcss/types/config";
 
-import { darkModeAtRule } from "./dark-mode";
-import { ContentConfig, PluginUtils } from "tailwindcss/types/config";
 import { hairlineWidth, platformSelect } from "../theme";
+import { darkModeAtRule } from "./dark-mode";
 import { color } from "./color";
 import { verify } from "./verify";
 import { translateX, translateY } from "./translate";
