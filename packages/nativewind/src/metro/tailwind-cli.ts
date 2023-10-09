@@ -90,6 +90,11 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
       if (firstRun) {
         console.log(`done`);
         firstRun = false;
+
+        if (!css.includes("@cssInterop set nativewind")) {
+          throw new Error("Unable to find NativeWind preset in output");
+        }
+
         mkdirSync(dirname(options.output), { recursive: true });
         writeFileSync(getOutput(options.output, options), css, "utf-8");
         done();
