@@ -28,3 +28,9 @@ React Native uses a different default `flex-direction` to the web. This can be f
 ## rem sizing
 
 React Native's `<Text />` renders with a `fontSize: 14`, while the web's default is `16px`. For consistency, NativeWind uses an `rem` value of `16` on web and `14` on native.
+
+## Color Opacity
+
+For performance reasons, NativeWind renders with the `corePlugins`: `textOpacity`,`borderOpacity`, `divideOpacity` and `backgroundOpacity` disabled. Theses plugin allows colors to dynamically changed via CSS variables. Instead, the opacity is set as a static value in the `color` property.
+
+If you require this functionality, you can enable the disabled plugins in your `tailwind.config.js` file.
