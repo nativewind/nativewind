@@ -14,6 +14,7 @@
     "write-heading-ids": "docusaurus write-heading-ids"
   },
   "dependencies": {
+    "@types/lodash.debounce": "4.0.7",
     "@docusaurus/core": "3.0.0-beta.0",
     "@docusaurus/preset-classic": "3.0.0-beta.0",
     "@mdx-js/react": "2.3.0",
@@ -37,9 +38,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@types/lodash.debounce": "4.0.7",
-    "sass": "^1.64.1"
   }
 }

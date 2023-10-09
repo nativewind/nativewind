@@ -72,7 +72,13 @@ const sidebars = {
       type: "category",
       label: "API",
       collapsed: false,
-      items: ["api/use-color-scheme", "api/native-wind-style-sheet"],
+      items: [
+        "api/with-nativewind",
+        "api/remap-props",
+        "api/css-interop",
+        "api/use-color-scheme",
+        "api/native-wind-style-sheet",
+      ],
     },
     {
       type: "category",
