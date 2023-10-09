@@ -24,7 +24,7 @@
     "expo-status-bar": "~1.6.0",
     "expo-system-ui": "~2.4.0",
     "expo-web-browser": "~12.3.2",
-    "nativewind": "4.0.0",
+    "nativewind": "4.0.0-alpha.14",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.72.5",
@@ -43,5 +43,8 @@
     "react-test-renderer": "18.2.0",
     "typescript": "^5.1.3"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "react-refresh": "0.14.0"
+  }
 }
