@@ -107,8 +107,7 @@ export default function nativewindPreset() {
  * will only contain CSS variables and never referenced directly
  */
 const forceDark = plugin(function ({ config }) {
-  const content = config<Extract<ContentConfig, { files: any }>>("content");
-  content.files.push({ raw: "dark" });
+  config("safelist").push("dark");
 });
 
 const visibility = plugin(({ addUtilities }) => {

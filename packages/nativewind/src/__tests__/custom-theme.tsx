@@ -31,7 +31,6 @@ test("Using css variables", async () => {
       theme: {
         colors: {
           primary: "rgb(var(--color-primary) / <alpha-value>)",
-          secondary: "rgb(var(--color-secondary) / <alpha-value>)",
         },
       },
     },
