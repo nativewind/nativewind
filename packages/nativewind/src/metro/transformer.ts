@@ -6,7 +6,7 @@ import worker, {
 import path from "path";
 
 import { transform as cssInteropTransform } from "react-native-css-interop/metro/transformer";
-import { getOutput } from "./tailwind-cli";
+import { getOutput } from "./common";
 
 interface NativeWindJsTransformerConfig extends JsTransformerConfig {
   transformerPath?: string;

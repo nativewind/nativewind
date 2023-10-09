@@ -9,7 +9,7 @@ import {
   ComposableIntermediateConfigT,
 } from "react-native-css-interop/metro";
 
-import { cssToReactNativeRuntimeOptions } from "./with-tailwind-options";
+import { cssToReactNativeRuntimeOptions } from "./common";
 import { tailwindCli } from "./tailwind-cli";
 
 interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {

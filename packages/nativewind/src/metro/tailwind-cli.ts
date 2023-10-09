@@ -1,12 +1,15 @@
 import { spawn } from "node:child_process";
+import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
+
 import { ServerOptions, Server, WebSocket } from "ws";
 import type { GetTransformOptionsOpts } from "metro-config";
 import {
   cssToReactNativeRuntime,
   CssToReactNativeRuntimeOptions,
 } from "react-native-css-interop/css-to-rn";
-import { writeFileSync, mkdirSync } from "node:fs";
+
+import { getOutput } from "./common";
 
 export interface TailwindCliOptions extends GetTransformOptionsOpts {
   output: string;
@@ -44,9 +47,9 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
     spawnCommands.push("--watch");
   }
 
-  const startWebSocketServer = options.dev && options.platform !== "web";
+  const startedWSServer = options.dev && options.platform !== "web";
 
-  if (startWebSocketServer) {
+  if (startedWSServer) {
     const wss = new Server(options.hotServerOptions);
     wss.on("connection", (ws) => {
       connections.add(ws);
@@ -57,60 +60,55 @@ export function tailwindCli(input: string, options: TailwindCliOptions) {
     });
   }
 
-  if (options.platform === "web") {
-    spawnCommands.push("--output", getOutput(options.output, options));
-  }
+  mkdirSync(dirname(options.output), { recursive: true });
+
   const { stdout, stderr } = spawn("npx", spawnCommands, {
     shell: true,
     env,
   });
 
   let firstRun = true;
-
   let chunks: Buffer[] = [];
 
-  stderr.on("data", (data) => {
-    if (data.toString().includes("Rebuilding")) return;
+  stderr.on("data", (data: Buffer | string) => {
+    data = data.toString();
+
+    if (!data.includes("Done in")) return;
 
     clearTimeout(timeout);
 
-    if (options.platform === "web") {
-      done();
-    } else {
-      const css = chunks.reduce((acc, chunk) => acc + chunk.toString(), "");
-      chunks = [];
+    const css = chunks.reduce((acc, chunk) => acc + chunk.toString(), "");
+    chunks = [];
 
-      const runtimeData = JSON.stringify(
+    if (firstRun) {
+      if (
+        !(
+          css.includes("@cssInterop set nativewind") ||
+          css.includes("css-interop-nativewind")
+        )
+      ) {
+        throw new Error(
+          "Unable to detect NativeWind preset. Please ensure the `nativewind/preset` preset is included in your tailwind.config.js file.",
+        );
+      }
+      firstRun = false;
+    } else if (startedWSServer) {
+      latestData = JSON.stringify(
         cssToReactNativeRuntime(css, options.cssToReactNativeRuntime),
       );
 
-      latestData = runtimeData;
-
-      if (firstRun) {
-        console.log(`done`);
-        firstRun = false;
-
-        if (!css.includes("@cssInterop set nativewind")) {
-          throw new Error("Unable to find NativeWind preset in output");
-        }
-
-        mkdirSync(dirname(options.output), { recursive: true });
-        writeFileSync(getOutput(options.output, options), css, "utf-8");
-        done();
-      } else if (startWebSocketServer) {
-        for (const ws of connections) {
-          ws.send(runtimeData);
-        }
+      for (const ws of connections) {
+        ws.send(latestData);
       }
     }
+
+    writeFileSync(getOutput(options.output, options), css);
+    done();
   });
 
-  stdout.on("data", (css: Buffer) => chunks.push(css));
+  stdout.on("data", (css: Buffer) => {
+    chunks.push(css);
+  });
 
   return deferred;
-}
-
-export function getOutput(output: string, options: GetTransformOptionsOpts) {
-  // Force a platform and `.css` extensions (as they might be using `.sass` or another preprocessor
-  return `${output}.${options.platform !== "web" ? "native" : "web"}.css`;
 }

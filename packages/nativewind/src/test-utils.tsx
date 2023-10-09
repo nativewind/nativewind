@@ -9,7 +9,7 @@ import {
   warnings,
 } from "react-native-css-interop/testing-library";
 import tailwind, { Config } from "tailwindcss";
-import { cssToReactNativeRuntimeOptions } from "./metro/with-tailwind-options";
+import { cssToReactNativeRuntimeOptions } from "./metro/common";
 
 export { createMockComponent } from "react-native-css-interop/testing-library";
 
