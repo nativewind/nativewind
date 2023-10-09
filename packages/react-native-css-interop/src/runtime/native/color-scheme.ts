@@ -1,4 +1,4 @@
-import { Appearance } from "react-native";
+import { AppState, Appearance } from "react-native";
 import { createSignal, useComputed } from "../signals";
 import { INTERNAL_RESET } from "../../shared";
 
@@ -38,15 +38,27 @@ function createColorScheme(appearance: typeof Appearance) {
     }
   };
 
-  let listener = appearance.addChangeListener(({ colorScheme }) => {
+  let appStateListener = AppState.addEventListener("change", (state) => {
+    if (state === "active" && isSystem) {
+      set(appearance.getColorScheme() ?? "light");
+    }
+  });
+
+  let appearanceListener = appearance.addChangeListener(({ colorScheme }) => {
     if (isSystem) {
       set(colorScheme ?? "light");
     }
   });
 
   const reset = (appearance: typeof Appearance) => {
-    listener.remove();
-    listener = appearance.addChangeListener(({ colorScheme }) => {
+    appStateListener.remove();
+    appStateListener = AppState.addEventListener("change", (state) => {
+      if (state === "active" && isSystem) {
+        set(appearance.getColorScheme() ?? "light");
+      }
+    });
+    appearanceListener.remove();
+    appearanceListener = appearance.addChangeListener(({ colorScheme }) => {
       if (isSystem) {
         signal.set(colorScheme ?? "light");
       }
