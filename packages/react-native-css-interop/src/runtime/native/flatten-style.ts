@@ -38,9 +38,10 @@ export function flattenStyle(
   style: StyleProp,
   interop: InteropComputed,
   options: FlattenStyleOptions = {},
-  flatStyle: Style = {},
+  flatStyle?: Style,
   depth = 0,
 ): Style {
+  flatStyle ||= {};
   if (!style) {
     return flatStyle;
   }

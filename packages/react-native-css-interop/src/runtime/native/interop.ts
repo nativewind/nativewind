@@ -54,7 +54,6 @@ export interface InteropComputed extends Computed<any> {
   lastDependencies: unknown[];
   lastVersion: number;
   // Rendering
-  styledProps: Record<string, unknown>;
   contextValue?: InteropComputed;
   shouldUpdateContext: boolean;
   convertToPressable: boolean;
@@ -144,7 +143,6 @@ export function createInteropComputed(
     lastDependencies: [],
     lastVersion: 0,
     // rendering
-    styledProps: {},
     shouldUpdateContext: false,
     requiresLayout: false,
     convertToPressable: false,
@@ -283,7 +281,6 @@ export function createInteropComputed(
       fastReloadSignal.get();
 
       const styledProps: Record<string, unknown> = {};
-      interop.styledProps = styledProps;
       interop.animatedProps.clear();
       interop.transitionProps.clear();
 
@@ -297,9 +294,21 @@ export function createInteropComputed(
       for (const [key, { sources, nativeStyleToProp }] of options.config) {
         dynamicStyles ||= Boolean(nativeStyleToProp);
 
-        const prop = props[key] as StyleProp;
+        let prop = props[key] as StyleProp;
         let stylesToFlatten: StyleProp = [];
-        if (prop) stylesToFlatten.push(prop);
+        if (prop) {
+          if (Array.isArray(prop)) {
+            prop = prop.flat(10);
+            for (const style of prop) {
+              if (!style) continue;
+              dynamicStyles ||= styleMetaMap.has(style);
+              stylesToFlatten.push(style);
+            }
+          } else {
+            dynamicStyles ||= styleMetaMap.has(prop);
+            stylesToFlatten.push(prop);
+          }
+        }
 
         for (const sourceProp of sources) {
           const source = props?.[sourceProp];
@@ -311,17 +320,18 @@ export function createInteropComputed(
             let styles = getGlobalStyle(className);
             if (!styles) continue;
 
-            if (!Array.isArray(styles)) {
-              styles = [styles];
-            }
-
-            for (const style of styles) {
-              stylesToFlatten.push(style);
+            if (Array.isArray(styles)) {
+              for (const style of styles) {
+                if (!style) continue;
+                dynamicStyles ||= styleMetaMap.has(style);
+                stylesToFlatten.push(style);
+              }
+            } else {
+              dynamicStyles ||= styleMetaMap.has(styles);
+              stylesToFlatten.push(styles);
             }
           }
         }
-
-        dynamicStyles ||= stylesToFlatten.some((s) => s && styleMetaMap.has(s));
 
         stylesToFlatten = stylesToFlatten.sort(
           styleSpecificityCompareFn(dynamicStyles ? "desc" : "asc"),
@@ -339,7 +349,10 @@ export function createInteropComputed(
           continue;
         }
 
-        const style = flattenStyle(stylesToFlatten, interop as InteropComputed);
+        // TODO: This is a bug. We shouldn't have to clone the style object.
+        const style = {
+          ...flattenStyle(stylesToFlatten, interop as InteropComputed, {}, {}),
+        };
         const meta = styleMetaMap.get(style);
 
         const hasInlineContainers = containerNamesSetDuringRender.size > 0;
@@ -387,7 +400,7 @@ export function createInteropComputed(
           }
         }
 
-        styledProps[key] = Object.freeze(style);
+        styledProps[key] = style;
       }
 
       if (interop.animatedProps.size > 0 || interop.transitionProps.size > 0) {
@@ -451,7 +464,6 @@ export function createInteropComputed(
         };
       }
 
-      interop.styledProps = styledProps;
       interop.convertToPressable = convertToPressable;
 
       // processStyles(props, interop as InteropComputed, options);
@@ -499,7 +511,7 @@ export function createInteropComputed(
         interop.contextValue = Object.assign({}, interop as InteropComputed);
       }
 
-      return { ...interop };
+      return { ...interop, styledProps };
     },
   };
 
