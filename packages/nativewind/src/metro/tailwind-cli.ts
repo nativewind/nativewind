@@ -80,7 +80,9 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
       firstRun = false;
       clearTimeout(timeout);
       done();
-    } else if (startedWSServer) {
+    }
+
+    if (startedWSServer) {
       latestData = JSON.stringify(
         cssToReactNativeRuntime(
           readFileSync(output, "utf-8"),
