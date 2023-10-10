@@ -445,6 +445,12 @@ export function createInteropComputed(
         };
       }
 
+      if (convertToPressable) {
+        styledProps.onPress = (event: GestureResponderEvent) => {
+          (props as any).onPress?.(event);
+        };
+      }
+
       interop.styledProps = styledProps;
       interop.convertToPressable = convertToPressable;
 
