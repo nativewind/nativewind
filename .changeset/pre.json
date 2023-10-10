@@ -9,6 +9,9 @@
     "react-native-css-interop": "0.0.0-alpha.11"
   },
   "changesets": [
+    "afraid-clocks-shake",
+    "clever-planets-warn",
+    "cold-files-visit",
     "five-countries-fold",
     "silly-crabs-float",
     "silver-bulldogs-peel",
