@@ -49,3 +49,53 @@ test("rotate-180", () => {
     transform: [{ rotate: "180deg" }],
   });
 });
+
+test("rotate-45", () => {
+  registerCSS(`
+*, ::before, ::after{
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-pan-x:  ;
+  --tw-pan-y:  ;
+}
+  
+.rotate-45 { 
+  --tw-rotate: 45deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+}`);
+
+  const component = render(
+    <A testID={testID} className="rotate-45" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({
+    transform: [
+      {
+        translateX: 0,
+      },
+      {
+        translateY: 0,
+      },
+      {
+        rotate: "45deg",
+      },
+      {
+        skewX: "0",
+      },
+      {
+        skewY: "0",
+      },
+      {
+        scaleX: 1,
+      },
+      {
+        scaleY: 1,
+      },
+    ],
+  });
+});

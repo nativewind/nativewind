@@ -176,9 +176,7 @@ export function flattenStyle(
               options,
             );
 
-            if (getterOrValue === undefined) {
-              continue;
-            } else if (typeof getterOrValue === "function") {
+            if (typeof getterOrValue === "function") {
               transforms.push(
                 Object.defineProperty({}, transform.name, {
                   configurable: true,
@@ -470,6 +468,7 @@ function extractValue(
         {
           wrap: false,
           parseFloat: false,
+          zeroDefault: "0deg",
         },
       );
     }
@@ -644,6 +643,7 @@ interface CreateRuntimeFunctionOptions {
   joinArgs?: boolean;
   callback?: Function;
   spreadCallbackArgs?: boolean;
+  zeroDefault?: any;
 }
 
 /**
@@ -660,6 +660,7 @@ function createRuntimeFunction(
     parseFloat: shouldParseFloat = true,
     joinArgs: joinArguments = true,
     spreadCallbackArgs: spreadCallbackArguments = false,
+    zeroDefault,
     callback,
   }: CreateRuntimeFunctionOptions = {},
 ) {
@@ -705,6 +706,10 @@ function createRuntimeFunction(
       if (!Number.isNaN(float) && float.toString() === result) {
         result = float;
       }
+    }
+
+    if (zeroDefault && result === "0") {
+      result = zeroDefault;
     }
 
     if (callback) {

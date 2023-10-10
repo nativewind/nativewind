@@ -61,7 +61,13 @@ export function createColorSchemeSignal(
   let dark = createSignal(darkValue);
 
   const get = () => {
-    return colorScheme.get() === "light" ? light.get() : dark.get();
+    if (colorScheme.get() === "light") {
+      return light.get();
+    } else {
+      const value = dark.get();
+
+      return value === undefined ? light.get() : value;
+    }
   };
 
   // Set the value and unsubscribe from the parent if the value is not undefined.
