@@ -1,6 +1,7 @@
-export default function () {
+module.exports = function () {
   return {
     plugins: [
+      require("./dist/babel-plugin").default,
       [
         "@babel/plugin-transform-react-jsx",
         {
@@ -10,4 +11,4 @@ export default function () {
       ],
     ],
   };
-}
+};

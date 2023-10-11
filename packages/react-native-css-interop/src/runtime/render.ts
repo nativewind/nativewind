@@ -1,9 +1,13 @@
-import type { ComponentType } from "react";
+import { ComponentType, ReactNode, createElement } from "react";
 import type { BasicInteropFunction, JSXFunction } from "../types";
 
 export type InteropTypeCheck<T> = {
   type: ComponentType<T>;
   check: (props: T) => boolean;
+  createElementWithInterop: (
+    props: any,
+    children: ReactNode,
+  ) => ReturnType<typeof createElement>;
 };
 export const interopComponents = new WeakMap<object, InteropTypeCheck<any>>();
 
@@ -34,4 +38,18 @@ export function renderWithInterop<P>(
   ...args: Parameters<JSXFunction<P>>
 ) {
   return interop(jsx, ...args);
+}
+
+export function createElementAndCheckCssInterop(
+  ...args: Parameters<typeof createElement>
+) {
+  const type = args[0];
+
+  if (!type) return createElement(...args);
+
+  const interop = interopComponents.get(type as object);
+
+  return !interop || !interop.check(args[1])
+    ? createElement(...args)
+    : interop.createElementWithInterop(args[1], args.slice(2) as ReactNode);
 }

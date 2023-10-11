@@ -92,6 +92,9 @@ export function cssInterop<T extends {}, M>(
 
   const interopComponent: InteropTypeCheck<T> = {
     type: render,
+    createElementWithInterop(props, children) {
+      return createElement(...interop(component, config, props, children));
+    },
     check(props) {
       for (const [
         targetProp,
@@ -174,6 +177,9 @@ export function remapProps<P, M>(
   interopComponents.set(component, {
     type: forwardRef(render),
     check: () => true,
+    createElementWithInterop(props, children) {
+      return render({ ...props, children }, null);
+    },
   });
 }
 
