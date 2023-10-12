@@ -349,10 +349,12 @@ export function createInteropComputed(
           continue;
         }
 
-        // TODO: This is a bug. We shouldn't have to clone the style object.
-        const style = {
-          ...flattenStyle(stylesToFlatten, interop as InteropComputed, {}, {}),
-        };
+        const style = flattenStyle(
+          stylesToFlatten,
+          interop as InteropComputed,
+          {},
+          {},
+        );
         const meta = styleMetaMap.get(style);
 
         const hasInlineContainers = containerNamesSetDuringRender.size > 0;

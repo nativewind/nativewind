@@ -39,13 +39,13 @@ export async function renderTailwind<T extends { className: string }>(
     tailwind({
       theme: {},
       ...config,
-      presets: config.presets ? config.presets : [require("./tailwind").preset],
+      presets: [require("./tailwind")],
       plugins: [tailwindcssContainerQueries],
       content: getClassNames(component),
     }),
   ]).process(css, { from: undefined });
 
-  // console.log(output);
+  // // console.log(output);
 
   registerCSS(output, cssToReactNativeRuntimeOptions);
 

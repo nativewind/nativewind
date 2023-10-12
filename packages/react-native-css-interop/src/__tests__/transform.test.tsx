@@ -85,10 +85,10 @@ test("rotate-45", () => {
         rotate: "45deg",
       },
       {
-        skewX: "0",
+        skewX: "0deg",
       },
       {
-        skewY: "0",
+        skewY: "0deg",
       },
       {
         scaleX: 1,

@@ -47,7 +47,6 @@ const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>([
  *
  *  - Switch to using useAnimatedProps instead of useAnimatedStyle
  *  - Animation should follow prop mapping
- *
  */
 
 /*
@@ -187,6 +186,7 @@ function useAnimationAndTransitions(
         }
       }
     }
+
     doAnimation(transitionProps, transitionValues);
     doAnimation(animationProps, animationValues);
     return result;

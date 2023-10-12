@@ -190,3 +190,12 @@ remapProps(VirtualizedList, {
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
+
+try {
+  const { Svg } = require("react-native-svg").Svg;
+  cssInterop(Svg, {
+    className: "style",
+  });
+} catch {
+  // Ignore
+}
