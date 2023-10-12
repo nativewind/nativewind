@@ -39,12 +39,13 @@
     "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput"
   },
   "files": [
-    "dist/",
+    "babel.js",
     "css-to-rn/",
+    "dist/",
+    "doctor/",
     "jsx-dev-runtime/",
     "jsx-runtime/",
     "metro/",
-    "doctor/",
     "testing-library/",
     "types.d.ts"
   ],

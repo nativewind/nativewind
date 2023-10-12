@@ -22,14 +22,13 @@ import {
 import { defaultCSSInterop } from "./runtime/css-interop";
 import { InteropTypeCheck, interopComponents, render } from "./runtime/render";
 import type {
-  RemapProps,
   ComponentTypeWithMapping,
   EnableCssInteropOptions,
   InteropFunction,
 } from "./types";
 import { getNormalizeConfig } from "./runtime/native/prop-mapping";
-import { getGlobalStyle } from "./runtime/native/stylesheet";
-import { opaqueStyles, styleMetaMap } from "./runtime/native/misc";
+import { styleMetaMap } from "./runtime/native/misc";
+import { remapProps } from "./runtime/css-interop";
 
 export function unstable_styled<P extends object, M>(
   component: ComponentType<P>,
@@ -124,63 +123,6 @@ export function cssInterop<T extends {}, M>(
   };
 
   interopComponents.set(component, interopComponent);
-}
-
-export function remapProps<P, M>(
-  component: ComponentType<P>,
-  mapping: RemapProps<P> & M,
-) {
-  const { config } = getNormalizeConfig(mapping);
-
-  let render: any = <P extends Record<string, unknown>>(
-    { ...props }: PropsWithChildren<P>,
-    ref: unknown,
-  ) => {
-    for (const [key, { sources }] of config) {
-      let rawStyles = [];
-
-      for (const sourceProp of sources) {
-        const source = props?.[sourceProp];
-
-        if (typeof source !== "string") continue;
-        delete props[sourceProp];
-
-        for (const className of source.split(/\s+/)) {
-          const style = getGlobalStyle(className);
-
-          if (style !== undefined) {
-            const opaqueStyle = {};
-            opaqueStyles.set(opaqueStyle, style);
-            rawStyles.push(opaqueStyle);
-          }
-        }
-      }
-
-      const existingStyle = props[key];
-
-      if (Array.isArray(existingStyle)) {
-        rawStyles.push(...existingStyle);
-      } else if (existingStyle) {
-        rawStyles.push(existingStyle);
-      }
-
-      if (rawStyles.length !== 0) {
-        (props as any)[key] = rawStyles.length === 1 ? rawStyles[0] : rawStyles;
-      }
-    }
-
-    (props as any).ref = ref;
-
-    return createElement(component as any, props, props.children);
-  };
-
-  interopComponents.set(component, {
-    type: forwardRef(render),
-    check: () => true,
-    createElementWithInterop(props, children) {
-      return render({ ...props, children }, null);
-    },
-  });
 }
 
 cssInterop(Image, { className: "style" });

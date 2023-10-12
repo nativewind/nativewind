@@ -42,7 +42,7 @@
     "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput"
   },
   "files": [
-    "babel/",
+    "babel.js",
     "dist/",
     "jsx-dev-runtime/",
     "jsx-runtime/",

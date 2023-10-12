@@ -1,10 +1,19 @@
-import { createElement } from "react";
+import {
+  ComponentType,
+  PropsWithChildren,
+  createElement,
+  forwardRef,
+} from "react";
 
-import { InteropFunction } from "../testing-library";
+import { InteropFunction, RemapProps } from "../testing-library";
 import { reactGlobal } from "./signals";
 import { Pressable, View } from "react-native";
 import { InheritanceProvider } from "./native/inheritance";
 import { useInteropComputed } from "./native/interop";
+import { opaqueStyles } from "./native/misc";
+import { getNormalizeConfig } from "./native/prop-mapping";
+import { getGlobalStyle } from "./native/stylesheet";
+import { interopComponents } from "./render";
 
 export const defaultCSSInterop: InteropFunction = (
   component,
@@ -69,3 +78,60 @@ export const defaultCSSInterop: InteropFunction = (
     return createElementParams;
   }
 };
+
+export function remapProps<P, M>(
+  component: ComponentType<P>,
+  mapping: RemapProps<P> & M,
+) {
+  const { config } = getNormalizeConfig(mapping);
+
+  let render: any = <P extends Record<string, unknown>>(
+    { ...props }: PropsWithChildren<P>,
+    ref: unknown,
+  ) => {
+    for (const [key, { sources }] of config) {
+      let rawStyles = [];
+
+      for (const sourceProp of sources) {
+        const source = props?.[sourceProp];
+
+        if (typeof source !== "string") continue;
+        delete props[sourceProp];
+
+        for (const className of source.split(/\s+/)) {
+          const style = getGlobalStyle(className);
+
+          if (style !== undefined) {
+            const opaqueStyle = {};
+            opaqueStyles.set(opaqueStyle, style);
+            rawStyles.push(opaqueStyle);
+          }
+        }
+      }
+
+      const existingStyle = props[key];
+
+      if (Array.isArray(existingStyle)) {
+        rawStyles.push(...existingStyle);
+      } else if (existingStyle) {
+        rawStyles.push(existingStyle);
+      }
+
+      if (rawStyles.length !== 0) {
+        (props as any)[key] = rawStyles.length === 1 ? rawStyles[0] : rawStyles;
+      }
+    }
+
+    (props as any).ref = ref;
+
+    return createElement(component as any, props, props.children);
+  };
+
+  interopComponents.set(component as any, {
+    type: forwardRef(render),
+    check: () => true,
+    createElementWithInterop(props, children) {
+      return render({ ...props, children }, null);
+    },
+  });
+}
