@@ -62,6 +62,7 @@ export interface InteropComputed extends Computed<any> {
   variables: Map<string, Signal<ExtractedStyleValue>>;
   getVariable: (name: string) => ExtractedStyleValue;
   setVariable: (name: string, value: ExtractedStyleValue) => void;
+  hasSetVariable: (name: string) => boolean;
   hasVariable: (name: string) => boolean;
   // containers
   containers: Map<string, Signal<InteropComputed>>;
@@ -203,6 +204,9 @@ export function createInteropComputed(
 
       variablesAccessedDuringRender.set(name, signal);
       return signal.get();
+    },
+    hasSetVariable(name) {
+      return variablesSetDuringRender.has(name);
     },
     hasVariable(name) {
       return variablesAccessedDuringRender.has(name);
@@ -349,13 +353,18 @@ export function createInteropComputed(
           continue;
         }
 
-        const style = flattenStyle(
+        let style = flattenStyle(
           stylesToFlatten,
           interop as InteropComputed,
           {},
           {},
         );
         const meta = styleMetaMap.get(style);
+
+        style = { ...style };
+        if (meta) {
+          styleMetaMap.set(style, meta);
+        }
 
         const hasInlineContainers = containerNamesSetDuringRender.size > 0;
 

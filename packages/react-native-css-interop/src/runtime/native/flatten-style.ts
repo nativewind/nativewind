@@ -136,7 +136,7 @@ export function flattenStyle(
 
   if (styleMeta.variables) {
     for (const [key, value] of Object.entries(styleMeta.variables)) {
-      if (depth <= 1 && interop.hasVariable(key)) {
+      if (interop.hasSetVariable(key)) {
         continue;
       }
 
