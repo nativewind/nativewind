@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { mkdirSync, readFileSync } from "node:fs";
+import { Stats, mkdirSync, readFileSync, statSync } from "node:fs";
 import { dirname } from "node:path";
 
 import { ServerOptions, Server, WebSocket } from "ws";
@@ -45,9 +45,11 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
   const spawnCommands = ["tailwindcss", "--input", input, "--output", output];
 
   let firstRun = true;
-  let latestData: string | undefined;
+  let latestStat: Stats | undefined;
+  let latestStyleData: string = "{}";
+  let version = 0;
   let startedWSServer = false;
-  const connections = new Set<WebSocket>();
+  const connections = new Map<WebSocket, number>();
 
   if (options.dev) {
     spawnCommands.push("--watch");
@@ -56,11 +58,9 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
       startedWSServer = true;
       const wss = new Server(options.hotServerOptions);
       wss.on("connection", (ws) => {
-        connections.add(ws);
+        connections.set(ws, version);
         ws.on("close", () => connections.delete(ws));
-        if (latestData) {
-          ws.send(latestData);
-        }
+        ws.send(latestStyleData);
       });
     }
   }
@@ -76,22 +76,30 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
     if (!data.includes("Done in")) return;
 
     if (firstRun) {
-      console.log("done");
       firstRun = false;
       clearTimeout(timeout);
       done();
     }
 
     if (startedWSServer) {
-      latestData = JSON.stringify(
+      const stat = statSync(output);
+
+      if (stat.mtimeMs === latestStat?.mtimeMs) return;
+      latestStat = stat;
+      version = version + 1;
+
+      latestStyleData = JSON.stringify(
         cssToReactNativeRuntime(
           readFileSync(output, "utf-8"),
           options.cssToReactNativeRuntime,
         ),
       );
 
-      for (const ws of connections) {
-        ws.send(latestData);
+      for (const [ws, lastVersion] of connections) {
+        if (lastVersion !== version) {
+          ws.send(latestStyleData);
+          connections.set(ws, version);
+        }
       }
     }
   });
