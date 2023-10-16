@@ -23,7 +23,7 @@ Add the paths to all of your component files in your tailwind.config.js file.
 module.exports = {
 - content: [],
 + content: ["./app/**/*.{js,jsx,ts,tsx}", "./<custom-folder>/**/*.{js,jsx,ts,tsx}"],
-+ preset: [require("nativewind/preset")],
++ presets: [require("nativewind/preset")],
   theme: {
     extend: {},
   },
