@@ -30,7 +30,7 @@ import { setRootVariables, setUniversalVariables } from "./inheritance";
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
 
-export const fastReloadSignal = createSignal(0);
+export const fastReloadSignal = createSignal(0, "fast-reload");
 
 const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_FLAGS]: {},

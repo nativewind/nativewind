@@ -42,6 +42,7 @@ export function flattenStyle(
   depth = 0,
 ): Style {
   flatStyle ||= {};
+
   if (!style) {
     return flatStyle;
   }

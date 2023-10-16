@@ -68,7 +68,7 @@ function createColorScheme(appearance: typeof Appearance) {
   };
 
   return {
-    get: signal.get,
+    ...signal,
     set,
     toggle,
     [INTERNAL_RESET]: reset,

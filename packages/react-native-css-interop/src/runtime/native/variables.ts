@@ -23,5 +23,5 @@ export function vars(variables: Record<string, string | number>) {
 
 export const useUnstableNativeVariable = (name: string) => {
   const interop = useContext(effectContext);
-  return useComputed(() => interop.variables.get(name)?.get(), interop);
+  return useComputed(() => interop.signals.get(name)?.get(), interop);
 };

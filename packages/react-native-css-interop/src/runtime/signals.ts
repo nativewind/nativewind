@@ -15,20 +15,22 @@ const context: Computed<any>[] = [];
 export type Signal<T> = ReturnType<typeof createSignal<T>>;
 type SignalSetFn<T> = (previous?: T) => T;
 
-export function createSignal<T = unknown>(value: T | undefined) {
+export function createSignal<T = unknown>(value: T | undefined, id?: string) {
   const signal = {
-    subscriptions: new Set<() => void>(),
+    subscriptions: new Set<(() => void) | Computed<any>>(),
     /**
      * Get the value and subscribe if we are in an effect
      */
     get() {
       const running = context[context.length - 1];
       if (running) {
+        // console.log("get", id, running.id);
         signal.subscriptions.add(running);
         running.dependencies.add(signal);
       }
       return value;
     },
+    id,
     /**
      * Get the value without subscribing
      */
@@ -47,6 +49,7 @@ export function createSignal<T = unknown>(value: T | undefined) {
 
       if (Object.is(value, nextValue)) return;
       value = nextValue as T;
+      // console.log("set", id);
       if (reactGlobal.isInComponent) {
         for (const sub of signal.subscriptions) {
           reactGlobal.delayedEvents.add(sub);
@@ -71,26 +74,25 @@ export function createSignal<T = unknown>(value: T | undefined) {
 
 export interface Computed<T = unknown> extends Signal<T> {
   (): void;
-  debugName?: string;
-  dependencies: Set<Signal<any> | (() => void)>;
+  dependencies: Set<Signal<any>>;
   fn: SignalSetFn<T>;
   runInEffect<T>(fn: () => T): T;
 }
 
 function setup(effect: Computed<any>) {
   // Clean up the previous run
-  cleanup(effect);
+  cleanupEffect(effect);
   // Setup the new run
   context.push(effect);
   reactGlobal.delayedEvents.delete(effect);
   reactGlobal.currentStore = effect;
 }
 
-function teardown(effect: Computed<any>) {
+function teardown(_effect: Computed<any>) {
   context.pop();
 }
 
-export function cleanup(effect: Computed<any>) {
+export function cleanupEffect(effect: Computed<any>) {
   for (const dep of effect.dependencies) {
     if ("subscriptions" in dep) {
       dep.subscriptions.delete(effect);
@@ -103,7 +105,7 @@ export function cleanup(effect: Computed<any>) {
 export function createComputed<T>(
   fn: SignalSetFn<T>,
   runOnInitialization = true,
-  debugName?: string,
+  id?: string,
 ): Computed<T> {
   const effect: Computed<T> = Object.assign(
     function () {
@@ -111,9 +113,8 @@ export function createComputed<T>(
       effect.set(effect.fn);
       teardown(effect);
     },
-    createSignal<T>(undefined),
+    createSignal<T>(undefined, id),
     {
-      debugName,
       dependencies: new Set(),
       fn: fn,
       /**

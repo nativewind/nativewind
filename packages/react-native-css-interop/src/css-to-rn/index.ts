@@ -12,7 +12,7 @@ import {
   ContainerRule,
 } from "lightningcss";
 
-import { isRuntimeValue } from "../shared";
+import { DEFAULT_CONTAINER_NAME, isRuntimeValue } from "../shared";
 import {
   ExtractedStyle,
   StyleSheetRegisterOptions,
@@ -578,7 +578,7 @@ function declarationsToStyle(
       { property: "container" | "container-name" | "container-type" }
     >,
   ) {
-    let names: false | string[] = ["__default"];
+    let names: false | string[] = [DEFAULT_CONTAINER_NAME];
     let type: ContainerType | undefined;
 
     switch (declaration.property) {

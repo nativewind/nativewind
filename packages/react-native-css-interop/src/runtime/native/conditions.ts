@@ -17,6 +17,7 @@ import { Platform } from "react-native";
 import { colorScheme } from "./color-scheme";
 import { rem } from "./rem";
 import { InteropComputed } from "./interop";
+import { DEFAULT_CONTAINER_NAME } from "../../shared";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -64,7 +65,7 @@ export function testContainerQuery(
 
     // If the query has a name, we use the container with that name
     // Otherwise default to the last container
-    if (!container) container = effect.getContainer("__default");
+    if (!container) container = effect.getContainer(DEFAULT_CONTAINER_NAME);
 
     // We failed if the container doesn't exist (e.g no default container)
     if (!container) return false;

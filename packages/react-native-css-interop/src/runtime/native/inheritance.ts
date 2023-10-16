@@ -7,8 +7,7 @@ import type { InteropComputed } from "./interop";
 export const rootVariables: Map<string, ColorSchemeSignal> = new Map();
 export const universalVariables: Map<string, ColorSchemeSignal> = new Map();
 export const effectContext = createContext({
-  variables: rootVariables,
-  containers: new Map(),
+  signals: rootVariables,
 } as unknown as InteropComputed);
 export const InheritanceProvider = effectContext.Provider;
 
@@ -21,7 +20,7 @@ function createVariableSetter(map: typeof rootVariables) {
       for (const [name, value] of Object.entries(light)) {
         let signal = map.get(name);
         if (!signal) {
-          signal = createColorSchemeSignal();
+          signal = createColorSchemeSignal(name);
           map.set(name, signal);
         }
         signal.setLight(value);
@@ -32,7 +31,7 @@ function createVariableSetter(map: typeof rootVariables) {
       for (const [name, value] of Object.entries(dark)) {
         let variable = map.get(name);
         if (!variable) {
-          variable = createColorSchemeSignal();
+          variable = createColorSchemeSignal(name);
           map.set(name, variable);
         }
         variable.setDark(value);
@@ -53,26 +52,21 @@ export type ColorSchemeSignal = Signal<ExtractedStyleValue> & {
  * A special signal that can be used to set a value for both light and dark color schemes.
  * Currently only used for root and universal variables.
  */
-export function createColorSchemeSignal(
-  lightValue: ExtractedStyleValue | undefined = undefined,
-  darkValue = lightValue,
-): ColorSchemeSignal {
-  let light = createSignal(lightValue);
-  let dark = createSignal(darkValue);
+export function createColorSchemeSignal(id: string): ColorSchemeSignal {
+  let light = createSignal<any>(undefined, `${id}#root-light`);
+  let dark = createSignal<any>(undefined, `${id}#root-dark`);
 
   const get = () => {
     if (colorScheme.get() === "light") {
       return light.get();
     } else {
-      const value = dark.get();
-
-      return value === undefined ? light.get() : value;
+      return dark.peek() === "undefined" ? light.get() : dark.get();
     }
   };
 
   // Set the value and unsubscribe from the parent if the value is not undefined.
   const set = (nextValue: ExtractedStyleValue) => {
-    colorScheme.get() === "light" ? light.set(nextValue) : dark.set(nextValue);
+    colorScheme.peek() === "light" ? light.set(nextValue) : dark.set(nextValue);
   };
 
   const unsubscribe = (subscription: () => void) => {
@@ -82,6 +76,7 @@ export function createColorSchemeSignal(
 
   return {
     ...light,
+    id,
     get,
     set,
     setLight: light.set,

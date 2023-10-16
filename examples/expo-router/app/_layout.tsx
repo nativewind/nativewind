@@ -43,14 +43,9 @@ export default memo(function RootLayout() {
   return <RootLayoutNav />;
 });
 
-const theme = vars({
-  "--theme-fg": "black",
-  "--theme-bg": "rgba(230,230,230,1)",
-});
-
 function RootLayoutNav() {
   return (
-    <View style={[theme, StyleSheet.absoluteFill]}>
+    <View style={StyleSheet.absoluteFill}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />

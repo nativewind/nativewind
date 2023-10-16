@@ -1,8 +1,9 @@
 import { useContext, useEffect, useRef, useSyncExternalStore } from "react";
+import { LayoutChangeEvent } from "react-native";
 import {
   Computed as Computed,
   Signal,
-  cleanup,
+  cleanupEffect,
   createComputed,
   createSignal,
   reactGlobal,
@@ -10,8 +11,6 @@ import {
 import { NormalizedOptions } from "./prop-mapping";
 import { fastReloadSignal, StyleSheet, getGlobalStyle } from "./stylesheet";
 import {
-  ColorSchemeSignal,
-  createColorSchemeSignal,
   effectContext,
   rootVariables,
   universalVariables,
@@ -26,49 +25,26 @@ import {
 import { styleMetaMap } from "./misc";
 import { styleSpecificityCompareFn } from "../specificity";
 import { flattenStyle } from "./flatten-style";
-import {
-  GestureResponderEvent,
-  LayoutChangeEvent,
-  NativeSyntheticEvent,
-  TargetedEvent,
-} from "react-native";
+import { DEFAULT_CONTAINER_NAME } from "../../shared";
 
-/**
- * TODO:
- *  - Current, if anything changes we will always generate new styles
- *      If this incorrect, as we should check if that actual styles have changed from the previous
- *      fn() is called with the previous prop, we just don't use it.
- *      Maybe each style should be calculated in its own computed?
- *  - We have a mix of properties on the Interop and off it, we should standardize
- *  - Can tracking be done in a more performant way?
- *  - Need to add caching for styles.
- */
 export interface InteropComputed extends Computed<any> {
-  shouldUpdate(
-    parent: InteropComputed,
-    props: Record<string, unknown>,
-  ): boolean;
+  rerender(parent: InteropComputed, props: Record<string, unknown>): void;
   // tracking
   props: Record<string, unknown>;
   parent: InteropComputed;
   lastDependencies: unknown[];
-  lastVersion: number;
   // Rendering
   contextValue?: InteropComputed;
   shouldUpdateContext: boolean;
   convertToPressable: boolean;
   requiresLayout: boolean;
-  // variables
-  variables: Map<string, Signal<ExtractedStyleValue>>;
+  signals: Map<string, Signal<any>>;
+  // Variable
   getVariable: (name: string) => ExtractedStyleValue;
   setVariable: (name: string, value: ExtractedStyleValue) => void;
   hasSetVariable: (name: string) => boolean;
-  hasVariable: (name: string) => boolean;
-  // containers
-  containers: Map<string, Signal<InteropComputed>>;
   getContainer: (name: string) => InteropComputed | undefined;
   setContainer: (name: string) => void;
-  // interaction
   getInteraction: GetInteraction;
   setInteraction: <T extends keyof Interaction>(
     name: T,
@@ -89,10 +65,8 @@ export function useInteropComputed(
 
   if (!interopRef.current) {
     interopRef.current = createInteropComputed(options, props, parent);
-  } else if (interopRef.current.shouldUpdate(parent, props)) {
-    interopRef.current.props = props;
-    interopRef.current.parent = parent;
-    interopRef.current();
+  } else {
+    interopRef.current.rerender(parent, props);
   }
 
   const interop = interopRef.current;
@@ -102,7 +76,7 @@ export function useInteropComputed(
    */
 
   // If we unmount we need to cleanup the store's subscribers
-  useEffect(() => () => cleanup(interop), []);
+  useEffect(() => () => cleanupEffect(interop), []);
 
   // If there are any delayedEffects, run them after render
   useEffect(() => {
@@ -124,15 +98,10 @@ export function createInteropComputed(
 ): InteropComputed {
   const interaction: Interaction = {};
 
-  // variables
-  const inlineVariables = new Map();
-  const variablesSetDuringRender = new Set();
-  const variablesAccessedDuringRender = new Map();
-  // containers
-  const inlineContainers = new Map();
-  const containerNamesSetDuringRender = new Set();
-  const containersAccessedDuringRender = new Map();
+  const inlineSignals = new Map();
+  const signalsSetDuringRender = new Set();
   let containerSignal: Signal<InteropComputed> | undefined;
+  let hasInlineContainers: boolean = false;
 
   let partialInterop: Omit<
     InteropComputed,
@@ -142,7 +111,6 @@ export function createInteropComputed(
     props,
     parent,
     lastDependencies: [],
-    lastVersion: 0,
     // rendering
     shouldUpdateContext: false,
     requiresLayout: false,
@@ -150,88 +118,63 @@ export function createInteropComputed(
     // animations
     animatedProps: new Set(),
     transitionProps: new Set(),
-    // variables
-    variables: new Map(),
+    signals: new Map(),
     setVariable(name, value) {
-      variablesSetDuringRender.add(name);
-
-      let signal = inlineVariables.get(name);
-
+      signalsSetDuringRender.add(name);
+      let signal = inlineSignals.get(name);
       if (!signal) {
-        signal = createSignal(value);
+        signal = createSignal(value, name);
         interop.shouldUpdateContext = true;
-        inlineVariables.set(name, signal);
+        inlineSignals.set(name, signal);
       } else {
         signal.set(value);
       }
     },
     getVariable(name) {
       // Try the inline variables
-      let signal: Signal<any> | undefined = inlineVariables.get(name);
-
-      let value = signal?.get();
-      if (value !== undefined) return value;
+      let signal = inlineSignals.get(name);
+      if (signal && signal.peek() !== undefined) {
+        return signal.get();
+      }
 
       // Try the universal variables
       signal = universalVariables.get(name);
-      if (!signal) {
-        signal = createColorSchemeSignal();
-        universalVariables.set(name, signal as ColorSchemeSignal);
-        signal.get();
-      } else {
-        value = signal.get();
-        if (value !== undefined) return value;
+      if (signal && signal.peek() !== undefined) {
+        return signal.get();
       }
 
       // Try the inherited variables
-      signal = parent.variables.get(name);
-      if (signal) {
-        value = signal.get();
-        if (value !== undefined) {
-          variablesAccessedDuringRender.set(name, signal);
-          return value;
-        }
+      signal = parent.signals.get(name);
+      if (signal && signal.peek() !== undefined) {
+        return signal.get();
       }
 
-      // Try the root variables?
+      // Try the root variables
       signal = rootVariables.get(name);
-      if (!signal) {
-        // The root signal didn't exist, so create it.
-        signal = createColorSchemeSignal();
-        rootVariables.set(name, signal as ColorSchemeSignal);
-        // Also subscribe to it, incase fast-refresh adds a value
-      }
-
-      variablesAccessedDuringRender.set(name, signal);
-      return signal.get();
-    },
-    hasSetVariable(name) {
-      return variablesSetDuringRender.has(name);
-    },
-    hasVariable(name) {
-      return variablesAccessedDuringRender.has(name);
-    },
-    // containers
-    containers: new Map(),
-    getContainer(name) {
-      const signal = parent.containers.get(name);
-      if (signal) {
-        containersAccessedDuringRender.set(name, signal);
+      if (signal && signal.peek() !== undefined) {
         return signal.get();
       }
     },
+    hasSetVariable(name) {
+      return signalsSetDuringRender.has(name);
+    },
+    getContainer(name) {
+      return parent.signals.get(name)?.get();
+    },
     setContainer(name) {
-      containerNamesSetDuringRender.add(name);
-      containerSignal ??= createSignal(interop as InteropComputed);
-      inlineContainers.set(name, containerSignal);
-      inlineContainers.set("__default", containerSignal);
+      containerSignal ??= createSignal(interop as InteropComputed, name);
+      hasInlineContainers = true;
+      inlineSignals.set(name, containerSignal);
+      signalsSetDuringRender.add(name);
+      inlineSignals.set(DEFAULT_CONTAINER_NAME, containerSignal);
+      signalsSetDuringRender.add(DEFAULT_CONTAINER_NAME);
     },
     getInteraction(name) {
       if (!interaction[name]) {
         if (name === "layoutWidth" || name === "layoutHeight") {
-          interaction[name] = createSignal(0) as any;
+          interaction[name] = createSignal(0, name) as any;
         } else {
-          interaction[name] = createSignal(false) as any;
+          interaction[name] = createSignal(false, name) as any;
         }
       }
 
@@ -241,44 +184,38 @@ export function createInteropComputed(
       if (name in interaction) {
         interaction[name]!.set(value as any);
       } else {
-        interaction[name] = createSignal(value) as any;
+        interaction[name] = createSignal(value, name) as any;
       }
     },
-    shouldUpdate(parent, props) {
-      return Boolean(
+    rerender(parent, props) {
+      let shouldRerender =
+        parent !== interop.parent ||
         options.dependencies.some(
           (k, i) => props[k] !== interop.lastDependencies[i],
-        ) ||
-          // A variable we accessed has changed to a new signal
-          (variablesAccessedDuringRender.size &&
-            Array.from(variablesAccessedDuringRender).some(([name, signal]) => {
-              return signal !== parent.variables.get(name);
-            })) ||
-          // A container we accessed has changed to a new signal
-          (containersAccessedDuringRender.size &&
-            Array.from(containersAccessedDuringRender).some(
-              ([name, signal]) => {
-                return signal !== parent.containers.get(name);
-              },
-            )),
-      );
+        );
+
+      // This should be false most of the time. If a variable changes, the signal will re-run
+      // So by the time we get here, the values will be the same
+      if (shouldRerender) {
+        interop.props = props;
+        interop.parent = parent;
+        interop();
+      }
     },
     fn() {
-      const props = interop.props;
+      const props: Record<string, any> = interop.props;
+
       // Update the tracking
       reactGlobal.delayedEvents.delete(interop as InteropComputed);
       interop.lastDependencies = options.dependencies.map((k) => props![k]);
       interop.requiresLayout = false;
       interop.animationInteropKey = undefined;
       interop.shouldUpdateContext = false;
+      interop.convertToPressable = false;
 
-      // Track variables set/accessed during render
-      variablesSetDuringRender.clear();
-      variablesAccessedDuringRender.clear();
-
-      // Track containers set/accessed during render
-      containerNamesSetDuringRender.clear();
-      containersAccessedDuringRender.clear();
+      // Track signals set during render
+      signalsSetDuringRender.clear();
+      hasInlineContainers = false;
 
       // Listen for fast-reload
       // TODO: This should be improved...
@@ -291,7 +228,7 @@ export function createInteropComputed(
       let hasActive: boolean | undefined = false;
       let hasHover: boolean | undefined = false;
       let hasFocus: boolean | undefined = false;
-      let requiresLayout = false;
+      let requiresLayout: boolean | undefined = false;
 
       let dynamicStyles = false;
 
@@ -366,8 +303,6 @@ export function createInteropComputed(
           styleMetaMap.set(style, meta);
         }
 
-        const hasInlineContainers = containerNamesSetDuringRender.size > 0;
-
         if (meta) {
           if (meta.animations) interop.animatedProps.add(key);
           if (meta.transition) interop.transitionProps.add(key);
@@ -381,18 +316,10 @@ export function createInteropComputed(
             interop.shouldUpdateContext = true;
           }
 
-          requiresLayout ||= Boolean(
-            hasInlineContainers || meta.requiresLayout,
-          );
-          hasActive ||= Boolean(
-            hasInlineContainers || meta.pseudoClasses?.active,
-          );
-          hasHover ||= Boolean(
-            hasInlineContainers || meta.pseudoClasses?.hover,
-          );
-          hasFocus ||= Boolean(
-            hasInlineContainers || meta.pseudoClasses?.focus,
-          );
+          requiresLayout ||= hasInlineContainers || meta.requiresLayout;
+          hasActive ||= hasInlineContainers || meta.pseudoClasses?.active;
+          hasHover ||= hasInlineContainers || meta.pseudoClasses?.hover;
+          hasFocus ||= hasInlineContainers || meta.pseudoClasses?.focus;
         }
 
         /**
@@ -425,67 +352,58 @@ export function createInteropComputed(
 
       if (requiresLayout) {
         styledProps.onLayout = (event: LayoutChangeEvent) => {
-          (props as any).onLayout?.(event);
-          interop.setInteraction("layoutWidth", event.nativeEvent.layout.width);
-          interop.setInteraction(
-            "layoutHeight",
-            event.nativeEvent.layout.height,
-          );
+          props.onLayout?.(event);
+          const layout = event.nativeEvent.layout;
+          interop.setInteraction("layoutWidth", layout.width);
+          interop.setInteraction("layoutHeight", layout.height);
         };
       }
 
-      let convertToPressable = false;
       if (hasActive) {
-        convertToPressable = true;
-        styledProps.onPressIn = (event: GestureResponderEvent) => {
-          (props as any).onPressIn?.(event);
+        interop.convertToPressable = true;
+        styledProps.onPressIn = (event: unknown) => {
+          props.onPressIn?.(event);
           interop.setInteraction("active", true);
         };
-        styledProps.onPressOut = (event: GestureResponderEvent) => {
-          (props as any).onPressOut?.(event);
+        styledProps.onPressOut = (event: unknown) => {
+          props.onPressOut?.(event);
           interop.setInteraction("active", false);
         };
       }
       if (hasHover) {
-        convertToPressable = true;
-        styledProps.onHoverIn = (event: MouseEvent) => {
-          (props as any).onHoverIn?.(event);
+        interop.convertToPressable = true;
+        styledProps.onHoverIn = (event: unknown) => {
+          props.onHoverIn?.(event);
           interop.setInteraction("hover", true);
         };
-        styledProps.onHoverOut = (event: MouseEvent) => {
-          (props as any).onHoverIn?.(event);
+        styledProps.onHoverOut = (event: unknown) => {
+          props.onHoverIn?.(event);
           interop.setInteraction("hover", false);
         };
       }
       if (hasFocus) {
-        convertToPressable = true;
-        styledProps.onFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
-          (props as any).onFocus?.(event);
+        interop.convertToPressable = true;
+        styledProps.onFocus = (event: unknown) => {
+          props.onFocus?.(event);
           interop.setInteraction("focus", true);
         };
-        styledProps.onBlur = (event: NativeSyntheticEvent<TargetedEvent>) => {
-          (props as any).onBlur?.(event);
+        styledProps.onBlur = (event: unknown) => {
+          props.onBlur?.(event);
           interop.setInteraction("focus", false);
         };
       }
 
-      if (convertToPressable) {
-        styledProps.onPress = (event: GestureResponderEvent) => {
-          (props as any).onPress?.(event);
+      if (interop.convertToPressable) {
+        styledProps.onPress = (event: unknown) => {
+          props.onPress?.(event);
         };
       }
 
-      interop.convertToPressable = convertToPressable;
-
-      // processStyles(props, interop as InteropComputed, options);
-
-      interop.containers = new Map([...parent.containers, ...inlineContainers]);
-      interop.variables = new Map([
-        ...parent.variables,
+      interop.signals = new Map([
+        ...parent.signals,
         ...universalVariables,
-        ...inlineVariables,
+        ...inlineSignals,
       ]);
-
       /**
        * Clear any variables that were not used.
        *
@@ -495,27 +413,15 @@ export function createInteropComputed(
        * Note: we don't need to worry about garbage collection, as the effects
        *   will remove themselves from the signal when they re-run, leaving no references
        */
-
-      interop.shouldUpdateContext ||=
-        inlineVariables.size !== variablesSetDuringRender.size;
-      for (const variable of inlineVariables.keys()) {
-        if (!variablesSetDuringRender.has(variable)) {
-          inlineVariables.delete(variable);
+      for (const [name, signal] of inlineSignals) {
+        if (!signalsSetDuringRender.has(name)) {
+          signal.set(undefined);
+          inlineSignals.delete(name);
           interop.shouldUpdateContext = true;
         }
       }
-
       interop.shouldUpdateContext ||=
-        inlineContainers.size !== containerNamesSetDuringRender.size;
-      for (const container of inlineContainers.keys()) {
-        if (
-          container !== "__default" &&
-          !containerNamesSetDuringRender.has(container)
-        ) {
-          inlineContainers.delete(container);
-          interop.shouldUpdateContext = true;
-        }
-      }
+        inlineSignals.size !== signalsSetDuringRender.size;
 
       if (interop.shouldUpdateContext) {
         // Duplicate this object, making it identify different
@@ -527,7 +433,7 @@ export function createInteropComputed(
   };
 
   const interop: InteropComputed = Object.assign(
-    createComputed(partialInterop.fn, false),
+    createComputed(partialInterop.fn, false, props.testID?.toString()),
     partialInterop,
   );
 

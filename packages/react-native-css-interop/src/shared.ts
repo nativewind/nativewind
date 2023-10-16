@@ -4,6 +4,8 @@ export const INTERNAL_RESET = Symbol();
 export const INTERNAL_SET = Symbol();
 export const INTERNAL_FLAGS = Symbol();
 
+export const DEFAULT_CONTAINER_NAME = "@__";
+
 export function isRuntimeValue(value: unknown): value is RuntimeValue {
   if (!value) {
     return false;

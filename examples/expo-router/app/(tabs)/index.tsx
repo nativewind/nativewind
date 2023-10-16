@@ -9,8 +9,8 @@ const App = () => {
   return (
     <View className="flex-1 items-center justify-center" style={theme}>
       <Text className="text-[--theme-fg]">Try editing me! 🎉</Text>
-      <Text className="scale-100 active:scale-150 text-black active:text-red-500 transition-[transform,color] duration-[1s]">
-        Bounce
+      <Text className="scale-100 active:scale-150 text-blue-500 active:text-red-500 transition-[color,transform] duration-[3s]">
+        Press me
       </Text>
     </View>
   );
