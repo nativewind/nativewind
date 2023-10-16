@@ -10,6 +10,7 @@ import {
   StatusBar,
   VirtualizedList,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
 import * as JSX from "react/jsx-runtime";
 import { render as tlRender, screen } from "@testing-library/react-native";
@@ -39,6 +40,7 @@ test("Component types", () => {
       className="bg-black"
       imageClassName="bg-black"
     />,
+    <TextInput className="bg-black" placeholderClassName="bg-black" />,
     <KeyboardAvoidingView
       className="bg-black"
       contentContainerClassName="bg-black"
@@ -58,6 +60,38 @@ test("Component types", () => {
       indicatorClassName="bg-black"
     />,
   ];
+});
+
+test("TextInput", () => {
+  registerCSS(`.text-black { color: black } .text-white { color: white }`);
+
+  render(
+    <TextInput
+      testID={testID}
+      className="text-black"
+      placeholderClassName="text-white"
+    />,
+  );
+
+  const component = screen.getByTestId(testID);
+
+  // These should be removed
+  expect(component.props).not.toEqual(
+    expect.objectContaining({
+      className: expect.any,
+      placeholderClassName: expect.any,
+    }),
+  );
+
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      testID,
+      placeholderTextColor: "rgba(255, 255, 255, 1)",
+      style: {
+        color: "rgba(0, 0, 0, 1)",
+      },
+    }),
+  );
 });
 
 test("ActivityIndicator", () => {

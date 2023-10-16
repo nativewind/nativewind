@@ -35,6 +35,9 @@ declare module "react-native" {
   interface ViewProps {
     className?: string;
   }
+  interface TextInputProps {
+    placeholderClassName?: string;
+  }
   interface TextProps {
     className?: string;
   }

@@ -19,7 +19,6 @@ import {
   ExtractedStyleValue,
   GetInteraction,
   Interaction,
-  Style,
   StyleProp,
 } from "../../types";
 import { styleMetaMap } from "./misc";
@@ -221,7 +220,7 @@ export function createInteropComputed(
       // TODO: This should be improved...
       fastReloadSignal.get();
 
-      const styledProps: Record<string, unknown> = {};
+      const styledProps: Record<string, any> = {};
       interop.animatedProps.clear();
       interop.transitionProps.clear();
 
@@ -290,7 +289,7 @@ export function createInteropComputed(
           continue;
         }
 
-        let style = flattenStyle(
+        let style: Record<string, any> = flattenStyle(
           stylesToFlatten,
           interop as InteropComputed,
           {},
@@ -329,11 +328,14 @@ export function createInteropComputed(
          *  Freezing the whole object keeps everything consistent
          */
         if (nativeStyleToProp) {
-          for (const [key, targetProp] of Object.entries(nativeStyleToProp)) {
-            const styleKey = key as keyof Style;
-            if (targetProp === true && style[styleKey]) {
-              styledProps[styleKey] = style[styleKey];
-              delete style[styleKey];
+          for (let [key, targetProp] of Object.entries(nativeStyleToProp)) {
+            if (key in style) {
+              if (typeof targetProp === "string") {
+                styledProps[targetProp] = style[key];
+              } else {
+                styledProps[key] = style[key];
+              }
+              delete style[key];
             }
           }
         }
