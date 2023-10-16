@@ -30,10 +30,8 @@ export function withNativeWind(
     projectRoot = process.cwd(),
     inlineRem = 14,
     configPath: tailwindConfigPath = "tailwind.config",
-    hotServerOptions = {
-      port: 8089,
-    },
-  }: WithNativeWindOptions,
+    hotServerOptions = {},
+  }: WithNativeWindOptions = {},
 ) {
   if (!input) {
     throw new Error(
@@ -103,11 +101,15 @@ export function withNativeWind(
         tailwindHasStarted[platform] = true;
 
         // Generate the styles
-        await tailwindCli(input, {
+        const cliOutput = await tailwindCli(input, {
           ...options,
           output,
           hotServerOptions,
         });
+
+        if (cliOutput) {
+          Object.assign((metroConfig as any).transformer.nativewind, cliOutput);
+        }
       }
 
       return previousTransformOptions?.(

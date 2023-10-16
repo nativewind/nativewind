@@ -1,3 +1,4 @@
+import net from "node:net";
 import { spawn } from "node:child_process";
 import { Stats, mkdirSync, readFileSync, statSync } from "node:fs";
 import { dirname } from "node:path";
@@ -18,8 +19,11 @@ export interface TailwindCliOptions extends GetTransformOptionsOpts {
 }
 
 export async function tailwindCli(input: string, options: TailwindCliOptions) {
-  let done: () => void;
-  const deferred = new Promise<void>((resolve) => (done = resolve));
+  let done: (nativewindOptions?: Record<string, any>) => void;
+  let nativewindOptions: Record<string, any> | undefined;
+  const deferred = new Promise<Record<string, any> | undefined>(
+    (resolve) => (done = resolve),
+  );
 
   const env = {
     ...process.env,
@@ -56,6 +60,13 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
 
     if (options.platform !== "web") {
       startedWSServer = true;
+
+      if (!options.hotServerOptions.port) {
+        options.hotServerOptions.port = await getAvailablePort();
+      }
+
+      nativewindOptions = { fastRefreshPort: options.hotServerOptions.port };
+
       const wss = new Server(options.hotServerOptions);
       wss.on("connection", (ws) => {
         connections.set(ws, version);
@@ -78,7 +89,7 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
     if (firstRun) {
       firstRun = false;
       clearTimeout(timeout);
-      done();
+      done(nativewindOptions);
     }
 
     if (startedWSServer) {
@@ -105,4 +116,23 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
   });
 
   return deferred;
+}
+
+async function getAvailablePort(port = 8089): Promise<number> {
+  return checkAvailablePort(port).catch(() => getAvailablePort(port + 1));
+}
+
+function checkAvailablePort(port: number) {
+  return new Promise<number>((resolve, reject) => {
+    const server = net.createServer();
+    server.unref();
+    server.on("error", reject);
+
+    server.listen({ port }, () => {
+      const { port } = server.address() as net.AddressInfo;
+      server.close(() => {
+        resolve(port);
+      });
+    });
+  });
 }
