@@ -20,10 +20,11 @@ function createVariableSetter(map: typeof rootVariables) {
       for (const [name, value] of Object.entries(light)) {
         let signal = map.get(name);
         if (!signal) {
-          signal = createColorSchemeSignal(name);
+          signal = createColorSchemeSignal(name, value);
           map.set(name, signal);
+        } else {
+          signal.setLight(value);
         }
-        signal.setLight(value);
       }
     }
 
@@ -52,9 +53,12 @@ export type ColorSchemeSignal = Signal<ExtractedStyleValue> & {
  * A special signal that can be used to set a value for both light and dark color schemes.
  * Currently only used for root and universal variables.
  */
-export function createColorSchemeSignal(id: string): ColorSchemeSignal {
-  let light = createSignal<any>(undefined, `${id}#root-light`);
-  let dark = createSignal<any>(undefined, `${id}#root-dark`);
+export function createColorSchemeSignal(
+  id: string,
+  value?: any,
+): ColorSchemeSignal {
+  let light = createSignal<any>(value, `${id}#root-light`);
+  let dark = createSignal<any>(value, `${id}#root-dark`);
 
   const get = () => {
     if (colorScheme.get() === "light") {
