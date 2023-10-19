@@ -31,6 +31,7 @@ import { DEFAULT_CONTAINER_NAME, transformKeys } from "../../shared";
 import {
   AnimatableValue,
   SharedValue,
+  cancelAnimation,
   makeMutable,
   withDelay,
   withRepeat,
@@ -68,9 +69,8 @@ export interface InteropComputed extends Computed<any> {
   ) => void;
   // Animations
   isAnimated: boolean;
-  sharedValues: Map<string, SharedValue<any>>;
+  sharedValues: Record<string, SharedValue<any>>;
   currentAnimationNames: Set<string>;
-  animationStyles: Record<string, any>;
 }
 
 export function useInteropComputed(
@@ -129,10 +129,9 @@ export function createInteropComputed(
     props,
     parent,
     lastDependencies: [],
-    sharedValues: new Map(),
+    sharedValues: {},
     isAnimated: false,
     currentAnimationNames: new Set(),
-    animationStyles: {},
     // rendering
     shouldUpdateContext: false,
     requiresLayout: false,
@@ -234,7 +233,6 @@ export function createInteropComputed(
       reactGlobal.delayedEvents.delete(interop as InteropComputed);
       interop.lastDependencies = options.dependencies.map((k) => props![k]);
       interop.requiresLayout = false;
-      interop.isAnimated = false;
       interop.shouldUpdateContext = false;
       interop.convertToPressable = false;
 
@@ -363,7 +361,7 @@ export function createInteropComputed(
 
         styledProps[key] = style;
 
-        const seenAnimatedProps = new Set(Object.keys(interop.animationStyles));
+        const seenAnimatedProps = new Set();
 
         if (key === "style" && meta?.animations) {
           const needsLayout = Boolean(
@@ -389,7 +387,7 @@ export function createInteropComputed(
             for (const name of a.name) {
               if (name.type === "none") {
                 names = [];
-                interop.isAnimated = false;
+                interop.currentAnimationNames.clear();
                 break;
               }
 
@@ -401,9 +399,7 @@ export function createInteropComputed(
             }
 
             if (shouldResetAnimations) {
-              interop.animationStyles = {};
               interop.currentAnimationNames.clear();
-              seenAnimatedProps.clear();
 
               // Loop in reverse order
               for (let index = names.length - 1; index >= 0; index--) {
@@ -458,10 +454,10 @@ export function createInteropComputed(
                     );
                   }) as [AnimatableValue, ...AnimatableValue[]];
 
-                  let sharedValue = interop.sharedValues.get(prop);
+                  let sharedValue = interop.sharedValues[prop];
                   if (!sharedValue) {
                     sharedValue = makeMutable(initialValue);
-                    interop.sharedValues.set(prop, sharedValue);
+                    interop.sharedValues[prop] = sharedValue;
                   } else {
                     sharedValue.value = initialValue;
                   }
@@ -470,18 +466,29 @@ export function createInteropComputed(
                     withSequence(...sequence),
                     iterations,
                   );
+                }
+              }
+            } else {
+              for (const name of names) {
+                const keyframes = animationMap.get(name);
+                if (!keyframes) {
+                  continue;
+                }
 
-                  interop.animationStyles[prop] = sharedValue;
+                for (const prop of Object.keys(keyframes.frames)) {
+                  seenAnimatedProps.add(prop);
                 }
               }
             }
           }
         } else {
-          interop.animationStyles = {};
+          interop.currentAnimationNames.clear();
         }
 
         // We only support transition on 'style' right now
         if (key === "style" && meta?.transition) {
+          interop.isAnimated = true;
+
           const t = { ...defaultTransition, ...meta.transition };
           for (let index = 0; index < t.property.length; index++) {
             const prop = t.property[index];
@@ -496,8 +503,6 @@ export function createInteropComputed(
 
             seenAnimatedProps.add(prop);
 
-            interop.isAnimated = true;
-
             const duration = timeToMS(t.duration[index % t.duration.length]);
             const delay = timeToMS(t.delay[index % t.delay.length]);
             // const easing: any =
@@ -505,10 +510,10 @@ export function createInteropComputed(
             //     index % transition.timingFunction.length
             //   ];
 
-            let sharedValue = interop.sharedValues.get(prop);
+            let sharedValue = interop.sharedValues[prop];
             if (!sharedValue) {
               sharedValue = makeMutable(value);
-              interop.sharedValues.set(prop, sharedValue);
+              interop.sharedValues[prop] = sharedValue;
             }
 
             if (value !== sharedValue.value) {
@@ -522,9 +527,15 @@ export function createInteropComputed(
           }
         }
 
+        for (const [key, value] of Object.entries(interop.sharedValues)) {
+          if (seenAnimatedProps.has(key)) continue;
+          cancelAnimation(value);
+          value.value = styledProps[key] ?? defaultValues[key];
+        }
+
         styledProps[key] = {
           ...styledProps[key],
-          ...interop.animationStyles,
+          ...interop.sharedValues,
         };
 
         for (const tKey of transformKeys) {
