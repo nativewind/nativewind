@@ -1,9 +1,4 @@
-import {
-  TransformsStyle,
-  Platform,
-  PixelRatio,
-  PlatformColor,
-} from "react-native";
+import { Platform, PixelRatio, PlatformColor } from "react-native";
 import {
   testPseudoClasses,
   testMediaQuery,
@@ -125,14 +120,18 @@ export function flattenStyle(
   }
 
   if (styleMeta.container?.names) {
-    flatStyleMeta.requiresLayout = true;
+    flatStyleMeta.requiresLayoutWidth = true;
+    flatStyleMeta.requiresLayoutHeight = true;
     for (const name of styleMeta.container.names) {
       interop.setContainer(name);
     }
   }
 
-  if (styleMeta.requiresLayout) {
-    flatStyleMeta.requiresLayout = true;
+  if (styleMeta.requiresLayoutWidth) {
+    flatStyleMeta.requiresLayoutWidth = true;
+  }
+  if (styleMeta.requiresLayoutHeight) {
+    flatStyleMeta.requiresLayoutHeight = true;
   }
 
   if (styleMeta.variables) {
@@ -164,62 +163,37 @@ export function flattenStyle(
 
     switch (key) {
       case "transform": {
-        const transforms: Record<string, unknown>[] = [];
-
-        for (const transform of value) {
-          // Transform is either an React Native transform object OR
-          // A extracted value with type: "function"
-          if ("type" in transform) {
+        /**
+         * We never parse transforms to the transform property, so this is an inline transform
+         * They can be a string or an array of object
+         */
+        if (typeof value === "string") {
+          // TODO: Handle this. Should get this from flattenStyle from RN
+        } else {
+          value = value.map((v: any) => {
+            if (!isRuntimeValue(v)) return v;
             const getterOrValue = extractValue(
-              transform,
-              flatStyle,
-              flatStyleMeta,
+              v,
+              flatStyle!,
+              flatStyleMeta!,
               interop,
               options,
             );
 
             if (typeof getterOrValue === "function") {
-              transforms.push(
-                Object.defineProperty({}, transform.name, {
-                  configurable: true,
-                  enumerable: true,
-                  get() {
-                    return getterOrValue();
-                  },
-                }),
-              );
+              return Object.defineProperty({}, v.name, {
+                configurable: true,
+                enumerable: true,
+                get: getterOrValue,
+              });
+            } else {
+              return {
+                [v.name]: getterOrValue,
+              };
             }
-          } else {
-            for (const [tKey, tValue] of Object.entries(transform)) {
-              const $transform: Record<string, unknown> = {};
-
-              const getterOrValue = extractValue(
-                tValue,
-                flatStyle,
-                flatStyleMeta,
-                interop,
-                options,
-              );
-
-              if (typeof getterOrValue === "function") {
-                Object.defineProperty($transform, tKey, {
-                  configurable: true,
-                  enumerable: true,
-                  get() {
-                    return getterOrValue();
-                  },
-                });
-              } else {
-                $transform[tKey] = getterOrValue;
-              }
-
-              transforms.push($transform);
-            }
-          }
+          });
+          Object.assign(flatStyle, ...value);
         }
-
-        flatStyle.transform =
-          transforms as unknown as TransformsStyle["transform"];
         break;
       }
       case "textShadow": {
@@ -335,7 +309,7 @@ function extractAndDefineProperty(
   }
 }
 
-function extractValue(
+export function extractValue(
   value: unknown,
   flatStyle: Style,
   flatStyleMeta: StyleMeta,
@@ -394,7 +368,7 @@ function extractValue(
       } else if (typeof flatStyle.height === "number") {
         reference = flatStyle.height;
       } else {
-        reference = effect.getInteraction("layoutHeight").get();
+        reference = effect.getLayout()[1];
       }
 
       if (reference) {
@@ -404,7 +378,7 @@ function extractValue(
           if (typeof flatStyle.height === "number") {
             reference = flatStyle.height;
           } else {
-            reference = effect.getInteraction("layoutHeight").get() ?? 0;
+            reference = effect.getLayout()[1];
           }
 
           return round(reference * multiplier);
@@ -421,7 +395,7 @@ function extractValue(
       } else if (typeof flatStyle.width === "number") {
         reference = flatStyle.width;
       } else {
-        reference = effect.getInteraction("layoutWidth").get();
+        reference = effect.getLayout()[0];
       }
 
       if (reference) {
@@ -431,7 +405,7 @@ function extractValue(
           if (typeof flatStyle.width === "number") {
             reference = flatStyle.width;
           } else {
-            reference = effect.getInteraction("layoutWidth").get() ?? 0;
+            reference = effect.getLayout()[0];
           }
 
           return round(reference * multiplier);

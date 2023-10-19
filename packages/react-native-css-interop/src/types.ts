@@ -18,20 +18,7 @@ import {
   Appearance,
   Dimensions,
   ImageStyle,
-  MatrixTransform,
-  PerpectiveTransform as PerspectiveTransform,
-  RotateTransform,
-  RotateXTransform,
-  RotateYTransform,
-  RotateZTransform,
-  ScaleTransform,
-  ScaleXTransform,
-  ScaleYTransform,
-  SkewXTransform,
-  SkewYTransform,
   TextStyle,
-  TranslateXTransform,
-  TranslateYTransform,
   ViewStyle,
 } from "react-native";
 import { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
@@ -154,7 +141,8 @@ export type ExtractedStyle = {
   container?: Partial<ExtractedContainer>;
   containerQuery?: ExtractedContainerQuery[];
   transition?: ExtractedTransition;
-  requiresLayout?: boolean;
+  requiresLayoutWidth?: boolean;
+  requiresLayoutHeight?: boolean;
   warnings?: ExtractionWarning[];
   importantStyles?: string[];
 };
@@ -176,17 +164,6 @@ export type CSSSpecificity = {
   O: number;
 };
 
-export type PropInteropMeta = {
-  containers?: string[];
-  animated: boolean;
-  transition: boolean;
-  requiresLayout: boolean;
-  hasActive?: boolean;
-  hasHover?: boolean;
-  hasFocus?: boolean;
-  hasVariables?: boolean;
-};
-
 export type StyleMeta = {
   alreadyProcessed?: true;
   variableProps?: Set<string>;
@@ -197,7 +174,8 @@ export type StyleMeta = {
   container?: ExtractedContainer;
   containerQuery?: ExtractedContainerQuery[];
   transition?: ExtractedTransition;
-  requiresLayout?: boolean;
+  requiresLayoutWidth?: boolean;
+  requiresLayoutHeight?: boolean;
   importantStyles?: string[];
   specificity?: Specificity;
   wrapInContext?: boolean;
@@ -220,8 +198,6 @@ export type Interaction = {
   active?: Signal<boolean>;
   hover?: Signal<boolean>;
   focus?: Signal<boolean>;
-  layoutWidth?: Signal<number>;
-  layoutHeight?: Signal<number>;
 };
 
 export type ExtractedContainer = {
@@ -269,13 +245,14 @@ export type ExtractedTransition = {
 };
 
 export type ExtractedAnimation = {
-  frames: ExtractedKeyframe[];
-  requiresLayout?: boolean;
+  frames: Record<string, ExtractedStyleFrame[]>;
+  requiresLayoutWidth?: boolean;
+  requiresLayoutHeight?: boolean;
 };
 
-export type ExtractedKeyframe = {
-  selector: number;
-  style: Record<string, ExtractedStyleValue>;
+export type ExtractedStyleFrame = {
+  progress: number;
+  value: ExtractedStyleValue | "!INHERIT!";
 };
 
 export type PseudoClassesQuery = {
@@ -301,22 +278,6 @@ export type StyleProp = Style | StyleProp[] | undefined;
 export type NamedStyles<T> = {
   [P in keyof T]: StyleProp;
 };
-
-export type TransformRecord = Partial<
-  PerspectiveTransform &
-    RotateTransform &
-    RotateXTransform &
-    RotateYTransform &
-    RotateZTransform &
-    ScaleTransform &
-    ScaleXTransform &
-    ScaleYTransform &
-    TranslateXTransform &
-    TranslateYTransform &
-    SkewXTransform &
-    SkewYTransform &
-    MatrixTransform
->;
 
 export type CamelToKebabCase<
   T extends string,

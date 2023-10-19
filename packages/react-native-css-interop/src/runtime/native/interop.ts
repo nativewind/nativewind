@@ -16,15 +16,29 @@ import {
   universalVariables,
 } from "./inheritance";
 import {
+  ExtractedAnimations,
+  ExtractedStyleFrame,
   ExtractedStyleValue,
+  ExtractedTransition,
   GetInteraction,
   Interaction,
   StyleProp,
 } from "../../types";
-import { styleMetaMap } from "./misc";
+import { animationMap, styleMetaMap } from "./misc";
 import { styleSpecificityCompareFn } from "../specificity";
-import { flattenStyle } from "./flatten-style";
-import { DEFAULT_CONTAINER_NAME } from "../../shared";
+import { extractValue, flattenStyle } from "./flatten-style";
+import { DEFAULT_CONTAINER_NAME, transformKeys } from "../../shared";
+import {
+  AnimatableValue,
+  SharedValue,
+  makeMutable,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+import { Time } from "lightningcss";
+import { colorScheme } from "./color-scheme";
 
 export interface InteropComputed extends Computed<any> {
   rerender(parent: InteropComputed, props: Record<string, unknown>): void;
@@ -37,6 +51,7 @@ export interface InteropComputed extends Computed<any> {
   shouldUpdateContext: boolean;
   convertToPressable: boolean;
   requiresLayout: boolean;
+  isLayoutReady: () => boolean;
   signals: Map<string, Signal<any>>;
   // Variable
   getVariable: (name: string) => ExtractedStyleValue;
@@ -44,15 +59,18 @@ export interface InteropComputed extends Computed<any> {
   hasSetVariable: (name: string) => boolean;
   getContainer: (name: string) => InteropComputed | undefined;
   setContainer: (name: string) => void;
+  getLayout(): [number, number];
   getInteraction: GetInteraction;
+  cleanup(): void;
   setInteraction: <T extends keyof Interaction>(
     name: T,
     value: Parameters<NonNullable<Interaction[T]>["set"]>[0],
   ) => void;
   // Animations
-  animationInteropKey?: string;
-  transitionProps: Set<string>;
-  animatedProps: Set<string>;
+  isAnimated: boolean;
+  sharedValues: Map<string, SharedValue<any>>;
+  currentAnimationNames: Set<string>;
+  animationStyles: Record<string, any>;
 }
 
 export function useInteropComputed(
@@ -75,7 +93,7 @@ export function useInteropComputed(
    */
 
   // If we unmount we need to cleanup the store's subscribers
-  useEffect(() => () => cleanupEffect(interop), []);
+  useEffect(() => () => interop.cleanup(), []);
 
   // If there are any delayedEffects, run them after render
   useEffect(() => {
@@ -98,6 +116,7 @@ export function createInteropComputed(
   const interaction: Interaction = {};
 
   const inlineSignals = new Map();
+  const layoutSignal = createSignal([0, 0], `${props.testID}#layout`);
   const signalsSetDuringRender = new Set();
   let containerSignal: Signal<InteropComputed> | undefined;
   let hasInlineContainers: boolean = false;
@@ -110,13 +129,15 @@ export function createInteropComputed(
     props,
     parent,
     lastDependencies: [],
+    sharedValues: new Map(),
+    isAnimated: false,
+    currentAnimationNames: new Set(),
+    animationStyles: {},
     // rendering
     shouldUpdateContext: false,
     requiresLayout: false,
     convertToPressable: false,
     // animations
-    animatedProps: new Set(),
-    transitionProps: new Set(),
     signals: new Map(),
     setVariable(name, value) {
       signalsSetDuringRender.add(name);
@@ -128,6 +149,9 @@ export function createInteropComputed(
       } else {
         signal.set(value);
       }
+    },
+    cleanup() {
+      cleanupEffect(interop);
     },
     getVariable(name) {
       // Try the inline variables
@@ -170,11 +194,7 @@ export function createInteropComputed(
     },
     getInteraction(name) {
       if (!interaction[name]) {
-        if (name === "layoutWidth" || name === "layoutHeight") {
-          interaction[name] = createSignal(0, name) as any;
-        } else {
-          interaction[name] = createSignal(false, name) as any;
-        }
+        interaction[name] = createSignal(false, name) as any;
       }
 
       return interaction[name]!;
@@ -185,6 +205,12 @@ export function createInteropComputed(
       } else {
         interaction[name] = createSignal(value, name) as any;
       }
+    },
+    getLayout() {
+      return layoutSignal.get()! as [number, number];
+    },
+    isLayoutReady() {
+      return interop.getLayout()[0] !== 0;
     },
     rerender(parent, props) {
       let shouldRerender =
@@ -208,7 +234,7 @@ export function createInteropComputed(
       reactGlobal.delayedEvents.delete(interop as InteropComputed);
       interop.lastDependencies = options.dependencies.map((k) => props![k]);
       interop.requiresLayout = false;
-      interop.animationInteropKey = undefined;
+      interop.isAnimated = false;
       interop.shouldUpdateContext = false;
       interop.convertToPressable = false;
 
@@ -221,13 +247,11 @@ export function createInteropComputed(
       fastReloadSignal.get();
 
       const styledProps: Record<string, any> = {};
-      interop.animatedProps.clear();
-      interop.transitionProps.clear();
 
       let hasActive: boolean | undefined = false;
       let hasHover: boolean | undefined = false;
       let hasFocus: boolean | undefined = false;
-      let requiresLayout: boolean | undefined = false;
+      interop.requiresLayout = false;
 
       let dynamicStyles = false;
 
@@ -303,9 +327,6 @@ export function createInteropComputed(
         }
 
         if (meta) {
-          if (meta.animations) interop.animatedProps.add(key);
-          if (meta.transition) interop.transitionProps.add(key);
-
           /**
            * If the style could possibly add variables or containers (even if not currently),
            * we the effect should create a context. This stop children unmounting
@@ -315,10 +336,10 @@ export function createInteropComputed(
             interop.shouldUpdateContext = true;
           }
 
-          requiresLayout ||= hasInlineContainers || meta.requiresLayout;
           hasActive ||= hasInlineContainers || meta.pseudoClasses?.active;
           hasHover ||= hasInlineContainers || meta.pseudoClasses?.hover;
           hasFocus ||= hasInlineContainers || meta.pseudoClasses?.focus;
+          interop.requiresLayout ||= Boolean(hasInlineContainers);
         }
 
         /**
@@ -341,25 +362,228 @@ export function createInteropComputed(
         }
 
         styledProps[key] = style;
-      }
 
-      if (interop.animatedProps.size > 0 || interop.transitionProps.size > 0) {
-        interop.animationInteropKey = [
-          ...interop.animatedProps,
-          ...interop.transitionProps,
-        ].join(":");
-      } else {
-        interop.animationInteropKey = undefined;
-      }
+        const seenAnimatedProps = new Set(Object.keys(interop.animationStyles));
 
-      if (requiresLayout) {
-        styledProps.onLayout = (event: LayoutChangeEvent) => {
-          props.onLayout?.(event);
-          const layout = event.nativeEvent.layout;
-          interop.setInteraction("layoutWidth", layout.width);
-          interop.setInteraction("layoutHeight", layout.height);
+        if (key === "style" && meta?.animations) {
+          const needsLayout = Boolean(
+            (meta.requiresLayoutWidth && style.width === undefined) ||
+              (meta.requiresLayoutHeight && style.height === undefined),
+          );
+
+          interop.requiresLayout ||= Boolean(
+            meta.requiresLayoutWidth || meta.requiresLayoutHeight,
+          );
+
+          interop.isAnimated = true;
+
+          if (needsLayout && !interop.isLayoutReady()) {
+            // Since layout isn't ready, subscribe to it so we can re-render when it is
+            layoutSignal.get();
+          } else {
+            const a = { ...defaultAnimation, ...meta.animations };
+
+            let names: string[] = [];
+            let shouldResetAnimations = false;
+
+            for (const name of a.name) {
+              if (name.type === "none") {
+                names = [];
+                interop.isAnimated = false;
+                break;
+              }
+
+              names.push(name.value);
+
+              if (!interop.currentAnimationNames.has(name.value)) {
+                shouldResetAnimations = true;
+              }
+            }
+
+            if (shouldResetAnimations) {
+              interop.animationStyles = {};
+              interop.currentAnimationNames.clear();
+              seenAnimatedProps.clear();
+
+              // Loop in reverse order
+              for (let index = names.length - 1; index >= 0; index--) {
+                const name = names[index % names.length];
+                interop.currentAnimationNames.add(name);
+
+                const keyframes = animationMap.get(name);
+                if (!keyframes) {
+                  continue;
+                }
+
+                const totalDuration = timeToMS(
+                  a.duration[index % a.name.length],
+                );
+                const delay = timeToMS(a.delay[index % a.delay.length]);
+                const iterationCount =
+                  a.iterationCount[index % a.iterationCount.length];
+                const iterations =
+                  iterationCount.type === "infinite"
+                    ? -1
+                    : iterationCount.value;
+
+                for (const [prop, [initialFrame, ...frames]] of Object.entries(
+                  keyframes.frames,
+                )) {
+                  if (seenAnimatedProps.has(prop)) continue;
+                  seenAnimatedProps.add(prop);
+
+                  const initialValue = extractAnimationValue(
+                    initialFrame,
+                    prop,
+                    style,
+                    meta,
+                    interop,
+                  );
+
+                  const sequence = frames.map((frame) => {
+                    return withDelay(
+                      delay,
+                      withTiming(
+                        extractAnimationValue(
+                          frame,
+                          prop,
+                          style,
+                          meta,
+                          interop,
+                        ),
+                        {
+                          duration: totalDuration * frame.progress,
+                        },
+                      ),
+                    );
+                  }) as [AnimatableValue, ...AnimatableValue[]];
+
+                  let sharedValue = interop.sharedValues.get(prop);
+                  if (!sharedValue) {
+                    sharedValue = makeMutable(initialValue);
+                    interop.sharedValues.set(prop, sharedValue);
+                  } else {
+                    sharedValue.value = initialValue;
+                  }
+
+                  sharedValue.value = withRepeat(
+                    withSequence(...sequence),
+                    iterations,
+                  );
+
+                  interop.animationStyles[prop] = sharedValue;
+                }
+              }
+            }
+          }
+        } else {
+          interop.animationStyles = {};
+        }
+
+        // We only support transition on 'style' right now
+        if (key === "style" && meta?.transition) {
+          const t = { ...defaultTransition, ...meta.transition };
+          for (let index = 0; index < t.property.length; index++) {
+            const prop = t.property[index];
+
+            if (seenAnimatedProps.has(prop)) continue;
+
+            let value: any = style[prop] ?? defaultValues[prop];
+            if (typeof value === "function") {
+              value = value();
+            }
+            if (value === undefined) continue;
+
+            seenAnimatedProps.add(prop);
+
+            interop.isAnimated = true;
+
+            const duration = timeToMS(t.duration[index % t.duration.length]);
+            const delay = timeToMS(t.delay[index % t.delay.length]);
+            // const easing: any =
+            //   transition.timingFunction[
+            //     index % transition.timingFunction.length
+            //   ];
+
+            let sharedValue = interop.sharedValues.get(prop);
+            if (!sharedValue) {
+              sharedValue = makeMutable(value);
+              interop.sharedValues.set(prop, sharedValue);
+            }
+
+            if (value !== sharedValue.value) {
+              sharedValue.value = withDelay(
+                delay,
+                withTiming(value, { duration }),
+              );
+            }
+
+            styledProps[key][prop] = sharedValue;
+          }
+        }
+
+        styledProps[key] = {
+          ...styledProps[key],
+          ...interop.animationStyles,
         };
+
+        for (const tKey of transformKeys) {
+          if (tKey in styledProps[key]) {
+            styledProps[key].transform ??= [];
+            styledProps[key].transform.push({ [tKey]: styledProps[key][tKey] });
+            delete styledProps[key][tKey];
+          }
+        }
+
+        /**
+         * reanimated's jestUtil `toHaveAnimatedStyle` does not work for inline styles,
+         * so we use this hack to make it work
+         */
+        if (!!process.env.JEST_WORKER_ID && seenAnimatedProps.size > 0) {
+          styledProps[key].animatedStyle = {
+            current: {
+              get value() {
+                return Object.fromEntries(
+                  Object.entries(styledProps[key]).flatMap(([k, v]: any[]) => {
+                    if (k === "animatedStyle") return [];
+                    if (k === "transform" && Array.isArray(v)) {
+                      return [
+                        [
+                          k,
+                          v.map((v: any) =>
+                            Object.fromEntries(
+                              Object.entries(v).map(([k, v]: any[]) => {
+                                return [k, "value" in v ? v.value : v];
+                              }),
+                            ),
+                          ),
+                        ],
+                      ];
+                    } else if (Array.isArray(v)) {
+                      return [[k, v.map((v) => ("value" in v ? v.value : v))]];
+                    } else if (typeof v === "object") {
+                      return [[k, "value" in v ? v.value : v]];
+                    } else {
+                      return [[k, v]];
+                    }
+                  }),
+                );
+              },
+            },
+          };
+        }
       }
+
+      styledProps.onLayout = (event: LayoutChangeEvent) => {
+        props.onLayout?.(event);
+        const layout = event.nativeEvent.layout;
+
+        const [width, height] = layoutSignal.peek()!;
+
+        if (layout.width !== width || layout.height !== height) {
+          layoutSignal.set([layout.width, layout.height]);
+        }
+      };
 
       if (hasActive) {
         interop.convertToPressable = true;
@@ -398,6 +622,7 @@ export function createInteropComputed(
       if (interop.convertToPressable) {
         styledProps.onPress = (event: unknown) => {
           props.onPress?.(event);
+          interop.setInteraction("active", false);
         };
       }
 
@@ -443,3 +668,125 @@ export function createInteropComputed(
 
   return interop;
 }
+
+const defaultTransition: Required<ExtractedTransition> = {
+  property: [],
+  duration: [
+    {
+      type: "seconds",
+      value: 0,
+    },
+  ],
+  delay: [
+    {
+      type: "seconds",
+      value: 0,
+    },
+  ],
+  timingFunction: [{ type: "linear" }],
+};
+
+const defaultAnimation: Required<ExtractedAnimations> = {
+  direction: ["normal"],
+  fillMode: ["none"],
+  iterationCount: [{ type: "number", value: 1 }],
+  timingFunction: [{ type: "linear" }],
+  name: [],
+  playState: ["running"],
+  duration: [
+    {
+      type: "seconds",
+      value: 0,
+    },
+  ],
+  delay: [
+    {
+      type: "seconds",
+      value: 0,
+    },
+  ],
+};
+
+const timeToMS = (time: Time) => {
+  return time.type === "milliseconds" ? time.value : time.value * 1000;
+};
+
+function extractAnimationValue(
+  frame: ExtractedStyleFrame,
+  prop: string,
+  style: Record<string, any>,
+  meta: any,
+  interop: InteropComputed,
+) {
+  let value =
+    frame.value === "!INHERIT!"
+      ? style[prop] ?? defaultValues[prop]
+      : frame.value === "!INITIAL!"
+      ? defaultValues[prop]
+      : extractValue(frame.value, style, meta, interop);
+
+  return typeof value === "function" ? value() : value;
+}
+
+export const defaultValues: Record<
+  string,
+  AnimatableValue | (() => AnimatableValue)
+> = {
+  backgroundColor: "transparent",
+  borderBottomColor: "transparent",
+  borderBottomLeftRadius: 0,
+  borderBottomRightRadius: 0,
+  borderBottomWidth: 0,
+  borderColor: "transparent",
+  borderLeftColor: "transparent",
+  borderLeftWidth: 0,
+  borderRadius: 0,
+  borderRightColor: "transparent",
+  borderRightWidth: 0,
+  borderTopColor: "transparent",
+  borderTopWidth: 0,
+  borderWidth: 0,
+  bottom: 0,
+  color: () => {
+    return colorScheme.get() === "dark" ? "white" : "black";
+  },
+  flex: 1,
+  flexBasis: 1,
+  flexGrow: 1,
+  flexShrink: 0,
+  fontSize: 14,
+  fontWeight: "400",
+  gap: 0,
+  left: 0,
+  lineHeight: 14,
+  margin: 0,
+  marginBottom: 0,
+  marginLeft: 0,
+  marginRight: 0,
+  marginTop: 0,
+  maxHeight: 99999,
+  maxWidth: 99999,
+  minHeight: 0,
+  minWidth: 0,
+  opacity: 1,
+  padding: 0,
+  paddingBottom: 0,
+  paddingLeft: 0,
+  paddingRight: 0,
+  paddingTop: 0,
+  perspective: 1,
+  right: 0,
+  rotate: "0deg",
+  rotateX: "0deg",
+  rotateY: "0deg",
+  rotateZ: "0deg",
+  scale: 1,
+  scaleX: 1,
+  scaleY: 1,
+  skewX: "0deg",
+  skewY: "0deg",
+  top: 0,
+  translateX: 0,
+  translateY: 0,
+  zIndex: 0,
+};

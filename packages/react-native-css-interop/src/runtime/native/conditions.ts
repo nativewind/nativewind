@@ -80,9 +80,11 @@ export function testContainerQuery(
     // If there is no condition, we passed (maybe only named as specified)
     if (!query.condition) return true;
 
+    const layout = container.getLayout();
+
     return testCondition(query.condition, {
-      width: container.getInteraction("layoutWidth").get() ?? 0,
-      height: container.getInteraction("layoutHeight").get() ?? 0,
+      width: layout[0],
+      height: layout[1],
     });
   });
 }

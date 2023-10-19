@@ -14,6 +14,7 @@ describe("Accessibility - Screen Readers", () => {
           margin: -1,
           overflow: "hidden",
           padding: 0,
+          position: "absolute",
           width: 1,
         }),
         warning: () =>
@@ -48,6 +49,11 @@ describe("Accessibility - Screen Readers", () => {
             [
               "not-sr-only",
               [
+                {
+                  property: "position",
+                  type: "IncompatibleNativeValue",
+                  value: "static",
+                },
                 {
                   property: "width",
                   type: "IncompatibleNativeValue",

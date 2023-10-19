@@ -32,16 +32,11 @@ import type {
   TextShadow,
   TokenOrValue,
   VerticalAlign,
-  Transform,
   Token,
   BoxShadow,
 } from "lightningcss";
 
-import type {
-  ExtractionWarning,
-  RuntimeValue,
-  TransformRecord,
-} from "../types";
+import type { ExtractionWarning, RuntimeValue } from "../types";
 
 type AddStyleProp = (
   property: string,
@@ -87,7 +82,7 @@ export interface ParseDeclarationOptions {
   addContainerProp: AddContainerProp;
   addTransitionProp: AddTransitionProp;
   addWarning: AddWarning;
-  requiresLayout: () => void;
+  requiresLayout: (name: string) => void;
 }
 
 export interface ParseDeclarationOptionsWithValueWarning
@@ -281,7 +276,12 @@ export function parseDeclaration(
         parseOverflow(declaration.value.x, parseOptions),
       );
     case "position":
-      // Position works differently on web and native
+      const value: any = (declaration as any).value.type;
+      if (value === "absolute" || value === "relative") {
+        return addStyleProp(declaration.property, value);
+      } else {
+        parseOptions.addValueWarning(value);
+      }
       return;
     case "top":
       return addStyleProp(
@@ -1097,39 +1097,134 @@ export function parseDeclaration(
     case "animation":
       return addAnimationProp(declaration.property, declaration.value);
     case "transform": {
-      return addStyleProp(
-        declaration.property,
-        parseTransform(declaration.value, parseOptions),
-      );
+      if (declaration.value.length === 0) {
+        addStyleProp("perspective", undefined);
+        addStyleProp("translateX", undefined);
+        addStyleProp("translateY", undefined);
+        addStyleProp("rotate", undefined);
+        addStyleProp("rotateX", undefined);
+        addStyleProp("rotateY", undefined);
+        addStyleProp("rotateZ", undefined);
+        addStyleProp("scale", undefined);
+        addStyleProp("scaleX", undefined);
+        addStyleProp("scaleY", undefined);
+        addStyleProp("skewX", undefined);
+        addStyleProp("skewY", undefined);
+        break;
+      }
+
+      for (const transform of declaration.value) {
+        switch (transform.type) {
+          case "perspective":
+            addStyleProp(
+              "perspective",
+              parseLength(transform.value, parseOptions),
+            );
+            break;
+          case "translate":
+            addStyleProp(
+              "translateX",
+              parseLengthOrCoercePercentageToRuntime(
+                transform.value[0],
+                "cw",
+                parseOptions,
+              ),
+            );
+            addStyleProp(
+              "translateY",
+              parseLengthOrCoercePercentageToRuntime(
+                transform.value[1],
+                "ch",
+                parseOptions,
+              ),
+            );
+            break;
+          case "translateX":
+            addStyleProp(
+              "translateX",
+              parseLengthOrCoercePercentageToRuntime(
+                transform.value,
+                "cw",
+                parseOptions,
+              ),
+            );
+            break;
+          case "translateY":
+            addStyleProp(
+              "translateY",
+              parseLengthOrCoercePercentageToRuntime(
+                transform.value,
+                "ch",
+                parseOptions,
+              ),
+            );
+            break;
+          case "rotate":
+            addStyleProp("rotate", parseAngle(transform.value, parseOptions));
+            break;
+          case "rotateX":
+            addStyleProp("rotateX", parseAngle(transform.value, parseOptions));
+            break;
+          case "rotateY":
+            addStyleProp("rotateY", parseAngle(transform.value, parseOptions));
+            break;
+          case "rotateZ":
+            addStyleProp("rotateZ", parseAngle(transform.value, parseOptions));
+            break;
+          case "scale":
+            handleStyleShorthand("scale", {
+              scaleX: parseLength(transform.value[0], parseOptions),
+              scaleY: parseLength(transform.value[1], parseOptions),
+            });
+            break;
+          case "scaleX":
+            addStyleProp("scaleX", parseLength(transform.value, parseOptions));
+            break;
+          case "scaleY":
+            addStyleProp("scaleY", parseLength(transform.value, parseOptions));
+            break;
+          case "skew":
+            addStyleProp("skewX", parseAngle(transform.value[0], parseOptions));
+            addStyleProp("skewY", parseAngle(transform.value[1], parseOptions));
+            break;
+          case "skewX":
+            addStyleProp("skewX", parseAngle(transform.value, parseOptions));
+            break;
+          case "skewY":
+            addStyleProp("skewY", parseAngle(transform.value, parseOptions));
+            break;
+
+          case "translateZ":
+          case "translate3d":
+          case "scaleZ":
+          case "scale3d":
+          case "rotate3d":
+          case "matrix":
+          case "matrix3d":
+            break;
+        }
+      }
+      return;
     }
     case "translate":
-      return addStyleProp(
-        "transform",
-        [
-          { translateX: declaration.value.x },
-          { translateY: declaration.value.y },
-        ],
-        { append: true },
+      addStyleProp(
+        "transformX",
+        parseLength(declaration.value.x, parseOptions),
       );
+      addStyleProp(
+        "transformY",
+        parseLength(declaration.value.y, parseOptions),
+      );
+      return;
     case "rotate":
-      return addStyleProp(
-        "transform",
-        [
-          { rotateX: declaration.value.x },
-          { rotateY: declaration.value.y },
-          { rotateY: declaration.value.z },
-        ],
-        { append: true },
-      );
+      addStyleProp("rotateX", parseAngle(declaration.value.x, parseOptions));
+      addStyleProp("rotateY", parseAngle(declaration.value.y, parseOptions));
+      addStyleProp("rotateZ", parseAngle(declaration.value.z, parseOptions));
+      return;
     case "scale":
-      return addStyleProp(
-        "transform",
-        [
-          { scaleX: parseLength(declaration.value.x, parseOptions) },
-          { scaleY: parseLength(declaration.value.y, parseOptions) },
-        ],
-        { append: true },
-      );
+      addStyleProp("scaleX", parseLength(declaration.value.x, parseOptions));
+      addStyleProp("scaleY", parseLength(declaration.value.y, parseOptions));
+      return;
     case "text-transform":
       return addStyleProp(declaration.property, declaration.value.case);
     case "letter-spacing":
@@ -1217,154 +1312,154 @@ export function parseDeclaration(
 const invalidIdent = new Set(["auto", "inherit"]);
 
 const validProperties = [
+  "align-content",
+  "align-items",
+  "align-self",
+  "animation",
+  "animation-delay",
+  "animation-direction",
+  "animation-duration",
+  "animation-fill-mode",
+  "animation-iteration-count",
+  "animation-name",
+  "animation-play-state",
+  "animation-timing-function",
+  "aspect-ratio",
   "background-color",
-  "opacity",
-  "color",
-  "display",
-  "width",
-  "height",
-  "min-width",
-  "min-height",
-  "max-width",
-  "max-height",
   "block-size",
-  "inline-size",
-  "min-block-size",
-  "min-inline-size",
-  "max-block-size",
-  "max-inline-size",
-  "overflow",
-  "position",
-  "top",
-  "bottom",
-  "left",
-  "right",
-  "box-shadow",
-  "inset-block-start",
-  "inset-block-end",
-  "inset-inline-start",
-  "inset-inline-end",
-  "inset-block",
-  "inset-inline",
-  "inset",
-  "border-top-color",
-  "border-bottom-color",
-  "border-left-color",
-  "border-right-color",
-  "border-block-start-color",
+  "border",
+  "border-block",
+  "border-block-color",
+  "border-block-end",
   "border-block-end-color",
-  "border-inline-start-color",
-  "border-inline-end-color",
-  "border-top-width",
-  "border-bottom-width",
-  "border-left-width",
-  "border-right-width",
-  "border-block-start-width",
   "border-block-end-width",
-  "border-inline-start-width",
-  "border-inline-end-width",
-  "border-top-left-radius",
-  "border-top-right-radius",
+  "border-block-start",
+  "border-block-start-color",
+  "border-block-start-width",
+  "border-block-width",
+  "border-bottom",
+  "border-bottom-color",
   "border-bottom-left-radius",
   "border-bottom-right-radius",
-  "border-start-start-radius",
-  "border-start-end-radius",
-  "border-end-start-radius",
-  "border-end-end-radius",
-  "border-radius",
+  "border-bottom-width",
   "border-color",
-  "border-style",
-  "border-width",
-  "border-block-color",
-  "border-block-width",
-  "border-inline-color",
-  "border-inline-width",
-  "border",
-  "border-top",
-  "border-bottom",
-  "border-left",
-  "border-right",
-  "border-block",
-  "border-block-start",
-  "border-block-end",
+  "border-end-end-radius",
+  "border-end-start-radius",
   "border-inline",
-  "border-inline-start",
+  "border-inline-color",
   "border-inline-end",
+  "border-inline-end-color",
+  "border-inline-end-width",
+  "border-inline-start",
+  "border-inline-start-color",
+  "border-inline-start-width",
+  "border-inline-width",
+  "border-left",
+  "border-left-color",
+  "border-left-width",
+  "border-radius",
+  "border-right",
+  "border-right-color",
+  "border-right-width",
+  "border-start-end-radius",
+  "border-start-start-radius",
+  "border-style",
+  "border-top",
+  "border-top-color",
+  "border-top-left-radius",
+  "border-top-right-radius",
+  "border-top-width",
+  "border-width",
+  "bottom",
+  "box-shadow",
+  "color",
+  "column-gap",
+  "container",
+  "container-name",
+  "container-type",
+  "display",
+  "flex",
+  "flex-basis",
   "flex-direction",
-  "flex-wrap",
   "flex-flow",
   "flex-grow",
   "flex-shrink",
-  "flex-basis",
-  "flex",
-  "align-content",
-  "justify-content",
-  "align-self",
-  "align-items",
-  "row-gap",
-  "column-gap",
-  "gap",
-  "margin-top",
-  "margin-bottom",
-  "margin-left",
-  "margin-right",
-  "margin-block-start",
-  "margin-block-end",
-  "margin-inline-start",
-  "margin-inline-end",
-  "margin-block",
-  "margin-inline",
-  "margin",
-  "padding-top",
-  "padding-bottom",
-  "padding-left",
-  "padding-right",
-  "padding-block-start",
-  "padding-block-end",
-  "padding-inline-start",
-  "padding-inline-end",
-  "padding-block",
-  "padding-inline",
-  "padding",
-  "font-weight",
-  "font-size",
+  "flex-wrap",
+  "font",
   "font-family",
+  "font-size",
   "font-style",
   "font-variant-caps",
-  "line-height",
-  "font",
-  "vertical-align",
-  "transition-property",
-  "transition-duration",
-  "transition-delay",
-  "transition-timing-function",
-  "transition",
-  "aspect-ratio",
-  "animation-duration",
-  "animation-timing-function",
-  "animation-iteration-count",
-  "animation-direction",
-  "animation-play-state",
-  "animation-delay",
-  "animation-fill-mode",
-  "animation-name",
-  "animation",
-  "transform",
-  "translate",
-  "rotate",
-  "scale",
-  "text-transform",
+  "font-weight",
+  "gap",
+  "height",
+  "inline-size",
+  "inset",
+  "inset-block",
+  "inset-block-end",
+  "inset-block-start",
+  "inset-inline",
+  "inset-inline-end",
+  "inset-inline-start",
+  "justify-content",
+  "left",
   "letter-spacing",
-  "text-decoration-line",
-  "text-decoration-color",
-  "text-decoration",
-  "text-shadow",
-  "z-index",
-  "container-type",
-  "text-decoration-style",
-  "container-name",
-  "container",
+  "line-height",
+  "margin",
+  "margin-block",
+  "margin-block-end",
+  "margin-block-start",
+  "margin-bottom",
+  "margin-inline",
+  "margin-inline-end",
+  "margin-inline-start",
+  "margin-left",
+  "margin-right",
+  "margin-top",
+  "max-block-size",
+  "max-height",
+  "max-inline-size",
+  "max-width",
+  "min-block-size",
+  "min-height",
+  "min-inline-size",
+  "min-width",
+  "opacity",
+  "overflow",
+  "padding",
+  "padding-block",
+  "padding-block-end",
+  "padding-block-start",
+  "padding-bottom",
+  "padding-inline",
+  "padding-inline-end",
+  "padding-inline-start",
+  "padding-left",
+  "padding-right",
+  "padding-top",
+  "position",
+  "right",
+  "rotate",
+  "row-gap",
+  "scale",
   "text-align",
+  "text-decoration",
+  "text-decoration-color",
+  "text-decoration-line",
+  "text-decoration-style",
+  "text-shadow",
+  "text-transform",
+  "top",
+  "transform",
+  "transition",
+  "transition-delay",
+  "transition-duration",
+  "transition-property",
+  "transition-timing-function",
+  "translate",
+  "vertical-align",
+  "width",
+  "z-index",
 ] as const;
 
 const validPropertiesLoose = new Set<string>(validProperties);
@@ -1705,9 +1800,13 @@ export function parseLength(
 }
 
 function parseAngle(
-  angle: Angle,
+  angle: Angle | number,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
+  if (typeof angle === "number") {
+    return `${angle}deg`;
+  }
+
   switch (angle.type) {
     case "deg":
     case "rad":
@@ -2193,7 +2292,7 @@ function parseLengthOrCoercePercentageToRuntime(
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
   if (value.type === "percentage") {
-    options.requiresLayout();
+    options.requiresLayout(runtimeName);
     return {
       type: "runtime",
       name: runtimeName,
@@ -2390,87 +2489,6 @@ function parseAspectRatio(
       return aspectRatio.ratio.join(" / ");
     }
   }
-}
-
-function parseTransform(
-  transforms: Transform[],
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
-  const records: TransformRecord[] = [];
-
-  for (const transform of transforms) {
-    switch (transform.type) {
-      case "perspective":
-        records.push({
-          [transform.type]: parseLength(transform.value, options) as number,
-        });
-        break;
-      case "translateX":
-      case "scaleX":
-        records.push({
-          [transform.type]: parseLengthOrCoercePercentageToRuntime(
-            transform.value,
-            "cw",
-            options,
-          ) as number,
-        });
-        break;
-      case "translateY":
-      case "scaleY":
-        records.push({
-          [transform.type]: parseLengthOrCoercePercentageToRuntime(
-            transform.value,
-            "ch",
-            options,
-          ) as number,
-        });
-        break;
-      case "translate":
-        records.push({
-          translateX: parseLength(transform.value[0], options) as number,
-        });
-        records.push({
-          translateY: parseLength(transform.value[1], options) as number,
-        });
-        break;
-      case "scale":
-        records.push({
-          scaleX: parseLength(transform.value[0], options) as number,
-        });
-        records.push({
-          scaleY: parseLength(transform.value[1], options) as number,
-        });
-        break;
-      case "skew":
-        records.push({
-          skewX: parseAngle(transform.value[0], options),
-        });
-        records.push({
-          skewY: parseAngle(transform.value[1], options),
-        });
-        break;
-      case "rotate":
-      case "rotateX":
-      case "rotateY":
-      case "rotateZ":
-      case "skewX":
-      case "skewY":
-        records.push({
-          [transform.type]: parseAngle(transform.value, options),
-        });
-        break;
-      case "translateZ":
-      case "translate3d":
-      case "scaleZ":
-      case "scale3d":
-      case "rotate3d":
-      case "matrix":
-      case "matrix3d":
-        break;
-    }
-  }
-
-  return records;
 }
 
 function parseDimension(

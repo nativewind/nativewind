@@ -12,7 +12,11 @@ import {
   ContainerRule,
 } from "lightningcss";
 
-import { DEFAULT_CONTAINER_NAME, isRuntimeValue } from "../shared";
+import {
+  DEFAULT_CONTAINER_NAME,
+  isRuntimeValue,
+  transformKeys,
+} from "../shared";
 import {
   ExtractedStyle,
   StyleSheetRegisterOptions,
@@ -401,25 +405,29 @@ function extractKeyFrames(
   keyframes: KeyframesRule<Declaration>,
   extractOptions: ExtractRuleOptions,
 ) {
-  const extractedAnimation: ExtractedAnimation = { frames: [] };
+  const extractedAnimation: ExtractedAnimation = { frames: {} };
   const frames = extractedAnimation.frames;
+
+  let rawFrames = [];
 
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
 
-    /**
-     *  Animations ignore !important declarations
-     */
     const { style } = declarationsToStyle(
       frame.declarations.declarations,
       {
         ...extractOptions,
-        requiresLayout() {
-          extractedAnimation.requiresLayout = true;
+        useInitialIfUndefined: true,
+        requiresLayout(name) {
+          if (name === "cw") {
+            extractedAnimation.requiresLayoutWidth = true;
+          } else {
+            extractedAnimation.requiresLayoutHeight = true;
+          }
         },
       },
       {
-        I: 99,
+        I: 99, // Animations higher specificity than important
         S: 1,
         O: extractOptions.appearanceOrder,
       },
@@ -439,13 +447,13 @@ function extractKeyFrames(
 
       switch (selector.type) {
         case "percentage":
-          frames.push({ selector: selector.value, style });
+          rawFrames.push({ selector: selector.value, style });
           break;
         case "from":
-          frames.push({ selector: 0, style });
+          rawFrames.push({ selector: 0, style });
           break;
         case "to":
-          frames.push({ selector: 1, style });
+          rawFrames.push({ selector: 1, style });
           break;
         default:
           selector satisfies never;
@@ -453,18 +461,38 @@ function extractKeyFrames(
     }
   }
 
-  // Ensure there are always two frames, a start and end
-  if (frames.length === 1) {
-    frames.push({ selector: 0, style: {} });
-  }
+  // Need to sort afterwards, as the order of the frames is not guaranteed
+  rawFrames = rawFrames.sort((a, b) => a.selector - b.selector);
 
-  extractedAnimation.frames = frames.sort((a, b) => a.selector - b.selector);
+  /*
+   * Using the frame data, work out the progress for each style property
+   */
+  for (let i = 0; i < rawFrames.length; i++) {
+    const frame = rawFrames[i];
+    const animationProgress = frame.selector;
+    const previousProgress = i === 0 ? 0 : rawFrames[i - 1].selector;
+    const progress = animationProgress - previousProgress;
+
+    for (const [prop, value] of Object.entries(frame.style)) {
+      if (progress === 0) {
+        frames[prop] = [];
+      } else {
+        // All props need a progress 0 frame
+        frames[prop] ??= [{ value: "!INHERIT!", progress: 0 }];
+      }
+      frames[prop].push({
+        value,
+        progress,
+      });
+    }
+  }
 
   extractOptions.keyframes.set(keyframes.name.value, extractedAnimation);
 }
 
 interface GetExtractedStyleOptions extends ExtractRuleOptions {
-  requiresLayout?: () => void;
+  requiresLayout?: (name: string) => void;
+  useInitialIfUndefined?: boolean;
 }
 
 function getExtractedStyles(
@@ -521,6 +549,10 @@ function declarationsToStyle(
    * E.g. `transform` accepts an array of transforms
    */
   function addStyleProp(property: string, value: any, { append = false } = {}) {
+    if (value === undefined && options.useInitialIfUndefined) {
+      value = "!INITIAL!";
+    }
+
     if (value === undefined) {
       return;
     }
@@ -544,7 +576,7 @@ function declarationsToStyle(
       style[property] = value;
     }
 
-    if (isRuntimeValue(value)) {
+    if (isRuntimeValue(value) || transformKeys.includes(property as any)) {
       extractedStyle.isDynamic = true;
     }
 
@@ -751,8 +783,12 @@ function declarationsToStyle(
     extractedStyle.warnings.push(warning);
   }
 
-  function requiresLayout() {
-    extractedStyle.requiresLayout = true;
+  function requiresLayout(name: string) {
+    if (name === "cw") {
+      extractedStyle.requiresLayoutWidth = true;
+    } else {
+      extractedStyle.requiresLayoutHeight = true;
+    }
   }
 
   const parseDeclarationOptions: ParseDeclarationOptions = {

@@ -183,6 +183,16 @@ describe("Layout - Overscroll Behavior", () => {
   );
 });
 
+describe("Layout - Position", () => {
+  testCases(
+    ["absolute", style({ position: "absolute" })],
+    ["relative", style({ position: "relative" })],
+    ["static", invalidValue("position", "static")],
+    ["fixed", invalidValue("position", "fixed")],
+    ["sticky", invalidValue("position", "sticky")],
+  );
+});
+
 describe("Layout - Top Right Bottom Left", () => {
   testCases(
     ["top-0", style({ top: 0 })],

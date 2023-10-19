@@ -129,13 +129,15 @@ function tagStyles(
       meta.animations = styles.animations;
       hasMeta = true;
 
-      const requiresLayout = styles.animations.name?.some((nameObj) => {
-        const name = nameObj.type === "none" ? "none" : nameObj.value;
-        return animationMap.get(name)?.requiresLayout;
-      });
-
-      if (requiresLayout) {
-        meta.requiresLayout = true;
+      const names = styles.animations.name;
+      if (names) {
+        for (const name of names) {
+          if (name.type === "none") continue;
+          const animationMeta = animationMap.get(name.value);
+          if (!animationMeta) continue;
+          meta.requiresLayoutWidth ??= animationMeta?.requiresLayoutWidth;
+          meta.requiresLayoutHeight ??= animationMeta?.requiresLayoutHeight;
+        }
       }
     }
 
@@ -156,10 +158,12 @@ function tagStyles(
       meta.transition = styles.transition;
       hasMeta = true;
     }
-    if (styles.requiresLayout) {
-      meta.requiresLayout = styles.requiresLayout;
+    if (styles.requiresLayoutWidth || styles.requiresLayoutHeight) {
+      meta.requiresLayoutWidth ??= styles.requiresLayoutWidth;
+      meta.requiresLayoutHeight ??= styles.requiresLayoutHeight;
       hasMeta = true;
     }
+
     if (styles.importantStyles) {
       meta.importantStyles = styles.importantStyles;
       hasMeta = true;

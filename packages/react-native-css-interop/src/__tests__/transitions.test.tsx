@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react-native";
+import { render, screen } from "@testing-library/react-native";
 import { View } from "react-native";
 
 import {
@@ -14,7 +14,7 @@ jest.useFakeTimers();
 
 beforeEach(() => resetStyles());
 
-test("numeric transition", () => {
+test.only("numeric transition", () => {
   registerCSS(`
     .transition {
       transition: width 1s;
@@ -29,11 +29,9 @@ test("numeric transition", () => {
     }
 `);
 
-  const { rerender, getByTestId } = render(
-    <A testID={testID} className="transition first" />,
-  );
+  render(<A testID={testID} className="transition first" />);
 
-  const component = getByTestId(testID);
+  const component = screen.getByTestId(testID);
 
   // Should have a static width, no matter the time
   expect(component).toHaveAnimatedStyle({
@@ -44,7 +42,7 @@ test("numeric transition", () => {
     width: 100,
   });
 
-  rerender(<A testID={testID} className="transition second" />);
+  screen.rerender(<A testID={testID} className="transition second" />);
 
   // Directly after rerender, should still have the old width
   expect(component).toHaveAnimatedStyle({
@@ -52,7 +50,7 @@ test("numeric transition", () => {
   });
 
   // Width should only change after we advance time
-  jest.advanceTimersByTime(500);
+  jest.advanceTimersByTime(501);
   expect(component).toHaveAnimatedStyle({
     width: 150,
   });

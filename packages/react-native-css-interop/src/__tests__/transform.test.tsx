@@ -75,27 +75,13 @@ test("rotate-45", () => {
 
   expect(component).toHaveStyle({
     transform: [
-      {
-        translateX: 0,
-      },
-      {
-        translateY: 0,
-      },
-      {
-        rotate: "45deg",
-      },
-      {
-        skewX: "0deg",
-      },
-      {
-        skewY: "0deg",
-      },
-      {
-        scaleX: 1,
-      },
-      {
-        scaleY: 1,
-      },
+      { rotate: "45deg" },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { translateX: 0 },
+      { translateY: 0 },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
     ],
   });
 });

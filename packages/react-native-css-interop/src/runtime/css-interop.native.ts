@@ -4,6 +4,7 @@ import {
   createElement,
   forwardRef,
 } from "react";
+import Animated from "react-native-reanimated";
 
 import { InteropFunction, RemapProps } from "../testing-library";
 import { reactGlobal } from "./signals";
@@ -45,24 +46,10 @@ export const defaultCSSInterop: InteropFunction = (
 
   // Depending on the meta, we may be required to surround the component in other components (like VariableProvider)
   let createElementParams: Parameters<typeof createElement> = [
-    component,
+    effect.isAnimated ? createAnimatedComponent(component) : component,
     props,
     children,
   ];
-
-  if (effect.animationInteropKey) {
-    props = Object.assign(props, {
-      key: effect.animationInteropKey,
-      __component: component,
-      __store: effect,
-    });
-
-    createElementParams = [
-      require("./native/animations").AnimationInterop,
-      props,
-      children,
-    ];
-  }
 
   reactGlobal.isInComponent = false;
 
@@ -134,4 +121,34 @@ export function remapProps<P, M>(
       return render({ ...props, children }, null);
     },
   });
+}
+
+const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>();
+export function createAnimatedComponent(
+  Component: ComponentType<any>,
+): ComponentType<any> {
+  if (animatedCache.has(Component)) {
+    return animatedCache.get(Component)!;
+  } else if (Component.displayName?.startsWith("AnimatedComponent")) {
+    return Component;
+  }
+
+  if (
+    !(
+      typeof Component !== "function" ||
+      (Component.prototype && Component.prototype.isReactComponent)
+    )
+  ) {
+    throw new Error(
+      `Looks like you're passing an animation style to a function component \`${Component.name}\`. Please wrap your function component with \`React.forwardRef()\` or use a class component instead.`,
+    );
+  }
+
+  const AnimatedComponent = Animated.createAnimatedComponent(
+    Component as React.ComponentClass,
+  );
+
+  animatedCache.set(Component, AnimatedComponent);
+
+  return AnimatedComponent;
 }
