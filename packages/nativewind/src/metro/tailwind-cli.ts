@@ -20,7 +20,7 @@ export interface TailwindCliOptions extends GetTransformOptionsOpts {
 
 export async function tailwindCli(input: string, options: TailwindCliOptions) {
   let done: (nativewindOptions?: Record<string, any>) => void;
-  let nativewindOptions: Record<string, any> | undefined;
+  let nativewindOptions: Record<string, any> = {};
   const deferred = new Promise<Record<string, any> | undefined>(
     (resolve) => (done = resolve),
   );
@@ -65,7 +65,7 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
         options.hotServerOptions.port = await getAvailablePort();
       }
 
-      nativewindOptions = { fastRefreshPort: options.hotServerOptions.port };
+      nativewindOptions.fastRefreshPort = options.hotServerOptions.port;
 
       const wss = new Server(options.hotServerOptions);
       wss.on("connection", (ws) => {
@@ -86,12 +86,6 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
 
     if (!data.includes("Done in")) return;
 
-    if (firstRun) {
-      firstRun = false;
-      clearTimeout(timeout);
-      done(nativewindOptions);
-    }
-
     if (startedWSServer) {
       const stat = statSync(output);
 
@@ -105,6 +99,7 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
           options.cssToReactNativeRuntime,
         ),
       );
+      nativewindOptions.initialData = latestStyleData;
 
       for (const [ws, lastVersion] of connections) {
         if (lastVersion !== version) {
@@ -112,6 +107,12 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
           connections.set(ws, version);
         }
       }
+    }
+
+    if (firstRun) {
+      firstRun = false;
+      clearTimeout(timeout);
+      done(nativewindOptions);
     }
   });
 

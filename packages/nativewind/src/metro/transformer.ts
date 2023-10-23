@@ -14,6 +14,7 @@ interface NativeWindJsTransformerConfig extends JsTransformerConfig {
     input: string;
     output: string;
     fastRefreshPort: string;
+    initialData: string;
   };
 }
 
@@ -33,10 +34,10 @@ export async function transform(
         projectRoot,
         filename,
         Buffer.from(
-          `const url = require("react-native/Libraries/Core/Devtools/getDevServer")().url.replace(/(https?:\\/\\/.*)(:\\d*\\/)(.*)/, "$1$3")
-new globalThis.WebSocket(\`\${url}:${config.nativewind.fastRefreshPort}\`).addEventListener("message", (event) => {
-  require("react-native-css-interop").StyleSheet.register(JSON.parse(event.data))
-});`,
+          `const { StyleSheet } = require("react-native-css-interop");
+const url = require("react-native/Libraries/Core/Devtools/getDevServer")().url.replace(/(https?:\\/\\/.*)(:\\d*\\/)(.*)/, "$1$3")
+new globalThis.WebSocket(\`\${url}:${config.nativewind.fastRefreshPort}\`).addEventListener("message", (event) => StyleSheet.register(JSON.parse(event.data)));
+StyleSheet.register(JSON.parse('${config.nativewind.initialData}'));`,
           "utf8",
         ),
         options,

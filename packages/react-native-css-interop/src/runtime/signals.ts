@@ -1,4 +1,4 @@
-import { useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 
 export const reactGlobal: {
   isInComponent: boolean;
@@ -140,7 +140,17 @@ export function createComputed<T>(
  * We only ever track one dependency
  */
 export function useComputed<T>(fn: () => T, fnDependency?: any) {
+  reactGlobal.isInComponent = true;
   const computedRef = useRef<Computed<T> & { fnDependency: any }>();
+
+  useEffect(() => {
+    if (reactGlobal.delayedEvents.size) {
+      for (const sub of reactGlobal.delayedEvents) {
+        sub();
+      }
+      reactGlobal.delayedEvents.clear();
+    }
+  });
 
   if (computedRef.current == null) {
     computedRef.current = Object.assign(createComputed<T>(fn), {

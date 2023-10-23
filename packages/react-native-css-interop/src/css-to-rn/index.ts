@@ -292,10 +292,7 @@ function setStyleForSelectorList(
 
       // normalizeSelectorList will remove invalid dark mode selectors when using className
       // But if we are using type media, then we need to check the media of the styles
-      if (
-        style.media &&
-        (!options.darkMode || options.darkMode?.type === "media")
-      ) {
+      if (style.media) {
         // You can only have 1 media condition
         if (style.media.length !== 1) {
           continue;
