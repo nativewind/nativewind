@@ -416,7 +416,7 @@ function extractKeyFrames(
         ...extractOptions,
         useInitialIfUndefined: true,
         requiresLayout(name) {
-          if (name === "cw") {
+          if (name === "rnw") {
             extractedAnimation.requiresLayoutWidth = true;
           } else {
             extractedAnimation.requiresLayoutHeight = true;
@@ -781,7 +781,7 @@ function declarationsToStyle(
   }
 
   function requiresLayout(name: string) {
-    if (name === "cw") {
+    if (name === "rnw") {
       extractedStyle.requiresLayoutWidth = true;
     } else {
       extractedStyle.requiresLayoutHeight = true;

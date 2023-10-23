@@ -1126,7 +1126,7 @@ export function parseDeclaration(
               "translateX",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value[0],
-                "cw",
+                "rnw",
                 parseOptions,
               ),
             );
@@ -1134,7 +1134,7 @@ export function parseDeclaration(
               "translateY",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value[1],
-                "ch",
+                "rnh",
                 parseOptions,
               ),
             );
@@ -1144,7 +1144,7 @@ export function parseDeclaration(
               "translateX",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value,
-                "cw",
+                "rnw",
                 parseOptions,
               ),
             );
@@ -1154,7 +1154,7 @@ export function parseDeclaration(
               "translateY",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value,
-                "ch",
+                "rnh",
                 parseOptions,
               ),
             );
@@ -2500,8 +2500,8 @@ function parseDimension(
       return value;
     case "%":
       return `${value}%`;
-    case "ch":
-    case "cw":
+    case "rnh":
+    case "rnw":
       return {
         type: "runtime",
         name: unit,

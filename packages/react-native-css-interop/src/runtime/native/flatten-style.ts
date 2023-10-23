@@ -358,7 +358,7 @@ export function extractValue(
         return;
       };
     }
-    case "ch": {
+    case "rnh": {
       const multiplier = value.arguments[0] as number;
 
       let reference: number | undefined;
@@ -385,7 +385,7 @@ export function extractValue(
         };
       }
     }
-    case "cw": {
+    case "rnw": {
       const multiplier = value.arguments[0] as number;
 
       let reference: number | undefined;
