@@ -1,6 +1,7 @@
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
-import NPM from "../_npm.mdx";
+import Install from "./_install.mdx";
+import Tailwind from "./_tailwind.mdx";
 
 # React Native
 
@@ -16,42 +17,11 @@ NativeWind works with both Expo and Vanilla React Native projects but Expo provi
 
 ### 1. Install NativeWind
 
-You will need to install `nativewind` and it's peer dependency `tailwindcss`.
-
-<NPM deps={["nativewind"]} devDeps={["tailwindcss"]} />
+<Install />
 
 ### 2. Setup Tailwind CSS
 
-Run `npx tailwindcss init` to create a `tailwind.config.js` file
-
-Add the paths to all of your component files in your tailwind.config.js file.
-
-```diff title="tailwind.config.js"
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-- content: [],
-+ content: ["./App.{js,jsx,ts,tsx}", "./<custom-folder>/**/*.{js,jsx,ts,tsx}"],
-+ presets: [require("nativewind/preset")],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
-```
-
-Create a CSS file and add the Tailwind directives
-
-```css title="global.css"
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-```
-
-:::info
-
-From here onwards, replace `./your-css-file.css` with the relative path to the CSS file you just created
-
-:::
+<Tailwind />
 
 ### 3. Add the Babel preset
 
