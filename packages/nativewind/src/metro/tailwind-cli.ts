@@ -55,7 +55,7 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
   let startedWSServer = false;
   const connections = new Map<WebSocket, number>();
 
-  if (options.dev) {
+  if (options.dev && options.hot) {
     spawnCommands.push("--watch");
 
     if (options.platform !== "web") {
