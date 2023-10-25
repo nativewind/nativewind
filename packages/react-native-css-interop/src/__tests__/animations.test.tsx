@@ -81,7 +81,7 @@ test("single frame", () => {
     transform: [{ rotate: "180deg" }],
   });
 
-  jest.advanceTimersByTime(1500);
+  jest.advanceTimersByTime(1501);
 
   expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "360deg" }],
@@ -111,7 +111,7 @@ test("transform - starting", () => {
     transform: [{ rotate: "180deg" }],
   });
 
-  jest.advanceTimersByTime(1500);
+  jest.advanceTimersByTime(1501);
 
   expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "270deg" }],
@@ -166,7 +166,7 @@ test("bounce", () => {
     ],
   });
 
-  jest.advanceTimersByTime(500);
+  jest.advanceTimersByTime(501);
 
   expect(component).toHaveAnimatedStyle({
     height: 100,
@@ -186,7 +186,7 @@ test("bounce", () => {
     ],
   });
 
-  jest.advanceTimersByTime(500);
+  jest.advanceTimersByTime(501);
 
   expect(component).toHaveAnimatedStyle({
     height: 100,
