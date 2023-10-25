@@ -1,9 +1,9 @@
 import type { GetTransformOptionsOpts } from "metro-config";
 import loadConfig from "tailwindcss/loadConfig";
 import type { ServerOptions } from "ws";
+import micromatch from "micromatch";
 
 import path from "path";
-import { tmpdir } from "os";
 import {
   withCssInterop,
   CssToReactNativeRuntimeOptions,
@@ -15,9 +15,9 @@ import { tailwindCli } from "./tailwind-cli";
 
 interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
   input?: string;
+  projectRoot?: string;
   outputDir?: string;
   configPath?: string;
-  projectRoot?: string;
   hotServerOptions?: ServerOptions;
 }
 
@@ -25,10 +25,10 @@ export function withNativeWind(
   metroConfig: ComposableIntermediateConfigT,
   {
     input,
-    outputDir = tmpdir(),
+    outputDir = ["node_modules", ".cache", "nativewind"].join(path.sep),
     projectRoot = process.cwd(),
     inlineRem = 14,
-    configPath: tailwindConfigPath = "tailwind.config",
+    configPath: tailwindConfigPath = "tailwind.config.js",
     hotServerOptions = {},
   }: WithNativeWindOptions = {},
 ) {
@@ -36,18 +36,26 @@ export function withNativeWind(
     throw new Error(
       "withNativeWind requires an input parameter: `withNativeWind({ input: <css-file> })`",
     );
-  } else {
-    input = path.resolve(input);
   }
 
-  const output = path.resolve(
-    projectRoot,
-    path.join(outputDir, path.basename(input)),
-  );
+  const output = path.resolve(projectRoot, path.join(outputDir, input));
+  input = path.resolve(input);
 
-  const { important: importantConfig } = loadConfig(
+  const { important: importantConfig, content } = loadConfig(
     path.resolve(tailwindConfigPath),
   );
+
+  const contentArray = "files" in content ? content.files : content;
+  const matchesOutputDir = contentArray.some((pattern) => {
+    if (typeof pattern !== "string") return false;
+    return micromatch.isMatch(output, pattern);
+  });
+
+  if (matchesOutputDir) {
+    throw new Error(
+      `NativeWind: Your '${tailwindConfigPath}#content' includes the output file ${output} which will cause an infinite loop. Please read https://tailwindcss.com/docs/content-configuration#styles-rebuild-in-an-infinite-loop`,
+    );
+  }
 
   metroConfig = withCssInterop(metroConfig, {
     ...cssToReactNativeRuntimeOptions,

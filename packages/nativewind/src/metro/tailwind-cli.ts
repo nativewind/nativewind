@@ -49,7 +49,6 @@ export async function tailwindCli(
 
   const spawnCommands = ["tailwindcss", "--input", input, "--output", output];
 
-  let firstRun = true;
   let latestStat: Stats | undefined;
   let latestStyleData: string = "{}";
   let version = 0;
@@ -110,11 +109,8 @@ export async function tailwindCli(
       }
     }
 
-    if (firstRun) {
-      firstRun = false;
-      clearTimeout(timeout);
-      done(nativewindOptions);
-    }
+    clearTimeout(timeout);
+    done(nativewindOptions);
   });
 
   return deferred;

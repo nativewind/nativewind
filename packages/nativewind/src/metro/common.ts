@@ -1,5 +1,3 @@
-import type { GetTransformOptionsOpts } from "metro-config";
-
 // This is separated so it can be used in tests
 // Importing `withTailwind` will cause Jest to fail
 export const cssToReactNativeRuntimeOptions = {
@@ -12,7 +10,7 @@ export const cssToReactNativeRuntimeOptions = {
   grouping: ["^group(/.*)?"],
 };
 
-export function getOutput(output: string, options: GetTransformOptionsOpts) {
+export function getOutput(output: string, options: { platform?: string }) {
   // Force a platform and `.css` extensions (as they might be using `.sass` or another preprocessor
   return `${output}.${options.platform !== "web" ? "native" : "web"}.css`;
 }

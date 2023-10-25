@@ -6,7 +6,6 @@ import worker, {
 import path from "path";
 
 import { transform as cssInteropTransform } from "react-native-css-interop/metro/transformer";
-import { getOutput } from "./common";
 
 interface NativeWindJsTransformerConfig extends JsTransformerConfig {
   transformerPath?: string;
@@ -48,10 +47,7 @@ StyleSheet.register(JSON.parse('${config.nativewind.initialData}'));`,
         config,
         projectRoot,
         filename,
-        Buffer.from(
-          `import '${getOutput(config.nativewind.output, options)}'`,
-          "utf8",
-        ),
+        Buffer.from(`import '${config.nativewind.output}'`, "utf8"),
         options,
       );
     }
