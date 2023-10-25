@@ -40,7 +40,7 @@ test("basic animation", () => {
     marginLeft: "100%",
   });
 
-  jest.advanceTimersByTime(1500);
+  jest.advanceTimersByTime(1501);
 
   expect(component).toHaveAnimatedStyle({
     marginLeft: "50%",
@@ -75,7 +75,7 @@ test("single frame", () => {
     transform: [{ rotate: "0deg" }],
   });
 
-  jest.advanceTimersByTime(1500);
+  jest.advanceTimersByTime(1501);
 
   expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "180deg" }],

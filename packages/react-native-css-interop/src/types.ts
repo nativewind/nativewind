@@ -39,9 +39,7 @@ export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
   grouping: RegExp[];
   darkMode?: DarkMode;
   rootVariables: StyleSheetRegisterOptions["rootVariables"];
-  rootDarkVariables: StyleSheetRegisterOptions["rootDarkVariables"];
-  defaultVariables: StyleSheetRegisterOptions["defaultVariables"];
-  defaultDarkVariables: StyleSheetRegisterOptions["defaultDarkVariables"];
+  universalVariables: StyleSheetRegisterOptions["universalVariables"];
   flags: Record<string, unknown>;
   selectorPrefix?: string;
   appearanceOrder: number;
@@ -264,13 +262,19 @@ export type PseudoClassesQuery = {
 export type StyleSheetRegisterOptions = {
   declarations?: Record<string, ExtractedStyle | ExtractedStyle[]>;
   keyframes?: Record<string, ExtractedAnimation>;
-  rootVariables?: Record<string, ExtractedStyleValue>;
-  rootDarkVariables?: Record<string, ExtractedStyleValue>;
-  defaultVariables?: Record<string, ExtractedStyleValue>;
-  defaultDarkVariables?: Record<string, ExtractedStyleValue>;
-  colorSchemeClass?: string;
+  rootVariables?: Record<string, VariableRecord>;
+  universalVariables?: Record<string, VariableRecord>;
   flags?: Record<string, unknown>;
 };
+
+export type VariableRecord = Record<
+  string,
+  {
+    darkApp?: ExtractedStyleValue;
+    darkDevice?: ExtractedStyleValue;
+    light?: ExtractedStyleValue;
+  }
+>;
 
 export type Style = ViewStyle & TextStyle & ImageStyle;
 export type StyleProp = Style | StyleProp[] | undefined;

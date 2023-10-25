@@ -15,7 +15,7 @@ const context: Computed<any>[] = [];
 export type Signal<T> = ReturnType<typeof createSignal<T>>;
 type SignalSetFn<T> = (previous?: T) => T;
 
-export function createSignal<T = unknown>(value: T | undefined, id?: string) {
+export function createSignal<T = unknown>(value: T, id?: string) {
   const signal = {
     subscriptions: new Set<(() => void) | Computed<any>>(),
     /**
@@ -113,7 +113,7 @@ export function createComputed<T>(
       effect.set(effect.fn);
       teardown(effect);
     },
-    createSignal<T>(undefined, id),
+    createSignal<T>(undefined as T, id),
     {
       dependencies: new Set(),
       fn: fn,

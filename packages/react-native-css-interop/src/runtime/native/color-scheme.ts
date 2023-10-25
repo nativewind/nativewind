@@ -2,7 +2,46 @@ import { AppState, Appearance } from "react-native";
 import { createSignal, useComputed } from "../signals";
 import { INTERNAL_RESET } from "../../shared";
 
-export const colorScheme = createColorScheme(Appearance);
+let appearance = Appearance;
+
+let appearanceListener = appearance.addChangeListener((state) =>
+  _appColorScheme.set(state.colorScheme ?? "light"),
+);
+
+AppState.addEventListener("change", () =>
+  _appColorScheme.set(appearance.getColorScheme() ?? "light"),
+);
+
+const _appColorScheme = createSignal<"light" | "dark" | "system">("system");
+export const colorScheme = {
+  ..._appColorScheme,
+  set(value: "light" | "dark" | "system") {
+    _appColorScheme.set(value);
+    if (value === "system") {
+      appearance.setColorScheme(null);
+    } else {
+      appearance.setColorScheme(value);
+    }
+  },
+  get() {
+    let current = _appColorScheme.get();
+    if (current === "system") current = appearance.getColorScheme() ?? "light";
+    return current;
+  },
+  toggle() {
+    let current = _appColorScheme.peek();
+    if (current === "system") current = appearance.getColorScheme() ?? "light";
+    _appColorScheme.set(current === "light" ? "dark" : "light");
+  },
+  [INTERNAL_RESET]: ($appearance: typeof Appearance) => {
+    _appColorScheme.set("system");
+    appearance = $appearance;
+    appearanceListener.remove();
+    appearanceListener = appearance.addChangeListener((state) =>
+      _appColorScheme.set(state.colorScheme ?? "light"),
+    );
+  },
+};
 
 export function useColorScheme() {
   return useComputed(() => ({
@@ -10,67 +49,4 @@ export function useColorScheme() {
     setColorScheme: colorScheme.set,
     toggleColorScheme: colorScheme.toggle,
   }));
-}
-
-function createColorScheme(appearance: typeof Appearance) {
-  let isSystem = true;
-  const signal = createSignal<"light" | "dark">(
-    appearance.getColorScheme() ?? "light",
-  );
-
-  const set = (colorScheme: "light" | "dark" | "system") => {
-    let newColorScheme;
-    if (colorScheme === "system") {
-      newColorScheme = appearance.getColorScheme() ?? "light";
-    } else {
-      newColorScheme = colorScheme;
-    }
-
-    signal.set(newColorScheme);
-    appearance.setColorScheme(newColorScheme);
-  };
-
-  const toggle = () => {
-    if (signal.get() === "light") {
-      set("dark");
-    } else {
-      set("light");
-    }
-  };
-
-  let appStateListener = AppState.addEventListener("change", (state) => {
-    if (state === "active" && isSystem) {
-      set(appearance.getColorScheme() ?? "light");
-    }
-  });
-
-  let appearanceListener = appearance.addChangeListener(({ colorScheme }) => {
-    if (isSystem) {
-      set(colorScheme ?? "light");
-    }
-  });
-
-  const reset = (appearance: typeof Appearance) => {
-    appStateListener.remove();
-    appStateListener = AppState.addEventListener("change", (state) => {
-      if (state === "active" && isSystem) {
-        set(appearance.getColorScheme() ?? "light");
-      }
-    });
-    appearanceListener.remove();
-    appearanceListener = appearance.addChangeListener(({ colorScheme }) => {
-      if (isSystem) {
-        signal.set(colorScheme ?? "light");
-      }
-    });
-    isSystem = true;
-    signal.set(appearance.getColorScheme() ?? "light");
-  };
-
-  return {
-    ...signal,
-    set,
-    toggle,
-    [INTERNAL_RESET]: reset,
-  };
 }

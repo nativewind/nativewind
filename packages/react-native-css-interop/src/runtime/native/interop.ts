@@ -10,11 +10,7 @@ import {
 } from "../signals";
 import { NormalizedOptions } from "./prop-mapping";
 import { fastReloadSignal, StyleSheet, getGlobalStyle } from "./stylesheet";
-import {
-  effectContext,
-  rootVariables,
-  universalVariables,
-} from "./inheritance";
+import { effectContext, globalVariables } from "./inheritance";
 import {
   ExtractedAnimations,
   ExtractedStyleFrame,
@@ -30,6 +26,7 @@ import { extractValue, flattenStyle } from "./flatten-style";
 import { DEFAULT_CONTAINER_NAME, transformKeys } from "../../shared";
 import {
   AnimatableValue,
+  Easing,
   SharedValue,
   cancelAnimation,
   makeMutable,
@@ -160,19 +157,13 @@ export function createInteropComputed(
       }
 
       // Try the universal variables
-      signal = universalVariables.get(name);
+      signal = globalVariables.universal.get(name);
       if (signal && signal.peek() !== undefined) {
         return signal.get();
       }
 
       // Try the inherited variables
       signal = parent.signals.get(name);
-      if (signal && signal.peek() !== undefined) {
-        return signal.get();
-      }
-
-      // Try the root variables
-      signal = rootVariables.get(name);
       if (signal && signal.peek() !== undefined) {
         return signal.get();
       }
@@ -449,6 +440,7 @@ export function createInteropComputed(
                         ),
                         {
                           duration: totalDuration * frame.progress,
+                          easing: Easing.linear,
                         },
                       ),
                     );
@@ -639,7 +631,7 @@ export function createInteropComputed(
 
       interop.signals = new Map([
         ...parent.signals,
-        ...universalVariables,
+        ...globalVariables.universal,
         ...inlineSignals,
       ]);
       /**

@@ -25,7 +25,7 @@ import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
 import { colorScheme } from "./color-scheme";
 import { rem } from "./rem";
 import { createSignal } from "../signals";
-import { setRootVariables, setUniversalVariables } from "./inheritance";
+import { createColorSchemeSignal, globalVariables } from "./inheritance";
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
@@ -43,7 +43,6 @@ const commonStyleSheet: CommonStyleSheet = {
     vw[INTERNAL_RESET](dimensions);
     vh[INTERNAL_RESET](dimensions);
     colorScheme[INTERNAL_RESET](appearance);
-    // resetVariables();
   },
   getFlag(name) {
     return this[INTERNAL_FLAGS][name];
@@ -73,11 +72,27 @@ const commonStyleSheet: CommonStyleSheet = {
       }
     }
 
-    setRootVariables(options.rootVariables, options.rootDarkVariables);
-    setUniversalVariables(
-      options.defaultVariables,
-      options.defaultDarkVariables,
-    );
+    if (options.rootVariables) {
+      for (const [name, value] of Object.entries(options.rootVariables)) {
+        let signal = globalVariables.root.get(name);
+        if (!signal) {
+          signal = createColorSchemeSignal(`root:${name}`);
+          globalVariables.root.set(name, signal);
+        }
+        signal.set(value);
+      }
+    }
+
+    if (options.universalVariables) {
+      for (const [name, value] of Object.entries(options.universalVariables)) {
+        let signal = globalVariables.universal.get(name);
+        if (!signal) {
+          signal = createColorSchemeSignal(`root:${name}`);
+          globalVariables.universal.set(name, signal);
+        }
+        signal.set(value);
+      }
+    }
 
     fastReloadSignal.set((fastReloadSignal.get() ?? 0) + 1);
   },

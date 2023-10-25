@@ -71,9 +71,7 @@ export function cssToReactNativeRuntime(
     declarations: new Map(),
     keyframes: new Map(),
     rootVariables: {},
-    rootDarkVariables: {},
-    defaultVariables: {},
-    defaultDarkVariables: {},
+    universalVariables: {},
     flags: {},
     appearanceOrder: 0,
   };
@@ -102,9 +100,7 @@ export function cssToReactNativeRuntime(
     declarations: Object.fromEntries(extractOptions.declarations),
     keyframes: Object.fromEntries(extractOptions.keyframes),
     rootVariables: extractOptions.rootVariables,
-    rootDarkVariables: extractOptions.rootDarkVariables,
-    defaultVariables: extractOptions.defaultVariables,
-    defaultDarkVariables: extractOptions.defaultDarkVariables,
+    universalVariables: extractOptions.universalVariables,
     flags: extractOptions.flags,
   };
 }
@@ -273,112 +269,84 @@ function setStyleForSelectorList(
 ) {
   const { declarations } = options;
 
-  for (const selector of normalizeSelectors(selectorList, options)) {
+  for (const selector of normalizeSelectors(
+    extractedStyle,
+    selectorList,
+    options,
+  )) {
     const style = { ...extractedStyle };
 
-    if (selector.type === "variables") {
+    if (
+      selector.type === "rootVariables" ||
+      selector.type === "universalVariables"
+    ) {
       if (!style.variables) {
         continue;
       }
 
-      let key;
-      if (selector.darkMode) {
-        key = selector.rootVariables
-          ? "rootDarkVariables"
-          : "defaultDarkVariables";
-      } else {
-        key = selector.rootVariables ? "rootVariables" : "defaultVariables";
+      const { type, subtype } = selector;
+      const record = (options[type] ??= {});
+      for (const [name, value] of Object.entries(style.variables)) {
+        record[name] ??= {};
+        record[name][subtype] = value as any;
       }
+      continue;
+    } else if (selector.type === "className") {
+      const {
+        className,
+        groupClassName,
+        pseudoClasses,
+        groupPseudoClasses,
+        darkMode,
+      } = selector;
 
-      // normalizeSelectorList will remove invalid dark mode selectors when using className
-      // But if we are using type media, then we need to check the media of the styles
-      if (style.media) {
-        // You can only have 1 media condition
-        if (style.media.length !== 1) {
-          continue;
-        }
+      const specificity = {
+        ...extractedStyle.specificity,
+        ...selector.specificity,
+      };
 
-        const media = style.media[0];
-        const condition = media.condition;
-        const isDarkMode = Boolean(
-          media.qualifier !== "not" &&
-            condition &&
-            condition.type === "feature" &&
-            condition.value.type === "plain" &&
-            condition.value.name === "prefers-color-scheme" &&
-            condition.value.value.type === "ident" &&
-            condition.value.value.value === "dark",
+      if (groupClassName) {
+        // Add the conditions to the declarations object
+        addDeclaration(
+          groupClassName,
+          {
+            style: {},
+            specificity,
+            container: {
+              names: [groupClassName],
+            },
+          },
+          declarations,
         );
 
-        if (isDarkMode) {
-          key =
-            key === "rootVariables"
-              ? "rootDarkVariables"
-              : "defaultDarkVariables";
-        }
+        style.containerQuery ??= [];
+        style.containerQuery.push({
+          name: groupClassName,
+          pseudoClasses: groupPseudoClasses,
+        });
       }
 
-      Object.assign<ExtractRuleOptions, Partial<ExtractRuleOptions>>(options, {
-        [key]: style.variables,
-      });
-
-      continue;
-    }
-
-    const {
-      className,
-      groupClassName,
-      pseudoClasses,
-      groupPseudoClasses,
-      darkMode,
-    } = selector;
-
-    const specificity = {
-      ...extractedStyle.specificity,
-      ...selector.specificity,
-    };
-
-    if (groupClassName) {
-      // Add the conditions to the declarations object
-      addDeclaration(
-        groupClassName,
-        {
-          style: {},
-          specificity,
-          container: {
-            names: [groupClassName],
+      if (darkMode) {
+        style.media ??= [];
+        style.media.push({
+          mediaType: "all",
+          condition: {
+            type: "feature",
+            value: {
+              type: "plain",
+              name: "prefers-color-scheme",
+              value: { type: "ident", value: "dark" },
+            },
           },
-        },
+        });
+      }
+
+      addDeclaration(
+        className,
+        { ...style, specificity, pseudoClasses },
         declarations,
       );
-
-      style.containerQuery ??= [];
-      style.containerQuery.push({
-        name: groupClassName,
-        pseudoClasses: groupPseudoClasses,
-      });
     }
-
-    if (darkMode) {
-      style.media ??= [];
-      style.media.push({
-        mediaType: "all",
-        condition: {
-          type: "feature",
-          value: {
-            type: "plain",
-            name: "prefers-color-scheme",
-            value: { type: "ident", value: "dark" },
-          },
-        },
-      });
-    }
-
-    addDeclaration(
-      className,
-      { ...style, specificity, pseudoClasses },
-      declarations,
-    );
   }
 }
 

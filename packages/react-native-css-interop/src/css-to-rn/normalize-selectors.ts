@@ -1,12 +1,10 @@
-import type { Selector, SelectorList } from "lightningcss";
-import { CSSSpecificity, ExtractRuleOptions } from "../types";
+import type { MediaQuery, Selector, SelectorList } from "lightningcss";
+import { CSSSpecificity, ExtractRuleOptions, ExtractedStyle } from "../types";
 
 export type NormalizeSelector =
   | {
-      type: "variables";
-      darkMode?: boolean;
-      rootVariables?: boolean;
-      defaultVariables?: boolean;
+      type: "rootVariables" | "universalVariables";
+      subtype: "light" | "dark";
     }
   | {
       type: "className";
@@ -19,62 +17,86 @@ export type NormalizeSelector =
     };
 
 export function normalizeSelectors(
+  extractedStyle: ExtractedStyle,
   selectorList: SelectorList,
   options: ExtractRuleOptions,
   selectors: NormalizeSelector[] = [],
   defaults: Partial<NormalizeSelector> = {},
 ) {
-  for (let lightningCssSelector of selectorList) {
+  for (let cssSelector of selectorList) {
     // Ignore `:is()`, and just process its selectors
-    if (isIsPseudoClass(lightningCssSelector)) {
-      normalizeSelectors(lightningCssSelector[0].selectors, options, selectors);
+    if (isIsPseudoClass(cssSelector)) {
+      normalizeSelectors(
+        extractedStyle,
+        cssSelector[0].selectors,
+        options,
+        selectors,
+      );
       continue;
     }
 
     // Matches: :root {}
-    if (isRootVariableSelector(lightningCssSelector)) {
+    if (isRootVariableSelector(cssSelector)) {
+      if (isDarkModeMediaQuery(extractedStyle.media?.[0])) {
+        selectors.push({
+          type: "rootVariables",
+          subtype: "dark",
+        });
+      } else {
+        selectors.push({
+          type: "rootVariables",
+          subtype: "light",
+        });
+      }
+      continue;
+    }
+
+    // Matches: .dark:root {}
+    if (isRootDarkVariableSelector(cssSelector, options)) {
       selectors.push({
-        type: "variables",
-        rootVariables: true,
+        type: "rootVariables",
+        subtype: "dark",
       });
       continue;
     }
 
-    // Matches: .dark {}
-    if (isRootDarkVariableSelector(lightningCssSelector, options)) {
-      selectors.push({
-        type: "variables",
-        darkMode: true,
-        rootVariables: true,
-      });
-      continue;
-    }
-
-    // Matches:   * {}
-    if (isDefaultVariableSelector(lightningCssSelector)) {
-      selectors.push({
-        type: "variables",
-        defaultVariables: true,
-      });
+    // Matches: * {}
+    if (isDefaultVariableSelector(cssSelector)) {
+      if (isDarkModeMediaQuery(extractedStyle.media?.[0])) {
+        selectors.push({
+          type: "universalVariables",
+          subtype: "dark",
+        });
+      } else {
+        selectors.push({
+          type: "universalVariables",
+          subtype: "light",
+        });
+      }
       continue;
     }
 
     // Matches:  .dark * {}
-    if (isDarkDefaultVariableSelector(lightningCssSelector, options)) {
+    if (isDarkDefaultVariableSelector(cssSelector, options)) {
       selectors.push({
-        type: "variables",
-        darkMode: true,
-        defaultVariables: true,
+        type: "universalVariables",
+        subtype: "dark",
       });
       continue;
     }
 
     // Matches:  .dark <selector> {}
-    if (isDarkClassSelector(lightningCssSelector, options)) {
-      const [_, __, third, ...rest] = lightningCssSelector;
-      normalizeSelectors([[third, ...rest]], options, selectors, {
-        darkMode: true,
-      });
+    if (isDarkClassSelector(cssSelector, options)) {
+      const [_, __, third, ...rest] = cssSelector;
+      normalizeSelectors(
+        extractedStyle,
+        [[third, ...rest]],
+        options,
+        selectors,
+        {
+          darkMode: true,
+        },
+      );
       continue;
     }
 
@@ -89,7 +111,7 @@ export function normalizeSelectors(
 
     let previousWasCombinator = true;
 
-    for (const component of lightningCssSelector) {
+    for (const component of cssSelector) {
       switch (component.type) {
         case "universal":
         case "namespace":
@@ -198,6 +220,16 @@ function isIsPseudoClass(
     selector.length === 1 &&
     selector[0].type === "pseudo-class" &&
     selector[0].kind === "is"
+  );
+}
+
+function isDarkModeMediaQuery(query?: MediaQuery): boolean {
+  return Boolean(
+    query?.condition &&
+      query.condition.type === "feature" &&
+      query.condition.value.type === "plain" &&
+      query.condition.value.name === "prefers-color-scheme" &&
+      query.condition.value.value.value === "dark",
   );
 }
 
