@@ -3,6 +3,7 @@ import loadConfig from "tailwindcss/loadConfig";
 import type { ServerOptions } from "ws";
 
 import path from "path";
+import { tmpdir } from "os";
 import {
   withCssInterop,
   CssToReactNativeRuntimeOptions,
@@ -14,19 +15,17 @@ import { tailwindCli } from "./tailwind-cli";
 
 interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
   input?: string;
-  output?: string;
+  outputDir?: string;
   configPath?: string;
   projectRoot?: string;
   hotServerOptions?: ServerOptions;
 }
 
-const outputDir = ["node_modules", ".cache", "nativewind"].join(path.sep);
-
 export function withNativeWind(
   metroConfig: ComposableIntermediateConfigT,
   {
     input,
-    output,
+    outputDir = tmpdir(),
     projectRoot = process.cwd(),
     inlineRem = 14,
     configPath: tailwindConfigPath = "tailwind.config",
@@ -41,14 +40,10 @@ export function withNativeWind(
     input = path.resolve(input);
   }
 
-  if (!output) {
-    output = path.resolve(
-      projectRoot,
-      path.join(outputDir, path.basename(input)),
-    );
-  } else if (!path.isAbsolute(output)) {
-    output = path.resolve(output);
-  }
+  const output = path.resolve(
+    projectRoot,
+    path.join(outputDir, path.basename(input)),
+  );
 
   const { important: importantConfig } = loadConfig(
     path.resolve(tailwindConfigPath),
@@ -101,7 +96,7 @@ export function withNativeWind(
         tailwindHasStarted[platform] = true;
 
         // Generate the styles
-        const cliOutput = await tailwindCli(input, {
+        const cliOutput = await tailwindCli(input, metroConfig, {
           ...options,
           output,
           hotServerOptions,

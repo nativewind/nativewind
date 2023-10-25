@@ -5,20 +5,21 @@ import { dirname } from "node:path";
 
 import { ServerOptions, Server, WebSocket } from "ws";
 import type { GetTransformOptionsOpts } from "metro-config";
-import {
-  CssToReactNativeRuntimeOptions,
-  cssToReactNativeRuntime,
-} from "react-native-css-interop/css-to-rn";
+import { ComposableIntermediateConfigT } from "react-native-css-interop/metro";
+import { cssToReactNativeRuntime } from "react-native-css-interop/css-to-rn";
 
 import { getOutput } from "./common";
 
 export interface TailwindCliOptions extends GetTransformOptionsOpts {
   output: string;
   hotServerOptions: ServerOptions;
-  cssToReactNativeRuntime?: CssToReactNativeRuntimeOptions;
 }
 
-export async function tailwindCli(input: string, options: TailwindCliOptions) {
+export async function tailwindCli(
+  input: string,
+  metroConfig: ComposableIntermediateConfigT,
+  options: TailwindCliOptions,
+) {
   let done: (nativewindOptions?: Record<string, any>) => void;
   let nativewindOptions: Record<string, any> = {};
   const deferred = new Promise<Record<string, any> | undefined>(
@@ -96,7 +97,7 @@ export async function tailwindCli(input: string, options: TailwindCliOptions) {
       latestStyleData = JSON.stringify(
         cssToReactNativeRuntime(
           readFileSync(output, "utf-8"),
-          options.cssToReactNativeRuntime,
+          metroConfig.transformer.cssToReactNativeRuntime,
         ),
       );
       nativewindOptions.initialData = latestStyleData;
