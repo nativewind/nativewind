@@ -458,6 +458,8 @@ export function createInteropComputed(
                     withSequence(...sequence),
                     iterations,
                   );
+
+                  styledProps[key][prop] = sharedValue;
                 }
               }
             } else {
@@ -528,47 +530,11 @@ export function createInteropComputed(
         for (const tKey of transformKeys) {
           if (tKey in styledProps[key]) {
             styledProps[key].transform ??= [];
-            styledProps[key].transform.push({ [tKey]: styledProps[key][tKey] });
+            styledProps[key].transform.push({
+              [tKey]: styledProps[key][tKey],
+            });
             delete styledProps[key][tKey];
           }
-        }
-
-        /**
-         * reanimated's jestUtil `toHaveAnimatedStyle` does not work for inline styles,
-         * so we use this hack to make it work
-         */
-        if (!!process.env.JEST_WORKER_ID && seenAnimatedProps.size > 0) {
-          styledProps[key].animatedStyle = {
-            current: {
-              get value() {
-                return Object.fromEntries(
-                  Object.entries(styledProps[key]).flatMap(([k, v]: any[]) => {
-                    if (k === "animatedStyle") return [];
-                    if (k === "transform" && Array.isArray(v)) {
-                      return [
-                        [
-                          k,
-                          v.map((v: any) =>
-                            Object.fromEntries(
-                              Object.entries(v).map(([k, v]: any[]) => {
-                                return [k, "value" in v ? v.value : v];
-                              }),
-                            ),
-                          ),
-                        ],
-                      ];
-                    } else if (Array.isArray(v)) {
-                      return [[k, v.map((v) => ("value" in v ? v.value : v))]];
-                    } else if (typeof v === "object") {
-                      return [[k, "value" in v ? v.value : v]];
-                    } else {
-                      return [[k, v]];
-                    }
-                  }),
-                );
-              },
-            },
-          };
         }
       }
 

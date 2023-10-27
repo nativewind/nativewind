@@ -57,29 +57,48 @@ export const defaultCSSInterop: InteropFunction = (
    */
   if (effect.isAnimated) {
     const entries = Object.entries(props.style);
-    props.style = useAnimatedStyle(() => {
-      const style: any = {};
+    props.style = useAnimatedStyle(
+      () => {
+        const style: any = {};
 
-      for (const [key, value] of entries as any) {
+        for (const [key, value] of entries as any) {
+          if (typeof value === "object" && "value" in value) {
+            style[key] = value.value;
+          } else if (key === "transform") {
+            style.transform = value.map((v: any) => {
+              const [key, value] = Object.entries(v)[0] as any;
+
+              if (typeof value === "object" && "value" in value) {
+                return { [key]: value.value };
+              } else {
+                return { [key]: value };
+              }
+            });
+          } else {
+            style[key] = value;
+          }
+        }
+
+        return style;
+      },
+      // Our tests don't use the babel plugin, so we manually specify the dependencies
+      entries.flatMap(([key, value]: any) => {
         if (typeof value === "object" && "value" in value) {
-          style[key] = value.value;
+          return [value];
         } else if (key === "transform") {
-          style.transform = value.map((v: any) => {
-            const [key, value] = Object.entries(v)[0] as any;
-
+          return value.flatMap((v: any) => {
+            const [, value] = Object.entries(v)[0] as any;
             if (typeof value === "object" && "value" in value) {
-              return { [key]: value.value };
+              return [value];
             } else {
-              return { [key]: value };
+              return [];
             }
           });
         } else {
-          style[key] = value;
+          return [];
         }
-      }
-
-      return style;
-    });
+      }),
+    );
   }
 
   reactGlobal.isInComponent = false;
