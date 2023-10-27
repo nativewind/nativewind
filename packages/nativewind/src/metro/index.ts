@@ -19,6 +19,7 @@ interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
   outputDir?: string;
   configPath?: string;
   hotServerOptions?: ServerOptions;
+  cliCommand?: string;
 }
 
 export function withNativeWind(
@@ -29,6 +30,7 @@ export function withNativeWind(
     projectRoot = process.cwd(),
     inlineRem = 14,
     configPath: tailwindConfigPath = "tailwind.config.js",
+    cliCommand = "npx tailwindcss",
     hotServerOptions = {},
   }: WithNativeWindOptions = {},
 ) {
@@ -107,6 +109,7 @@ export function withNativeWind(
         const cliOutput = await tailwindCli(input, metroConfig, {
           ...options,
           output,
+          cliCommand,
           hotServerOptions,
         });
 

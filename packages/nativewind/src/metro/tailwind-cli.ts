@@ -12,6 +12,7 @@ import { getOutput } from "./common";
 
 export interface TailwindCliOptions extends GetTransformOptionsOpts {
   output: string;
+  cliCommand: string;
   hotServerOptions: ServerOptions;
 }
 
@@ -51,7 +52,13 @@ export async function tailwindCli(
 
   const output = getOutput(options.output, options);
 
-  const spawnCommands = ["tailwindcss", "--input", input, "--output", output];
+  const spawnCommands = [
+    ...options.cliCommand.split(" "),
+    "--input",
+    input,
+    "--output",
+    output,
+  ];
 
   let latestStat: Stats | undefined;
   let latestStyleData: string = "{}";
@@ -81,7 +88,8 @@ export async function tailwindCli(
   }
 
   try {
-    const cli = spawn("npx", spawnCommands, {
+    const [command, ...args] = spawnCommands;
+    const cli = spawn(command, args, {
       shell: true,
       env,
     });
