@@ -64,7 +64,7 @@ export const defaultCSSInterop: InteropFunction = (
         if (typeof value === "object" && "value" in value) {
           style[key] = value.value;
         } else if (key === "transform") {
-          style.transform = value.map((v) => {
+          style.transform = value.map((v: any) => {
             const [key, value] = Object.entries(v)[0] as any;
 
             if (typeof value === "object" && "value" in value) {
