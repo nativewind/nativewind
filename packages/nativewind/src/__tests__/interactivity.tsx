@@ -1,5 +1,5 @@
 import { resetStyles } from "react-native-css-interop/testing-library";
-import { invalidProperty, testCases } from "../test-utils";
+import { invalidProperty, style, testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
 
@@ -166,10 +166,10 @@ describe("Interactivity - Touch Action", () => {
 });
 
 describe("Interactivity - User Select", () => {
-  testCases(["select-none", invalidProperty("user-select")]);
-  testCases(["select-text", invalidProperty("user-select")]);
-  testCases(["select-all", invalidProperty("user-select")]);
-  testCases(["select-auto", invalidProperty("user-select")]);
+  testCases(["select-none", style({ userSelect: "none" })]);
+  testCases(["select-text", style({ userSelect: "text" })]);
+  testCases(["select-all", style({ userSelect: "all" })]);
+  testCases(["select-auto", style({ userSelect: "auto" })]);
 });
 
 describe("Interactivity - Will Change", () => {
