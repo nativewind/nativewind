@@ -525,11 +525,6 @@ export function createInteropComputed(
           value.value = styledProps[key] ?? defaultValues[key];
         }
 
-        styledProps[key] = {
-          ...styledProps[key],
-          ...interop.sharedValues,
-        };
-
         for (const tKey of transformKeys) {
           if (tKey in styledProps[key]) {
             styledProps[key].transform ??= [];
