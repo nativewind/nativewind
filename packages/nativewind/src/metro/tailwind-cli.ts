@@ -21,9 +21,13 @@ export async function tailwindCli(
   options: TailwindCliOptions,
 ) {
   let done: (nativewindOptions?: Record<string, any>) => void;
+  let reject: () => void = () => {};
   let nativewindOptions: Record<string, any> = {};
   const deferred = new Promise<Record<string, any> | undefined>(
-    (resolve) => (done = resolve),
+    (resolve, _reject) => {
+      done = resolve;
+      reject = _reject;
+    },
   );
 
   const env = {
@@ -76,44 +80,78 @@ export async function tailwindCli(
     }
   }
 
-  const { stderr } = spawn("npx", spawnCommands, {
-    shell: true,
-    env,
-  });
+  try {
+    const cli = spawn("npx", spawnCommands, {
+      shell: true,
+      env,
+    });
 
-  stderr.on("data", (data: Buffer | string) => {
-    data = data.toString();
+    cli.on("error", (error) => reject());
+    cli.stderr.on("data", (data: Buffer | string) => {
+      data = data.toString();
 
-    if (!data.includes("Done in")) return;
+      if (data.includes("tailwindcss/lib/cli") || data.includes("npm ERR!")) {
+        reject();
+      }
 
-    if (startedWSServer) {
-      const stat = statSync(output);
+      // console.log(data);
 
-      if (stat.mtimeMs === latestStat?.mtimeMs) return;
-      latestStat = stat;
-      version = version + 1;
+      if (data.includes("warn - ")) {
+        console.warn(data);
+        return;
+      }
 
-      latestStyleData = JSON.stringify(
-        cssToReactNativeRuntime(
-          readFileSync(output, "utf-8"),
-          metroConfig.transformer.cssToReactNativeRuntime,
-        ),
-      );
-      nativewindOptions.initialData = latestStyleData;
+      if (data.startsWith("Specified input file")) {
+        console.log("");
+        console.error(data);
+        clearTimeout(timeout);
+        return;
+      }
 
-      for (const [ws, lastVersion] of connections) {
-        if (lastVersion !== version) {
-          ws.send(latestStyleData);
-          connections.set(ws, version);
+      if (!data.includes("Done in")) return;
+
+      if (startedWSServer) {
+        const stat = statSync(output);
+
+        if (stat.mtimeMs === latestStat?.mtimeMs) return;
+        latestStat = stat;
+        version = version + 1;
+
+        latestStyleData = JSON.stringify(
+          cssToReactNativeRuntime(
+            readFileSync(output, "utf-8"),
+            metroConfig.transformer.cssToReactNativeRuntime,
+          ),
+        );
+        nativewindOptions.initialData = latestStyleData;
+
+        for (const [ws, lastVersion] of connections) {
+          if (lastVersion !== version) {
+            ws.send(latestStyleData);
+            connections.set(ws, version);
+          }
         }
       }
-    }
 
-    clearTimeout(timeout);
-    done(nativewindOptions);
-  });
+      clearTimeout(timeout);
+      done(nativewindOptions);
+    });
+  } catch {
+    reject();
+  }
 
-  return deferred;
+  return deferred
+    .then((data) => {
+      console.log("done");
+      return data;
+    })
+    .catch(() => {
+      console.error(
+        "\nError running TailwindCSS CLI, please run the CLI manually to see the error.",
+      );
+      console.error("Command used: npx", ...spawnCommands);
+      process.exit(1);
+    });
 }
 
 async function getAvailablePort(port = 8089): Promise<number> {
