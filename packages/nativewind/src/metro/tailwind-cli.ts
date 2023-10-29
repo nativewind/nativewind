@@ -55,9 +55,9 @@ export async function tailwindCli(
   const spawnCommands = [
     ...options.cliCommand.split(" "),
     "--input",
-    input,
+    `"${input}"`,
     "--output",
-    output,
+    `"${output}"`,
   ];
 
   let latestStat: Stats | undefined;
@@ -92,6 +92,8 @@ export async function tailwindCli(
     const cli = spawn(command, args, {
       shell: true,
       env,
+      windowsVerbatimArguments: true,
+      windowsHide: true,
     });
 
     cli.on("error", (error) => reject());
