@@ -11,7 +11,7 @@ import { reactGlobal } from "./signals";
 import { Pressable, View } from "react-native";
 import { InheritanceProvider } from "./native/inheritance";
 import { useInteropComputed } from "./native/interop";
-import { opaqueStyles } from "./native/misc";
+import { opaqueStyles, styleMetaMap } from "./native/misc";
 import { getNormalizeConfig } from "./native/prop-mapping";
 import { getGlobalStyle } from "./native/stylesheet";
 import { interopComponents } from "./render";
@@ -122,20 +122,21 @@ export function remapProps<P, M>(
           if (style !== undefined) {
             const opaqueStyle = {};
             opaqueStyles.set(opaqueStyle, style);
+            styleMetaMap.set(opaqueStyle, {});
             rawStyles.push(opaqueStyle);
           }
         }
       }
 
-      const existingStyle = props[key];
-
-      if (Array.isArray(existingStyle)) {
-        rawStyles.push(...existingStyle);
-      } else if (existingStyle) {
-        rawStyles.push(existingStyle);
-      }
-
       if (rawStyles.length !== 0) {
+        const existingStyle = props[key];
+
+        if (Array.isArray(existingStyle)) {
+          rawStyles.push(...existingStyle);
+        } else if (existingStyle) {
+          rawStyles.push(existingStyle);
+        }
+
         (props as any)[key] = rawStyles.length === 1 ? rawStyles[0] : rawStyles;
       }
     }

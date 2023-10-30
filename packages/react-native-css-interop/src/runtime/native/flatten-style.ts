@@ -9,7 +9,7 @@ import { RuntimeValue, Style, StyleMeta, StyleProp } from "../../types";
 import { StyleSheet } from "./stylesheet";
 import { isRuntimeValue } from "../../shared";
 import { rem } from "./rem";
-import { styleMetaMap, vh, vw } from "./misc";
+import { opaqueStyles, styleMetaMap, vh, vw } from "./misc";
 
 type FlattenStyleOptions = {
   ch?: number;
@@ -53,6 +53,11 @@ export function flattenStyle(
       flattenStyle(s, interop, options, flatStyle, depth + 1);
     }
     return flatStyle;
+  }
+
+  const intelligibleStyle = opaqueStyles.get(style);
+  if (intelligibleStyle) {
+    style = intelligibleStyle;
   }
 
   /*
