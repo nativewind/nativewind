@@ -1,6 +1,6 @@
 {
   "name": "website",
-  "version": "0.0.2-alpha.15",
+  "version": "0.0.2-alpha.16",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -19,10 +19,10 @@
     "@docusaurus/preset-classic": "3.0.0-beta.0",
     "@mdx-js/react": "2.3.0",
     "docusaurus-plugin-sass": "0.2.5",
-    "nativewind": "4.0.0-alpha.30",
+    "nativewind": "4.0.0-alpha.31",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native-css-interop": "0.0.0-alpha.26",
+    "react-native-css-interop": "0.0.0-alpha.27",
     "react-twitter-embed": "4.0.4",
     "sass": "1.68.0",
     "tailwindcss": "3.3.3"

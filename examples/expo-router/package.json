@@ -1,7 +1,7 @@
 {
   "name": "nativewind-expo-router",
   "main": "index",
-  "version": "1.0.2-alpha.15",
+  "version": "1.0.2-alpha.16",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -24,7 +24,7 @@
     "expo-status-bar": "~1.6.0",
     "expo-system-ui": "~2.4.0",
     "expo-web-browser": "~12.3.2",
-    "nativewind": "4.0.0-alpha.30",
+    "nativewind": "4.0.0-alpha.31",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.72.6",
