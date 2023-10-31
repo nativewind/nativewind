@@ -34,9 +34,7 @@ export function withCssInterop(
       ...config.resolver,
       sourceExts: [...config.resolver.sourceExts, "css"],
     },
-    transformerPath: require.resolve(
-      "react-native-css-interop/dist/metro/transformer",
-    ),
+    transformerPath: require.resolve("./transformer"),
     transformer: {
       ...config.transformer,
       cssToReactNativeRuntime: options,

@@ -67,9 +67,7 @@ export function withNativeWind(
   });
 
   // eslint-disable-next-line unicorn/prefer-module
-  metroConfig.transformerPath = require.resolve(
-    "nativewind/dist/metro/transformer",
-  );
+  metroConfig.transformerPath = require.resolve("./transformer");
 
   const tailwindHasStarted: Record<string, boolean> = {
     native: false,
