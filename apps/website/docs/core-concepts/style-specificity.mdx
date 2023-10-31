@@ -1,0 +1,97 @@
+# Style Specificity
+
+NativeWind follows the same specificity rules as CSS with some extensions to the rules to accomodate the inline-style nature of React Native and its existing ecosystem.
+
+Before explaing the solution, let's first look at the problem.
+
+```tsx
+function MyText({ style }) {
+  return <Text {...props} style={[{ color: 'black' }, style]} >
+}
+
+remapProps(MyText, { className: 'style' })
+
+// Component 1
+<MyText style={{ color: 'red' }}>The text will be red on all platforms</MyText>
+// Component 2
+<MyText className="text-red-500">What color should I render as?</MyText>
+```
+
+If you are an iOS/android developer you would probably answer `red` for `Component 2`, but a web developer will probably answer `black`. This is because the web works on style specificity,
+
+```
+// <MyText> will render as
+<Text style={{ color: 'black' }, { $$css: true, className: 'text-red-500'}}>
+
+// Which is just react-native-web's way of writing
+<Text className="text-red-500" style={{ color: 'black' }} />
+```
+
+And following the style specificity rules, the inline style will be applied.
+
+So, does NativeWind implement what will be **correct** or what will be **expected**? We cannot be both, so NativeWind uses a custom ordering.
+
+From this point, we will use the terms
+
+- **correct** to refer to the CSS way of order styles on the web
+- **expected** the React Native way of ordering styles, left-to-right, that is expected by React Native developers
+
+## Specificity order
+
+The specificity order is as follows (highest to lowest):
+
+- important styles (sorted by CSS specificity order)
+- inline & remapped styles (in left-to-right order)
+- className styles (following CSS specificity order)
+
+## What are remapped styles?
+
+Remapped styles are styles that have been mapped from a className to a prop and then rendered inline. This is a new concept that is not present in CSS. It is a way to preserve the order of styles when integrating with existing React Native components.
+
+This preserves the **expected** behaviour of React Native styles, however it does not preserve the **correct** behaviour of CSS styles.
+
+## Fixing ordering with !important
+
+Remapping styles will causes styling differences between web and native, as they switch from specificity ordering to left-to-right. If this is causing you issues, you can 'fix' it by making your styles important, returning them back to specificity ordering.
+
+````tsx,
+
+## Examples
+
+### Basic components
+
+```tsx
+// Order: [{ color: 'red'}, { color: 'green'}]
+// Text will be `green` because inline styles are more specific than className styles
+<Text className="text-red-500" style={{ color: 'green' }}>
+
+// Order: [{ color: 'red'}, { color: 'green'}, { color: 'blue'}]
+// Text will be `blue` because the `!text-blue-500` because it is using the !important modifier and is more specific than the inline-style
+<Text className="text-red-500 !text-blue-500" style={{ color: 'green' }}>
+````
+
+### Remapped components
+
+ClassName styles are converted into remapped styles, which are then inserted inline to the right of the inline-style.
+
+```tsx
+function MyText({ style }) {
+  return <Text {...props} style={[{ color: 'black' }, style]} >
+}
+remapProps(MyText, { className: 'style' })
+
+<MyText className="text-red-500">
+// Order on native: [{ color: 'black'}, { color: 'red'}]
+// Text will be `red`. The className is converted into a remapped style, which is then inserted inline to the right of `color: black`
+
+// Order on web: [{ color: 'red'}, { color: 'black'}]
+// Text will be `black` as the inline-style is more specific than the className style
+```
+
+The `!important` modifier can be used to fix the ordering between the platforms
+
+```tsx
+<MyText className="!text-red-500">
+// Order: [{ color: 'black'}, { color: 'red'}]
+// Text will be `red`. The classNames are converted into a remapped styles, but the important remapped style has a higher specificity than the inline-style
+```

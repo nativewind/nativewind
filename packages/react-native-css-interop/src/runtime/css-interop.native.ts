@@ -11,9 +11,9 @@ import { reactGlobal } from "./signals";
 import { Pressable, View } from "react-native";
 import { InheritanceProvider } from "./native/inheritance";
 import { useInteropComputed } from "./native/interop";
-import { opaqueStyles, styleMetaMap } from "./native/misc";
+import { opaqueStyles, styleMetaMap, styleSpecificity } from "./native/misc";
 import { getNormalizeConfig } from "./native/prop-mapping";
-import { getGlobalStyle } from "./native/stylesheet";
+import { getGlobalStyle, getSpecificity } from "./native/stylesheet";
 import { interopComponents } from "./render";
 
 export const defaultCSSInterop: InteropFunction = (
@@ -121,7 +121,12 @@ export function remapProps<P, M>(
 
           if (style !== undefined) {
             const opaqueStyle = {};
-            opaqueStyles.set(opaqueStyle, style);
+            const copyOfStyle = { ...style };
+            opaqueStyles.set(opaqueStyle, copyOfStyle);
+            styleSpecificity.set(copyOfStyle, {
+              remapped: true,
+              ...getSpecificity(style),
+            });
             styleMetaMap.set(opaqueStyle, {});
             rawStyles.push(opaqueStyle);
           }
@@ -153,6 +158,8 @@ export function remapProps<P, M>(
       return render({ ...props, children }, null);
     },
   });
+
+  return;
 }
 
 const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>();

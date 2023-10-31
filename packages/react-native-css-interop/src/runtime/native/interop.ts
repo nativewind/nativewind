@@ -255,11 +255,11 @@ export function createInteropComputed(
             for (const style of prop) {
               if (!style) continue;
               dynamicStyles ||= styleMetaMap.has(style);
-              stylesToFlatten.push(style);
+              stylesToFlatten.push(getGlobalStyle(style));
             }
           } else {
             dynamicStyles ||= styleMetaMap.has(prop);
-            stylesToFlatten.push(prop);
+            stylesToFlatten.push(getGlobalStyle(prop));
           }
         }
 

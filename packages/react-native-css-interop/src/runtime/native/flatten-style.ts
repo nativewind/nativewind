@@ -6,10 +6,10 @@ import {
 } from "./conditions";
 import type { InteropComputed } from "./interop";
 import { RuntimeValue, Style, StyleMeta, StyleProp } from "../../types";
-import { StyleSheet } from "./stylesheet";
+import { StyleSheet, inlineSpecificity } from "./stylesheet";
 import { isRuntimeValue } from "../../shared";
 import { rem } from "./rem";
-import { opaqueStyles, styleMetaMap, vh, vw } from "./misc";
+import { styleMetaMap, vh, vw } from "./misc";
 
 type FlattenStyleOptions = {
   ch?: number;
@@ -55,21 +55,16 @@ export function flattenStyle(
     return flatStyle;
   }
 
-  const intelligibleStyle = opaqueStyles.get(style);
-  if (intelligibleStyle) {
-    style = intelligibleStyle;
-  }
-
   /*
    * TODO: Investigate if we early exit if there is no styleMeta.
    */
   const styleMeta: StyleMeta = styleMetaMap.get(style) ?? {
-    specificity: { inline: 1 },
+    specificity: inlineSpecificity,
   };
   let flatStyleMeta = styleMetaMap.get(flatStyle);
 
   if (!flatStyleMeta) {
-    flatStyleMeta = { alreadyProcessed: true, specificity: { inline: 1 } };
+    flatStyleMeta = { alreadyProcessed: true, specificity: inlineSpecificity };
     styleMetaMap.set(flatStyle, flatStyleMeta);
   }
 

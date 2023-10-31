@@ -145,7 +145,7 @@ export type ExtractedStyle = {
   importantStyles?: string[];
 };
 
-export type Specificity = { inline?: number; I?: undefined } | CSSSpecificity;
+export type Specificity = CSSSpecificity;
 
 export type CSSSpecificity = {
   /** IDs - https://drafts.csswg.org/selectors/#specificity-rules */
@@ -160,6 +160,10 @@ export type CSSSpecificity = {
   S: number;
   /** Appearance Order */
   O: number;
+  /** Inline */
+  inline?: number;
+  /** Remapped from remapProps */
+  remapped?: boolean;
 };
 
 export type StyleMeta = {

@@ -11,6 +11,7 @@ import {
   StyleMeta,
   CommonStyleSheet,
   ExtractionWarning,
+  Specificity,
 } from "../../types";
 import {
   animationMap,
@@ -212,10 +213,18 @@ export function getGlobalStyle(style?: any): StyleProp {
   }
 }
 
-export function getSpecificity(style?: object) {
-  if (style) {
-    return styleSpecificity.get(style) ?? { inline: 1 };
-  } else {
-    return { inline: 1 };
-  }
+export function getSpecificity(style?: object): Specificity {
+  return style
+    ? styleSpecificity.get(style) ?? inlineSpecificity
+    : inlineSpecificity;
 }
+
+export const inlineSpecificity: Specificity = {
+  inline: 1,
+  A: 0,
+  B: 0,
+  C: 0,
+  I: 0,
+  S: 1,
+  O: Infinity,
+};

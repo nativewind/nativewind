@@ -11,43 +11,34 @@ export function styleSpecificityCompareFn(direction = "asc") {
 }
 
 export function specificityCompare(a: Specificity, b: Specificity) {
-  if ("inline" in a && "inline" in b) {
-    return 0;
-  } else if ("inline" in a) {
-    return "I" in b && b.I ? -1 : 1;
-  } else if ("inline" in b) {
-    return "I" in a && a.I ? 1 : -1;
-  } else if ("A" in a && "A" in b) {
-    // Important styles are always last
-    if (a.I !== b.I) {
-      return a.I - b.I;
-    }
-
+  // Important first
+  if (a.I !== b.I) {
+    return a.I - b.I;
+  } else if (a.I || b.I) {
+    return a.I ? 1 : -1;
+  } else if ((a.inline || a.remapped) && (b.inline || b.remapped)) {
+    // Then inline/remapped
+    return 1;
+  } else if (a.inline || b.inline) {
+    // If one is inline, it goes first
+    return a.inline ? 1 : -1;
+  } else if (a.A !== b.A) {
     // Ids
-    if (a.A !== b.A) {
-      return a.A - b.A;
-    }
-
+    return a.A - b.A;
+  } else if (a.B !== b.B) {
     // Classes
-    if (a.B !== b.B) {
-      return a.B - b.B;
-    }
-
+    return a.B - b.B;
+  } else if (a.C !== b.C) {
     // Styles
-    if (a.C !== b.C) {
-      return a.C - b.C;
-    }
-
-    // Styles have the same specificity, so we need to compare the order
-
+    return a.C - b.C;
+  } else if (a.S !== b.S) {
     // StyleSheet Order
-    if (a.S !== b.S) {
-      return a.S - b.S;
-    }
-
+    return a.S - b.S;
+  } else if (a.O !== b.O) {
     // Appearance Order
     return a.O - b.O;
+  } else {
+    // They are the same?
+    return 0;
   }
-
-  return 0;
 }

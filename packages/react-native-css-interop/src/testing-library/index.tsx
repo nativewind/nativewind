@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import * as JSX from "react/jsx-runtime";
 
-import { StyleSheet, cssInterop } from "../index";
+import { StyleSheet, cssInterop, remapProps } from "../index";
 import { render } from "../runtime/render";
 import { INTERNAL_RESET } from "../shared";
 import {
@@ -43,6 +43,24 @@ export function createMockComponent<
   } = {},
 ) {
   cssInterop<P, M>(Component, mapping);
+
+  const mock = jest.fn((props: P & { [K in keyof M]?: string }, _ref) => {
+    return render((JSX as any).jsx, Component, props as any, "");
+  });
+
+  const component = forwardRef(mock);
+
+  return Object.assign(component, { mock });
+}
+
+export function createRemappedComponent<
+  P extends object = any,
+  M = { className: "style" },
+>(
+  Component: React.ComponentType<P>,
+  mapping: Parameters<typeof remapProps<any, any>>[1],
+) {
+  remapProps(Component, mapping);
 
   const mock = jest.fn((props: P & { [K in keyof M]?: string }, _ref) => {
     return render((JSX as any).jsx, Component, props as any, "");
