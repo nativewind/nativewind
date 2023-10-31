@@ -12,6 +12,18 @@ pluginTester({
     filename: "/someFile.js",
   },
   tests: {
+    "createElement with interopRequire": {
+      code: `var _react = _interopRequireDefault(require("react"));
+export default function App() {
+  return /*#__PURE__*/ _react.default.createElement(_reactNative.Text, {})
+}`,
+      output: `import { createElementAndCheckCssInterop as _createElementAndCheckCssInterop } from "react-native-css-interop";
+var _react = _interopRequireDefault(require("react"));
+export default function App() {
+  return /*#__PURE__*/ _createElementAndCheckCssInterop(_reactNative.Text, {});
+}`,
+      babelOptions: { filename: "/someFile.js" },
+    },
     "createElement identifier by import": {
       code: `import { createElement } from "react";
 export default function App() {
@@ -62,7 +74,6 @@ export default function App() {
       babelOptions: { filename: "/someFile.js" },
     },
     "createElement by namespace require": {
-      only: true,
       code: `var react = require("react");
 export default function App() {
   return react.createElement("div", {}, "Hello World");

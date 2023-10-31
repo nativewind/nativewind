@@ -25,18 +25,28 @@ export default function () {
       MemberExpression(path: NodePath<MemberExpression>, state: any) {
         if (
           allowedFileRegex.test(state.filename) &&
-          isMemberExpression(path.node) &&
-          isIdentifier(path.node.property, { name: "createElement" }) &&
-          isIdentifier(path.node.object)
+          isIdentifier(path.node.property, { name: "createElement" })
         ) {
-          const name = path.node.object.name;
+          let shouldReplace = false;
 
           if (
-            name.toLowerCase() !== "react" ||
-            !isImportedFromReact(path.scope.getBinding(name))
+            isIdentifier(path.node.object, { name: "react" }) ||
+            isIdentifier(path.node.object, { name: "React" })
           ) {
-            return;
+            shouldReplace = isImportedFromReact(
+              path.scope.getBinding(path.node.object.name),
+            );
+          } else if (
+            isMemberExpression(path.node.object) &&
+            isIdentifier(path.node.object.object, { name: "_react" }) &&
+            isIdentifier(path.node.object.property, { name: "default" })
+          ) {
+            shouldReplace = isImportedFromReact(
+              path.scope.getBinding(path.node.object.object.name),
+            );
           }
+
+          if (!shouldReplace) return;
 
           path.replaceWith(addNamed(path, ...importMeta));
         }
@@ -69,13 +79,22 @@ function isImportedFromReact(binding?: Binding): boolean {
       isImportDeclaration(path.parentPath.node) &&
       path.parentPath.node.source.value.toLowerCase() === "react"
     );
-  } else if (path.isVariableDeclarator()) {
-    return (
-      isCallExpression(path.node.init) &&
-      isIdentifier(path.node.init.callee, { name: "require" }) &&
+  } else if (path.isVariableDeclarator() && isCallExpression(path.node.init)) {
+    if (
+      isIdentifier(path.node.init.callee, { name: "require" }) && // const <name> = require("react")
       isStringLiteral(path.node.init.arguments[0], { value: "react" })
-    );
-  } else {
-    return false;
+    ) {
+      return true;
+    } else if (
+      isIdentifier(path.node.init.callee, { name: "_interopRequireDefault" }) && // const <name> = _interopRequireDefault(require("react"))
+      isCallExpression(path.node.init.arguments[0]) &&
+      isIdentifier(path.node.init.arguments[0].callee, { name: "require" }) &&
+      isStringLiteral(path.node.init.arguments[0].arguments[0], {
+        value: "react",
+      })
+    ) {
+      return true;
+    }
   }
+  return false;
 }
