@@ -81,11 +81,11 @@ const config = {
       colorMode: {
         respectPrefersColorScheme: true,
       },
-      // announcementBar: {
-      //   content:
-      //     '<a href="/v4/overview">NativeWind v4.0 is currently in alpha. Click here to see the docs</a>',
-      //   isCloseable: true,
-      // },
+      announcementBar: {
+        content:
+          '<a href="/v4/overview">NativeWind v4.0 is coming soon. Click here to see the docs</a>',
+        isCloseable: true,
+      },
       navbar: {
         title: "NativeWind",
         logo: {
