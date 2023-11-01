@@ -4,14 +4,12 @@
 
 While troubleshooting, always start your application without the cache!
 
-**This is the most common cause of issues**
-
 - Expo `npx expo start --clear`
 - React Native CLI `npx react-native start --reset-cache`
 
 :::
 
-Before troubleshooting NativeWind, it's crucial to ensure that Tailwind CSS itself is functioning correctly. NativeWind uses the Tailwind CSS CLI to compile your styles, so any issues with Tailwind CLI should be resolved first. You can inspect the Tailwind CSS output at the following location: `node_modules/.cache/nativewind/<input-css-filename>.<platform>.css`, or by simply running `npx tailwindcss --input <input.css>`.
+Before troubleshooting NativeWind, it's crucial to ensure that Tailwind CSS itself is functioning correctly. NativeWind uses the Tailwind CLI to compile your styles, so any issues with Tailwind CLI should be resolved first. You can inspect the Tailwind CSS output at the following location: `node_modules/.cache/nativewind/<input-css-filename>.<platform>.css`, or by simply running `npx tailwindcss --input <input.css>`.
 
 For instance, if you've observed that a custom class `text-brand` isn't behaving as expected. You can proceed as follows:
 

@@ -27,10 +27,19 @@ const sidebars = {
       items: [
         "getting-started/react-native",
         "getting-started/expo-router",
-        "getting-started/expo",
         "getting-started/nextjs",
         "getting-started/typescript",
         "getting-started/other-bundlers",
+      ],
+    },
+    {
+      type: "category",
+      label: "Guides",
+      collapsed: false,
+      items: [
+        "guides/troubleshooting",
+        "guides/custom-components",
+        "guides/themes",
       ],
     },
     {
@@ -44,18 +53,7 @@ const sidebars = {
         "core-concepts/dark-mode",
         "core-concepts/units",
         "core-concepts/differences",
-      ],
-    },
-    {
-      type: "category",
-      label: "Guides",
-      collapsed: false,
-      items: [
-        "guides/troubleshooting",
-        "guides/platforms",
-        "guides/custom-components",
-        "guides/theming",
-        "guides/theme-values",
+        "core-concepts/style-specificity",
       ],
     },
     {

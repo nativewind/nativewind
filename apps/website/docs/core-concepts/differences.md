@@ -1,6 +1,12 @@
 # Platform Differences
 
-NativeWind aligns CSS and React Native into a common language. However the two style engines do have their differences. We refer to these differences as quirks.
+NativeWind aligns CSS and React Native into a common language. However the two style engines do have their differences. These are some common differences you may encounter.
+
+## Styling per platform
+
+Styles can be applied selectively per platform using a platform variant. Additionally the `native` variant can be used to target all platforms except for web.
+
+Supported platform modifiers are: `ios:`, `android:`, `web:`, `windows:`, `osx:`, `native:`.
 
 ## Explicit styles
 

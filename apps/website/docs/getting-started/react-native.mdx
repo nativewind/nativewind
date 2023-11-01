@@ -54,33 +54,38 @@ module.exports = {
 ### 4. Modify your metro.config.js
 
 <Tabs groupId="framework">
-<TabItem value="Expo SDK 50">
+  <TabItem value="Expo">
+    <Tabs groupId="sdk">
+      <TabItem value="Expo SDK 50">
 
-```diff title="metro.config.js"
-const { getDefaultConfig } = require("expo/metro-config");
-+ const { withNativeWind } = require('nativewind/metro');
+        ```diff title="metro.config.js"
+        const { getDefaultConfig } = require("expo/metro-config");
+        + const { withNativeWind } = require('nativewind/metro');
 
-const config = getDefaultConfig(__dirname)
+        const config = getDefaultConfig(__dirname)
 
-- module.exports = config
-+ module.exports = withNativeWind(config, { input: './your-css-file.css' })
-```
+        - module.exports = config
+        + module.exports = withNativeWind(config, { input: './your-css-file.css' })
+        ```
 
-</TabItem >
-<TabItem value="Expo SDK 49">
+        </TabItem >
+        <TabItem value="Expo SDK 49">
 
-```diff title="metro.config.js"
-const { getDefaultConfig } = require("expo/metro-config");
-+ const { withNativeWind } = require('nativewind/metro');
+        ```diff title="metro.config.js"
+        const { getDefaultConfig } = require("expo/metro-config");
+        + const { withNativeWind } = require('nativewind/metro');
 
-- const config = getDefaultConfig(__dirname)
-+ const config = getDefaultConfig(__dirname, { isCSSEnabled: true })
+        - const config = getDefaultConfig(__dirname)
+        + const config = getDefaultConfig(__dirname, { isCSSEnabled: true })
 
-- module.exports = config
-+ module.exports = withNativeWind(config, { input: './your-css-file.css' })
-```
+        - module.exports = config
+        + module.exports = withNativeWind(config, { input: './your-css-file.css' })
+        ```
+      </TabItem>
+    </Tabs>
 
-</TabItem>
+  </TabItem>
+
   <TabItem value="vanilla" label="Vanilla">
 
 ```diff title="metro.config.js"
@@ -92,15 +97,19 @@ const config = {/* your config */}
 + module.exports = withNativeWind(config, { input: './your-css-file.css'})
 ```
 
-</TabItem>
+  </TabItem>
 </Tabs>
 
 ### 5. Import your CSS file
 
-```diff title=App.js
+```diff title="App.js"
 + import "./<your-css-file>.css"
 
 export default App() {
   /* Your App */
 }
 ```
+
+### 6. TypeScript (optional)
+
+Please follow the [TypeScript guide](/docs/typescript).

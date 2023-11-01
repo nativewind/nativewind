@@ -18,9 +18,7 @@ const processNode = (node, parent) => {
 
 const SnackPlayer = () => {
   return async (tree) => {
-    const { visitParents: visit } = await import(
-      "unist-util-visit-parents/lib/index.js"
-    );
+    const { visitParents: visit } = await import("unist-util-visit-parents");
     const nodesToProcess = [];
     visit(tree, "code", (node, parent) => {
       if (node.lang === "SnackPlayer") {
