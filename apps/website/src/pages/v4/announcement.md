@@ -2,9 +2,7 @@
 
 Dear NativeWind Community,
 
-I'm happy to announce the release of NativeWind v4! This new update presents a multitude of improvements, innovative features, and enhancements that significantly bolster the capabilities of NativeWind. Committed to our philosophy of "Write once, style anywhere," NativeWind continuously challenges its limits, delivering an intuitive and dynamic experience. This update includes everything from completely rewritten compiler and runtime, an overhauled API with new utilities, improved performance, and broader compatibility - all of which I'm are eager to share with you.
-
-Let me first address the lack of updates NativeWind version 3 beta. As you may recall, I had initially planned to launch the third iteration of NativeWind. However, during its development, it became clear that did not meet my future requirements and I became dishearten about the project. I was also getting married and became distracted with other life events. I apologize for the lack of communication and I'm sorry for the inconvenience this may have caused. However, I have my best ideas while away from the computer and during that time I was able to re-evaluate NativeWind and develop a new vision for the project.
+I'm happy to announce the release of NativeWind v4! This release is the culmination of months of work and I'm excited to share it with you. Previously NativeWind focused on static styling, simply changing `className`->`style` at build time. NativeWind v4 is a complete rewrite, and now supports highly dynamic styles, allowing you to use Tailwind CSS's full feature set.
 
 ## The Updated Architecture
 
@@ -12,61 +10,59 @@ NativeWind v4 is distinguished by its transition away from using a Babel plugin 
 
 1. **The `className` prop can accessed inside your components**.
 1. NativeWind will wrap less components and generally only components which are leaf nodes in the render tree, greatly improving performance
-1. NativeWind can distinguish between static & dynamic styles and can alternate between a lightweight or full featured wrapper.
 
 Preserving the `className` prop fixes the biggest limitation and source of confusion with NativeWind, and allows you to use 3rd party `className` management libraries (`tailwind-variants`/`classnames`/`clsx`/`cva`/etc)
 
 ```tsx title=MyApp.js
 // There is no need to wrap this component! `className` is accessible inside the component!
 export function MyText({ className, ...props }: TextProps) {
-  return <Text className=`text-black ${className}` {...props} />
+  return <Text className={`text-black ${className}`} {...props} />;
 }
 ```
 
-For NativeWind to transform `className`->`style`, components need to be "tagged" with a `cssInterop` or `propRemap` wrapper.
-
-- `cssInterop`: enables style evaluation and may wrap your component in additional context/hooks. Can affect performance and generally should only be used on native components
-- `propRemap`: a lightweight wrapper that changes props to `style` objects, but does not resolve styles or add any hooks
-
-We'll discuss these more in the new API section.
-
 ## New Features
-
-### Improved compilation
-
-NativeWind v4 resolves the majority of caching issues! **This includes hot reloading when you make change to your `tailwind.config.js` theme!**. This is a huge improvement over v2, which required you to restart the bundler, often without a cache, to see theme changes. This greatly improves the development experience and allows you to quickly iterate on designs made with NativeWind.
-
-Additionally, the style compiler has be rewritten using [lightningcss](https://lightningcss.dev/) and should be significantly faster than v2.
 
 ### CSS Variables
 
-NativeWind has been updated to include support for CSS Custom Properties, commonly known as CSS Variables. You now have the flexibility to define these variables in a variety of ways: within your `tailwind.config.js`, inline on individual components, or directly via CSS.
+NativeWind has been updated to include support for CSS Custom Properties, commonly known as CSS Variables.
 
 ```jsx title=tailwind.config.js
-// in your theme
+// You can define them as a theme value
 module.exports = {
   theme: {
     extend: [
       colors: {
-        brand: "var(--my-brand-color)"
+        brand: "var(--brand-color)"
       }
     ]
   },
-  plugins: [
-    plugin(function ({ addBase }) {
-      addBase({
-        ":root": { "--my-brand-color": "red" },
-      })
-    })
-  ]
 }
 ```
 
+You can define them inline
+
 ```tsx title=App.tsx
-// inline on a component, using the `vars()` helper
 import { vars } from "nativewind";
-<View style={vars({ "--my-brand-color": "red" })} />;
+<View style={vars({ "--brand-color": "red" })}>
+  <Text className="text-brand">Red text!</Text>
+</View>;
 ```
+
+Part of your theme
+
+```jsx title=tailwind.config.js
+module.exports = {
+  plugins: [
+    plugin(function ({ addBase }) {
+      addBase({
+        ":root": { "--brand-color": "red" },
+      });
+    }),
+  ],
+};
+```
+
+Or directly in your CSS
 
 ```css title=global.css
 /* in CSS */
@@ -81,84 +77,6 @@ import { vars } from "nativewind";
   }
 }
 ```
-
-### CSS Specificity
-
-NativeWind now matches the CSS specificity of the Tailwind CSS, applying more consistent styling across native and web.
-
-### `rem` Support
-
-NativeWind v4 includes `rem` unit support! Allow you to change the global scaling of your app. By default this behaviour is disabled, can be If you need to modify the default `rem` value or disable `rem` inlining, adjust your `metro.config.js`:
-
-```jsx title=metro.config.js
-export default withNativeWind(config, {
-  input: "global.css",
-  inlineNativeRem: false // Disable rem inlining
-  // OR
-  inlineNativeRem: 16 // Set a custom rem value
-})
-```
-
-### Improved support for React Native core components (native only)
-
-NativeWind v4 adds more sensible defaults for the React Native core components. These includes automatically mapping some styles to props.
-
-```tsx
-// You write
-<ActivityIndicator className="bg-black text-white" />
-
-// ❌ NativeWind v2
-<ActivityIndicator style={{ backgroundColor: "rgba(0, 0, 0, 1)", color: "rgba(255, 255, 255, 1)" }}/>
-
-// ✅ NativeWind v4
-<ActivityIndicator color="rgba(255, 255, 255, 1)" style={{ backgroundColor: "rgba(0, 0, 0, 1)" }}/>
-```
-
-### Tailwind Groups and parent state modifiers
-
-NativeWind v4 now supports the `group` and `group/<name>` syntax.
-
-https://tailwindcss.com/docs/hover-focus-and-other-states#differentiating-nested-groups
-
-### Theme Functions
-
-The theme functions have been improved and now support nested functions.
-
-```jsx title=tailwind.config.js
-import { platformSelect, platformColor, pixelRatioSelect, hairlineWidth } from "nativewind/theme"
-module.exports = {
-  theme: {
-    extend: {
-      colors: {
-        brand: platformSelect({
-          ios: platformColor('label'),
-          android: platformColor('?android:attr/textColor')
-          default: "var(--brand-color, black)
-        })
-      }
-      borderWidth: {
-        "hw": pixelRatioSelect({
-          1: hairlineWidth(),
-          1.5: 1,
-          default: hairlineWidth()
-        })
-      }
-    }
-  }
-}
-```
-
-### React 18 Improvements
-
-React 18 has significantly altered our approach to React applications. New features like React Server Components and the Suspense APIs necessitated a more strategic viewpoint from library authors. In response to this, NativeWind has been rewritten to ensure compatibility with Suspense APIs will work with React Server Components on web.
-
-### React Native Web improvements
-
-React Native Web has upcoming "compiler-less" mode which removes the built in CSS StyleSheet compiler, allows for smaller/faster web applications. As NativeWind already pre-builds your CSS, you'll be able to take advantage of this from day 1.
-
-## Experimental Features
-
-The focus of this release is to give you a more stable version of NativeWind. However, we have also included some experimental features that we are excited to share with you that showcase the future of NativeWind. These features will work in a limited capacity and you are welcome to test them, but they an active work-in-progress and are not recommended for production use.
 
 ### Animations (experimental):
 
@@ -198,67 +116,11 @@ NativeWind adds experimental support for Tailwind CSS transition classes.
 
 Transitions are dynamic, and work with both Tailwind CSS and inline styles.
 
-### Custom CSS (experimental)
+### Tailwind Groups and parent state modifiers
 
-You may have noticed many of our examples include raw CSS. NativeWind now supports custom CSS, allowing you to use Tailwind CSS alongside your own custom styles. Note that we currently only support a limited subset of CSS rules and properties. Further documentation is on the way.
+NativeWind v4 now supports the `group` and `group/<name>` syntax.
 
-```jsx title=global.css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-.my-class {
-  @apply text-base text-black
-}
-
-// Media queries are supported
-@media (prefers-color-scheme: dark) {
-  .my-class {
-    @apply text-base text-white
-  }
-}
-```
-
-```jsx titleApp.tsx
-import { Text, View } from "react-native";
-
-export function Test() {
-  return (
-    <View className="container">
-      <Text className="my-class">Hello world!</Text>
-    </View>
-  );
-}
-```
-
-**`:root` and `*` selectors**
-
-The `:root` and `*` CSS selectors are two special CSS selectors that disobey NativeWind's standard "class only selector" rule. Both selectors mimic the standard CSS behavior, but can only contain CSS variables - style definitions will be ignored.
-
-`:root` - Set CSS variables at the root of your application
-`*` - Set default CSS variables for all components. These override any cascading variables
-
-Additionally these selectors have special syntax to enable their Dark Mode variations.
-
-```css
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* ... */
-  }
-
-  * {
-    /* ... */
-  }
-}
-
-/* If you have defined `darkMode: 'class'` in your tailwind.config.js` */
-.dark {
-  /* ... */
-}
-.dark * {
-  /* ... */
-}
-```
+https://tailwindcss.com/docs/hover-focus-and-other-states#differentiating-nested-groups
 
 ### Container Queries (experimental)
 
@@ -294,6 +156,109 @@ A subset of the Container Query spec is also available within your CSS
 
 `container-type` and style-based container queries are not supported.
 
+### Improved compilation
+
+NativeWind v4 resolves the majority of caching issues! **This includes hot reloading when you make change to your `tailwind.config.js` theme!**. This is a huge improvement over v2, which required you to restart the bundler, often without a cache, to see theme changes. This greatly improves the development experience and allows you to quickly iterate on designs made with NativeWind.
+
+Additionally, the style compiler has be rewritten using [lightningcss](https://lightningcss.dev/) and should be significantly faster than v2.
+
+### `rem` Support
+
+NativeWind v4 includes `rem` unit support! Allow you to change the global scaling of your app. By default this behaviour is disabled, can be If you need to modify the default `rem` value or disable `rem` inlining, adjust your `metro.config.js`:
+
+```jsx title=metro.config.js
+export default withNativeWind(config, {
+  input: "global.css",
+  inlineNativeRem: false // Disable rem inlining
+  // OR
+  inlineNativeRem: 16 // Set a custom rem value
+})
+```
+
+### Improved support for React Native core components (native only)
+
+NativeWind v4 adds more sensible defaults for the React Native core components. These includes automatically mapping some styles to props.
+
+```tsx
+// You write
+<ActivityIndicator className="bg-black text-white" />
+
+// ❌ NativeWind v2
+<ActivityIndicator style={{ backgroundColor: "rgba(0, 0, 0, 1)", color: "rgba(255, 255, 255, 1)" }}/>
+
+// ✅ NativeWind v4
+<ActivityIndicator color="rgba(255, 255, 255, 1)" style={{ backgroundColor: "rgba(0, 0, 0, 1)" }}/>
+```
+
+### Theme Functions
+
+The theme functions have been improved and now support nested functions.
+
+```jsx title=tailwind.config.js
+import { platformSelect, platformColor, pixelRatioSelect, hairlineWidth } from "nativewind/theme"
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        brand: platformSelect({
+          ios: platformColor('label'),
+          android: platformColor('?android:attr/textColor')
+          default: "var(--brand-color, black)
+        })
+      }
+      borderWidth: {
+        "hw": pixelRatioSelect({
+          1: hairlineWidth(),
+          1.5: 1,
+          default: hairlineWidth()
+        })
+      }
+    }
+  }
+}
+```
+
+### React 18 Improvements
+
+React 18 has significantly altered our approach to React applications. New features like React Server Components and the Suspense APIs necessitated a more strategic viewpoint from library authors. In response to this, NativeWind has been rewritten to ensure compatibility with Suspense APIs will work with React Server Components on web.
+
+### React Native Web improvements
+
+React Native Web has upcoming "compiler-less" mode which removes the built in CSS StyleSheet compiler, allows for smaller/faster web applications. As NativeWind already pre-builds your CSS, you'll be able to take advantage of this from day 1.
+
+### Custom CSS (experimental)
+
+You may have noticed many of our examples include raw CSS. NativeWind now supports custom CSS, allowing you to use Tailwind CSS alongside your own custom styles. Note that we currently only support a limited subset of CSS rules and properties. Further documentation is on the way.
+
+```jsx title=global.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.my-class {
+  @apply text-base text-black
+}
+
+// Media queries are supported
+@media (prefers-color-scheme: dark) {
+  .my-class {
+    @apply text-base text-white
+  }
+}
+```
+
+```jsx titleApp.tsx
+import { Text, View } from "react-native";
+
+export function Test() {
+  return (
+    <View className="container">
+      <Text className="my-class">Hello world!</Text>
+    </View>
+  );
+}
+```
+
 ## Breaking Changes from v2
 
 The introduction of a new architecture inevitably brings some breaking changes.
@@ -324,6 +289,10 @@ const App = () => {
 };
 ```
 
+### CSS Specificity
+
+NativeWind has change its specificity algorithm. You can read more about it here: https://www.nativewind.dev/v4/core-concepts/style-specificity
+
 ### Base Scaling Modifications
 
 NativeWind now processed the `rem` unit, a significant change affecting all `rem` based styles. Previously, NativeWind matched Tailwind CSS documentation's scaling, replacing `rem` values with their `px` equivalents. Now, the default `rem` value is set to 14, aligning with `<Text />` default. As a result, your app might appear smaller due to the scale change from the static 16px to 14. To revert to the previous behavior, set the `inlineNativeRem` option in your `withNativeWind` config:
@@ -336,10 +305,6 @@ export default withNativeWind(config, {
   inlineNativeRem: 16 // Modify this
 })
 ```
-
-### CSS Specificity
-
-NativeWind used to resolve styles right->left. This is not how Tailwind CSS works and was a general source of confusion. NativeWind now resolves styles in specificity order, matching the web. You may been to rearrange your styles to match the new order.
 
 ### `gap-` polyfill has been removed
 
@@ -434,26 +399,16 @@ Simply add the variables to a component’s style tag using the new `vars()` fun
 - `**odd/even/first/last`: These modifiers are temporary unavailable. They will be added in a future version.
 - `NativeWindStyleSheet.getSSRStyles()` has been removed and is no longer required.
 
-## New Troubleshooting
-
-NativeWind's setup isn't difficult, but it does require multiple plugins to be configured correctly and does not provide a clear troubleshooting guide when mistakes are made. To help with troubleshooting, simply add `import 'nativewind/doctor'` anywhere into your application and it will attempt to diagnose any setup issues.
-
-It verifies
-
-- That the jsx transform is present (invalid jsx setup)
-- Styles have been correctly injected (invalid metro setup)
-- If custom styles exist (invalid Tailwind setup)
-
 ## New API
 
-### `propRemap`
+### `remapProps`
 
 `propRemap` accepts a `Component` as the first argument and a mapping as the second. The mapping is in the format `{ [existing prop]: [new prop] | true }`, and it returns a typed version of the component.
 
 An example of how NativeWind maps `<FlatList />` is:
 
 ```jsx
-propRemap(FlatList, {
+remapProps(FlatList, {
   style: "className",
   ListFooterComponentStyle: "ListFooterComponentClassName",
   ListHeaderComponentStyle: "ListHeaderComponentClassName",
@@ -466,89 +421,21 @@ propRemap(FlatList, {
 <FlatList className="w-10" ListHeaderComponentClassName="bg-black" />;
 ```
 
-`propRemap` is a lightweight wrapper which doesn't generate any styles. Instead it converts Tailwind CSS strings to `OpaqueStyleTokens` (readonly empty objects). These tokens should be treat just any other other style object, and once passed to a component tagged with `cssInterop`, they will be converted into styles.
+`remapProps` is a lightweight wrapper which doesn't generate any styles. Instead it converts Tailwind CSS strings to `OpaqueStyleTokens` (readonly empty objects). These tokens should be treat just any other other style object, and once passed to a component tagged with `remapProps`, they will be converted into styles.
 
-For TypeScript users, guides on creating declaration files to type 3rd party components correctly will be available. Alternatively, you can directly use the returned component:
+(See the documentation for more information)[https://www.nativewind.dev/v4/api/remap-props]
 
-```jsx
-jsxCopy code
-const StyledComponent = remapClassNameProps(MyComponent, {
-  props: {
-    style: "className",
-    otherStyle: "otherClassName",
-  }
-});
+**`cssInterop(component, mapping)`**
 
-```
+`cssInterop` signals to NativeWind that a specific component should be treated as a primitive. On this component, it sets up the dynamic style logic.
 
-**`enableCSSInterop(component, mapping)`**
+Before using `cssInterop` you should could consider if `remapProps` would be more suitable. The main reasons to use `cssInterop` are:
 
-`enableCSSInterop` signals to NativeWind that a specific component should be treated as a primitive. On this component, it sets up the dynamic style logic.
-
-Before using `enableCSSInterop` you should could consider if `remapClassNameProps` would be more suitable. The main reasons to use `enableCSSInterop` are:
-
-- The component renders a Native Component (e.g `<View />`)
+- The component renders a Native Component
 - Moving a style property to an prop
   - Note: If this is not a 3rd party component, you should consider simply using the style prop as this will not work on web.
 
-For reference, NativeWind enable's the CSS interop only for these Core Components, with all others using `remapClassNameProps`:
-
-```jsx
-enableCSSInterop(Image, { className: "style" });
-enableCSSInterop(Pressable, { className: "style" });
-enableCSSInterop(Text, { className: "style" });
-enableCSSInterop(View, { className: "style" });
-enableCSSInterop(ActivityIndicator, {
-  className: {
-    target: "style"
-    nativeStyleToProp: { color: true }
-  }
-});
-enableCSSInterop(StatusBar, {
-  className: {
-    target: false
-    nativeStyleToProp: { backgroundColor: true }
-  }
-});
-```
-
-An example use case on when to use `enableCSSInterop` is `react-native-svg`, which renders Native Components, needs styles mapped to props and is typically very low in the render tree.
-
-```tsx
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Circle, Rect from } 'react-native-svg';
-
-enableCSSInterop(Svg, {
-  className: {
-    target: "style",
-    nativeStyleToProp: { width: true, height: true }
-  },
-});
-enableCSSInterop(Circle, {
-  className: {
-    target: "style",
-    nativeStyleToProp: { width: true, height: true, stroke: true, strokeWidth: true, fill: true }
-  },
-});
-enableCSSInterop(Rect, {
-  className: {
-    target: "style",
-    nativeStyleToProp: { width: true, height: true, stroke: true, strokeWidth: true, fill: true }
-  },
-});
-
-export function SvgExample () {
-  return (
-    <View className="inset-0 items-center content-center">
-      <Svg className="h-1/2 w-1/2" viewBox="0 0 100 100" >
-        <Circle cx="50" cy="50" r="45" className="stroke-blue-500 stroke-2 fill-green-500" />
-        <Rect x="15" y="15" className="w-16 h-16 stroke-red-500 stroke-2 fill-yellow-500" />
-      </Svg>
-    </View>
-  );
-}
-```
+(See the documentation for more information)[https://www.nativewind.dev/v4/api/css-interop]
 
 ### `vars()`
 
