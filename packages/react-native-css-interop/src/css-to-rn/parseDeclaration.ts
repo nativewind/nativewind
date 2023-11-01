@@ -2174,7 +2174,7 @@ function parseBorderStyle(
     return borderStyle.top;
   }
 
-  options.addValueWarning(JSON.stringify(borderStyle.top));
+  options.addValueWarning(borderStyle.top);
 
   return undefined;
 }
