@@ -6,12 +6,12 @@ I'm happy to announce the release of NativeWind v4! This release is the culminat
 
 ## The Updated Architecture
 
-NativeWind v4 is distinguished by its transition away from using a Babel plugin to a `jsxImportSource` transform. In the older architecture, Babel wrapped every component with a `className` prop in the `StyledComponent` wrapper (or you manually wrapped the component using `styled()`) and converted `className`->`style`. With the `jsxImportSource` transform, only native components are wrapper (`<View/>`/`<Text/>`/etc). This has has major advantages of:
+NativeWind v4 is distinguished by its transition away from using a Babel plugin to a `jsxImportSource` transform. In the older architecture, Babel wrapped every component with a `className` prop in the `StyledComponent` wrapper (or you manually wrapped the component using `styled()`) and converted `className`->`style`. With the `jsxImportSource` transform, only native components need to be wrapped (`<View/>`,`<Text/>`, etc). This has has major advantages of:
 
 1. **The `className` prop can accessed inside your components**.
-1. NativeWind will wrap less components and generally only components which are leaf nodes in the render tree, greatly improving performance
+1. NativeWind will wrap less components and generally only components which are leaf nodes in the render tree
 
-Preserving the `className` prop fixes the biggest limitation and source of confusion with NativeWind, and allows you to use 3rd party `className` management libraries (`tailwind-variants`/`classnames`/`clsx`/`cva`/etc)
+Preserving the `className` prop fixes the biggest limitation and source of confusion with NativeWind, and allows you to use 3rd party `className` management libraries (`tailwind-variants`,`classnames`,`clsx`,`cva`,etc)
 
 ```tsx title=MyApp.js
 // There is no need to wrap this component! `className` is accessible inside the component!
