@@ -14,9 +14,12 @@ import {
   StatusBar,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
   VirtualizedList,
   Image,
+  TouchableHighlight,
+  TouchableWithoutFeedback,
 } from "react-native";
 
 import { defaultCSSInterop } from "./runtime/css-interop";
@@ -183,6 +186,9 @@ remapProps(KeyboardAvoidingView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
 });
+remapProps(TouchableOpacity, { className: "style" });
+remapProps(TouchableHighlight, { className: "style" });
+remapProps(TouchableWithoutFeedback, { className: "style" });
 remapProps(VirtualizedList, {
   className: "style",
   ListFooterComponentClassName: "ListFooterComponentStyle",
