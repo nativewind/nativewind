@@ -103,7 +103,7 @@ export function MyText({ bold, italic, lineThrough, ...props }) {
 By default NativeWind maps `className`->`style`, but it can handle the mapping of complex components.
 
 ```tsx
-remapClassNameProps(FlatList, {
+remapProps(FlatList, {
   className: "style",
   ListFooterComponentClassName: "ListFooterComponentStyle",
   ListHeaderComponentClassName: "ListHeaderComponentStyle",

@@ -21,8 +21,8 @@ const CustomizedButton = remapProps(ThirdPartyButton, {
 
 ```tsx
 // Create a new prop and map it to an existing prop
-remapClassNameProps(component, { "new-prop": "existing-prop" });
+remapProps(component, { "new-prop": "existing-prop" });
 
 // Override an existing prop.
-remapClassNameProps(component, { prop: true });
+remapProps(component, { prop: true });
 ```
