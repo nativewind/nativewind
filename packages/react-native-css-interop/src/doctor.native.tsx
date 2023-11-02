@@ -7,8 +7,10 @@ export function verifyJSX() {
   return <react-native-css-interop-jsx-pragma-check /> === true;
 }
 
-export function verifyFlag(name: string, value: unknown = true) {
-  return StyleSheet[INTERNAL_FLAGS][name] === value;
+export function verifyFlag(name: string, value?: unknown) {
+  return value === undefined
+    ? Boolean(StyleSheet[INTERNAL_FLAGS][name])
+    : StyleSheet[INTERNAL_FLAGS][name] === value;
 }
 
 export function verifyReceivedData() {
