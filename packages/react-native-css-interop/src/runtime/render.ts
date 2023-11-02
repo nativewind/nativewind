@@ -5,7 +5,6 @@ import {
   createElement,
   forwardRef,
 } from "react";
-import { Platform } from "react-native";
 import type {
   BasicInteropFunction,
   EnableCssInteropOptions,
