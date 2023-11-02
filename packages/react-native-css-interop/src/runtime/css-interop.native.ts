@@ -162,7 +162,10 @@ export function remapProps<P, M>(
   return;
 }
 
-const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>();
+const animatedCache = new Map<
+  ComponentType<any> | string,
+  ComponentType<any>
+>();
 export function createAnimatedComponent(
   Component: ComponentType<any>,
 ): ComponentType<any> {

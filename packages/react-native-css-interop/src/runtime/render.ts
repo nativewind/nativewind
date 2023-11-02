@@ -1,5 +1,20 @@
-import { ComponentType, ReactNode, createElement } from "react";
-import type { BasicInteropFunction, JSXFunction } from "../types";
+import {
+  ComponentType,
+  PropsWithChildren,
+  ReactNode,
+  createElement,
+  forwardRef,
+} from "react";
+import { Platform } from "react-native";
+import type {
+  BasicInteropFunction,
+  EnableCssInteropOptions,
+  InteropFunction,
+  JSXFunction,
+} from "../types";
+import { defaultCSSInterop } from "./css-interop";
+import { getNormalizeConfig } from "./native/prop-mapping";
+import { styleMetaMap } from "./native/misc";
 
 export type InteropTypeCheck<T> = {
   type: ComponentType<T>;
@@ -9,7 +24,10 @@ export type InteropTypeCheck<T> = {
     children: ReactNode,
   ) => ReturnType<typeof createElement>;
 };
-export const interopComponents = new WeakMap<object, InteropTypeCheck<any>>();
+export const interopComponents = new Map<
+  object | string,
+  InteropTypeCheck<any>
+>();
 
 export function render<P>(
   jsx: JSXFunction<P>,
@@ -21,6 +39,14 @@ export function render<P>(
     if (type === "react-native-css-interop-jsx-pragma-check") {
       return true;
     }
+  }
+
+  if (
+    typeof type === "string" &&
+    Platform.OS !== "web" &&
+    !interopComponents.has(type)
+  ) {
+    cssInterop(type, { className: "style" });
   }
 
   const interop = interopComponents.get(type) as
@@ -52,4 +78,81 @@ export function createElementAndCheckCssInterop(
   return !interop || !interop.check(args[1])
     ? createElement(...args)
     : interop.createElementWithInterop(args[1], args.slice(2) as ReactNode);
+}
+
+export function cssInterop<T extends {}, M>(
+  component: ComponentType<T> | string,
+  mapping: EnableCssInteropOptions<T> & M,
+  interop: InteropFunction = defaultCSSInterop,
+) {
+  const config = getNormalizeConfig(mapping);
+
+  let render: any = <P extends { ___pressable?: true }>(
+    { children, ___pressable, ...props }: PropsWithChildren<P>,
+    ref: unknown,
+  ) => {
+    if (ref) {
+      (props as any).ref = ref;
+    }
+
+    if (___pressable) {
+      return createElement(component, props as unknown as T, children);
+    } else {
+      return createElement(
+        ...interop(component, config, props as unknown as T, children),
+      );
+    }
+  };
+
+  if (__DEV__) {
+    if (typeof component === "string") {
+      render.displayName = `CSSInterop.${component}`;
+    } else {
+      render.displayName = `CSSInterop.${
+        component.displayName ?? component.name ?? "unknown"
+      }`;
+    }
+  }
+
+  render = forwardRef(render);
+
+  const checkArray = (props: any[]) =>
+    props.some((prop): boolean => {
+      return Array.isArray(prop) ? checkArray(prop) : styleMetaMap.has(prop);
+    });
+
+  const interopComponent: InteropTypeCheck<T> = {
+    type: render,
+    createElementWithInterop(props, children) {
+      return createElement(...interop(component, config, props, children));
+    },
+    check(props) {
+      for (const [
+        targetProp,
+        { sources, nativeStyleToProp },
+      ] of config.config) {
+        if (nativeStyleToProp) return true;
+
+        for (const source of sources) {
+          if (typeof props[source] === "string") {
+            return true;
+          }
+        }
+
+        const target: any = props[targetProp];
+
+        if (Array.isArray(target)) {
+          if (checkArray(target)) {
+            return true;
+          }
+        } else if (styleMetaMap.has(target)) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+  };
+
+  interopComponents.set(component, interopComponent);
 }
