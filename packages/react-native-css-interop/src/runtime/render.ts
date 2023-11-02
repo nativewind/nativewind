@@ -41,13 +41,14 @@ export function render<P>(
     }
   }
 
-  if (
-    typeof type === "string" &&
-    Platform.OS !== "web" &&
-    !interopComponents.has(type)
-  ) {
-    cssInterop(type, { className: "style" });
-  }
+  // TODO: Try and add this back
+  // if (
+  //   typeof type === "string" &&
+  //   Platform.OS !== "web" &&
+  //   !interopComponents.has(type)
+  // ) {
+  //   cssInterop(type, { className: "style" });
+  // }
 
   const interop = interopComponents.get(type) as
     | InteropTypeCheck<P>
