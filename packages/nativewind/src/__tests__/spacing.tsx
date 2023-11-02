@@ -28,6 +28,7 @@ describe("Spacing - Margin", () => {
     ["ml-0", style({ marginLeft: 0 })],
     ["ms-0", style({ marginStart: 0 })],
     ["me-0", style({ marginEnd: 0 })],
+    ["m-auto", style({ margin: "auto" })],
   );
 });
 

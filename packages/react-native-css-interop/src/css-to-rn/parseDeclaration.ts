@@ -1034,51 +1034,75 @@ export function parseDeclaration(
       return;
     case "margin":
       handleStyleShorthand("margin", {
-        "margin-top": parseSize(declaration.value.top, parseOptions),
-        "margin-bottom": parseSize(declaration.value.bottom, parseOptions),
-        "margin-left": parseSize(declaration.value.left, parseOptions),
-        "margin-right": parseSize(declaration.value.right, parseOptions),
+        "margin-top": parseSize(declaration.value.top, parseOptions, {
+          allowAuto: true,
+        }),
+        "margin-bottom": parseSize(declaration.value.bottom, parseOptions, {
+          allowAuto: true,
+        }),
+        "margin-left": parseSize(declaration.value.left, parseOptions, {
+          allowAuto: true,
+        }),
+        "margin-right": parseSize(declaration.value.right, parseOptions, {
+          allowAuto: true,
+        }),
       });
       return;
     case "margin-top":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, parseOptions),
+        parseSize(declaration.value, parseOptions, {
+          allowAuto: true,
+        }),
       );
     case "margin-bottom":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, parseOptions),
+        parseSize(declaration.value, parseOptions, {
+          allowAuto: true,
+        }),
       );
     case "margin-left":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, parseOptions),
+        parseSize(declaration.value, parseOptions, {
+          allowAuto: true,
+        }),
       );
     case "margin-right":
       return addStyleProp(
         declaration.property,
-        parseSize(declaration.value, parseOptions),
+        parseSize(declaration.value, parseOptions, {
+          allowAuto: true,
+        }),
       );
     case "margin-block-start":
       return addStyleProp(
         "margin-start",
-        parseLengthPercentageOrAuto(declaration.value, parseOptions),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions, {
+          allowAuto: true,
+        }),
       );
     case "margin-block-end":
       return addStyleProp(
         "margin-end",
-        parseLengthPercentageOrAuto(declaration.value, parseOptions),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions, {
+          allowAuto: true,
+        }),
       );
     case "margin-inline-start":
       return addStyleProp(
         "margin-start",
-        parseLengthPercentageOrAuto(declaration.value, parseOptions),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions, {
+          allowAuto: true,
+        }),
       );
     case "margin-inline-end":
       return addStyleProp(
         "margin-end",
-        parseLengthPercentageOrAuto(declaration.value, parseOptions),
+        parseLengthPercentageOrAuto(declaration.value, parseOptions, {
+          allowAuto: true,
+        }),
       );
     case "margin-block":
       handleStyleShorthand("margin-block", {
@@ -1827,13 +1851,10 @@ function parseAngle(
   }
 }
 
-type ParseSizeOptions = ParseDeclarationOptionsWithValueWarning & {
-  allowAuto?: boolean;
-};
-
 function parseSize(
   size: Size | MaxSize,
-  { allowAuto = false, ...options }: ParseSizeOptions,
+  options: ParseDeclarationOptionsWithValueWarning,
+  { allowAuto = false } = {},
 ) {
   switch (size.type) {
     case "length-percentage":
@@ -1895,11 +1916,16 @@ function parseColor(
 function parseLengthPercentageOrAuto(
   lengthPercentageOrAuto: LengthPercentageOrAuto,
   options: ParseDeclarationOptionsWithValueWarning,
+  { allowAuto = false } = {},
 ) {
   switch (lengthPercentageOrAuto.type) {
     case "auto":
-      options.addValueWarning(lengthPercentageOrAuto.type);
-      return;
+      if (allowAuto) {
+        return lengthPercentageOrAuto.type;
+      } else {
+        options.addValueWarning(lengthPercentageOrAuto.type);
+        return undefined;
+      }
     case "length-percentage":
       return parseLength(lengthPercentageOrAuto.value, options);
   }
