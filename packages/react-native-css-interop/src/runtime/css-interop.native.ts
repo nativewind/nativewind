@@ -80,6 +80,10 @@ export const defaultCSSInterop: InteropFunction = (
 
       return style;
     }, [props.style]);
+  } else {
+    useAnimatedStyle(() => {
+      return {};
+    }, [undefined]);
   }
 
   reactGlobal.isInComponent = false;
