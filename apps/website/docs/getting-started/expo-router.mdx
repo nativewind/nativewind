@@ -37,20 +37,7 @@ module.exports = {
 If your project does not have a `metro.config.js` run `npx expo customize metro.config.js`
 
 <Tabs>
-<TabItem value="SDK 50+">
-
-```diff title="metro.config.js"
-const { getDefaultConfig } = require("expo/metro-config");
-+ const { withNativeWind } = require('nativewind/metro');
-
-const config = getDefaultConfig(__dirname)
-
-- module.exports = config
-+ module.exports = withNativeWind(config, { input: './your-css-file.css' })
-```
-
-</TabItem >
-<TabItem value="SDK <= 49">
+<TabItem value="SDK 49">
 
 ```diff title="metro.config.js"
 const { getDefaultConfig } = require("expo/metro-config");
@@ -64,6 +51,19 @@ const { getDefaultConfig } = require("expo/metro-config");
 ```
 
 </TabItem>
+<TabItem value="SDK 50+">
+
+```diff title="metro.config.js"
+const { getDefaultConfig } = require("expo/metro-config");
++ const { withNativeWind } = require('nativewind/metro');
+
+const config = getDefaultConfig(__dirname)
+
+- module.exports = config
++ module.exports = withNativeWind(config, { input: './your-css-file.css' })
+```
+
+</TabItem >
 
 </Tabs>
 

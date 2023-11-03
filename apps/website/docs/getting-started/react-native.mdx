@@ -56,6 +56,19 @@ module.exports = {
 <Tabs groupId="framework">
   <TabItem value="Expo">
     <Tabs groupId="sdk">
+      <TabItem value="Expo SDK 49">
+
+        ```diff title="metro.config.js"
+        const { getDefaultConfig } = require("expo/metro-config");
+        + const { withNativeWind } = require('nativewind/metro');
+
+        - const config = getDefaultConfig(__dirname)
+        + const config = getDefaultConfig(__dirname, { isCSSEnabled: true })
+
+        - module.exports = config
+        + module.exports = withNativeWind(config, { input: './your-css-file.css' })
+        ```
+      </TabItem>
       <TabItem value="Expo SDK 50">
 
         ```diff title="metro.config.js"
@@ -69,19 +82,6 @@ module.exports = {
         ```
 
         </TabItem >
-        <TabItem value="Expo SDK 49">
-
-        ```diff title="metro.config.js"
-        const { getDefaultConfig } = require("expo/metro-config");
-        + const { withNativeWind } = require('nativewind/metro');
-
-        - const config = getDefaultConfig(__dirname)
-        + const config = getDefaultConfig(__dirname, { isCSSEnabled: true })
-
-        - module.exports = config
-        + module.exports = withNativeWind(config, { input: './your-css-file.css' })
-        ```
-      </TabItem>
     </Tabs>
 
   </TabItem>
