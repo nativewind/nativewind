@@ -9,6 +9,7 @@ module.exports = function () {
           importSource: "react-native-css-interop",
         },
       ],
+      "react-native-reanimated/plugin",
     ],
   };
 };
