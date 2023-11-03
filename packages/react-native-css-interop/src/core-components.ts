@@ -31,7 +31,7 @@ import type {
 } from "./types";
 import { remapProps } from "./runtime/css-interop";
 import { getNormalizeConfig } from "./runtime/native/prop-mapping";
-import { styleMetaMap } from "./testing-library";
+import { styleMetaMap } from "./runtime/native/misc";
 
 export function unstable_styled<P extends object, M>(
   component: ComponentType<P>,
