@@ -33,7 +33,7 @@ export function render<P>(
   props: any,
   ...args: Parameters<JSXFunction<P>> extends [any, any, ...infer R] ? R : never
 ) {
-  if (__DEV__) {
+  if (process.env.NODE_ENV === "development") {
     if (type === "react-native-css-interop-jsx-pragma-check") {
       return true;
     }
@@ -105,7 +105,7 @@ export function cssInterop<T extends {}, M>(
     }
   };
 
-  if (__DEV__) {
+  if (process.env.NODE_ENV === "development") {
     if (typeof component === "string") {
       render.displayName = `CSSInterop.${component}`;
     } else {
