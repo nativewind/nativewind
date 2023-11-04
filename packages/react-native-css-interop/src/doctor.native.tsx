@@ -1,4 +1,4 @@
-import { globalStyles } from "./runtime/native/misc";
+import { globalStyles } from "./runtime/globals";
 import { StyleSheet } from "./runtime/native/stylesheet";
 import { INTERNAL_FLAGS } from "./shared";
 

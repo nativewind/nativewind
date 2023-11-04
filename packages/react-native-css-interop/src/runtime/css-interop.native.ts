@@ -11,10 +11,10 @@ import { reactGlobal } from "./signals";
 import { Pressable, View } from "react-native";
 import { InheritanceProvider } from "./native/inheritance";
 import { useInteropComputed } from "./native/interop";
-import { opaqueStyles, styleMetaMap, styleSpecificity } from "./native/misc";
 import { getNormalizeConfig } from "./native/prop-mapping";
 import { getGlobalStyle, getSpecificity } from "./native/stylesheet";
 import { interopComponents } from "./render";
+import { opaqueStyles, styleSpecificity, styleMetaMap } from "./globals";
 
 export const defaultCSSInterop: InteropFunction = (
   component,

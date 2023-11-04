@@ -2,19 +2,7 @@ import { createContext } from "react";
 import { AccessibilityInfo, Dimensions } from "react-native";
 import { createSignal } from "../signals";
 import { INTERNAL_RESET, INTERNAL_SET } from "../../shared";
-import {
-  ContainerRuntime,
-  ExtractedAnimation,
-  Specificity,
-  StyleMeta,
-  StyleProp,
-} from "../../types";
-
-export const animationMap = new Map<string, ExtractedAnimation>();
-export const globalStyles = new Map<string, StyleProp>();
-export const opaqueStyles = new WeakMap<object, StyleProp>();
-export const styleSpecificity = new WeakMap<object, Specificity>();
-export const styleMetaMap = new WeakMap<NonNullable<StyleProp>, StyleMeta>();
+import { ContainerRuntime } from "../../types";
 
 export const ContainerContext = createContext<Record<string, ContainerRuntime>>(
   {},

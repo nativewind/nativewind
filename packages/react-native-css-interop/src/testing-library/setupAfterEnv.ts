@@ -1,6 +1,6 @@
 import { expect } from "@jest/globals";
 import matchers from "expect/build/matchers";
-import { styleMetaMap } from "../runtime/native/misc";
+import { styleMetaMap } from "../runtime/globals";
 
 // I do not know why this is needed
 matchers.customTesters = [];

@@ -1,9 +1,4 @@
-import {
-  ComponentType,
-  PropsWithChildren,
-  createElement,
-  forwardRef,
-} from "react";
+import { ComponentType, createElement, forwardRef } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -23,15 +18,16 @@ import {
 } from "react-native";
 
 import { defaultCSSInterop } from "./runtime/css-interop";
-import { InteropTypeCheck, interopComponents, render } from "./runtime/render";
+import { cssInterop, render } from "./runtime/render";
 import type {
   ComponentTypeWithMapping,
   EnableCssInteropOptions,
   InteropFunction,
 } from "./types";
 import { remapProps } from "./runtime/css-interop";
-import { getNormalizeConfig } from "./runtime/native/prop-mapping";
-import { styleMetaMap } from "./runtime/native/misc";
+import { defaultInteropRef } from "./runtime/globals";
+
+defaultInteropRef.current = defaultCSSInterop;
 
 export function unstable_styled<P extends object, M>(
   component: ComponentType<P>,
@@ -53,83 +49,6 @@ export function unstable_styled<P extends object, M>(
       props.key,
     );
   }) as unknown as ComponentTypeWithMapping<P, M>;
-}
-
-export function cssInterop<T extends {}, M>(
-  component: ComponentType<T> | string,
-  mapping: EnableCssInteropOptions<T> & M,
-  interop: InteropFunction = defaultCSSInterop,
-) {
-  const config = getNormalizeConfig(mapping);
-
-  let render: any = <P extends { ___pressable?: true }>(
-    { children, ___pressable, ...props }: PropsWithChildren<P>,
-    ref: unknown,
-  ) => {
-    if (ref) {
-      (props as any).ref = ref;
-    }
-
-    if (___pressable) {
-      return createElement(component, props as unknown as T, children);
-    } else {
-      return createElement(
-        ...interop(component, config, props as unknown as T, children),
-      );
-    }
-  };
-
-  if (__DEV__) {
-    if (typeof component === "string") {
-      render.displayName = `CSSInterop.${component}`;
-    } else {
-      render.displayName = `CSSInterop.${
-        component.displayName ?? component.name ?? "unknown"
-      }`;
-    }
-  }
-
-  render = forwardRef(render);
-
-  const checkArray = (props: any[]) =>
-    props.some((prop): boolean => {
-      return Array.isArray(prop) ? checkArray(prop) : styleMetaMap.has(prop);
-    });
-
-  const interopComponent: InteropTypeCheck<T> = {
-    type: render,
-    createElementWithInterop(props, children) {
-      return createElement(...interop(component, config, props, children));
-    },
-    check(props) {
-      for (const [
-        targetProp,
-        { sources, nativeStyleToProp },
-      ] of config.config) {
-        if (nativeStyleToProp) return true;
-
-        for (const source of sources) {
-          if (typeof props[source] === "string") {
-            return true;
-          }
-        }
-
-        const target: any = props[targetProp];
-
-        if (Array.isArray(target)) {
-          if (checkArray(target)) {
-            return true;
-          }
-        } else if (styleMetaMap.has(target)) {
-          return true;
-        }
-      }
-
-      return false;
-    },
-  };
-
-  interopComponents.set(component, interopComponent);
 }
 
 cssInterop(Image, { className: "style" });

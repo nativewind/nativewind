@@ -13,20 +13,19 @@ import {
   ExtractionWarning,
   Specificity,
 } from "../../types";
+import { vh, vw } from "./misc";
+import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
+import { colorScheme } from "./color-scheme";
+import { rem } from "./rem";
+import { createSignal } from "../signals";
+import { createColorSchemeSignal, globalVariables } from "./inheritance";
 import {
   animationMap,
   globalStyles,
   opaqueStyles,
   styleMetaMap,
   styleSpecificity,
-  vh,
-  vw,
-} from "./misc";
-import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
-import { colorScheme } from "./color-scheme";
-import { rem } from "./rem";
-import { createSignal } from "../signals";
-import { createColorSchemeSignal, globalVariables } from "./inheritance";
+} from "../globals";
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();

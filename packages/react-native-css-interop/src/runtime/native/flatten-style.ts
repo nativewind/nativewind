@@ -9,7 +9,8 @@ import { RuntimeValue, Style, StyleMeta, StyleProp } from "../../types";
 import { StyleSheet, inlineSpecificity } from "./stylesheet";
 import { isRuntimeValue } from "../../shared";
 import { rem } from "./rem";
-import { styleMetaMap, vh, vw } from "./misc";
+import { vh, vw } from "./misc";
+import { styleMetaMap } from "../globals";
 
 type FlattenStyleOptions = {
   ch?: number;

@@ -20,7 +20,6 @@ import {
   Interaction,
   StyleProp,
 } from "../../types";
-import { animationMap, styleMetaMap } from "./misc";
 import { styleSpecificityCompareFn } from "../specificity";
 import { extractValue, flattenStyle } from "./flatten-style";
 import { DEFAULT_CONTAINER_NAME, transformKeys } from "../../shared";
@@ -37,6 +36,7 @@ import {
 } from "react-native-reanimated";
 import { Time } from "lightningcss";
 import { colorScheme } from "./color-scheme";
+import { styleMetaMap, animationMap } from "../globals";
 
 export interface InteropComputed extends Computed<any> {
   rerender(parent: InteropComputed, props: Record<string, unknown>): void;

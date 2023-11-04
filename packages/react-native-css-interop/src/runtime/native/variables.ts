@@ -1,8 +1,8 @@
-import { styleMetaMap } from "./misc";
 import { StyleProp } from "../../types";
 import { useComputed } from "../signals";
 import { useContext } from "react";
 import { effectContext } from "./inheritance";
+import { styleMetaMap } from "../globals";
 
 export function vars(variables: Record<string, string | number>) {
   const $variables: Record<string, string | number> = {};
