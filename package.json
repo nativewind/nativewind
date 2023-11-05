@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "test": "turbo test --continue",
-    "snapshot": "npx changeshot version --snapshot && npx changeset publish --tag snapshot && git restore .",
+    "snapshot": "npx changeset version --snapshot && npx changeset publish --tag snapshot && git restore .",
     "build": "turbo run build --filter='./packages/*'",
     "build:watch": "turbo run build:watch --filter='./packages/*'",
     "dev": "npm_config_loglevel=silent turbo dev",
