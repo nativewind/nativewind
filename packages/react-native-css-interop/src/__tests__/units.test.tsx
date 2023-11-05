@@ -116,3 +116,16 @@ test("rem - dynamic", () => {
   expect(rem.get()).toEqual(10);
   expect(component).toHaveStyle({ fontSize: 100 });
 });
+
+test.only("hsl", () => {
+  registerCSS(`.my-class { 
+    --primary: 0 84.2% 60.2%;
+    color: hsl(var(--primary)); 
+  }`);
+
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "hsl(0 84.2% 60.2%)" });
+});

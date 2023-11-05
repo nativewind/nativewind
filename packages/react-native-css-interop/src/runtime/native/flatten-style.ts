@@ -582,6 +582,28 @@ export function extractValue(
         },
       );
     }
+    case "hsla": {
+      return createRuntimeFunction(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        effect,
+        options,
+        {
+          wrap: false,
+          joinArgs: false,
+          callback(value: any) {
+            if (value.length === 3) {
+              return `hsl(${value.join(" ")})`;
+            } else if (value.length === 4) {
+              return `hsla(${value.join(" ")})`;
+            } else {
+              return value;
+            }
+          },
+        },
+      );
+    }
     case "rgb": {
       return createRuntimeFunction(
         value,
@@ -664,8 +686,10 @@ function createRuntimeFunction(
 
   const valueFn = () => {
     let $args: any = args
+      .flat(10)
       .map((a) => (typeof a === "function" ? a() : a))
-      .filter((a) => a !== undefined);
+      .filter((a) => a !== undefined)
+      .flat(10);
 
     if (joinArguments) {
       $args = $args.join(", ");
