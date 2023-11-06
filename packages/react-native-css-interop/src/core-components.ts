@@ -92,6 +92,9 @@ cssInterop(TextInput, {
     },
   },
 });
+cssInterop(TouchableOpacity, { className: "style" });
+cssInterop(TouchableHighlight, { className: "style" });
+cssInterop(TouchableWithoutFeedback, { className: "style" });
 
 remapProps(FlatList, {
   className: "style",
@@ -109,9 +112,6 @@ remapProps(KeyboardAvoidingView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
 });
-remapProps(TouchableOpacity, { className: "style" });
-remapProps(TouchableHighlight, { className: "style" });
-remapProps(TouchableWithoutFeedback, { className: "style" });
 remapProps(VirtualizedList, {
   className: "style",
   ListFooterComponentClassName: "ListFooterComponentStyle",
