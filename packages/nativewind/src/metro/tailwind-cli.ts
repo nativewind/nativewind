@@ -104,8 +104,6 @@ export async function tailwindCli(
         reject();
       }
 
-      // console.log(data);
-
       if (data.includes("warn - ")) {
         console.warn(data);
         return;
@@ -120,6 +118,8 @@ export async function tailwindCli(
 
       if (!data.includes("Done in")) return;
 
+      nativewindOptions.rawOutput = readFileSync(output, "utf-8");
+
       if (startedWSServer) {
         const stat = statSync(output);
 
@@ -129,11 +129,11 @@ export async function tailwindCli(
 
         latestStyleData = JSON.stringify(
           cssToReactNativeRuntime(
-            readFileSync(output, "utf-8"),
+            nativewindOptions.rawOutput,
             metroConfig.transformer.cssToReactNativeRuntime,
           ),
         );
-        nativewindOptions.initialData = latestStyleData;
+        nativewindOptions.parsedOutput = latestStyleData;
 
         for (const [ws, lastVersion] of connections) {
           if (lastVersion !== version) {

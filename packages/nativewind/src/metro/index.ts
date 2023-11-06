@@ -40,7 +40,6 @@ export function withNativeWind(
     );
   }
 
-  const output = path.resolve(projectRoot, path.join(outputDir, input));
   input = path.resolve(input);
 
   const { important: importantConfig, content } = loadConfig(
@@ -48,16 +47,6 @@ export function withNativeWind(
   );
 
   const contentArray = "files" in content ? content.files : content;
-  const matchesOutputDir = contentArray.some((pattern) => {
-    if (typeof pattern !== "string") return false;
-    return micromatch.isMatch(output, pattern);
-  });
-
-  if (matchesOutputDir) {
-    throw new Error(
-      `NativeWind: Your '${tailwindConfigPath}#content' includes the output file ${output} which will cause an infinite loop. Please read https://tailwindcss.com/docs/content-configuration#styles-rebuild-in-an-infinite-loop`,
-    );
-  }
 
   metroConfig = withCssInterop(metroConfig, {
     ...cssToReactNativeRuntimeOptions,
@@ -81,14 +70,23 @@ export function withNativeWind(
     ...metroConfig.transformer,
     nativewind: {
       input,
-      output,
     },
     getTransformOptions: async (
       entryPoints: ReadonlyArray<string>,
       options: GetTransformOptionsOpts,
       getDependenciesOf: (filePath: string) => Promise<string[]>,
     ) => {
-      if (!output || !input) throw new Error("Invalid NativeWind config");
+      const output = path.resolve(projectRoot, path.join(outputDir, input!));
+      const matchesOutputDir = contentArray.some((pattern) => {
+        if (typeof pattern !== "string") return false;
+        return micromatch.isMatch(output, pattern);
+      });
+
+      if (matchesOutputDir) {
+        throw new Error(
+          `NativeWind: Your '${tailwindConfigPath}#content' includes the output file ${output} which will cause an infinite loop. Please read https://tailwindcss.com/docs/content-configuration#styles-rebuild-in-an-infinite-loop`,
+        );
+      }
 
       // Clear Metro's progress bar and move to the start of the line
       // We will print out own output before letting Metro print again
@@ -104,7 +102,7 @@ export function withNativeWind(
         tailwindHasStarted[platform] = true;
 
         // Generate the styles
-        const cliOutput = await tailwindCli(input, metroConfig, {
+        const cliOutput = await tailwindCli(input!, metroConfig, {
           ...options,
           output,
           cliCommand,
