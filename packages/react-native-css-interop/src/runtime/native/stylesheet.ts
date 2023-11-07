@@ -52,6 +52,7 @@ const commonStyleSheet: CommonStyleSheet = {
   },
   unstable_hook_onClassName() {},
   register(options: StyleSheetRegisterOptions) {
+    // console.log(JSON.stringify(options, null, 2));
     this[INTERNAL_FLAGS]["$$receivedData"] = "true";
     if (options.flags) {
       Object.assign(this[INTERNAL_FLAGS], options.flags);
@@ -181,6 +182,11 @@ function tagStyles(
 
     if (styles.importantStyles) {
       meta.importantStyles = styles.importantStyles;
+      hasMeta = true;
+    }
+
+    if (styles.nativeProps) {
+      meta.nativeProps = styles.nativeProps;
       hasMeta = true;
     }
 

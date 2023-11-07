@@ -143,6 +143,7 @@ export type ExtractedStyle = {
   requiresLayoutHeight?: boolean;
   warnings?: ExtractionWarning[];
   importantStyles?: string[];
+  nativeProps?: Record<string, string>;
 };
 
 export type Specificity = CSSSpecificity;
@@ -179,6 +180,7 @@ export type StyleMeta = {
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
   importantStyles?: string[];
+  nativeProps?: Record<string, string>;
   specificity?: Specificity;
   wrapInContext?: boolean;
 };

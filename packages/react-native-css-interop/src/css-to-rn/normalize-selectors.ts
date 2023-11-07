@@ -1,4 +1,9 @@
-import type { MediaQuery, Selector, SelectorList } from "lightningcss";
+import type {
+  MediaQuery,
+  Selector,
+  SelectorComponent,
+  SelectorList,
+} from "lightningcss";
 import { CSSSpecificity, ExtractRuleOptions, ExtractedStyle } from "../types";
 
 export type NormalizeSelector =
@@ -12,6 +17,7 @@ export type NormalizeSelector =
       className: string;
       groupClassName?: string;
       pseudoClasses?: Record<string, true>;
+      nativeProps?: Record<string, string>;
       groupPseudoClasses?: Record<string, true>;
       specificity: Pick<CSSSpecificity, "A" | "B" | "C">;
     };
@@ -191,6 +197,25 @@ export function normalizeSelectors(
               selector.pseudoClasses ??= {};
               selector.pseudoClasses[component.kind] = true;
               break;
+            case "custom-function":
+              if (component.name === "native-prop") {
+                const args = getCustomFunctionArguments(component);
+                if (!args) {
+                  isValid = false;
+                  break;
+                }
+
+                selector.nativeProps ??= {};
+
+                if (args.length === 1) {
+                  selector.nativeProps[args[0]] = args[0];
+                } else if (args.length === 2) {
+                  selector.nativeProps[args[0]] = args[1];
+                }
+              } else {
+                isValid = false;
+              }
+              break;
             default: {
               isValid = false;
             }
@@ -211,6 +236,34 @@ export function normalizeSelectors(
   }
 
   return selectors;
+}
+
+function getCustomFunctionArguments(
+  component: Extract<
+    SelectorComponent,
+    { type: "pseudo-class"; kind: "custom-function" }
+  >,
+) {
+  const args: string[] = [];
+
+  for (const arg of component.arguments) {
+    if (arg.type === "token") {
+      switch (arg.value.type) {
+        case "string":
+        case "ident":
+          args.push(arg.value.value);
+          break;
+        case "comma":
+          break;
+        default:
+          return undefined;
+      }
+    } else {
+      return undefined;
+    }
+  }
+
+  return args;
 }
 
 function isIsPseudoClass(

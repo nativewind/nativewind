@@ -8,6 +8,7 @@ import { color } from "./color";
 import { verify } from "./verify";
 import { translateX, translateY } from "./translate";
 import { shadows } from "./shadows";
+import { nativePropModifierPlugin } from "./prop-modifier";
 
 /**
  * The native module requires the `.dark` selector to pickup darkMode variables
@@ -126,6 +127,7 @@ const preset: Config = {
     translateY,
     visibility,
     verify,
+    nativePropModifierPlugin,
   ],
   corePlugins: {
     preflight: false,

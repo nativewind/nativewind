@@ -298,6 +298,7 @@ function setStyleForSelectorList(
         pseudoClasses,
         groupPseudoClasses,
         darkMode,
+        nativeProps,
       } = selector;
 
       const specificity = {
@@ -324,6 +325,10 @@ function setStyleForSelectorList(
           name: groupClassName,
           pseudoClasses: groupPseudoClasses,
         });
+      }
+
+      if (nativeProps) {
+        style.nativeProps = { ...style.nativeProps, ...nativeProps };
       }
 
       if (darkMode) {

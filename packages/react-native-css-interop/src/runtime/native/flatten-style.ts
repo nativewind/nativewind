@@ -120,6 +120,13 @@ export function flattenStyle(
     };
   }
 
+  if (styleMeta.nativeProps) {
+    flatStyleMeta.nativeProps = {
+      ...flatStyleMeta.nativeProps,
+      ...styleMeta.nativeProps,
+    };
+  }
+
   if (styleMeta.container?.names) {
     flatStyleMeta.requiresLayoutWidth = true;
     flatStyleMeta.requiresLayoutHeight = true;

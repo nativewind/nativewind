@@ -4,6 +4,7 @@ import plugin from "tailwindcss/plugin";
 import { darkModeAtRule } from "./dark-mode";
 import { color } from "./color";
 import { verify } from "./verify";
+import { webPropModifierPlugin } from "./prop-modifier";
 
 const preset: Config = {
   content: [],
@@ -13,6 +14,7 @@ const preset: Config = {
     color,
     darkModeAtRule,
     verify,
+    webPropModifierPlugin,
   ],
 };
 
