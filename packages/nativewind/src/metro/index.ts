@@ -76,7 +76,10 @@ export function withNativeWind(
       options: GetTransformOptionsOpts,
       getDependenciesOf: (filePath: string) => Promise<string[]>,
     ) => {
-      const output = path.resolve(projectRoot, path.join(outputDir, input!));
+      const output = path.resolve(
+        projectRoot,
+        path.join(outputDir, path.basename(input!)),
+      );
       const matchesOutputDir = contentArray.some((pattern) => {
         if (typeof pattern !== "string") return false;
         return micromatch.isMatch(output, pattern);
