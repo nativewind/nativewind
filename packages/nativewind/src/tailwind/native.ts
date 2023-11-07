@@ -9,6 +9,7 @@ import { verify } from "./verify";
 import { translateX, translateY } from "./translate";
 import { shadows } from "./shadows";
 import { nativePropModifierPlugin } from "./prop-modifier";
+import { nativeFill, nativeStroke, nativeStrokeWidth } from "./svg";
 
 /**
  * The native module requires the `.dark` selector to pickup darkMode variables
@@ -128,18 +129,24 @@ const preset: Config = {
     visibility,
     verify,
     nativePropModifierPlugin,
+    nativeFill,
+    nativeStroke,
+    nativeStrokeWidth,
   ],
   corePlugins: {
     preflight: false,
-    translate: false,
-    boxShadow: false,
-    visibility: false,
-    textOpacity: false,
-    divideOpacity: false,
-    borderOpacity: false,
     backgroundOpacity: false,
+    borderOpacity: false,
+    boxShadow: false,
+    divideOpacity: false,
+    fill: false,
     placeholderOpacity: false,
     ringOpacity: false,
+    stroke: false,
+    strokeWidth: false,
+    textOpacity: false,
+    translate: false,
+    visibility: false,
   },
 };
 

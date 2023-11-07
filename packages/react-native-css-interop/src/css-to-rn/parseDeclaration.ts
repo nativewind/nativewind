@@ -37,6 +37,7 @@ import type {
   Token,
   BoxShadow,
   UserSelect,
+  SVGPaint,
 } from "lightningcss";
 
 import type { ExtractionWarning, RuntimeValue } from "../types";
@@ -144,6 +145,7 @@ const validProperties = [
   "container-name",
   "container-type",
   "display",
+  "fill",
   "flex",
   "flex-basis",
   "flex-direction",
@@ -208,6 +210,8 @@ const validProperties = [
   "rotate",
   "row-gap",
   "scale",
+  "stroke",
+  "stroke-width",
   "text-align",
   "text-decoration",
   "text-decoration-color",
@@ -1484,6 +1488,27 @@ export function parseDeclaration(
         parseUserSelect(declaration.value, parseOptions),
       );
     }
+    case "fill": {
+      return addStyleProp(
+        declaration.property,
+        parseSVGPaint(declaration.value, parseOptions),
+      );
+    }
+    case "stroke": {
+      return addStyleProp(
+        declaration.property,
+        parseSVGPaint(declaration.value, parseOptions),
+      );
+    }
+    case "stroke-width": {
+      return addStyleProp(
+        declaration.property,
+        parseDimensionPercentageFor_LengthValue(
+          declaration.value,
+          parseOptions,
+        ),
+      );
+    }
     default: {
       /**
        * This is used to know when lightningcss has added a new property and we need to add it to the
@@ -2560,6 +2585,30 @@ function parseUserSelect(
   }
 }
 
+function parseSVGPaint(
+  value: SVGPaint,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  if (value.type === "none") {
+    return "transparent";
+  } else if (value.type === "color") {
+    return parseColor(value.value, options);
+  }
+}
+
 function round(number: number) {
   return Math.round((number + Number.EPSILON) * 100) / 100;
+}
+
+function parseDimensionPercentageFor_LengthValue(
+  value: DimensionPercentageFor_LengthValue,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  if (value.type === "calc") {
+    return undefined;
+  } else if (value.type === "percentage") {
+    return `${value.value}%`;
+  } else {
+    return parseLength(value.value, options);
+  }
 }

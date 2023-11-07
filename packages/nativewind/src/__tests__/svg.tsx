@@ -1,19 +1,16 @@
 import { resetStyles } from "react-native-css-interop/testing-library";
-import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
+import { testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
 
-describe.skip("SVG - Fill", () => {
-  // TODO
-  testCases();
+describe("SVG - Fill", () => {
+  testCases(["fill-black", { props: { fill: "rgba(0, 0, 0, 1)" } }]);
 });
 
-describe.skip("SVG - Stroke", () => {
-  // TODO
-  testCases();
+describe("SVG - Stroke", () => {
+  testCases(["stroke-black", { props: { stroke: "rgba(0, 0, 0, 1)" } }]);
 });
 
-describe.skip("SVG - Stroke Width", () => {
-  // TODO
-  testCases();
+describe("SVG - Stroke Width", () => {
+  testCases(["stroke-1", { props: { strokeWidth: 1 } }]);
 });

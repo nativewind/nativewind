@@ -45,7 +45,7 @@ export async function renderTailwind<T extends { className: string }>(
     }),
   ]).process(css, { from: undefined });
 
-  // // console.log(output);
+  // console.log(output);
 
   registerCSS(output, cssToReactNativeRuntimeOptions);
 
@@ -57,6 +57,7 @@ type TestCase = [
   string,
   {
     style?: ReturnType<typeof style>["style"];
+    props?: Record<string, unknown>;
     warning?: (name: string) => Map<string, ExtractionWarning[]>;
   },
 ];
@@ -128,6 +129,10 @@ export function testCasesWithOptions(
       expect(component).toHaveAnimatedStyle(expected.style ?? {});
     } else {
       expect(component).toHaveStyle(expected.style ?? {});
+    }
+
+    if (expected.props) {
+      expect(component.props).toEqual(expect.objectContaining(expected.props));
     }
 
     if (expected.warning) {
