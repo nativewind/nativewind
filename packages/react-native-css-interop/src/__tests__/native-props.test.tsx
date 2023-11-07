@@ -12,8 +12,45 @@ const A = createMockComponent(View);
 
 beforeEach(() => resetStyles());
 
-test("native props", () => {
-  registerCSS(`.my-class:native-prop(color,placeholderColor) { color: red }`);
+test(":native-prop() no args", () => {
+  registerCSS(`.my-class:native-prop() { color: red; background-color: blue }`);
+
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      color: "rgba(255, 0, 0, 1)",
+      backgroundColor: "rgba(0, 0, 255, 1)",
+      style: {},
+    }),
+  );
+});
+
+test(":native-prop() one arg", () => {
+  registerCSS(
+    `.my-class:native-prop(color) { color: red; background-color: blue }`,
+  );
+
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      color: "rgba(255, 0, 0, 1)",
+      style: {
+        backgroundColor: "rgba(0, 0, 255, 1)",
+      },
+    }),
+  );
+});
+
+test(":native-prop() two args", () => {
+  registerCSS(
+    `.my-class:native-prop(color,placeholderColor) { color: red; background-color: blue }`,
+  );
 
   const component = render(
     <A testID={testID} className="my-class" />,
@@ -22,7 +59,9 @@ test("native props", () => {
   expect(component.props).toEqual(
     expect.objectContaining({
       placeholderColor: "rgba(255, 0, 0, 1)",
-      style: {},
+      style: {
+        backgroundColor: "rgba(0, 0, 255, 1)",
+      },
     }),
   );
 });
