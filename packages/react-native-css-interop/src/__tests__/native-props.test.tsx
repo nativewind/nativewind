@@ -12,7 +12,7 @@ const A = createMockComponent(View);
 
 beforeEach(() => resetStyles());
 
-test(":native-prop() no args", () => {
+test(":native-prop() zero args", () => {
   registerCSS(`.my-class:native-prop() { color: red; background-color: blue }`);
 
   const component = render(
