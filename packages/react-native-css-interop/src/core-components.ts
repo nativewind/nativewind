@@ -107,11 +107,3 @@ remapProps(VirtualizedList, {
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
-
-/**
- *  These are popular 3rd party libraries that we want to support out of the box.
- */
-try {
-  const { Svg } = require("react-native-svg");
-  cssInterop(Svg, { className: "style" });
-} catch {}
