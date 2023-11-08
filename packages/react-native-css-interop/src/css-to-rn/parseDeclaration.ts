@@ -38,6 +38,7 @@ import type {
   BoxShadow,
   UserSelect,
   SVGPaint,
+  ColorOrAuto,
 } from "lightningcss";
 
 import type { ExtractionWarning, RuntimeValue } from "../types";
@@ -139,6 +140,7 @@ const validProperties = [
   "border-width",
   "bottom",
   "box-shadow",
+  "caret-color",
   "color",
   "column-gap",
   "container",
@@ -1509,6 +1511,12 @@ export function parseDeclaration(
         ),
       );
     }
+    case "caret-color": {
+      return addStyleProp(
+        declaration.property,
+        parseColorOrAuto(declaration.value, parseOptions),
+      );
+    }
     default: {
       /**
        * This is used to know when lightningcss has added a new property and we need to add it to the
@@ -1903,6 +1911,18 @@ function parseSize(
   }
 
   size satisfies never;
+}
+
+function parseColorOrAuto(
+  color: ColorOrAuto,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  if (color.type === "auto") {
+    options.addValueWarning(`Invalid color value ${color.type}`);
+    return;
+  } else {
+    return parseColor(color.value, options);
+  }
 }
 
 function parseColor(

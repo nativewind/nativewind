@@ -1,6 +1,9 @@
 import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 import { PluginUtils } from "tailwindcss/types/config";
+import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
+import withAlphaVariable from "tailwindcss/lib/util/withAlphaVariable";
+import toColorValue from "tailwindcss/lib/util/toColorValue";
 
 import { hairlineWidth, platformSelect } from "../theme";
 import { darkModeAtRule } from "./dark-mode";
@@ -8,32 +11,17 @@ import { color } from "./color";
 import { verify } from "./verify";
 import { translateX, translateY } from "./translate";
 import { shadows } from "./shadows";
-import { nativePropModifierPlugin } from "./prop-modifier";
-import { nativeFill, nativeStroke, nativeStrokeWidth } from "./svg";
-import { nativePlaceholder } from "./placeholder";
 
-/**
- * The native module requires the `.dark` selector to pickup darkMode variables
- * when using darkMode: 'class'
- *
- * If the user never uses the word 'dark' the selector will never be processed
- * This is an edge case, but one we often encounter in testing (where .dark)
- * will only contain CSS variables and never referenced directly
- */
-const forceDark = plugin(function ({ config }) {
-  config("safelist").push("dark");
-});
-
-const visibility = plugin(({ addUtilities }) => {
-  addUtilities({
-    ".visible": { opacity: 1 },
-    ".invisible": { opacity: 0 },
-  } as any);
-});
-
-const platforms = plugin(function ({ addVariant }) {
+const nativePlugins = plugin(function ({
+  addUtilities,
+  addVariant,
+  corePlugins,
+  config,
+  matchUtilities,
+  matchVariant,
+  theme,
+}) {
   const nativePlatforms = ["android", "ios", "windows", "macos"];
-
   /**
    * `display-mode` is a valid media query, but the ${platform} values are not.
    *
@@ -49,6 +37,136 @@ const platforms = plugin(function ({ addVariant }) {
   addVariant(
     "native",
     nativePlatforms.map((platform) => `@media (display-mode: ${platform})`),
+  );
+
+  /**
+   * The native module requires the `.dark` selector to pickup darkMode variables
+   * when using darkMode: 'class'
+   *
+   * If the user never uses the word 'dark' the selector will never be processed
+   * This is an edge case, but one we often encounter in testing (where .dark)
+   * will only contain CSS variables and never referenced directly
+   */
+  config("safelist").push("dark");
+
+  /**
+   * Change the visible/invisible classes
+   *
+   */
+  addUtilities({
+    ".visible": { opacity: 1 },
+    ".invisible": { opacity: 0 },
+  } as any);
+
+  /**
+   * prop-[]:
+   */
+  matchVariant(
+    "prop",
+    (value) => {
+      return `&:native-prop(${value ?? ""})`;
+    },
+    {
+      values: {
+        DEFAULT: undefined,
+      },
+    },
+  );
+
+  /**
+   * Native Prop remapping
+   */
+  addVariant("selection", "&:native-prop(color,selectionColor)");
+  addVariant("placeholder", `&:native-prop(color,placeholderTextColor)`);
+  matchUtilities(
+    {
+      caret: (value) => {
+        return {
+          "&:native-prop(caretColor,cursorColor)": {
+            "caret-color": toColorValue(value),
+          },
+        };
+      },
+    },
+    {
+      values: flattenColorPalette(theme("caretColor")),
+      type: ["color", "any"],
+    },
+  );
+  matchUtilities(
+    {
+      decoration: (value) => {
+        return {
+          "&:native-prop(textDecorationColor,underlineColorAndroid)": {
+            "text-decoration-color": toColorValue(value),
+          },
+        };
+      },
+    },
+    {
+      values: flattenColorPalette(theme("textDecorationColor")),
+      type: ["color", "any"],
+    },
+  );
+  matchUtilities(
+    {
+      placeholder: (value) => {
+        if (!corePlugins("placeholderOpacity")) {
+          return {
+            "&:native-prop(color,placeholderTextColor)": {
+              color: toColorValue(value),
+            },
+          };
+        }
+        return {
+          "&:native-prop(color,placeholderTextColor)": withAlphaVariable({
+            color: value,
+            property: "color",
+            variable: "--tw-placeholder-opacity",
+          }),
+        };
+      },
+    },
+    {
+      values: flattenColorPalette(theme("placeholderColor")),
+      type: ["color", "any"],
+    },
+  );
+
+  /**
+   * SVG Prop remapping
+   */
+  matchUtilities(
+    {
+      fill: (value) => ({
+        "&:native-prop(fill)": {
+          fill: toColorValue(value),
+        },
+      }),
+    },
+    { values: flattenColorPalette(theme("fill")), type: ["color", "any"] },
+  );
+
+  matchUtilities(
+    {
+      stroke: (value) => ({
+        "&:native-prop(stroke)": {
+          stroke: toColorValue(value),
+        },
+      }),
+    },
+    { values: flattenColorPalette(theme("stroke")), type: ["color", "any"] },
+  );
+
+  matchUtilities(
+    {
+      stroke: (value) => ({
+        "&:native-prop(strokeWidth)": {
+          strokeWidth: toColorValue(value),
+        },
+      }),
+    },
+    { values: theme("strokeWidth"), type: ["length", "number", "percentage"] },
   );
 });
 
@@ -123,31 +241,26 @@ const preset: Config = {
     color,
     darkModeAtRule,
     shadows,
-    forceDark,
-    platforms,
     translateX,
     translateY,
-    visibility,
     verify,
-    nativePlaceholder,
-    nativePropModifierPlugin,
-    nativeFill,
-    nativeStroke,
-    nativeStrokeWidth,
+    nativePlugins,
   ],
   corePlugins: {
     preflight: false,
     backgroundOpacity: false,
     borderOpacity: false,
     boxShadow: false,
+    caretColor: false,
     divideOpacity: false,
     fill: false,
+    placeholderColor: false,
     placeholderOpacity: false,
     ringOpacity: false,
     stroke: false,
     strokeWidth: false,
+    textDecorationColor: false,
     textOpacity: false,
-    placeholderColor: false,
     translate: false,
     visibility: false,
   },

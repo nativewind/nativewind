@@ -79,18 +79,6 @@ cssInterop(TextInput, {
       textAlign: true,
     },
   },
-  placeholderClassName: {
-    target: false,
-    nativeStyleToProp: {
-      color: "placeholderTextColor",
-    },
-  },
-  selectionClassName: {
-    target: false,
-    nativeStyleToProp: {
-      color: "selectionColor",
-    },
-  },
 });
 cssInterop(TouchableOpacity, { className: "style" });
 cssInterop(TouchableHighlight, { className: "style" });

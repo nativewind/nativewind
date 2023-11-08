@@ -67,3 +67,22 @@ test("mixed", async () => {
   fireEvent(component, "focus");
   expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
 });
+
+test("selection", async () => {
+  await renderTailwind(<A testID={testID} className="selection:text-black" />);
+
+  const component = screen.getByTestId(testID);
+  expect(component.props).toEqual({
+    selectionColor: "black",
+    style: {},
+  });
+
+  fireEvent(component, "pressIn");
+  expect(component).toHaveStyle({});
+
+  fireEvent(component, "hoverIn");
+  expect(component).toHaveStyle({});
+
+  fireEvent(component, "focus");
+  expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+});
