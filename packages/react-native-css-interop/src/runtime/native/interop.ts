@@ -331,14 +331,10 @@ export function createInteropComputed(
           interop.requiresLayout ||= Boolean(hasInlineContainers);
 
           if (meta.nativeProps) {
-            for (let [key, targetProp] of Object.entries(meta.nativeProps)) {
-              if (key in style) {
-                if (typeof targetProp === "string") {
-                  styledProps[targetProp] = style[key];
-                } else {
-                  styledProps[key] = style[key];
-                }
-                delete style[key];
+            for (let prop of Object.values(meta.nativeProps)) {
+              if (prop in style) {
+                styledProps[prop] = style[prop];
+                delete style[prop];
               }
             }
           }

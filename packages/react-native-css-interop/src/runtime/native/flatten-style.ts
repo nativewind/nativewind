@@ -161,6 +161,10 @@ export function flattenStyle(
   }
 
   for (let [key, value] of Object.entries(style)) {
+    if (styleMeta.nativeProps?.[key]) {
+      key = styleMeta.nativeProps?.[key];
+    }
+
     if (
       // We can shortcut setting a value if it already exists
       value === undefined ||

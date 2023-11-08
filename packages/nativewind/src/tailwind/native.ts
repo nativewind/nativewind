@@ -10,6 +10,7 @@ import { translateX, translateY } from "./translate";
 import { shadows } from "./shadows";
 import { nativePropModifierPlugin } from "./prop-modifier";
 import { nativeFill, nativeStroke, nativeStrokeWidth } from "./svg";
+import { nativePlaceholder } from "./placeholder";
 
 /**
  * The native module requires the `.dark` selector to pickup darkMode variables
@@ -128,6 +129,7 @@ const preset: Config = {
     translateY,
     visibility,
     verify,
+    nativePlaceholder,
     nativePropModifierPlugin,
     nativeFill,
     nativeStroke,
@@ -145,6 +147,7 @@ const preset: Config = {
     stroke: false,
     strokeWidth: false,
     textOpacity: false,
+    placeholderColor: false,
     translate: false,
     visibility: false,
   },
