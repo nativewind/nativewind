@@ -333,7 +333,6 @@ export function createInteropComputed(
           if (meta.nativeProps) {
             for (let prop of Object.values(meta.nativeProps)) {
               if (prop in style) {
-                console.log("prop", prop);
                 styledProps[prop] = style[prop];
                 delete style[prop];
               }
