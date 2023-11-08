@@ -1,4 +1,4 @@
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useReducer } from "react";
 
 export const reactGlobal: {
   isInComponent: boolean;
@@ -139,9 +139,29 @@ export function createComputed<T>(
 /*
  * We only ever track one dependency
  */
-export function useComputed<T>(fn: () => T, fnDependency?: any) {
-  reactGlobal.isInComponent = true;
-  const computedRef = useRef<Computed<T> & { fnDependency: any }>();
+export function useComputed<T>(fn: () => T, dependency?: any) {
+  const [{ computed, dependency: lastDependency }, dispatch] = useReducer(
+    (
+      state: { computed: Computed<T>; dependency?: any },
+      action: { computed?: Computed<T>; dependency?: any },
+    ) => {
+      return { ...state, ...action };
+    },
+    undefined,
+    () => {
+      return {
+        computed: createComputed<T>(fn),
+        dependency,
+      };
+    },
+  );
+
+  useEffect(() => {
+    const sub = computed.subscribe(() => {
+      dispatch({});
+    });
+    return () => sub();
+  }, [computed]);
 
   useEffect(() => {
     if (reactGlobal.delayedEvents.size) {
@@ -152,18 +172,12 @@ export function useComputed<T>(fn: () => T, fnDependency?: any) {
     }
   });
 
-  if (computedRef.current == null) {
-    computedRef.current = Object.assign(createComputed<T>(fn), {
-      fnDependency,
+  if (dependency != lastDependency) {
+    dispatch({
+      computed: createComputed(fn),
+      dependency,
     });
-  } else if (computedRef.current.fnDependency !== fnDependency) {
-    computedRef.current.fn = fn;
-    computedRef.current();
   }
 
-  return useSyncExternalStore(
-    computedRef.current.subscribe,
-    computedRef.current.peek,
-    computedRef.current.peek,
-  );
+  return computed.peek();
 }

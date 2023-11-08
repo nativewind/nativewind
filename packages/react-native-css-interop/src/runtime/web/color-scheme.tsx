@@ -1,41 +1,46 @@
-import { Appearance } from "react-native";
+import { AppState, Appearance } from "react-native";
 import { StyleSheet } from "./stylesheet";
 import { createSignal, useComputed } from "../signals";
+import { INTERNAL_RESET } from "../../shared";
 
-const manualColorScheme = createSignal("light");
+let appearance = Appearance;
+
+let appearanceListener = appearance.addChangeListener((state) =>
+  _appColorScheme.set(state.colorScheme ?? "light"),
+);
+
+AppState.addEventListener("change", () =>
+  _appColorScheme.set(appearance.getColorScheme() ?? "light"),
+);
 
 // This shouldn't change, as its loaded from the CSS
 const [darkMode, darkModeValue] = StyleSheet.getFlag("darkMode")?.split(
   " ",
 ) ?? ["media"];
 
+let initialColor: "light" | "dark" | "system" = "system";
 if (darkMode === "media") {
-  manualColorScheme.set(Appearance.getColorScheme() ?? "light");
-
+  initialColor = Appearance.getColorScheme() ?? "light";
   Appearance.addChangeListener(({ colorScheme }) => {
     if (darkMode === "media") {
-      manualColorScheme.set(colorScheme ?? "light");
+      _appColorScheme.set(colorScheme ?? "light");
     }
   });
 } else if (darkMode === "class") {
-  manualColorScheme.set(
-    globalThis.window.document.documentElement.classList.contains(darkModeValue)
-      ? "dark"
-      : "light",
-  );
+  initialColor = globalThis.window.document.documentElement.classList.contains(
+    darkModeValue,
+  )
+    ? "dark"
+    : "light";
 }
 
-export function useColorScheme() {
-  return useComputed(() => ({
-    colorScheme: manualColorScheme.get(),
-    setColorScheme: colorScheme.set,
-    toggleColorScheme: colorScheme.toggle,
-  }));
-}
+const _appColorScheme = createSignal<"light" | "dark" | "system">(initialColor);
 
 export const colorScheme = {
-  get: () => manualColorScheme.get(),
-  set: (colorScheme: "light" | "dark" | "system") => {
+  ..._appColorScheme,
+  set(value: "light" | "dark" | "system") {
+    _appColorScheme.set(value);
+
     if (darkMode === "media") {
       throw new Error(
         "Cannot manually set color scheme, as dark mode is type 'media'. Please use StyleSheet.setFlag('darkMode', 'class')",
@@ -48,31 +53,43 @@ export const colorScheme = {
       );
     }
 
-    let newColorScheme: "light" | "dark" | undefined;
-
-    if (colorScheme === "system") {
-      if (typeof window !== undefined) {
-        newColorScheme = window.matchMedia("(prefers-color-scheme: dark)")
-          ? "dark"
-          : "light";
-      }
-    } else {
-      newColorScheme = colorScheme;
-    }
-
-    if (!newColorScheme) return;
-
-    if (newColorScheme === "dark") {
+    if (value === "dark") {
       globalThis.window?.document.documentElement.classList.add(darkModeValue);
     } else {
       globalThis.window?.document.documentElement.classList.remove(
         darkModeValue,
       );
     }
-
-    manualColorScheme.set(newColorScheme);
+  },
+  get() {
+    let current = _appColorScheme.get();
+    return current === "system"
+      ? appearance.getColorScheme() ?? "light"
+      : current;
   },
   toggle() {
-    colorScheme.set(colorScheme.get() === "dark" ? "light" : "dark");
+    let current = _appColorScheme.peek();
+    if (current === "system") {
+      current = appearance.getColorScheme() ?? "light";
+    }
+    _appColorScheme.set(current === "light" ? "dark" : "light");
+  },
+  [INTERNAL_RESET]: ($appearance: typeof Appearance) => {
+    _appColorScheme.set("system");
+    appearance = $appearance;
+    appearanceListener.remove();
+    appearanceListener = appearance.addChangeListener((state) =>
+      _appColorScheme.set(state.colorScheme ?? "light"),
+    );
   },
 };
+
+export function useColorScheme() {
+  return useComputed(() => {
+    return {
+      colorScheme: colorScheme.get(),
+      setColorScheme: colorScheme.set,
+      toggleColorScheme: colorScheme.toggle,
+    };
+  });
+}
