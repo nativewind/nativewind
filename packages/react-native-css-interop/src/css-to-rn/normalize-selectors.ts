@@ -213,9 +213,12 @@ export function normalizeSelectors(
                     selector.nativeProps[key] = key;
                   }
                 } else if (args.length === 1) {
-                  selector.nativeProps[args[0]] = args[0];
+                  const keys = Object.keys(extractedStyle.style);
+                  for (const key of keys) {
+                    selector.nativeProps[key] = args[0];
+                  }
                 } else if (args.length === 2) {
-                  selector.nativeProps[args[0]] = args[1];
+                  selector.nativeProps[args[1]] = args[0];
                 }
               } else {
                 isValid = false;

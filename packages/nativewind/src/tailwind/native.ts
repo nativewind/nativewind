@@ -76,13 +76,13 @@ const nativePlugins = plugin(function ({
   /**
    * Native Prop remapping
    */
-  addVariant("selection", "&:native-prop(color,selectionColor)");
-  addVariant("placeholder", `&:native-prop(color,placeholderTextColor)`);
+  addVariant("selection", "&:native-prop(selectionColor,color)");
+  addVariant("placeholder", `&:native-prop(placeholderTextColor,color)`);
   matchUtilities(
     {
       caret: (value) => {
         return {
-          "&:native-prop(caretColor,cursorColor)": {
+          "&:native-prop(cursorColor,caretColor)": {
             "caret-color": toColorValue(value),
           },
         };
@@ -95,31 +95,16 @@ const nativePlugins = plugin(function ({
   );
   matchUtilities(
     {
-      decoration: (value) => {
-        return {
-          "&:native-prop(textDecorationColor,underlineColorAndroid)": {
-            "text-decoration-color": toColorValue(value),
-          },
-        };
-      },
-    },
-    {
-      values: flattenColorPalette(theme("textDecorationColor")),
-      type: ["color", "any"],
-    },
-  );
-  matchUtilities(
-    {
       placeholder: (value) => {
         if (!corePlugins("placeholderOpacity")) {
           return {
-            "&:native-prop(color,placeholderTextColor)": {
+            "&:native-prop(placeholderTextColor,color)": {
               color: toColorValue(value),
             },
           };
         }
         return {
-          "&:native-prop(color,placeholderTextColor)": withAlphaVariable({
+          "&:native-prop(placeholderTextColor,color)": withAlphaVariable({
             color: value,
             property: "color",
             variable: "--tw-placeholder-opacity",
@@ -259,7 +244,6 @@ const preset: Config = {
     ringOpacity: false,
     stroke: false,
     strokeWidth: false,
-    textDecorationColor: false,
     textOpacity: false,
     translate: false,
     visibility: false,
