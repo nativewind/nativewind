@@ -479,6 +479,7 @@ export function createInteropComputed(
                 }
 
                 for (const prop of Object.keys(keyframes.frames)) {
+                  styledProps[key][prop] = interop.sharedValues[prop];
                   seenAnimatedProps.add(prop);
                 }
               }
