@@ -3,9 +3,12 @@ import { createSignal } from "../signals";
 import { colorScheme } from "./color-scheme";
 import type { InteropComputed } from "./interop";
 
+export const rem = createColorSchemeSignal("rem");
+
 export const globalVariables = {
   root: new Map<string, ColorSchemeSignal>(),
   universal: new Map<string, ColorSchemeSignal>(),
+  rem,
 };
 
 export const effectContext = createContext({
@@ -21,7 +24,7 @@ type ColorSchemeSignal = ReturnType<typeof createColorSchemeSignal>;
  */
 export function createColorSchemeSignal(id: string) {
   let light = createSignal<any>(undefined, `${id}#light`);
-  let dark = createSignal<any>(undefined, `${id}#dark-app`);
+  let dark = createSignal<any>(undefined, `${id}#dark`);
 
   const get = () => {
     return colorScheme.get() === "light"
@@ -40,9 +43,14 @@ export function createColorSchemeSignal(id: string) {
     light.unsubscribe(subscription);
   };
 
-  const set = (value: Record<string, any>) => {
-    if ("dark" in value) dark.set(value.dark);
-    if ("light" in value) light.set(value.light);
+  const set = (value: Record<string, any> | any) => {
+    if (typeof value === "object") {
+      if ("dark" in value) dark.set(value.dark);
+      if ("light" in value) light.set(value.light);
+    } else {
+      light.set(value);
+      dark.set(value);
+    }
   };
 
   return {

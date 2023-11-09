@@ -74,6 +74,7 @@ export function cssToReactNativeRuntime(
     universalVariables: {},
     flags: {},
     appearanceOrder: 0,
+    rem: { light: 14, dark: 14 },
   };
 
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
@@ -102,6 +103,7 @@ export function cssToReactNativeRuntime(
     rootVariables: extractOptions.rootVariables,
     universalVariables: extractOptions.universalVariables,
     flags: extractOptions.flags,
+    rem: extractOptions.rem,
   };
 }
 
@@ -280,6 +282,16 @@ function setStyleForSelectorList(
       selector.type === "rootVariables" ||
       selector.type === "universalVariables"
     ) {
+      if (style.style.fontSize) {
+        options.rem ??= {};
+
+        if (selector.subtype === "light") {
+          options.rem.light = style.style.fontSize;
+        } else {
+          options.rem.dark = style.style.fontSize;
+        }
+      }
+
       if (!style.variables) {
         continue;
       }

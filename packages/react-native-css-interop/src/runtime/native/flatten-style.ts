@@ -8,7 +8,7 @@ import type { InteropComputed } from "./interop";
 import { RuntimeValue, Style, StyleMeta, StyleProp } from "../../types";
 import { StyleSheet, inlineSpecificity } from "./stylesheet";
 import { isRuntimeValue } from "../../shared";
-import { rem } from "./rem";
+import { globalVariables } from "./inheritance";
 import { vh, vw } from "./misc";
 import { styleMetaMap } from "../globals";
 
@@ -359,7 +359,7 @@ export function extractValue(
       return round((vw.get() / 100) * (value.arguments[0] as number));
     }
     case "rem": {
-      return round(rem.get() * (value.arguments[0] as number));
+      return round(globalVariables.rem.get() * (value.arguments[0] as number));
     }
     case "em": {
       return () => {

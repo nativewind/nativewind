@@ -15,9 +15,9 @@ import {
 import { isReduceMotionEnabled, vh, vw } from "./misc";
 import { Platform } from "react-native";
 import { colorScheme } from "./color-scheme";
-import { rem } from "./rem";
 import { InteropComputed } from "./interop";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
+import { globalVariables } from "./inheritance";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -181,7 +181,7 @@ function getMediaFeatureValue(value: MediaFeatureValue) {
         case "px":
           return length.value;
         case "rem":
-          return length.value * rem.get();
+          return length.value * globalVariables.rem.get();
         default:
           return null;
       }

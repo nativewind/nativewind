@@ -43,6 +43,7 @@ export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
   flags: Record<string, unknown>;
   selectorPrefix?: string;
   appearanceOrder: number;
+  rem?: StyleSheetRegisterOptions["rem"];
 }
 
 export type EnableCssInteropOptions<P> = {
@@ -270,6 +271,10 @@ export type StyleSheetRegisterOptions = {
   keyframes?: Record<string, ExtractedAnimation>;
   rootVariables?: Record<string, VariableRecord>;
   universalVariables?: Record<string, VariableRecord>;
+  rem?: {
+    light?: ExtractedStyleValue;
+    dark?: ExtractedStyleValue;
+  };
   flags?: Record<string, unknown>;
 };
 

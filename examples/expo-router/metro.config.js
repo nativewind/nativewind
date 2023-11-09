@@ -23,4 +23,5 @@ module.exports = withNativeWind(config, {
   input: "global.css",
   // This is optional
   projectRoot,
+  inlineRem: false,
 });

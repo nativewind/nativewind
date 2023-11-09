@@ -164,7 +164,7 @@ Additionally, the style compiler has be rewritten using [lightningcss](https://l
 
 ### `rem` Support
 
-NativeWind v4 includes `rem` unit support! Allow you to change the global scaling of your app. By default this behaviour is disabled, can be If you need to modify the default `rem` value or disable `rem` inlining, adjust your `metro.config.js`:
+NativeWind v4 includes scaling support for the `rem` unit. By default NativeWind will inline the `rem` value, replacing `rem` with `px` at build time. This greatly improves performance, but can be disabled if you need to dynamically change the `rem` value at runtime. [More information](https://www.nativewind.dev/v4/tailwind/typography/font-size)
 
 ```jsx title=metro.config.js
 export default withNativeWind(config, {

@@ -16,7 +16,6 @@ import {
 import { vh, vw } from "./misc";
 import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
 import { colorScheme } from "./color-scheme";
-import { rem } from "./rem";
 import { createSignal } from "../signals";
 import { createColorSchemeSignal, globalVariables } from "./inheritance";
 import {
@@ -39,7 +38,7 @@ const commonStyleSheet: CommonStyleSheet = {
     animationMap.clear();
     warnings.clear();
     warned.clear();
-    rem[INTERNAL_RESET]();
+    globalVariables.rem.set(14);
     vw[INTERNAL_RESET](dimensions);
     vh[INTERNAL_RESET](dimensions);
     colorScheme[INTERNAL_RESET](appearance);
@@ -93,6 +92,10 @@ const commonStyleSheet: CommonStyleSheet = {
         }
         signal.set(value);
       }
+    }
+
+    if (options.rem) {
+      globalVariables.rem.set(options.rem);
     }
 
     fastReloadSignal.set((fastReloadSignal.get() ?? 0) + 1);
