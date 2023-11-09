@@ -7,6 +7,7 @@ import {
   Pressable,
   ScrollView,
   StatusBar,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -52,6 +53,7 @@ export function unstable_styled<P extends object, M>(
 }
 
 cssInterop(Image, { className: "style" });
+cssInterop(Switch, { className: "style" });
 cssInterop(Pressable, { className: "style" });
 cssInterop(Text, { className: "style" });
 cssInterop(View, { className: "style" });

@@ -159,7 +159,7 @@ export async function tailwindCli(
       console.error(
         "\nError running TailwindCSS CLI, please run the CLI manually to see the error.",
       );
-      console.error("Command used: npx", ...spawnCommands);
+      console.error("Command used: ", ...spawnCommands);
       process.exit(1);
     });
 }
