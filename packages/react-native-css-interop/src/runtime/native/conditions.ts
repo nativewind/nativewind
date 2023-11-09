@@ -166,6 +166,10 @@ function testPlainFeature(
       return testComparison("greater-than-equal", ref.height, value);
     case "max-height":
       return testComparison("less-than-equal", ref.height, value);
+    case "orientation":
+      return value === "landscape"
+        ? testComparison("less-than", ref.height, ref.width)
+        : testComparison("greater-than-equal", ref.height, ref.width);
     default:
       return false;
   }
@@ -220,18 +224,21 @@ function testComparison(
   ref: number | SignalLike<number>,
   value: unknown,
 ) {
+  ref = unwrap(ref);
+  value = unwrap(value);
+
   if (typeof value !== "number") return false;
   switch (comparison) {
     case "equal":
-      return unwrap(ref) === value;
+      return ref === value;
     case "greater-than":
-      return unwrap(ref) > value;
+      return ref > value;
     case "greater-than-equal":
-      return unwrap(ref) >= value;
+      return ref >= value;
     case "less-than":
-      return unwrap(ref) < value;
+      return ref < value;
     case "less-than-equal":
-      return unwrap(ref) < value;
+      return ref < value;
   }
 }
 
