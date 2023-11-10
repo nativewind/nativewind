@@ -32,7 +32,7 @@ export function withCssInterop(
     ...config,
     resolver: {
       ...config.resolver,
-      sourceExts: [...config.resolver.sourceExts, "css"],
+      sourceExts: [...config?.resolver.sourceExts, "css"],
     },
     transformerPath: require.resolve("./transformer"),
     transformer: {

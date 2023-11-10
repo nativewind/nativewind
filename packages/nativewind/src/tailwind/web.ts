@@ -11,7 +11,10 @@ import { allowedColors } from "./common";
 const preset: Config = {
   content: [],
   theme: {
-    trackColor: allowedColors,
+    extend: {
+      trackColor: allowedColors,
+      thumbColor: allowedColors,
+    },
   },
   plugins: [
     plugin(({ addVariant }) => addVariant("web", "&")),

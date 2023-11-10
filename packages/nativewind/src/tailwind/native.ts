@@ -12,6 +12,7 @@ import { verify } from "./verify";
 import { translateX, translateY } from "./translate";
 import { shadows } from "./shadows";
 import { allowedColors } from "./common";
+import { nativeSwitch } from "./switch";
 
 const nativePlugins = plugin(function ({
   addUtilities,
@@ -159,7 +160,6 @@ const nativePlugins = plugin(function ({
 const preset: Config = {
   content: [],
   theme: {
-    trackColor: allowedColors,
     extend: {
       fontFamily: {
         sans: platformSelect({ android: "san-serif", ios: "'system font'" }),
@@ -222,7 +222,8 @@ const preset: Config = {
         transform:
           "transform, perspective, rotate, rotateX, rotateY, rotateZ, scale, scaleX, scaleY, translateX, translateY, skewX, skewY",
       },
-      trackColor: ({ colors }: any) => colors,
+      trackColor: allowedColors,
+      thumbColor: allowedColors,
     },
   },
   plugins: [
@@ -233,6 +234,7 @@ const preset: Config = {
     translateY,
     verify,
     nativePlugins,
+    nativeSwitch,
   ],
   corePlugins: {
     preflight: false,

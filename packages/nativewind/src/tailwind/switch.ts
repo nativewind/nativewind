@@ -15,7 +15,7 @@ export const nativeSwitch = plugin(function ({ matchUtilities, theme }) {
       },
     },
     {
-      values: flattenColorPalette(theme("trackColor")),
+      values: flattenColorPalette(theme("thumbColor")),
       type: ["color", "any"],
     },
   );
@@ -31,7 +31,7 @@ export const webSwitch = plugin(function ({
       thumb: (value) => {
         if (!corePlugins("backgroundOpacity")) {
           return {
-            '& > [style*="margin-left: -20"]': {
+            "& > div:nth-child(2)": {
               backgroundColor: toColorValue(value) + " !important",
             },
           };
@@ -46,12 +46,12 @@ export const webSwitch = plugin(function ({
         output["background-color"] += " !important";
 
         return {
-          '& > [style*="margin-left: -20"]': output,
+          "& > div:nth-child(2)": output,
         };
       },
     },
     {
-      values: flattenColorPalette(theme("trackColor")),
+      values: flattenColorPalette(theme("thumbColor")),
       type: ["color", "any"],
     },
   );
