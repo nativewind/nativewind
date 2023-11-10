@@ -10,6 +10,7 @@ import {
   Switch,
   Text,
   TextInput,
+  SafeAreaView,
   TouchableOpacity,
   View,
   VirtualizedList,
@@ -57,6 +58,7 @@ cssInterop(Switch, { className: "style" });
 cssInterop(Pressable, { className: "style" });
 cssInterop(Text, { className: "style" });
 cssInterop(View, { className: "style" });
+cssInterop(SafeAreaView, { className: "style" });
 cssInterop(ActivityIndicator, {
   className: {
     target: "style",
@@ -116,4 +118,8 @@ remapProps(VirtualizedList, {
 try {
   const { Svg } = require("react-native-svg");
   cssInterop(Svg, { className: "style" });
+} catch {}
+try {
+  const { SafeAreaView } = require("react-native-safe-area-context");
+  cssInterop(SafeAreaView, { className: "style" });
 } catch {}
