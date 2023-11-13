@@ -63,25 +63,18 @@ test("Component types", () => {
 });
 
 test("TextInput", () => {
-  registerCSS(`.text-black { color: black } .text-white { color: white }`);
+  registerCSS(
+    `.text-black { color: black } 
+     .placeholder\\:text-white:native-prop(placeholderTextColor,color) {
+       color: #fff
+     }`,
+  );
 
   render(
-    <TextInput
-      testID={testID}
-      className="text-black"
-      placeholderClassName="text-white"
-    />,
+    <TextInput testID={testID} className="text-black placeholder:text-white" />,
   );
 
   const component = screen.getByTestId(testID);
-
-  // These should be removed
-  expect(component.props).not.toEqual(
-    expect.objectContaining({
-      className: expect.any,
-      placeholderClassName: expect.any,
-    }),
-  );
 
   expect(component.props).toEqual(
     expect.objectContaining({

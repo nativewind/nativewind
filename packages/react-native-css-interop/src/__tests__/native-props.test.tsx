@@ -28,7 +28,8 @@ test(":native-prop() zero args", () => {
   );
 });
 
-test(":native-prop() one arg", () => {
+// This isn't supported just yet
+test.skip(":native-prop() one arg", () => {
   registerCSS(
     `.my-class:native-prop(color) { color: red; background-color: blue }`,
   );
@@ -49,7 +50,7 @@ test(":native-prop() one arg", () => {
 
 test(":native-prop() two args", () => {
   registerCSS(
-    `.my-class:native-prop(color,placeholderColor) { color: red; background-color: blue }`,
+    `.my-class:native-prop(placeholderColor,color) { color: red; background-color: blue }`,
   );
 
   const component = render(

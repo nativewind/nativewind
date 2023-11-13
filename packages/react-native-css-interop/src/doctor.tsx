@@ -15,12 +15,14 @@ export function verifyJSX() {
   return <react-native-css-interop-jsx-pragma-check /> === true;
 }
 
-export function verifyFlag(name: string, value: unknown = "true") {
-  return (
-    computedStyles.getPropertyValue(`--css-interop-verify-${name}`) === value
-  );
+export function verifyFlag(name?: string, value: unknown = "true") {
+  return globalThis.window
+    ? computedStyles.getPropertyValue(
+        name ? `--css-interop-${name}` : "--css-interop",
+      ) === value
+    : true;
 }
 
 export function verifyReceivedData() {
-  return computedStyles.getPropertyValue(`--css-interop`) === "true";
+  return verifyFlag();
 }

@@ -1,4 +1,3 @@
-import { ComponentType, createElement, forwardRef } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -19,39 +18,11 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-import { defaultCSSInterop } from "./runtime/css-interop";
-import { cssInterop, render } from "./runtime/render";
-import type {
-  ComponentTypeWithMapping,
-  EnableCssInteropOptions,
-  InteropFunction,
-} from "./types";
-import { remapProps } from "./runtime/css-interop";
-import { defaultInteropRef } from "./runtime/globals";
+import { defaultCSSInterop, remapProps } from "../css-interop";
+import { cssInterop } from "../render";
+import { defaultInteropRef } from "../globals";
 
 defaultInteropRef.current = defaultCSSInterop;
-
-export function unstable_styled<P extends object, M>(
-  component: ComponentType<P>,
-  mapping?: EnableCssInteropOptions<P> & M,
-  interop: InteropFunction = defaultCSSInterop,
-) {
-  if (mapping) {
-    cssInterop(component, mapping, interop);
-  }
-
-  return forwardRef<unknown, any>((props, _ref) => {
-    return render<any>(
-      (element, { children, ...props }, key) => {
-        children = Array.isArray(children) ? children : [children];
-        return createElement(element, { key, ...props }, ...children);
-      },
-      component,
-      props as any,
-      props.key,
-    );
-  }) as unknown as ComponentTypeWithMapping<P, M>;
-}
 
 cssInterop(Image, { className: "style" });
 cssInterop(Switch, { className: "style" });
@@ -111,15 +82,3 @@ remapProps(VirtualizedList, {
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
-
-/**
- *  These are popular 3rd party libraries that we want to support out of the box.
- */
-try {
-  const { Svg } = require("react-native-svg");
-  cssInterop(Svg, { className: "style" });
-} catch {}
-try {
-  const { SafeAreaView } = require("react-native-safe-area-context");
-  cssInterop(SafeAreaView, { className: "style" });
-} catch {}

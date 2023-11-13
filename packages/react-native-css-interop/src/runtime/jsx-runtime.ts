@@ -1,4 +1,5 @@
 import ReactJSXRuntime from "react/jsx-runtime";
+import "./components";
 import { render } from "./render";
 import { JSXFunction } from "../types";
 

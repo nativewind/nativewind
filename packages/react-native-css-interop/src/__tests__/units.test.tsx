@@ -8,7 +8,7 @@ import {
   registerCSS,
   resetStyles,
 } from "../testing-library";
-import { rem } from "../runtime/native/rem";
+import { rem } from "../runtime/native/inheritance";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);

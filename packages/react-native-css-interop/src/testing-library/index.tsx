@@ -13,7 +13,7 @@ import { cssToReactNativeRuntime } from "../css-to-rn";
 
 export { warnings } from "../runtime/native/stylesheet";
 
-import "../core-components";
+import "../runtime/components";
 
 export * from "../types";
 declare global {
