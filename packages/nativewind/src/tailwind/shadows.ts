@@ -69,6 +69,7 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
           "-rn-shadowColor": "var(--tw-shadow-color)",
           "-rn-shadow-offset": `${x} ${y}`,
           "-rn-shadow-radius": blur ?? 0,
+          "-rn-shadow-opacity": 1,
           "-rn-elevation": elevation,
         } as any;
       },
