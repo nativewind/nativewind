@@ -31,6 +31,9 @@ export type CssToReactNativeRuntimeOptions = {
   ignorePropertyWarningRegex?: (string | RegExp)[];
   selectorPrefix?: string;
   stylesheetOrder?: number;
+  experiments?: {
+    inlineAnimations?: true;
+  };
 };
 
 export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {

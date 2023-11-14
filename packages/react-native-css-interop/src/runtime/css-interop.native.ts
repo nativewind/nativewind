@@ -55,35 +55,37 @@ export const defaultCSSInterop: InteropFunction = (
    * This code shouldn't be needed, but inline shared values are not working properly.
    * https://github.com/software-mansion/react-native-reanimated/issues/5296
    */
-  if (effect.isAnimated) {
-    const entries = Object.entries(props.style);
-    props.style = useAnimatedStyle(() => {
-      const style: any = {};
+  if (!process.env.NATIVEWIND_INLINE_ANIMATION) {
+    if (effect.isAnimated) {
+      const entries = Object.entries(props.style);
+      props.style = useAnimatedStyle(() => {
+        const style: any = {};
 
-      for (const [key, value] of entries as any) {
-        if (typeof value === "object" && "value" in value) {
-          style[key] = value.value;
-        } else if (key === "transform") {
-          style.transform = value.map((v: any) => {
-            const [key, value] = Object.entries(v)[0] as any;
+        for (const [key, value] of entries as any) {
+          if (typeof value === "object" && "value" in value) {
+            style[key] = value.value;
+          } else if (key === "transform") {
+            style.transform = value.map((v: any) => {
+              const [key, value] = Object.entries(v)[0] as any;
 
-            if (typeof value === "object" && "value" in value) {
-              return { [key]: value.value };
-            } else {
-              return { [key]: value };
-            }
-          });
-        } else {
-          style[key] = value;
+              if (typeof value === "object" && "value" in value) {
+                return { [key]: value.value };
+              } else {
+                return { [key]: value };
+              }
+            });
+          } else {
+            style[key] = value;
+          }
         }
-      }
 
-      return style;
-    }, [props.style]);
-  } else {
-    useAnimatedStyle(() => {
-      return {};
-    }, [undefined]);
+        return style;
+      }, [props.style]);
+    } else {
+      useAnimatedStyle(() => {
+        return {};
+      }, [undefined]);
+    }
   }
 
   reactGlobal.isInComponent = false;

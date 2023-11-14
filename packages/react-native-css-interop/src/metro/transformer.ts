@@ -12,11 +12,13 @@ interface CssInteropJsTransformerConfig extends JsTransformerConfig {
   cssToReactNativeRuntime?: CssToReactNativeRuntimeOptions;
 }
 
+type Experiments = NonNullable<CssToReactNativeRuntimeOptions["experiments"]>;
+
 export function transform(
   config: CssInteropJsTransformerConfig,
   projectRoot: string,
   filename: string,
-  data: Buffer,
+  data: Buffer | string,
   options: JsTransformOptions,
 ): Promise<TransformResponse> {
   const transformer = config.transformerPath
@@ -36,13 +38,29 @@ export function transform(
 
   const isCSSModule = matchCssModule(filename);
 
+  data = experimentsToJS(config.cssToReactNativeRuntime?.experiments);
+
   data = Buffer.from(
     isCSSModule
-      ? `module.exports = require("react-native-css-interop").StyleSheet.create(${runtimeData});`
-      : `require("react-native-css-interop").StyleSheet.register(${runtimeData})`,
+      ? `${data}module.exports = require("react-native-css-interop").StyleSheet.create(${runtimeData});`
+      : `${data}require("react-native-css-interop").StyleSheet.register(${runtimeData})`,
   );
 
   return worker.transform(config, projectRoot, filename, data, options);
+}
+
+export function experimentsToJS(experiments: Experiments = {}): string {
+  return (
+    Object.entries(experiments) as [keyof Experiments, true | undefined][]
+  ).reduce((acc, [key, value]) => {
+    if (!value) return acc;
+    switch (key) {
+      case "inlineAnimations":
+        return `${acc}process.env.NATIVEWIND_INLINE_ANIMATION = '1';`;
+      default:
+        return acc;
+    }
+  }, "");
 }
 
 function matchCss(filePath: string): boolean {

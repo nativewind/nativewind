@@ -32,6 +32,7 @@ export function withNativeWind(
     configPath: tailwindConfigPath = "tailwind.config.js",
     cliCommand = "npx tailwindcss",
     hotServerOptions = {},
+    experiments,
   }: WithNativeWindOptions = {},
 ) {
   if (!input) {
@@ -51,6 +52,7 @@ export function withNativeWind(
   metroConfig = withCssInterop(metroConfig, {
     ...cssToReactNativeRuntimeOptions,
     inlineRem,
+    experiments,
     selectorPrefix:
       typeof importantConfig === "string" ? importantConfig : undefined,
   });
@@ -70,6 +72,7 @@ export function withNativeWind(
     ...metroConfig.transformer,
     nativewind: {
       input,
+      experiments,
     },
     getTransformOptions: async (
       entryPoints: ReadonlyArray<string>,
