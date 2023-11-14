@@ -45,6 +45,7 @@ export async function tailwindCli(
         `tailwindcss(${platform}) is taking a long time to build, please read https://tailwindcss.com/docs/content-configuration#pattern-recommendations to speed up your build time`,
       );
     }
+    reject();
     // 1 minute.
   }, 60000);
 

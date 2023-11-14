@@ -1,5 +1,6 @@
 import type { GetTransformOptionsOpts } from "metro-config";
 import loadConfig from "tailwindcss/loadConfig";
+import tailwindPackage from "tailwindcss/package.json";
 import type { ServerOptions } from "ws";
 import micromatch from "micromatch";
 
@@ -30,7 +31,11 @@ export function withNativeWind(
     projectRoot = process.cwd(),
     inlineRem = 14,
     configPath: tailwindConfigPath = "tailwind.config.js",
-    cliCommand = "npx tailwindcss",
+    cliCommand = path.join(
+      require.resolve("tailwindcss/package.json"),
+      "../",
+      tailwindPackage.bin.tailwindcss,
+    ),
     hotServerOptions = {},
     experiments,
   }: WithNativeWindOptions = {},
