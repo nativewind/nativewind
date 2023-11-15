@@ -131,13 +131,17 @@ export type ExtractedStyleValue =
   | ExtractedStyleValue[]
   | (() => ExtractedStyleValue);
 
+export type PropertyDescriptorValue = PropertyDescriptor | RuntimeValue;
+export type PropertyDescriptorValueEntries = Array<
+  [string, PropertyDescriptorValue]
+>;
+
 export type ExtractedStyle = {
   specificity: Specificity;
   isDynamic?: boolean;
   media?: MediaQuery[];
-  variables?: Record<string, ExtractedStyleValue>;
+  variables?: Array<[string, ExtractedStyleValue]>;
   prop?: [string, string | true];
-  style: Record<string, ExtractedStyleValue>;
   pseudoClasses?: PseudoClassesQuery;
   animations?: ExtractedAnimations;
   container?: Partial<ExtractedContainer>;
@@ -148,7 +152,19 @@ export type ExtractedStyle = {
   warnings?: ExtractionWarning[];
   importantStyles?: string[];
   nativeProps?: Record<string, string>;
+  entries?: [
+    string,
+    PropertyDescriptorValue | PropertyDescriptorValueEntries,
+  ][];
 };
+
+export interface ExtractedPropertyDescriptors
+  extends Omit<ExtractedStyle, "entries"> {
+  entries?: [
+    string,
+    PropertyDescriptor | Array<[string, PropertyDescriptor]>,
+  ][];
+}
 
 export type Specificity = CSSSpecificity;
 
@@ -167,8 +183,6 @@ export type CSSSpecificity = {
   O: number;
   /** Inline */
   inline?: number;
-  /** Remapped from remapProps */
-  remapped?: boolean;
 };
 
 export type StyleMeta = {

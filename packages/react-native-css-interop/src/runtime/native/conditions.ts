@@ -24,6 +24,10 @@ interface ConditionReference {
   height: number | SignalLike<number>;
 }
 
+export function testMediaQueries(mediaQueries: MediaQuery[]) {
+  return mediaQueries.every((query) => testMediaQuery(query));
+}
+
 /**
  * Test a media query against current conditions
  */

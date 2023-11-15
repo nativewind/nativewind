@@ -43,14 +43,7 @@ import type {
 
 import type { ExtractionWarning, RuntimeValue } from "../types";
 
-type AddStyleProp = (
-  property: string,
-  value: unknown,
-  options?: {
-    shortHand?: boolean;
-    append?: boolean;
-  },
-) => void;
+type AddStyleProp = (property: string, value: unknown) => void;
 
 type HandleStyleShorthand = (
   property: string,
@@ -293,10 +286,31 @@ export function parseDeclaration(
       },
     };
 
-    return addStyleProp(
-      declaration.value.propertyId.property,
-      parseUnparsed(declaration.value.value, parseOptions),
-    );
+    if (declaration.value.propertyId.property === "transform") {
+      for (const transform of declaration.value.value as any[]) {
+        if (transform.value.name === "translate") {
+          console.log(transform.value.arguments);
+          addStyleProp(
+            "translateX",
+            parseUnparsed(transform.value.arguments[0], parseOptions),
+          );
+          addStyleProp(
+            "translateY",
+            parseUnparsed(transform.value.arguments[2], parseOptions),
+          );
+        } else {
+          addStyleProp(
+            transform.value.name,
+            parseUnparsed(transform.value.arguments, parseOptions),
+          );
+        }
+      }
+    } else {
+      return addStyleProp(
+        declaration.value.propertyId.property,
+        parseUnparsed(declaration.value.value, parseOptions),
+      );
+    }
   } else if (declaration.property === "custom") {
     const property = declaration.value.name;
     if (

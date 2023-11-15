@@ -11,8 +11,9 @@ import type {
   InteropFunction,
   JSXFunction,
 } from "../types";
-import { defaultInteropRef, styleMetaMap } from "./globals";
+import { defaultInteropRef } from "./globals";
 import { getNormalizeConfig } from "./native/prop-mapping";
+import { opaqueStyles } from "./native/style";
 
 export type InteropTypeCheck<T> = {
   type: ComponentType<T>;
@@ -119,7 +120,7 @@ export function cssInterop<T extends {}, M>(
 
   const checkArray = (props: any[]) =>
     props.some((prop): boolean => {
-      return Array.isArray(prop) ? checkArray(prop) : styleMetaMap.has(prop);
+      return Array.isArray(prop) ? checkArray(prop) : opaqueStyles.has(prop);
     });
 
   const interopComponent: InteropTypeCheck<T> = {
@@ -141,13 +142,12 @@ export function cssInterop<T extends {}, M>(
         }
 
         const target: any = props[targetProp];
-        const targetMeta = styleMetaMap.get(target);
 
         if (Array.isArray(target)) {
           if (checkArray(target)) {
             return true;
           }
-        } else if (targetMeta && !targetMeta.alreadyProcessed) {
+        } else if (opaqueStyles.has(target)) {
           return true;
         }
       }

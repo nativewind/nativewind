@@ -55,9 +55,9 @@ test("rotate-45", () => {
 *, ::before, ::after{
   --tw-translate-x: 0;
   --tw-translate-y: 0;
-  --tw-rotate: 0;
-  --tw-skew-x: 0;
-  --tw-skew-y: 0;
+  --tw-rotate: 0deg;
+  --tw-skew-x: 0deg;
+  --tw-skew-y: 0deg;
   --tw-scale-x: 1;
   --tw-scale-y: 1;
   --tw-pan-x:  ;

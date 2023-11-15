@@ -35,11 +35,11 @@ test("dynamic variables should not unmount children", () => {
     </A>,
   ).getByTestId(testID);
 
-  expect(onMount).toBeCalledTimes(1);
-  expect(onUnMount).not.toBeCalled();
+  expect(onUnMount).not.toHaveBeenCalled();
+  expect(onMount).toHaveBeenCalledTimes(1);
 
   fireEvent(component, "hoverIn");
 
-  expect(onUnMount).not.toBeCalled();
-  expect(onMount).toBeCalledTimes(1);
+  expect(onUnMount).not.toHaveBeenCalled();
+  expect(onMount).toHaveBeenCalledTimes(1);
 });

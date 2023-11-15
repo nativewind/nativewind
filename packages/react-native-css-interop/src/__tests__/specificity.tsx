@@ -35,12 +35,7 @@ test("inline styles", () => {
     <A testID={testID} className="red" style={{ backgroundColor: "blue" }} />,
   ).getByTestId(testID);
 
-  // RN merges styles RTL, so we need to make sure the array is in
-  // Ascending specificity order
-  expect(component).toHaveStyle([
-    { backgroundColor: "rgba(255, 0, 0, 1)" },
-    { backgroundColor: "blue" },
-  ]);
+  expect(component).toHaveStyle({ backgroundColor: "blue" });
 });
 
 test("specificity order", () => {
@@ -50,12 +45,7 @@ test("specificity order", () => {
     <A testID={testID} className="blue red" />,
   ).getByTestId(testID);
 
-  // RN merges styles RTL, so we need to make sure the array is in
-  // Ascending specificity order
-  expect(component).toHaveStyle([
-    { color: "rgba(255, 0, 0, 1)" },
-    { color: "rgba(0, 0, 255, 1)" },
-  ]);
+  expect(component).toHaveStyle({ color: "rgba(0, 0, 255, 1)" });
 });
 
 test("specificity modifiers", () => {
@@ -86,10 +76,7 @@ test("important - no wrapper", () => {
     <A testID={testID} className="blue red" />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle([
-    { color: "rgba(255, 0, 0, 1)" },
-    { color: "rgba(0, 0, 255, 1)" },
-  ]);
+  expect(component).toHaveStyle({ color: "rgba(0, 0, 255, 1)" });
 });
 
 test("important - inline", () => {
@@ -101,10 +88,7 @@ test("important - inline", () => {
     <A testID={testID} className="blue" style={{ backgroundColor: "red" }} />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle([
-    { backgroundColor: "red" },
-    { backgroundColor: "rgba(0, 0, 255, 1)" },
-  ]);
+  expect(component).toHaveStyle({ backgroundColor: "rgba(0, 0, 255, 1)" });
 });
 
 test("important - modifiers", () => {

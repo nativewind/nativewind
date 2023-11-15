@@ -12,9 +12,8 @@ import { Pressable, View } from "react-native";
 import { InheritanceProvider } from "./native/inheritance";
 import { useInteropComputed } from "./native/interop";
 import { getNormalizeConfig } from "./native/prop-mapping";
-import { getGlobalStyle, getSpecificity } from "./native/stylesheet";
 import { interopComponents } from "./render";
-import { opaqueStyles, styleSpecificity, styleMetaMap } from "./globals";
+import { opaqueStyles, styleSignals } from "./native/style";
 
 export const defaultCSSInterop: InteropFunction = (
   component,
@@ -29,7 +28,7 @@ export const defaultCSSInterop: InteropFunction = (
 
   props = {
     ...props,
-    ...effect.styledProps,
+    ...effect.props,
   };
 
   for (const source of options.sources) {
@@ -123,18 +122,16 @@ export function remapProps<P, M>(
         delete props[sourceProp];
 
         for (const className of source.split(/\s+/)) {
-          const style = getGlobalStyle(className);
+          const signal = styleSignals.get(className);
 
-          if (style !== undefined) {
-            const opaqueStyle = {};
-            const copyOfStyle = { ...style };
-            opaqueStyles.set(opaqueStyle, copyOfStyle);
-            styleSpecificity.set(copyOfStyle, {
-              remapped: true,
-              ...getSpecificity(style),
+          if (signal !== undefined) {
+            const style = {};
+            opaqueStyles.set(style, {
+              reducer(acc) {
+                return signal?.reducer(acc, true) ?? acc;
+              },
             });
-            styleMetaMap.set(opaqueStyle, {});
-            rawStyles.push(opaqueStyle);
+            rawStyles.push(style);
           }
         }
       }

@@ -1,14 +1,4 @@
 import { Specificity } from "../types";
-import { getSpecificity } from "./native/stylesheet";
-
-export function styleSpecificityCompareFn(direction = "asc") {
-  return (a?: object, b?: object) => {
-    return (
-      specificityCompare(getSpecificity(a), getSpecificity(b)) *
-      (direction === "asc" ? 1 : -1)
-    );
-  };
-}
 
 export function specificityCompare(a: Specificity, b: Specificity) {
   // Important first

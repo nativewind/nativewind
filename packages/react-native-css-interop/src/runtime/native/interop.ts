@@ -1,5 +1,4 @@
 import { useContext, useEffect, useRef, useSyncExternalStore } from "react";
-import { LayoutChangeEvent } from "react-native";
 import {
   Computed as Computed,
   Signal,
@@ -9,19 +8,14 @@ import {
   reactGlobal,
 } from "../signals";
 import { NormalizedOptions } from "./prop-mapping";
-import { fastReloadSignal, StyleSheet, getGlobalStyle } from "./stylesheet";
+import { fastReloadSignal, StyleSheet } from "./stylesheet";
 import { effectContext, globalVariables } from "./inheritance";
 import {
-  ExtractedAnimations,
-  ExtractedStyleFrame,
   ExtractedStyleValue,
-  ExtractedTransition,
   GetInteraction,
   Interaction,
   StyleProp,
 } from "../../types";
-import { styleSpecificityCompareFn } from "../specificity";
-import { extractValue, flattenStyle } from "./flatten-style";
 import { DEFAULT_CONTAINER_NAME, transformKeys } from "../../shared";
 import {
   AnimatableValue,
@@ -34,9 +28,16 @@ import {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import { Time } from "lightningcss";
-import { colorScheme } from "./color-scheme";
-import { styleMetaMap, animationMap } from "../globals";
+import {
+  createPropAccumulator,
+  defaultValues,
+  extractAnimationValue,
+  reduceInlineStyle,
+  styleSignals,
+  timeToMS,
+} from "./style";
+import { LayoutChangeEvent } from "react-native";
+import { animationMap } from "../globals";
 
 export interface InteropComputed extends Computed<any> {
   rerender(parent: InteropComputed, props: Record<string, unknown>): void;
@@ -48,8 +49,6 @@ export interface InteropComputed extends Computed<any> {
   contextValue?: InteropComputed;
   shouldUpdateContext: boolean;
   convertToPressable: boolean;
-  requiresLayout: boolean;
-  isLayoutReady: () => boolean;
   signals: Map<string, Signal<any>>;
   // Variable
   getVariable: (name: string) => ExtractedStyleValue;
@@ -113,7 +112,10 @@ export function createInteropComputed(
   const interaction: Interaction = {};
 
   const inlineSignals = new Map();
-  const layoutSignal = createSignal([0, 0], `${props.testID}#layout`);
+  const layoutSignal = createSignal<[number, number] | undefined>(
+    undefined,
+    `${props.testID}#layout`,
+  );
   const signalsSetDuringRender = new Set();
   let containerSignal: Signal<InteropComputed> | undefined;
   let hasInlineContainers: boolean = false;
@@ -131,7 +133,6 @@ export function createInteropComputed(
     currentAnimationNames: new Set(),
     // rendering
     shouldUpdateContext: false,
-    requiresLayout: false,
     convertToPressable: false,
     // animations
     signals: new Map(),
@@ -197,10 +198,7 @@ export function createInteropComputed(
       }
     },
     getLayout() {
-      return layoutSignal.get()! as [number, number];
-    },
-    isLayoutReady() {
-      return interop.getLayout()[0] !== 0;
+      return layoutSignal.get() ?? [0, 0];
     },
     rerender(parent, props) {
       let shouldRerender =
@@ -223,7 +221,6 @@ export function createInteropComputed(
       // Update the tracking
       reactGlobal.delayedEvents.delete(interop as InteropComputed);
       interop.lastDependencies = options.dependencies.map((k) => props![k]);
-      interop.requiresLayout = false;
       interop.shouldUpdateContext = false;
       interop.convertToPressable = false;
 
@@ -235,368 +232,287 @@ export function createInteropComputed(
       // TODO: This should be improved...
       fastReloadSignal.get();
 
-      const styledProps: Record<string, any> = {};
-
-      let hasActive: boolean | undefined = false;
-      let hasHover: boolean | undefined = false;
-      let hasFocus: boolean | undefined = false;
-      interop.requiresLayout = false;
-
       let dynamicStyles = false;
 
-      for (const [key, { sources, nativeStyleToProp }] of options.config) {
+      const acc = createPropAccumulator(interop);
+
+      for (const [prop, { sources, nativeStyleToProp }] of options.config) {
         dynamicStyles ||= Boolean(nativeStyleToProp);
 
-        let prop = props[key] as StyleProp;
-        let stylesToFlatten: StyleProp = [];
-        if (prop) {
-          if (Array.isArray(prop)) {
-            prop = prop.flat(10);
-            for (const style of prop) {
-              if (!style) continue;
-              dynamicStyles ||= styleMetaMap.has(style);
-              stylesToFlatten.push(getGlobalStyle(style));
-            }
-          } else {
-            dynamicStyles ||= styleMetaMap.has(prop);
-            stylesToFlatten.push(getGlobalStyle(prop));
-          }
+        let propValue = props[prop] as StyleProp;
+
+        if (propValue) {
+          reduceInlineStyle(acc, prop, propValue);
         }
 
         for (const sourceProp of sources) {
           const source = props?.[sourceProp];
           if (typeof source !== "string") continue;
-
           StyleSheet.unstable_hook_onClassName?.(source);
-
           for (const className of source.split(/\s+/)) {
-            let styles = getGlobalStyle(className);
+            let styles = styleSignals.get(className);
             if (!styles) continue;
+            styles.reducer(acc);
+          }
+        }
 
-            if (Array.isArray(styles)) {
-              for (const style of styles) {
-                if (!style) continue;
-                dynamicStyles ||= styleMetaMap.has(style);
-                stylesToFlatten.push(style);
-              }
+        if (prop === "style") {
+          if (typeof acc.props[prop].width === "number") {
+            acc.requiresLayoutWidth = false;
+          }
+          if (typeof acc.props[prop].height === "number") {
+            acc.requiresLayoutHeight = false;
+          }
+
+          const needsLayout =
+            acc.requiresLayoutWidth || acc.requiresLayoutHeight;
+
+          const seenAnimatedProps = new Set();
+
+          if (acc.animations) {
+            const {
+              name: animationNames,
+              duration: durations,
+              delay: delays,
+              iterationCount: iterationCounts,
+            } = acc.animations;
+
+            interop.isAnimated = true;
+
+            if (needsLayout && !layoutSignal.peek()) {
+              // Since layout isn't ready, subscribe to it so we can re-render when it is
+              layoutSignal.get();
             } else {
-              dynamicStyles ||= styleMetaMap.has(styles);
-              stylesToFlatten.push(styles);
-            }
-          }
-        }
+              let names: string[] = [];
+              let shouldResetAnimations = false;
 
-        stylesToFlatten = stylesToFlatten.sort(
-          styleSpecificityCompareFn(dynamicStyles ? "desc" : "asc"),
-        );
-
-        if (stylesToFlatten.length === 1) {
-          stylesToFlatten = stylesToFlatten[0] as StyleProp;
-        }
-
-        if (!stylesToFlatten) continue;
-
-        // If the styles are not dynamic, then we can avoid flattenStyle
-        if (!dynamicStyles) {
-          styledProps[key] = stylesToFlatten;
-          continue;
-        }
-
-        let style: Record<string, any> = flattenStyle(
-          stylesToFlatten,
-          interop as InteropComputed,
-          {},
-          {},
-        );
-        const meta = styleMetaMap.get(style);
-
-        style = { ...style };
-        if (meta) {
-          styleMetaMap.set(style, meta);
-        }
-
-        if (meta) {
-          /**
-           * If the style could possibly add variables or containers (even if not currently),
-           * we the effect should create a context. This stop children unmounting
-           * when the variables/containers become active
-           */
-          if (meta.wrapInContext && !interop.contextValue) {
-            interop.shouldUpdateContext = true;
-          }
-
-          hasActive ||= hasInlineContainers || meta.pseudoClasses?.active;
-          hasHover ||= hasInlineContainers || meta.pseudoClasses?.hover;
-          hasFocus ||= hasInlineContainers || meta.pseudoClasses?.focus;
-          interop.requiresLayout ||= Boolean(hasInlineContainers);
-
-          if (meta.nativeProps) {
-            for (let prop of Object.values(meta.nativeProps)) {
-              if (prop in style) {
-                styledProps[prop] = style[prop];
-                delete style[prop];
-              }
-            }
-          }
-        }
-
-        /**
-         * Map the flatStyle to the correct prop and/or move style properties to props (nativeStyleToProp)
-         *
-         * Note: We freeze the flatStyle as many of its props are getter's without a setter
-         *  Freezing the whole object keeps everything consistent
-         */
-        if (nativeStyleToProp) {
-          for (let [key, targetProp] of Object.entries(nativeStyleToProp)) {
-            if (key in style) {
-              if (typeof targetProp === "string") {
-                styledProps[targetProp] = style[key];
-              } else {
-                styledProps[key] = style[key];
-              }
-              delete style[key];
-            }
-          }
-        }
-
-        styledProps[key] = style;
-
-        const seenAnimatedProps = new Set();
-
-        if (key === "style" && meta?.animations) {
-          const needsLayout = Boolean(
-            (meta.requiresLayoutWidth && style.width === undefined) ||
-              (meta.requiresLayoutHeight && style.height === undefined),
-          );
-
-          interop.requiresLayout ||= Boolean(
-            meta.requiresLayoutWidth || meta.requiresLayoutHeight,
-          );
-
-          interop.isAnimated = true;
-
-          if (needsLayout && !interop.isLayoutReady()) {
-            // Since layout isn't ready, subscribe to it so we can re-render when it is
-            layoutSignal.get();
-          } else {
-            const a = { ...defaultAnimation, ...meta.animations };
-
-            let names: string[] = [];
-            let shouldResetAnimations = false;
-
-            for (const name of a.name) {
-              if (name.type === "none") {
-                names = [];
-                interop.currentAnimationNames.clear();
-                break;
-              }
-
-              names.push(name.value);
-
-              if (!interop.currentAnimationNames.has(name.value)) {
-                shouldResetAnimations = true;
-              }
-            }
-
-            if (shouldResetAnimations) {
-              interop.currentAnimationNames.clear();
-
-              // Loop in reverse order
-              for (let index = names.length - 1; index >= 0; index--) {
-                const name = names[index % names.length];
-                interop.currentAnimationNames.add(name);
-
-                const keyframes = animationMap.get(name);
-                if (!keyframes) {
-                  continue;
+              for (const name of animationNames) {
+                if (name.type === "none") {
+                  names = [];
+                  interop.currentAnimationNames.clear();
+                  break;
                 }
 
-                const totalDuration = timeToMS(
-                  a.duration[index % a.name.length],
-                );
-                const delay = timeToMS(a.delay[index % a.delay.length]);
-                const iterationCount =
-                  a.iterationCount[index % a.iterationCount.length];
-                const iterations =
-                  iterationCount.type === "infinite"
-                    ? -1
-                    : iterationCount.value;
+                names.push(name.value);
 
-                for (const [prop, [initialFrame, ...frames]] of Object.entries(
-                  keyframes.frames,
-                )) {
-                  if (seenAnimatedProps.has(prop)) continue;
-                  seenAnimatedProps.add(prop);
+                if (!interop.currentAnimationNames.has(name.value)) {
+                  shouldResetAnimations = true;
+                }
+              }
 
-                  const initialValue = extractAnimationValue(
-                    initialFrame,
-                    prop,
-                    style,
-                    meta,
-                    interop,
-                  );
+              if (shouldResetAnimations) {
+                interop.currentAnimationNames.clear();
 
-                  const sequence = frames.map((frame) => {
-                    return withDelay(
-                      delay,
-                      withTiming(
-                        extractAnimationValue(
-                          frame,
-                          prop,
-                          style,
-                          meta,
-                          interop,
-                        ),
-                        {
-                          duration: totalDuration * frame.progress,
-                          easing: Easing.linear,
-                        },
-                      ),
-                    );
-                  }) as [AnimatableValue, ...AnimatableValue[]];
+                // Loop in reverse order
+                for (let index = names.length - 1; index >= 0; index--) {
+                  const name = names[index % names.length];
+                  interop.currentAnimationNames.add(name);
 
-                  let sharedValue = interop.sharedValues[prop];
-                  if (!sharedValue) {
-                    sharedValue = makeMutable(initialValue);
-                    interop.sharedValues[prop] = sharedValue;
-                  } else {
-                    sharedValue.value = initialValue;
+                  const keyframes = animationMap.get(name);
+                  if (!keyframes) {
+                    continue;
                   }
 
-                  sharedValue.value = withRepeat(
-                    withSequence(...sequence),
-                    iterations,
+                  const totalDuration = timeToMS(
+                    durations[index % name.length],
                   );
+                  const delay = timeToMS(delays[index % delays.length]);
+                  const iterationCount =
+                    iterationCounts[index % iterationCounts.length];
+                  const iterations =
+                    iterationCount.type === "infinite"
+                      ? -1
+                      : iterationCount.value;
 
-                  styledProps[key][prop] = sharedValue;
-                }
-              }
-            } else {
-              for (const name of names) {
-                const keyframes = animationMap.get(name);
-                if (!keyframes) {
-                  continue;
-                }
+                  for (const [
+                    prop,
+                    [initialFrame, ...frames],
+                  ] of Object.entries(keyframes.frames)) {
+                    if (seenAnimatedProps.has(prop)) continue;
+                    seenAnimatedProps.add(prop);
 
-                for (const prop of Object.keys(keyframes.frames)) {
-                  styledProps[key][prop] = interop.sharedValues[prop];
-                  seenAnimatedProps.add(prop);
+                    const initialValue = extractAnimationValue(
+                      initialFrame,
+                      prop,
+                      acc.props[prop],
+                      meta,
+                      interop,
+                    );
+
+                    const sequence = frames.map((frame) => {
+                      return withDelay(
+                        delay,
+                        withTiming(
+                          extractAnimationValue(
+                            frame,
+                            prop,
+                            acc.props[prop],
+                            meta,
+                            interop,
+                          ),
+                          {
+                            duration: totalDuration * frame.progress,
+                            easing: Easing.linear,
+                          },
+                        ),
+                      );
+                    }) as [AnimatableValue, ...AnimatableValue[]];
+
+                    let sharedValue = interop.sharedValues[prop];
+                    if (!sharedValue) {
+                      sharedValue = makeMutable(initialValue);
+                      interop.sharedValues[prop] = sharedValue;
+                    } else {
+                      sharedValue.value = initialValue;
+                    }
+
+                    sharedValue.value = withRepeat(
+                      withSequence(...sequence),
+                      iterations,
+                    );
+
+                    acc.props[prop][prop] = sharedValue;
+                  }
+                }
+              } else {
+                for (const name of names) {
+                  const keyframes = animationMap.get(name);
+                  if (!keyframes) {
+                    continue;
+                  }
+
+                  for (const prop of Object.keys(keyframes.frames)) {
+                    acc.props[prop][prop] = interop.sharedValues[prop];
+                    seenAnimatedProps.add(prop);
+                  }
                 }
               }
             }
+          } else {
+            interop.currentAnimationNames.clear();
           }
-        } else {
-          interop.currentAnimationNames.clear();
-        }
 
-        // We only support transition on 'style' right now
-        if (key === "style" && meta?.transition) {
-          interop.isAnimated = true;
+          // We only support transition on 'style' right now
+          if (acc.transition) {
+            interop.isAnimated = true;
 
-          const t = { ...defaultTransition, ...meta.transition };
-          for (let index = 0; index < t.property.length; index++) {
-            const prop = t.property[index];
+            const {
+              property: properties,
+              duration: durations,
+              delay: delays,
+            } = acc.transition;
 
+            for (let index = 0; index < properties.length; index++) {
+              const prop2 = properties[index];
+
+              if (seenAnimatedProps.has(prop2)) continue;
+
+              let value = acc.props[prop][prop2] ?? defaultValues[prop2];
+              if (typeof value === "function") {
+                value = value();
+              }
+              if (value === undefined) continue;
+
+              seenAnimatedProps.add(prop2);
+
+              const duration = timeToMS(durations[index % durations.length]);
+              const delay = timeToMS(delays[index % delays.length]);
+              // const easing: any =
+              //   transition.timingFunction[
+              //     index % transition.timingFunction.length
+              //   ];
+
+              let sharedValue = interop.sharedValues[prop2];
+              if (!sharedValue) {
+                sharedValue = makeMutable(value);
+                interop.sharedValues[prop2] = sharedValue;
+              }
+
+              if (value !== sharedValue.value) {
+                sharedValue.value = withDelay(
+                  delay,
+                  withTiming(value, { duration }),
+                );
+              }
+
+              acc.props[prop][prop2] = sharedValue;
+            }
+          }
+
+          for (const [prop, value] of Object.entries(interop.sharedValues)) {
             if (seenAnimatedProps.has(prop)) continue;
-
-            let value: any = style[prop] ?? defaultValues[prop];
-            if (typeof value === "function") {
-              value = value();
-            }
-            if (value === undefined) continue;
-
-            seenAnimatedProps.add(prop);
-
-            const duration = timeToMS(t.duration[index % t.duration.length]);
-            const delay = timeToMS(t.delay[index % t.delay.length]);
-            // const easing: any =
-            //   transition.timingFunction[
-            //     index % transition.timingFunction.length
-            //   ];
-
-            let sharedValue = interop.sharedValues[prop];
-            if (!sharedValue) {
-              sharedValue = makeMutable(value);
-              interop.sharedValues[prop] = sharedValue;
-            }
-
-            if (value !== sharedValue.value) {
-              sharedValue.value = withDelay(
-                delay,
-                withTiming(value, { duration }),
-              );
-            }
-
-            styledProps[key][prop] = sharedValue;
+            cancelAnimation(value);
+            value.value = acc.props[prop][prop] ?? defaultValues[prop];
           }
         }
 
-        for (const [key, value] of Object.entries(interop.sharedValues)) {
-          if (seenAnimatedProps.has(key)) continue;
-          cancelAnimation(value);
-          value.value = styledProps[key] ?? defaultValues[key];
-        }
-
-        for (const tKey of transformKeys) {
-          if (tKey in styledProps[key]) {
-            styledProps[key].transform ??= [];
-            styledProps[key].transform.push({
-              [tKey]: styledProps[key][tKey],
-            });
-            delete styledProps[key][tKey];
+        if (typeof acc.props[prop] === "object") {
+          for (const tKey of transformKeys) {
+            if (tKey in acc.props[prop]) {
+              acc.props[prop].transform ??= [];
+              acc.props[prop].transform.push({
+                [tKey]: acc.props[prop][tKey],
+              });
+              delete acc.props[prop][tKey];
+            }
           }
         }
       }
 
-      styledProps.onLayout = (event: LayoutChangeEvent) => {
-        props.onLayout?.(event);
-        const layout = event.nativeEvent.layout;
-
-        const [width, height] = layoutSignal.peek()!;
-
-        if (layout.width !== width || layout.height !== height) {
-          layoutSignal.set([layout.width, layout.height]);
-        }
-      };
-
-      if (hasActive) {
+      if (acc.hasActive || acc.hasContainer) {
         interop.convertToPressable = true;
-        styledProps.onPressIn = (event: unknown) => {
+        acc.props.onPressIn = (event: unknown) => {
           props.onPressIn?.(event);
           interop.setInteraction("active", true);
         };
-        styledProps.onPressOut = (event: unknown) => {
+        acc.props.onPressOut = (event: unknown) => {
           props.onPressOut?.(event);
           interop.setInteraction("active", false);
         };
       }
-      if (hasHover) {
+      if (acc.hasHover || acc.hasContainer) {
         interop.convertToPressable = true;
-        styledProps.onHoverIn = (event: unknown) => {
+        acc.props.onHoverIn = (event: unknown) => {
           props.onHoverIn?.(event);
           interop.setInteraction("hover", true);
         };
-        styledProps.onHoverOut = (event: unknown) => {
+        acc.props.onHoverOut = (event: unknown) => {
           props.onHoverIn?.(event);
           interop.setInteraction("hover", false);
         };
       }
-      if (hasFocus) {
+      if (acc.hasFocus || acc.hasContainer) {
         interop.convertToPressable = true;
-        styledProps.onFocus = (event: unknown) => {
+        acc.props.onFocus = (event: unknown) => {
           props.onFocus?.(event);
           interop.setInteraction("focus", true);
         };
-        styledProps.onBlur = (event: unknown) => {
+        acc.props.onBlur = (event: unknown) => {
           props.onBlur?.(event);
           interop.setInteraction("focus", false);
         };
       }
 
       if (interop.convertToPressable) {
-        styledProps.onPress = (event: unknown) => {
+        acc.props.onPress = (event: unknown) => {
           props.onPress?.(event);
           interop.setInteraction("active", false);
+        };
+      }
+
+      if (acc.requiresLayoutWidth || acc.requiresLayoutHeight) {
+        if (!layoutSignal.peek()) {
+          // Since layout isn't ready, subscribe to it so we can re-render when it is
+          layoutSignal.get();
+        }
+
+        acc.props.onLayout = (event: LayoutChangeEvent) => {
+          props.onLayout?.(event);
+          const layout = event.nativeEvent.layout;
+          const [width, height] = layoutSignal.peek() ?? [0, 0];
+          if (layout.width !== width || layout.height !== height) {
+            layoutSignal.set([layout.width, layout.height]);
+          }
         };
       }
 
@@ -621,15 +537,17 @@ export function createInteropComputed(
           interop.shouldUpdateContext = true;
         }
       }
+
       interop.shouldUpdateContext ||=
-        inlineSignals.size !== signalsSetDuringRender.size;
+        inlineSignals.size !== signalsSetDuringRender.size ||
+        (acc.forceContext && !interop.contextValue);
 
       if (interop.shouldUpdateContext) {
         // Duplicate this object, making it identify different
         interop.contextValue = Object.assign({}, interop as InteropComputed);
       }
 
-      return { ...interop, styledProps };
+      return { ...interop, props: acc.props };
     },
   };
 
@@ -642,125 +560,3 @@ export function createInteropComputed(
 
   return interop;
 }
-
-const defaultTransition: Required<ExtractedTransition> = {
-  property: [],
-  duration: [
-    {
-      type: "seconds",
-      value: 0,
-    },
-  ],
-  delay: [
-    {
-      type: "seconds",
-      value: 0,
-    },
-  ],
-  timingFunction: [{ type: "linear" }],
-};
-
-const defaultAnimation: Required<ExtractedAnimations> = {
-  direction: ["normal"],
-  fillMode: ["none"],
-  iterationCount: [{ type: "number", value: 1 }],
-  timingFunction: [{ type: "linear" }],
-  name: [],
-  playState: ["running"],
-  duration: [
-    {
-      type: "seconds",
-      value: 0,
-    },
-  ],
-  delay: [
-    {
-      type: "seconds",
-      value: 0,
-    },
-  ],
-};
-
-const timeToMS = (time: Time) => {
-  return time.type === "milliseconds" ? time.value : time.value * 1000;
-};
-
-function extractAnimationValue(
-  frame: ExtractedStyleFrame,
-  prop: string,
-  style: Record<string, any>,
-  meta: any,
-  interop: InteropComputed,
-) {
-  let value =
-    frame.value === "!INHERIT!"
-      ? style[prop] ?? defaultValues[prop]
-      : frame.value === "!INITIAL!"
-      ? defaultValues[prop]
-      : extractValue(frame.value, style, meta, interop);
-
-  return typeof value === "function" ? value() : value;
-}
-
-export const defaultValues: Record<
-  string,
-  AnimatableValue | (() => AnimatableValue)
-> = {
-  backgroundColor: "transparent",
-  borderBottomColor: "transparent",
-  borderBottomLeftRadius: 0,
-  borderBottomRightRadius: 0,
-  borderBottomWidth: 0,
-  borderColor: "transparent",
-  borderLeftColor: "transparent",
-  borderLeftWidth: 0,
-  borderRadius: 0,
-  borderRightColor: "transparent",
-  borderRightWidth: 0,
-  borderTopColor: "transparent",
-  borderTopWidth: 0,
-  borderWidth: 0,
-  bottom: 0,
-  color: () => {
-    return colorScheme.get() === "dark" ? "white" : "black";
-  },
-  flex: 1,
-  flexBasis: 1,
-  flexGrow: 1,
-  flexShrink: 0,
-  fontSize: 14,
-  fontWeight: "400",
-  gap: 0,
-  left: 0,
-  lineHeight: 14,
-  margin: 0,
-  marginBottom: 0,
-  marginLeft: 0,
-  marginRight: 0,
-  marginTop: 0,
-  maxHeight: 99999,
-  maxWidth: 99999,
-  minHeight: 0,
-  minWidth: 0,
-  opacity: 1,
-  padding: 0,
-  paddingBottom: 0,
-  paddingLeft: 0,
-  paddingRight: 0,
-  paddingTop: 0,
-  perspective: 1,
-  right: 0,
-  rotate: "0deg",
-  rotateX: "0deg",
-  rotateY: "0deg",
-  rotateZ: "0deg",
-  scale: 1,
-  scaleX: 1,
-  scaleY: 1,
-  skewX: "0deg",
-  skewY: "0deg",
-  top: 0,
-  translateX: 0,
-  translateY: 0,
-  zIndex: 0,
-};

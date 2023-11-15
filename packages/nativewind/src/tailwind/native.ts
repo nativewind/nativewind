@@ -15,6 +15,7 @@ import { allowedColors } from "./common";
 import { nativeSwitch } from "./switch";
 
 const nativePlugins = plugin(function ({
+  addBase,
   addUtilities,
   addVariant,
   corePlugins,
@@ -24,6 +25,13 @@ const nativePlugins = plugin(function ({
   theme,
 }) {
   const nativePlatforms = ["android", "ios", "windows", "macos"];
+  addBase({
+    "*": {
+      "--tw-rotate": "0deg",
+      "--tw-skew-x": "0deg",
+      "--tw-skew-y": "0deg",
+    },
+  });
   /**
    * `display-mode` is a valid media query, but the ${platform} values are not.
    *

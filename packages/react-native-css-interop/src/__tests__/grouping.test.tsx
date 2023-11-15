@@ -32,7 +32,7 @@ test("group", async () => {
     </A>,
   );
 
-  expect(getByTestId(testID)).toHaveStyle({});
+  expect(getByTestId(testID)).toHaveStyle(undefined);
 
   rerender(
     <A className="group/item">
@@ -68,7 +68,7 @@ test("group - active", async () => {
   const parent = screen.getByTestId(parentID);
   const child = screen.getByTestId(childID);
 
-  expect(child).toHaveStyle({});
+  expect(child).toHaveStyle(undefined);
 
   fireEvent(parent, "pressIn");
 

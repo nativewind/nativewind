@@ -282,13 +282,19 @@ function setStyleForSelectorList(
       selector.type === "rootVariables" ||
       selector.type === "universalVariables"
     ) {
-      if (style.style.fontSize) {
+      const styleEntries = style.entries?.find(([key]) => key === "style");
+      const fontSize =
+        styleEntries &&
+        Array.isArray(styleEntries[1]) &&
+        styleEntries[1].find(([key]) => key === "fontSize")?.[1];
+
+      if (fontSize && "value" in fontSize) {
         options.rem ??= {};
 
         if (selector.subtype === "light") {
-          options.rem.light = style.style.fontSize;
+          options.rem.light = fontSize.value;
         } else {
-          options.rem.dark = style.style.fontSize;
+          options.rem.dark = fontSize.value;
         }
       }
 
@@ -298,7 +304,7 @@ function setStyleForSelectorList(
 
       const { type, subtype } = selector;
       const record = (options[type] ??= {});
-      for (const [name, value] of Object.entries(style.variables)) {
+      for (const [name, value] of style.variables) {
         record[name] ??= {};
         record[name][subtype] = value as any;
       }
@@ -323,7 +329,6 @@ function setStyleForSelectorList(
         addDeclaration(
           groupClassName,
           {
-            style: {},
             specificity,
             container: {
               names: [groupClassName],
@@ -388,14 +393,14 @@ function extractKeyFrames(
   extractOptions: ExtractRuleOptions,
 ) {
   const extractedAnimation: ExtractedAnimation = { frames: {} };
-  const frames = extractedAnimation.frames;
+  // const frames = extractedAnimation.frames;
 
   let rawFrames = [];
 
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
 
-    const { style } = declarationsToStyle(
+    const { entries } = declarationsToStyle(
       frame.declarations.declarations,
       {
         ...extractOptions,
@@ -415,6 +420,8 @@ function extractKeyFrames(
       },
     );
 
+    if (!entries) continue;
+
     for (const selector of frame.selectors) {
       const keyframe =
         selector.type === "percentage"
@@ -429,13 +436,13 @@ function extractKeyFrames(
 
       switch (selector.type) {
         case "percentage":
-          rawFrames.push({ selector: selector.value, style });
+          rawFrames.push({ selector: selector.value, entries });
           break;
         case "from":
-          rawFrames.push({ selector: 0, style });
+          rawFrames.push({ selector: 0, entries });
           break;
         case "to":
-          rawFrames.push({ selector: 1, style });
+          rawFrames.push({ selector: 1, entries });
           break;
         default:
           selector satisfies never;
@@ -449,25 +456,25 @@ function extractKeyFrames(
   /*
    * Using the frame data, work out the progress for each style property
    */
-  for (let i = 0; i < rawFrames.length; i++) {
-    const frame = rawFrames[i];
-    const animationProgress = frame.selector;
-    const previousProgress = i === 0 ? 0 : rawFrames[i - 1].selector;
-    const progress = animationProgress - previousProgress;
+  // for (let i = 0; i < rawFrames.length; i++) {
+  //   const frame = rawFrames[i];
+  //   const animationProgress = frame.selector;
+  //   const previousProgress = i === 0 ? 0 : rawFrames[i - 1].selector;
+  //   const progress = animationProgress - previousProgress;
 
-    for (const [prop, value] of Object.entries(frame.style)) {
-      if (progress === 0) {
-        frames[prop] = [];
-      } else {
-        // All props need a progress 0 frame
-        frames[prop] ??= [{ value: "!INHERIT!", progress: 0 }];
-      }
-      frames[prop].push({
-        value,
-        progress,
-      });
-    }
-  }
+  //   for (const [prop, value] of Object.entries(frame.entries)) {
+  //     if (progress === 0) {
+  //       frames[prop] = [];
+  //     } else {
+  //       // All props need a progress 0 frame
+  //       frames[prop] ??= [{ value: "!INHERIT!", progress: 0 }];
+  //     }
+  //     frames[prop].push({
+  //       value,
+  //       progress,
+  //     });
+  //   }
+  // }
 
   extractOptions.keyframes.set(keyframes.name.value, extractedAnimation);
 }
@@ -515,7 +522,7 @@ function declarationsToStyle(
   specificity: Pick<CSSSpecificity, "I" | "S" | "O">,
 ): ExtractedStyle {
   const extractedStyle: ExtractedStyle = {
-    style: {},
+    entries: [],
     specificity: { A: 0, B: 0, C: 0, ...specificity },
   };
 
@@ -530,7 +537,7 @@ function declarationsToStyle(
    * The `append` option allows the same property to be added multiple times
    * E.g. `transform` accepts an array of transforms
    */
-  function addStyleProp(property: string, value: any, { append = false } = {}) {
+  function addStyleProp(property: string, value: any, prop = "style") {
     if (value === undefined && options.useInitialIfUndefined) {
       value = "!INITIAL!";
     }
@@ -545,21 +552,30 @@ function declarationsToStyle(
 
     property = kebabToCamelCase(property);
 
-    const style = extractedStyle.style;
-
-    if (append) {
-      const styleValue = style[property];
-      if (Array.isArray(styleValue)) {
-        styleValue.push(...value);
-      } else {
-        style[property] = [value];
-      }
-    } else {
-      style[property] = value;
-    }
-
     if (isRuntimeValue(value) || transformKeys.includes(property as any)) {
       extractedStyle.isDynamic = true;
+    }
+
+    const styleEntries = extractedStyle.entries!;
+    let propEntries = styleEntries.find(([key]) => key === prop);
+    if (!propEntries) {
+      propEntries = [prop, []];
+      styleEntries.push(propEntries);
+    }
+
+    const entries = propEntries[1];
+
+    if (!Array.isArray(entries)) return;
+
+    if (isRuntimeValue(value)) {
+      entries.push([property, value]);
+    } else {
+      entries.push([
+        property,
+        {
+          value,
+        },
+      ]);
     }
 
     if (processingImportant) {
@@ -582,8 +598,8 @@ function declarationsToStyle(
   }
 
   function addVariable(property: string, value: any) {
-    extractedStyle.variables ??= {};
-    extractedStyle.variables[property] = value;
+    extractedStyle.variables ??= [];
+    extractedStyle.variables.push([property, value]);
   }
 
   function addContainerProp(

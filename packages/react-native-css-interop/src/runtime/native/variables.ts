@@ -2,22 +2,33 @@ import { StyleProp } from "../../types";
 import { useComputed } from "../signals";
 import { useContext } from "react";
 import { effectContext } from "./inheritance";
-import { styleMetaMap } from "../globals";
+import { InlineSpecificity, opaqueStyles } from "./style";
+import { specificityCompare } from "../specificity";
 
 export function vars(variables: Record<string, string | number>) {
-  const $variables: Record<string, string | number> = {};
-
-  for (const [key, value] of Object.entries(variables)) {
-    if (key.startsWith("--")) {
-      $variables[key] = value;
-    } else {
-      $variables[`--${key}`] = value;
-    }
-  }
-
-  // Create an empty style prop with meta
   const style: StyleProp = {};
-  styleMetaMap.set(style, { variables: $variables });
+  opaqueStyles.set(style, {
+    reducer(acc) {
+      for (let [key, value] of Object.entries(variables)) {
+        if (!key.startsWith("--")) {
+          key = `--${key}`;
+        }
+
+        const specificity = acc.variablesSpecificity[key];
+
+        if (
+          specificity &&
+          specificityCompare(specificity, InlineSpecificity) >= 0
+        ) {
+          continue;
+        }
+
+        acc.setVariable(key, value, InlineSpecificity);
+      }
+
+      return acc;
+    },
+  });
   return style;
 }
 

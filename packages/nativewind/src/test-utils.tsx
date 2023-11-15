@@ -128,7 +128,9 @@ export function testCasesWithOptions(
     if (animated) {
       expect(component).toHaveAnimatedStyle(expected.style ?? {});
     } else {
-      expect(component).toHaveStyle(expected.style ?? {});
+      expect(component).toHaveStyle(
+        Object.fromEntries(Object.entries(expected.style ?? {})),
+      );
     }
 
     if (expected.props) {
