@@ -51,12 +51,6 @@ export function cssToReactNativeRuntime(
   code: Buffer | string,
   options: CssToReactNativeRuntimeOptions = {},
 ): StyleSheetRegisterOptions {
-  code = typeof code === "string" ? code : code.toString("utf-8");
-  // I don't know why we need to remove this line, but we do
-  // Issue: https://github.com/parcel-bundler/lightningcss/issues/484
-  code = code.replaceAll("-webkit-text-size-adjust: 100%;", "");
-  code = Buffer.from(code);
-
   // Parse the grouping options to create an array of regular expressions
   const grouping =
     options.grouping?.map((value) => {
@@ -65,9 +59,7 @@ export function cssToReactNativeRuntime(
 
   // These will by mutated by `extractRule`
   const extractOptions: ExtractRuleOptions = {
-    ...options,
     darkMode: { type: "media" },
-    grouping,
     declarations: new Map(),
     keyframes: new Map(),
     rootVariables: {},
@@ -75,12 +67,14 @@ export function cssToReactNativeRuntime(
     flags: {},
     appearanceOrder: 0,
     rem: { light: 14, dark: 14 },
+    ...options,
+    grouping,
   };
 
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
   lightningcss({
     filename: "style.css", // This is ignored, but required
-    code,
+    code: typeof code === "string" ? Buffer.from(code) : code,
     visitor: {
       Rule(rule) {
         // Extract the style declarations and animations from the current rule

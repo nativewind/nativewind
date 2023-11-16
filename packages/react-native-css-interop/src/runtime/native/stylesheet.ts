@@ -8,7 +8,6 @@ import { StyleSheetRegisterOptions, CommonStyleSheet } from "../../types";
 import { vh, vw } from "./misc";
 import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
 import { colorScheme } from "./color-scheme";
-import { createSignal } from "../signals";
 import { createColorSchemeSignal, globalVariables } from "./inheritance";
 import {
   animationMap,
@@ -17,8 +16,6 @@ import {
   warned,
   warnings,
 } from "./style";
-
-export const fastReloadSignal = createSignal(0, "fast-reload");
 
 const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_FLAGS]: {},
@@ -37,7 +34,7 @@ const commonStyleSheet: CommonStyleSheet = {
   },
   unstable_hook_onClassName() {},
   register(options: StyleSheetRegisterOptions) {
-    // console.log(JSON.stringify(options, null, 2));
+    console.log(JSON.stringify(options, null, 2));
     this[INTERNAL_FLAGS]["$$receivedData"] = "true";
     if (options.flags) {
       Object.assign(this[INTERNAL_FLAGS], options.flags);
@@ -81,8 +78,6 @@ const commonStyleSheet: CommonStyleSheet = {
     if (options.rem) {
       globalVariables.rem.set(options.rem);
     }
-
-    fastReloadSignal.set((fastReloadSignal.get() ?? 0) + 1);
   },
 };
 

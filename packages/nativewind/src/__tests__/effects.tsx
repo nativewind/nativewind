@@ -14,8 +14,8 @@ describe("Effects - Box Shadow", () => {
     [
       "shadow-sm",
       style({
-        elevation: 1.5,
-        shadowColor: "rgba(0, 0, 0, 0.05098039284348488)",
+        elevation: 1,
+        shadowColor: "rgba(0, 0, 0, 0.3490196168422699)",
         shadowOpacity: 1,
         shadowOffset: {
           height: 1,
@@ -27,14 +27,14 @@ describe("Effects - Box Shadow", () => {
     [
       "shadow",
       style({
-        elevation: 2,
-        shadowColor: "rgba(0, 0, 0, 0.10196078568696976)",
+        elevation: 3,
+        shadowColor: "rgba(0, 0, 0, 0.3490196168422699)",
         shadowOpacity: 1,
         shadowOffset: {
           height: 1,
           width: 0,
         },
-        shadowRadius: 2,
+        shadowRadius: 4,
       }),
     ],
     [

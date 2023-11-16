@@ -9,7 +9,7 @@ import {
   reactGlobal,
 } from "../signals";
 import { NormalizedOptions } from "./prop-mapping";
-import { fastReloadSignal, StyleSheet } from "./stylesheet";
+import { StyleSheet } from "./stylesheet";
 import { effectContext, globalVariables } from "./inheritance";
 import {
   ExtractedStyleValue,
@@ -224,10 +224,6 @@ export function createInteropComputed(
 
       // Track signals set during render
       signalsSetDuringRender.clear();
-
-      // Listen for fast-reload
-      // TODO: This should be improved...
-      fastReloadSignal.get();
 
       const acc = createPropAccumulator(interop);
 

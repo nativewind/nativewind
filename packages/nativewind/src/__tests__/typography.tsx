@@ -5,9 +5,9 @@ afterEach(() => resetStyles());
 
 describe("Typography - Font Family", () => {
   testCases(
-    ["font-sans", style({ fontFamily: "'system font'" })],
+    ["font-sans", style({ fontFamily: "system font" })],
     ["font-serif", style({ fontFamily: "Georgia" })],
-    ["font-mono", style({ fontFamily: "'Courier New'" })],
+    ["font-mono", style({ fontFamily: "Courier New" })],
   );
 });
 

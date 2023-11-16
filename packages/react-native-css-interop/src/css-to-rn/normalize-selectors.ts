@@ -203,7 +203,6 @@ export function normalizeSelectors(
               selector.pseudoClasses[component.kind] = true;
               break;
             case "custom-function": {
-              debugger;
               switch (component.name) {
                 case "native-prop": {
                   const args = getCustomFunctionArguments(component);
@@ -328,6 +327,11 @@ function getCustomFunctionArguments(
         case "string":
         case "ident":
           args.push(arg.value.value);
+          break;
+        case "delim":
+          if (arg.value.value === "*") {
+            args.push("*");
+          }
           break;
         case "comma":
           break;

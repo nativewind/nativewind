@@ -35,47 +35,47 @@ describe("Accessibility - Screen Readers", () => {
           ]),
       },
     ],
-    // [
-    //   "not-sr-only",
-    //   {
-    //     ...style({
-    //       margin: 0,
-    //       overflow: "visible",
-    //       padding: 0,
-    //     }),
+    [
+      "not-sr-only",
+      {
+        ...style({
+          margin: 0,
+          overflow: "visible",
+          padding: 0,
+        }),
 
-    //     warning: () =>
-    //       new Map([
-    //         [
-    //           "not-sr-only",
-    //           [
-    //             {
-    //               property: "position",
-    //               type: "IncompatibleNativeValue",
-    //               value: "static",
-    //             },
-    //             {
-    //               property: "width",
-    //               type: "IncompatibleNativeValue",
-    //               value: "auto",
-    //             },
-    //             {
-    //               property: "height",
-    //               type: "IncompatibleNativeValue",
-    //               value: "auto",
-    //             },
-    //             {
-    //               property: "clip",
-    //               type: "IncompatibleNativeProperty",
-    //             },
-    //             {
-    //               property: "white-space",
-    //               type: "IncompatibleNativeProperty",
-    //             },
-    //           ],
-    //         ],
-    //       ]),
-    //   },
-    // ],
+        warning: () =>
+          new Map([
+            [
+              "not-sr-only",
+              [
+                {
+                  property: "position",
+                  type: "IncompatibleNativeValue",
+                  value: "static",
+                },
+                {
+                  property: "width",
+                  type: "IncompatibleNativeValue",
+                  value: "auto",
+                },
+                {
+                  property: "height",
+                  type: "IncompatibleNativeValue",
+                  value: "auto",
+                },
+                {
+                  property: "clip",
+                  type: "IncompatibleNativeProperty",
+                },
+                {
+                  property: "white-space",
+                  type: "IncompatibleNativeProperty",
+                },
+              ],
+            ],
+          ]),
+      },
+    ],
   );
 });

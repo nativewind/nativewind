@@ -54,16 +54,6 @@ const GetStyle = Symbol("CSSInteropGetStyle");
 const GetVariable = Symbol("CSSInteropGetVariable");
 const RunInEffect = Symbol("CSSInteropRunInEffect");
 
-export const InlineSpecificity: Specificity = {
-  A: 0,
-  B: 0,
-  C: 0,
-  I: 0,
-  S: 0,
-  O: 0,
-  inline: 1,
-};
-
 export function createPropAccumulator(interop: InteropComputed) {
   const acc: PropAccumulator = {
     interop,
@@ -492,7 +482,6 @@ export function parseValue(
     case "rgba": {
       return {
         get: function () {
-          debugger;
           const args = resolveRuntimeArgs(
             value.arguments,
             getPropAccumulator(this, primaryPropAcc),
@@ -543,7 +532,6 @@ export function parseValue(
     case "getPixelSizeForLayoutSize": {
       return {
         get: function () {
-          debugger;
           return PixelRatio.getPixelSizeForLayoutSize(
             resolveRuntimeArgs(
               value.arguments[0],
@@ -717,6 +705,16 @@ function hasLowerSpecificity(a: Specificity | undefined, b: Specificity) {
   if (!a) return false;
   return specificityCompare(a, b) === 1;
 }
+
+const InlineSpecificity: Specificity = {
+  A: 0,
+  B: 0,
+  C: 0,
+  I: 0,
+  S: 0,
+  O: 0,
+  inline: 1,
+};
 
 export function specificityCompare(a: Specificity, b: Specificity) {
   // Important first

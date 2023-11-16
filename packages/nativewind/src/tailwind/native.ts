@@ -167,6 +167,15 @@ const preset: Config = {
         serif: platformSelect({ android: "serif", ios: "Georgia" }),
         mono: platformSelect({ android: "mono", ios: "'Courier New'" }),
       },
+      elevation: {
+        sm: "1",
+        DEFAULT: "3",
+        md: "6",
+        lg: "8",
+        xl: "13",
+        "2xl": "24",
+        none: "0",
+      },
       boxShadow: {
         sm: " 0px 1px 1px rgba(0, 0, 0, 0.35)",
         DEFAULT: "0px 1px 4px rgba(0, 0, 0, 0.35)",
@@ -206,15 +215,6 @@ const preset: Config = {
         wide: "0.25px",
         wider: "0.5px",
         widest: "1px",
-      },
-      elevation: {
-        sm: "1",
-        DEFAULT: "3",
-        md: "6",
-        lg: "8",
-        xl: "13",
-        "2xl": "24",
-        none: "0",
       },
       transitionProperty: {
         DEFAULT:
