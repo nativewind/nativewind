@@ -559,7 +559,12 @@ export function createInteropComputed(
         interop.contextValue = Object.assign({}, interop as InteropComputed);
       }
 
-      return { ...interop, props: acc.props };
+      return {
+        props: acc.props,
+        convertToPressable: interop.convertToPressable,
+        isAnimated: interop.isAnimated,
+        contextValue: interop.contextValue,
+      };
     },
   };
 
