@@ -45,7 +45,7 @@ export async function renderTailwind<T extends { className: string }>(
     }),
   ]).process(css, { from: undefined });
 
-  console.log(output);
+  // console.log(output);
 
   registerCSS(output, cssToReactNativeRuntimeOptions);
 

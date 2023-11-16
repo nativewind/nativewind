@@ -1,4 +1,4 @@
-import { globalStyles } from "./runtime/globals";
+import { styleSignals } from "./runtime/native/style";
 import { StyleSheet } from "./runtime/native/stylesheet";
 import { INTERNAL_FLAGS } from "./shared";
 
@@ -18,5 +18,5 @@ export function verifyReceivedData() {
 }
 
 export function verifyHasStyles() {
-  return globalStyles.size > 0;
+  return styleSignals.size > 0;
 }

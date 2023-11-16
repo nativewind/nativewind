@@ -7,6 +7,7 @@ import {
   ExtractedAnimations,
   ExtractedTransition,
   ExtractionWarning,
+  ExtractedAnimation,
 } from "../../types";
 import {
   testContainerQuery,
@@ -41,6 +42,13 @@ export interface PropAccumulator {
   setVariable(name: string, value: any, specificity: Specificity): void;
   [RunInEffect]: (fn: () => any) => any;
 }
+
+export const styleSignals = new Map<string, StyleSignal>();
+export const opaqueStyles = new WeakMap<object, Pick<StyleSignal, "reducer">>();
+export const animationMap = new Map<string, ExtractedAnimation>();
+
+export const warnings = new Map<string, ExtractionWarning[]>();
+export const warned = new Set<string>();
 
 const GetStyle = Symbol("CSSInteropGetStyle");
 const GetVariable = Symbol("CSSInteropGetVariable");
@@ -101,12 +109,6 @@ export function createPropAccumulator(interop: InteropComputed) {
 interface StyleSignal extends Signal<ExtractedPropertyDescriptors[]> {
   reducer: (acc: PropAccumulator, forceInline?: boolean) => PropAccumulator;
 }
-
-export const styleSignals = new Map<string, StyleSignal>();
-export const opaqueStyles = new WeakMap<object, Pick<StyleSignal, "reducer">>();
-
-export const warnings = new Map<string, ExtractionWarning[]>();
-export const warned = new Set<string>();
 
 export function upsertStyleSignal(name: string, styles: ExtractedStyle[]) {
   const mappedStyles: ExtractedPropertyDescriptors[] = styles.map((style) => {

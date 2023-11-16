@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef, useSyncExternalStore } from "react";
+import { LayoutChangeEvent } from "react-native";
 import {
   Computed as Computed,
   Signal,
@@ -29,6 +30,7 @@ import {
   withTiming,
 } from "react-native-reanimated";
 import {
+  animationMap,
   createPropAccumulator,
   defaultValues,
   reduceInlineStyle,
@@ -36,8 +38,6 @@ import {
   styleSignals,
   timeToMS,
 } from "./style";
-import { LayoutChangeEvent } from "react-native";
-import { animationMap } from "../globals";
 
 export interface InteropComputed extends Computed<any> {
   rerender(parent: InteropComputed, props: Record<string, unknown>): void;

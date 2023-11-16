@@ -365,7 +365,6 @@ export type DarkMode =
 export interface CommonStyleSheet {
   [INTERNAL_RESET](options?: ResetOptions): void;
   [INTERNAL_FLAGS]: Record<string, string>;
-  classNameMergeStrategy(c: string): string;
   unstable_hook_onClassName?(c: string): void;
   register(options: StyleSheetRegisterOptions): void;
   getFlag(name: string): string | undefined;
