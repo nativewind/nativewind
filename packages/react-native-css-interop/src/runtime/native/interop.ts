@@ -65,6 +65,7 @@ export interface InteropComputed extends Computed<any> {
   ) => void;
   // Animations
   isAnimated: boolean;
+  animationWaitingOnLayout: boolean;
   sharedValues: Record<string, SharedValue<any>>;
   currentAnimationNames: Set<string>;
 }
@@ -135,6 +136,7 @@ export function createInteropComputed(
     convertToPressable: false,
     // animations
     signals: new Map(),
+    animationWaitingOnLayout: false,
     setVariable(name, value) {
       signalsSetDuringRender.add(name);
       let signal = inlineSignals.get(name);
@@ -254,9 +256,6 @@ export function createInteropComputed(
             acc.requiresLayoutHeight = false;
           }
 
-          const needsLayout =
-            acc.requiresLayoutWidth || acc.requiresLayoutHeight;
-
           const seenAnimatedProps = new Set();
 
           if (acc.animations) {
@@ -269,120 +268,119 @@ export function createInteropComputed(
 
             interop.isAnimated = true;
 
-            if (needsLayout && !layoutSignal.peek()) {
-              // Since layout isn't ready, subscribe to it so we can re-render when it is
-              layoutSignal.get();
-            } else {
-              let names: string[] = [];
-              let shouldResetAnimations = false;
+            acc.props.style ??= {};
 
-              for (const name of animationNames) {
-                if (name.type === "none") {
-                  names = [];
-                  interop.currentAnimationNames.clear();
-                  break;
-                }
+            let names: string[] = [];
+            let shouldResetAnimations = interop.animationWaitingOnLayout;
 
-                names.push(name.value);
-
-                if (!interop.currentAnimationNames.has(name.value)) {
-                  shouldResetAnimations = true;
-                }
+            for (const name of animationNames) {
+              if (name.type === "none") {
+                names = [];
+                interop.currentAnimationNames.clear();
+                break;
               }
 
-              if (shouldResetAnimations) {
-                acc.props.style ??= {};
-                interop.currentAnimationNames.clear();
+              names.push(name.value);
 
-                // Loop in reverse order
-                for (let index = names.length - 1; index >= 0; index--) {
-                  const name = names[index % names.length];
-                  interop.currentAnimationNames.add(name);
+              if (!interop.currentAnimationNames.has(name.value)) {
+                shouldResetAnimations = true;
+              }
+            }
 
-                  const keyframes = animationMap.get(name);
-                  if (!keyframes) {
-                    continue;
-                  }
+            if (shouldResetAnimations) {
+              interop.currentAnimationNames.clear();
+              interop.animationWaitingOnLayout = false;
 
-                  const totalDuration = timeToMS(
-                    durations[index % name.length],
-                  );
-                  const delay = timeToMS(delays[index % delays.length]);
-                  const iterationCount =
-                    iterationCounts[index % iterationCounts.length];
-                  const iterations =
-                    iterationCount.type === "infinite"
-                      ? -1
-                      : iterationCount.value;
+              // Loop in reverse order
+              for (let index = names.length - 1; index >= 0; index--) {
+                const name = names[index % names.length];
+                interop.currentAnimationNames.add(name);
 
-                  for (const [key, [initialFrame, ...frames]] of Object.entries(
-                    keyframes.frames,
-                  )) {
-                    if (seenAnimatedProps.has(key)) continue;
-                    seenAnimatedProps.add(key);
-
-                    const initialValue = resolveAnimationValue(
-                      initialFrame,
-                      key,
-                      acc.props.style,
-                      acc,
-                    );
-
-                    const sequence = frames.map(
-                      ({ progress, ...descriptor }) => {
-                        return withDelay(
-                          delay,
-                          withTiming(
-                            resolveAnimationValue(
-                              descriptor,
-                              key,
-                              acc.props.style,
-                              acc,
-                            ),
-                            {
-                              duration: totalDuration * progress,
-                              easing: Easing.linear,
-                            },
-                          ),
-                        );
-                      },
-                    ) as [AnimatableValue, ...AnimatableValue[]];
-
-                    let sharedValue = interop.sharedValues[key];
-                    if (!sharedValue) {
-                      sharedValue = makeMutable(initialValue);
-                      interop.sharedValues[key] = sharedValue;
-                    } else {
-                      sharedValue.value = initialValue;
-                    }
-
-                    sharedValue.value = withRepeat(
-                      withSequence(...sequence),
-                      iterations,
-                    );
-
-                    Object.defineProperty(acc.props[prop], key, {
-                      configurable: true,
-                      enumerable: true,
-                      value: sharedValue,
-                    });
-                  }
+                const keyframes = animationMap.get(name);
+                if (!keyframes) {
+                  continue;
                 }
-              } else {
-                for (const name of names) {
-                  const keyframes = animationMap.get(name);
-                  if (!keyframes) {
-                    continue;
+
+                const totalDuration = timeToMS(durations[index % name.length]);
+                const delay = timeToMS(delays[index % delays.length]);
+                const iterationCount =
+                  iterationCounts[index % iterationCounts.length];
+                const iterations =
+                  iterationCount.type === "infinite"
+                    ? -1
+                    : iterationCount.value;
+
+                for (const [key, [initialFrame, ...frames]] of Object.entries(
+                  keyframes.frames,
+                )) {
+                  if (seenAnimatedProps.has(key)) continue;
+                  seenAnimatedProps.add(key);
+
+                  const initialValue = resolveAnimationValue(
+                    initialFrame,
+                    key,
+                    acc,
+                    acc.props.style,
+                  );
+
+                  const sequence = frames.map(({ progress, ...descriptor }) => {
+                    return withDelay(
+                      delay,
+                      withTiming(
+                        resolveAnimationValue(
+                          descriptor,
+                          key,
+                          acc,
+                          acc.props.style,
+                        ),
+                        {
+                          duration: totalDuration * progress,
+                          easing: Easing.linear,
+                        },
+                      ),
+                    );
+                  }) as [AnimatableValue, ...AnimatableValue[]];
+
+                  interop.animationWaitingOnLayout =
+                    (acc.requiresLayoutWidth || acc.requiresLayoutHeight) &&
+                    !layoutSignal.peek();
+
+                  let sharedValue = interop.sharedValues[key];
+                  if (!sharedValue) {
+                    sharedValue = makeMutable(initialValue);
+                    interop.sharedValues[key] = sharedValue;
+                  } else {
+                    sharedValue.value = initialValue;
                   }
 
-                  for (const key of Object.keys(keyframes.frames)) {
-                    Object.defineProperty(acc.props[prop], key, {
-                      configurable: true,
-                      enumerable: true,
-                      value: interop.sharedValues[key],
-                    });
-                    seenAnimatedProps.add(key);
-                  }
+                  sharedValue.value = withRepeat(
+                    withSequence(...sequence),
+                    iterations,
+                  );
+
+                  Object.defineProperty(acc.props[prop], key, {
+                    configurable: true,
+                    enumerable: true,
+                    value: sharedValue,
+                  });
+                }
+              }
+            } else {
+              for (const name of names) {
+                const keyframes = animationMap.get(name);
+                if (!keyframes) {
+                  continue;
+                }
+
+                acc.props[prop] ??= {};
+
+                for (const key of Object.keys(keyframes.frames)) {
+                  Object.defineProperty(acc.props[prop], key, {
+                    configurable: true,
+                    enumerable: true,
+                    value: interop.sharedValues[key],
+                  });
+                  seenAnimatedProps.add(key);
                 }
               }
             }
@@ -510,7 +508,11 @@ export function createInteropComputed(
         };
       }
 
-      if (acc.requiresLayoutWidth || acc.requiresLayoutHeight) {
+      if (
+        acc.requiresLayoutWidth ||
+        acc.requiresLayoutHeight ||
+        interop.animationWaitingOnLayout
+      ) {
         if (!layoutSignal.peek()) {
           // Since layout isn't ready, subscribe to it so we can re-render when it is
           layoutSignal.get();

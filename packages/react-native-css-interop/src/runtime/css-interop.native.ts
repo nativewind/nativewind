@@ -58,9 +58,9 @@ export const defaultCSSInterop: InteropFunction = (
    */
   if (!process.env.NATIVEWIND_INLINE_ANIMATION) {
     if (effect.isAnimated) {
-      const entries = Object.entries(props.style);
       props.style = useAnimatedStyle(() => {
         const style: any = {};
+        const entries = Object.entries(effect.props.style);
 
         for (const [key, value] of entries as any) {
           if (typeof value === "object" && "value" in value) {
@@ -81,7 +81,7 @@ export const defaultCSSInterop: InteropFunction = (
         }
 
         return style;
-      }, [props.style]);
+      }, [effect.props.style]);
     } else {
       // Preserve the order of hooks.
       // We could just called `useAnimatedStyle()` but it invokes a worklet which is not needed.

@@ -34,7 +34,7 @@ const commonStyleSheet: CommonStyleSheet = {
   },
   unstable_hook_onClassName() {},
   register(options: StyleSheetRegisterOptions) {
-    console.log(JSON.stringify(options, null, 2));
+    // console.log(JSON.stringify(options, null, 2));
     this[INTERNAL_FLAGS]["$$receivedData"] = "true";
     if (options.flags) {
       Object.assign(this[INTERNAL_FLAGS], options.flags);

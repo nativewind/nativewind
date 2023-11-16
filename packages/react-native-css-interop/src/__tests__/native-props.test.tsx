@@ -27,7 +27,7 @@ test(":native-prop() zero args", () => {
   );
 });
 
-test.only(":native-prop(*)", () => {
+test(":native-prop(*)", () => {
   registerCSS(
     `.my-class:native-prop(*) { color: red; background-color: blue }`,
   );

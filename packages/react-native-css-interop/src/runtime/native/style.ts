@@ -68,7 +68,7 @@ export function createPropAccumulator(interop: InteropComputed) {
     forceContext: false,
     requiresLayoutWidth: false,
     requiresLayoutHeight: false,
-    getLayout: () => undefined,
+    getLayout: interop.getLayout,
     setVariable(name, value, specificity) {
       acc.variables[name] = value;
       acc.variablesSpecificity[name] = specificity;
@@ -77,7 +77,7 @@ export function createPropAccumulator(interop: InteropComputed) {
     [GetVariable](name) {
       return interop.runInEffect(() => {
         if (acc.variables[name] !== undefined) {
-          const descriptor = parseValue(acc.variables[name]);
+          const descriptor = parseValue(acc.variables[name], acc);
 
           if (!descriptor) {
           } else if ("value" in descriptor) {
@@ -374,7 +374,7 @@ export function reduceInlineStyle(
 
 export function parseValue(
   value: DescriptorOrRuntimeValue | string | number | Array<unknown>,
-  primaryPropAcc?: PropAccumulator,
+  acc?: PropAccumulator,
   primaryStyle?: Record<string, any>,
 ): PropertyDescriptor {
   if (
@@ -391,7 +391,7 @@ export function parseValue(
     case "var": {
       return {
         get: function () {
-          return getPropAccumulator(this, primaryPropAcc)[GetVariable](
+          return getPropAccumulator(this, acc)[GetVariable](
             value.arguments[0] as string,
           );
         },
@@ -400,7 +400,7 @@ export function parseValue(
     case "vh": {
       return {
         get: function () {
-          return runInEffect(this, primaryPropAcc, () => {
+          return runInEffect(this, acc, () => {
             return round((vh.get() / 100) * (value.arguments[0] as number));
           });
         },
@@ -409,7 +409,7 @@ export function parseValue(
     case "vw": {
       return {
         get: function () {
-          return runInEffect(this, primaryPropAcc, () => {
+          return runInEffect(this, acc, () => {
             return round((vw.get() / 100) * (value.arguments[0] as number));
           });
         },
@@ -430,7 +430,7 @@ export function parseValue(
     case "rem": {
       return {
         get: function () {
-          return runInEffect(this, primaryPropAcc, () => {
+          return runInEffect(this, acc, () => {
             return round(
               globalVariables.rem.get() * (value.arguments[0] as number),
             );
@@ -439,9 +439,10 @@ export function parseValue(
       };
     }
     case "rnh": {
+      if (acc) acc.requiresLayoutHeight = true;
       return {
         get: function () {
-          const acc = getPropAccumulator(this, primaryPropAcc);
+          acc = getPropAccumulator(this, acc);
           const style = getStyle(this, primaryStyle);
 
           let ref = 0;
@@ -459,9 +460,10 @@ export function parseValue(
       };
     }
     case "rnw": {
+      if (acc) acc.requiresLayoutWidth = true;
       return {
         get: function () {
-          const acc = getPropAccumulator(this, primaryPropAcc);
+          acc = getPropAccumulator(this, acc);
           const style = getStyle(this, primaryStyle);
 
           let ref = 0;
@@ -484,7 +486,7 @@ export function parseValue(
         get: function () {
           const args = resolveRuntimeArgs(
             value.arguments,
-            getPropAccumulator(this, primaryPropAcc),
+            getPropAccumulator(this, acc),
           );
           if (args.length === 3) {
             return `rgb(${args.join(", ")})`;
@@ -501,7 +503,7 @@ export function parseValue(
         get: function () {
           const args = resolveRuntimeArgs(
             value.arguments,
-            getPropAccumulator(this, primaryPropAcc),
+            getPropAccumulator(this, acc),
           );
           if (args.length === 3) {
             return `hsl(${args.join(" ")})`;
@@ -524,7 +526,7 @@ export function parseValue(
         get: function () {
           return resolveRuntimeArgs(
             [Platform.select(value.arguments[0])],
-            getPropAccumulator(this, primaryPropAcc),
+            getPropAccumulator(this, acc),
           );
         },
       };
@@ -535,7 +537,7 @@ export function parseValue(
           return PixelRatio.getPixelSizeForLayoutSize(
             resolveRuntimeArgs(
               value.arguments[0],
-              getPropAccumulator(this, primaryPropAcc),
+              getPropAccumulator(this, acc),
             ),
           );
         },
@@ -549,7 +551,7 @@ export function parseValue(
             Number(
               resolveRuntimeArgs(
                 value.arguments[0],
-                getPropAccumulator(this, primaryPropAcc),
+                getPropAccumulator(this, acc),
               ),
             )
           );
@@ -564,7 +566,7 @@ export function parseValue(
             Number(
               resolveRuntimeArgs(
                 value.arguments[0],
-                getPropAccumulator(this, primaryPropAcc),
+                getPropAccumulator(this, acc),
               ),
             )
           );
@@ -577,7 +579,7 @@ export function parseValue(
           const specifics = value.arguments[0];
           return resolveRuntimeArgs(
             specifics[PixelRatio.get()] ?? specifics["default"],
-            getPropAccumulator(this, primaryPropAcc),
+            getPropAccumulator(this, acc),
           );
         },
       };
@@ -588,7 +590,7 @@ export function parseValue(
           const specifics = value.arguments[0];
           return resolveRuntimeArgs(
             specifics[PixelRatio.getFontScale()] ?? specifics["default"],
-            getPropAccumulator(this, primaryPropAcc),
+            getPropAccumulator(this, acc),
           );
         },
       };
@@ -599,7 +601,7 @@ export function parseValue(
           return PixelRatio.roundToNearestPixel(
             resolveRuntimeArgs(
               value.arguments[0],
-              getPropAccumulator(this, primaryPropAcc),
+              getPropAccumulator(this, acc),
             ),
           );
         },
@@ -610,7 +612,7 @@ export function parseValue(
         get: function () {
           const args = resolveRuntimeArgs(
             value.arguments,
-            getPropAccumulator(this, primaryPropAcc),
+            getPropAccumulator(this, acc),
           );
 
           return `${value.name}(${args.join(",")})`;
@@ -660,8 +662,8 @@ function resolveRuntimeArgs(
 export function resolveAnimationValue(
   frame: DescriptorOrRuntimeValue,
   prop: string,
-  style: Record<string, any>,
   acc: PropAccumulator,
+  style: Record<string, any> = {},
 ) {
   if ("value" in frame) {
     if (frame.value === "!INHERIT!") {
