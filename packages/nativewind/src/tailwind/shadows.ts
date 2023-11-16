@@ -6,17 +6,16 @@ import { parseBoxShadowValue } from "tailwindcss/lib/util/parseBoxShadowValue";
 
 export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
   const { addDefaults } = rest as any;
-  const values = theme("dropShadow");
-  const entries = values ? Object.entries(values) : [];
+  const boxShadowEntries = Object.entries(theme("boxShadow") ?? {});
 
   function getElevation(value: any) {
-    let elevationKey: any = entries.find((entry) => entry[1] === value)?.[0];
+    let elevationKey: any = boxShadowEntries.find(
+      (entry) => entry[1] === value,
+    )?.[0];
 
-    let elevation: number;
+    let elevation = theme("elevation")?.[elevationKey];
 
-    if (elevationKey) {
-      elevation = theme("elevation")?.[elevationKey];
-    } else {
+    if (elevation === undefined) {
       elevation = Number.parseFloat(value.split(" ")[2]);
     }
 
@@ -67,7 +66,8 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
         return {
           "--tw-shadow-color": value === "none" ? "#0000" : color,
           "-rn-shadowColor": "var(--tw-shadow-color)",
-          "-rn-shadow-offset": `${x} ${y}`,
+          "-rn-shadow-offset\\.width": x,
+          "-rn-shadow-offset\\.height": y,
           "-rn-shadow-radius": blur ?? 0,
           "-rn-shadow-opacity": 1,
           "-rn-elevation": elevation,

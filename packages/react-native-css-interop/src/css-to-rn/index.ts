@@ -96,6 +96,18 @@ export function cssToReactNativeRuntime(
     },
   });
 
+  for (const [, styles] of extractOptions.declarations) {
+    if (Array.isArray(styles)) {
+      for (const style of styles) {
+        style.entries = recordToEntries(style.record);
+        delete style.record;
+      }
+    } else {
+      styles.entries = recordToEntries(styles.record);
+      delete styles.record;
+    }
+  }
+
   // Convert the extracted style declarations and animations from maps to objects and return them
   return {
     declarations: Object.fromEntries(extractOptions.declarations),
@@ -393,14 +405,14 @@ function extractKeyFrames(
   extractOptions: ExtractRuleOptions,
 ) {
   const extractedAnimation: ExtractedAnimation = { frames: {} };
-  // const frames = extractedAnimation.frames;
+  const frames = extractedAnimation.frames;
 
   let rawFrames = [];
 
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
 
-    const { entries } = declarationsToStyle(
+    const { record } = declarationsToStyle(
       frame.declarations.declarations,
       {
         ...extractOptions,
@@ -414,12 +426,13 @@ function extractKeyFrames(
         },
       },
       {
-        I: 99, // Animations higher specificity than important
+        I: 99, // Animations have higher specificity than important
         S: 1,
         O: extractOptions.appearanceOrder,
       },
     );
 
+    const entries = recordToEntries(record);
     if (!entries) continue;
 
     for (const selector of frame.selectors) {
@@ -453,28 +466,32 @@ function extractKeyFrames(
   // Need to sort afterwards, as the order of the frames is not guaranteed
   rawFrames = rawFrames.sort((a, b) => a.selector - b.selector);
 
-  /*
-   * Using the frame data, work out the progress for each style property
-   */
-  // for (let i = 0; i < rawFrames.length; i++) {
-  //   const frame = rawFrames[i];
-  //   const animationProgress = frame.selector;
-  //   const previousProgress = i === 0 ? 0 : rawFrames[i - 1].selector;
-  //   const progress = animationProgress - previousProgress;
+  for (let i = 0; i < rawFrames.length; i++) {
+    const frame = rawFrames[i];
+    const animationProgress = frame.selector;
+    const previousProgress = i === 0 ? 0 : rawFrames[i - 1].selector;
+    const progress = animationProgress - previousProgress;
 
-  //   for (const [prop, value] of Object.entries(frame.entries)) {
-  //     if (progress === 0) {
-  //       frames[prop] = [];
-  //     } else {
-  //       // All props need a progress 0 frame
-  //       frames[prop] ??= [{ value: "!INHERIT!", progress: 0 }];
-  //     }
-  //     frames[prop].push({
-  //       value,
-  //       progress,
-  //     });
-  //   }
-  // }
+    for (const [prop, styleValue] of frame.entries) {
+      // We only support animations on style properties
+      if (prop !== "style") continue;
+      // We only support object animations
+      if (!Array.isArray(styleValue)) continue;
+
+      for (const [key, value] of styleValue) {
+        if (progress === 0) {
+          frames[key] = [];
+        } else {
+          // All props need a progress 0 frame
+          frames[key] ??= [{ value: "!INHERIT!", progress: 0 }];
+        }
+        frames[key].push({
+          ...value,
+          progress,
+        });
+      }
+    }
+  }
 
   extractOptions.keyframes.set(keyframes.name.value, extractedAnimation);
 }
@@ -522,8 +539,8 @@ function declarationsToStyle(
   specificity: Pick<CSSSpecificity, "I" | "S" | "O">,
 ): ExtractedStyle {
   const extractedStyle: ExtractedStyle = {
-    entries: [],
     specificity: { A: 0, B: 0, C: 0, ...specificity },
+    record: { style: {} },
   };
 
   let processingImportant = false;
@@ -537,7 +554,7 @@ function declarationsToStyle(
    * The `append` option allows the same property to be added multiple times
    * E.g. `transform` accepts an array of transforms
    */
-  function addStyleProp(property: string, value: any, prop = "style") {
+  function addStyleProp(property: string, value: any) {
     if (value === undefined && options.useInitialIfUndefined) {
       value = "!INITIAL!";
     }
@@ -556,27 +573,12 @@ function declarationsToStyle(
       extractedStyle.isDynamic = true;
     }
 
-    const styleEntries = extractedStyle.entries!;
-    let propEntries = styleEntries.find(([key]) => key === prop);
-    if (!propEntries) {
-      propEntries = [prop, []];
-      styleEntries.push(propEntries);
+    if (!isRuntimeValue(value)) {
+      value = { value };
     }
 
-    const entries = propEntries[1];
-
-    if (!Array.isArray(entries)) return;
-
-    if (isRuntimeValue(value)) {
-      entries.push([property, value]);
-    } else {
-      entries.push([
-        property,
-        {
-          value,
-        },
-      ]);
-    }
+    const style = extractedStyle.record!.style as Record<string, unknown>;
+    style[property] = value;
 
     if (processingImportant) {
       extractedStyle.importantStyles ??= [];
@@ -847,4 +849,24 @@ function equal(a: unknown, b: unknown) {
   }
 
   return false;
+}
+
+function recordToEntries(record: ExtractedStyle["record"]) {
+  if (!record) return [];
+  const entries: ExtractedStyle["entries"] = [];
+
+  for (const [key, value] of Object.entries(record)) {
+    if ("$$type" in value) {
+      entries.push([key, value.value]);
+    } else {
+      const subEntries = Object.entries(value);
+      if (subEntries.length > 0) {
+        entries.push([key, Object.entries(value)]);
+      }
+    }
+  }
+
+  if (entries.length === 0) return undefined;
+
+  return entries;
 }

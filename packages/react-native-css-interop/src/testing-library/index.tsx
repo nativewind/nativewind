@@ -11,7 +11,7 @@ import {
 } from "../types";
 import { cssToReactNativeRuntime } from "../css-to-rn";
 
-export { warnings } from "../runtime/native/stylesheet";
+export { warnings } from "../runtime/native/style";
 
 import "../runtime/components";
 

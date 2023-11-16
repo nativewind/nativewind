@@ -3,12 +3,14 @@ import {
   PropsWithChildren,
   createElement,
   forwardRef,
+  useEffect,
+  useRef,
 } from "react";
+import { Pressable, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { InteropFunction, RemapProps } from "../testing-library";
 import { reactGlobal } from "./signals";
-import { Pressable, View } from "react-native";
 import { InheritanceProvider } from "./native/inheritance";
 import { useInteropComputed } from "./native/interop";
 import { getNormalizeConfig } from "./native/prop-mapping";
@@ -81,9 +83,12 @@ export const defaultCSSInterop: InteropFunction = (
         return style;
       }, [props.style]);
     } else {
-      useAnimatedStyle(() => {
-        return {};
-      }, [undefined]);
+      // Preserve the order of hooks.
+      // We could just called `useAnimatedStyle()` but it invokes a worklet which is not needed.
+      useRef(); // https://github.com/software-mansion/react-native-reanimated/blob/870116bfdee872a8b3ccb8f23750fe1475a01c20/src/reanimated2/hook/useAnimatedStyle.ts#L405
+      useRef(); // https://github.com/software-mansion/react-native-reanimated/blob/870116bfdee872a8b3ccb8f23750fe1475a01c20/src/reanimated2/hook/useAnimatedStyle.ts#L406;
+      useEffect(() => {}, []); // https://github.com/software-mansion/react-native-reanimated/blob/870116bfdee872a8b3ccb8f23750fe1475a01c20/src/reanimated2/hook/useAnimatedStyle.ts#L461
+      useEffect(() => {}, []); // https://github.com/software-mansion/react-native-reanimated/blob/870116bfdee872a8b3ccb8f23750fe1475a01c20/src/reanimated2/hook/useAnimatedStyle.ts#L507
     }
   }
 

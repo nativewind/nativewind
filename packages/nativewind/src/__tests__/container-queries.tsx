@@ -19,7 +19,7 @@ test("Unnamed containers", async () => {
   let parent = screen.getByTestId(parentID);
   let child = screen.getByTestId(childID);
 
-  expect(child).toHaveStyle({});
+  expect(child).toHaveStyle(undefined);
 
   // Jest does not fire layout events, so we need to manually
   fireEvent(parent, "layout", {
@@ -44,7 +44,7 @@ test("Named containers", async () => {
   let parent = screen.getByTestId(parentID);
   let child = screen.getByTestId(childID);
 
-  expect(child).toHaveStyle({});
+  expect(child).toHaveStyle(undefined);
 
   // Jest does not fire layout events, so we need to manually
   fireEvent(parent, "layout", {

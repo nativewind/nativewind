@@ -131,9 +131,12 @@ export type ExtractedStyleValue =
   | ExtractedStyleValue[]
   | (() => ExtractedStyleValue);
 
-export type PropertyDescriptorValue = PropertyDescriptor | RuntimeValue;
-export type PropertyDescriptorValueEntries = Array<
-  [string, PropertyDescriptorValue]
+export type DescriptorOrRuntimeValue = PropertyDescriptor | RuntimeValue;
+export type StyleEntries = Array<
+  [string, DescriptorOrRuntimeValue | Array<[string, DescriptorOrRuntimeValue]>]
+>;
+export type ResolvedStyleEntries = Array<
+  [string, PropertyDescriptor | Array<[string, PropertyDescriptor]>]
 >;
 
 export type ExtractedStyle = {
@@ -152,18 +155,20 @@ export type ExtractedStyle = {
   warnings?: ExtractionWarning[];
   importantStyles?: string[];
   nativeProps?: Record<string, string>;
-  entries?: [
+  entries?: StyleEntries;
+  record?: Record<
     string,
-    PropertyDescriptorValue | PropertyDescriptorValueEntries,
-  ][];
+    | Record<string, DescriptorOrRuntimeValue>
+    | {
+        $$type: "prop";
+        value: DescriptorOrRuntimeValue;
+      }
+  >;
 };
 
 export interface ExtractedPropertyDescriptors
   extends Omit<ExtractedStyle, "entries"> {
-  entries?: [
-    string,
-    PropertyDescriptor | Array<[string, PropertyDescriptor]>,
-  ][];
+  entries?: ResolvedStyleEntries;
 }
 
 export type Specificity = CSSSpecificity;
@@ -272,9 +277,8 @@ export type ExtractedAnimation = {
   requiresLayoutHeight?: boolean;
 };
 
-export type ExtractedStyleFrame = {
+export type ExtractedStyleFrame = DescriptorOrRuntimeValue & {
   progress: number;
-  value: ExtractedStyleValue | "!INHERIT!";
 };
 
 export type PseudoClassesQuery = {

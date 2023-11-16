@@ -31,8 +31,8 @@ import {
 import {
   createPropAccumulator,
   defaultValues,
-  extractAnimationValue,
   reduceInlineStyle,
+  resolveAnimationValue,
   styleSignals,
   timeToMS,
 } from "./style";
@@ -118,7 +118,6 @@ export function createInteropComputed(
   );
   const signalsSetDuringRender = new Set();
   let containerSignal: Signal<InteropComputed> | undefined;
-  let hasInlineContainers: boolean = false;
 
   let partialInterop: Omit<
     InteropComputed,
@@ -177,7 +176,6 @@ export function createInteropComputed(
     },
     setContainer(name) {
       containerSignal ??= createSignal(interop as InteropComputed, name);
-      hasInlineContainers = true;
       inlineSignals.set(name, containerSignal);
       signalsSetDuringRender.add(name);
       inlineSignals.set(DEFAULT_CONTAINER_NAME, containerSignal);
@@ -226,19 +224,14 @@ export function createInteropComputed(
 
       // Track signals set during render
       signalsSetDuringRender.clear();
-      hasInlineContainers = false;
 
       // Listen for fast-reload
       // TODO: This should be improved...
       fastReloadSignal.get();
 
-      let dynamicStyles = false;
-
       const acc = createPropAccumulator(interop);
 
       for (const [prop, { sources, nativeStyleToProp }] of options.config) {
-        dynamicStyles ||= Boolean(nativeStyleToProp);
-
         let propValue = props[prop] as StyleProp;
 
         if (propValue) {
@@ -257,10 +250,11 @@ export function createInteropComputed(
         }
 
         if (prop === "style") {
-          if (typeof acc.props[prop].width === "number") {
+          const styleProp = acc.props[prop];
+          if (styleProp && typeof styleProp.width === "number") {
             acc.requiresLayoutWidth = false;
           }
-          if (typeof acc.props[prop].height === "number") {
+          if (styleProp && typeof styleProp.height === "number") {
             acc.requiresLayoutHeight = false;
           }
 
@@ -301,6 +295,7 @@ export function createInteropComputed(
               }
 
               if (shouldResetAnimations) {
+                acc.props.style ??= {};
                 interop.currentAnimationNames.clear();
 
                 // Loop in reverse order
@@ -324,44 +319,43 @@ export function createInteropComputed(
                       ? -1
                       : iterationCount.value;
 
-                  for (const [
-                    prop,
-                    [initialFrame, ...frames],
-                  ] of Object.entries(keyframes.frames)) {
-                    if (seenAnimatedProps.has(prop)) continue;
-                    seenAnimatedProps.add(prop);
+                  for (const [key, [initialFrame, ...frames]] of Object.entries(
+                    keyframes.frames,
+                  )) {
+                    if (seenAnimatedProps.has(key)) continue;
+                    seenAnimatedProps.add(key);
 
-                    const initialValue = extractAnimationValue(
+                    const initialValue = resolveAnimationValue(
                       initialFrame,
-                      prop,
-                      acc.props[prop],
-                      meta,
-                      interop,
+                      key,
+                      acc.props.style,
+                      acc,
                     );
 
-                    const sequence = frames.map((frame) => {
-                      return withDelay(
-                        delay,
-                        withTiming(
-                          extractAnimationValue(
-                            frame,
-                            prop,
-                            acc.props[prop],
-                            meta,
-                            interop,
+                    const sequence = frames.map(
+                      ({ progress, ...descriptor }) => {
+                        return withDelay(
+                          delay,
+                          withTiming(
+                            resolveAnimationValue(
+                              descriptor,
+                              key,
+                              acc.props.style,
+                              acc,
+                            ),
+                            {
+                              duration: totalDuration * progress,
+                              easing: Easing.linear,
+                            },
                           ),
-                          {
-                            duration: totalDuration * frame.progress,
-                            easing: Easing.linear,
-                          },
-                        ),
-                      );
-                    }) as [AnimatableValue, ...AnimatableValue[]];
+                        );
+                      },
+                    ) as [AnimatableValue, ...AnimatableValue[]];
 
-                    let sharedValue = interop.sharedValues[prop];
+                    let sharedValue = interop.sharedValues[key];
                     if (!sharedValue) {
                       sharedValue = makeMutable(initialValue);
-                      interop.sharedValues[prop] = sharedValue;
+                      interop.sharedValues[key] = sharedValue;
                     } else {
                       sharedValue.value = initialValue;
                     }
@@ -371,7 +365,11 @@ export function createInteropComputed(
                       iterations,
                     );
 
-                    acc.props[prop][prop] = sharedValue;
+                    Object.defineProperty(acc.props[prop], key, {
+                      configurable: true,
+                      enumerable: true,
+                      value: sharedValue,
+                    });
                   }
                 }
               } else {
@@ -381,9 +379,13 @@ export function createInteropComputed(
                     continue;
                   }
 
-                  for (const prop of Object.keys(keyframes.frames)) {
-                    acc.props[prop][prop] = interop.sharedValues[prop];
-                    seenAnimatedProps.add(prop);
+                  for (const key of Object.keys(keyframes.frames)) {
+                    Object.defineProperty(acc.props[prop], key, {
+                      configurable: true,
+                      enumerable: true,
+                      value: interop.sharedValues[key],
+                    });
+                    seenAnimatedProps.add(key);
                   }
                 }
               }
@@ -403,17 +405,17 @@ export function createInteropComputed(
             } = acc.transition;
 
             for (let index = 0; index < properties.length; index++) {
-              const prop2 = properties[index];
+              const key = properties[index];
 
-              if (seenAnimatedProps.has(prop2)) continue;
+              if (seenAnimatedProps.has(key)) continue;
 
-              let value = acc.props[prop][prop2] ?? defaultValues[prop2];
+              let value = acc.props[prop][key] ?? defaultValues[key];
               if (typeof value === "function") {
                 value = value();
               }
               if (value === undefined) continue;
 
-              seenAnimatedProps.add(prop2);
+              seenAnimatedProps.add(key);
 
               const duration = timeToMS(durations[index % durations.length]);
               const delay = timeToMS(delays[index % delays.length]);
@@ -422,10 +424,10 @@ export function createInteropComputed(
               //     index % transition.timingFunction.length
               //   ];
 
-              let sharedValue = interop.sharedValues[prop2];
+              let sharedValue = interop.sharedValues[key];
               if (!sharedValue) {
                 sharedValue = makeMutable(value);
-                interop.sharedValues[prop2] = sharedValue;
+                interop.sharedValues[key] = sharedValue;
               }
 
               if (value !== sharedValue.value) {
@@ -435,14 +437,26 @@ export function createInteropComputed(
                 );
               }
 
-              acc.props[prop][prop2] = sharedValue;
+              Object.defineProperty(acc.props[prop], key, {
+                configurable: true,
+                enumerable: true,
+                value: sharedValue,
+              });
             }
           }
 
-          for (const [prop, value] of Object.entries(interop.sharedValues)) {
-            if (seenAnimatedProps.has(prop)) continue;
+          for (const [key, value] of Object.entries(interop.sharedValues)) {
+            if (seenAnimatedProps.has(key)) continue;
             cancelAnimation(value);
-            value.value = acc.props[prop][prop] ?? defaultValues[prop];
+            value.value = acc.props[prop][key] ?? defaultValues[key];
+          }
+
+          if (nativeStyleToProp) {
+            for (let [key, targetProp] of Object.entries(nativeStyleToProp)) {
+              if (targetProp === true) targetProp = key;
+              acc.props[targetProp] = acc.props.style[key];
+              delete acc.props.style[key];
+            }
           }
         }
 

@@ -289,7 +289,6 @@ export function parseDeclaration(
     if (declaration.value.propertyId.property === "transform") {
       for (const transform of declaration.value.value as any[]) {
         if (transform.value.name === "translate") {
-          console.log(transform.value.arguments);
           addStyleProp(
             "translateX",
             parseUnparsed(transform.value.arguments[0], parseOptions),
@@ -305,6 +304,7 @@ export function parseDeclaration(
           );
         }
       }
+      return;
     } else {
       return addStyleProp(
         declaration.value.propertyId.property,

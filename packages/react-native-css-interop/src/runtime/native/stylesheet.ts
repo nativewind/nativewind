@@ -7,7 +7,6 @@ import {
 import {
   StyleSheetRegisterOptions,
   CommonStyleSheet,
-  ExtractionWarning,
   Specificity,
 } from "../../types";
 import { vh, vw } from "./misc";
@@ -16,10 +15,7 @@ import { colorScheme } from "./color-scheme";
 import { createSignal } from "../signals";
 import { createColorSchemeSignal, globalVariables } from "./inheritance";
 import { animationMap, globalStyles } from "../globals";
-import { upsertStyleSignal } from "./style";
-
-export const warnings = new Map<string, ExtractionWarning[]>();
-export const warned = new Set<string>();
+import { styleSignals, upsertStyleSignal, warned, warnings } from "./style";
 
 export const fastReloadSignal = createSignal(0, "fast-reload");
 
@@ -31,6 +27,7 @@ const commonStyleSheet: CommonStyleSheet = {
     warnings.clear();
     warned.clear();
     globalVariables.rem.set(14);
+    styleSignals.clear();
     vw[INTERNAL_RESET](dimensions);
     vh[INTERNAL_RESET](dimensions);
     colorScheme[INTERNAL_RESET](appearance);

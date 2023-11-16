@@ -4,7 +4,12 @@ import type {
   SelectorComponent,
   SelectorList,
 } from "lightningcss";
-import { CSSSpecificity, ExtractRuleOptions, ExtractedStyle } from "../types";
+import {
+  CSSSpecificity,
+  DescriptorOrRuntimeValue,
+  ExtractRuleOptions,
+  ExtractedStyle,
+} from "../types";
 
 export type NormalizeSelector =
   | {
@@ -197,35 +202,98 @@ export function normalizeSelectors(
               selector.pseudoClasses ??= {};
               selector.pseudoClasses[component.kind] = true;
               break;
-            case "custom-function":
-              if (component.name === "native-prop") {
-                const args = getCustomFunctionArguments(component);
-                if (!args) {
-                  isValid = false;
+            case "custom-function": {
+              debugger;
+              switch (component.name) {
+                case "native-prop": {
+                  const args = getCustomFunctionArguments(component);
+                  if (!args) {
+                    isValid = false;
+                    break;
+                  }
+
+                  const record = extractedStyle.record!;
+                  const style = record.style as Record<
+                    string,
+                    DescriptorOrRuntimeValue
+                  >;
+                  if (!style) {
+                    isValid = false;
+                    break;
+                  }
+
+                  if (
+                    args.length === 0 ||
+                    (args.length === 1 && args[0] === "*")
+                  ) {
+                    // :native-props() OR :native-props(*)
+                    for (const [key, value] of Object.entries(style)) {
+                      record[key] = { $$type: "prop", value };
+                    }
+                    delete record.style;
+                  } else if (args.length === 2 && args[0] === "*") {
+                    // :nativeProps(*, <prop>
+                    const prop = args[1];
+                    record[prop] = {
+                      $$type: "prop",
+                      value: Object.values(style)[0],
+                    };
+                    delete record.style;
+                  } else if (args.length === 2) {
+                    const key = args[0];
+                    const prop = args[1];
+
+                    record[prop] = {
+                      $$type: "prop",
+                      value: style[key],
+                    };
+
+                    delete style[key];
+                  } else {
+                    isValid = false;
+                  }
                   break;
                 }
-
-                selector.nativeProps ??= {};
-
-                if (args.length === 0) {
-                  const keys = Object.keys(extractedStyle.style);
-                  for (const key of keys) {
-                    selector.nativeProps[key] = key;
+                case "move-prop": {
+                  const args = getCustomFunctionArguments(component);
+                  if (!args) {
+                    isValid = false;
+                    break;
                   }
-                } else if (args.length === 1) {
-                  const keys = Object.keys(extractedStyle.style);
-                  for (const key of keys) {
-                    selector.nativeProps[key] = args[0];
+
+                  const record = extractedStyle.record!;
+                  const style = record.style as Record<
+                    string,
+                    DescriptorOrRuntimeValue
+                  >;
+                  if (!style) {
+                    isValid = false;
+                    break;
                   }
-                } else if (args.length === 2) {
-                  selector.nativeProps[args[1]] = args[0];
+
+                  if (args.length === 2 && args[0] === "*") {
+                    // :move-props(*,<prop>)
+                    record[args[1]] = style;
+                    delete record.style;
+                  } else if (args.length === 2) {
+                    // :move-props(<key>, <prop>)
+                    const key = args[0];
+                    const prop = args[1];
+                    record[prop] ??= {};
+                    const destination = record[prop];
+                    if ("$$type" in destination) {
+                      record[prop] = { [key]: style[key] };
+                    } else {
+                      destination[key] = style[key];
+                    }
+                    delete style[key];
+                  }
+                  break;
                 }
-              } else {
-                isValid = false;
+                default: {
+                  isValid = false;
+                }
               }
-              break;
-            default: {
-              isValid = false;
             }
           }
         }

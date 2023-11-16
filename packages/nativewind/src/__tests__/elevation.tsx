@@ -11,7 +11,7 @@ describe("Custom - Elevation", () => {
     [
       "elevation-sm",
       style({
-        elevation: 1.5,
+        elevation: 1,
       }),
     ],
   );

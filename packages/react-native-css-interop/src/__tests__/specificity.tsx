@@ -7,26 +7,11 @@ import {
   registerCSS,
   resetStyles,
 } from "../testing-library";
-import { specificityCompare } from "../runtime/specificity";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(Text);
 
 beforeEach(() => resetStyles());
-
-test(specificityCompare.name, () => {
-  expect(
-    [
-      { A: 0, B: 1, C: 0, I: 0, S: 1, O: 0 },
-      { A: 0, B: 1, C: 0, I: 0, S: 1, O: 1 },
-      { inline: 1, A: 0, B: 1, C: 0, I: 0, S: 1, O: 1 },
-    ].sort(specificityCompare),
-  ).toEqual([
-    { A: 0, B: 1, C: 0, I: 0, S: 1, O: 0 },
-    { A: 0, B: 1, C: 0, I: 0, S: 1, O: 1 },
-    { inline: 1, A: 0, B: 1, C: 0, I: 0, S: 1, O: 1 },
-  ]);
-});
 
 test("inline styles", () => {
   registerCSS(`.red { background-color: red; }`);

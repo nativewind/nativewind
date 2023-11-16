@@ -3,10 +3,10 @@ import {
   ExtractedStyle,
   Specificity,
   ExtractedPropertyDescriptors,
-  PropertyDescriptorValue,
+  DescriptorOrRuntimeValue,
   ExtractedAnimations,
   ExtractedTransition,
-  ExtractedStyleFrame,
+  ExtractionWarning,
 } from "../../types";
 import {
   testContainerQuery,
@@ -16,7 +16,7 @@ import {
 import type { InteropComputed } from "./interop";
 import { vh, vw } from "./misc";
 import { globalVariables } from "./inheritance";
-import { StyleSheet, Platform, PlatformColor } from "react-native";
+import { StyleSheet, Platform, PlatformColor, PixelRatio } from "react-native";
 import { AnimatableValue } from "react-native-reanimated";
 import { colorScheme } from "./color-scheme";
 import { Time } from "lightningcss";
@@ -105,8 +105,17 @@ interface StyleSignal extends Signal<ExtractedPropertyDescriptors[]> {
 export const styleSignals = new Map<string, StyleSignal>();
 export const opaqueStyles = new WeakMap<object, Pick<StyleSignal, "reducer">>();
 
+export const warnings = new Map<string, ExtractionWarning[]>();
+export const warned = new Set<string>();
+
 export function upsertStyleSignal(name: string, styles: ExtractedStyle[]) {
   const mappedStyles: ExtractedPropertyDescriptors[] = styles.map((style) => {
+    if (process.env.NODE_ENV !== "production") {
+      if (style.warnings) {
+        warnings.set(name, style.warnings);
+      }
+    }
+
     return {
       ...style,
       entries: style.entries?.map(([key, value]) => {
@@ -122,156 +131,189 @@ export function upsertStyleSignal(name: string, styles: ExtractedStyle[]) {
 
   let signal = styleSignals.get(name);
   if (signal) {
-    signal.set(mappedStyles);
+    if (!deepEqual(signal.get(), mappedStyles)) {
+      warned.delete(name);
+      signal.set(mappedStyles);
+    }
   } else {
-    styleSignals.set(name, createStyleSignal(name, mappedStyles));
+    let signal = styleSignals.get(name);
+
+    if (signal) {
+      signal.set(mappedStyles);
+    } else {
+      signal = {
+        ...createSignal<ExtractedPropertyDescriptors[]>(mappedStyles, name),
+        reducer(acc, forceInline = false) {
+          if (process.env.NODE_ENV !== "production") {
+            if (warnings.has(name)) {
+              if (process.env.NODE_ENV !== "test") {
+                console.log(warnings.get(name));
+                warnings.delete(name);
+              }
+              warned.add(name);
+            }
+          }
+
+          const extractedStyles = signal!.get();
+          return reduceClassNameStyle(acc, extractedStyles, forceInline);
+        },
+      };
+    }
+    styleSignals.set(name, signal);
   }
 }
 
-export function createStyleSignal(
-  name: string,
-  styles: ExtractedPropertyDescriptors[],
+export function reduceClassNameStyle(
+  acc: PropAccumulator,
+  extractedStyles: ExtractedPropertyDescriptors[],
+  forceInline = false,
 ) {
-  let signal = styleSignals.get(name);
+  for (const style of extractedStyles) {
+    if (style.variables || style.container?.names) {
+      acc.forceContext = true;
+    }
 
-  if (signal) {
-    signal.set(styles);
-  } else {
-    signal = {
-      ...createSignal<ExtractedPropertyDescriptors[]>(styles, name),
-      reducer(acc, forceInline = false) {
-        const extractedStyles = signal!.get();
+    if (style.pseudoClasses) {
+      acc.hasActive ||= Boolean(style.pseudoClasses.active);
+      acc.hasHover ||= Boolean(style.pseudoClasses.hover);
+      acc.hasFocus ||= Boolean(style.pseudoClasses.focus);
+      if (!testPseudoClasses(acc.interop, style.pseudoClasses)) {
+        continue;
+      }
+    }
 
-        for (const style of extractedStyles) {
-          if (style.variables || style.container?.names) {
-            acc.forceContext = true;
-          }
+    if (style.media && !testMediaQueries(style.media)) {
+      continue;
+    }
 
-          if (style.pseudoClasses) {
-            acc.hasActive ||= Boolean(style.pseudoClasses.active);
-            acc.hasHover ||= Boolean(style.pseudoClasses.hover);
-            acc.hasFocus ||= Boolean(style.pseudoClasses.focus);
-            if (!testPseudoClasses(acc.interop, style.pseudoClasses)) {
-              continue;
-            }
-          }
+    if (
+      style.containerQuery &&
+      !testContainerQuery(style.containerQuery, acc.interop)
+    ) {
+      continue;
+    }
 
-          if (style.media && !testMediaQueries(style.media)) {
-            continue;
-          }
+    const styleSpecificity: Specificity = forceInline
+      ? {
+          ...style.specificity,
+          inline: 1,
+        }
+      : style.specificity;
 
-          if (
-            style.containerQuery &&
-            !testContainerQuery(style.containerQuery, acc.interop)
-          ) {
-            continue;
-          }
+    if (style.variables) {
+      for (const [key, value] of style.variables) {
+        const specificity = acc.variablesSpecificity[key];
 
-          const styleSpecificity: Specificity = forceInline
-            ? {
-                ...style.specificity,
-                inline: 1,
-              }
-            : style.specificity;
-
-          if (style.variables) {
-            for (const [key, value] of style.variables) {
-              const specificity = acc.variablesSpecificity[key];
-
-              if (hasLowerSpecificity(specificity, styleSpecificity)) {
-                continue;
-              }
-
-              acc.setVariable(key, value, style.specificity);
-            }
-          }
-
-          if (style.animations) {
-            acc.animations = {
-              ...defaultAnimation,
-              ...acc.animations,
-              ...style.animations,
-            };
-          }
-
-          if (style.transition) {
-            acc.transition = {
-              ...defaultTransition,
-              ...acc.transition,
-              ...style.transition,
-            };
-          }
-
-          if (style.container?.names) {
-            acc.requiresLayoutWidth = true;
-            acc.requiresLayoutHeight = true;
-            acc.hasContainer = true;
-            for (const name of style.container.names) {
-              acc.interop.setContainer(name);
-            }
-          }
-
-          if (style.entries) {
-            for (const [prop, styleEntriesOrValue] of style.entries) {
-              acc.propsSpecificity[prop] ??= {};
-
-              if (Array.isArray(styleEntriesOrValue)) {
-                for (let [key, value] of styleEntriesOrValue) {
-                  const specificity =
-                    acc.propsSpecificity[prop]["__prop"] ??
-                    acc.propsSpecificity[prop][key];
-
-                  if (hasLowerSpecificity(specificity, styleSpecificity)) {
-                    continue;
-                  }
-
-                  acc.propsSpecificity[prop][key] = style.specificity;
-                  acc.propsSpecificity[prop]["__prop"] = undefined;
-                  acc.props[prop] ??= {
-                    [GetStyle]: () => acc.props[prop],
-                    [GetVariable]: acc[GetVariable],
-                    [RunInEffect]: acc[RunInEffect],
-                  };
-
-                  let object = acc.props[prop];
-
-                  if (key.includes(".")) {
-                    const [left, right] = key.split(".");
-                    object[left] ??= {};
-                    object = object[left];
-                    key = right;
-                  }
-
-                  Object.defineProperty(object, key, {
-                    configurable: true,
-                    enumerable: true,
-                    ...value,
-                  });
-                }
-              } else {
-                const specificity = acc.propsSpecificity[prop]["__prop"];
-
-                if (hasLowerSpecificity(specificity, styleSpecificity)) {
-                  continue;
-                }
-
-                acc.propsSpecificity[prop]["__prop"] = style.specificity;
-                Object.defineProperty(acc.props, prop, {
-                  configurable: true,
-                  enumerable: true,
-                  ...styleEntriesOrValue,
-                });
-              }
-            }
-          }
+        if (hasLowerSpecificity(specificity, styleSpecificity)) {
+          continue;
         }
 
-        return acc;
-      },
-    };
+        acc.setVariable(key, value, style.specificity);
+      }
+    }
+
+    if (style.animations) {
+      acc.animations = {
+        ...defaultAnimation,
+        ...acc.animations,
+        ...style.animations,
+      };
+    }
+
+    if (style.transition) {
+      acc.transition = {
+        ...defaultTransition,
+        ...acc.transition,
+        ...style.transition,
+      };
+    }
+
+    if (style.container?.names) {
+      acc.requiresLayoutWidth = true;
+      acc.requiresLayoutHeight = true;
+      acc.hasContainer = true;
+      for (const name of style.container.names) {
+        acc.interop.setContainer(name);
+      }
+    }
+
+    if (style.entries) {
+      for (const [prop, styleEntriesOrValue] of style.entries) {
+        acc.propsSpecificity[prop] ??= {};
+
+        if (Array.isArray(styleEntriesOrValue)) {
+          for (let [key, value] of styleEntriesOrValue) {
+            const specificity =
+              acc.propsSpecificity[prop]["__prop"] ??
+              acc.propsSpecificity[prop][key];
+
+            if (hasLowerSpecificity(specificity, styleSpecificity)) {
+              continue;
+            }
+
+            acc.propsSpecificity[prop][key] = style.specificity;
+            acc.propsSpecificity[prop]["__prop"] = undefined;
+            acc.props[prop] ??= {
+              [GetStyle]: () => acc.props[prop],
+              [GetVariable]: acc[GetVariable],
+              [RunInEffect]: acc[RunInEffect],
+            };
+
+            let object = acc.props[prop];
+
+            if (key.includes(".")) {
+              const [left, right] = key.split(".");
+              object[left] ??= {};
+              object = object[left];
+              key = right;
+            }
+
+            Object.defineProperty(object, key, {
+              configurable: true,
+              enumerable: true,
+              ...value,
+            });
+          }
+        } else {
+          const specificity = acc.propsSpecificity[prop]["__prop"];
+
+          if (hasLowerSpecificity(specificity, styleSpecificity)) {
+            continue;
+          }
+
+          acc.propsSpecificity[prop]["__prop"] = style.specificity;
+          Object.defineProperty(acc.props, prop, {
+            configurable: true,
+            enumerable: true,
+            ...styleEntriesOrValue,
+          });
+        }
+      }
+    }
   }
 
-  return signal;
+  return acc;
+}
+
+export function reduceOpaqueStyle(
+  acc: PropAccumulator,
+  variables: Record<string, string | number>,
+) {
+  for (let [key, value] of Object.entries(variables)) {
+    if (!key.startsWith("--")) {
+      key = `--${key}`;
+    }
+
+    const specificity = acc.variablesSpecificity[key];
+
+    if (hasLowerSpecificity(specificity, InlineSpecificity)) {
+      continue;
+    }
+
+    acc.setVariable(key, value, InlineSpecificity);
+  }
+
+  return acc;
 }
 
 export function reduceInlineStyle(
@@ -339,25 +381,16 @@ export function reduceInlineStyle(
 }
 
 export function parseValue(
-  value: PropertyDescriptorValue | string | number | Array<unknown>,
+  value: DescriptorOrRuntimeValue | string | number | Array<unknown>,
   primaryPropAcc?: PropAccumulator,
+  primaryStyle?: Record<string, any>,
 ): PropertyDescriptor {
-  if (typeof value === "number" || Array.isArray(value)) {
-    return {
-      value,
-    };
-  }
-
-  if (typeof value === "string") {
-    if (value.includes(" ")) {
-      return {
-        value: value.split(" "),
-      };
-    } else {
-      return {
-        value,
-      };
-    }
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    Array.isArray(value)
+  ) {
+    return { value };
   }
 
   if (!("name" in value)) return value;
@@ -365,7 +398,7 @@ export function parseValue(
   switch (value.name) {
     case "var": {
       return {
-        get: function (primaryPropAcc?: PropAccumulator) {
+        get: function () {
           return getPropAccumulator(this, primaryPropAcc)[GetVariable](
             value.arguments[0] as string,
           );
@@ -393,7 +426,7 @@ export function parseValue(
     case "em": {
       return {
         get: function () {
-          const style = getStyle(this);
+          const style = getStyle(this, primaryStyle);
           if (style && "fontSize" in style) {
             return round(
               ((style.fontSize || 0) * value.arguments[0]) as number,
@@ -417,7 +450,7 @@ export function parseValue(
       return {
         get: function () {
           const acc = getPropAccumulator(this, primaryPropAcc);
-          const style = getStyle(this);
+          const style = getStyle(this, primaryStyle);
 
           let ref = 0;
           if (typeof style?.height === "number") {
@@ -437,7 +470,7 @@ export function parseValue(
       return {
         get: function () {
           const acc = getPropAccumulator(this, primaryPropAcc);
-          const style = getStyle(this);
+          const style = getStyle(this, primaryStyle);
 
           let ref = 0;
           if (typeof style?.width === "number") {
@@ -450,6 +483,25 @@ export function parseValue(
           }
 
           return round((ref * value.arguments[0]) as number);
+        },
+      };
+    }
+    case "rgb":
+    case "rgba": {
+      return {
+        get: function () {
+          debugger;
+          const args = resolveRuntimeArgs(
+            value.arguments,
+            getPropAccumulator(this, primaryPropAcc),
+          );
+          if (args.length === 3) {
+            return `rgb(${args.join(", ")})`;
+          } else if (args.length === 4) {
+            return `rgba(${args.join(", ")})`;
+          } else {
+            return;
+          }
         },
       };
     }
@@ -471,19 +523,14 @@ export function parseValue(
       };
     }
     case "hairlineWidth": {
-      return {
-        value: StyleSheet.hairlineWidth,
-      };
+      return { value: StyleSheet.hairlineWidth };
     }
     case "platformColor": {
-      return {
-        value: PlatformColor(...value.arguments),
-      };
+      return { value: PlatformColor(...value.arguments) };
     }
     case "platformSelect": {
       return {
         get: function () {
-          debugger;
           return resolveRuntimeArgs(
             [Platform.select(value.arguments[0])],
             getPropAccumulator(this, primaryPropAcc),
@@ -491,28 +538,117 @@ export function parseValue(
         },
       };
     }
+    case "getPixelSizeForLayoutSize": {
+      return {
+        get: function () {
+          debugger;
+          return PixelRatio.getPixelSizeForLayoutSize(
+            resolveRuntimeArgs(
+              value.arguments[0],
+              getPropAccumulator(this, primaryPropAcc),
+            ),
+          );
+        },
+      };
+    }
+    case "fontScale": {
+      return {
+        get: function () {
+          return (
+            PixelRatio.getFontScale() *
+            Number(
+              resolveRuntimeArgs(
+                value.arguments[0],
+                getPropAccumulator(this, primaryPropAcc),
+              ),
+            )
+          );
+        },
+      };
+    }
+    case "pixelScale": {
+      return {
+        get: function () {
+          return (
+            PixelRatio.get() *
+            Number(
+              resolveRuntimeArgs(
+                value.arguments[0],
+                getPropAccumulator(this, primaryPropAcc),
+              ),
+            )
+          );
+        },
+      };
+    }
+    case "pixelScaleSelect": {
+      return {
+        get: function () {
+          const specifics = value.arguments[0];
+          return resolveRuntimeArgs(
+            specifics[PixelRatio.get()] ?? specifics["default"],
+            getPropAccumulator(this, primaryPropAcc),
+          );
+        },
+      };
+    }
+    case "fontScaleSelect": {
+      return {
+        get: function () {
+          const specifics = value.arguments[0];
+          return resolveRuntimeArgs(
+            specifics[PixelRatio.getFontScale()] ?? specifics["default"],
+            getPropAccumulator(this, primaryPropAcc),
+          );
+        },
+      };
+    }
+    case "roundToNearestPixel": {
+      return {
+        get: function () {
+          return PixelRatio.roundToNearestPixel(
+            resolveRuntimeArgs(
+              value.arguments[0],
+              getPropAccumulator(this, primaryPropAcc),
+            ),
+          );
+        },
+      };
+    }
     default: {
       return {
-        value: undefined,
+        get: function () {
+          const args = resolveRuntimeArgs(
+            value.arguments,
+            getPropAccumulator(this, primaryPropAcc),
+          );
+
+          return `${value.name}(${args.join(",")})`;
+        },
       };
     }
   }
 }
 
-function resolveRuntimeArgs(args: any, acc: PropAccumulator): any {
+function resolveRuntimeArgs(
+  args: any,
+  acc: PropAccumulator,
+  style?: Record<string, any>,
+): any {
   let resolved = [];
+  if (args === undefined) return;
   if (Array.isArray(args)) {
     for (const arg of args) {
       resolved.push(resolveRuntimeArgs(arg, acc));
     }
   } else {
-    const descriptor = parseValue(args, acc);
+    const descriptor = parseValue(args, acc, style);
 
     if (descriptor) {
       if (descriptor.value !== undefined) {
         resolved.push(descriptor.value);
       } else {
-        const value = (descriptor.get as any)?.(acc);
+        const value = (descriptor.get as any)?.();
         if (value !== undefined) {
           resolved.push(value);
         }
@@ -532,19 +668,25 @@ function resolveRuntimeArgs(args: any, acc: PropAccumulator): any {
 }
 
 export function resolveAnimationValue(
-  frame: ExtractedStyleFrame,
+  frame: DescriptorOrRuntimeValue,
   prop: string,
   style: Record<string, any>,
   acc: PropAccumulator,
 ) {
-  return frame.value === "!INHERIT!"
-    ? style[prop] ?? defaultValues[prop]
-    : frame.value === "!INITIAL!"
-    ? defaultValues[prop]
-    : resolveRuntimeArgs(frame.value, acc);
+  if ("value" in frame) {
+    if (frame.value === "!INHERIT!") {
+      return style[prop] ?? defaultValues[prop];
+    } else if (frame.value === "!INITIAL!") {
+      return defaultValues[prop];
+    }
+  }
+
+  return resolveRuntimeArgs(frame, acc, style);
 }
 
-function getStyle(source: unknown) {
+function getStyle(source: unknown, primaryStyle?: Record<string, any>) {
+  if (primaryStyle) return primaryStyle;
+
   if (source && typeof source === "object" && GetStyle in source) {
     const style = (source as any)[GetStyle]();
     if (style && typeof style === "object") {
@@ -554,7 +696,7 @@ function getStyle(source: unknown) {
 }
 
 function runInEffect(
-  source: unknown,
+  source: any,
   primary: PropAccumulator | undefined,
   fn: () => any,
 ) {
@@ -600,6 +742,28 @@ export function specificityCompare(a: Specificity, b: Specificity) {
     return 0;
   }
 }
+
+export const timeToMS = (time: Time) => {
+  return time.type === "milliseconds" ? time.value : time.value * 1000;
+};
+
+const defaultAnimation: Required<ExtractedAnimations> = {
+  name: [],
+  direction: ["normal"],
+  fillMode: ["none"],
+  iterationCount: [{ type: "number", value: 1 }],
+  timingFunction: [{ type: "linear" }],
+  playState: ["running"],
+  duration: [{ type: "seconds", value: 0 }],
+  delay: [{ type: "seconds", value: 0 }],
+};
+
+const defaultTransition: Required<ExtractedTransition> = {
+  property: [],
+  duration: [{ type: "seconds", value: 0 }],
+  delay: [{ type: "seconds", value: 0 }],
+  timingFunction: [{ type: "linear" }],
+};
 
 export const defaultValues: Record<
   string,
@@ -664,61 +828,27 @@ export const defaultValues: Record<
   zIndex: 0,
 };
 
-const defaultAnimation: Required<ExtractedAnimations> = {
-  direction: ["normal"],
-  fillMode: ["none"],
-  iterationCount: [{ type: "number", value: 1 }],
-  timingFunction: [{ type: "linear" }],
-  name: [],
-  playState: ["running"],
-  duration: [
-    {
-      type: "seconds",
-      value: 0,
-    },
-  ],
-  delay: [
-    {
-      type: "seconds",
-      value: 0,
-    },
-  ],
-};
+function deepEqual(obj1: any, obj2: any) {
+  if (obj1 === obj2)
+    // it's just the same object. No need to compare.
+    return true;
 
-const defaultTransition: Required<ExtractedTransition> = {
-  property: [],
-  duration: [
-    {
-      type: "seconds",
-      value: 0,
-    },
-  ],
-  delay: [
-    {
-      type: "seconds",
-      value: 0,
-    },
-  ],
-  timingFunction: [{ type: "linear" }],
-};
+  if (isPrimitive(obj1) && isPrimitive(obj2))
+    // compare primitives
+    return obj1 === obj2;
 
-export const timeToMS = (time: Time) => {
-  return time.type === "milliseconds" ? time.value : time.value * 1000;
-};
+  if (Object.keys(obj1).length !== Object.keys(obj2).length) return false;
 
-export function extractAnimationValue(
-  frame: ExtractedStyleFrame,
-  prop: string,
-  style: Record<string, any>,
-  meta: any,
-  interop: InteropComputed,
-) {
-  let value =
-    frame.value === "!INHERIT!"
-      ? style[prop] ?? defaultValues[prop]
-      : frame.value === "!INITIAL!"
-      ? defaultValues[prop]
-      : undefined; // parseValue(frame.value, style, meta, interop);
+  // compare objects with same number of keys
+  for (let key in obj1) {
+    if (!(key in obj2)) return false; //other object doesn't have this prop
+    if (!deepEqual(obj1[key], obj2[key])) return false;
+  }
 
-  return typeof value === "function" ? value() : value;
+  return true;
+}
+
+//check if value is primitive
+function isPrimitive(obj: any) {
+  return obj !== Object(obj);
 }

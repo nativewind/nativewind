@@ -13,13 +13,13 @@ test("hover", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "hoverIn");
   expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
 
   fireEvent(component, "hoverOut");
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 });
 
 test("focus", async () => {
@@ -27,13 +27,13 @@ test("focus", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "focus");
   expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
 
   fireEvent(component, "blur");
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 });
 
 test("active", async () => {
@@ -41,13 +41,13 @@ test("active", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "pressIn");
   expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
 
   fireEvent(component, "pressOut");
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 });
 
 test("mixed", async () => {
@@ -56,26 +56,25 @@ test("mixed", async () => {
   );
 
   const component = screen.getByTestId(testID);
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "pressIn");
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "hoverIn");
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "focus");
   expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
 });
 
-test.only("selection", async () => {
+test("selection", async () => {
   await renderTailwind(<A testID={testID} className="selection:text-black" />);
 
   const component = screen.getByTestId(testID);
   expect(component.props).toEqual(
     expect.objectContaining({
       selectionColor: "rgba(0, 0, 0, 1)",
-      style: {},
     }),
   );
 });
