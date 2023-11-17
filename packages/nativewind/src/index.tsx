@@ -8,6 +8,7 @@ export {
   cssInterop,
   remapProps,
   StyleSheet,
+  colorScheme,
   rem,
 } from "react-native-css-interop";
 
