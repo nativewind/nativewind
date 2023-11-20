@@ -12,12 +12,18 @@ import { NormalizedOptions } from "./prop-mapping";
 import { StyleSheet } from "./stylesheet";
 import { effectContext, globalVariables } from "./inheritance";
 import {
-  ExtractedStyleValue,
   GetInteraction,
   Interaction,
-  StyleProp,
+  NativeStyleToProp,
+  RuntimeStyle,
+  RuntimeValue,
+  RuntimeValueDescriptor,
 } from "../../types";
-import { DEFAULT_CONTAINER_NAME, transformKeys } from "../../shared";
+import {
+  DEFAULT_CONTAINER_NAME,
+  STYLE_SCOPES,
+  transformKeys,
+} from "../../shared";
 import {
   AnimatableValue,
   Easing,
@@ -33,10 +39,12 @@ import {
   animationMap,
   createPropAccumulator,
   defaultValues,
-  reduceInlineStyle,
-  resolveAnimationValue,
   styleSignals,
   timeToMS,
+  reduceStyles,
+  resolveAnimationValue,
+  PropAccumulator,
+  opaqueStyles,
 } from "./style";
 
 export interface InteropComputed extends Computed<any> {
@@ -51,8 +59,8 @@ export interface InteropComputed extends Computed<any> {
   convertToPressable: boolean;
   signals: Map<string, Signal<any>>;
   // Variable
-  getVariable: (name: string) => ExtractedStyleValue;
-  setVariable: (name: string, value: ExtractedStyleValue) => void;
+  getVariable: (name: string) => RuntimeValue;
+  setVariable: (name: string, value: RuntimeValueDescriptor) => void;
   hasSetVariable: (name: string) => boolean;
   getContainer: (name: string) => InteropComputed | undefined;
   setContainer: (name: string) => void;
@@ -68,11 +76,16 @@ export interface InteropComputed extends Computed<any> {
   animationWaitingOnLayout: boolean;
   sharedValues: Record<string, SharedValue<any>>;
   currentAnimationNames: Set<string>;
+  acc: PropAccumulator;
 }
+
+type Layers = Record<0 | 1 | 2, Array<RuntimeStyle | object>> & {
+  classNames: string;
+};
 
 export function useInteropComputed(
   props: Record<string, unknown>,
-  options: NormalizedOptions<Record<string, unknown>>,
+  options: NormalizedOptions,
 ) {
   const parent = useContext(effectContext);
   const interopRef = useRef<InteropComputed>();
@@ -106,7 +119,7 @@ export function useInteropComputed(
 }
 
 export function createInteropComputed(
-  options: NormalizedOptions<Record<string, unknown>>,
+  options: NormalizedOptions,
   props: Record<string, unknown>,
   parent: InteropComputed,
 ): InteropComputed {
@@ -137,6 +150,7 @@ export function createInteropComputed(
     // animations
     signals: new Map(),
     animationWaitingOnLayout: false,
+    acc: {} as PropAccumulator,
     setVariable(name, value) {
       signalsSetDuringRender.add(name);
       let signal = inlineSignals.get(name);
@@ -227,26 +241,90 @@ export function createInteropComputed(
       // Track signals set during render
       signalsSetDuringRender.clear();
 
-      const acc = createPropAccumulator(interop);
+      const mapping: [string, Layers, NativeStyleToProp<any> | undefined][] =
+        [];
+      let acc = createPropAccumulator(interop);
+      interop.acc = acc;
+      let maxScope = STYLE_SCOPES.STATIC;
 
-      for (const [prop, { sources, nativeStyleToProp }] of options.config) {
-        let propValue = props[prop] as StyleProp;
+      // Collect everything into the specificity layers and calculate the max scope
+      for (const [prop, sourceProp, nativeStyleToProp] of options.config) {
+        const classNames = props?.[sourceProp];
+        if (typeof classNames !== "string") continue;
+        StyleSheet.unstable_hook_onClassName?.(classNames);
 
-        if (propValue) {
-          reduceInlineStyle(acc, prop, propValue);
+        const layers: Layers = {
+          classNames,
+          0: [],
+          1: [],
+          2: [],
+        };
+
+        for (const className of classNames.split(/\s+/)) {
+          let signal = styleSignals.get(className);
+          if (!signal) continue;
+          const meta = signal.get();
+          maxScope = Math.max(maxScope, meta.scope);
+          if (meta[0]) layers[0].push(...meta[0]);
+          if (meta[1]) layers[1].push(...meta[1]);
+          if (meta[2]) layers[2].push(...meta[2]);
         }
 
-        for (const sourceProp of sources) {
-          const source = props?.[sourceProp];
-          if (typeof source !== "string") continue;
-          StyleSheet.unstable_hook_onClassName?.(source);
-          for (const className of source.split(/\s+/)) {
-            let styles = styleSignals.get(className);
-            if (!styles) continue;
-            styles.reducer(acc);
+        let inlineStyles = props?.[prop];
+        if (inlineStyles) {
+          if (Array.isArray(inlineStyles)) {
+            layers[1].push(
+              ...inlineStyles.flat(10).map((style) => {
+                if (opaqueStyles.has(style)) {
+                  style = opaqueStyles.get(style)!;
+                }
+                return style;
+              }),
+            );
+          } else {
+            if (opaqueStyles.has(inlineStyles)) {
+              inlineStyles = opaqueStyles.get(inlineStyles)!;
+            }
+            layers[1].push(inlineStyles);
           }
         }
 
+        mapping.push([prop, layers, nativeStyleToProp]);
+      }
+
+      /**
+       * Process the styles in order of layers
+       *  0: className
+       *  1: inline
+       *  2: important
+       *  3: transitions
+       *  4: animations
+       *
+       * We swap the processing order of 3 and 4, so we can skip already processed attributes
+       */
+      for (const [prop, layers, nativeStyleToProp] of mapping) {
+        // Layer 0 - className
+        if (layers[0].length) {
+          reduceStyles(acc, prop, layers[0], maxScope);
+        }
+
+        // Layer 1 - inline
+        if (layers[1].length) {
+          reduceStyles(acc, prop, layers[1], maxScope);
+        }
+
+        // Layer 2 - important
+        if (layers[2].length) {
+          reduceStyles(acc, prop, layers[2], maxScope);
+        }
+
+        // This is where the magic happens!
+        // Non-static styles need to be resolved.
+        if (maxScope !== STYLE_SCOPES.STATIC && acc.props[prop]) {
+          resolveObject(acc.props[prop]);
+        }
+
+        // Layer 3 & 4 only occur when the target is 'style'
         if (prop === "style") {
           const styleProp = acc.props[prop];
           if (styleProp && typeof styleProp.width === "number") {
@@ -258,6 +336,7 @@ export function createInteropComputed(
 
           const seenAnimatedProps = new Set();
 
+          // Layer 4 - animations
           if (acc.animations) {
             const {
               name: animationNames,
@@ -317,24 +396,22 @@ export function createInteropComputed(
                   seenAnimatedProps.add(key);
 
                   const initialValue = resolveAnimationValue(
-                    initialFrame,
+                    initialFrame.value,
                     key,
-                    acc,
                     acc.props.style,
                   );
 
-                  const sequence = frames.map(({ progress, ...descriptor }) => {
+                  const sequence = frames.map((frame) => {
                     return withDelay(
                       delay,
                       withTiming(
                         resolveAnimationValue(
-                          descriptor,
+                          frame.value,
                           key,
-                          acc,
                           acc.props.style,
                         ),
                         {
-                          duration: totalDuration * progress,
+                          duration: totalDuration * frame.progress,
                           easing: Easing.linear,
                         },
                       ),
@@ -388,7 +465,7 @@ export function createInteropComputed(
             interop.currentAnimationNames.clear();
           }
 
-          // We only support transition on 'style' right now
+          // Layer 3 - transitions
           if (acc.transition) {
             interop.isAnimated = true;
 
@@ -439,21 +516,25 @@ export function createInteropComputed(
             }
           }
 
+          // Cleanup any sharedValues that are no longer used
           for (const [key, value] of Object.entries(interop.sharedValues)) {
             if (seenAnimatedProps.has(key)) continue;
             cancelAnimation(value);
             value.value = acc.props[prop][key] ?? defaultValues[key];
           }
+        }
 
-          if (nativeStyleToProp) {
-            for (let [key, targetProp] of Object.entries(nativeStyleToProp)) {
-              if (targetProp === true) targetProp = key;
-              acc.props[targetProp] = acc.props.style[key];
-              delete acc.props.style[key];
-            }
+        // Move any styles to the correct prop
+        if (nativeStyleToProp) {
+          for (let [key, targetProp] of Object.entries(nativeStyleToProp)) {
+            if (targetProp === true) targetProp = key;
+            if (acc.props.style[key] === undefined) continue;
+            acc.props[prop] = acc.props.style[key];
+            delete acc.props.style[key];
           }
         }
 
+        // React Native has some nested styles, so we need to expand these values
         if (typeof acc.props[prop] === "object") {
           for (const tKey of transformKeys) {
             if (tKey in acc.props[prop]) {
@@ -576,4 +657,23 @@ export function createInteropComputed(
   interop();
 
   return interop;
+}
+
+// function cloneObject<T extends object>(obj: T): T {
+//   var clone = {} as T;
+//   for (var i in obj) {
+//     const v = obj[i];
+//     if (typeof v == "object" && v != null) clone[i] = cloneObject(v);
+//     else clone[i] = v;
+//   }
+//   return clone;
+// }
+
+// Walk an object, resolving any getters
+function resolveObject<T extends object>(obj: T) {
+  for (var i in obj) {
+    const v = obj[i];
+    if (typeof v == "object" && v != null) resolveObject(v);
+    else obj[i] = typeof v === "function" ? v() : v;
+  }
 }

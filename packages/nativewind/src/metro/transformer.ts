@@ -44,8 +44,8 @@ export async function transform(
 const url = require("react-native/Libraries/Core/Devtools/getDevServer")().url.replace(/(https?:\\/\\/.*)(:\\d*\\/)(.*)/, "$1$3")
 new globalThis.WebSocket(\`\${url}:${
             config.nativewind.fastRefreshPort
-          }\`).addEventListener("message", (event) => StyleSheet.register(JSON.parse(event.data)));
-StyleSheet.register(JSON.parse('${config.nativewind.parsedOutput}'));`,
+          }\`).addEventListener("message", (event) => StyleSheet.registerCompiled(JSON.parse(event.data)));
+StyleSheet.registerCompiled(JSON.parse('${config.nativewind.parsedOutput}'));`,
           "utf8",
         ),
         options,

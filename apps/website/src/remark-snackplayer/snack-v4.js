@@ -43,7 +43,7 @@ if (Platform.OS === "web") {
       .then((response) => response.json())
       .then((body) => {
         content.split(" ").forEach((c) => alreadyProcessed.add(c));
-        StyleSheet.register(body);
+        StyleSheet.registerCompiled(body);
       })
       .catch((error) => {
         console.error("Error connecting to NativeWind snack server");

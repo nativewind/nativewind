@@ -41,7 +41,7 @@ import type {
   ColorOrAuto,
 } from "lightningcss";
 
-import type { ExtractionWarning, RuntimeValue } from "../types";
+import type { ExtractionWarning, RuntimeValueDescriptor } from "../types";
 
 type AddStyleProp = (property: string, value: unknown) => void;
 
@@ -1781,7 +1781,7 @@ export function parseLength(
     | NumberOrPercentage
     | LengthValue,
   options: ParseDeclarationOptionsWithValueWarning,
-): number | string | RuntimeValue | undefined {
+): number | string | RuntimeValueDescriptor | undefined {
   const { inlineRem = 14 } = options;
 
   if (typeof length === "number") {
@@ -1797,7 +1797,6 @@ export function parseLength(
           return length.value * inlineRem;
         } else {
           return {
-            type: "runtime",
             name: "rem",
             arguments: [length.value],
           };
@@ -1805,7 +1804,6 @@ export function parseLength(
       case "vw":
       case "vh":
         return {
-          type: "runtime",
           name: length.unit,
           arguments: [length.value],
         };

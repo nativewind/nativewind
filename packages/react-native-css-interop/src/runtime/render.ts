@@ -128,17 +128,12 @@ export function cssInterop<T extends {}, M>(
     createElementWithInterop(props, children) {
       return createElement(...interop!(component, config, props, children));
     },
-    check(props) {
-      for (const [
-        targetProp,
-        { sources, nativeStyleToProp },
-      ] of config.config) {
+    check(props: Record<string, unknown>) {
+      for (const [targetProp, source, nativeStyleToProp] of config.config) {
         if (nativeStyleToProp) return true;
 
-        for (const source of sources) {
-          if (typeof props[source] === "string") {
-            return true;
-          }
+        if (typeof props[source] === "string") {
+          return true;
         }
 
         const target: any = props[targetProp];

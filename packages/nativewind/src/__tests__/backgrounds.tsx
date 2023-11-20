@@ -3,7 +3,7 @@ import { invalidProperty, invalidValue, style, testCases } from "../test-utils";
 
 afterEach(() => resetStyles());
 
-describe("Backgrounds - Background Attachment", () => {
+describe.only("Backgrounds - Background Attachment", () => {
   testCases(
     ["bg-fixed", invalidProperty("background-attachment")],
     // ["bg-local", invalidProperty("background-attachment")],

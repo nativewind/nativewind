@@ -19,6 +19,9 @@ const commonStyleSheet: CommonStyleSheet = {
   register(_options) {
     throw new Error("Stylesheet.register is not available on web");
   },
+  registerCompiled(_options) {
+    throw new Error("Stylesheet.registerCompiled is not available on web");
+  },
 };
 
 export const StyleSheet = Object.assign({}, commonStyleSheet, RNStyleSheet);

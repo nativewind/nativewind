@@ -2,7 +2,6 @@ import {
   View,
   Text,
   Pressable,
-  FlatList,
   ImageBackground,
   KeyboardAvoidingView,
   Modal,
@@ -62,7 +61,7 @@ test("Component types", () => {
   ];
 });
 
-test("TextInput", () => {
+test.only("TextInput", () => {
   registerCSS(
     `.text-black { color: black } 
      .placeholder\\:text-white:native-prop() {

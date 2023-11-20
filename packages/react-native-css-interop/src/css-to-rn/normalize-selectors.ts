@@ -4,12 +4,7 @@ import type {
   SelectorComponent,
   SelectorList,
 } from "lightningcss";
-import {
-  CSSSpecificity,
-  DescriptorOrRuntimeValue,
-  ExtractRuleOptions,
-  ExtractedStyle,
-} from "../types";
+import { Specificity, ExtractRuleOptions, CompilerStyleMeta } from "../types";
 
 export type NormalizeSelector =
   | {
@@ -22,13 +17,12 @@ export type NormalizeSelector =
       className: string;
       groupClassName?: string;
       pseudoClasses?: Record<string, true>;
-      nativeProps?: Record<string, string>;
       groupPseudoClasses?: Record<string, true>;
-      specificity: Pick<CSSSpecificity, "A" | "B" | "C">;
+      specificity: Pick<Specificity, "A" | "B" | "C">;
     };
 
 export function normalizeSelectors(
-  extractedStyle: ExtractedStyle,
+  extractedStyle: CompilerStyleMeta,
   selectorList: SelectorList,
   options: ExtractRuleOptions,
   selectors: NormalizeSelector[] = [],
@@ -211,11 +205,7 @@ export function normalizeSelectors(
                     break;
                   }
 
-                  const record = extractedStyle.record!;
-                  const style = record.style as Record<
-                    string,
-                    DescriptorOrRuntimeValue
-                  >;
+                  const style = extractedStyle.props.style;
                   if (!style) {
                     isValid = false;
                     break;
@@ -227,26 +217,30 @@ export function normalizeSelectors(
                   ) {
                     // :native-props() OR :native-props(*)
                     for (const [key, value] of Object.entries(style)) {
-                      record[key] = { $$type: "prop", value };
+                      extractedStyle.propSingleValue[key] = {
+                        $$type: "prop",
+                        value,
+                      };
+                      delete extractedStyle.props.style;
                     }
-                    delete record.style;
                   } else if (args.length === 2 && args[0] === "*") {
-                    // :nativeProps(*, <prop>
+                    // :nativeProps(*, <prop>)
                     const prop = args[1];
-                    record[prop] = {
+                    const [key, value] = Object.entries(style)[0];
+                    extractedStyle.propSingleValue[prop] = {
                       $$type: "prop",
-                      value: Object.values(style)[0],
+                      value,
                     };
-                    delete record.style;
+                    delete style[key];
                   } else if (args.length === 2) {
                     const key = args[0];
                     const prop = args[1];
+                    const value = style[key];
 
-                    record[prop] = {
+                    extractedStyle.propSingleValue[prop] = {
                       $$type: "prop",
-                      value: style[key],
+                      value,
                     };
-
                     delete style[key];
                   } else {
                     isValid = false;
@@ -260,11 +254,7 @@ export function normalizeSelectors(
                     break;
                   }
 
-                  const record = extractedStyle.record!;
-                  const style = record.style as Record<
-                    string,
-                    DescriptorOrRuntimeValue
-                  >;
+                  const style = extractedStyle.props.style;
                   if (!style) {
                     isValid = false;
                     break;
@@ -272,16 +262,17 @@ export function normalizeSelectors(
 
                   if (args.length === 2 && args[0] === "*") {
                     // :move-props(*,<prop>)
-                    record[args[1]] = style;
-                    delete record.style;
+                    extractedStyle.props[args[1]] = style;
+                    delete extractedStyle.props.style;
                   } else if (args.length === 2) {
                     // :move-props(<key>, <prop>)
                     const key = args[0];
                     const prop = args[1];
-                    record[prop] ??= {};
-                    const destination = record[prop];
+
+                    extractedStyle.props[prop] ??= {};
+                    const destination = extractedStyle.props[prop];
                     if ("$$type" in destination) {
-                      record[prop] = { [key]: style[key] };
+                      extractedStyle.props[prop] = { [key]: style[key] };
                     } else {
                       destination[key] = style[key];
                     }

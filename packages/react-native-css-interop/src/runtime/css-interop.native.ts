@@ -13,7 +13,7 @@ import { InheritanceProvider } from "./native/inheritance";
 import { useInteropComputed } from "./native/interop";
 import { getNormalizeConfig } from "./native/prop-mapping";
 import { interopComponents } from "./render";
-import { opaqueStyles, styleSignals } from "./native/style";
+import { styleSignals } from "./native/style";
 
 export const defaultCSSInterop: InteropFunction = (
   component,
@@ -110,7 +110,7 @@ export function remapProps<P, M>(
     { ...props }: PropsWithChildren<P>,
     ref: unknown,
   ) => {
-    for (const [key, { sources }] of config) {
+    for (const [key, sources] of config) {
       let rawStyles = [];
 
       for (const sourceProp of sources) {
@@ -124,11 +124,11 @@ export function remapProps<P, M>(
 
           if (signal !== undefined) {
             const style = {};
-            opaqueStyles.set(style, {
-              reducer(acc) {
-                return signal?.reducer(acc, true) ?? acc;
-              },
-            });
+            // opaqueStyles.set(style, {
+            //   reducer(acc) {
+            //     return signal?.reducer(acc, true) ?? acc;
+            //   },
+            // });
             rawStyles.push(style);
           }
         }

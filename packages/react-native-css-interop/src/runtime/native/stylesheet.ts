@@ -4,7 +4,7 @@ import {
   Appearance,
 } from "react-native";
 
-import { StyleSheetRegisterOptions, CommonStyleSheet } from "../../types";
+import { CommonStyleSheet } from "../../types";
 import { vh, vw } from "./misc";
 import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
 import { colorScheme } from "./color-scheme";
@@ -33,7 +33,10 @@ const commonStyleSheet: CommonStyleSheet = {
     return this[INTERNAL_FLAGS][name];
   },
   unstable_hook_onClassName() {},
-  register(options: StyleSheetRegisterOptions) {
+  register() {
+    throw new Error("Stylesheet.register is not yet implemented");
+  },
+  registerCompiled(options) {
     // console.log(JSON.stringify(options, null, 2));
     this[INTERNAL_FLAGS]["$$receivedData"] = "true";
     if (options.flags) {
@@ -47,8 +50,7 @@ const commonStyleSheet: CommonStyleSheet = {
     }
 
     if (options.declarations) {
-      for (let [name, styles] of Object.entries(options.declarations)) {
-        if (!Array.isArray(styles)) styles = [styles];
+      for (let [name, styles] of options.declarations) {
         upsertStyleSignal(name, styles);
       }
     }

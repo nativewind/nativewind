@@ -13,7 +13,7 @@ const A = createMockComponent(Text);
 
 beforeEach(() => resetStyles());
 
-test("inline styles", () => {
+test.only("inline styles", () => {
   registerCSS(`.red { background-color: red; }`);
 
   const component = render(

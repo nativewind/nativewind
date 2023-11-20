@@ -10,7 +10,7 @@ export const reactGlobal: {
   delayedEvents: new Set(),
 };
 
-const context: Computed<any>[] = [];
+export const context: Computed<any>[] = [];
 
 export type Signal<T> = ReturnType<typeof createSignal<T>>;
 type SignalSetFn<T> = (previous?: T) => T;

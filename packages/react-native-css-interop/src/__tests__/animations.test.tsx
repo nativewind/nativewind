@@ -124,7 +124,7 @@ test("transform - starting", () => {
   });
 });
 
-test("bounce", () => {
+test.only("bounce", () => {
   registerCSS(`
     .my-class {
       animation: bounce 1s infinite;

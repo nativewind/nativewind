@@ -15,7 +15,7 @@ const A = createMockComponent(View);
 
 beforeEach(() => resetStyles());
 
-test("px", () => {
+test.only("px", () => {
   registerCSS(`.my-class { width: 10px; }`);
 
   const component = render(

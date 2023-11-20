@@ -43,7 +43,7 @@ export function transform(
   data = Buffer.from(
     isCSSModule
       ? `${data}module.exports = require("react-native-css-interop").StyleSheet.create(${runtimeData});`
-      : `${data}require("react-native-css-interop").StyleSheet.register(${runtimeData})`,
+      : `${data}require("react-native-css-interop").StyleSheet.registerCompiled(${runtimeData})`,
   );
 
   return worker.transform(config, projectRoot, filename, data, options);

@@ -14,18 +14,22 @@ import {
 
 import {
   DEFAULT_CONTAINER_NAME,
-  isRuntimeValue,
-  transformKeys,
+  STYLE_SCOPES,
+  isPropDescriptor,
 } from "../shared";
 import {
-  ExtractedStyle,
-  StyleSheetRegisterOptions,
+  TransportStyle,
   AnimatableCSSProperty,
   ExtractedAnimation,
   ExtractionWarning,
   ExtractRuleOptions,
-  CSSSpecificity,
   CssToReactNativeRuntimeOptions,
+  StyleSheetRegisterCompiledOptions,
+  GroupedTransportStyles,
+  PropRuntimeValueDescriptor,
+  CompilerStyleMeta,
+  RuntimeValueDescriptor,
+  Specificity,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import { normalizeSelectors } from "./normalize-selectors";
@@ -50,7 +54,7 @@ export type { CssToReactNativeRuntimeOptions };
 export function cssToReactNativeRuntime(
   code: Buffer | string,
   options: CssToReactNativeRuntimeOptions = {},
-): StyleSheetRegisterOptions {
+): StyleSheetRegisterCompiledOptions {
   // Parse the grouping options to create an array of regular expressions
   const grouping =
     options.grouping?.map((value) => {
@@ -90,21 +94,48 @@ export function cssToReactNativeRuntime(
     },
   });
 
-  for (const [, styles] of extractOptions.declarations) {
-    if (Array.isArray(styles)) {
-      for (const style of styles) {
-        style.entries = recordToEntries(style.record);
-        delete style.record;
+  const declarations: StyleSheetRegisterCompiledOptions["declarations"] = [];
+  for (const [name, styles] of extractOptions.declarations) {
+    if (styles.length > 0) {
+      const grouped: GroupedTransportStyles = { scope: STYLE_SCOPES.SELF };
+
+      for (const { props, propSingleValue, warnings, ...rest } of styles) {
+        const transportStyle: TransportStyle = rest;
+        transportStyle.props = Object.entries(props)
+          .filter(([key]) => propSingleValue[key] === undefined)
+          .map(([key, value]) => {
+            if (value["$$type"] === "prop") {
+              return [key, value as PropRuntimeValueDescriptor];
+            } else {
+              return [key, Object.entries(value)];
+            }
+          });
+
+        transportStyle.props.push(...Object.entries(propSingleValue));
+
+        if (transportStyle.specificity.I) {
+          grouped[2] ??= [];
+          grouped[2].push(transportStyle);
+        } else {
+          grouped[0] ??= [];
+          grouped[0].push(transportStyle);
+        }
+
+        if (warnings) {
+          grouped.warnings ??= [];
+          grouped.warnings.push(...warnings);
+        }
       }
-    } else {
-      styles.entries = recordToEntries(styles.record);
-      delete styles.record;
+
+      if (grouped[0]?.length || grouped[2]?.length) {
+        declarations.push([name, grouped]);
+      }
     }
   }
 
   // Convert the extracted style declarations and animations from maps to objects and return them
   return {
-    declarations: Object.fromEntries(extractOptions.declarations),
+    declarations,
     keyframes: Object.fromEntries(extractOptions.keyframes),
     rootVariables: extractOptions.rootVariables,
     universalVariables: extractOptions.universalVariables,
@@ -123,7 +154,7 @@ export function cssToReactNativeRuntime(
 function extractRule(
   rule: Rule | CSSInteropAtRule,
   extractOptions: ExtractRuleOptions,
-  partialStyle: Partial<ExtractedStyle> = {},
+  partialStyle: Partial<CompilerStyleMeta> = {},
 ) {
   // Check the rule's type to determine which extraction function to call
   switch (rule.type) {
@@ -271,7 +302,7 @@ function extractedContainer(
  * @param declarations - The declarations object to use when adding declarations.
  */
 function setStyleForSelectorList(
-  extractedStyle: ExtractedStyle,
+  extractedStyle: CompilerStyleMeta,
   selectorList: SelectorList,
   options: ExtractRuleOptions,
 ) {
@@ -288,19 +319,19 @@ function setStyleForSelectorList(
       selector.type === "rootVariables" ||
       selector.type === "universalVariables"
     ) {
-      const styleEntries = style.entries?.find(([key]) => key === "style");
-      const fontSize =
-        styleEntries &&
-        Array.isArray(styleEntries[1]) &&
-        styleEntries[1].find(([key]) => key === "fontSize")?.[1];
+      const styleProp = style.props?.style;
 
-      if (fontSize && "value" in fontSize) {
+      if (typeof styleProp === "object" && "fontSize" in styleProp) {
         options.rem ??= {};
 
-        if (selector.subtype === "light") {
-          options.rem.light = fontSize.value;
-        } else {
-          options.rem.dark = fontSize.value;
+        const fontSize = styleProp.fontSize;
+
+        if (typeof fontSize === "number") {
+          if (selector.subtype === "light") {
+            options.rem.light = fontSize;
+          } else {
+            options.rem.dark = fontSize;
+          }
         }
       }
 
@@ -322,7 +353,6 @@ function setStyleForSelectorList(
         pseudoClasses,
         groupPseudoClasses,
         darkMode,
-        nativeProps,
       } = selector;
 
       const specificity = {
@@ -336,6 +366,8 @@ function setStyleForSelectorList(
           groupClassName,
           {
             specificity,
+            props: {},
+            propSingleValue: {},
             container: {
               names: [groupClassName],
             },
@@ -348,10 +380,6 @@ function setStyleForSelectorList(
           name: groupClassName,
           pseudoClasses: groupPseudoClasses,
         });
-      }
-
-      if (nativeProps) {
-        style.nativeProps = { ...style.nativeProps, ...nativeProps };
       }
 
       if (darkMode) {
@@ -380,17 +408,14 @@ function setStyleForSelectorList(
 
 function addDeclaration(
   className: string,
-  style: ExtractedStyle,
+  style: CompilerStyleMeta,
   declarations: ExtractRuleOptions["declarations"],
 ) {
   const existing = declarations.get(className);
-
-  if (Array.isArray(existing)) {
+  if (existing) {
     existing.push(style);
-  } else if (existing) {
-    declarations.set(className, [existing, style]);
   } else {
-    declarations.set(className, style);
+    declarations.set(className, [style]);
   }
 }
 
@@ -400,13 +425,15 @@ function extractKeyFrames(
 ) {
   const extractedAnimation: ExtractedAnimation = { frames: {} };
   const frames = extractedAnimation.frames;
-
-  let rawFrames = [];
+  let rawFrames: Array<{
+    selector: number;
+    values: Record<string, RuntimeValueDescriptor>;
+  }> = [];
 
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
 
-    const { record } = declarationsToStyle(
+    const { props } = declarationsToStyle(
       frame.declarations.declarations,
       {
         ...extractOptions,
@@ -426,8 +453,8 @@ function extractKeyFrames(
       },
     );
 
-    const entries = recordToEntries(record);
-    if (!entries) continue;
+    const styleProp = props?.style;
+    if (!styleProp || isPropDescriptor(styleProp)) continue;
 
     for (const selector of frame.selectors) {
       const keyframe =
@@ -443,13 +470,13 @@ function extractKeyFrames(
 
       switch (selector.type) {
         case "percentage":
-          rawFrames.push({ selector: selector.value, entries });
+          rawFrames.push({ selector: selector.value, values: styleProp });
           break;
         case "from":
-          rawFrames.push({ selector: 0, entries });
+          rawFrames.push({ selector: 0, values: styleProp });
           break;
         case "to":
-          rawFrames.push({ selector: 1, entries });
+          rawFrames.push({ selector: 1, values: styleProp });
           break;
         default:
           selector satisfies never;
@@ -466,24 +493,17 @@ function extractKeyFrames(
     const previousProgress = i === 0 ? 0 : rawFrames[i - 1].selector;
     const progress = animationProgress - previousProgress;
 
-    for (const [prop, styleValue] of frame.entries) {
-      // We only support animations on style properties
-      if (prop !== "style") continue;
-      // We only support object animations
-      if (!Array.isArray(styleValue)) continue;
-
-      for (const [key, value] of styleValue) {
-        if (progress === 0) {
-          frames[key] = [];
-        } else {
-          // All props need a progress 0 frame
-          frames[key] ??= [{ value: "!INHERIT!", progress: 0 }];
-        }
-        frames[key].push({
-          ...value,
-          progress,
-        });
+    for (const [key, value] of Object.entries(frame.values)) {
+      if (progress === 0) {
+        frames[key] = [];
+      } else {
+        // All props need a progress 0 frame
+        frames[key] ??= [{ value: "!INHERIT!", progress: 0 }];
       }
+      frames[key].push({
+        value,
+        progress,
+      });
     }
   }
 
@@ -498,7 +518,7 @@ interface GetExtractedStyleOptions extends ExtractRuleOptions {
 function getExtractedStyles(
   declarationBlock: DeclarationBlock<Declaration>,
   options: GetExtractedStyleOptions,
-): ExtractedStyle[] {
+): CompilerStyleMeta[] {
   const extractedStyles = [];
 
   if (declarationBlock.declarations && declarationBlock.declarations.length) {
@@ -530,14 +550,13 @@ function getExtractedStyles(
 function declarationsToStyle(
   declarations: Declaration[],
   options: GetExtractedStyleOptions,
-  specificity: Pick<CSSSpecificity, "I" | "S" | "O">,
-): ExtractedStyle {
-  const extractedStyle: ExtractedStyle = {
+  specificity: Pick<Specificity, "I" | "S" | "O">,
+): CompilerStyleMeta {
+  const extractedStyle: CompilerStyleMeta = {
     specificity: { A: 0, B: 0, C: 0, ...specificity },
-    record: { style: {} },
+    props: {},
+    propSingleValue: {},
   };
-
-  let processingImportant = false;
 
   /*
    * Adds a style property to the rule record.
@@ -548,7 +567,11 @@ function declarationsToStyle(
    * The `append` option allows the same property to be added multiple times
    * E.g. `transform` accepts an array of transforms
    */
-  function addStyleProp(property: string, value: any) {
+  function addStyleProp(
+    property: string,
+    value: any,
+    hoisted?: "transform" | "shadow",
+  ) {
     if (value === undefined && options.useInitialIfUndefined) {
       value = "!INITIAL!";
     }
@@ -563,20 +586,13 @@ function declarationsToStyle(
 
     property = kebabToCamelCase(property);
 
-    if (isRuntimeValue(value) || transformKeys.includes(property as any)) {
-      extractedStyle.isDynamic = true;
-    }
+    extractedStyle.props.style ??= {};
+    extractedStyle.props.style[property] = value;
 
-    if (!isRuntimeValue(value)) {
-      value = { value };
-    }
-
-    const style = extractedStyle.record!.style as Record<string, unknown>;
-    style[property] = value;
-
-    if (processingImportant) {
-      extractedStyle.importantStyles ??= [];
-      extractedStyle.importantStyles.push(property);
+    if (hoisted) {
+      extractedStyle.hoistedValues ??= {};
+      extractedStyle.hoistedValues.style ??= {};
+      extractedStyle.hoistedValues.style[property] = hoisted;
     }
   }
 
@@ -843,24 +859,4 @@ function equal(a: unknown, b: unknown) {
   }
 
   return false;
-}
-
-function recordToEntries(record: ExtractedStyle["record"]) {
-  if (!record) return [];
-  const entries: ExtractedStyle["entries"] = [];
-
-  for (const [key, value] of Object.entries(record)) {
-    if ("$$type" in value) {
-      entries.push([key, value.value]);
-    } else {
-      const subEntries = Object.entries(value);
-      if (subEntries.length > 0) {
-        entries.push([key, Object.entries(value)]);
-      }
-    }
-  }
-
-  if (entries.length === 0) return undefined;
-
-  return entries;
 }
