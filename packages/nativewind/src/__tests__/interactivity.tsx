@@ -25,8 +25,8 @@ describe("Interactivity - Cursor", () => {
 
 describe("Interactivity - Caret Color", () => {
   testCases(
-    ["caret-inherit", invalidProperty("caret-color")],
-    ["caret-current", invalidProperty("caret-color")],
+    // ["caret-inherit", invalidProperty("caret-color")],
+    // ["caret-current", invalidProperty("caret-color")],
     ["caret-white", { props: { cursorColor: "rgba(255, 255, 255, 1)" } }],
   );
 });

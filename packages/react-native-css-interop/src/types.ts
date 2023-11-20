@@ -131,7 +131,7 @@ export type CompilerStyleMeta = {
   requiresLayoutHeight?: boolean;
   props: Record<string, Record<string, RuntimeValueDescriptor>>;
   propSingleValue: Record<string, PropRuntimeValueDescriptor>;
-  hoistedValues?: Record<string, Record<string, "transform" | "shadow">>;
+  hoistedStyles?: [string, string, "transform" | "shadow"][];
   warnings?: ExtractionWarning[];
 };
 
@@ -268,6 +268,7 @@ export type ExtractedTransition = {
 
 export type ExtractedAnimation = {
   frames: Record<string, RuntimeValueFrame[]>;
+  hoistedStyles?: [string, string, "transform" | "shadow"][];
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
 };

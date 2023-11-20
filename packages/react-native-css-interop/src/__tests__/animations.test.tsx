@@ -124,7 +124,7 @@ test("transform - starting", () => {
   });
 });
 
-test.only("bounce", () => {
+test("bounce", () => {
   registerCSS(`
     .my-class {
       animation: bounce 1s infinite;
@@ -150,7 +150,9 @@ test.only("bounce", () => {
   // Initial frame is incorrect due to missing layout
   expect(component).toHaveAnimatedStyle({
     transform: [
+      { translateY: 0 },
       { perspective: 1 },
+      { translateX: 0 },
       { rotate: "0deg" },
       { rotateX: "0deg" },
       { rotateY: "0deg" },
@@ -158,8 +160,6 @@ test.only("bounce", () => {
       { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
-      { translateX: 0 },
-      { translateY: 0 },
       { skewX: "0deg" },
       { skewY: "0deg" },
     ],
@@ -178,7 +178,9 @@ test.only("bounce", () => {
 
   expect(component).toHaveAnimatedStyle({
     transform: [
+      { translateY: -25 },
       { perspective: 1 },
+      { translateX: 0 },
       { rotate: "0deg" },
       { rotateX: "0deg" },
       { rotateY: "0deg" },
@@ -186,8 +188,6 @@ test.only("bounce", () => {
       { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
-      { translateX: 0 },
-      { translateY: -25 },
       { skewX: "0deg" },
       { skewY: "0deg" },
     ],
@@ -197,16 +197,16 @@ test.only("bounce", () => {
 
   expect(component).toHaveAnimatedStyle({
     transform: [
-      { perspective: 1 },
-      { rotate: "0deg" },
-      { rotateX: "0deg" },
-      { rotateY: "0deg" },
-      { rotateZ: "0deg" },
-      { scale: 1 },
-      { scaleX: 1 },
-      { scaleY: 1 },
-      { translateX: 0 },
       { translateY: 0 },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
       { skewX: "0deg" },
       { skewY: "0deg" },
     ],
@@ -216,7 +216,9 @@ test.only("bounce", () => {
 
   expect(component).toHaveAnimatedStyle({
     transform: [
+      { translateY: -25 },
       { perspective: 1 },
+      { translateX: 0 },
       { rotate: "0deg" },
       { rotateX: "0deg" },
       { rotateY: "0deg" },
@@ -224,8 +226,6 @@ test.only("bounce", () => {
       { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
-      { translateX: 0 },
-      { translateY: -25 },
       { skewX: "0deg" },
       { skewY: "0deg" },
     ],

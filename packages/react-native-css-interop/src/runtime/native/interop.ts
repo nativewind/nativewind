@@ -19,11 +19,7 @@ import {
   RuntimeValue,
   RuntimeValueDescriptor,
 } from "../../types";
-import {
-  DEFAULT_CONTAINER_NAME,
-  STYLE_SCOPES,
-  transformKeys,
-} from "../../shared";
+import { DEFAULT_CONTAINER_NAME, STYLE_SCOPES } from "../../shared";
 import {
   AnimatableValue,
   Easing,
@@ -389,6 +385,11 @@ export function createInteropComputed(
                     ? -1
                     : iterationCount.value;
 
+                if (keyframes.hoistedStyles) {
+                  acc.hoistedStyles ??= [];
+                  acc.hoistedStyles.push(...keyframes.hoistedStyles);
+                }
+
                 for (const [key, [initialFrame, ...frames]] of Object.entries(
                   keyframes.frames,
                 )) {
@@ -450,6 +451,11 @@ export function createInteropComputed(
                 }
 
                 acc.props[prop] ??= {};
+
+                if (keyframes.hoistedStyles) {
+                  acc.hoistedStyles ??= [];
+                  acc.hoistedStyles.push(...keyframes.hoistedStyles);
+                }
 
                 for (const key of Object.keys(keyframes.frames)) {
                   Object.defineProperty(acc.props[prop], key, {
@@ -534,15 +540,27 @@ export function createInteropComputed(
           }
         }
 
+        debugger;
+
         // React Native has some nested styles, so we need to expand these values
-        if (typeof acc.props[prop] === "object") {
-          for (const tKey of transformKeys) {
-            if (tKey in acc.props[prop]) {
-              acc.props[prop].transform ??= [];
-              acc.props[prop].transform.push({
-                [tKey]: acc.props[prop][tKey],
-              });
-              delete acc.props[prop][tKey];
+        if (acc.hoistedStyles) {
+          for (let [prop, key, transform] of acc.hoistedStyles) {
+            if (acc.props[prop] && key in acc.props[prop]) {
+              switch (transform) {
+                case "transform":
+                  acc.props[prop].transform ??= [];
+                  acc.props[prop].transform.push({
+                    [key]: acc.props[prop][key],
+                  });
+                  delete acc.props[prop][key];
+                  break;
+                case "shadow":
+                  const [type, shadowKey] = key.split(".");
+                  acc.props[prop][type] ??= {};
+                  acc.props[prop][type][shadowKey] = acc.props[prop][key];
+                  delete acc.props[prop][key];
+                  break;
+              }
             }
           }
         }

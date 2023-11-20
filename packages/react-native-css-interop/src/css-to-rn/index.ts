@@ -433,7 +433,7 @@ function extractKeyFrames(
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
 
-    const { props } = declarationsToStyle(
+    const { props, hoistedStyles } = declarationsToStyle(
       frame.declarations.declarations,
       {
         ...extractOptions,
@@ -452,6 +452,11 @@ function extractKeyFrames(
         O: extractOptions.appearanceOrder,
       },
     );
+
+    if (hoistedStyles) {
+      extractedAnimation.hoistedStyles ??= [];
+      extractedAnimation.hoistedStyles.push(...hoistedStyles);
+    }
 
     const styleProp = props?.style;
     if (!styleProp || isPropDescriptor(styleProp)) continue;
@@ -584,27 +589,27 @@ function declarationsToStyle(
       return addVariable(property, value);
     }
 
-    property = kebabToCamelCase(property);
+    property = toRNProperty(property);
 
     extractedStyle.props.style ??= {};
     extractedStyle.props.style[property] = value;
 
     if (hoisted) {
-      extractedStyle.hoistedValues ??= {};
-      extractedStyle.hoistedValues.style ??= {};
-      extractedStyle.hoistedValues.style[property] = hoisted;
+      extractedStyle.hoistedStyles ??= [];
+      extractedStyle.hoistedStyles?.push(["style", property, hoisted]);
     }
   }
 
   function handleStyleShorthand(
     name: string,
     options: Record<string, unknown>,
+    hoisted?: "transform" | "shadow",
   ) {
     if (allEqual(...Object.values(options))) {
-      return addStyleProp(name, Object.values(options)[0]);
+      return addStyleProp(name, Object.values(options)[0], hoisted);
     } else {
       for (const [name, value] of Object.entries(options)) {
-        addStyleProp(name, value);
+        addStyleProp(name, value, hoisted);
       }
     }
   }
@@ -680,7 +685,7 @@ function declarationsToStyle(
     switch (declaration.property) {
       case "transition-property":
         extractedStyle.transition.property = declaration.value.map((v) => {
-          return kebabToCamelCase(v.property) as AnimatableCSSProperty;
+          return toRNProperty(v.property) as AnimatableCSSProperty;
         });
         break;
       case "transition-duration":
@@ -727,9 +732,7 @@ function declarationsToStyle(
         for (const value of declaration.value) {
           if (setProperty) {
             extractedStyle.transition.property?.push(
-              kebabToCamelCase(
-                value.property.property,
-              ) as AnimatableCSSProperty,
+              toRNProperty(value.property.property) as AnimatableCSSProperty,
             );
           }
           if (setDuration) {
@@ -819,14 +822,6 @@ function declarationsToStyle(
   return extractedStyle;
 }
 
-function kebabToCamelCase(str: string) {
-  if (str.startsWith("-rn-")) {
-    str = str.slice("-rn-".length);
-  }
-
-  return str.replace(/-./g, (x) => x[1].toUpperCase());
-}
-
 function allEqual(...params: unknown[]) {
   return params.every((param, index, array) => {
     return index === 0 ? true : equal(array[0], param);
@@ -859,4 +854,12 @@ function equal(a: unknown, b: unknown) {
   }
 
   return false;
+}
+
+function toRNProperty(str: string) {
+  if (str.startsWith("-rn-")) {
+    str = str.slice("-rn-".length);
+  }
+
+  return str.replace(/-./g, (x) => x[1].toUpperCase());
 }

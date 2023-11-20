@@ -32,7 +32,7 @@ export interface PropAccumulator {
   animations?: Required<ExtractedAnimations>;
   transition?: Required<ExtractedTransition>;
   props: Record<string, any>;
-  hoistedValues?: Record<string, Record<string, "transform" | "shadow">>;
+  hoistedStyles?: [string, string, "transform" | "shadow"][];
   variables: Record<string, any>;
   variablesSpecificity: Record<string, Specificity>;
   hasActive: boolean;
@@ -131,28 +131,28 @@ function printWarnings(name: string, groupedStyleMeta: GroupedTransportStyles) {
   for (const warning of groupedStyleMeta.warnings) {
     if (process.env.NODE_ENV === "test") {
       warnings.set(name, groupedStyleMeta.warnings);
-    }
+    } else {
+      warned.add(name);
 
-    warned.add(name);
-
-    switch (warning.type) {
-      case "IncompatibleNativeProperty":
-        console.log("IncompatibleNativeProperty ", warning.property);
-        break;
-      case "IncompatibleNativeValue":
-        console.log(
-          "IncompatibleNativeValue ",
-          warning.property,
-          warning.value,
-        );
-        break;
-      case "IncompatibleNativeFunctionValue":
-        console.log(
-          "IncompatibleNativeFunctionValue ",
-          warning.property,
-          warning.value,
-        );
-        break;
+      switch (warning.type) {
+        case "IncompatibleNativeProperty":
+          console.log("IncompatibleNativeProperty ", warning.property);
+          break;
+        case "IncompatibleNativeValue":
+          console.log(
+            "IncompatibleNativeValue ",
+            warning.property,
+            warning.value,
+          );
+          break;
+        case "IncompatibleNativeFunctionValue":
+          console.log(
+            "IncompatibleNativeFunctionValue ",
+            warning.property,
+            warning.value,
+          );
+          break;
+      }
     }
   }
 }
@@ -211,6 +211,11 @@ export function reduceStyles(
       !testContainerQuery(style.containerQuery, acc.interop)
     ) {
       continue;
+    }
+
+    if (style.hoistedStyles) {
+      acc.hoistedStyles ??= [];
+      acc.hoistedStyles.push(...style.hoistedStyles);
     }
 
     if (style.variables) {
