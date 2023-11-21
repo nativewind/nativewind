@@ -61,7 +61,7 @@ test("Component types", () => {
   ];
 });
 
-test.only("TextInput", () => {
+test("TextInput", () => {
   registerCSS(
     `.text-black { color: black } 
      .placeholder\\:text-white:native-prop() {

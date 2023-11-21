@@ -116,7 +116,7 @@ test("rem - dynamic", () => {
   expect(component).toHaveStyle({ fontSize: 100 });
 });
 
-test.only("hsl", () => {
+test("hsl", () => {
   registerCSS(`.my-class { 
     --primary: 0 84.2% 60.2%;
     color: hsl(var(--primary)); 
