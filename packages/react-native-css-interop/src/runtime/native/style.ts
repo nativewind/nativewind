@@ -23,8 +23,18 @@ import {
   interopGlobal,
   setupEffect,
 } from "../signals";
-import { globalVariables, rem, vh, vw } from "./misc";
-import { colorScheme } from "./color-scheme";
+import {
+  animationMap,
+  colorScheme,
+  globalVariables,
+  opaqueStyles,
+  rem,
+  styleSignals,
+  vh,
+  vw,
+  warned,
+  warnings,
+} from "./globals";
 import {
   DEFAULT_CONTAINER_NAME,
   STYLE_SCOPES,
@@ -40,8 +50,6 @@ import type { Time } from "lightningcss";
 import type {
   ExtractedAnimations,
   ExtractedTransition,
-  ExtractionWarning,
-  ExtractedAnimation,
   GroupedTransportStyles,
   RuntimeValueDescriptor,
   RuntimeStyle,
@@ -54,21 +62,11 @@ import type {
   Specificity,
 } from "../../types";
 
-export const styleSignals = new Map<string, Signal<GroupedRuntimeStyle>>();
-export const opaqueStyles = new WeakMap<object, RuntimeStyle>();
-export const animationMap = new Map<string, ExtractedAnimation>();
-
-export const globalClassNameCache = new Map<string, InteropReducerState>();
-export const globalInlineCache = new WeakMap<object, InteropReducerState>();
-
-export const warnings = new Map<string, ExtractionWarning[]>();
-export const warned = new Set<string>();
-
-export interface InteropReducerState {
+export interface InteropStore {
   testId?: string;
   version: number;
   onChange?: () => void;
-  parent: InteropReducerState;
+  parent: InteropStore;
   originalProps: Record<string, any>;
   props: Record<string, any>;
   options: NormalizedOptions;
@@ -80,7 +78,7 @@ export interface InteropReducerState {
   hasContainer: boolean;
   convertToPressable: boolean;
   shouldUpdateContext: boolean;
-  context?: InteropReducerState;
+  context?: InteropStore;
   isAnimated: boolean;
   animations?: Required<ExtractedAnimations>;
   animationNames: Set<string>;
@@ -100,20 +98,17 @@ export interface InteropReducerState {
   getVariable(name: string): any;
   setVariable(name: string, value: any, specificity: Specificity): void;
   setContainer(name: string): void;
-  getContainer(name: string): InteropReducerState | undefined;
-  containerSignal?: Signal<InteropReducerState>;
-  rerender(
-    parent?: InteropReducerState,
-    originalProps?: Record<string, any>,
-  ): void;
+  getContainer(name: string): InteropStore | undefined;
+  containerSignal?: Signal<InteropStore>;
+  rerender(parent?: InteropStore, originalProps?: Record<string, any>): void;
 }
 
 export function createInteropStore(
-  parent: InteropReducerState,
+  parent: InteropStore,
   options: NormalizedOptions,
   originalProps: Record<string, any>,
 ) {
-  const state: InteropReducerState = {
+  const state: InteropStore = {
     testId: originalProps.testId,
     version: 0,
     parent,
@@ -209,10 +204,10 @@ export function createInteropStore(
 }
 
 function render(
-  state: InteropReducerState,
-  parent?: InteropReducerState,
+  state: InteropStore,
+  parent?: InteropStore,
   originalProps?: Record<string, any>,
-): InteropReducerState {
+): InteropStore {
   if (parent) state.parent = parent;
   if (originalProps) {
     state.originalProps = originalProps;
@@ -722,7 +717,7 @@ function mapStyle(style: TransportStyle): RuntimeStyle {
 }
 
 export function reduceStyles(
-  state: InteropReducerState,
+  state: InteropStore,
   prop: string,
   styles: Array<RuntimeStyle | object>,
   _scope: number,

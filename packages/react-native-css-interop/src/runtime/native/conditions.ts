@@ -12,11 +12,10 @@ import {
   PseudoClassesQuery,
   SignalLike,
 } from "../../types";
-import { isReduceMotionEnabled, rem, vh, vw } from "./misc";
+import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
-import { colorScheme } from "./color-scheme";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
-import { InteropReducerState } from "./style";
+import { InteropStore } from "./style";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -42,7 +41,7 @@ export function testMediaQuery(
 }
 
 export function testPseudoClasses(
-  state: InteropReducerState,
+  state: InteropStore,
   meta: PseudoClassesQuery,
 ) {
   let fail = false;
@@ -53,7 +52,7 @@ export function testPseudoClasses(
 }
 
 export function testContainerQuery(
-  state: InteropReducerState,
+  state: InteropStore,
   containerQuery: ExtractedContainerQuery[] | undefined,
 ) {
   // If there is no query, we passed

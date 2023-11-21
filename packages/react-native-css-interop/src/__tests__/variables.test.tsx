@@ -7,7 +7,7 @@ import {
   resetStyles,
 } from "../testing-library";
 import { memo } from "react";
-import { useUnstableNativeVariable } from "../runtime/native/variables";
+import { useUnstableNativeVariable } from "../runtime/native/globals";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);

@@ -13,8 +13,8 @@ import type {
 } from "../types";
 import { defaultInteropRef } from "./globals";
 import { getNormalizeConfig } from "./native/prop-mapping";
-import { opaqueStyles } from "./native/style";
 import { interopGlobal } from "./signals";
+import { opaqueStyles } from "./native/globals";
 
 export type InteropTypeCheck<T> = {
   type: ComponentType<T>;

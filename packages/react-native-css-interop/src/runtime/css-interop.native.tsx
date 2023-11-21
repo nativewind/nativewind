@@ -13,8 +13,12 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { InteropFunction, RemapProps } from "../testing-library";
 import { getNormalizeConfig } from "./native/prop-mapping";
 import { interopComponents } from "./render";
-import { createInteropStore, styleSignals } from "./native/style";
-import { interopContext, InteropProvider } from "./native/misc";
+import { createInteropStore } from "./native/style";
+import {
+  interopContext,
+  InteropProvider,
+  styleSignals,
+} from "./native/globals";
 
 export const defaultCSSInterop: InteropFunction = (
   component,

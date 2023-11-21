@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from "react";
-import { InteropReducerState } from "./native/style";
+import { InteropStore } from "./native/style";
 
 export const interopGlobal: {
   isInComponent: boolean;
@@ -19,7 +19,7 @@ type SignalSetFn<T> = (previous?: T) => T;
 export type Effect = {
   (): void;
   dependencies: Set<Signal<any>>;
-  state?: InteropReducerState;
+  state?: InteropStore;
 };
 
 export function createSignal<T = unknown>(value: T, id?: string) {

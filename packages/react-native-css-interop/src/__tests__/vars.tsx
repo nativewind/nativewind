@@ -6,7 +6,7 @@ import {
   registerCSS,
   resetStyles,
 } from "../testing-library";
-import { vars } from "../runtime/native/variables";
+import { vars } from "../runtime/native/globals";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);

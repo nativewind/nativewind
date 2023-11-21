@@ -5,16 +5,20 @@ import {
 } from "react-native";
 
 import { CommonStyleSheet } from "../../types";
-import { createColorSchemeSignal, globalVariables, rem, vh, vw } from "./misc";
 import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
-import { colorScheme } from "./color-scheme";
+import { upsertStyleSignal } from "./style";
 import {
   animationMap,
+  colorScheme,
+  createColorSchemeSignal,
+  globalVariables,
+  rem,
   styleSignals,
-  upsertStyleSignal,
+  vh,
+  vw,
   warned,
   warnings,
-} from "./style";
+} from "./globals";
 
 const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_FLAGS]: {},
