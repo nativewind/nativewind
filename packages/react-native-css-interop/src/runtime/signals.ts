@@ -6,7 +6,7 @@ export const interopGlobal: {
   current: Effect | null;
   delayedEvents: Set<() => void>;
 } = {
-  isInComponent: false,
+  isInComponent: true,
   current: null,
   delayedEvents: new Set(),
 };

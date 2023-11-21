@@ -94,29 +94,41 @@ export function cssInterop<T extends {}, M>(
     { children, ___pressable, ...props }: PropsWithChildren<P>,
     ref: unknown,
   ) => {
-    try {
-      if (ref) {
-        (props as any).ref = ref;
-      }
+    if (ref) {
+      (props as any).ref = ref;
+    }
 
-      if (___pressable) {
-        return createElement(component, props as unknown as T, children);
-      } else {
-        interopGlobal.isInComponent = true;
-        interopGlobal.current = null;
-        return createElement(
-          ...interop!(component, config, props as unknown as T, children),
-        );
-      }
-    } finally {
-      interopGlobal.isInComponent = false;
+    if (___pressable) {
+      return createElement(component, props as unknown as T, children);
+    } else {
+      interopGlobal.isInComponent = true;
       interopGlobal.current = null;
-      if (interopGlobal.delayedEvents.size) {
-        for (const sub of interopGlobal.delayedEvents) {
-          sub();
-        }
-        interopGlobal.delayedEvents.clear();
-      }
+
+      const element = createElement(
+        ...interop!(component, config, props as unknown as T, children),
+      );
+      const originalType = element.props;
+
+      /**
+       * We can't update another element while rendering, so we need to delay the update.
+       * Before React can process the element, it must check its props.
+       * So by 'hooking' into it, we can use this as our delaying mechanism
+       */
+      return Object.create(element, {
+        props: {
+          get() {
+            interopGlobal.isInComponent = false;
+            interopGlobal.current = null;
+            if (interopGlobal.delayedEvents.size) {
+              for (const sub of interopGlobal.delayedEvents) {
+                sub();
+              }
+              interopGlobal.delayedEvents.clear();
+            }
+            return originalType;
+          },
+        },
+      });
     }
   };
 
