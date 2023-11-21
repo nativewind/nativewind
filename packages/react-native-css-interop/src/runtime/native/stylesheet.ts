@@ -37,7 +37,7 @@ const commonStyleSheet: CommonStyleSheet = {
     throw new Error("Stylesheet.register is not yet implemented");
   },
   registerCompiled(options) {
-    console.log(JSON.stringify(options, null, 2));
+    // console.log(JSON.stringify(options, null, 2));
     this[INTERNAL_FLAGS]["$$receivedData"] = "true";
     if (options.flags) {
       Object.assign(this[INTERNAL_FLAGS], options.flags);

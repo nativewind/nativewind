@@ -33,8 +33,6 @@ import {
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import { normalizeSelectors } from "./normalize-selectors";
-import { type } from "os";
-import { SCOPABLE_TYPES } from "@babel/types";
 
 type CSSInteropAtRule = {
   type: "custom";

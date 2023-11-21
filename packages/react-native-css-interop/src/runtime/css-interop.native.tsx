@@ -65,16 +65,16 @@ export const defaultCSSInterop: InteropFunction = (
   reactGlobal.isInComponent = false;
 
   if (effect.contextValue) {
-    return [
+    createElementParams = [
       InheritanceProvider,
       {
         value: effect.contextValue,
       },
       createElement(...createElementParams),
     ] as any;
-  } else {
-    return createElementParams;
   }
+
+  return createElementParams;
 };
 
 export function CSSInteropAnimationWrapper({

@@ -101,16 +101,6 @@ export function useInteropComputed(
   // If we unmount we need to cleanup the store's subscribers
   useEffect(() => () => interop.cleanup(), []);
 
-  // If there are any delayedEffects, run them after render
-  useEffect(() => {
-    if (reactGlobal.delayedEvents.size) {
-      for (const sub of reactGlobal.delayedEvents) {
-        sub();
-      }
-      reactGlobal.delayedEvents.clear();
-    }
-  });
-
   return useSyncExternalStore(interop.subscribe, interop.peek, interop.peek);
 }
 

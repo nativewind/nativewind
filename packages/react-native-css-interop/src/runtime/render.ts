@@ -14,6 +14,7 @@ import type {
 import { defaultInteropRef } from "./globals";
 import { getNormalizeConfig } from "./native/prop-mapping";
 import { opaqueStyles } from "./native/style";
+import { reactGlobal } from "./signals";
 
 export type InteropTypeCheck<T> = {
   type: ComponentType<T>;
@@ -93,16 +94,27 @@ export function cssInterop<T extends {}, M>(
     { children, ___pressable, ...props }: PropsWithChildren<P>,
     ref: unknown,
   ) => {
-    if (ref) {
-      (props as any).ref = ref;
-    }
+    try {
+      if (ref) {
+        (props as any).ref = ref;
+      }
 
-    if (___pressable) {
-      return createElement(component, props as unknown as T, children);
-    } else {
-      return createElement(
-        ...interop!(component, config, props as unknown as T, children),
-      );
+      if (___pressable) {
+        return createElement(component, props as unknown as T, children);
+      } else {
+        reactGlobal.isInComponent = true;
+        return createElement(
+          ...interop!(component, config, props as unknown as T, children),
+        );
+      }
+    } finally {
+      reactGlobal.isInComponent = false;
+      if (reactGlobal.delayedEvents.size) {
+        for (const sub of reactGlobal.delayedEvents) {
+          sub();
+        }
+        reactGlobal.delayedEvents.clear();
+      }
     }
   };
 
