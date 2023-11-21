@@ -43,16 +43,11 @@ import type {
 
 import type { ExtractionWarning, RuntimeValueDescriptor } from "../types";
 
-type AddStyleProp = (
-  property: string,
-  value: unknown,
-  hoisted?: "transform" | "shadow",
-) => void;
+type AddStyleProp = (property: string, value: unknown) => void;
 
 type HandleStyleShorthand = (
   property: string,
   options: Record<string, unknown>,
-  hoisted?: "transform" | "shadow",
 ) => void;
 
 type AddAnimationDefaultProp = (property: string, value: unknown[]) => void;
@@ -297,18 +292,15 @@ export function parseDeclaration(
           addStyleProp(
             "translateX",
             parseUnparsed(transform.value.arguments[0], parseOptions),
-            "transform",
           );
           addStyleProp(
             "translateY",
             parseUnparsed(transform.value.arguments[2], parseOptions),
-            "transform",
           );
         } else {
           addStyleProp(
             transform.value.name,
             parseUnparsed(transform.value.arguments, parseOptions),
-            "transform",
           );
         }
       }
@@ -326,13 +318,6 @@ export function parseDeclaration(
       property.startsWith("--") ||
       property.startsWith("-rn-")
     ) {
-      let hoisted: "transform" | "shadow" | undefined;
-      if (property.startsWith("-rn")) {
-        if (property.includes("shadow-offset.")) {
-          hoisted = "shadow";
-        }
-      }
-
       return addStyleProp(
         property,
         parseUnparsed(declaration.value.value, {
@@ -352,7 +337,6 @@ export function parseDeclaration(
             });
           },
         }),
-        hoisted,
       );
     } else {
       return addWarning({
@@ -1315,18 +1299,18 @@ export function parseDeclaration(
       return addAnimationProp(declaration.property, declaration.value);
     case "transform": {
       if (declaration.value.length === 0) {
-        addStyleProp("perspective", undefined, "transform");
-        addStyleProp("translateX", undefined, "transform");
-        addStyleProp("translateY", undefined, "transform");
-        addStyleProp("rotate", undefined, "transform");
-        addStyleProp("rotateX", undefined, "transform");
-        addStyleProp("rotateY", undefined, "transform");
-        addStyleProp("rotateZ", undefined, "transform");
-        addStyleProp("scale", undefined, "transform");
-        addStyleProp("scaleX", undefined, "transform");
-        addStyleProp("scaleY", undefined, "transform");
-        addStyleProp("skewX", undefined, "transform");
-        addStyleProp("skewY", undefined, "transform");
+        addStyleProp("perspective", undefined);
+        addStyleProp("translateX", undefined);
+        addStyleProp("translateY", undefined);
+        addStyleProp("rotate", undefined);
+        addStyleProp("rotateX", undefined);
+        addStyleProp("rotateY", undefined);
+        addStyleProp("rotateZ", undefined);
+        addStyleProp("scale", undefined);
+        addStyleProp("scaleX", undefined);
+        addStyleProp("scaleY", undefined);
+        addStyleProp("skewX", undefined);
+        addStyleProp("skewY", undefined);
         break;
       }
 
@@ -1336,7 +1320,6 @@ export function parseDeclaration(
             addStyleProp(
               "perspective",
               parseLength(transform.value, parseOptions),
-              "transform",
             );
             break;
           case "translate":
@@ -1347,7 +1330,6 @@ export function parseDeclaration(
                 "rnw",
                 parseOptions,
               ),
-              "transform",
             );
             addStyleProp(
               "translateY",
@@ -1356,7 +1338,6 @@ export function parseDeclaration(
                 "rnh",
                 parseOptions,
               ),
-              "transform",
             );
             break;
           case "translateX":
@@ -1367,7 +1348,6 @@ export function parseDeclaration(
                 "rnw",
                 parseOptions,
               ),
-              "transform",
             );
             break;
           case "translateY":
@@ -1378,86 +1358,41 @@ export function parseDeclaration(
                 "rnh",
                 parseOptions,
               ),
-              "transform",
             );
             break;
           case "rotate":
-            addStyleProp(
-              "rotate",
-              parseAngle(transform.value, parseOptions),
-              "transform",
-            );
+            addStyleProp("rotate", parseAngle(transform.value, parseOptions));
             break;
           case "rotateX":
-            addStyleProp(
-              "rotateX",
-              parseAngle(transform.value, parseOptions),
-              "transform",
-            );
+            addStyleProp("rotateX", parseAngle(transform.value, parseOptions));
             break;
           case "rotateY":
-            addStyleProp(
-              "rotateY",
-              parseAngle(transform.value, parseOptions),
-              "transform",
-            );
+            addStyleProp("rotateY", parseAngle(transform.value, parseOptions));
             break;
           case "rotateZ":
-            addStyleProp(
-              "rotateZ",
-              parseAngle(transform.value, parseOptions),
-              "transform",
-            );
+            addStyleProp("rotateZ", parseAngle(transform.value, parseOptions));
             break;
           case "scale":
-            handleStyleShorthand(
-              "scale",
-              {
-                scaleX: parseLength(transform.value[0], parseOptions),
-                scaleY: parseLength(transform.value[1], parseOptions),
-              },
-              "transform",
-            );
+            handleStyleShorthand("scale", {
+              scaleX: parseLength(transform.value[0], parseOptions),
+              scaleY: parseLength(transform.value[1], parseOptions),
+            });
             break;
           case "scaleX":
-            addStyleProp(
-              "scaleX",
-              parseLength(transform.value, parseOptions),
-              "transform",
-            );
+            addStyleProp("scaleX", parseLength(transform.value, parseOptions));
             break;
           case "scaleY":
-            addStyleProp(
-              "scaleY",
-              parseLength(transform.value, parseOptions),
-              "transform",
-            );
+            addStyleProp("scaleY", parseLength(transform.value, parseOptions));
             break;
           case "skew":
-            addStyleProp(
-              "skewX",
-              parseAngle(transform.value[0], parseOptions),
-              "transform",
-            );
-            addStyleProp(
-              "skewY",
-              parseAngle(transform.value[1], parseOptions),
-              "transform",
-            );
+            addStyleProp("skewX", parseAngle(transform.value[0], parseOptions));
+            addStyleProp("skewY", parseAngle(transform.value[1], parseOptions));
             break;
           case "skewX":
-            addStyleProp(
-              "skewX",
-              parseAngle(transform.value, parseOptions),
-              "transform",
-            );
+            addStyleProp("skewX", parseAngle(transform.value, parseOptions));
             break;
           case "skewY":
-            addStyleProp(
-              "skewY",
-              parseAngle(transform.value, parseOptions),
-              "transform",
-            );
+            addStyleProp("skewY", parseAngle(transform.value, parseOptions));
             break;
 
           case "translateZ":
@@ -2239,12 +2174,10 @@ function parseTextShadow(
   addStyleProp(
     "textShadowOffset.width",
     parseLength(textShadow.xOffset, options),
-    "shadow",
   );
   addStyleProp(
     "textShadowOffset.height",
     parseLength(textShadow.yOffset, options),
-    "shadow",
   );
   addStyleProp("textShadowRadius", parseLength(textShadow.blur, options));
 }

@@ -574,11 +574,15 @@ function declarationsToStyle(
    * The `append` option allows the same property to be added multiple times
    * E.g. `transform` accepts an array of transforms
    */
-  function addStyleProp(
-    property: string,
-    value: any,
-    hoisted?: "transform" | "shadow",
-  ) {
+  function addStyleProp(property: string, value: any) {
+    let hoisted: "transform" | "shadow" | undefined;
+    if (transformProperties.has(property)) {
+      hoisted = "transform";
+    }
+    if (shadowProperties.has(property)) {
+      hoisted = "shadow";
+    }
+
     if (value === undefined && options.useInitialIfUndefined) {
       value = "!INITIAL!";
     }
@@ -614,13 +618,12 @@ function declarationsToStyle(
   function handleStyleShorthand(
     name: string,
     options: Record<string, unknown>,
-    hoisted?: "transform" | "shadow",
   ) {
     if (allEqual(...Object.values(options))) {
-      return addStyleProp(name, Object.values(options)[0], hoisted);
+      return addStyleProp(name, Object.values(options)[0]);
     } else {
       for (const [name, value] of Object.entries(options)) {
-        addStyleProp(name, value, hoisted);
+        addStyleProp(name, value);
       }
     }
   }
@@ -695,9 +698,33 @@ function declarationsToStyle(
 
     switch (declaration.property) {
       case "transition-property":
-        extractedStyle.transition.property = declaration.value.map((v) => {
-          return toRNProperty(v.property) as AnimatableCSSProperty;
-        });
+        extractedStyle.transition.property = [];
+
+        for (const v of declaration.value) {
+          let hoisted;
+
+          if (transformProperties.has(v.property)) {
+            hoisted = "transform";
+          }
+
+          if (shadowProperties.has(v.property)) {
+            hoisted = "shadow";
+          }
+
+          if (hoisted) {
+            extractedStyle.hoistedStyles ??= [];
+            extractedStyle.hoistedStyles?.push([
+              "style",
+              v.property,
+              "transform",
+            ]);
+          }
+
+          extractedStyle.transition.property.push(
+            toRNProperty(v.property) as AnimatableCSSProperty,
+          );
+        }
+
         break;
       case "transition-duration":
         extractedStyle.transition.duration = declaration.value;
@@ -874,3 +901,34 @@ function toRNProperty(str: string) {
 
   return str.replace(/-./g, (x) => x[1].toUpperCase());
 }
+
+const transformProperties = new Set([
+  "perspective",
+  "translateX",
+  "translateY",
+  "translateZ",
+  "scale",
+  "scaleX",
+  "scaleY",
+  "scaleZ",
+  "rotate",
+  "rotateX",
+  "rotateY",
+  "rotateZ",
+  "skewX",
+  "skewY",
+  "skewZ",
+  "matrix",
+  "matrix3d",
+]);
+
+const shadowProperties = new Set([
+  "-rn-shadowOffset.width",
+  "-rn-shadowOffset.height",
+  "-rn-textShadowOffset.width",
+  "-rn-textShadowOffset.height",
+  "shadowOffset.width",
+  "shadowOffset.height",
+  "textShadowOffset.width",
+  "textShadowOffset.height",
+]);

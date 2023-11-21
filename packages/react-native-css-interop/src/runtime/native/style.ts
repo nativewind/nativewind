@@ -460,9 +460,11 @@ function render(
           if (seenAnimatedProps.has(key)) continue;
 
           let value = state.props[prop][key] ?? defaultValues[key];
+
           if (typeof value === "function") {
             value = value();
           }
+
           if (value === undefined) continue;
 
           seenAnimatedProps.add(key);
@@ -503,21 +505,13 @@ function render(
       }
     }
 
-    // Move any styles to the correct prop
-    if (nativeStyleToProp) {
-      for (let [key, targetProp] of Object.entries(nativeStyleToProp)) {
-        if (targetProp === true) targetProp = key;
-        if (state.props.style[key] === undefined) continue;
-        state.props[prop] = state.props.style[key];
-        delete state.props.style[key];
-      }
-    }
-
-    // React Native has some nested styles, so we need to expand these values
+    // The compiler hoists styles, so we need to move them back to the correct prop
     if (state.hoistedStyles) {
-      for (let [prop, key, transform] of state.hoistedStyles) {
+      for (let hoisted of state.hoistedStyles) {
+        const prop = hoisted[0];
+        const key = hoisted[1];
         if (state.props[prop] && key in state.props[prop]) {
-          switch (transform) {
+          switch (hoisted[2]) {
             case "transform":
               state.props[prop].transform ??= [];
               state.props[prop].transform.push({
@@ -533,6 +527,16 @@ function render(
               break;
           }
         }
+      }
+    }
+
+    // Move any styles to the correct prop
+    if (nativeStyleToProp) {
+      for (let [key, targetProp] of Object.entries(nativeStyleToProp)) {
+        if (targetProp === true) targetProp = key;
+        if (state.props.style[key] === undefined) continue;
+        state.props[prop] = state.props.style[key];
+        delete state.props.style[key];
       }
     }
   }
