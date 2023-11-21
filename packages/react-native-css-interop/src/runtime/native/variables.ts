@@ -3,6 +3,7 @@ import { RuntimeValueDescriptor, StyleProp } from "../../types";
 import { useComputed } from "../signals";
 import { effectContext } from "./inheritance";
 import { opaqueStyles } from "./style";
+import { STYLE_SCOPES } from "../../shared";
 
 export function vars(variables: Record<string, RuntimeValueDescriptor>) {
   const style: StyleProp = {};
@@ -11,6 +12,7 @@ export function vars(variables: Record<string, RuntimeValueDescriptor>) {
     variables: Object.entries(variables).map(([name, value]) => {
       return [name.startsWith("--") ? name : `--${name}`, value];
     }),
+    scope: STYLE_SCOPES.SELF,
     specificity: {
       A: 0,
       B: 0,

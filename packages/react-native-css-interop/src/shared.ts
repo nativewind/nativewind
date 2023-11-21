@@ -7,10 +7,12 @@ export const INTERNAL_FLAGS = Symbol();
 export const DEFAULT_CONTAINER_NAME = "@__";
 
 export const STYLE_SCOPES = {
-  STATIC: 0, // Style is completely static
-  GLOBAL: 1, // Style is the same globally (media queries)
-  CONTEXT: 2, // Style is the same within a context (variables / containers)
-  SELF: 3, // Style can affect other styles (sets variable)
+  /** @description Style is the same globally */
+  GLOBAL: 0,
+  /** @description Style is the same within a context (variables / containers) */
+  CONTEXT: 1,
+  /** @description Style can affect other styles (sets variables, uses other styles) */
+  SELF: 2,
 };
 
 export function isPropDescriptor(

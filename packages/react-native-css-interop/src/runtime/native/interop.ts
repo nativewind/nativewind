@@ -241,7 +241,7 @@ export function createInteropComputed(
         [];
       let acc = createPropAccumulator(interop);
       interop.acc = acc;
-      let maxScope = STYLE_SCOPES.STATIC;
+      let maxScope = STYLE_SCOPES.GLOBAL;
 
       // Collect everything into the specificity layers and calculate the max scope
       for (const [prop, sourceProp, nativeStyleToProp] of options.config) {
@@ -314,9 +314,7 @@ export function createInteropComputed(
           reduceStyles(acc, prop, layers[2], maxScope);
         }
 
-        // This is where the magic happens!
-        // Non-static styles need to be resolved.
-        if (maxScope !== STYLE_SCOPES.STATIC && acc.props[prop]) {
+        if (acc.props[prop]) {
           resolveObject(acc.props[prop]);
         }
 

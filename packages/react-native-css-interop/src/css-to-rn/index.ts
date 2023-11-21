@@ -33,6 +33,8 @@ import {
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import { normalizeSelectors } from "./normalize-selectors";
+import { type } from "os";
+import { SCOPABLE_TYPES } from "@babel/types";
 
 type CSSInteropAtRule = {
   type: "custom";
@@ -368,6 +370,7 @@ function setStyleForSelectorList(
             specificity,
             props: {},
             propSingleValue: {},
+            scope: STYLE_SCOPES.GLOBAL,
             container: {
               names: [groupClassName],
             },
@@ -561,6 +564,7 @@ function declarationsToStyle(
     specificity: { A: 0, B: 0, C: 0, ...specificity },
     props: {},
     propSingleValue: {},
+    scope: STYLE_SCOPES.GLOBAL,
   };
 
   /*
@@ -590,6 +594,15 @@ function declarationsToStyle(
     }
 
     property = toRNProperty(property);
+
+    if (typeof value === "string" || typeof value === "number") {
+      extractedStyle.scope = Math.max(
+        STYLE_SCOPES.GLOBAL,
+        extractedStyle.scope,
+      );
+    } else {
+      extractedStyle.scope = Math.max(STYLE_SCOPES.SELF, extractedStyle.scope);
+    }
 
     extractedStyle.props.style ??= {};
     extractedStyle.props.style[property] = value;

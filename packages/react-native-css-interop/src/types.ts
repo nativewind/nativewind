@@ -132,6 +132,7 @@ export type CompilerStyleMeta = {
   props: Record<string, Record<string, RuntimeValueDescriptor>>;
   propSingleValue: Record<string, PropRuntimeValueDescriptor>;
   hoistedStyles?: [string, string, "transform" | "shadow"][];
+  scope: number;
   warnings?: ExtractionWarning[];
 };
 

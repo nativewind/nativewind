@@ -56,32 +56,9 @@ export const defaultCSSInterop: InteropFunction = (
    */
   if (!process.env.NATIVEWIND_INLINE_ANIMATION) {
     if (effect.isAnimated) {
-      props.style = useAnimatedStyle(() => {
-        const style: any = {};
-        const entries = Object.entries(effect.props.style);
-
-        for (const [key, value] of entries as any) {
-          if (typeof value === "object" && "value" in value) {
-            style[key] = value.value;
-          } else if (key === "transform") {
-            style.transform = value.map((v: any) => {
-              const [key, value] = Object.entries(v)[0] as any;
-
-              if (typeof value === "object" && "value" in value) {
-                return { [key]: value.value };
-              } else {
-                return { [key]: value };
-              }
-            });
-          } else {
-            style[key] = value;
-          }
-        }
-
-        return style;
-      }, [effect.props.style]);
-    } else {
-      useAnimatedStyle(() => ({}), [effect]);
+      props.__component = createElementParams[0];
+      createElementParams[0] = CSSInteropAnimationWrapper;
+      createElementParams;
     }
   }
 
@@ -99,6 +76,39 @@ export const defaultCSSInterop: InteropFunction = (
     return createElementParams;
   }
 };
+
+export function CSSInteropAnimationWrapper({
+  __component: Component,
+  __sharedValues,
+  ...props
+}: any) {
+  const style = useAnimatedStyle(() => {
+    const style: any = {};
+    const entries = Object.entries(props.style);
+
+    for (const [key, value] of entries as any) {
+      if (typeof value === "object" && "value" in value) {
+        style[key] = value.value;
+      } else if (key === "transform") {
+        style.transform = value.map((v: any) => {
+          const [key, value] = Object.entries(v)[0] as any;
+
+          if (typeof value === "object" && "value" in value) {
+            return { [key]: value.value };
+          } else {
+            return { [key]: value };
+          }
+        });
+      } else {
+        style[key] = value;
+      }
+    }
+
+    return style;
+  }, [props.style]);
+
+  return <Component {...props} style={style} />;
+}
 
 export function remapProps<P, M>(
   component: ComponentType<P>,
