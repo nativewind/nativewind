@@ -3,17 +3,18 @@ import {
   PropsWithChildren,
   createElement,
   forwardRef,
+  useContext,
+  useRef,
+  useSyncExternalStore,
 } from "react";
 import { Pressable, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { InteropFunction, RemapProps } from "../testing-library";
-import { reactGlobal } from "./signals";
-import { InheritanceProvider } from "./native/inheritance";
-import { useInteropComputed } from "./native/interop";
 import { getNormalizeConfig } from "./native/prop-mapping";
 import { interopComponents } from "./render";
-import { styleSignals } from "./native/style";
+import { createInteropStore, styleSignals } from "./native/style";
+import { interopContext, InteropProvider } from "./native/misc";
 
 export const defaultCSSInterop: InteropFunction = (
   component,
@@ -21,31 +22,56 @@ export const defaultCSSInterop: InteropFunction = (
   props,
   children,
 ) => {
-  reactGlobal.isInComponent = true;
-  reactGlobal.currentStore = null;
+  const parent = useContext(interopContext);
+  const storeRef = useRef<ReturnType<typeof createInteropStore>>();
+  if (!storeRef.current) {
+    storeRef.current = createInteropStore(parent, options, props);
+  }
 
-  const effect = useInteropComputed(props, options);
+  /**
+   * I think there is a way to rewrite this with useReducer, but I'm not sure how to do it.
+   * If a signal changes we need to render a different component.
+   * But you cannot do a state update while rendering, but useSyncExternalStore
+   * allows you to work around this restriction
+   */
+  useSyncExternalStore(
+    storeRef.current.subscribe,
+    storeRef.current.snapshot,
+    storeRef.current.snapshot,
+  );
 
+  const state = storeRef.current.state;
+
+  // If the parent or a dependency changes we need to rerender
+  if (
+    parent !== state.parent ||
+    options.dependencies.some((k, i) => props[k] !== state.dependencies[i])
+  ) {
+    state.rerender(parent, props);
+  }
+
+  // Merge the styled props with the props passed to the component
   props = {
     ...props,
-    ...effect.props,
+    ...state.props,
   };
 
+  // Delete any props that were used as sources
   for (const source of options.sources) {
     delete props[source];
   }
 
   // View doesn't support the interaction props, so force the component to be a Pressable (which accepts ViewProps)
-  if (effect.convertToPressable) {
-    Object.assign(props, { ___pressable: true });
-    if ((component as any) === View) {
+  if (state.convertToPressable) {
+    if (component === View) {
+      props.___pressable = true;
       component = Pressable;
     }
   }
 
   // Depending on the meta, we may be required to surround the component in other components (like VariableProvider)
   let createElementParams: Parameters<typeof createElement> = [
-    effect.isAnimated ? createAnimatedComponent(component) : component,
+    state.isAnimated ? createAnimatedComponent(component) : component,
     props,
     children,
   ];
@@ -55,20 +81,18 @@ export const defaultCSSInterop: InteropFunction = (
    * https://github.com/software-mansion/react-native-reanimated/issues/5296
    */
   if (!process.env.NATIVEWIND_INLINE_ANIMATION) {
-    if (effect.isAnimated) {
+    if (state.isAnimated) {
       props.__component = createElementParams[0];
       createElementParams[0] = CSSInteropAnimationWrapper;
       createElementParams;
     }
   }
 
-  reactGlobal.isInComponent = false;
-
-  if (effect.contextValue) {
+  if (state.context) {
     createElementParams = [
-      InheritanceProvider,
+      InteropProvider,
       {
-        value: effect.contextValue,
+        value: state.context,
       },
       createElement(...createElementParams),
     ] as any;

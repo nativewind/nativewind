@@ -49,7 +49,7 @@ test("combined inline variable", () => {
   });
 });
 
-test.only("inherit variables", () => {
+test("inherit variables", () => {
   const B = createMockComponent(View);
 
   registerCSS(`

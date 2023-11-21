@@ -58,6 +58,10 @@ export type NormalizedCSSInteropClassNamePropConfig<P> = {
   nativeStyleToProp?: NativeStyleToProp<P>;
 };
 
+export type Layers = Record<0 | 1 | 2, Array<RuntimeStyle | object>> & {
+  classNames: string;
+};
+
 export type CSSInteropClassNamePropConfig<P> =
   | undefined
   | (keyof P & string)

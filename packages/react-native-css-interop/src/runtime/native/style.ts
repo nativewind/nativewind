@@ -1,6 +1,43 @@
-import { Signal, context, createSignal } from "../signals";
 import {
-  Specificity,
+  StyleSheet,
+  Platform,
+  PlatformColor,
+  PixelRatio,
+  LayoutChangeEvent,
+} from "react-native";
+import {
+  AnimatableValue,
+  Easing,
+  cancelAnimation,
+  makeMutable,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+import {
+  Effect,
+  Signal,
+  cleanupEffect,
+  createSignal,
+  interopGlobal,
+  setupEffect,
+} from "../signals";
+import { globalVariables, rem, vh, vw } from "./misc";
+import { colorScheme } from "./color-scheme";
+import {
+  DEFAULT_CONTAINER_NAME,
+  STYLE_SCOPES,
+  isPropDescriptor,
+} from "../../shared";
+import { NormalizedOptions } from "./prop-mapping";
+import {
+  testContainerQuery,
+  testMediaQueries,
+  testPseudoClasses,
+} from "./conditions";
+import type { Time } from "lightningcss";
+import type {
   ExtractedAnimations,
   ExtractedTransition,
   ExtractionWarning,
@@ -11,74 +48,584 @@ import {
   RuntimeValue,
   GroupedRuntimeStyle,
   TransportStyle,
+  Interaction,
+  Layers,
+  NativeStyleToProp,
+  Specificity,
 } from "../../types";
-import {
-  testContainerQuery,
-  testMediaQueries,
-  testPseudoClasses,
-} from "./conditions";
-import type { InteropComputed } from "./interop";
-import { vh, vw } from "./misc";
-import { globalVariables } from "./inheritance";
-import { StyleSheet, Platform, PlatformColor, PixelRatio } from "react-native";
-import { AnimatableValue } from "react-native-reanimated";
-import { colorScheme } from "./color-scheme";
-import { Time } from "lightningcss";
-import { STYLE_SCOPES, isPropDescriptor } from "../../shared";
-
-export interface PropAccumulator {
-  interop: InteropComputed;
-  scope: number;
-  animations?: Required<ExtractedAnimations>;
-  transition?: Required<ExtractedTransition>;
-  props: Record<string, any>;
-  hoistedStyles?: [string, string, "transform" | "shadow"][];
-  variables: Record<string, any>;
-  variablesSpecificity: Record<string, Specificity>;
-  hasActive: boolean;
-  hasHover: boolean;
-  hasFocus: boolean;
-  hasContainer: boolean;
-  forceContext: boolean;
-  requiresLayoutWidth: boolean;
-  requiresLayoutHeight: boolean;
-  getLayout: () => [number, number] | undefined;
-  setVariable(name: string, value: any, specificity: Specificity): void;
-}
 
 export const styleSignals = new Map<string, Signal<GroupedRuntimeStyle>>();
 export const opaqueStyles = new WeakMap<object, RuntimeStyle>();
 export const animationMap = new Map<string, ExtractedAnimation>();
 
-export const globalClassNameCache = new Map<string, PropAccumulator>();
-export const globalInlineCache = new WeakMap<object, PropAccumulator>();
+export const globalClassNameCache = new Map<string, InteropReducerState>();
+export const globalInlineCache = new WeakMap<object, InteropReducerState>();
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
 
-export function createPropAccumulator(interop: InteropComputed) {
-  const acc: PropAccumulator = {
-    interop,
+export interface InteropReducerState {
+  testId?: string;
+  version: number;
+  onChange?: () => void;
+  parent: InteropReducerState;
+  originalProps: Record<string, any>;
+  props: Record<string, any>;
+  options: NormalizedOptions;
+  scope: number;
+  interaction: Interaction;
+  hasActive: boolean;
+  hasHover: boolean;
+  hasFocus: boolean;
+  hasContainer: boolean;
+  convertToPressable: boolean;
+  shouldUpdateContext: boolean;
+  context?: InteropReducerState;
+  isAnimated: boolean;
+  animations?: Required<ExtractedAnimations>;
+  animationNames: Set<string>;
+  transition?: Required<ExtractedTransition>;
+  signalsToRemove: Set<string>;
+  inlineVariables: Map<string, Signal<any>>;
+  containerNames: Set<string>;
+  effect: Effect;
+  requiresLayoutWidth: boolean;
+  requiresLayoutHeight: boolean;
+  animationWaitingOnLayout: boolean;
+  layout?: Signal<[number, number] | undefined>;
+  dependencies: any[];
+  hoistedStyles?: [string, string, "transform" | "shadow"][];
+  sharedValues: Record<string, ReturnType<typeof makeMutable>>;
+  getInteraction(name: keyof Interaction): boolean;
+  getVariable(name: string): any;
+  setVariable(name: string, value: any, specificity: Specificity): void;
+  setContainer(name: string): void;
+  getContainer(name: string): InteropReducerState | undefined;
+  containerSignal?: Signal<InteropReducerState>;
+  rerender(
+    parent?: InteropReducerState,
+    originalProps?: Record<string, any>,
+  ): void;
+}
+
+export function createInteropStore(
+  parent: InteropReducerState,
+  options: NormalizedOptions,
+  originalProps: Record<string, any>,
+) {
+  const state: InteropReducerState = {
+    testId: originalProps.testId,
+    version: 0,
+    parent,
+    options,
     props: {},
+    originalProps,
     scope: STYLE_SCOPES.GLOBAL,
-    variables: {},
-    variablesSpecificity: {},
+    interaction: {},
     hasActive: false,
-    hasFocus: false,
     hasHover: false,
+    hasFocus: false,
     hasContainer: false,
-    forceContext: false,
-    requiresLayoutWidth: false,
+    shouldUpdateContext: false,
+    convertToPressable: false,
+    animationWaitingOnLayout: false,
     requiresLayoutHeight: false,
-    getLayout: interop.getLayout,
-    setVariable(name, value, specificity) {
-      acc.variables[name] = value;
-      acc.variablesSpecificity[name] = specificity;
-      interop.setVariable(name, value);
+    requiresLayoutWidth: false,
+    isAnimated: false,
+    animationNames: new Set(),
+    signalsToRemove: new Set(),
+    inlineVariables: new Map(),
+    containerNames: new Set(),
+    sharedValues: {},
+    dependencies: options.dependencies.map((k) => originalProps[k]),
+    setVariable(name, value) {
+      state.signalsToRemove.delete(name);
+
+      const existing = state.inlineVariables.get(name);
+      if (!existing) {
+        state.inlineVariables.set(name, createSignal(value, name));
+      } else {
+        existing.set(value);
+      }
+    },
+    getVariable(name) {
+      let value: any = undefined;
+      value ??= state.inlineVariables.get(name)?.get();
+      value ??= globalVariables.universal.get(name)?.get();
+      value ??= parent.getVariable(name);
+      return value;
+    },
+    setContainer(name) {
+      state.containerSignal ??= createSignal(state, name);
+      state.containerNames.add(name);
+    },
+    getContainer(name) {
+      if (
+        state.containerSignal &&
+        (state.containerNames.has(name) || name === DEFAULT_CONTAINER_NAME)
+      ) {
+        return state.containerSignal.get();
+      } else {
+        return parent.getContainer(name);
+      }
+    },
+    getInteraction(name) {
+      if (!this.interaction[name]) {
+        this.interaction[name] = createSignal(false, name);
+      }
+      return this.interaction[name]!.get();
+    },
+    effect: Object.assign(
+      () => {
+        state.rerender();
+        state.onChange?.();
+      },
+      {
+        dependencies: new Set<Signal<any>>(),
+      },
+    ),
+    rerender: (parent, originalProps) => {
+      render(state, parent, originalProps);
     },
   };
 
-  return acc;
+  state.effect.state = state;
+
+  render(state);
+
+  return {
+    state,
+    subscribe(subscriber: () => void) {
+      state.onChange = subscriber;
+      return () => {
+        state.onChange = undefined;
+        cleanupEffect(state.effect);
+      };
+    },
+    snapshot() {
+      return state.version;
+    },
+  };
+}
+
+function render(
+  state: InteropReducerState,
+  parent?: InteropReducerState,
+  originalProps?: Record<string, any>,
+): InteropReducerState {
+  if (parent) state.parent = parent;
+  if (originalProps) {
+    state.originalProps = originalProps;
+    state.dependencies = state.options.dependencies.map(
+      (k) => state.originalProps![k],
+    );
+  }
+
+  state.shouldUpdateContext = false;
+  state.convertToPressable ||= false;
+  state.signalsToRemove = new Set(state.inlineVariables.keys());
+  state.props = {};
+
+  setupEffect(state.effect);
+  interopGlobal.delayedEvents.delete(state.effect!);
+
+  let maxScope = STYLE_SCOPES.GLOBAL;
+  const mapping: [string, Layers, NativeStyleToProp<any> | undefined][] = [];
+
+  // Collect everything into the specificity layers and calculate the max scope
+  for (const [prop, sourceProp, nativeStyleToProp] of state.options.config) {
+    const classNames = state.originalProps?.[sourceProp];
+    if (typeof classNames !== "string") continue;
+
+    const layers: Layers = {
+      classNames,
+      0: [],
+      1: [],
+      2: [],
+    };
+
+    for (const className of classNames.split(/\s+/)) {
+      let signal = styleSignals.get(className);
+      if (!signal) continue;
+      const meta = signal.get();
+      maxScope = Math.max(maxScope, meta.scope);
+      if (meta[0]) layers[0].push(...meta[0]);
+      if (meta[1]) layers[1].push(...meta[1]);
+      if (meta[2]) layers[2].push(...meta[2]);
+    }
+
+    let inlineStyles = state.originalProps?.[prop];
+    if (inlineStyles) {
+      if (Array.isArray(inlineStyles)) {
+        layers[1].push(
+          ...inlineStyles.flat(10).map((style) => {
+            if (opaqueStyles.has(style)) {
+              style = opaqueStyles.get(style)!;
+            }
+            return style;
+          }),
+        );
+      } else {
+        if (opaqueStyles.has(inlineStyles)) {
+          inlineStyles = opaqueStyles.get(inlineStyles)!;
+        }
+        layers[1].push(inlineStyles);
+      }
+    }
+
+    mapping.push([prop, layers, nativeStyleToProp]);
+  }
+
+  /**
+   * Process the styles in order of layers
+   *  0: className
+   *  1: inline
+   *  2: important
+   *  3: transitions
+   *  4: animations
+   *
+   * We swap the processing order of 3 and 4, so we can skip already processed attributes
+   */
+  for (const [prop, layers, nativeStyleToProp] of mapping) {
+    // Layer 0 - className
+    if (layers[0].length) {
+      reduceStyles(state, prop, layers[0], maxScope);
+    }
+
+    // Layer 1 - inline
+    if (layers[1].length) {
+      reduceStyles(state, prop, layers[1], maxScope);
+    }
+
+    // Layer 2 - important
+    if (layers[2].length) {
+      reduceStyles(state, prop, layers[2], maxScope);
+    }
+
+    if (state.props[prop]) {
+      resolveObject(state.props[prop]);
+    }
+
+    // Layer 3 & 4 only occur when the target is 'style'
+    if (prop === "style") {
+      const styleProp = state.props[prop];
+      if (styleProp && typeof styleProp.width === "number") {
+        state.requiresLayoutWidth = false;
+      }
+      if (styleProp && typeof styleProp.height === "number") {
+        state.requiresLayoutHeight = false;
+      }
+
+      const seenAnimatedProps = new Set();
+
+      // Layer 4 - animations
+      if (state.animations) {
+        const {
+          name: animationNames,
+          duration: durations,
+          delay: delays,
+          iterationCount: iterationCounts,
+        } = state.animations;
+
+        state.isAnimated = true;
+
+        state.props.style ??= {};
+
+        let names: string[] = [];
+        let shouldResetAnimations = state.animationWaitingOnLayout;
+
+        for (const name of animationNames) {
+          if (name.type === "none") {
+            names = [];
+            state.animationNames.clear();
+            break;
+          }
+
+          names.push(name.value);
+
+          if (!state.animationNames.has(name.value)) {
+            shouldResetAnimations = true;
+          }
+        }
+
+        if (shouldResetAnimations) {
+          state.animationNames.clear();
+          state.animationWaitingOnLayout = false;
+
+          // Loop in reverse order
+          for (let index = names.length - 1; index >= 0; index--) {
+            const name = names[index % names.length];
+            state.animationNames.add(name);
+
+            const keyframes = animationMap.get(name);
+            if (!keyframes) {
+              continue;
+            }
+
+            const totalDuration = timeToMS(durations[index % name.length]);
+            const delay = timeToMS(delays[index % delays.length]);
+            const iterationCount =
+              iterationCounts[index % iterationCounts.length];
+            const iterations =
+              iterationCount.type === "infinite" ? -1 : iterationCount.value;
+
+            if (keyframes.hoistedStyles) {
+              state.hoistedStyles ??= [];
+              state.hoistedStyles.push(...keyframes.hoistedStyles);
+            }
+
+            for (const [key, [initialFrame, ...frames]] of Object.entries(
+              keyframes.frames,
+            )) {
+              if (seenAnimatedProps.has(key)) continue;
+              seenAnimatedProps.add(key);
+
+              const initialValue = resolveAnimationValue(
+                initialFrame.value,
+                key,
+                state.props.style,
+              );
+
+              const sequence = frames.map((frame) => {
+                return withDelay(
+                  delay,
+                  withTiming(
+                    resolveAnimationValue(frame.value, key, state.props.style),
+                    {
+                      duration: totalDuration * frame.progress,
+                      easing: Easing.linear,
+                    },
+                  ),
+                );
+              }) as [AnimatableValue, ...AnimatableValue[]];
+
+              state.animationWaitingOnLayout =
+                (state.requiresLayoutWidth || state.requiresLayoutHeight) &&
+                !state.layout?.peek();
+
+              let sharedValue = state.sharedValues[key];
+              if (!sharedValue) {
+                sharedValue = makeMutable(initialValue);
+                state.sharedValues[key] = sharedValue;
+              } else {
+                sharedValue.value = initialValue;
+              }
+
+              sharedValue.value = withRepeat(
+                withSequence(...sequence),
+                iterations,
+              );
+
+              Object.defineProperty(state.props[prop], key, {
+                configurable: true,
+                enumerable: true,
+                value: sharedValue,
+              });
+            }
+          }
+        } else {
+          for (const name of names) {
+            const keyframes = animationMap.get(name);
+            if (!keyframes) {
+              continue;
+            }
+
+            state.props[prop] ??= {};
+
+            if (keyframes.hoistedStyles) {
+              state.hoistedStyles ??= [];
+              state.hoistedStyles.push(...keyframes.hoistedStyles);
+            }
+
+            for (const key of Object.keys(keyframes.frames)) {
+              Object.defineProperty(state.props[prop], key, {
+                configurable: true,
+                enumerable: true,
+                value: state.sharedValues[key],
+              });
+              seenAnimatedProps.add(key);
+            }
+          }
+        }
+      }
+
+      // Layer 3 - transitions
+      if (state.transition) {
+        state.isAnimated = true;
+
+        const {
+          property: properties,
+          duration: durations,
+          delay: delays,
+        } = state.transition;
+
+        for (let index = 0; index < properties.length; index++) {
+          const key = properties[index];
+
+          if (seenAnimatedProps.has(key)) continue;
+
+          let value = state.props[prop][key] ?? defaultValues[key];
+          if (typeof value === "function") {
+            value = value();
+          }
+          if (value === undefined) continue;
+
+          seenAnimatedProps.add(key);
+
+          const duration = timeToMS(durations[index % durations.length]);
+          const delay = timeToMS(delays[index % delays.length]);
+          // const easing: any =
+          //   transition.timingFunction[
+          //     index % transition.timingFunction.length
+          //   ];
+
+          let sharedValue = state.sharedValues[key];
+          if (!sharedValue) {
+            sharedValue = makeMutable(value);
+            state.sharedValues[key] = sharedValue;
+          }
+
+          if (value !== sharedValue.value) {
+            sharedValue.value = withDelay(
+              delay,
+              withTiming(value, { duration }),
+            );
+          }
+
+          Object.defineProperty(state.props[prop], key, {
+            configurable: true,
+            enumerable: true,
+            value: sharedValue,
+          });
+        }
+      }
+
+      // Cleanup any sharedValues that are no longer used
+      for (const [key, value] of Object.entries(state.sharedValues)) {
+        if (seenAnimatedProps.has(key)) continue;
+        cancelAnimation(value);
+        value.value = state.props[prop][key] ?? defaultValues[key];
+      }
+    }
+
+    // Move any styles to the correct prop
+    if (nativeStyleToProp) {
+      for (let [key, targetProp] of Object.entries(nativeStyleToProp)) {
+        if (targetProp === true) targetProp = key;
+        if (state.props.style[key] === undefined) continue;
+        state.props[prop] = state.props.style[key];
+        delete state.props.style[key];
+      }
+    }
+
+    // React Native has some nested styles, so we need to expand these values
+    if (state.hoistedStyles) {
+      for (let [prop, key, transform] of state.hoistedStyles) {
+        if (state.props[prop] && key in state.props[prop]) {
+          switch (transform) {
+            case "transform":
+              state.props[prop].transform ??= [];
+              state.props[prop].transform.push({
+                [key]: state.props[prop][key],
+              });
+              delete state.props[prop][key];
+              break;
+            case "shadow":
+              const [type, shadowKey] = key.split(".");
+              state.props[prop][type] ??= {};
+              state.props[prop][type][shadowKey] = state.props[prop][key];
+              delete state.props[prop][key];
+              break;
+          }
+        }
+      }
+    }
+  }
+
+  if (state.hasActive || state.hasContainer) {
+    state.convertToPressable = true;
+    state.interaction.active ??= createSignal(false, `${state.testId}#active`);
+    state.props.onPressIn = (event: unknown) => {
+      state.originalProps.onPressIn?.(event);
+      state.interaction.active!.set(true);
+    };
+    state.props.onPressOut = (event: unknown) => {
+      state.originalProps.onPressOut?.(event);
+      state.interaction.active!.set(false);
+    };
+  }
+  if (state.hasHover || state.hasContainer) {
+    state.convertToPressable = true;
+    state.interaction.hover ??= createSignal(false, `${state.testId}#hover`);
+    state.props.onHoverIn = (event: unknown) => {
+      state.originalProps.onHoverIn?.(event);
+      state.interaction.hover!.set(true);
+    };
+    state.props.onHoverOut = (event: unknown) => {
+      state.originalProps.onHoverOut?.(event);
+      state.interaction.hover!.set(false);
+    };
+  }
+  if (state.hasFocus || state.hasContainer) {
+    state.convertToPressable = true;
+    state.interaction.hover ??= createSignal(false, `${state.testId}#focus`);
+    state.props.onFocus = (event: unknown) => {
+      state.originalProps.onFocus?.(event);
+      state.interaction.focus!.set(true);
+    };
+    state.props.onBlur = (event: unknown) => {
+      state.originalProps.onBlur?.(event);
+      state.interaction.focus!.set(false);
+    };
+  }
+
+  if (state.convertToPressable) {
+    // This is an annoying quirk of RN. Pressable will only work if onPress is defined
+    state.props.onPress = state.originalProps.onPress ?? (() => {});
+  }
+
+  if (
+    state.requiresLayoutWidth ||
+    state.requiresLayoutHeight ||
+    state.animationWaitingOnLayout
+  ) {
+    if (!state.layout) {
+      state.layout ??= createSignal<[number, number] | undefined>(undefined);
+      state.layout.get();
+    } else if (!state.layout.peek()) {
+      state.layout.get();
+    }
+
+    state.props.onLayout ??= (event: LayoutChangeEvent) => {
+      state.originalProps.onLayout?.(event);
+      const layout = event.nativeEvent.layout;
+      const [width, height] = state.layout!.peek() ?? [0, 0];
+      if (layout.width !== width || layout.height !== height) {
+        state.layout!.set([layout.width, layout.height]);
+      }
+    };
+  }
+
+  if (state.containerNames.size === 0) {
+    state.containerSignal?.set(undefined);
+    state.containerSignal = undefined;
+  }
+
+  // for (const name of state.signalsToRemove) {
+  //   // Set to undefined to cause any dependencies to render
+  //   state.signals.get(name)?.set(undefined);
+  //   // Delete the signal
+  //   state.signals.delete(name);
+  //   state.shouldUpdateContext = true;
+  // }
+
+  if (state.shouldUpdateContext) {
+    // Duplicate this object, making it identify different
+    state.context = Object.assign({}, state);
+  }
+
+  state.version++;
+  return state;
 }
 
 export function upsertStyleSignal(
@@ -175,7 +722,7 @@ function mapStyle(style: TransportStyle): RuntimeStyle {
 }
 
 export function reduceStyles(
-  acc: PropAccumulator,
+  state: InteropReducerState,
   prop: string,
   styles: Array<RuntimeStyle | object>,
   _scope: number,
@@ -184,20 +731,22 @@ export function reduceStyles(
 
   for (let style of styles) {
     if (!("$$type" in style)) {
-      acc.props[prop] ??= {};
-      Object.assign(acc.props[prop], style);
+      state.props[prop] ??= {};
+      Object.assign(state.props[prop], style);
       continue;
     }
 
+    // If a style could possibly have a variable or a name, create the context
+    // This prevent children losing state if a context is suddenly created
     if (style.variables || style.container?.names) {
-      acc.forceContext = true;
+      state.context ??= state;
     }
 
     if (style.pseudoClasses) {
-      acc.hasActive ||= Boolean(style.pseudoClasses.active);
-      acc.hasHover ||= Boolean(style.pseudoClasses.hover);
-      acc.hasFocus ||= Boolean(style.pseudoClasses.focus);
-      if (!testPseudoClasses(acc.interop, style.pseudoClasses)) {
+      state.hasActive ||= Boolean(style.pseudoClasses.active);
+      state.hasHover ||= Boolean(style.pseudoClasses.hover);
+      state.hasFocus ||= Boolean(style.pseudoClasses.focus);
+      if (!testPseudoClasses(state, style.pseudoClasses)) {
         continue;
       }
     }
@@ -208,64 +757,64 @@ export function reduceStyles(
 
     if (
       style.containerQuery &&
-      !testContainerQuery(style.containerQuery, acc.interop)
+      !testContainerQuery(state, style.containerQuery)
     ) {
       continue;
     }
 
     if (style.hoistedStyles) {
-      acc.hoistedStyles ??= [];
-      acc.hoistedStyles.push(...style.hoistedStyles);
+      state.hoistedStyles ??= [];
+      state.hoistedStyles.push(...style.hoistedStyles);
     }
 
     if (style.variables) {
       for (const [key, value] of style.variables) {
-        acc.setVariable(key, value, style.specificity);
+        state.setVariable(key, value, style.specificity);
       }
     }
 
     if (style.animations) {
-      acc.animations = {
+      state.animations = {
         ...defaultAnimation,
-        ...acc.animations,
+        ...state.animations,
         ...style.animations,
       };
     }
 
     if (style.transition) {
-      acc.transition = {
+      state.transition = {
         ...defaultTransition,
-        ...acc.transition,
+        ...state.transition,
         ...style.transition,
       };
     }
 
     if (style.container?.names) {
-      acc.requiresLayoutWidth = true;
-      acc.requiresLayoutHeight = true;
-      acc.hasContainer = true;
+      state.requiresLayoutWidth = true;
+      state.requiresLayoutHeight = true;
+      state.hasContainer = true;
       for (const name of style.container.names) {
-        acc.interop.setContainer(name);
+        state.setContainer(name);
       }
     }
 
     if (style.props) {
       for (const [prop, value] of style.props) {
         if (typeof value === "object" && "$$type" in value) {
-          acc.props[prop] = value.value;
+          state.props[prop] = value.value;
         } else if (value !== undefined) {
           if (typeof value === "object") {
-            acc.props[prop] ??= {};
-            Object.assign(acc.props[prop], value);
+            state.props[prop] ??= {};
+            Object.assign(state.props[prop], value);
           } else {
-            acc.props[prop] = value;
+            state.props[prop] = value;
           }
         }
       }
     }
   }
 
-  return acc;
+  return state;
 }
 
 export function parseValue(
@@ -303,7 +852,7 @@ export function parseValue(
     }
     case "rem": {
       return function () {
-        return round(globalVariables.rem.get() * value.arguments[0]);
+        return round(rem.get() * value.arguments[0]);
       };
     }
     case "rnh": {
@@ -459,10 +1008,13 @@ export function specificityCompare(
   const a = o1.specificity;
   const b = o2.specificity;
 
-  // We skip the inline & important, as we have already separated styles
-  // into layers
-
-  if (a.A !== b.A) {
+  if (a.I !== b.I) {
+    // Important
+    return a.I - b.I;
+  } else if (a.inline !== b.inline) {
+    // Inline
+    return (a.inline || 0) - (b.inline || 0);
+  } else if (a.A !== b.A) {
     // Ids
     return a.A - b.A;
   } else if (a.B !== b.B) {
@@ -488,31 +1040,29 @@ export const timeToMS = (time: Time) => {
 };
 
 function getProp(name: string): any {
-  const current = context[context.length - 1]! as InteropComputed;
-  return current.acc.props[name];
+  return interopGlobal.current?.state?.props[name];
 }
 
 function getDimensions(
   dimension: "width" | "height" | "both",
   prop = "style",
 ): any {
-  const current = context[context.length - 1]! as InteropComputed;
-  const style = current.acc.props[prop];
+  const state = interopGlobal.current?.state!;
+  const style = state.props[prop];
+
   if (dimension === "width") {
     if (typeof style?.width === "number") {
       return style.width;
     } else {
-      const layout = current.getLayout();
-      current.acc.requiresLayoutWidth = true;
-      return layout?.[0] ?? 0;
+      state.requiresLayoutWidth = true;
+      return state.layout?.get()?.[0] ?? 0;
     }
   } else if (dimension === "height") {
     if (typeof style?.height === "number") {
       return style.height;
     } else {
-      const layout = current.getLayout();
-      current.acc.requiresLayoutHeight = true;
-      return layout?.[1] ?? 0;
+      state.requiresLayoutHeight = true;
+      return state.layout?.get()?.[1] ?? 0;
     }
   } else {
     let width = 0;
@@ -520,24 +1070,21 @@ function getDimensions(
     if (typeof style?.width === "number") {
       width = style.width;
     } else {
-      const layout = current.getLayout();
-      current.acc.requiresLayoutWidth = true;
-      width = layout?.[0] ?? 0;
+      state.requiresLayoutWidth = true;
+      width = state.layout?.get()?.[0] ?? 0;
     }
     if (typeof style?.height === "number") {
       height = style.height;
     } else {
-      const layout = current.getLayout();
-      current.acc.requiresLayoutHeight = true;
-      height = layout?.[1] ?? 0;
+      state.requiresLayoutHeight = true;
+      height = state.layout?.get()?.[1] ?? 0;
     }
     return { width, height };
   }
 }
 
 function getVariable(name: any) {
-  const current = context[context.length - 1]! as InteropComputed;
-  return resolve(current.getVariable(name));
+  return resolve(interopGlobal.current?.state?.getVariable(name));
 }
 
 const defaultAnimation: Required<ExtractedAnimations> = {
@@ -644,4 +1191,23 @@ function deepEqual(obj1: any, obj2: any) {
 //check if value is primitive
 function isPrimitive(obj: any) {
   return obj !== Object(obj);
+}
+
+// function cloneObject<T extends object>(obj: T): T {
+//   var clone = {} as T;
+//   for (var i in obj) {
+//     const v = obj[i];
+//     if (typeof v == "object" && v != null) clone[i] = cloneObject(v);
+//     else clone[i] = v;
+//   }
+//   return clone;
+// }
+
+// Walk an object, resolving any getters
+function resolveObject<T extends object>(obj: T) {
+  for (var i in obj) {
+    const v = obj[i];
+    if (typeof v == "object" && v != null) resolveObject(v);
+    else obj[i] = typeof v === "function" ? v() : v;
+  }
 }

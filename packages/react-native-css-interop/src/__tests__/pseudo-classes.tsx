@@ -14,7 +14,7 @@ const A = createMockComponent(TextInput);
 
 beforeEach(() => resetStyles());
 
-test.only("hover", () => {
+test("hover", () => {
   registerCSS(`.my-class:hover { width: 10px; }`);
 
   const component = render(

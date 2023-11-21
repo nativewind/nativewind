@@ -1,9 +1,9 @@
 import { useContext } from "react";
 import { RuntimeValueDescriptor, StyleProp } from "../../types";
 import { useComputed } from "../signals";
-import { effectContext } from "./inheritance";
 import { opaqueStyles } from "./style";
 import { STYLE_SCOPES } from "../../shared";
+import { interopContext } from "./misc";
 
 export function vars(variables: Record<string, RuntimeValueDescriptor>) {
   const style: StyleProp = {};
@@ -27,6 +27,6 @@ export function vars(variables: Record<string, RuntimeValueDescriptor>) {
 }
 
 export const useUnstableNativeVariable = (name: string) => {
-  const interop = useContext(effectContext);
-  return useComputed(() => interop.signals.get(name)?.get(), interop);
+  const state = useContext(interopContext);
+  return useComputed(() => state.getVariable(name), state);
 };

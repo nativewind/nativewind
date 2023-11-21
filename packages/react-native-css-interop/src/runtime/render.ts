@@ -14,7 +14,7 @@ import type {
 import { defaultInteropRef } from "./globals";
 import { getNormalizeConfig } from "./native/prop-mapping";
 import { opaqueStyles } from "./native/style";
-import { reactGlobal } from "./signals";
+import { interopGlobal } from "./signals";
 
 export type InteropTypeCheck<T> = {
   type: ComponentType<T>;
@@ -102,18 +102,20 @@ export function cssInterop<T extends {}, M>(
       if (___pressable) {
         return createElement(component, props as unknown as T, children);
       } else {
-        reactGlobal.isInComponent = true;
+        interopGlobal.isInComponent = true;
+        interopGlobal.current = null;
         return createElement(
           ...interop!(component, config, props as unknown as T, children),
         );
       }
     } finally {
-      reactGlobal.isInComponent = false;
-      if (reactGlobal.delayedEvents.size) {
-        for (const sub of reactGlobal.delayedEvents) {
+      interopGlobal.isInComponent = false;
+      interopGlobal.current = null;
+      if (interopGlobal.delayedEvents.size) {
+        for (const sub of interopGlobal.delayedEvents) {
           sub();
         }
-        reactGlobal.delayedEvents.clear();
+        interopGlobal.delayedEvents.clear();
       }
     }
   };

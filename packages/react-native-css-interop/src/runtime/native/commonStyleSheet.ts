@@ -1,9 +1,4 @@
-import {
-  Dimensions,
-  StyleSheet as RNStyleSheet,
-  Appearance,
-} from "react-native";
-
+import { Dimensions, Appearance } from "react-native";
 import { CommonStyleSheet } from "../../types";
 import { createColorSchemeSignal, globalVariables, rem, vh, vw } from "./misc";
 import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
@@ -16,7 +11,7 @@ import {
   warnings,
 } from "./style";
 
-const commonStyleSheet: CommonStyleSheet = {
+export const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_FLAGS]: {},
   [INTERNAL_RESET]({ dimensions = Dimensions, appearance = Appearance } = {}) {
     animationMap.clear();
@@ -81,5 +76,3 @@ const commonStyleSheet: CommonStyleSheet = {
     }
   },
 };
-
-export const StyleSheet = Object.assign({}, commonStyleSheet, RNStyleSheet);
