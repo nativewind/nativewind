@@ -12,7 +12,7 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { InteropFunction, RemapProps } from "../testing-library";
 import { getNormalizeConfig } from "./native/prop-mapping";
-import { createElementAndCheckCssInterop, interopComponents } from "./render";
+import { interopComponents } from "./render";
 import { createInteropStore } from "./native/style";
 import {
   interopContext,
