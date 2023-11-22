@@ -11,7 +11,7 @@ import {
 } from "../types";
 import { cssToReactNativeRuntime } from "../css-to-rn";
 
-export { warnings } from "../runtime/native/stylesheet";
+export { warnings } from "../runtime/native/globals";
 
 import "../runtime/components";
 
@@ -76,5 +76,5 @@ export function registerCSS(
   css: string,
   options?: CssToReactNativeRuntimeOptions,
 ) {
-  StyleSheet.register(cssToReactNativeRuntime(css, options));
+  StyleSheet.registerCompiled(cssToReactNativeRuntime(css, options));
 }

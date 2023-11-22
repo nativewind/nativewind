@@ -4,7 +4,7 @@ import type {
   SelectorComponent,
   SelectorList,
 } from "lightningcss";
-import { CSSSpecificity, ExtractRuleOptions, ExtractedStyle } from "../types";
+import { Specificity, ExtractRuleOptions, CompilerStyleMeta } from "../types";
 
 export type NormalizeSelector =
   | {
@@ -17,13 +17,12 @@ export type NormalizeSelector =
       className: string;
       groupClassName?: string;
       pseudoClasses?: Record<string, true>;
-      nativeProps?: Record<string, string>;
       groupPseudoClasses?: Record<string, true>;
-      specificity: Pick<CSSSpecificity, "A" | "B" | "C">;
+      specificity: Pick<Specificity, "A" | "B" | "C">;
     };
 
 export function normalizeSelectors(
-  extractedStyle: ExtractedStyle,
+  extractedStyle: CompilerStyleMeta,
   selectorList: SelectorList,
   options: ExtractRuleOptions,
   selectors: NormalizeSelector[] = [],
@@ -197,35 +196,94 @@ export function normalizeSelectors(
               selector.pseudoClasses ??= {};
               selector.pseudoClasses[component.kind] = true;
               break;
-            case "custom-function":
-              if (component.name === "native-prop") {
-                const args = getCustomFunctionArguments(component);
-                if (!args) {
-                  isValid = false;
+            case "custom-function": {
+              switch (component.name) {
+                case "native-prop": {
+                  const args = getCustomFunctionArguments(component);
+                  if (!args) {
+                    isValid = false;
+                    break;
+                  }
+
+                  const style = extractedStyle.props.style;
+                  if (!style) {
+                    isValid = false;
+                    break;
+                  }
+
+                  if (
+                    args.length === 0 ||
+                    (args.length === 1 && args[0] === "*")
+                  ) {
+                    // :native-props() OR :native-props(*)
+                    for (const [key, value] of Object.entries(style)) {
+                      extractedStyle.propSingleValue[key] = {
+                        $$type: "prop",
+                        value,
+                      };
+                      delete extractedStyle.props.style;
+                    }
+                  } else if (args.length === 2 && args[0] === "*") {
+                    // :nativeProps(*, <prop>)
+                    const prop = args[1];
+                    const [key, value] = Object.entries(style)[0];
+                    extractedStyle.propSingleValue[prop] = {
+                      $$type: "prop",
+                      value,
+                    };
+                    delete style[key];
+                  } else if (args.length === 2) {
+                    const key = args[0];
+                    const prop = args[1];
+                    const value = style[key];
+
+                    extractedStyle.propSingleValue[prop] = {
+                      $$type: "prop",
+                      value,
+                    };
+                    delete style[key];
+                  } else {
+                    isValid = false;
+                  }
                   break;
                 }
-
-                selector.nativeProps ??= {};
-
-                if (args.length === 0) {
-                  const keys = Object.keys(extractedStyle.style);
-                  for (const key of keys) {
-                    selector.nativeProps[key] = key;
+                case "move-prop": {
+                  const args = getCustomFunctionArguments(component);
+                  if (!args) {
+                    isValid = false;
+                    break;
                   }
-                } else if (args.length === 1) {
-                  const keys = Object.keys(extractedStyle.style);
-                  for (const key of keys) {
-                    selector.nativeProps[key] = args[0];
+
+                  const style = extractedStyle.props.style;
+                  if (!style) {
+                    isValid = false;
+                    break;
                   }
-                } else if (args.length === 2) {
-                  selector.nativeProps[args[1]] = args[0];
+
+                  if (args.length === 2 && args[0] === "*") {
+                    // :move-props(*,<prop>)
+                    extractedStyle.props[args[1]] = style;
+                    delete extractedStyle.props.style;
+                  } else if (args.length === 2) {
+                    // :move-props(<key>, <prop>)
+                    const key = args[0];
+                    const prop = args[1];
+
+                    extractedStyle.props[prop] ??= {};
+                    const destination = extractedStyle.props[prop];
+                    if ("$$type" in destination) {
+                      extractedStyle.props[prop] = { [key]: style[key] };
+                    } else {
+                      destination[key] = style[key];
+                    }
+                    delete style[key];
+                  }
+                  break;
                 }
-              } else {
-                isValid = false;
+                default: {
+                  isValid = false;
+                }
               }
-              break;
-            default: {
-              isValid = false;
             }
           }
         }
@@ -260,6 +318,11 @@ function getCustomFunctionArguments(
         case "string":
         case "ident":
           args.push(arg.value.value);
+          break;
+        case "delim":
+          if (arg.value.value === "*") {
+            args.push("*");
+          }
           break;
         case "comma":
           break;

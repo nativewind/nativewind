@@ -126,9 +126,13 @@ export function testCasesWithOptions(
     });
 
     if (animated) {
-      expect(component).toHaveAnimatedStyle(expected.style ?? {});
+      expect(component).toHaveAnimatedStyle(expected.style);
+    } else if (expected.style) {
+      expect(component).toHaveStyle(
+        Object.fromEntries(Object.entries(expected.style)),
+      );
     } else {
-      expect(component).toHaveStyle(expected.style ?? {});
+      expect(component).toHaveStyle(undefined);
     }
 
     if (expected.props) {

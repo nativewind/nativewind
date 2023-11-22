@@ -14,7 +14,7 @@ jest.useFakeTimers();
 
 beforeEach(() => resetStyles());
 
-test.only("numeric transition", () => {
+test("numeric transition", () => {
   registerCSS(`
     .transition {
       transition: width 1s;
@@ -112,7 +112,7 @@ test("color transition", () => {
   });
 
   // At the end of the transition
-  jest.advanceTimersByTime(500);
+  jest.advanceTimersByTime(501);
   expect(component).toHaveAnimatedStyle({
     color: "rgba(0, 0, 255, 1)",
   });

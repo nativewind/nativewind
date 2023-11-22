@@ -38,9 +38,9 @@ test("Using css variables", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(255,115,179,1)" });
+  expect(component).toHaveStyle({ color: "rgba(255, 115, 179, 1)" });
 
   act(() => colorScheme.set("dark"));
 
-  expect(component).toHaveStyle({ color: "rgba(155,100,255,1)" });
+  expect(component).toHaveStyle({ color: "rgba(155, 100, 255, 1)" });
 });

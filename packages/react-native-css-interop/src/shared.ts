@@ -1,4 +1,4 @@
-import { RuntimeValue } from "./types";
+import { PropRuntimeValueDescriptor, RuntimeValueDescriptor } from "./types";
 
 export const INTERNAL_RESET = Symbol();
 export const INTERNAL_SET = Symbol();
@@ -6,7 +6,24 @@ export const INTERNAL_FLAGS = Symbol();
 
 export const DEFAULT_CONTAINER_NAME = "@__";
 
-export function isRuntimeValue(value: unknown): value is RuntimeValue {
+export const STYLE_SCOPES = {
+  /** @description Style is the same globally */
+  GLOBAL: 0,
+  /** @description Style is the same within a context (variables / containers) */
+  CONTEXT: 1,
+  /** @description Style can affect other styles (sets variables, uses other styles) */
+  SELF: 2,
+};
+
+export function isPropDescriptor(
+  value: unknown,
+): value is PropRuntimeValueDescriptor {
+  return typeof value === "object" && value !== null && "$$type" in value;
+}
+
+export function isRuntimeValue(
+  value: unknown,
+): value is RuntimeValueDescriptor {
   if (!value) {
     return false;
   } else if (Array.isArray(value)) {
@@ -21,18 +38,3 @@ export function isRuntimeValue(value: unknown): value is RuntimeValue {
     return false;
   }
 }
-
-export const transformKeys = [
-  "perspective",
-  "rotate",
-  "rotateX",
-  "rotateY",
-  "rotateZ",
-  "scale",
-  "scaleX",
-  "scaleY",
-  "translateX",
-  "translateY",
-  "skewX",
-  "skewY",
-] as const;

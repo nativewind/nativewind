@@ -11,8 +11,10 @@ import type {
   InteropFunction,
   JSXFunction,
 } from "../types";
-import { defaultInteropRef, styleMetaMap } from "./globals";
+import { defaultInteropRef } from "./globals";
 import { getNormalizeConfig } from "./native/prop-mapping";
+import { interopGlobal } from "./signals";
+import { opaqueStyles } from "./native/globals";
 
 export type InteropTypeCheck<T> = {
   type: ComponentType<T>;
@@ -99,9 +101,34 @@ export function cssInterop<T extends {}, M>(
     if (___pressable) {
       return createElement(component, props as unknown as T, children);
     } else {
-      return createElement(
+      interopGlobal.isInComponent = true;
+      interopGlobal.current = null;
+
+      const element = createElement(
         ...interop!(component, config, props as unknown as T, children),
       );
+      const originalType = element.props;
+
+      /**
+       * We can't update another element while rendering, so we need to delay the update.
+       * Before React can process the element, it must check its props.
+       * So by 'hooking' into it, we can use this as our delaying mechanism
+       */
+      return Object.create(element, {
+        props: {
+          get() {
+            interopGlobal.isInComponent = false;
+            interopGlobal.current = null;
+            if (interopGlobal.delayedEvents.size) {
+              for (const sub of interopGlobal.delayedEvents) {
+                sub();
+              }
+              interopGlobal.delayedEvents.clear();
+            }
+            return originalType;
+          },
+        },
+      });
     }
   };
 
@@ -119,7 +146,7 @@ export function cssInterop<T extends {}, M>(
 
   const checkArray = (props: any[]) =>
     props.some((prop): boolean => {
-      return Array.isArray(prop) ? checkArray(prop) : styleMetaMap.has(prop);
+      return Array.isArray(prop) ? checkArray(prop) : opaqueStyles.has(prop);
     });
 
   const interopComponent: InteropTypeCheck<T> = {
@@ -127,27 +154,21 @@ export function cssInterop<T extends {}, M>(
     createElementWithInterop(props, children) {
       return createElement(...interop!(component, config, props, children));
     },
-    check(props) {
-      for (const [
-        targetProp,
-        { sources, nativeStyleToProp },
-      ] of config.config) {
+    check(props: Record<string, unknown>) {
+      for (const [targetProp, source, nativeStyleToProp] of config.config) {
         if (nativeStyleToProp) return true;
 
-        for (const source of sources) {
-          if (typeof props[source] === "string") {
-            return true;
-          }
+        if (typeof props[source] === "string") {
+          return true;
         }
 
         const target: any = props[targetProp];
-        const targetMeta = styleMetaMap.get(target);
 
         if (Array.isArray(target)) {
           if (checkArray(target)) {
             return true;
           }
-        } else if (targetMeta && !targetMeta.alreadyProcessed) {
+        } else if (opaqueStyles.has(target)) {
           return true;
         }
       }

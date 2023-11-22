@@ -19,7 +19,7 @@ test("darkMode: media", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   act(() => colorScheme.set("dark"));
 
@@ -50,12 +50,12 @@ test("darkMode: media variable switching", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgb(255,115,179)" });
+  expect(component).toHaveStyle({ color: "rgb(255, 115, 179)" });
 
   // You cannot manually set the color scheme when using media queries, so we fake it
   act(() => colorScheme.set("dark"));
 
-  expect(component).toHaveStyle({ color: "rgb(155,100,255)" });
+  expect(component).toHaveStyle({ color: "rgb(155, 100, 255)" });
 });
 
 test("darkMode: class", async () => {
@@ -68,7 +68,7 @@ test("darkMode: class", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   act(() => colorScheme.set("dark"));
 
@@ -102,9 +102,9 @@ test("darkMode: class variable switching", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgb(255,115,179)" });
+  expect(component).toHaveStyle({ color: "rgb(255, 115, 179)" });
 
   act(() => colorScheme.set("dark"));
 
-  expect(component).toHaveStyle({ color: "rgb(155,100,255)" });
+  expect(component).toHaveStyle({ color: "rgb(155, 100, 255)" });
 });

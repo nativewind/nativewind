@@ -1,14 +1,13 @@
 import { act, render } from "@testing-library/react-native";
 import { View } from "react-native";
 
-import { vh, vw } from "../runtime/native/misc";
+import { rem, vh, vw } from "../runtime/native/globals";
 import { INTERNAL_SET } from "../shared";
 import {
   createMockComponent,
   registerCSS,
   resetStyles,
 } from "../testing-library";
-import { rem } from "../runtime/native/inheritance";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
@@ -117,7 +116,7 @@ test("rem - dynamic", () => {
   expect(component).toHaveStyle({ fontSize: 100 });
 });
 
-test.only("hsl", () => {
+test("hsl", () => {
   registerCSS(`.my-class { 
     --primary: 0 84.2% 60.2%;
     color: hsl(var(--primary)); 

@@ -23,15 +23,13 @@ test(":native-prop() zero args", () => {
     expect.objectContaining({
       color: "rgba(255, 0, 0, 1)",
       backgroundColor: "rgba(0, 0, 255, 1)",
-      style: {},
     }),
   );
 });
 
-// This isn't supported just yet
-test.skip(":native-prop() one arg", () => {
+test(":native-prop(*)", () => {
   registerCSS(
-    `.my-class:native-prop(color) { color: red; background-color: blue }`,
+    `.my-class:native-prop(*) { color: red; background-color: blue }`,
   );
 
   const component = render(
@@ -41,16 +39,14 @@ test.skip(":native-prop() one arg", () => {
   expect(component.props).toEqual(
     expect.objectContaining({
       color: "rgba(255, 0, 0, 1)",
-      style: {
-        backgroundColor: "rgba(0, 0, 255, 1)",
-      },
+      backgroundColor: "rgba(0, 0, 255, 1)",
     }),
   );
 });
 
-test(":native-prop() two args", () => {
+test(":native-prop(color,customProp)", () => {
   registerCSS(
-    `.my-class:native-prop(placeholderColor,color) { color: red; background-color: blue }`,
+    `.my-class:native-prop(color,customProp) { color: red; background-color: blue }`,
   );
 
   const component = render(
@@ -59,10 +55,10 @@ test(":native-prop() two args", () => {
 
   expect(component.props).toEqual(
     expect.objectContaining({
-      placeholderColor: "rgba(255, 0, 0, 1)",
-      style: {
+      customProp: "rgba(255, 0, 0, 1)",
+      style: expect.objectContaining({
         backgroundColor: "rgba(0, 0, 255, 1)",
-      },
+      }),
     }),
   );
 });

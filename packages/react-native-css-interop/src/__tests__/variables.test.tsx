@@ -7,7 +7,7 @@ import {
   resetStyles,
 } from "../testing-library";
 import { memo } from "react";
-import { useUnstableNativeVariable } from "../runtime/native/variables";
+import { useUnstableNativeVariable } from "../runtime/native/globals";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
@@ -67,7 +67,7 @@ test("inherit variables", () => {
   const a = getByTestId("a");
   let b = getByTestId("b");
 
-  expect(a).toHaveStyle({});
+  expect(a).toHaveStyle(undefined);
   expect(b).toHaveStyle({ width: 10 });
   expect(B.mock).toHaveBeenCalledTimes(1);
 
@@ -80,7 +80,7 @@ test("inherit variables", () => {
   b = getByTestId("b");
 
   expect(B.mock).toHaveBeenCalledTimes(2);
-  expect(a).toHaveStyle({});
+  expect(a).toHaveStyle(undefined);
   expect(b).toHaveStyle({ width: 20 });
 });
 
@@ -102,7 +102,7 @@ test("inherit variables - memo", () => {
   const a = getByTestId("a");
   let b = getByTestId("b");
 
-  expect(a).toHaveStyle({});
+  expect(a).toHaveStyle(undefined);
   expect(b).toHaveStyle({ width: 10 });
 
   screen.rerender(
@@ -113,7 +113,7 @@ test("inherit variables - memo", () => {
 
   b = getByTestId("b");
 
-  expect(a).toHaveStyle({});
+  expect(a).toHaveStyle(undefined);
   expect(b).toHaveStyle({ width: 20 });
 });
 

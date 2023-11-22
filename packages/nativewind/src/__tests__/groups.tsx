@@ -22,8 +22,8 @@ test("Styling based on parent state (group-{modifier})", async () => {
   const parent = screen.getByTestId(parentID);
   const child = screen.getByTestId(childID);
 
-  expect(parent).toHaveStyle({});
-  expect(child).toHaveStyle({});
+  expect(parent).toHaveStyle(undefined);
+  expect(child).toHaveStyle(undefined);
 
   fireEvent(parent, "hoverIn");
 
@@ -44,13 +44,13 @@ test("Differentiating nested groups", async () => {
   const parent = screen.getByTestId(parentID);
   const child = screen.getByTestId(childID);
 
-  expect(grandparent).toHaveStyle({});
-  expect(parent).toHaveStyle({});
-  expect(child).toHaveStyle({});
+  expect(grandparent).toHaveStyle(undefined);
+  expect(parent).toHaveStyle(undefined);
+  expect(child).toHaveStyle(undefined);
 
   fireEvent(grandparent, "hoverIn");
 
-  expect(child).toHaveStyle({});
+  expect(child).toHaveStyle(undefined);
 
   fireEvent(parent, "hoverIn");
 

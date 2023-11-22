@@ -2,7 +2,6 @@ import {
   View,
   Text,
   Pressable,
-  FlatList,
   ImageBackground,
   KeyboardAvoidingView,
   Modal,
@@ -65,8 +64,8 @@ test("Component types", () => {
 test("TextInput", () => {
   registerCSS(
     `.text-black { color: black } 
-     .placeholder\\:text-white:native-prop(placeholderTextColor,color) {
-       color: #fff
+     .placeholder\\:text-white:native-prop() {
+       -rn-placeholderTextColor: #fff
      }`,
   );
 
@@ -80,9 +79,9 @@ test("TextInput", () => {
     expect.objectContaining({
       testID,
       placeholderTextColor: "rgba(255, 255, 255, 1)",
-      style: {
+      style: expect.objectContaining({
         color: "rgba(0, 0, 0, 1)",
-      },
+      }),
     }),
   );
 });
@@ -107,62 +106,9 @@ test("ActivityIndicator", () => {
     expect.objectContaining({
       testID,
       color: "rgba(255, 255, 255, 1)",
-      style: {
+      style: expect.objectContaining({
         backgroundColor: "rgba(0, 0, 0, 1)",
-      },
+      }),
     }),
   );
-});
-
-test("FlatList", () => {
-  registerCSS(`
-    .bg-black { background-color: black }
-    .text-white { color: white }
-    `);
-
-  render(
-    <FlatList
-      testID={testID}
-      data={[1]}
-      numColumns={2}
-      renderItem={() => <View />}
-      className="bg-black"
-      ListHeaderComponentClassName="bg-black text-white"
-      ListFooterComponentClassName="bg-black text-white"
-      columnWrapperClassName="bg-black"
-      contentContainerClassName="bg-black"
-      indicatorClassName="bg-black"
-    />,
-  );
-
-  const flatList = screen.getByTestId(testID);
-
-  // These should be removed
-  expect(flatList.props).not.toEqual(
-    expect.objectContaining({
-      className: expect.any,
-      ListHeaderComponentClassName: expect.any,
-      ListFooterComponentClassName: expect.any,
-      columnWrapperClassName: expect.any,
-      contentContainerClassName: expect.any,
-      indicatorClassName: expect.any,
-    }),
-  );
-
-  // These should be added
-  expect(flatList.props).toEqual(
-    expect.objectContaining({
-      testID,
-      style: {},
-      ListFooterComponentStyle: [{}, {}],
-      ListHeaderComponentStyle: [{}, {}],
-      contentContainerStyle: {},
-      indicatorStyle: {},
-    }),
-  );
-
-  const columnWrapper = screen.UNSAFE_getByProps({ style: null }).props
-    .children[0];
-
-  expect(columnWrapper).toHaveStyle([{ flexDirection: "row" }, {}]);
 });

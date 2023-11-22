@@ -37,7 +37,7 @@ export type CssToReactNativeRuntimeOptions = {
 };
 
 export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
-  declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
+  declarations: Map<string, CompilerStyleMeta[]>;
   keyframes: Map<string, ExtractedAnimation>;
   grouping: RegExp[];
   darkMode?: DarkMode;
@@ -58,6 +58,10 @@ export type NormalizedCSSInteropClassNamePropConfig<P> = {
   nativeStyleToProp?: NativeStyleToProp<P>;
 };
 
+export type Layers = Record<0 | 1 | 2, Array<RuntimeStyle | object>> & {
+  classNames: string;
+};
+
 export type CSSInteropClassNamePropConfig<P> =
   | undefined
   | (keyof P & string)
@@ -65,7 +69,9 @@ export type CSSInteropClassNamePropConfig<P> =
   | NormalizedCSSInteropClassNamePropConfig<P>;
 
 export type NativeStyleToProp<P> = {
-  [K in keyof Style & string]?: K extends keyof P ? keyof P | true : keyof P;
+  [K in keyof Style & string]?: K extends keyof P
+    ? (keyof P & string) | true
+    : keyof P & string;
 };
 
 export type RemapProps<P> = {
@@ -99,45 +105,22 @@ export type BasicInteropFunction = <P>(
 
 export type InteropFunction = (
   type: any,
-  options: NormalizedOptions<any>,
+  options: NormalizedOptions,
   props: Record<string, any>,
   children: ReactNode,
 ) => Parameters<typeof createElement>;
 
-export type NewInteropFunction = <P extends Record<string, any>>(
-  options: NormalizedOptions<P>,
-  props: P,
-  key: string | undefined,
-  ...args: unknown[]
-) => any;
-
 export type InteropFunctionOptions<P> = {
   remappedProps: P;
-  options: NormalizedOptions<P>;
+  options: NormalizedOptions;
   dependencies: unknown[];
   useWrapper: boolean;
 };
 
-export type RuntimeValue = {
-  type: "runtime";
-  name: string;
-  arguments: any[];
-};
-
-export type ExtractedStyleValue =
-  | string
-  | number
-  | RuntimeValue
-  | ExtractedStyleValue[]
-  | (() => ExtractedStyleValue);
-
-export type ExtractedStyle = {
+export type CompilerStyleMeta = {
   specificity: Specificity;
-  isDynamic?: boolean;
   media?: MediaQuery[];
-  variables?: Record<string, ExtractedStyleValue>;
-  prop?: [string, string | true];
-  style: Record<string, ExtractedStyleValue>;
+  variables?: Array<[string, RuntimeValueDescriptor]>;
   pseudoClasses?: PseudoClassesQuery;
   animations?: ExtractedAnimations;
   container?: Partial<ExtractedContainer>;
@@ -145,14 +128,65 @@ export type ExtractedStyle = {
   transition?: ExtractedTransition;
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
+  props: Record<string, Record<string, RuntimeValueDescriptor>>;
+  propSingleValue: Record<string, PropRuntimeValueDescriptor>;
+  hoistedStyles?: [string, string, "transform" | "shadow"][];
+  scope: number;
   warnings?: ExtractionWarning[];
-  importantStyles?: string[];
-  nativeProps?: Record<string, string>;
 };
 
-export type Specificity = CSSSpecificity;
+export type GroupedTransportStyles = {
+  0?: TransportStyle[];
+  1?: TransportStyle[];
+  2?: TransportStyle[];
+  warnings?: ExtractionWarning[];
+  scope: number;
+};
 
-export type CSSSpecificity = {
+export type TransportStyle = Omit<
+  CompilerStyleMeta,
+  "props" | "propSingleValue"
+> & {
+  props?: Array<
+    [
+      string,
+      PropRuntimeValueDescriptor | Array<[string, RuntimeValueDescriptor]>,
+    ]
+  >;
+};
+
+export type GroupedRuntimeStyle = {
+  0?: RuntimeStyle[];
+  1?: RuntimeStyle[];
+  2?: RuntimeStyle[];
+  scope: number;
+};
+
+export type RuntimeStyle = Omit<TransportStyle, "props"> & {
+  $$type: "runtime";
+  props?: Array<[string, RuntimeValue | Record<string, RuntimeValue>]>;
+};
+
+export type Layer = GroupedRuntimeStyle & {
+  classNames: string;
+};
+
+export type RuntimeValueDescriptor =
+  | string
+  | number
+  | {
+      name: string;
+      arguments: any[];
+    };
+
+export type PropRuntimeValueDescriptor = {
+  $$type: "prop";
+  value: RuntimeValueDescriptor;
+};
+
+export type RuntimeValue = string | number | undefined | (() => RuntimeValue);
+
+export type Specificity = {
   /** IDs - https://drafts.csswg.org/selectors/#specificity-rules */
   A: number;
   /** Classes, Attributes, Pseudo-Classes - https://drafts.csswg.org/selectors/#specificity-rules */
@@ -167,40 +201,11 @@ export type CSSSpecificity = {
   O: number;
   /** Inline */
   inline?: number;
-  /** Remapped from remapProps */
-  remapped?: boolean;
-};
-
-export type StyleMeta = {
-  alreadyProcessed?: true;
-  variableProps?: Set<string>;
-  media?: MediaQuery[];
-  variables?: Record<string, ExtractedStyleValue>;
-  pseudoClasses?: PseudoClassesQuery;
-  animations?: ExtractedAnimations;
-  container?: ExtractedContainer;
-  containerQuery?: ExtractedContainerQuery[];
-  transition?: ExtractedTransition;
-  requiresLayoutWidth?: boolean;
-  requiresLayoutHeight?: boolean;
-  importantStyles?: string[];
-  nativeProps?: Record<string, string>;
-  specificity?: Specificity;
-  wrapInContext?: boolean;
 };
 
 export interface SignalLike<T = unknown> {
   get(): T;
 }
-
-export type InteropMeta<P extends Record<string, unknown>> = {
-  interopMeta: true;
-  animatedProps: Set<keyof P>;
-  animationInteropKey?: string;
-  convertToPressable: boolean;
-  transitionProps: Set<keyof P>;
-  requiresLayout: boolean;
-};
 
 export type Interaction = {
   active?: Signal<boolean>;
@@ -216,12 +221,6 @@ export type ExtractedContainer = {
 export type GetInteraction = <T extends keyof Interaction>(
   name: T,
 ) => NonNullable<Interaction[T]>;
-
-export type ContainerRuntime = {
-  type: ContainerType;
-  style: Style;
-  getInteraction: GetInteraction;
-};
 
 export type ExtractedContainerQuery = {
   name?: string | null;
@@ -253,14 +252,15 @@ export type ExtractedTransition = {
 };
 
 export type ExtractedAnimation = {
-  frames: Record<string, ExtractedStyleFrame[]>;
+  frames: Record<string, RuntimeValueFrame[]>;
+  hoistedStyles?: [string, string, "transform" | "shadow"][];
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
 };
 
-export type ExtractedStyleFrame = {
+export type RuntimeValueFrame = {
   progress: number;
-  value: ExtractedStyleValue | "!INHERIT!";
+  value: RuntimeValueDescriptor;
 };
 
 export type PseudoClassesQuery = {
@@ -269,53 +269,40 @@ export type PseudoClassesQuery = {
   focus?: boolean;
 };
 
-export type StyleSheetRegisterOptions = {
-  declarations?: Record<string, ExtractedStyle | ExtractedStyle[]>;
+export type StyleSheetRegisterCompiledOptions = {
+  declarations?: [string, GroupedTransportStyles][];
   keyframes?: Record<string, ExtractedAnimation>;
   rootVariables?: Record<string, VariableRecord>;
   universalVariables?: Record<string, VariableRecord>;
-  rem?: {
-    light?: ExtractedStyleValue;
-    dark?: ExtractedStyleValue;
-  };
+  rem?: { light?: number; dark?: number };
+  flags?: Record<string, unknown>;
+};
+
+export type StyleSheetRegisterOptions = {
+  declarations?: Record<string, TransportStyle | TransportStyle[]>;
+  keyframes?: Record<string, ExtractedAnimation>;
+  rootVariables?: Record<string, VariableRecord>;
+  universalVariables?: Record<string, VariableRecord>;
+  rem?: { light?: number; dark?: number };
   flags?: Record<string, unknown>;
 };
 
 export type VariableRecord = Record<
   string,
   {
-    darkApp?: ExtractedStyleValue;
-    darkDevice?: ExtractedStyleValue;
-    light?: ExtractedStyleValue;
+    darkApp?: RuntimeValueDescriptor;
+    darkDevice?: RuntimeValueDescriptor;
+    light?: RuntimeValueDescriptor;
   }
 >;
 
 export type Style = ViewStyle & TextStyle & ImageStyle;
 export type StyleProp = Style | StyleProp[] | undefined;
 
-export type NamedStyles<T> = {
-  [P in keyof T]: StyleProp;
-};
-
-export type CamelToKebabCase<
-  T extends string,
-  A extends string = "",
-> = T extends `${infer F}${infer R}`
-  ? CamelToKebabCase<
-      R,
-      `${A}${F extends Lowercase<F> ? "" : "-"}${Lowercase<F>}`
-    >
-  : A;
-
 export type KebabToCamelCase<S extends string> =
   S extends `${infer P1}-${infer P2}${infer P3}`
     ? `${Lowercase<P1>}${Uppercase<P2>}${KebabToCamelCase<P3>}`
     : Lowercase<S>;
-
-export interface ResetOptions {
-  dimensions?: Dimensions;
-  appearance?: typeof Appearance;
-}
 
 export type ExtractionWarning =
   | ExtractionWarningProperty
@@ -345,11 +332,14 @@ export type DarkMode =
   | { type: "attribute"; value: string };
 
 export interface CommonStyleSheet {
-  [INTERNAL_RESET](options?: ResetOptions): void;
+  [INTERNAL_RESET](options?: {
+    dimensions?: Dimensions;
+    appearance?: typeof Appearance;
+  }): void;
   [INTERNAL_FLAGS]: Record<string, string>;
-  classNameMergeStrategy(c: string): string;
   unstable_hook_onClassName?(c: string): void;
   register(options: StyleSheetRegisterOptions): void;
+  registerCompiled(options: StyleSheetRegisterCompiledOptions): void;
   getFlag(name: string): string | undefined;
 }
 

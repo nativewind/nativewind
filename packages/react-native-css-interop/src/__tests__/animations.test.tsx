@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { render } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 
 import {
   createMockComponent,
@@ -128,7 +128,6 @@ test("bounce", () => {
   registerCSS(`
     .my-class {
       animation: bounce 1s infinite;
-      height: 100px;
     }
 
     @keyframes bounce {
@@ -148,39 +147,47 @@ test("bounce", () => {
     <A testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
+  // Initial frame is incorrect due to missing layout
   expect(component).toHaveAnimatedStyle({
-    height: 100,
     transform: [
-      { perspective: 1 },
-      { rotate: "0deg" },
-      { rotateX: "0deg" },
-      { rotateY: "0deg" },
-      { rotateZ: "0deg" },
-      { scale: 1 },
-      { scaleX: 1 },
-      { scaleY: 1 },
-      { translateX: 0 },
-      { translateY: -25 },
-      { skewX: "0deg" },
-      { skewY: "0deg" },
-    ],
-  });
-
-  jest.advanceTimersByTime(501);
-
-  expect(component).toHaveAnimatedStyle({
-    height: 100,
-    transform: [
-      { perspective: 1 },
-      { rotate: "0deg" },
-      { rotateX: "0deg" },
-      { rotateY: "0deg" },
-      { rotateZ: "0deg" },
-      { scale: 1 },
-      { scaleX: 1 },
-      { scaleY: 1 },
-      { translateX: 0 },
       { translateY: 0 },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
+    ],
+  });
+
+  fireEvent(component, "layout", {
+    nativeEvent: {
+      layout: {
+        width: 200,
+        height: 100,
+      },
+    },
+  });
+
+  jest.advanceTimersByTime(1);
+
+  expect(component).toHaveAnimatedStyle({
+    transform: [
+      { translateY: -25 },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
       { skewX: "0deg" },
       { skewY: "0deg" },
     ],
@@ -189,9 +196,10 @@ test("bounce", () => {
   jest.advanceTimersByTime(501);
 
   expect(component).toHaveAnimatedStyle({
-    height: 100,
     transform: [
+      { translateY: 0 },
       { perspective: 1 },
+      { translateX: 0 },
       { rotate: "0deg" },
       { rotateX: "0deg" },
       { rotateY: "0deg" },
@@ -199,8 +207,25 @@ test("bounce", () => {
       { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
-      { translateX: 0 },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
+    ],
+  });
+
+  jest.advanceTimersByTime(501);
+
+  expect(component).toHaveAnimatedStyle({
+    transform: [
       { translateY: -25 },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
       { skewX: "0deg" },
       { skewY: "0deg" },
     ],

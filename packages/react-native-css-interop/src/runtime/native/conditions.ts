@@ -12,16 +12,18 @@ import {
   PseudoClassesQuery,
   SignalLike,
 } from "../../types";
-import { isReduceMotionEnabled, vh, vw } from "./misc";
+import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
-import { colorScheme } from "./color-scheme";
-import { InteropComputed } from "./interop";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
-import { globalVariables } from "./inheritance";
+import { InteropStore } from "./style";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
   height: number | SignalLike<number>;
+}
+
+export function testMediaQueries(mediaQueries: MediaQuery[]) {
+  return mediaQueries.every((query) => testMediaQuery(query));
 }
 
 /**
@@ -39,19 +41,19 @@ export function testMediaQuery(
 }
 
 export function testPseudoClasses(
-  effect: InteropComputed,
+  state: InteropStore,
   meta: PseudoClassesQuery,
 ) {
   let fail = false;
-  if (meta.active) fail ||= effect.getInteraction("active").get() !== true;
-  if (meta.hover) fail ||= effect.getInteraction("hover").get() !== true;
-  if (meta.focus) fail ||= effect.getInteraction("focus").get() !== true;
+  if (meta.active) fail ||= state.getInteraction("active") !== true;
+  if (meta.hover) fail ||= state.getInteraction("hover") !== true;
+  if (meta.focus) fail ||= state.getInteraction("focus") !== true;
   return !fail;
 }
 
 export function testContainerQuery(
+  state: InteropStore,
   containerQuery: ExtractedContainerQuery[] | undefined,
-  effect: InteropComputed,
 ) {
   // If there is no query, we passed
   if (!containerQuery || containerQuery.length === 0) {
@@ -59,13 +61,13 @@ export function testContainerQuery(
   }
 
   return containerQuery.every((query) => {
-    let container = query.name ? effect.getContainer(query.name) : null;
+    let container = query.name ? state.getContainer(query.name) : null;
     // If the query has a name, but the container doesn't exist, we failed
     if (query.name && !container) return false;
 
     // If the query has a name, we use the container with that name
     // Otherwise default to the last container
-    if (!container) container = effect.getContainer(DEFAULT_CONTAINER_NAME);
+    if (!container) container = state.getContainer(DEFAULT_CONTAINER_NAME);
 
     // We failed if the container doesn't exist (e.g no default container)
     if (!container) return false;
@@ -80,7 +82,7 @@ export function testContainerQuery(
     // If there is no condition, we passed (maybe only named as specified)
     if (!query.condition) return true;
 
-    const layout = container.getLayout();
+    const layout = container.layout!.get() || [0, 0];
 
     return testCondition(query.condition, {
       width: layout[0],
@@ -185,7 +187,7 @@ function getMediaFeatureValue(value: MediaFeatureValue) {
         case "px":
           return length.value;
         case "rem":
-          return length.value * globalVariables.rem.get();
+          return length.value * rem.get();
         default:
           return null;
       }

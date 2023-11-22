@@ -14,20 +14,20 @@ const A = createMockComponent(TextInput);
 
 beforeEach(() => resetStyles());
 
-test.only("hover", () => {
+test("hover", () => {
   registerCSS(`.my-class:hover { width: 10px; }`);
 
   const component = render(
     <A testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "hoverIn");
   expect(component).toHaveStyle({ width: 10 });
 
   fireEvent(component, "hoverOut");
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 });
 
 test("active", () => {
@@ -37,13 +37,13 @@ test("active", () => {
     <A testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "pressIn");
   expect(component).toHaveStyle({ width: 10 });
 
   fireEvent(component, "pressOut");
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 });
 
 test("focus", () => {
@@ -53,13 +53,13 @@ test("focus", () => {
     <A testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "focus");
   expect(component).toHaveStyle({ width: 10 });
 
   fireEvent(component, "blur");
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 });
 
 test(":hover:active:focus", () => {
@@ -69,17 +69,17 @@ test(":hover:active:focus", () => {
     <A testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "hoverIn", {});
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "pressIn", {});
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "focus", {});
   expect(component).toHaveStyle({ width: 10 });
 
   fireEvent(component, "hoverOut", {});
-  expect(component).toHaveStyle({});
+  expect(component).toHaveStyle(undefined);
 });

@@ -14,7 +14,7 @@ export const defaultCSSInterop: InteropFunction = (
   props,
   children,
 ) => {
-  for (const [key, { sources }] of options.config) {
+  for (const [key, sources] of options.config) {
     const newStyles: StyleProp = [];
 
     for (const source of sources) {
@@ -54,7 +54,7 @@ export function remapProps<P, M>(
     { ...props }: PropsWithChildren<P>,
     ref: unknown,
   ) => {
-    for (const [key, { sources }] of config) {
+    for (const [key, sources] of config) {
       let rawStyles = [];
 
       for (const sourceProp of sources) {
@@ -75,7 +75,7 @@ export function remapProps<P, M>(
         rawStyles.push(existingStyle);
       }
 
-      props[key] = rawStyles as any;
+      (props as any)[key] = rawStyles as any;
     }
 
     return createElement(component as any, props, props.children);

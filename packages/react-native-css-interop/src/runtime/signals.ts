@@ -1,19 +1,26 @@
 import { useEffect, useReducer } from "react";
+import { InteropStore } from "./native/style";
 
-export const reactGlobal: {
+export const interopGlobal: {
   isInComponent: boolean;
-  currentStore: Computed<any> | null;
+  current: Effect | null;
   delayedEvents: Set<() => void>;
 } = {
-  isInComponent: false,
-  currentStore: null,
+  isInComponent: true,
+  current: null,
   delayedEvents: new Set(),
 };
 
-const context: Computed<any>[] = [];
+export const context: Effect[] = [];
 
 export type Signal<T> = ReturnType<typeof createSignal<T>>;
 type SignalSetFn<T> = (previous?: T) => T;
+
+export type Effect = {
+  (): void;
+  dependencies: Set<Signal<any>>;
+  state?: InteropStore;
+};
 
 export function createSignal<T = unknown>(value: T, id?: string) {
   const signal = {
@@ -50,9 +57,9 @@ export function createSignal<T = unknown>(value: T, id?: string) {
       if (Object.is(value, nextValue)) return;
       value = nextValue as T;
       // console.log("set", id);
-      if (reactGlobal.isInComponent) {
+      if (interopGlobal.isInComponent) {
         for (const sub of signal.subscriptions) {
-          reactGlobal.delayedEvents.add(sub);
+          interopGlobal.delayedEvents.add(sub);
         }
       } else {
         for (const sub of Array.from(signal.subscriptions)) {
@@ -79,27 +86,27 @@ export interface Computed<T = unknown> extends Signal<T> {
   runInEffect<T>(fn: () => T): T;
 }
 
-function setup(effect: Computed<any>) {
+export function setupEffect(effect: Effect) {
   // Clean up the previous run
   cleanupEffect(effect);
   // Setup the new run
   context.push(effect);
-  reactGlobal.delayedEvents.delete(effect);
-  reactGlobal.currentStore = effect;
+  interopGlobal.delayedEvents.delete(effect);
+  interopGlobal.current = effect;
 }
 
 function teardown(_effect: Computed<any>) {
   context.pop();
 }
 
-export function cleanupEffect(effect: Computed<any>) {
+export function cleanupEffect(effect: Effect) {
   for (const dep of effect.dependencies) {
     if ("subscriptions" in dep) {
       dep.subscriptions.delete(effect);
     }
   }
   effect.dependencies.clear();
-  reactGlobal.delayedEvents.delete(effect);
+  interopGlobal.delayedEvents.delete(effect);
 }
 
 export function createComputed<T>(
@@ -109,7 +116,7 @@ export function createComputed<T>(
 ): Computed<T> {
   const effect: Computed<T> = Object.assign(
     function () {
-      setup(effect);
+      setupEffect(effect);
       effect.set(effect.fn);
       teardown(effect);
     },
@@ -164,11 +171,11 @@ export function useComputed<T>(fn: () => T, dependency?: any) {
   }, [computed]);
 
   useEffect(() => {
-    if (reactGlobal.delayedEvents.size) {
-      for (const sub of reactGlobal.delayedEvents) {
+    if (interopGlobal.delayedEvents.size) {
+      for (const sub of interopGlobal.delayedEvents) {
         sub();
       }
-      reactGlobal.delayedEvents.clear();
+      interopGlobal.delayedEvents.clear();
     }
   });
 

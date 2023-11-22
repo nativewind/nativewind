@@ -2,7 +2,6 @@ import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 import { PluginUtils } from "tailwindcss/types/config";
 import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
-import withAlphaVariable from "tailwindcss/lib/util/withAlphaVariable";
 import toColorValue from "tailwindcss/lib/util/toColorValue";
 
 import { hairlineWidth, platformSelect } from "../theme";
@@ -15,15 +14,25 @@ import { allowedColors } from "./common";
 import { nativeSwitch } from "./switch";
 
 const nativePlugins = plugin(function ({
+  addBase,
   addUtilities,
   addVariant,
-  corePlugins,
   config,
   matchUtilities,
   matchVariant,
   theme,
+  ...other
 }) {
   const nativePlatforms = ["android", "ios", "windows", "macos"];
+
+  // RN requires the unit, so reset the defaults
+  // This is an undocumented feature of Tailwind that allows you to modify the @default layer
+  (other as any).addDefaults("transform", {
+    "--tw-rotate": "0deg",
+    "--tw-skew-x": "0deg",
+    "--tw-skew-y": "0deg",
+  });
+
   /**
    * `display-mode` is a valid media query, but the ${platform} values are not.
    *
@@ -65,57 +74,49 @@ const nativePlugins = plugin(function ({
    */
   matchVariant(
     "prop",
-    (value) => {
-      return `&:native-prop(${value ?? ""})`;
+    (value = "*", { modifier }) => {
+      return `&:native-prop(${[value, modifier].filter(Boolean).join(",")})`;
     },
-    {
-      values: {
-        DEFAULT: undefined,
-      },
-    },
+    { values: { DEFAULT: undefined } },
   );
 
   /**
    * Native Prop remapping
    */
-  addVariant("selection", "&:native-prop(selectionColor,color)");
-  addVariant("placeholder", `&:native-prop(placeholderTextColor,color)`);
+  addVariant("selection", (({ container }: any) => {
+    container.walkRules((rule: any) => {
+      rule.walkDecls((decl: any) => {
+        if (decl.prop == "color") {
+          decl.prop = "-rn-selectionColor";
+        }
+      });
+    });
+    return "&:native-prop()";
+  }) as any);
+
+  addVariant("placeholder", (({ container }: any) => {
+    container.walkRules((rule: any) => {
+      rule.walkDecls((decl: any) => {
+        if (decl.prop == "color") {
+          decl.prop = "-rn-placeholderTextColor";
+        }
+      });
+    });
+    return "&:native-prop()";
+  }) as any);
+
   matchUtilities(
     {
       caret: (value) => {
         return {
-          "&:native-prop(cursorColor,caretColor)": {
-            "caret-color": toColorValue(value),
+          "&:native-prop()": {
+            "-rn-cursorColor": toColorValue(value),
           },
         };
       },
     },
     {
       values: flattenColorPalette(theme("caretColor")),
-      type: ["color", "any"],
-    },
-  );
-  matchUtilities(
-    {
-      placeholder: (value) => {
-        if (!corePlugins("placeholderOpacity")) {
-          return {
-            "&:native-prop(placeholderTextColor,color)": {
-              color: toColorValue(value),
-            },
-          };
-        }
-        return {
-          "&:native-prop(placeholderTextColor,color)": withAlphaVariable({
-            color: value,
-            property: "color",
-            variable: "--tw-placeholder-opacity",
-          }),
-        };
-      },
-    },
-    {
-      values: flattenColorPalette(theme("placeholderColor")),
       type: ["color", "any"],
     },
   );
@@ -126,7 +127,7 @@ const nativePlugins = plugin(function ({
   matchUtilities(
     {
       fill: (value) => ({
-        "&:native-prop(fill)": {
+        "&:native-prop()": {
           fill: toColorValue(value),
         },
       }),
@@ -137,7 +138,7 @@ const nativePlugins = plugin(function ({
   matchUtilities(
     {
       stroke: (value) => ({
-        "&:native-prop(stroke)": {
+        "&:native-prop()": {
           stroke: toColorValue(value),
         },
       }),
@@ -148,7 +149,7 @@ const nativePlugins = plugin(function ({
   matchUtilities(
     {
       stroke: (value) => ({
-        "&:native-prop(strokeWidth)": {
+        "&:native-prop()": {
           strokeWidth: toColorValue(value),
         },
       }),
@@ -166,13 +167,22 @@ const preset: Config = {
         serif: platformSelect({ android: "serif", ios: "Georgia" }),
         mono: platformSelect({ android: "mono", ios: "'Courier New'" }),
       },
+      elevation: {
+        sm: "1",
+        DEFAULT: "3",
+        md: "6",
+        lg: "8",
+        xl: "13",
+        "2xl": "24",
+        none: "0",
+      },
       boxShadow: {
-        sm: "0 1px 1px rgb(0 0 0 / 0.18)",
-        DEFAULT: "0 1px 22px rgb(0 0 0 / 0.22)",
-        md: "0 3px 4.65px rgb(0 0 0 / 0.27)",
-        lg: "0 4px 4.65px rgb(0 0 0 / 0.30)",
-        xl: "0 6px 8.30px rgb(0 0 0 / 0.39)",
-        "2xl": "0 12px 16px rgb(0 0 0 / 0.58)",
+        sm: " 0px 1px 1px rgba(0, 0, 0, 0.35)",
+        DEFAULT: "0px 1px 4px rgba(0, 0, 0, 0.35)",
+        md: "0px 3px 10px rgba(0, 0, 0, 0.35)",
+        lg: "0px 4px 10px rgba(0, 0, 0, 0.35)",
+        xl: "0px 6px 19px rgba(0, 0, 0, 0.35)",
+        "2xl": "0px 12px 38px rgba(0, 0, 0, 0.35) ",
         none: "0 0 #0000",
       },
       translateX: ({ theme }: PluginUtils) => ({
@@ -205,15 +215,6 @@ const preset: Config = {
         wide: "0.25px",
         wider: "0.5px",
         widest: "1px",
-      },
-      elevation: {
-        sm: "1",
-        DEFAULT: "3",
-        md: "6",
-        lg: "8",
-        xl: "13",
-        "2xl": "24",
-        none: "0",
       },
       transitionProperty: {
         DEFAULT:

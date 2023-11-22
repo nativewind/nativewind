@@ -3,18 +3,23 @@ import {
   PropsWithChildren,
   createElement,
   forwardRef,
+  useContext,
+  useRef,
+  useSyncExternalStore,
 } from "react";
+import { Pressable, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { InteropFunction, RemapProps } from "../testing-library";
-import { reactGlobal } from "./signals";
-import { Pressable, View } from "react-native";
-import { InheritanceProvider } from "./native/inheritance";
-import { useInteropComputed } from "./native/interop";
 import { getNormalizeConfig } from "./native/prop-mapping";
-import { getGlobalStyle, getSpecificity } from "./native/stylesheet";
 import { interopComponents } from "./render";
-import { opaqueStyles, styleSpecificity, styleMetaMap } from "./globals";
+import { createInteropStore } from "./native/style";
+import {
+  interopContext,
+  InteropProvider,
+  opaqueStyles,
+  styleSignals,
+} from "./native/globals";
 
 export const defaultCSSInterop: InteropFunction = (
   component,
@@ -22,31 +27,56 @@ export const defaultCSSInterop: InteropFunction = (
   props,
   children,
 ) => {
-  reactGlobal.isInComponent = true;
-  reactGlobal.currentStore = null;
+  const parent = useContext(interopContext);
+  const storeRef = useRef<ReturnType<typeof createInteropStore>>();
+  if (!storeRef.current) {
+    storeRef.current = createInteropStore(parent, options, props);
+  }
 
-  const effect = useInteropComputed(props, options);
+  /**
+   * I think there is a way to rewrite this with useReducer, but I'm not sure how to do it.
+   * If a signal changes we need to render a different component.
+   * But you cannot do a state update while rendering, but useSyncExternalStore
+   * allows you to work around this restriction
+   */
+  useSyncExternalStore(
+    storeRef.current.subscribe,
+    storeRef.current.snapshot,
+    storeRef.current.snapshot,
+  );
 
+  const state = storeRef.current.state;
+
+  // If the parent or a dependency changes we need to rerender
+  if (
+    parent !== state.parent ||
+    options.dependencies.some((k, i) => props[k] !== state.dependencies[i])
+  ) {
+    state.rerender(parent, props);
+  }
+
+  // Merge the styled props with the props passed to the component
   props = {
     ...props,
-    ...effect.styledProps,
+    ...state.props,
   };
 
+  // Delete any props that were used as sources
   for (const source of options.sources) {
     delete props[source];
   }
 
   // View doesn't support the interaction props, so force the component to be a Pressable (which accepts ViewProps)
-  if (effect.convertToPressable) {
-    Object.assign(props, { ___pressable: true });
-    if ((component as any) === View) {
+  if (state.convertToPressable) {
+    if (component === View) {
+      props.___pressable = true;
       component = Pressable;
     }
   }
 
   // Depending on the meta, we may be required to surround the component in other components (like VariableProvider)
   let createElementParams: Parameters<typeof createElement> = [
-    effect.isAnimated ? createAnimatedComponent(component) : component,
+    state.isAnimated ? createAnimatedComponent(component) : component,
     props,
     children,
   ];
@@ -56,52 +86,58 @@ export const defaultCSSInterop: InteropFunction = (
    * https://github.com/software-mansion/react-native-reanimated/issues/5296
    */
   if (!process.env.NATIVEWIND_INLINE_ANIMATION) {
-    if (effect.isAnimated) {
-      const entries = Object.entries(props.style);
-      props.style = useAnimatedStyle(() => {
-        const style: any = {};
-
-        for (const [key, value] of entries as any) {
-          if (typeof value === "object" && "value" in value) {
-            style[key] = value.value;
-          } else if (key === "transform") {
-            style.transform = value.map((v: any) => {
-              const [key, value] = Object.entries(v)[0] as any;
-
-              if (typeof value === "object" && "value" in value) {
-                return { [key]: value.value };
-              } else {
-                return { [key]: value };
-              }
-            });
-          } else {
-            style[key] = value;
-          }
-        }
-
-        return style;
-      }, [props.style]);
-    } else {
-      useAnimatedStyle(() => {
-        return {};
-      }, [undefined]);
+    if (state.isAnimated) {
+      props.__component = createElementParams[0];
+      createElementParams[0] = CSSInteropAnimationWrapper;
+      createElementParams;
     }
   }
 
-  reactGlobal.isInComponent = false;
-
-  if (effect.contextValue) {
-    return [
-      InheritanceProvider,
+  if (state.context) {
+    createElementParams = [
+      InteropProvider,
       {
-        value: effect.contextValue,
+        value: state.context,
       },
       createElement(...createElementParams),
     ] as any;
-  } else {
-    return createElementParams;
   }
+
+  return createElementParams;
 };
+
+export function CSSInteropAnimationWrapper({
+  __component: Component,
+  __sharedValues,
+  ...props
+}: any) {
+  const style = useAnimatedStyle(() => {
+    const style: any = {};
+    const entries = Object.entries(props.style);
+
+    for (const [key, value] of entries as any) {
+      if (typeof value === "object" && "value" in value) {
+        style[key] = value.value;
+      } else if (key === "transform") {
+        style.transform = value.map((v: any) => {
+          const [key, value] = Object.entries(v)[0] as any;
+
+          if (typeof value === "object" && "value" in value) {
+            return { [key]: value.value };
+          } else {
+            return { [key]: value };
+          }
+        });
+      } else {
+        style[key] = value;
+      }
+    }
+
+    return style;
+  }, [props.style]);
+
+  return <Component {...props} style={style} />;
+}
 
 export function remapProps<P, M>(
   component: ComponentType<P>,
@@ -113,29 +149,23 @@ export function remapProps<P, M>(
     { ...props }: PropsWithChildren<P>,
     ref: unknown,
   ) => {
-    for (const [key, { sources }] of config) {
+    for (const entry of config) {
+      const key = entry[0];
+      const sourceProp = entry[1];
       let rawStyles = [];
 
-      for (const sourceProp of sources) {
-        const source = props?.[sourceProp];
+      const source = props?.[sourceProp];
 
-        if (typeof source !== "string") continue;
-        delete props[sourceProp];
+      if (typeof source !== "string") continue;
+      delete props[sourceProp];
 
-        for (const className of source.split(/\s+/)) {
-          const style = getGlobalStyle(className);
+      for (const className of source.split(/\s+/)) {
+        const signal = styleSignals.get(className);
 
-          if (style !== undefined) {
-            const opaqueStyle = {};
-            const copyOfStyle = { ...style };
-            opaqueStyles.set(opaqueStyle, copyOfStyle);
-            styleSpecificity.set(copyOfStyle, {
-              remapped: true,
-              ...getSpecificity(style),
-            });
-            styleMetaMap.set(opaqueStyle, {});
-            rawStyles.push(opaqueStyle);
-          }
+        if (signal !== undefined) {
+          const style = {};
+          opaqueStyles.set(style, signal.get());
+          rawStyles.push(style);
         }
       }
 

@@ -15,12 +15,12 @@ const commonStyleSheet: CommonStyleSheet = {
   [INTERNAL_RESET](_options) {
     return;
   },
-  classNameMergeStrategy(c) {
-    return c;
-  },
   unstable_hook_onClassName() {},
   register(_options) {
     throw new Error("Stylesheet.register is not available on web");
+  },
+  registerCompiled(_options) {
+    throw new Error("Stylesheet.registerCompiled is not available on web");
   },
 };
 

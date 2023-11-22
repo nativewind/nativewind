@@ -41,16 +41,9 @@ import type {
   ColorOrAuto,
 } from "lightningcss";
 
-import type { ExtractionWarning, RuntimeValue } from "../types";
+import type { ExtractionWarning, RuntimeValueDescriptor } from "../types";
 
-type AddStyleProp = (
-  property: string,
-  value: unknown,
-  options?: {
-    shortHand?: boolean;
-    append?: boolean;
-  },
-) => void;
+type AddStyleProp = (property: string, value: unknown) => void;
 
 type HandleStyleShorthand = (
   property: string,
@@ -293,12 +286,33 @@ export function parseDeclaration(
       },
     };
 
-    return addStyleProp(
-      declaration.value.propertyId.property,
-      parseUnparsed(declaration.value.value, parseOptions),
-    );
+    if (declaration.value.propertyId.property === "transform") {
+      for (const transform of declaration.value.value as any[]) {
+        if (transform.value.name === "translate") {
+          addStyleProp(
+            "translateX",
+            parseUnparsed(transform.value.arguments[0], parseOptions),
+          );
+          addStyleProp(
+            "translateY",
+            parseUnparsed(transform.value.arguments[2], parseOptions),
+          );
+        } else {
+          addStyleProp(
+            transform.value.name,
+            parseUnparsed(transform.value.arguments, parseOptions),
+          );
+        }
+      }
+      return;
+    } else {
+      return addStyleProp(
+        declaration.value.propertyId.property,
+        parseUnparsed(declaration.value.value, parseOptions),
+      );
+    }
   } else if (declaration.property === "custom") {
-    const property = declaration.value.name;
+    let property = declaration.value.name;
     if (
       validPropertiesLoose.has(property) ||
       property.startsWith("--") ||
@@ -1767,7 +1781,7 @@ export function parseLength(
     | NumberOrPercentage
     | LengthValue,
   options: ParseDeclarationOptionsWithValueWarning,
-): number | string | RuntimeValue | undefined {
+): number | string | RuntimeValueDescriptor | undefined {
   const { inlineRem = 14 } = options;
 
   if (typeof length === "number") {
@@ -1783,7 +1797,6 @@ export function parseLength(
           return length.value * inlineRem;
         } else {
           return {
-            type: "runtime",
             name: "rem",
             arguments: [length.value],
           };
@@ -1791,7 +1804,6 @@ export function parseLength(
       case "vw":
       case "vh":
         return {
-          type: "runtime",
           name: length.unit,
           arguments: [length.value],
         };
@@ -2159,10 +2171,14 @@ function parseTextShadow(
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
   addStyleProp("textShadowColor", parseColor(textShadow.color, options));
-  addStyleProp("textShadowOffset", [
+  addStyleProp(
+    "textShadowOffset.width",
     parseLength(textShadow.xOffset, options),
+  );
+  addStyleProp(
+    "textShadowOffset.height",
     parseLength(textShadow.yOffset, options),
-  ]);
+  );
   addStyleProp("textShadowRadius", parseLength(textShadow.blur, options));
 }
 
