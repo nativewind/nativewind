@@ -107,11 +107,11 @@ test("remapped - inline", () => {
     ({ style, ...props }) => {
       return <A {...props} style={[{ color: "black" }, style]} />;
     },
-    { className: "style" },
+    { className2: "style" },
   );
 
   const component = render(
-    <MyText testID={testID} className="red" />,
+    <MyText testID={testID} className2="red" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });

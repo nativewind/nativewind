@@ -69,7 +69,9 @@ export type CSSInteropClassNamePropConfig<P> =
   | NormalizedCSSInteropClassNamePropConfig<P>;
 
 export type NativeStyleToProp<P> = {
-  [K in keyof Style & string]?: K extends keyof P ? keyof P | true : keyof P;
+  [K in keyof Style & string]?: K extends keyof P
+    ? (keyof P & string) | true
+    : keyof P & string;
 };
 
 export type RemapProps<P> = {

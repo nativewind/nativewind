@@ -230,7 +230,6 @@ function render(
   // Collect everything into the specificity layers and calculate the max scope
   for (const [prop, sourceProp, nativeStyleToProp] of state.options.config) {
     const classNames = state.originalProps?.[sourceProp];
-    if (typeof classNames !== "string") continue;
 
     const layers: Layers = {
       classNames,
@@ -239,32 +238,56 @@ function render(
       2: [],
     };
 
-    for (const className of classNames.split(/\s+/)) {
-      let signal = styleSignals.get(className);
-      if (!signal) continue;
-      const meta = signal.get();
-      maxScope = Math.max(maxScope, meta.scope);
-      if (meta[0]) layers[0].push(...meta[0]);
-      if (meta[1]) layers[1].push(...meta[1]);
-      if (meta[2]) layers[2].push(...meta[2]);
+    if (classNames) {
+      for (const className of classNames.split(/\s+/)) {
+        let signal = styleSignals.get(className);
+        if (!signal) continue;
+        const meta = signal.get();
+        maxScope = Math.max(maxScope, meta.scope);
+        if (meta[0]) layers[0].push(...meta[0]);
+        if (meta[1]) layers[1].push(...meta[1]);
+        if (meta[2]) layers[2].push(...meta[2]);
+      }
     }
 
     let inlineStyles = state.originalProps?.[prop];
     if (inlineStyles) {
       if (Array.isArray(inlineStyles)) {
-        layers[1].push(
-          ...inlineStyles.flat(10).map((style) => {
-            if (opaqueStyles.has(style)) {
-              style = opaqueStyles.get(style)!;
+        for (let style of inlineStyles.flat(10)) {
+          if (opaqueStyles.has(style)) {
+            const opaqueStyle = opaqueStyles.get(style)!;
+            maxScope = Math.max(maxScope, opaqueStyle.scope);
+            // Layer 0 is upgraded to layer 1
+            if (opaqueStyle[0]) {
+              layers[1].push(...opaqueStyle[0]);
             }
-            return style;
-          }),
-        );
+            if (opaqueStyle[1]) {
+              layers[1].push(...opaqueStyle[1]);
+            }
+            if (opaqueStyle[2]) {
+              layers[2].push(...opaqueStyle[2]);
+            }
+          } else {
+            layers[1].push(style);
+          }
+        }
       } else {
         if (opaqueStyles.has(inlineStyles)) {
-          inlineStyles = opaqueStyles.get(inlineStyles)!;
+          const opaqueStyle = opaqueStyles.get(inlineStyles)!;
+          maxScope = Math.max(maxScope, opaqueStyle.scope);
+          // Layer 0 is upgraded to layer 1
+          if (opaqueStyle[0]) {
+            layers[1].push(...opaqueStyle[0]);
+          }
+          if (opaqueStyle[1]) {
+            layers[1].push(...opaqueStyle[1]);
+          }
+          if (opaqueStyle[2]) {
+            layers[2].push(...opaqueStyle[2]);
+          }
+        } else {
+          layers[1].push(inlineStyles);
         }
-        layers[1].push(inlineStyles);
       }
     }
 
@@ -289,12 +312,12 @@ function render(
 
     // Layer 1 - inline
     if (layers[1].length) {
-      reduceStyles(state, prop, layers[1], maxScope);
+      reduceStyles(state, prop, layers[1], maxScope, true);
     }
 
     // Layer 2 - important
     if (layers[2].length) {
-      reduceStyles(state, prop, layers[2], maxScope);
+      reduceStyles(state, prop, layers[2], maxScope, true);
     }
 
     if (state.props[prop]) {
@@ -535,7 +558,7 @@ function render(
       for (let [key, targetProp] of Object.entries(nativeStyleToProp)) {
         if (targetProp === true) targetProp = key;
         if (state.props.style[key] === undefined) continue;
-        state.props[prop] = state.props.style[key];
+        state.props[targetProp] = state.props.style[key];
         delete state.props.style[key];
       }
     }
@@ -725,11 +748,13 @@ export function reduceStyles(
   prop: string,
   styles: Array<RuntimeStyle | object>,
   _scope: number,
+  treatAsInline = false,
 ) {
-  styles.sort(specificityCompare);
+  styles.sort((a, b) => specificityCompare(a, b, treatAsInline));
 
   for (let style of styles) {
-    if (!("$$type" in style)) {
+    if (!style) continue;
+    if (typeof style === "object" && !("$$type" in style)) {
       state.props[prop] ??= {};
       Object.assign(state.props[prop], style);
       continue;
@@ -998,6 +1023,7 @@ function round(number: number) {
 export function specificityCompare(
   o1: object | RuntimeStyle,
   o2: object | RuntimeStyle,
+  treatAsInline = false,
 ) {
   // inline styles have no specificity and the order is preserved
   if (!("specificity" in o1) || !("specificity" in o2)) {
@@ -1010,7 +1036,7 @@ export function specificityCompare(
   if (a.I !== b.I) {
     // Important
     return a.I - b.I;
-  } else if (a.inline !== b.inline) {
+  } else if (!treatAsInline && a.inline !== b.inline) {
     // Inline
     return (a.inline || 0) - (b.inline || 0);
   } else if (a.A !== b.A) {

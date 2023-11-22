@@ -12,11 +12,12 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { InteropFunction, RemapProps } from "../testing-library";
 import { getNormalizeConfig } from "./native/prop-mapping";
-import { interopComponents } from "./render";
+import { createElementAndCheckCssInterop, interopComponents } from "./render";
 import { createInteropStore } from "./native/style";
 import {
   interopContext,
   InteropProvider,
+  opaqueStyles,
   styleSignals,
 } from "./native/globals";
 
@@ -148,27 +149,23 @@ export function remapProps<P, M>(
     { ...props }: PropsWithChildren<P>,
     ref: unknown,
   ) => {
-    for (const [key, sources] of config) {
+    for (const entry of config) {
+      const key = entry[0];
+      const sourceProp = entry[1];
       let rawStyles = [];
 
-      for (const sourceProp of sources) {
-        const source = props?.[sourceProp];
+      const source = props?.[sourceProp];
 
-        if (typeof source !== "string") continue;
-        delete props[sourceProp];
+      if (typeof source !== "string") continue;
+      delete props[sourceProp];
 
-        for (const className of source.split(/\s+/)) {
-          const signal = styleSignals.get(className);
+      for (const className of source.split(/\s+/)) {
+        const signal = styleSignals.get(className);
 
-          if (signal !== undefined) {
-            const style = {};
-            // opaqueStyles.set(style, {
-            //   reducer(acc) {
-            //     return signal?.reducer(acc, true) ?? acc;
-            //   },
-            // });
-            rawStyles.push(style);
-          }
+        if (signal !== undefined) {
+          const style = {};
+          opaqueStyles.set(style, signal.get());
+          rawStyles.push(style);
         }
       }
 

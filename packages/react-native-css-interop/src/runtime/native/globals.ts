@@ -12,14 +12,13 @@ import {
   ContainerRuntime,
   RuntimeValueDescriptor,
   GroupedRuntimeStyle,
-  RuntimeStyle,
   ExtractedAnimation,
   ExtractionWarning,
 } from "../../types";
 import { InteropStore } from "./style";
 
 export const styleSignals = new Map<string, Signal<GroupedRuntimeStyle>>();
-export const opaqueStyles = new WeakMap<object, RuntimeStyle>();
+export const opaqueStyles = new WeakMap<object, GroupedRuntimeStyle>();
 export const animationMap = new Map<string, ExtractedAnimation>();
 
 export const globalClassNameCache = new Map<string, InteropStore>();
@@ -176,20 +175,25 @@ export function useColorScheme() {
 export function vars(variables: Record<string, RuntimeValueDescriptor>) {
   const style: StyleProp = {};
   opaqueStyles.set(style, {
-    $$type: "runtime",
-    variables: Object.entries(variables).map(([name, value]) => {
-      return [name.startsWith("--") ? name : `--${name}`, value];
-    }),
     scope: STYLE_SCOPES.SELF,
-    specificity: {
-      A: 0,
-      B: 0,
-      C: 0,
-      I: 0,
-      O: 0,
-      S: 0,
-      inline: 1,
-    },
+    1: [
+      {
+        $$type: "runtime",
+        scope: STYLE_SCOPES.SELF,
+        variables: Object.entries(variables).map(([name, value]) => {
+          return [name.startsWith("--") ? name : `--${name}`, value];
+        }),
+        specificity: {
+          A: 0,
+          B: 0,
+          C: 0,
+          I: 0,
+          O: 0,
+          S: 0,
+          inline: 1,
+        },
+      },
+    ],
   });
   return style;
 }

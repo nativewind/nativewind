@@ -923,12 +923,12 @@ const transformProperties = new Set([
 ]);
 
 const shadowProperties = new Set([
-  "-rn-shadowOffset.width",
-  "-rn-shadowOffset.height",
-  "-rn-textShadowOffset.width",
-  "-rn-textShadowOffset.height",
-  "shadowOffset.width",
-  "shadowOffset.height",
-  "textShadowOffset.width",
-  "textShadowOffset.height",
+  "-rn-shadow-offset.width",
+  "-rn-shadow-offset.height",
+  "-rn-text-shadow-offset.width",
+  "-rn-text-shadow-offset.height",
+  "shadow-offset.width",
+  "shadow-offset.height",
+  "text-shadow-offset.width",
+  "text-shadow-offset.height",
 ]);
