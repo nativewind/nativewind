@@ -110,13 +110,6 @@ export type InteropFunction = (
   children: ReactNode,
 ) => Parameters<typeof createElement>;
 
-export type NewInteropFunction = <P extends Record<string, any>>(
-  options: NormalizedOptions,
-  props: P,
-  key: string | undefined,
-  ...args: unknown[]
-) => any;
-
 export type InteropFunctionOptions<P> = {
   remappedProps: P;
   options: NormalizedOptions;
@@ -214,15 +207,6 @@ export interface SignalLike<T = unknown> {
   get(): T;
 }
 
-export type InteropMeta<P extends Record<string, unknown>> = {
-  interopMeta: true;
-  animatedProps: Set<keyof P>;
-  animationInteropKey?: string;
-  convertToPressable: boolean;
-  transitionProps: Set<keyof P>;
-  requiresLayout: boolean;
-};
-
 export type Interaction = {
   active?: Signal<boolean>;
   hover?: Signal<boolean>;
@@ -237,12 +221,6 @@ export type ExtractedContainer = {
 export type GetInteraction = <T extends keyof Interaction>(
   name: T,
 ) => NonNullable<Interaction[T]>;
-
-export type ContainerRuntime = {
-  type: ContainerType;
-  style: Style;
-  getInteraction: GetInteraction;
-};
 
 export type ExtractedContainerQuery = {
   name?: string | null;
@@ -321,25 +299,10 @@ export type VariableRecord = Record<
 export type Style = ViewStyle & TextStyle & ImageStyle;
 export type StyleProp = Style | StyleProp[] | undefined;
 
-export type CamelToKebabCase<
-  T extends string,
-  A extends string = "",
-> = T extends `${infer F}${infer R}`
-  ? CamelToKebabCase<
-      R,
-      `${A}${F extends Lowercase<F> ? "" : "-"}${Lowercase<F>}`
-    >
-  : A;
-
 export type KebabToCamelCase<S extends string> =
   S extends `${infer P1}-${infer P2}${infer P3}`
     ? `${Lowercase<P1>}${Uppercase<P2>}${KebabToCamelCase<P3>}`
     : Lowercase<S>;
-
-export interface ResetOptions {
-  dimensions?: Dimensions;
-  appearance?: typeof Appearance;
-}
 
 export type ExtractionWarning =
   | ExtractionWarningProperty
@@ -369,7 +332,10 @@ export type DarkMode =
   | { type: "attribute"; value: string };
 
 export interface CommonStyleSheet {
-  [INTERNAL_RESET](options?: ResetOptions): void;
+  [INTERNAL_RESET](options?: {
+    dimensions?: Dimensions;
+    appearance?: typeof Appearance;
+  }): void;
   [INTERNAL_FLAGS]: Record<string, string>;
   unstable_hook_onClassName?(c: string): void;
   register(options: StyleSheetRegisterOptions): void;

@@ -9,7 +9,6 @@ import { Signal, createSignal, useComputed } from "../signals";
 import { INTERNAL_RESET, INTERNAL_SET, STYLE_SCOPES } from "../../shared";
 import {
   StyleProp,
-  ContainerRuntime,
   RuntimeValueDescriptor,
   GroupedRuntimeStyle,
   ExtractedAnimation,
@@ -31,10 +30,6 @@ export const globalVariables = {
   root: new Map<string, ColorSchemeSignal>(),
   universal: new Map<string, ColorSchemeSignal>(),
 };
-
-export const ContainerContext = createContext<Record<string, ContainerRuntime>>(
-  {},
-);
 
 const rootContext = {
   inlineVariables: globalVariables.root,
