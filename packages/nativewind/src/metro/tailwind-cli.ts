@@ -120,6 +120,7 @@ export async function tailwindCli(
       if (!data.includes("Done in")) return;
 
       nativewindOptions.rawOutput = readFileSync(output, "utf-8");
+      nativewindOptions.outputPath = output;
 
       if (startedWSServer) {
         const stat = statSync(output);

@@ -18,6 +18,7 @@ interface NativeWindJsTransformerConfig extends JsTransformerConfig {
     fastRefreshPort: string;
     rawOutput: string;
     parsedOutput: string;
+    outputPath: string;
     experiments?: CssToReactNativeRuntimeOptions["experiments"];
   };
 }
@@ -46,6 +47,17 @@ new globalThis.WebSocket(\`\${url}:${
             config.nativewind.fastRefreshPort
           }\`).addEventListener("message", (event) => StyleSheet.registerCompiled(JSON.parse(event.data)));
 StyleSheet.registerCompiled(JSON.parse('${config.nativewind.parsedOutput}'));`,
+          "utf8",
+        ),
+        options,
+      );
+    } else if (options.platform === "web") {
+      return worker.transform(
+        config,
+        projectRoot,
+        filename,
+        Buffer.from(
+          `require('react-native-css-interop');require('${config.nativewind.outputPath}');`,
           "utf8",
         ),
         options,

@@ -14,20 +14,20 @@ export const defaultCSSInterop: InteropFunction = (
   props,
   children,
 ) => {
-  for (const [key, sources] of options.config) {
+  for (const config of options.config) {
+    const key = config[0];
+    const sourceProp = config[1];
     const newStyles: StyleProp = [];
 
-    for (const source of sources) {
-      const value = props[source];
-      if (typeof value === "string") {
-        newStyles.push({
-          $$css: true,
-          [value]: value,
-        } as StyleProp);
-      }
-
-      delete props[source];
+    const value = props[sourceProp];
+    if (typeof value === "string") {
+      newStyles.push({
+        $$css: true,
+        [value]: value,
+      } as StyleProp);
     }
+
+    delete props[sourceProp];
 
     let styles: StyleProp = props[key];
     if (Array.isArray(styles)) {
@@ -54,18 +54,18 @@ export function remapProps<P, M>(
     { ...props }: PropsWithChildren<P>,
     ref: unknown,
   ) => {
-    for (const [key, sources] of config) {
+    for (const entry of config) {
+      const key = entry[0];
+      const sourceProp = entry[1];
       let rawStyles = [];
 
-      for (const sourceProp of sources) {
-        const value = props?.[sourceProp];
-        if (typeof value !== "string") continue;
-        delete props[sourceProp];
-        rawStyles.push({
-          $$css: true,
-          [value]: value,
-        } as StyleProp);
-      }
+      const value = props?.[sourceProp];
+      if (typeof value !== "string") continue;
+      delete props[sourceProp];
+      rawStyles.push({
+        $$css: true,
+        [value]: value,
+      } as StyleProp);
 
       const existingStyle = props[key];
 
