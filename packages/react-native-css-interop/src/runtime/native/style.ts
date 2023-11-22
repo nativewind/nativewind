@@ -16,7 +16,6 @@ import {
   withTiming,
 } from "react-native-reanimated";
 import {
-  Effect,
   Signal,
   cleanupEffect,
   createSignal,
@@ -40,7 +39,6 @@ import {
   STYLE_SCOPES,
   isPropDescriptor,
 } from "../../shared";
-import { NormalizedOptions } from "./prop-mapping";
 import {
   testContainerQuery,
   testMediaQueries,
@@ -56,52 +54,11 @@ import type {
   RuntimeValue,
   GroupedRuntimeStyle,
   TransportStyle,
-  Interaction,
   Layers,
   NativeStyleToProp,
-  Specificity,
+  InteropStore,
+  NormalizedOptions,
 } from "../../types";
-
-export interface InteropStore {
-  testId?: string;
-  version: number;
-  onChange?: () => void;
-  parent: InteropStore;
-  originalProps: Record<string, any>;
-  props: Record<string, any>;
-  options: NormalizedOptions;
-  scope: number;
-  interaction: Interaction;
-  hasActive: boolean;
-  hasHover: boolean;
-  hasFocus: boolean;
-  hasContainer: boolean;
-  convertToPressable: boolean;
-  shouldUpdateContext: boolean;
-  context?: InteropStore;
-  isAnimated: boolean;
-  animations?: Required<ExtractedAnimations>;
-  animationNames: Set<string>;
-  transition?: Required<ExtractedTransition>;
-  signalsToRemove: Set<string>;
-  inlineVariables: Map<string, Signal<any>>;
-  containerNames: Set<string>;
-  effect: Effect;
-  requiresLayoutWidth: boolean;
-  requiresLayoutHeight: boolean;
-  animationWaitingOnLayout: boolean;
-  layout?: Signal<[number, number] | undefined>;
-  dependencies: any[];
-  hoistedStyles?: [string, string, "transform" | "shadow"][];
-  sharedValues: Record<string, ReturnType<typeof makeMutable>>;
-  getInteraction(name: keyof Interaction): boolean;
-  getVariable(name: string): any;
-  setVariable(name: string, value: any, specificity: Specificity): void;
-  setContainer(name: string): void;
-  getContainer(name: string): InteropStore | undefined;
-  containerSignal?: Signal<InteropStore>;
-  rerender(parent?: InteropStore, originalProps?: Record<string, any>): void;
-}
 
 export function createInteropStore(
   parent: InteropStore,
@@ -128,13 +85,13 @@ export function createInteropStore(
     requiresLayoutWidth: false,
     isAnimated: false,
     animationNames: new Set(),
-    signalsToRemove: new Set(),
+    inlineVariablesToRemove: new Set(),
     inlineVariables: new Map(),
     containerNames: new Set(),
     sharedValues: {},
     dependencies: options.dependencies.map((k) => originalProps[k]),
     setVariable(name, value) {
-      state.signalsToRemove.delete(name);
+      state.inlineVariablesToRemove.delete(name);
 
       const existing = state.inlineVariables.get(name);
       if (!existing) {
@@ -218,7 +175,7 @@ function render(
 
   state.shouldUpdateContext = false;
   state.convertToPressable ||= false;
-  state.signalsToRemove = new Set(state.inlineVariables.keys());
+  state.inlineVariablesToRemove = new Set(state.inlineVariables.keys());
   state.props = {};
 
   setupEffect(state.effect);
@@ -434,11 +391,7 @@ function render(
                 iterations,
               );
 
-              Object.defineProperty(state.props[prop], key, {
-                configurable: true,
-                enumerable: true,
-                value: sharedValue,
-              });
+              state.props[prop][key] = sharedValue;
             }
           }
         } else {
@@ -633,13 +586,13 @@ function render(
     state.containerSignal = undefined;
   }
 
-  // for (const name of state.signalsToRemove) {
-  //   // Set to undefined to cause any dependencies to render
-  //   state.signals.get(name)?.set(undefined);
-  //   // Delete the signal
-  //   state.signals.delete(name);
-  //   state.shouldUpdateContext = true;
-  // }
+  for (const name of state.inlineVariablesToRemove) {
+    // Set to undefined to cause any dependencies to render
+    state.inlineVariables.get(name)?.set(undefined);
+    // Delete the signal
+    state.inlineVariables.delete(name);
+    state.shouldUpdateContext = true;
+  }
 
   if (state.shouldUpdateContext) {
     // Duplicate this object, making it identify different

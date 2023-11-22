@@ -1,8 +1,7 @@
 import { forwardRef } from "react";
 import * as JSX from "react/jsx-runtime";
 
-import { StyleSheet, cssInterop, remapProps } from "../index";
-import { render } from "../runtime/render";
+import { StyleSheet } from "../index";
 import { INTERNAL_RESET } from "../shared";
 import {
   CssToReactNativeRuntimeOptions,
@@ -11,11 +10,16 @@ import {
 } from "../types";
 import { cssToReactNativeRuntime } from "../css-to-rn";
 
-export { warnings } from "../runtime/native/globals";
-
 import "../runtime/components";
+import {
+  render,
+  cssInterop,
+  remapProps,
+} from "../runtime/components/rendering";
 
 export * from "../types";
+export { warnings } from "../runtime/native/globals";
+
 declare global {
   namespace jest {
     interface Matchers<R> {
@@ -41,6 +45,7 @@ export function createMockComponent<
     mapping?: EnableCssInteropOptions<P> & M;
   } = {},
 ) {
+  debugger;
   cssInterop<P, M>(Component, mapping);
 
   const mock = jest.fn((props: P & { [K in keyof M]?: string }, _ref) => {

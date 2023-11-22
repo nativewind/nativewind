@@ -13,8 +13,8 @@ import {
   GroupedRuntimeStyle,
   ExtractedAnimation,
   ExtractionWarning,
+  InteropStore,
 } from "../../types";
-import { InteropStore } from "./style";
 
 export const styleSignals = new Map<string, Signal<GroupedRuntimeStyle>>();
 export const opaqueStyles = new WeakMap<object, GroupedRuntimeStyle>();

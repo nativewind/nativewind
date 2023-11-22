@@ -5,10 +5,7 @@ import worker, {
 } from "metro-transform-worker";
 import path from "path";
 
-import {
-  transform as cssInteropTransform,
-  experimentsToJS,
-} from "react-native-css-interop/metro/transformer";
+import { transform as cssInteropTransform } from "react-native-css-interop/metro/transformer";
 import { CssToReactNativeRuntimeOptions } from "react-native-css-interop/metro";
 
 interface NativeWindJsTransformerConfig extends JsTransformerConfig {
@@ -39,13 +36,9 @@ export async function transform(
         projectRoot,
         filename,
         Buffer.from(
-          `${experimentsToJS(
-            config.nativewind.experiments,
-          )}const { StyleSheet } = require("react-native-css-interop");
+          `require('react-native-css-interop/dist/runtime/components');const { StyleSheet } = require("react-native-css-interop");
 const url = require("react-native/Libraries/Core/Devtools/getDevServer")().url.replace(/(https?:\\/\\/.*)(:\\d*\\/)(.*)/, "$1$3")
-new globalThis.WebSocket(\`\${url}:${
-            config.nativewind.fastRefreshPort
-          }\`).addEventListener("message", (event) => StyleSheet.registerCompiled(JSON.parse(event.data)));
+new globalThis.WebSocket(\`\${url}:${config.nativewind.fastRefreshPort}\`).addEventListener("message", (event) => StyleSheet.registerCompiled(JSON.parse(event.data)));
 StyleSheet.registerCompiled(JSON.parse('${config.nativewind.parsedOutput}'));`,
           "utf8",
         ),
@@ -57,7 +50,7 @@ StyleSheet.registerCompiled(JSON.parse('${config.nativewind.parsedOutput}'));`,
         projectRoot,
         filename,
         Buffer.from(
-          `require('react-native-css-interop');require('${config.nativewind.outputPath}');`,
+          `require('react-native-css-interop/dist/runtime/components');require('${config.nativewind.outputPath}');`,
           "utf8",
         ),
         options,

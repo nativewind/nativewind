@@ -39,6 +39,7 @@ export function transform(
   const isCSSModule = matchCssModule(filename);
 
   data = experimentsToJS(config.cssToReactNativeRuntime?.experiments);
+  data = `${data}require("react-native-css-interop/dist/runtime/components");`;
 
   data = Buffer.from(
     isCSSModule

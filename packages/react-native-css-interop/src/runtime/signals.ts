@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from "react";
-import { InteropStore } from "./native/style";
+import type { InteropStore } from "../types";
 
 export const interopGlobal: {
   isInComponent: boolean;

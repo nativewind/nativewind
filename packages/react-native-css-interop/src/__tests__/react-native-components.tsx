@@ -15,7 +15,7 @@ import * as JSX from "react/jsx-runtime";
 import { render as tlRender, screen } from "@testing-library/react-native";
 
 import { registerCSS, resetStyles } from "../testing-library";
-import { render as renderJSX } from "../runtime/render";
+import { render as renderJSX } from "../runtime/components/rendering";
 
 const testID = "react-native-css-interop";
 

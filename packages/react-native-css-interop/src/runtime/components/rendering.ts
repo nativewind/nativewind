@@ -1,10 +1,65 @@
+import { ComponentType } from "react";
 import type {
   EnableCssInteropOptions,
   NativeStyleToProp,
   NormalizedOptions,
+  RemapProps,
+  StyleProp,
 } from "../../types";
 
-export function getNormalizeConfig(
+export const interopComponents = new Map<object | string, NormalizedOptions>();
+
+export function render(jsx: any, type: any, props: any, ...args: any) {
+  const config = interopComponents.get(type);
+
+  if (config) {
+    debugger;
+    for (const entry of config.config) {
+      const key = entry[0];
+      const sourceProp = entry[1];
+      const newStyles: StyleProp = [];
+
+      const value = props[sourceProp];
+      if (typeof value === "string") {
+        newStyles.push({
+          $$css: true,
+          [value]: value,
+        } as StyleProp);
+      }
+
+      delete props[sourceProp];
+
+      let styles: StyleProp = props[key];
+      if (Array.isArray(styles)) {
+        styles = [...newStyles, ...styles];
+      } else if (styles) {
+        styles = [...newStyles, styles];
+      } else {
+        styles = newStyles;
+      }
+
+      props[key] = styles;
+    }
+  }
+
+  return jsx(type, props, ...args);
+}
+
+export function cssInterop<T extends {}, M>(
+  component: ComponentType<T> | string,
+  mapping: EnableCssInteropOptions<T> & M,
+) {
+  interopComponents.set(component, getNormalizeConfig(mapping));
+}
+
+export function remapProps<P, M>(
+  component: ComponentType<P>,
+  mapping: RemapProps<P> & M,
+) {
+  interopComponents.set(component, getNormalizeConfig(mapping));
+}
+
+function getNormalizeConfig(
   mapping: EnableCssInteropOptions<any>,
 ): NormalizedOptions {
   const config = new Map<

@@ -1,4 +1,7 @@
-import { PropRuntimeValueDescriptor, RuntimeValueDescriptor } from "./types";
+import type {
+  PropRuntimeValueDescriptor,
+  RuntimeValueDescriptor,
+} from "./types";
 
 export const INTERNAL_RESET = Symbol();
 export const INTERNAL_SET = Symbol();

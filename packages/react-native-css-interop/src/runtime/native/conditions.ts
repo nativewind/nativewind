@@ -9,13 +9,13 @@ import type {
 
 import {
   ExtractedContainerQuery,
+  InteropStore,
   PseudoClassesQuery,
   SignalLike,
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
-import { InteropStore } from "./style";
 
 interface ConditionReference {
   width: number | SignalLike<number>;

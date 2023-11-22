@@ -7,23 +7,72 @@ import type {
   ContainerCondition,
   Declaration,
 } from "lightningcss";
-import {
+import type {
   ComponentClass,
   ForwardRefExoticComponent,
   FunctionComponent,
+  ReactElement,
   ReactNode,
-  createElement,
 } from "react";
-import {
+import type {
   Appearance,
   Dimensions,
   ImageStyle,
   TextStyle,
   ViewStyle,
 } from "react-native";
-import { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
-import type { NormalizedOptions } from "./runtime/native/prop-mapping";
-import { Signal } from "./runtime/signals";
+import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
+import type { Effect, Signal } from "./runtime/signals";
+import { makeMutable } from "react-native-reanimated";
+
+type Prop = string;
+type Source = string;
+export interface NormalizedOptions {
+  config: [Prop, Source, NativeStyleToProp<any> | undefined][];
+  sources: Source[];
+  dependencies: (Prop & Source)[];
+}
+
+export interface InteropStore {
+  testId?: string;
+  version: number;
+  onChange?: () => void;
+  parent: InteropStore;
+  originalProps: Record<string, any>;
+  props: Record<string, any>;
+  options: NormalizedOptions;
+  scope: number;
+  interaction: Interaction;
+  hasActive: boolean;
+  hasHover: boolean;
+  hasFocus: boolean;
+  hasContainer: boolean;
+  convertToPressable: boolean;
+  shouldUpdateContext: boolean;
+  context?: InteropStore;
+  isAnimated: boolean;
+  animations?: Required<ExtractedAnimations>;
+  animationNames: Set<string>;
+  transition?: Required<ExtractedTransition>;
+  inlineVariablesToRemove: Set<string>;
+  inlineVariables: Map<string, Signal<any>>;
+  containerNames: Set<string>;
+  effect: Effect;
+  requiresLayoutWidth: boolean;
+  requiresLayoutHeight: boolean;
+  animationWaitingOnLayout: boolean;
+  layout?: Signal<[number, number] | undefined>;
+  dependencies: any[];
+  hoistedStyles?: [string, string, "transform" | "shadow"][];
+  sharedValues: Record<string, ReturnType<typeof makeMutable>>;
+  getInteraction(name: keyof Interaction): boolean;
+  getVariable(name: string): any;
+  setVariable(name: string, value: any, specificity: Specificity): void;
+  setContainer(name: string): void;
+  getContainer(name: string): InteropStore | undefined;
+  containerSignal?: Signal<InteropStore>;
+  rerender(parent?: InteropStore, originalProps?: Record<string, any>): void;
+}
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
@@ -108,7 +157,7 @@ export type InteropFunction = (
   options: NormalizedOptions,
   props: Record<string, any>,
   children: ReactNode,
-) => Parameters<typeof createElement>;
+) => ReactElement;
 
 export type InteropFunctionOptions<P> = {
   remappedProps: P;
