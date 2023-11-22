@@ -20,8 +20,6 @@ import {
 
 import { cssInterop, remapProps } from "./rendering";
 
-export { cssInterop, remapProps };
-
 cssInterop(Image, { className: "style" });
 cssInterop(Switch, { className: "style" });
 cssInterop(Pressable, { className: "style" });

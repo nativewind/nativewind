@@ -1,5 +1,9 @@
 import { createElement } from "react";
-import { cssInterop, remapProps } from "./runtime/components";
+import {
+  cssInterop,
+  remapProps,
+  createElementAndCheckCssInterop,
+} from "./runtime/components/rendering";
 import { unstable_styled } from "./runtime/components/styled";
 
 import { StyleSheet } from "./runtime/web/stylesheet";
@@ -9,6 +13,7 @@ import { rem } from "./runtime/web/rem";
 
 export {
   createElement,
+  createElementAndCheckCssInterop,
   rem,
   useUnstableNativeVariable,
   cssInterop,

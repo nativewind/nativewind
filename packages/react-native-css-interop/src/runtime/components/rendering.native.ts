@@ -1,6 +1,9 @@
 import {
+  ComponentClass,
   ComponentType,
+  FunctionComponent,
   PropsWithChildren,
+  ReactNode,
   createElement,
   forwardRef,
 } from "react";
@@ -17,10 +20,10 @@ import { opaqueStyles, styleSignals } from "../native/globals";
 export type InteropComponent = {
   type: ComponentType<any>;
   check: (props: Record<string, any>) => boolean;
-  // createElementWithInterop: (
-  //   props: any,
-  //   children: ReactNode,
-  // ) => ReturnType<typeof createElement>;
+  createElement: (
+    props: Record<string, any>,
+    ...children: ReactNode[]
+  ) => ReturnType<typeof createElement>;
 };
 
 export const interopComponents = new Map<object | string, InteropComponent>();
@@ -105,9 +108,9 @@ export function cssInterop<T extends {}, M>(
 
   const interopComponent: InteropComponent = {
     type: CssInteropComponent,
-    // createElementWithInterop(props, children) {
-    //   return createElement(...interop!(component, config, props, children));
-    // },
+    createElement(props, ...children) {
+      return defaultCSSInterop(component, config, props, children);
+    },
     check(props: Record<string, unknown>) {
       for (const [targetProp, source, nativeStyleToProp] of config.config) {
         if (nativeStyleToProp) return true;
@@ -181,13 +184,31 @@ export function remapProps<P, M>(
 
     return createElement(component as any, props, props.children);
   };
-
-  interopComponents.set(component as any, {
+  const interopComponent: InteropComponent = {
     type: forwardRef(render),
     check: () => true,
-  });
+    createElement(props, ...children) {
+      return createElement(interopComponent.type, props, ...children);
+    },
+  };
+
+  interopComponents.set(component as any, interopComponent);
 
   return;
+}
+
+export function createElementAndCheckCssInterop(
+  type: string | FunctionComponent | ComponentClass,
+  props: Record<string, any>,
+  ...children: ReactNode[]
+) {
+  if (!type) return createElement(type, props, ...children);
+
+  const interop = interopComponents.get(type as object);
+
+  return !interop || !interop.check(props)
+    ? createElement(type, props, ...children)
+    : interop.createElement(props, children);
 }
 
 function getNormalizeConfig(

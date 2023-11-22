@@ -1,4 +1,10 @@
-import { ComponentType } from "react";
+import {
+  ComponentClass,
+  ComponentType,
+  FunctionComponent,
+  ReactNode,
+  createElement,
+} from "react";
 import type {
   EnableCssInteropOptions,
   NativeStyleToProp,
@@ -57,6 +63,14 @@ export function remapProps<P, M>(
   mapping: RemapProps<P> & M,
 ) {
   interopComponents.set(component, getNormalizeConfig(mapping));
+}
+
+export function createElementAndCheckCssInterop(
+  type: string | FunctionComponent | ComponentClass,
+  props: Record<string, any>,
+  ...children: ReactNode[]
+) {
+  return render(createElement, type, props, ...children);
 }
 
 function getNormalizeConfig(
