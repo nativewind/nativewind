@@ -6,11 +6,11 @@ import { INTERNAL_RESET } from "../../shared";
 let appearance = Appearance;
 
 let appearanceListener = appearance.addChangeListener((state) =>
-  _appColorScheme.set(state.colorScheme ?? "light"),
+  _colorScheme.set(state.colorScheme ?? "light"),
 );
 
 AppState.addEventListener("change", () =>
-  _appColorScheme.set(appearance.getColorScheme() ?? "light"),
+  _colorScheme.set(appearance.getColorScheme() ?? "light"),
 );
 
 // This shouldn't change, as its loaded from the CSS
@@ -23,7 +23,7 @@ if (darkMode === "media") {
   initialColor = Appearance.getColorScheme() ?? "light";
   Appearance.addChangeListener(({ colorScheme }) => {
     if (darkMode === "media") {
-      _appColorScheme.set(colorScheme ?? "light");
+      _colorScheme.set(colorScheme ?? "light");
     }
   });
 } else if (darkMode === "class") {
@@ -34,12 +34,11 @@ if (darkMode === "media") {
     : "light";
 }
 
-const _appColorScheme = createSignal<"light" | "dark" | "system">(initialColor);
-
+const _colorScheme = createSignal<"light" | "dark" | "system">(initialColor);
 export const colorScheme = {
-  ..._appColorScheme,
+  ..._colorScheme,
   set(value: "light" | "dark" | "system") {
-    _appColorScheme.set(value);
+    _colorScheme.set(value);
 
     if (darkMode === "media") {
       throw new Error(
@@ -62,24 +61,21 @@ export const colorScheme = {
     }
   },
   get() {
-    let current = _appColorScheme.get();
-    return current === "system"
-      ? appearance.getColorScheme() ?? "light"
-      : current;
+    let current = _colorScheme.get();
+    if (current === "system") current = appearance.getColorScheme() ?? "light";
+    return current;
   },
   toggle() {
-    let current = _appColorScheme.peek();
-    if (current === "system") {
-      current = appearance.getColorScheme() ?? "light";
-    }
-    _appColorScheme.set(current === "light" ? "dark" : "light");
+    let current = _colorScheme.peek();
+    if (current === "system") current = appearance.getColorScheme() ?? "light";
+    _colorScheme.set(current === "light" ? "dark" : "light");
   },
   [INTERNAL_RESET]: ($appearance: typeof Appearance) => {
-    _appColorScheme.set("system");
+    _colorScheme.set("system");
     appearance = $appearance;
     appearanceListener.remove();
     appearanceListener = appearance.addChangeListener((state) =>
-      _appColorScheme.set(state.colorScheme ?? "light"),
+      _colorScheme.set(state.colorScheme ?? "light"),
     );
   },
 };
