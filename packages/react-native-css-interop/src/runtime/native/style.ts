@@ -510,7 +510,7 @@ function render(
     if (nativeStyleToProp) {
       for (let [key, targetProp] of Object.entries(nativeStyleToProp)) {
         if (targetProp === true) targetProp = key;
-        if (state.props.style[key] === undefined) continue;
+        if (state.props?.style?.[key] === undefined) continue;
         state.props[targetProp] = state.props.style[key];
         delete state.props.style[key];
       }
