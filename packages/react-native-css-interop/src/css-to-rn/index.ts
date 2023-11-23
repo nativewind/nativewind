@@ -30,6 +30,7 @@ import {
   CompilerStyleMeta,
   RuntimeValueDescriptor,
   Specificity,
+  HoistedTypes,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import { normalizeSelectors } from "./normalize-selectors";
@@ -355,6 +356,10 @@ function setStyleForSelectorList(
         darkMode,
       } = selector;
 
+      if (style.props?.style && Object.keys(style.props.style).length === 0) {
+        delete style.props.style;
+      }
+
       const specificity = {
         ...extractedStyle.specificity,
         ...selector.specificity,
@@ -575,13 +580,7 @@ function declarationsToStyle(
    * E.g. `transform` accepts an array of transforms
    */
   function addStyleProp(property: string, value: any) {
-    let hoisted: "transform" | "shadow" | undefined;
-    if (transformProperties.has(property)) {
-      hoisted = "transform";
-    }
-    if (shadowProperties.has(property)) {
-      hoisted = "shadow";
-    }
+    let hoisted = getHoisted(property);
 
     if (value === undefined && options.useInitialIfUndefined) {
       value = "!INITIAL!";
@@ -701,16 +700,7 @@ function declarationsToStyle(
         extractedStyle.transition.property = [];
 
         for (const v of declaration.value) {
-          let hoisted;
-
-          if (transformProperties.has(v.property)) {
-            hoisted = "transform";
-          }
-
-          if (shadowProperties.has(v.property)) {
-            hoisted = "shadow";
-          }
-
+          let hoisted = getHoisted(v.property);
           if (hoisted) {
             extractedStyle.hoistedStyles ??= [];
             extractedStyle.hoistedStyles?.push([
@@ -900,6 +890,16 @@ function toRNProperty(str: string) {
   }
 
   return str.replace(/-./g, (x) => x[1].toUpperCase());
+}
+
+function getHoisted(property: string): HoistedTypes | undefined {
+  if (transformProperties.has(property)) {
+    return "transform";
+  }
+
+  if (shadowProperties.has(property)) {
+    return "shadow";
+  }
 }
 
 const transformProperties = new Set([

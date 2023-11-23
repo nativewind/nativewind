@@ -105,6 +105,43 @@ const nativePlugins = plugin(function ({
     return "&:native-prop()";
   }) as any);
 
+  /**
+   * https://reactnative.dev/docs/pressable#rippleconfig
+   */
+  matchUtilities(
+    {
+      ripple: (value) => {
+        return {
+          "&:move-prop(color,android_ripple)": {
+            color: toColorValue(value),
+          },
+        };
+      },
+    },
+    {
+      values: flattenColorPalette(theme("rippleColor")),
+      type: ["color", "any"],
+    },
+  );
+  matchUtilities(
+    {
+      ripple: (value) => {
+        return {
+          "&:move-prop(borderless,android_ripple)": {
+            "-rn-borderless": value,
+          },
+        };
+      },
+    },
+    {
+      values: {
+        borderless: "true",
+        bordered: "false",
+      },
+      type: "any",
+    },
+  );
+
   matchUtilities(
     {
       caret: (value) => {
@@ -225,6 +262,7 @@ const preset: Config = {
       },
       trackColor: allowedColors,
       thumbColor: allowedColors,
+      rippleColor: allowedColors,
     },
   },
   plugins: [

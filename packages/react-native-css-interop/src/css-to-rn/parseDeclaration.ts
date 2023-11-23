@@ -1044,7 +1044,10 @@ export function parseDeclaration(
     case "row-gap":
       return addStyleProp("row-gap", parseGap(declaration.value, parseOptions));
     case "column-gap":
-      return addStyleProp("column-gap", parseGap(declaration.value, parseOptions));
+      return addStyleProp(
+        "column-gap",
+        parseGap(declaration.value, parseOptions),
+      );
     case "gap":
       addStyleProp("row-gap", parseGap(declaration.value.row, parseOptions));
       addStyleProp(
@@ -1598,13 +1601,21 @@ function unparsedKnownShorthand(
 function parseUnparsed(
   tokenOrValue: TokenOrValue | TokenOrValue[] | string | number | undefined,
   options: ParseDeclarationOptionsWithValueWarning,
-): string | number | object | undefined {
+): string | number | boolean | object | undefined {
+  debugger;
   if (tokenOrValue === undefined) {
     return;
   }
 
   if (typeof tokenOrValue === "string") {
-    return tokenOrValue;
+    debugger;
+    if (tokenOrValue === "true") {
+      return true;
+    } else if (tokenOrValue === "false") {
+      return false;
+    } else {
+      return tokenOrValue;
+    }
   }
 
   if (typeof tokenOrValue === "number") {
@@ -1714,14 +1725,24 @@ function parseUnparsed(
       switch (tokenOrValue.value.type) {
         case "string":
         case "number":
-        case "ident":
-          if (
-            ["auto", "inherit"].includes(tokenOrValue.value.value.toString())
-          ) {
-            return options.addValueWarning(tokenOrValue.value.value);
+        case "ident": {
+          const value = tokenOrValue.value.value;
+          if (typeof value === "string") {
+            if (["auto", "inherit"].includes(value)) {
+              return options.addValueWarning(value);
+            }
+
+            if (value === "true") {
+              return true;
+            } else if (value === "false") {
+              return false;
+            } else {
+              return value;
+            }
           } else {
-            return tokenOrValue.value.value;
+            return value;
           }
+        }
         case "function":
           options.addValueWarning(tokenOrValue.value.value);
           return;

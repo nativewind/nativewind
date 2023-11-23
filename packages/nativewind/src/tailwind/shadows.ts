@@ -28,7 +28,7 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
 
   let transformValue = transformThemeValue("boxShadow");
 
-  addDefaults(" box-shadow", {
+  addDefaults("box-shadow", {
     "--tw-ring-offset-shadow": "0 0 #0000",
     "--tw-ring-shadow": "0 0 #0000",
     "--tw-shadow": "0 0 #0000",
@@ -65,7 +65,7 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
 
         return {
           "--tw-shadow-color": value === "none" ? "#0000" : color,
-          "-rn-shadowColor": "var(--tw-shadow-color)",
+          "-rn-shadow-color": "var(--tw-shadow-color)",
           "-rn-shadow-offset\\.width": x,
           "-rn-shadow-offset\\.height": y,
           "-rn-shadow-radius": blur ?? 0,

@@ -63,7 +63,7 @@ export interface InteropStore {
   animationWaitingOnLayout: boolean;
   layout?: Signal<[number, number] | undefined>;
   dependencies: any[];
-  hoistedStyles?: [string, string, "transform" | "shadow"][];
+  hoistedStyles?: [string, string, HoistedTypes][];
   sharedValues: Record<string, ReturnType<typeof makeMutable>>;
   getInteraction(name: keyof Interaction): boolean;
   getVariable(name: string): any;
@@ -179,10 +179,12 @@ export type CompilerStyleMeta = {
   requiresLayoutHeight?: boolean;
   props: Record<string, Record<string, RuntimeValueDescriptor>>;
   propSingleValue: Record<string, PropRuntimeValueDescriptor>;
-  hoistedStyles?: [string, string, "transform" | "shadow"][];
+  hoistedStyles?: [string, string, HoistedTypes][];
   scope: number;
   warnings?: ExtractionWarning[];
 };
+
+export type HoistedTypes = "transform" | "shadow";
 
 export type GroupedTransportStyles = {
   0?: TransportStyle[];
@@ -233,7 +235,12 @@ export type PropRuntimeValueDescriptor = {
   value: RuntimeValueDescriptor;
 };
 
-export type RuntimeValue = string | number | undefined | (() => RuntimeValue);
+export type RuntimeValue =
+  | string
+  | number
+  | boolean
+  | undefined
+  | (() => RuntimeValue);
 
 export type Specificity = {
   /** IDs - https://drafts.csswg.org/selectors/#specificity-rules */
@@ -302,7 +309,7 @@ export type ExtractedTransition = {
 
 export type ExtractedAnimation = {
   frames: Record<string, RuntimeValueFrame[]>;
-  hoistedStyles?: [string, string, "transform" | "shadow"][];
+  hoistedStyles?: [string, string, HoistedTypes][];
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
 };

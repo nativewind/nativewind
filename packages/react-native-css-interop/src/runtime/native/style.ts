@@ -795,9 +795,13 @@ export function reduceStyles(
 }
 
 export function parseValue(
-  value: RuntimeValueDescriptor | string | number,
+  value: RuntimeValueDescriptor | string | number | boolean,
 ): RuntimeValue {
-  if (typeof value === "string" || typeof value === "number") {
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
     return value;
   }
 
