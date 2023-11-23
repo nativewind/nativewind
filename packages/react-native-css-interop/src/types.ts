@@ -98,6 +98,12 @@ export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
   rem?: StyleSheetRegisterOptions["rem"];
 }
 
+export type ExtractedStyleMapping = Record<
+  string,
+  | { hoist: string }
+  | { prop: string; attribute?: string; transform?: "append-object" }
+>;
+
 export type EnableCssInteropOptions<P> = {
   [K in string]?: CSSInteropClassNamePropConfig<P>;
 };

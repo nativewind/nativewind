@@ -78,3 +78,16 @@ test("selection", async () => {
     }),
   );
 });
+
+test("placeholder", async () => {
+  await renderTailwind(
+    <A testID={testID} className="placeholder:text-black" />,
+  );
+
+  const component = screen.getByTestId(testID);
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      placeholderTextColor: "rgba(0, 0, 0, 1)",
+    }),
+  );
+});

@@ -1,5 +1,6 @@
 // cSpell:ignore borderless
 import { Config } from "tailwindcss";
+import { AtRule } from "postcss";
 import plugin from "tailwindcss/plugin";
 import { PluginUtils } from "tailwindcss/types/config";
 import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
@@ -75,8 +76,35 @@ const nativePlugins = plugin(function ({
    */
   matchVariant(
     "prop",
-    (value = "*", { modifier }) => {
-      return `&:native-prop(${[value, modifier].filter(Boolean).join(",")})`;
+    (value = "\\*", { modifier, container }: any) => {
+      container.walkRules((rule: any) => {
+        rule.append(
+          new AtRule({
+            name: "rn-hoist",
+            params: `${value} ${modifier ?? ""}`,
+          }),
+        );
+      });
+      return `&`;
+    },
+    { values: { DEFAULT: undefined } },
+  );
+
+  /**
+   * move-[]:
+   */
+  matchVariant(
+    "move",
+    (value = "\\*", { modifier, container }: any) => {
+      container.walkRules((rule: any) => {
+        rule.append(
+          new AtRule({
+            name: "rn-move",
+            params: `${value} ${modifier ?? ""}`,
+          }),
+        );
+      });
+      return `&`;
     },
     { values: { DEFAULT: undefined } },
   );
@@ -86,24 +114,20 @@ const nativePlugins = plugin(function ({
    */
   addVariant("selection", (({ container }: any) => {
     container.walkRules((rule: any) => {
-      rule.walkDecls((decl: any) => {
-        if (decl.prop == "color") {
-          decl.prop = "-rn-selectionColor";
-        }
-      });
+      rule.append(
+        new AtRule({ name: "rn-hoist", params: "color selectionColor" }),
+      );
     });
-    return "&:native-prop()";
+    return "&";
   }) as any);
 
   addVariant("placeholder", (({ container }: any) => {
     container.walkRules((rule: any) => {
-      rule.walkDecls((decl: any) => {
-        if (decl.prop == "color") {
-          decl.prop = "-rn-placeholderTextColor";
-        }
-      });
+      rule.append(
+        new AtRule({ name: "rn-hoist", params: "color placeholderTextColor" }),
+      );
     });
-    return "&:native-prop()";
+    return "&";
   }) as any);
 
   // https://github.com/tailwindlabs/tailwindcss/blob/eb2fe9494b638c3b67194f3ddf3c040f064e060d/src/corePlugins.js#L624-L629
@@ -118,9 +142,10 @@ const nativePlugins = plugin(function ({
   matchUtilities(
     {
       "line-clamp": (value) => ({
-        "&:native-prop(numberOfLines,numberOfLines)": {
+        "&": {
+          "@rn-hoist -rn-number-of-lines": "true",
           overflow: "hidden",
-          "-rn-numberOfLines": value,
+          "-rn-number-of-lines": value,
         },
       }),
     },
@@ -129,9 +154,10 @@ const nativePlugins = plugin(function ({
 
   addUtilities({
     ".line-clamp-none": {
-      "&:native-prop(numberOfLines,numberOfLines)": {
+      "&": {
+        "@rn-hoist -rn-number-of-lines": "true",
         overflow: "visible",
-        "-rn-numberOfLines": "0",
+        "-rn-number-of-lines": "0",
       },
     },
   });
@@ -143,7 +169,8 @@ const nativePlugins = plugin(function ({
     {
       ripple: (value) => {
         return {
-          "&:move-prop(color,android_ripple)": {
+          "&": {
+            "@rn-move color android_ripple": "true",
             color: toColorValue(value),
           },
         };
@@ -158,7 +185,8 @@ const nativePlugins = plugin(function ({
     {
       ripple: (value) => {
         return {
-          "&:move-prop(borderless,android_ripple)": {
+          "&": {
+            "@rn-move -rn-borderless android_ripple": "true",
             "-rn-borderless": value,
           },
         };
@@ -177,8 +205,9 @@ const nativePlugins = plugin(function ({
     {
       caret: (value) => {
         return {
-          "&:native-prop()": {
-            "-rn-cursorColor": toColorValue(value),
+          "&": {
+            "@rn-hoist caret-color cursor-color": "true",
+            "caret-color": toColorValue(value),
           },
         };
       },
@@ -194,11 +223,14 @@ const nativePlugins = plugin(function ({
    */
   matchUtilities(
     {
-      fill: (value) => ({
-        "&:native-prop()": {
-          fill: toColorValue(value),
-        },
-      }),
+      fill: (value) => {
+        return {
+          "&": {
+            "@rn-hoist fill": "true",
+            fill: `${toColorValue(value)}`,
+          },
+        };
+      },
     },
     { values: flattenColorPalette(theme("fill")), type: ["color", "any"] },
   );
@@ -206,7 +238,8 @@ const nativePlugins = plugin(function ({
   matchUtilities(
     {
       stroke: (value) => ({
-        "&:native-prop()": {
+        "&": {
+          "@rn-hoist stroke": "true",
           stroke: toColorValue(value),
         },
       }),
@@ -217,7 +250,8 @@ const nativePlugins = plugin(function ({
   matchUtilities(
     {
       stroke: (value) => ({
-        "&:native-prop()": {
+        "&": {
+          "@rn-hoist stroke-width": "true",
           strokeWidth: toColorValue(value),
         },
       }),

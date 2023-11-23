@@ -31,6 +31,7 @@ import {
   RuntimeValueDescriptor,
   Specificity,
   HoistedTypes,
+  ExtractedStyleMapping,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import { normalizeSelectors } from "./normalize-selectors";
@@ -90,6 +91,12 @@ export function cssToReactNativeRuntime(
     },
     customAtRules: {
       cssInterop: {
+        prelude: "<custom-ident>+",
+      },
+      "rn-hoist": {
+        prelude: "<custom-ident>+",
+      },
+      "rn-move": {
         prelude: "<custom-ident>+",
       },
     },
@@ -180,6 +187,7 @@ function extractRule(
         for (const style of getExtractedStyles(
           rule.value.declarations,
           extractOptions,
+          getStyleMapping(rule.value.rules),
         )) {
           setStyleForSelectorList(
             { ...partialStyle, ...style },
@@ -197,6 +205,59 @@ function extractRule(
       }
     }
   }
+}
+
+function getStyleMapping<D, M>(rules?: any[]): ExtractedStyleMapping {
+  if (!rules) return {};
+  const mapping: ExtractedStyleMapping = {};
+
+  for (const rule of rules) {
+    if (rule.type !== "custom") continue;
+    switch (rule.value.name) {
+      case "rn-hoist": {
+        const components = rule.value.prelude.value.components.map((c: any) => {
+          return c.value;
+        });
+
+        if (components.length === 0) {
+          mapping["*"] = { hoist: toRNProperty(components[0]) };
+        } else if (components.length === 1) {
+          mapping[components[0]] = { hoist: toRNProperty(components[0]) };
+        } else if (components.length === 2) {
+          mapping[components[0]] = { hoist: toRNProperty(components[1]) };
+        }
+        break;
+      }
+      case "rn-move": {
+        const components = rule.value.prelude.value.components.map((c: any) => {
+          return c.value;
+        });
+
+        if (components.length === 1) {
+          mapping["*"] = { prop: toRNProperty(components[0]) };
+        } else if (components.length >= 2) {
+          const mappingValue: Extract<
+            ExtractedStyleMapping[keyof ExtractedStyleMapping],
+            { prop: string }
+          > = {
+            prop: toRNProperty(components[1]),
+          };
+
+          if (components[2]) {
+            mappingValue.attribute = toRNProperty(components[2]);
+          }
+
+          if (components[3]) {
+            mappingValue.transform = toRNProperty(components[3]) as any;
+          }
+
+          mapping[components[0]] = mappingValue;
+        }
+      }
+    }
+  }
+
+  return mapping;
 }
 
 function extractCSSInteropFlag(
@@ -457,6 +518,7 @@ function extractKeyFrames(
         S: 1,
         O: extractOptions.appearanceOrder,
       },
+      {},
     );
 
     if (hoistedStyles) {
@@ -529,16 +591,22 @@ interface GetExtractedStyleOptions extends ExtractRuleOptions {
 function getExtractedStyles(
   declarationBlock: DeclarationBlock<Declaration>,
   options: GetExtractedStyleOptions,
+  mapping: ExtractedStyleMapping = {},
 ): CompilerStyleMeta[] {
   const extractedStyles = [];
 
   if (declarationBlock.declarations && declarationBlock.declarations.length) {
     extractedStyles.push(
-      declarationsToStyle(declarationBlock.declarations, options, {
-        I: 0,
-        S: 1,
-        O: options.appearanceOrder,
-      }),
+      declarationsToStyle(
+        declarationBlock.declarations,
+        options,
+        {
+          I: 0,
+          S: 1,
+          O: options.appearanceOrder,
+        },
+        mapping,
+      ),
     );
   }
 
@@ -547,11 +615,16 @@ function getExtractedStyles(
     declarationBlock.importantDeclarations.length
   ) {
     extractedStyles.push(
-      declarationsToStyle(declarationBlock.importantDeclarations, options, {
-        I: 1,
-        S: 1,
-        O: options.appearanceOrder,
-      }),
+      declarationsToStyle(
+        declarationBlock.importantDeclarations,
+        options,
+        {
+          I: 1,
+          S: 1,
+          O: options.appearanceOrder,
+        },
+        mapping,
+      ),
     );
   }
 
@@ -562,6 +635,7 @@ function declarationsToStyle(
   declarations: Declaration[],
   options: GetExtractedStyleOptions,
   specificity: Pick<Specificity, "I" | "S" | "O">,
+  mapping: ExtractedStyleMapping,
 ): CompilerStyleMeta {
   const extractedStyle: CompilerStyleMeta = {
     specificity: { A: 0, B: 0, C: 0, ...specificity },
@@ -579,8 +653,8 @@ function declarationsToStyle(
    * The `append` option allows the same property to be added multiple times
    * E.g. `transform` accepts an array of transforms
    */
-  function addStyleProp(property: string, value: any) {
-    let hoisted = getHoisted(property);
+  function addStyleProp(attribute: string, value: any) {
+    let prop = "style";
 
     if (value === undefined && options.useInitialIfUndefined) {
       value = "!INITIAL!";
@@ -590,11 +664,9 @@ function declarationsToStyle(
       return;
     }
 
-    if (property.startsWith("--")) {
-      return addVariable(property, value);
+    if (attribute.startsWith("--")) {
+      return addVariable(attribute, value);
     }
-
-    property = toRNProperty(property);
 
     if (typeof value === "string" || typeof value === "number") {
       extractedStyle.scope = Math.max(
@@ -605,12 +677,32 @@ function declarationsToStyle(
       extractedStyle.scope = Math.max(STYLE_SCOPES.SELF, extractedStyle.scope);
     }
 
-    extractedStyle.props.style ??= {};
-    extractedStyle.props.style[property] = value;
+    const mappingValue = mapping[attribute] ?? mapping["*"];
+    if (mappingValue) {
+      if ("hoist" in mappingValue) {
+        prop = mappingValue.hoist;
+        extractedStyle.props[prop] = {
+          $$type: "prop",
+          value,
+        };
+      } else if ("prop" in mappingValue) {
+        prop = mappingValue.prop;
+        attribute = mappingValue.attribute ?? attribute;
+        attribute = toRNProperty(attribute);
+        extractedStyle.props[prop] ??= {};
+        extractedStyle.props[prop][attribute] = value;
+      }
+    } else {
+      let hoisted = getHoisted(attribute);
 
-    if (hoisted) {
-      extractedStyle.hoistedStyles ??= [];
-      extractedStyle.hoistedStyles?.push(["style", property, hoisted]);
+      attribute = toRNProperty(attribute);
+      extractedStyle.props.style ??= {};
+      extractedStyle.props.style[attribute] = value;
+
+      if (hoisted) {
+        extractedStyle.hoistedStyles ??= [];
+        extractedStyle.hoistedStyles?.push(["style", attribute, hoisted]);
+      }
     }
   }
 

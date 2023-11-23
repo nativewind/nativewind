@@ -8,7 +8,8 @@ export const nativeSwitch = plugin(function ({ matchUtilities, theme }) {
     {
       thumb: (value) => {
         return {
-          "&:native-prop(thumbColor,caretColor)": {
+          "&": {
+            "@rn-hoist caret-color thumbColor": "true",
             "caret-color": toColorValue(value),
           },
         };

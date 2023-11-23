@@ -64,8 +64,9 @@ test("Component types", () => {
 test("TextInput", () => {
   registerCSS(
     `.text-black { color: black } 
-     .placeholder\\:text-white:native-prop() {
-       -rn-placeholderTextColor: #fff
+     .placeholder\\:text-white {
+       @rn-hoist color placeholderTextColor;
+       color: #fff
      }`,
   );
 

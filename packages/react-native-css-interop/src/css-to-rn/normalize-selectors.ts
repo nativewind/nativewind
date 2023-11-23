@@ -1,9 +1,4 @@
-import type {
-  MediaQuery,
-  Selector,
-  SelectorComponent,
-  SelectorList,
-} from "lightningcss";
+import type { MediaQuery, Selector, SelectorList } from "lightningcss";
 import { Specificity, ExtractRuleOptions, CompilerStyleMeta } from "../types";
 
 export type NormalizeSelector =
@@ -196,95 +191,6 @@ export function normalizeSelectors(
               selector.pseudoClasses ??= {};
               selector.pseudoClasses[component.kind] = true;
               break;
-            case "custom-function": {
-              switch (component.name) {
-                case "native-prop": {
-                  const args = getCustomFunctionArguments(component);
-                  if (!args) {
-                    isValid = false;
-                    break;
-                  }
-
-                  const style = extractedStyle.props.style;
-                  if (!style) {
-                    isValid = false;
-                    break;
-                  }
-
-                  if (
-                    args.length === 0 ||
-                    (args.length === 1 && args[0] === "*")
-                  ) {
-                    // :native-props() OR :native-props(*)
-                    for (const [key, value] of Object.entries(style)) {
-                      extractedStyle.propSingleValue[key] = {
-                        $$type: "prop",
-                        value,
-                      };
-                      delete extractedStyle.props.style;
-                    }
-                  } else if (args.length === 2 && args[0] === "*") {
-                    // :nativeProps(*, <prop>)
-                    const prop = args[1];
-                    const [key, value] = Object.entries(style)[0];
-                    extractedStyle.propSingleValue[prop] = {
-                      $$type: "prop",
-                      value,
-                    };
-                    delete style[key];
-                  } else if (args.length === 2) {
-                    const key = args[0];
-                    const prop = args[1];
-                    const value = style[key];
-
-                    extractedStyle.propSingleValue[prop] = {
-                      $$type: "prop",
-                      value,
-                    };
-                    delete style[key];
-                  } else {
-                    isValid = false;
-                  }
-                  break;
-                }
-                case "move-prop": {
-                  const args = getCustomFunctionArguments(component);
-                  if (!args) {
-                    isValid = false;
-                    break;
-                  }
-
-                  const style = extractedStyle.props.style;
-                  if (!style) {
-                    isValid = false;
-                    break;
-                  }
-
-                  if (args.length === 2 && args[0] === "*") {
-                    // :move-props(*,<prop>)
-                    extractedStyle.props[args[1]] = style;
-                    delete extractedStyle.props.style;
-                  } else if (args.length === 2) {
-                    // :move-props(<key>, <prop>)
-                    const key = args[0];
-                    const prop = args[1];
-
-                    extractedStyle.props[prop] ??= {};
-                    const destination = extractedStyle.props[prop];
-                    if ("$$type" in destination) {
-                      extractedStyle.props[prop] = { [key]: style[key] };
-                    } else {
-                      destination[key] = style[key];
-                    }
-                    delete style[key];
-                  }
-                  break;
-                }
-                default: {
-                  isValid = false;
-                }
-              }
-            }
           }
         }
       }
@@ -302,39 +208,6 @@ export function normalizeSelectors(
   }
 
   return selectors;
-}
-
-function getCustomFunctionArguments(
-  component: Extract<
-    SelectorComponent,
-    { type: "pseudo-class"; kind: "custom-function" }
-  >,
-) {
-  const args: string[] = [];
-
-  for (const arg of component.arguments) {
-    if (arg.type === "token") {
-      switch (arg.value.type) {
-        case "string":
-        case "ident":
-          args.push(arg.value.value);
-          break;
-        case "delim":
-          if (arg.value.value === "*") {
-            args.push("*");
-          }
-          break;
-        case "comma":
-          break;
-        default:
-          return undefined;
-      }
-    } else {
-      return undefined;
-    }
-  }
-
-  return args;
 }
 
 function isIsPseudoClass(

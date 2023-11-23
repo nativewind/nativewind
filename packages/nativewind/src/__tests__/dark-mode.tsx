@@ -75,6 +75,25 @@ test("darkMode: class", async () => {
   expect(component).toHaveStyle({ color: "rgba(0, 0, 0, 1)" });
 });
 
+test("darkMode: class - on custom prop", async () => {
+  await renderTailwind(<A testID={testID} className="dark:fill-black" />, {
+    base: true,
+    config: {
+      darkMode: "class",
+    },
+  });
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle(undefined);
+  expect(component.props).not.toHaveProperty("fill");
+
+  act(() => colorScheme.set("dark"));
+
+  expect(component).toHaveStyle(undefined);
+  expect(component.props.fill).toEqual("rgba(0, 0, 0, 1)");
+});
+
 test("darkMode: class variable switching", async () => {
   await renderTailwind(
     <A testID={testID} className="text-[color:rgb(var(--color))]" />,
