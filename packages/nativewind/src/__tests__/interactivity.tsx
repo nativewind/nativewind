@@ -33,8 +33,10 @@ describe("Interactivity - Caret Color", () => {
 
 describe("Interactivity - Pointer Events", () => {
   testCases(
-    ["pointer-events-none", invalidProperty("pointer-events")],
-    ["pointer-events-auto", invalidProperty("pointer-events")],
+    ["pointer-events-none", style({ pointerEvents: "none" })],
+    ["pointer-events-auto", style({ pointerEvents: "auto" })],
+    ["pointer-events-box-none", style({ pointerEvents: "box-none" })],
+    ["pointer-events-box-only", style({ pointerEvents: "box-only" })],
   );
 });
 

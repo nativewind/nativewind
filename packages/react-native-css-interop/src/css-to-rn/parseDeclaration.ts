@@ -200,6 +200,7 @@ const validProperties = [
   "padding-left",
   "padding-right",
   "padding-top",
+  "pointer-events",
   "position",
   "right",
   "rotate",
@@ -245,6 +246,7 @@ export interface ParseDeclarationOptionsWithValueWarning
   extends ParseDeclarationOptions {
   addValueWarning: (value: any) => undefined;
   addFunctionValueWarning: (value: any) => undefined;
+  allowAuto?: boolean;
 }
 
 export function parseDeclaration(
@@ -322,6 +324,7 @@ export function parseDeclaration(
         property,
         parseUnparsed(declaration.value.value, {
           ...options,
+          allowAuto: allowAuto.has(property),
           addValueWarning(value: any) {
             return addWarning({
               type: "IncompatibleNativeValue",
@@ -1726,7 +1729,11 @@ function parseUnparsed(
         case "ident": {
           const value = tokenOrValue.value.value;
           if (typeof value === "string") {
-            if (["auto", "inherit"].includes(value)) {
+            if (!options.allowAuto && value === "auto") {
+              return options.addValueWarning(value);
+            }
+
+            if (value === "inherit") {
               return options.addValueWarning(value);
             }
 
@@ -2667,3 +2674,5 @@ function parseDimensionPercentageFor_LengthValue(
     return parseLength(value.value, options);
   }
 }
+
+const allowAuto = new Set(["pointer-events"]);

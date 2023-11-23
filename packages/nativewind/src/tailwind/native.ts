@@ -1,3 +1,4 @@
+// cSpell:ignore borderless
 import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 import { PluginUtils } from "tailwindcss/types/config";
@@ -105,7 +106,15 @@ const nativePlugins = plugin(function ({
     return "&:native-prop()";
   }) as any);
 
-  // https:github.com/tailwindlabs/tailwindcss/blob/eb2fe9494b638c3b67194f3ddf3c040f064e060d/src/corePlugins.js#L729C3-L750C5
+  // https://github.com/tailwindlabs/tailwindcss/blob/eb2fe9494b638c3b67194f3ddf3c040f064e060d/src/corePlugins.js#L624-L629
+  addUtilities({
+    ".pointer-events-none": { "pointer-events": "none" },
+    ".pointer-events-auto": { "pointer-events": "auto" },
+    ".pointer-events-box-none": { "pointer-events": "box-none" },
+    ".pointer-events-box-only": { "pointer-events": "box-only" },
+  });
+
+  // https://github.com/tailwindlabs/tailwindcss/blob/eb2fe9494b638c3b67194f3ddf3c040f064e060d/src/corePlugins.js#L729C3-L750C5
   matchUtilities(
     {
       "line-clamp": (value) => ({
@@ -313,6 +322,7 @@ const preset: Config = {
     strokeWidth: false,
     textOpacity: false,
     translate: false,
+    pointerEvents: false,
     visibility: false,
   },
 };
