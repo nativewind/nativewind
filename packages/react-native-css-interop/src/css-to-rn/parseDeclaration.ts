@@ -1602,13 +1602,11 @@ function parseUnparsed(
   tokenOrValue: TokenOrValue | TokenOrValue[] | string | number | undefined,
   options: ParseDeclarationOptionsWithValueWarning,
 ): string | number | boolean | object | undefined {
-  debugger;
   if (tokenOrValue === undefined) {
     return;
   }
 
   if (typeof tokenOrValue === "string") {
-    debugger;
     if (tokenOrValue === "true") {
       return true;
     } else if (tokenOrValue === "false") {
