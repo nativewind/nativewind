@@ -105,6 +105,28 @@ const nativePlugins = plugin(function ({
     return "&:native-prop()";
   }) as any);
 
+  // https:github.com/tailwindlabs/tailwindcss/blob/eb2fe9494b638c3b67194f3ddf3c040f064e060d/src/corePlugins.js#L729C3-L750C5
+  matchUtilities(
+    {
+      "line-clamp": (value) => ({
+        "&:native-prop(numberOfLines,numberOfLines)": {
+          overflow: "hidden",
+          "-rn-numberOfLines": value,
+        },
+      }),
+    },
+    { values: theme("lineClamp") },
+  );
+
+  addUtilities({
+    ".line-clamp-none": {
+      "&:native-prop(numberOfLines,numberOfLines)": {
+        overflow: "visible",
+        "-rn-numberOfLines": "0",
+      },
+    },
+  });
+
   /**
    * https://reactnative.dev/docs/pressable#rippleconfig
    */
@@ -285,6 +307,7 @@ const preset: Config = {
     fill: false,
     placeholderColor: false,
     placeholderOpacity: false,
+    lineClamp: false,
     ringOpacity: false,
     stroke: false,
     strokeWidth: false,

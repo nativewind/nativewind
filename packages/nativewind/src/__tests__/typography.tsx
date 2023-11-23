@@ -105,16 +105,37 @@ describe("Typography - Letter Spacing", () => {
   );
 });
 
-describe.skip("Typography - Line Clamp", () => {
-  //TODO
-  testCases();
-  // line-clamp-1
-  // line-clamp-2
-  // line-clamp-3
-  // line-clamp-4
-  // line-clamp-5
-  // line-clamp-6
-  // line-clamp-none
+describe("Typography - Line Clamp", () => {
+  testCases(
+    [
+      "line-clamp-1",
+      { props: { numberOfLines: 1 }, style: { overflow: "hidden" } },
+    ],
+    [
+      "line-clamp-2",
+      { props: { numberOfLines: 2 }, style: { overflow: "hidden" } },
+    ],
+    [
+      "line-clamp-3",
+      { props: { numberOfLines: 3 }, style: { overflow: "hidden" } },
+    ],
+    [
+      "line-clamp-4",
+      { props: { numberOfLines: 4 }, style: { overflow: "hidden" } },
+    ],
+    [
+      "line-clamp-5",
+      { props: { numberOfLines: 5 }, style: { overflow: "hidden" } },
+    ],
+    [
+      "line-clamp-6",
+      { props: { numberOfLines: 6 }, style: { overflow: "hidden" } },
+    ],
+    [
+      "line-clamp-none",
+      { props: { numberOfLines: 0 }, style: { overflow: "visible" } },
+    ],
+  );
 });
 
 describe("Typography - Line Height", () => {
