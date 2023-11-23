@@ -68,7 +68,7 @@ export const colorScheme = {
   toggle() {
     let current = _colorScheme.peek();
     if (current === "system") current = appearance.getColorScheme() ?? "light";
-    _colorScheme.set(current === "light" ? "dark" : "light");
+    colorScheme.set(current === "light" ? "dark" : "light");
   },
   [INTERNAL_RESET]: ($appearance: typeof Appearance) => {
     _colorScheme.set("system");
