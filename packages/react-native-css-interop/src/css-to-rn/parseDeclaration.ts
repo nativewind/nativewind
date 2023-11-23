@@ -1044,7 +1044,7 @@ export function parseDeclaration(
     case "row-gap":
       return addStyleProp("row-gap", parseGap(declaration.value, parseOptions));
     case "column-gap":
-      return addStyleProp("row-gap", parseGap(declaration.value, parseOptions));
+      return addStyleProp("column-gap", parseGap(declaration.value, parseOptions));
     case "gap":
       addStyleProp("row-gap", parseGap(declaration.value.row, parseOptions));
       addStyleProp(
