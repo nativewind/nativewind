@@ -45,7 +45,6 @@ export function createMockComponent<
     mapping?: EnableCssInteropOptions<P> & M;
   } = {},
 ) {
-  debugger;
   cssInterop<P, M>(Component, mapping);
 
   const mock = jest.fn((props: P & { [K in keyof M]?: string }, _ref) => {

@@ -19,7 +19,6 @@ interface NativeWindJsTransformerConfig extends JsTransformerConfig {
     experiments?: CssToReactNativeRuntimeOptions["experiments"];
   };
 }
-
 export async function transform(
   config: NativeWindJsTransformerConfig,
   projectRoot: string,
@@ -36,7 +35,7 @@ export async function transform(
         projectRoot,
         filename,
         Buffer.from(
-          `require('react-native-css-interop/dist/runtime/components');const { StyleSheet } = require("react-native-css-interop");
+          `const { StyleSheet } = require("react-native-css-interop");
 const url = require("react-native/Libraries/Core/Devtools/getDevServer")().url.replace(/(https?:\\/\\/.*)(:\\d*\\/)(.*)/, "$1$3")
 new globalThis.WebSocket(\`\${url}:${config.nativewind.fastRefreshPort}\`).addEventListener("message", (event) => StyleSheet.registerCompiled(JSON.parse(event.data)));
 StyleSheet.registerCompiled(JSON.parse('${config.nativewind.parsedOutput}'));`,
@@ -49,10 +48,7 @@ StyleSheet.registerCompiled(JSON.parse('${config.nativewind.parsedOutput}'));`,
         config,
         projectRoot,
         filename,
-        Buffer.from(
-          `require('react-native-css-interop/dist/runtime/components');require('${config.nativewind.outputPath}');`,
-          "utf8",
-        ),
+        Buffer.from(`require('${config.nativewind.outputPath}');`, "utf8"),
         options,
       );
     } else {

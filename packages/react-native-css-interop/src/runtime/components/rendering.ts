@@ -19,7 +19,7 @@ export function render(jsx: any, type: any, props: any, ...args: any) {
   const config = interopComponents.get(type);
 
   if (config) {
-    debugger;
+    props = { ...props };
     for (const entry of config.config) {
       const key = entry[0];
       const sourceProp = entry[1];
