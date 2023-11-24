@@ -109,6 +109,9 @@ export function cssInterop<T extends {}, M>(
   const interopComponent: InteropComponent = {
     type: CssInteropComponent,
     createElement(props, ...children) {
+      if (props.children) {
+        children = props.children;
+      }
       return defaultCSSInterop(component, config, props, children);
     },
     check(props: Record<string, unknown>) {

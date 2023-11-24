@@ -72,6 +72,7 @@ function isImportedFromReact(binding?: Binding): boolean {
     return false;
   } else if (
     path.isImportSpecifier() ||
+    path.isImportDefaultSpecifier() ||
     path.isImportDeclaration() ||
     path.isImportNamespaceSpecifier()
   ) {

@@ -37,6 +37,20 @@ export default function App() {
 
       babelOptions: { filename: "/someFile.js" },
     },
+    "createElement identifier by default import": {
+      code: `import React from "react";
+export default function App() {
+  return React.createElement("div", {}, "Hello World");
+}`,
+      output: `import { createElementAndCheckCssInterop as _createElementAndCheckCssInterop } from "react-native-css-interop";
+import React from "react";
+export default function App() {
+  return _createElementAndCheckCssInterop("div", {}, "Hello World");
+}`,
+
+      babelOptions: { filename: "/someFile.js" },
+    },
+
     "createElement identifier by require": {
       code: `const { createElement } = require("react");
 export default function App() {
