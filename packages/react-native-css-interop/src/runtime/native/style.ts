@@ -44,7 +44,7 @@ import {
   testMediaQueries,
   testPseudoClasses,
 } from "./conditions";
-import type { Time } from "lightningcss";
+import type { EasingFunction, Time } from "lightningcss";
 import type {
   ExtractedAnimations,
   ExtractedTransition,
@@ -300,6 +300,7 @@ function render(
           duration: durations,
           delay: delays,
           iterationCount: iterationCounts,
+          timingFunction: timingFunctions,
         } = state.animations;
 
         state.isAnimated = true;
@@ -339,6 +340,8 @@ function render(
 
             const totalDuration = timeToMS(durations[index % name.length]);
             const delay = timeToMS(delays[index % delays.length]);
+            const timingFunction =
+              timingFunctions[index % timingFunctions.length];
             const iterationCount =
               iterationCounts[index % iterationCounts.length];
             const iterations =
@@ -368,7 +371,7 @@ function render(
                     resolveAnimationValue(frame.value, key, state.props.style),
                     {
                       duration: totalDuration * frame.progress,
-                      easing: Easing.linear,
+                      easing: getEasing(timingFunction),
                     },
                   ),
                 );
@@ -428,6 +431,7 @@ function render(
           property: properties,
           duration: durations,
           delay: delays,
+          timingFunction: timingFunctions,
         } = state.transition;
 
         for (let index = 0; index < properties.length; index++) {
@@ -447,10 +451,7 @@ function render(
 
           const duration = timeToMS(durations[index % durations.length]);
           const delay = timeToMS(delays[index % delays.length]);
-          // const easing: any =
-          //   transition.timingFunction[
-          //     index % transition.timingFunction.length
-          //   ];
+          const easing = timingFunctions[index % timingFunctions.length];
 
           let sharedValue = state.sharedValues[key];
           if (!sharedValue) {
@@ -461,7 +462,10 @@ function render(
           if (value !== sharedValue.value) {
             sharedValue.value = withDelay(
               delay,
-              withTiming(value, { duration }),
+              withTiming(value, {
+                duration,
+                easing: getEasing(easing),
+              }),
             );
           }
 
@@ -1191,5 +1195,29 @@ function resolveObject<T extends object>(obj: T) {
     const v = obj[i];
     if (typeof v == "object" && v != null) resolveObject(v);
     else obj[i] = typeof v === "function" ? v() : v;
+  }
+}
+
+function getEasing(timingFunction: EasingFunction) {
+  switch (timingFunction.type) {
+    case "ease":
+      return Easing.ease;
+    case "ease-in":
+      return Easing.in(Easing.quad);
+    case "ease-out":
+      return Easing.out(Easing.quad);
+    case "ease-in-out":
+      return Easing.inOut(Easing.quad);
+    case "linear":
+      return Easing.linear;
+    case "cubic-bezier":
+      return Easing.bezier(
+        timingFunction.x1,
+        timingFunction.y1,
+        timingFunction.x2,
+        timingFunction.y2,
+      );
+    default:
+      return Easing.linear;
   }
 }
