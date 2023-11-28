@@ -17,7 +17,7 @@ beforeEach(() => resetStyles());
 test("numeric transition", () => {
   registerCSS(`
     .transition {
-      transition: width 1s;
+      transition: width 1s linear;
     }
 
     .first {
@@ -71,7 +71,7 @@ test("numeric transition", () => {
 test("color transition", () => {
   registerCSS(`
     .transition {
-      transition: color 1s;
+      transition: color 1s linear;
     }
 
     .first {

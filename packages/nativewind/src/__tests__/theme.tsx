@@ -218,3 +218,29 @@ test("nested functions", async () => {
     borderWidth: 123,
   });
 });
+
+test("custom color w/ css variable", async () => {
+  await renderTailwind(
+    <A
+      testID={testA}
+      className="text-primary-50 [--color-primary-50:240,253,250]"
+    />,
+    {
+      config: {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: "rgb(var(--color-primary-50) / <alpha-value>)",
+              },
+            },
+          },
+        },
+      },
+    },
+  );
+
+  expect(screen.getByTestId(testA)).toHaveStyle({
+    color: "rgba(240, 253, 250, 1)",
+  });
+});
