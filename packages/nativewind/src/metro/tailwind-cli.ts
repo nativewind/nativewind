@@ -14,6 +14,8 @@ export interface TailwindCliOptions extends GetTransformOptionsOpts {
   output: string;
   cliCommand: string;
   hotServerOptions: ServerOptions;
+  browserslist: string | null;
+  browserslistEnv: string | null;
 }
 
 export async function tailwindCli(
@@ -34,6 +36,8 @@ export async function tailwindCli(
   const env = {
     ...process.env,
     NATIVEWIND_NATIVE: options.platform !== "web" ? "1" : undefined,
+    BROWSERSLIST: options.browserslist ?? undefined,
+    BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
   };
 
   const platform = options.platform === "web" ? "web" : "native";

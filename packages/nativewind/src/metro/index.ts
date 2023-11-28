@@ -15,12 +15,14 @@ import { cssToReactNativeRuntimeOptions } from "./common";
 import { tailwindCli } from "./tailwind-cli";
 
 interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
-  input?: string;
+  input: string;
   projectRoot?: string;
   outputDir?: string;
   configPath?: string;
   hotServerOptions?: ServerOptions;
   cliCommand?: string;
+  browserslist?: string | null;
+  browserslistEnv?: string | null;
 }
 
 export function withNativeWind(
@@ -37,8 +39,10 @@ export function withNativeWind(
       tailwindPackage.bin.tailwindcss,
     )}`,
     hotServerOptions = {},
+    browserslist = "last 1 version",
+    browserslistEnv = "native",
     experiments,
-  }: WithNativeWindOptions = {},
+  }: WithNativeWindOptions,
 ) {
   if (!input) {
     throw new Error(
@@ -118,6 +122,8 @@ export function withNativeWind(
           output,
           cliCommand,
           hotServerOptions,
+          browserslist,
+          browserslistEnv,
         });
 
         if (cliOutput) {

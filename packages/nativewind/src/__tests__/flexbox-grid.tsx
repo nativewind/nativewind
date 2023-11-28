@@ -163,6 +163,8 @@ describe("Flexbox & Grid - Gap", () => {
     ["gap-0", style({ columnGap: 0, rowGap: 0 })],
     ["gap-1", style({ columnGap: 3.5, rowGap: 3.5 })],
     ["gap-px", style({ columnGap: 1, rowGap: 1 })],
+    ["gap-x-1", style({ columnGap: 3.5 })],
+    ["gap-y-1", style({ rowGap: 3.5 })],
   );
 });
 
