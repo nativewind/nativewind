@@ -547,7 +547,7 @@ function render(
   }
   if (state.hasFocus || state.hasContainer) {
     state.convertToPressable = true;
-    state.interaction.hover ??= createSignal(false, `${state.testId}#focus`);
+    state.interaction.focus ??= createSignal(false, `${state.testId}#focus`);
     state.props.onFocus = (event: unknown) => {
       state.originalProps.onFocus?.(event);
       state.interaction.focus!.set(true);
