@@ -41,11 +41,13 @@ export function createMockComponent<
   {
     mapping = { className: "style" } as unknown as EnableCssInteropOptions<P> &
       M,
+    propDeps = [],
   }: {
     mapping?: EnableCssInteropOptions<P> & M;
+    propDeps?: (keyof EnableCssInteropOptions<P>)[],
   } = {},
 ) {
-  cssInterop<P, M>(Component, mapping);
+  cssInterop<P, M>(Component, mapping, propDeps);
 
   const mock = jest.fn((props: P & { [K in keyof M]?: string }, _ref) => {
     return render((JSX as any).jsx, Component, props as any, "");

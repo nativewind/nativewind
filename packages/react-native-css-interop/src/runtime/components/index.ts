@@ -22,7 +22,7 @@ import { cssInterop, remapProps } from "./rendering";
 
 cssInterop(Image, { className: "style" });
 cssInterop(Switch, { className: "style" });
-cssInterop(Pressable, { className: "style" });
+cssInterop(Pressable, { className: "style" }, ["disabled"]);
 cssInterop(Text, { className: "style" });
 cssInterop(View, { className: "style" });
 cssInterop(SafeAreaView, { className: "style" });

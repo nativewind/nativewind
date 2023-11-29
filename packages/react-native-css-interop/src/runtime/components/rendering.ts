@@ -54,15 +54,17 @@ export function render(jsx: any, type: any, props: any, ...args: any) {
 export function cssInterop<T extends {}, M>(
   component: ComponentType<T> | string,
   mapping: EnableCssInteropOptions<T> & M,
+  propDeps?: (keyof EnableCssInteropOptions<T>)[],
 ) {
-  interopComponents.set(component, getNormalizeConfig(mapping));
+  interopComponents.set(component, getNormalizeConfig(mapping, propDeps));
 }
 
 export function remapProps<P, M>(
   component: ComponentType<P>,
   mapping: RemapProps<P> & M,
+  propDeps?: (keyof RemapProps<P>)[],
 ) {
-  interopComponents.set(component, getNormalizeConfig(mapping));
+  interopComponents.set(component, getNormalizeConfig(mapping, propDeps));
 }
 
 export function createElementAndCheckCssInterop(
@@ -75,6 +77,7 @@ export function createElementAndCheckCssInterop(
 
 function getNormalizeConfig(
   mapping: EnableCssInteropOptions<any>,
+  propDeps: (keyof EnableCssInteropOptions<any>)[] = [],
 ): NormalizedOptions {
   const config = new Map<
     string,
@@ -82,6 +85,8 @@ function getNormalizeConfig(
   >();
   const dependencies = new Set<string>();
   const sources = new Set<string>();
+
+  propDeps.forEach((dep) => dependencies.add(dep));
 
   for (const [key, options] of Object.entries(mapping) as Array<
     [string, EnableCssInteropOptions<any>[string]]

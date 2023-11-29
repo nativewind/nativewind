@@ -188,6 +188,7 @@ export function normalizeSelectors(
             case "hover":
             case "active":
             case "focus":
+            case "disabled":
               selector.pseudoClasses ??= {};
               selector.pseudoClasses[component.kind] = true;
               break;

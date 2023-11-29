@@ -48,6 +48,7 @@ export function testPseudoClasses(
   if (meta.active) fail ||= state.getInteraction("active") !== true;
   if (meta.hover) fail ||= state.getInteraction("hover") !== true;
   if (meta.focus) fail ||= state.getInteraction("focus") !== true;
+  if (meta.disabled) fail ||= state.getInteraction("disabled") !== true;
   return !fail;
 }
 

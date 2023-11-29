@@ -77,6 +77,7 @@ export function createInteropStore(
     hasActive: false,
     hasHover: false,
     hasFocus: false,
+    hasDisabled: false,
     hasContainer: false,
     shouldUpdateContext: false,
     convertToPressable: false,
@@ -557,6 +558,10 @@ function render(
       state.interaction.focus!.set(false);
     };
   }
+  if (state.hasDisabled || state.hasContainer) {
+    state.interaction.disabled ??= createSignal(state.originalProps.disabled, `${state.testId}#disabled`);
+    state.originalProps.disabled ? state.interaction.disabled.set(true) : state.interaction.disabled.set(false);
+  }
 
   if (state.convertToPressable) {
     // This is an annoying quirk of RN. Pressable will only work if onPress is defined
@@ -727,6 +732,7 @@ export function reduceStyles(
       state.hasActive ||= Boolean(style.pseudoClasses.active);
       state.hasHover ||= Boolean(style.pseudoClasses.hover);
       state.hasFocus ||= Boolean(style.pseudoClasses.focus);
+      state.hasDisabled ||= Boolean(style.pseudoClasses.disabled);
       if (!testPseudoClasses(state, style.pseudoClasses)) {
         continue;
       }

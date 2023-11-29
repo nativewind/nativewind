@@ -27,6 +27,9 @@ cssInterop(component, {
     }
   }
 });
+
+// Update styles if prop changes
+cssInterop(component, { "new-prop": "existing-prop" }, ['prop']);
 ```
 
 ## Examples
@@ -55,3 +58,12 @@ cssInterop(TextInput, {
   },
 });
 ```
+
+Here is an example of forcing a re-render with style update based on prop change using `<Pressable />`. This is useful for the `disabled:` pseudo selector
+
+```tsx
+cssInterop(Pressable, {
+  className: "style",
+  },
+  ['disabled']
+});

@@ -46,6 +46,7 @@ export interface InteropStore {
   hasActive: boolean;
   hasHover: boolean;
   hasFocus: boolean;
+  hasDisabled: boolean;
   hasContainer: boolean;
   convertToPressable: boolean;
   shouldUpdateContext: boolean;
@@ -273,6 +274,7 @@ export type Interaction = {
   active?: Signal<boolean>;
   hover?: Signal<boolean>;
   focus?: Signal<boolean>;
+  disabled?: Signal<boolean>;
 };
 
 export type ExtractedContainer = {
@@ -329,6 +331,7 @@ export type PseudoClassesQuery = {
   hover?: boolean;
   active?: boolean;
   focus?: boolean;
+  disabled?: boolean;
 };
 
 export type StyleSheetRegisterCompiledOptions = {

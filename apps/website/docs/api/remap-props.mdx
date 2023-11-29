@@ -25,4 +25,7 @@ remapProps(component, { "new-prop": "existing-prop" });
 
 // Override an existing prop.
 remapProps(component, { prop: true });
+
+// Create a new prop and map it to an existing prop and re-render when a prop changes
+remapProps(component, { "new-prop": "existing-prop" }, ['existing-prop-2']);
 ```
