@@ -780,7 +780,7 @@ export function reduceStyles(
     }
 
     if (style.props) {
-      for (const [prop, value] of style.props) {
+      for (const [_prop, value] of style.props) {
         if (typeof value === "object" && "$$type" in value) {
           state.props[prop] = value.value;
         } else if (value !== undefined) {
