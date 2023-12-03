@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { ComponentType, forwardRef } from "react";
 import * as JSX from "react/jsx-runtime";
 
 import { StyleSheet } from "../index";
@@ -15,7 +15,9 @@ import {
   render,
   cssInterop,
   remapProps,
+  interopComponents,
 } from "../runtime/components/rendering";
+import { opaqueStyles } from "../runtime/native/globals";
 
 export * from "../types";
 export { warnings } from "../runtime/native/globals";
@@ -34,21 +36,19 @@ declare global {
  * set the jsxImportSource.
  */
 export function createMockComponent<
-  P extends object,
-  M = { className: "style" },
+  const T extends ComponentType,
+  const M extends EnableCssInteropOptions<any>,
 >(
-  Component: React.ComponentType<P>,
-  {
-    mapping = { className: "style" } as unknown as EnableCssInteropOptions<P> &
-      M,
-  }: {
-    mapping?: EnableCssInteropOptions<P> & M;
-  } = {},
+  Component: T,
+  mapping: EnableCssInteropOptions<T> & M = {
+    className: "style",
+  } as unknown as EnableCssInteropOptions<T> & M,
 ) {
-  cssInterop<P, M>(Component, mapping);
+  cssInterop(Component, mapping);
 
-  const mock = jest.fn((props: P & { [K in keyof M]?: string }, _ref) => {
-    return render((JSX as any).jsx, Component, props as any, "");
+  const mock = jest.fn((props, ref) => {
+    props.ref = ref;
+    return render((JSX as any).jsx, Component, props, "");
   });
 
   const component = forwardRef(mock);
@@ -65,7 +65,8 @@ export function createRemappedComponent<
 ) {
   remapProps(Component, mapping);
 
-  const mock = jest.fn((props: P & { [K in keyof M]?: string }, _ref) => {
+  const mock = jest.fn((props, ref) => {
+    props.ref = ref;
     return render((JSX as any).jsx, Component, props as any, "");
   });
 
@@ -74,11 +75,61 @@ export function createRemappedComponent<
   return Object.assign(component, { mock });
 }
 
-export const resetStyles = StyleSheet[INTERNAL_RESET].bind(StyleSheet);
+export const resetStyles = () => {
+  StyleSheet[INTERNAL_RESET]();
+};
+
+export const resetComponents = () => {
+  interopComponents.clear();
+};
 
 export function registerCSS(
   css: string,
   options?: CssToReactNativeRuntimeOptions,
 ) {
   StyleSheet.registerCompiled(cssToReactNativeRuntime(css, options));
+}
+
+export function revealStyles(obj: any): any {
+  switch (typeof obj) {
+    case "string":
+    case "number":
+    case "bigint":
+    case "boolean":
+    case "symbol":
+    case "undefined":
+    case "function":
+      return obj;
+    case "object":
+    default: {
+      const style = opaqueStyles.get(obj);
+      if (style) return style;
+
+      return Object.fromEntries(
+        Object.entries(obj).map(([key, value]): any => {
+          switch (typeof value) {
+            case "string":
+            case "number":
+            case "bigint":
+            case "boolean":
+            case "symbol":
+            case "undefined":
+            case "function":
+              return [key, value];
+            case "object":
+            default: {
+              if (Array.isArray(value)) {
+                return [key, value.map(revealStyles)];
+              } else if (value) {
+                const style = opaqueStyles.get(value);
+                return [key, style ?? value];
+              } else {
+                return [key, value];
+              }
+            }
+          }
+        }),
+      );
+    }
+  }
 }

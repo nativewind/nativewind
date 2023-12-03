@@ -1,15 +1,14 @@
 import {
   ComponentClass,
-  ComponentType,
   FunctionComponent,
   ReactNode,
   createElement,
 } from "react";
 import type {
+  CssInterop,
   EnableCssInteropOptions,
   NativeStyleToProp,
   NormalizedOptions,
-  RemapProps,
   StyleProp,
 } from "../../types";
 
@@ -51,19 +50,13 @@ export function render(jsx: any, type: any, props: any, ...args: any) {
   return jsx(type, props, ...args);
 }
 
-export function cssInterop<T extends {}, M>(
-  component: ComponentType<T> | string,
-  mapping: EnableCssInteropOptions<T> & M,
-) {
+export const cssInterop: CssInterop = (component, mapping) => {
   interopComponents.set(component, getNormalizeConfig(mapping));
-}
+  return component;
+};
 
-export function remapProps<P, M>(
-  component: ComponentType<P>,
-  mapping: RemapProps<P> & M,
-) {
-  interopComponents.set(component, getNormalizeConfig(mapping));
-}
+// On web, these are the same
+export const remapProps = cssInterop;
 
 export function createElementAndCheckCssInterop(
   type: string | FunctionComponent | ComponentClass,

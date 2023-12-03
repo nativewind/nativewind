@@ -76,15 +76,13 @@ test("TextInput", () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component.props).toEqual(
-    expect.objectContaining({
-      testID,
-      placeholderTextColor: "rgba(255, 255, 255, 1)",
-      style: expect.objectContaining({
-        color: "rgba(0, 0, 0, 1)",
-      }),
-    }),
-  );
+  expect(component.props).toEqual({
+    testID,
+    placeholderTextColor: "rgba(255, 255, 255, 1)",
+    style: {
+      color: "rgba(0, 0, 0, 1)",
+    },
+  });
 });
 
 test("ActivityIndicator", () => {
@@ -97,19 +95,15 @@ test("ActivityIndicator", () => {
   const component = screen.getByTestId(testID);
 
   // These should be removed
-  expect(component.props).not.toEqual(
-    expect.objectContaining({
-      className: expect.any,
-    }),
-  );
+  expect(component.props).not.toEqual({
+    className: expect.any,
+  });
 
-  expect(component.props).toEqual(
-    expect.objectContaining({
-      testID,
-      color: "rgba(255, 255, 255, 1)",
-      style: expect.objectContaining({
-        backgroundColor: "rgba(0, 0, 0, 1)",
-      }),
-    }),
-  );
+  expect(component.props).toEqual({
+    testID,
+    color: "rgba(255, 255, 255, 1)",
+    style: {
+      backgroundColor: "rgba(0, 0, 0, 1)",
+    },
+  });
 });

@@ -1,10 +1,7 @@
-import { ComponentType } from "react";
-import type { EnableCssInteropOptions, InteropFunction } from "../../types";
-
-export function unstable_styled<P extends object, M>(
-  component: ComponentType<P>,
-  mapping?: EnableCssInteropOptions<P> & M,
-  interop?: InteropFunction,
+export function unstable_styled(
+  _component: any,
+  _mapping?: any,
+  _interop?: any,
 ) {
   throw new Error("Not implemented");
 }

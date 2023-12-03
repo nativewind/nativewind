@@ -8,10 +8,10 @@ import {
   forwardRef,
 } from "react";
 import type {
+  CssInterop,
   EnableCssInteropOptions,
   NativeStyleToProp,
   NormalizedOptions,
-  RemapProps,
 } from "../../types";
 import { defaultCSSInterop } from "../native/interop";
 import { interopGlobal } from "../signals";
@@ -41,10 +41,7 @@ export function render(jsx: any, type: any, props: any, ...args: any) {
   }
 }
 
-export function cssInterop<T extends {}, M>(
-  component: ComponentType<T> | string,
-  mapping: EnableCssInteropOptions<T> & M,
-) {
+export const cssInterop: CssInterop = (component, mapping) => {
   const config = getNormalizeConfig(mapping);
 
   function CssInteropComponent({
@@ -62,7 +59,7 @@ export function cssInterop<T extends {}, M>(
     }
 
     if (___pressable) {
-      return createElement(component, props as unknown as T, children);
+      return createElement(component, props, children);
     } else {
       interopGlobal.isInComponent = true;
       interopGlobal.current = null;
@@ -138,12 +135,10 @@ export function cssInterop<T extends {}, M>(
   };
 
   interopComponents.set(component, interopComponent);
-}
+  return component;
+};
 
-export function remapProps<P, M>(
-  component: ComponentType<P>,
-  mapping: RemapProps<P> & M,
-) {
+export const remapProps: CssInterop = (component, mapping) => {
   const { config } = getNormalizeConfig(mapping);
 
   let render: any = <P extends Record<string, unknown>>(
@@ -197,8 +192,8 @@ export function remapProps<P, M>(
 
   interopComponents.set(component as any, interopComponent);
 
-  return;
-}
+  return component;
+};
 
 export function createElementAndCheckCssInterop(
   type: string | FunctionComponent | ComponentClass,

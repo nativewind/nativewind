@@ -8,9 +8,10 @@ import type {
   Declaration,
 } from "lightningcss";
 import type {
-  ComponentClass,
+  ComponentProps,
+  ElementType,
   ForwardRefExoticComponent,
-  FunctionComponent,
+  JSXElementConstructor,
   ReactElement,
   ReactNode,
 } from "react";
@@ -24,6 +25,10 @@ import type {
 import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
 import type { Effect, Signal } from "./runtime/signals";
 import { makeMutable } from "react-native-reanimated";
+
+export type ComponentType<P = any> =
+  | ForwardRefExoticComponent<P>
+  | ElementType<P>;
 
 type Prop = string;
 type Source = string;
@@ -104,44 +109,60 @@ export type ExtractedStyleMapping = Record<
   | { prop: string; attribute?: string; transform?: "append-object" }
 >;
 
-export type EnableCssInteropOptions<P> = {
-  [K in string]?: CSSInteropClassNamePropConfig<P>;
-};
-
-export type NormalizedCSSInteropClassNamePropConfig<P> = {
-  target: (keyof P & string) | boolean;
-  nativeStyleToProp?: NativeStyleToProp<P>;
-};
+export type EnableCssInteropOptions<
+  T extends keyof JSX.IntrinsicElements | JSXElementConstructor<any>,
+> = Record<string, CSSInteropClassNamePropConfig<ComponentProps<T>>>;
 
 export type Layers = Record<0 | 1 | 2, Array<RuntimeStyle | object>> & {
   classNames: string;
 };
 
+export type CssInterop = <
+  const T extends ComponentType,
+  const M extends EnableCssInteropOptions<any>,
+>(
+  component: T,
+  mapping: EnableCssInteropOptions<T> & M,
+) => ComponentType<ComponentProps<T> & CssInteropGeneratedProps<M>>;
+
 export type CSSInteropClassNamePropConfig<P> =
   | undefined
-  | (keyof P & string)
   | boolean
-  | NormalizedCSSInteropClassNamePropConfig<P>;
+  | (keyof P & string)
+  | {
+      target: (keyof P & string) | boolean;
+      nativeStyleToProp?: NativeStyleToProp<P>;
+    };
+
+export type CssInteropGeneratedProps<T extends EnableCssInteropOptions<any>> = {
+  [K in keyof T as K extends string
+    ? T[K] extends undefined | false
+      ? never
+      : T[K] extends true
+      ? K
+      : T[K] extends string
+      ? T[K]
+      : CssInteropOptionTargetToProp<T[K], K>
+    : never]: string;
+};
+
+type CssInteropOptionTargetToProp<T, K extends string> = T extends {
+  target: string | boolean;
+}
+  ? T["target"] extends false
+    ? never
+    : T["target"] extends true
+    ? K
+    : T["target"] extends string
+    ? T["target"]
+    : never
+  : never;
 
 export type NativeStyleToProp<P> = {
   [K in keyof Style & string]?: K extends keyof P
     ? (keyof P & string) | true
     : keyof P & string;
 };
-
-export type RemapProps<P> = {
-  [K in string]?: (keyof P & string) | true | undefined;
-};
-
-export type ComponentTypeWithMapping<P, M> = ComponentType<
-  P & { [K in keyof M]?: string }
->;
-
-export type ComponentType<P> =
-  | ForwardRefExoticComponent<P>
-  | FunctionComponent<P>
-  | ComponentClass<P>
-  | string;
 
 export type JSXFunction<P> = (
   type: ComponentType<P>,

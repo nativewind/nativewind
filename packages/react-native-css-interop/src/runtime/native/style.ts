@@ -702,7 +702,7 @@ function mapStyle(style: TransportStyle): RuntimeStyle {
 
 export function reduceStyles(
   state: InteropStore,
-  prop: string,
+  targetProp: string,
   styles: Array<RuntimeStyle | object>,
   _scope: number,
   treatAsInline = false,
@@ -712,8 +712,8 @@ export function reduceStyles(
   for (let style of styles) {
     if (!style) continue;
     if (typeof style === "object" && !("$$type" in style)) {
-      state.props[prop] ??= {};
-      Object.assign(state.props[prop], style);
+      state.props[targetProp] ??= {};
+      Object.assign(state.props[targetProp], style);
       continue;
     }
 
@@ -779,8 +779,14 @@ export function reduceStyles(
       }
     }
 
+    debugger;
+
     if (style.props) {
-      for (const [prop, value] of style.props) {
+      for (let [prop, value] of style.props) {
+        // The compiler maps to 'style' by default, but we may be rendering for a different prop
+        if (targetProp !== "style" && prop === "style") {
+          prop = targetProp;
+        }
         if (typeof value === "object" && "$$type" in value) {
           state.props[prop] = value.value;
         } else if (value !== undefined) {
