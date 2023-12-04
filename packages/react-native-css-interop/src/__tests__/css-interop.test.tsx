@@ -12,7 +12,6 @@ const testID = "react-native-css-interop";
 
 beforeEach(() => {
   resetStyles();
-  debugger;
   resetComponents();
 });
 

@@ -11,6 +11,7 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { createInteropStore } from "./style";
 import type { InteropFunction } from "../../types";
 import { interopContext, InteropProvider } from "./globals";
+import { getTestAttributeValue } from "./conditions";
 
 export type InteropComponent = {
   type: ComponentType<any>;
@@ -20,14 +21,16 @@ export type InteropComponent = {
 export const defaultCSSInterop: InteropFunction = (
   component,
   options,
-  props,
+  originalProps,
   children,
 ) => {
+  let props: Record<string, any> = { ...originalProps, children };
   const parent = useContext(interopContext);
   const storeRef = useRef<ReturnType<typeof createInteropStore>>();
   if (!storeRef.current) {
     storeRef.current = createInteropStore(parent, options, props);
   }
+  const state = storeRef.current.state!;
 
   /**
    * I think there is a way to rewrite this with useReducer, but I'm not sure how to do it.
@@ -41,12 +44,13 @@ export const defaultCSSInterop: InteropFunction = (
     storeRef.current.snapshot,
   );
 
-  const state = storeRef.current.state;
-
   // If the parent or a dependency changes we need to rerender
   if (
     parent !== state.parent ||
-    options.dependencies.some((k, i) => props[k] !== state.dependencies[i])
+    options.dependencies.some((k, i) => props[k] !== state.dependencies[i]) ||
+    storeRef.current.state.attrDependencies.some((condition) => {
+      return getTestAttributeValue(props, condition) !== condition.previous;
+    })
   ) {
     state.rerender(parent, props);
   }

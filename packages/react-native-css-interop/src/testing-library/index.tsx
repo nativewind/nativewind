@@ -46,7 +46,7 @@ export function createMockComponent<
 ) {
   cssInterop(Component, mapping);
 
-  const mock = jest.fn((props, ref) => {
+  const mock = jest.fn(({ ...props }, ref) => {
     props.ref = ref;
     return render((JSX as any).jsx, Component, props, "");
   });

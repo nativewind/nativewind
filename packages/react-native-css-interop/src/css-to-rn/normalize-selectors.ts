@@ -1,5 +1,10 @@
 import type { MediaQuery, Selector, SelectorList } from "lightningcss";
-import { Specificity, ExtractRuleOptions, CompilerStyleMeta } from "../types";
+import {
+  Specificity,
+  ExtractRuleOptions,
+  CompilerStyleMeta,
+  AttributeCondition,
+} from "../types";
 
 export type NormalizeSelector =
   | {
@@ -13,6 +18,7 @@ export type NormalizeSelector =
       groupClassName?: string;
       pseudoClasses?: Record<string, true>;
       groupPseudoClasses?: Record<string, true>;
+      attrs?: AttributeCondition[];
       specificity: Pick<Specificity, "A" | "B" | "C">;
     };
 
@@ -122,10 +128,24 @@ export function normalizeSelectors(
           selector.specificity.A++;
           isValid = false;
           break;
-        case "attribute":
+        case "attribute": {
+          if (!selector.className) {
+            isValid = false;
+            break;
+          }
+
           selector.specificity.B++;
-          isValid = false;
+          selector.attrs ??= [];
+          if (component.name.startsWith("data-")) {
+            selector.attrs.push({
+              ...component,
+              type: "data-attribute",
+            });
+          } else {
+            selector.attrs.push(component);
+          }
           break;
+        }
         case "pseudo-element":
           selector.specificity.C++;
           isValid = false;
@@ -190,6 +210,18 @@ export function normalizeSelectors(
             case "focus":
               selector.pseudoClasses ??= {};
               selector.pseudoClasses[component.kind] = true;
+              break;
+            case "disabled":
+              selector.attrs ??= [];
+              selector.attrs.push({ type: "attribute", name: "disabled" });
+              break;
+            case "empty":
+              selector.attrs ??= [];
+              selector.attrs.push({
+                type: "attribute",
+                name: "children",
+                operation: { operator: "empty" },
+              });
               break;
           }
         }

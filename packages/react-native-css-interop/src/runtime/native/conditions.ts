@@ -8,6 +8,7 @@ import type {
 } from "lightningcss";
 
 import {
+  AttributeCondition,
   ExtractedContainerQuery,
   InteropStore,
   PseudoClassesQuery,
@@ -258,4 +259,34 @@ function unwrap<T>(value: T | SignalLike<T>): T {
   return value && typeof value === "object" && "get" in value
     ? value.get()
     : value;
+}
+
+export function getTestAttributeValue(
+  props: Record<string, any>,
+  condition: AttributeCondition,
+) {
+  return condition.type === "data-attribute"
+    ? props["dataSet"]?.[condition.name.replace("data-", "")]
+    : props[condition.name];
+}
+
+export function testAttribute(propValue: any, condition: AttributeCondition) {
+  const operation = condition.operation;
+
+  if (operation == null) return propValue != null;
+
+  switch (operation.operator) {
+    case "empty": {
+      return propValue == null || propValue == "";
+    }
+    case "includes":
+    case "dash-match":
+    case "prefix":
+    case "substring":
+    case "suffix":
+      return false;
+    case "equal": {
+      return propValue?.toString() === operation.value.toString();
+    }
+  }
 }

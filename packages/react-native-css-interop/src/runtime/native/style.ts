@@ -40,6 +40,8 @@ import {
   isPropDescriptor,
 } from "../../shared";
 import {
+  getTestAttributeValue,
+  testAttribute,
   testContainerQuery,
   testMediaQueries,
   testPseudoClasses,
@@ -90,6 +92,7 @@ export function createInteropStore(
     containerNames: new Set(),
     sharedValues: {},
     dependencies: options.dependencies.map((k) => originalProps[k]),
+    attrDependencies: [],
     setVariable(name, value) {
       state.inlineVariablesToRemove.delete(name);
 
@@ -177,6 +180,7 @@ function render(
   state.convertToPressable ||= false;
   state.inlineVariablesToRemove = new Set(state.inlineVariables.keys());
   state.props = {};
+  state.attrDependencies = [];
 
   setupEffect(state.effect);
   interopGlobal.delayedEvents.delete(state.effect!);
@@ -743,6 +747,20 @@ export function reduceStyles(
       continue;
     }
 
+    if (style.attrs) {
+      let passed = true;
+      for (const attrCondition of style.attrs) {
+        const attrValue = getTestAttributeValue(
+          state.originalProps,
+          attrCondition,
+        );
+        state.attrDependencies.push({ ...attrCondition, previous: attrValue });
+        if (!testAttribute(attrValue, attrCondition)) passed = false;
+      }
+
+      if (!passed) continue;
+    }
+
     if (style.hoistedStyles) {
       state.hoistedStyles ??= [];
       state.hoistedStyles.push(...style.hoistedStyles);
@@ -778,8 +796,6 @@ export function reduceStyles(
         state.setContainer(name);
       }
     }
-
-    debugger;
 
     if (style.props) {
       for (let [prop, value] of style.props) {

@@ -415,6 +415,7 @@ function setStyleForSelectorList(
         pseudoClasses,
         groupPseudoClasses,
         darkMode,
+        attrs,
       } = selector;
 
       if (style.props?.style && Object.keys(style.props.style).length === 0) {
@@ -432,6 +433,7 @@ function setStyleForSelectorList(
           groupClassName,
           {
             specificity,
+            attrs,
             props: {},
             propSingleValue: {},
             scope: STYLE_SCOPES.GLOBAL,
@@ -466,7 +468,7 @@ function setStyleForSelectorList(
 
       addDeclaration(
         className,
-        { ...style, specificity, pseudoClasses },
+        { ...style, specificity, pseudoClasses, attrs },
         declarations,
       );
     }

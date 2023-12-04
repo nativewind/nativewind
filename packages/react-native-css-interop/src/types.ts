@@ -6,6 +6,7 @@ import type {
   EasingFunction,
   ContainerCondition,
   Declaration,
+  SelectorComponent,
 } from "lightningcss";
 import type {
   ComponentProps,
@@ -68,6 +69,7 @@ export interface InteropStore {
   animationWaitingOnLayout: boolean;
   layout?: Signal<[number, number] | undefined>;
   dependencies: any[];
+  attrDependencies: AttributeDependency[];
   hoistedStyles?: [string, string, HoistedTypes][];
   sharedValues: Record<string, ReturnType<typeof makeMutable>>;
   getInteraction(name: keyof Interaction): boolean;
@@ -206,6 +208,7 @@ export type CompilerStyleMeta = {
   requiresLayoutHeight?: boolean;
   props: Record<string, Record<string, RuntimeValueDescriptor>>;
   propSingleValue: Record<string, PropRuntimeValueDescriptor>;
+  attrs?: AttributeCondition[];
   hoistedStyles?: [string, string, HoistedTypes][];
   scope: number;
   warnings?: ExtractionWarning[];
@@ -425,6 +428,28 @@ export interface CommonStyleSheet {
   registerCompiled(options: StyleSheetRegisterCompiledOptions): void;
   getFlag(name: string): string | undefined;
 }
+
+export type AttributeCondition = PropCondition | DataAttributeCondition;
+export type AttributeDependency = AttributeCondition & {
+  previous?: any;
+};
+
+type AttributeSelectorComponent = Extract<
+  SelectorComponent,
+  { type: "attribute" }
+>;
+
+export type PropCondition = Omit<AttributeSelectorComponent, "operation"> & {
+  operation?:
+    | AttributeSelectorComponent["operation"]
+    | {
+        operator: "empty";
+      };
+};
+
+export type DataAttributeCondition = Omit<PropCondition, "type"> & {
+  type: "data-attribute";
+};
 
 /*
  * This is a list of all the CSS properties that can be animated
