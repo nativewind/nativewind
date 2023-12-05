@@ -5,7 +5,6 @@ import {
   PropsWithChildren,
   ReactNode,
   createElement,
-  forwardRef,
 } from "react";
 import type {
   CssInterop,
@@ -141,10 +140,7 @@ export const cssInterop: CssInterop = (component, mapping) => {
 export const remapProps: CssInterop = (component, mapping) => {
   const { config } = getNormalizeConfig(mapping);
 
-  let render: any = <P extends Record<string, unknown>>(
-    { ...props }: PropsWithChildren<P>,
-    ref: unknown,
-  ) => {
+  let render: any = ({ ...props }: Record<string, any>) => {
     for (const entry of config) {
       const key = entry[0];
       const sourceProp = entry[1];
@@ -178,12 +174,15 @@ export const remapProps: CssInterop = (component, mapping) => {
       }
     }
 
-    (props as any).ref = ref;
+    if (props.___ref) {
+      props.ref = props.___ref;
+      delete props.___ref;
+    }
 
     return createElement(component as any, props, props.children);
   };
   const interopComponent: InteropComponent = {
-    type: forwardRef(render),
+    type: render,
     check: () => true,
     createElement(props, ...children) {
       return createElement(interopComponent.type, props, ...children);

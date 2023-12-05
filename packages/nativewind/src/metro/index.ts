@@ -42,11 +42,11 @@ export function withNativeWind(
     browserslist = "last 1 version",
     browserslistEnv = "native",
     experiments,
-  }: WithNativeWindOptions,
+  }: WithNativeWindOptions = {} as WithNativeWindOptions,
 ) {
   if (!input) {
     throw new Error(
-      "withNativeWind requires an input parameter: `withNativeWind({ input: <css-file> })`",
+      "withNativeWind requires an input parameter: `withNativeWind(config, { input: <css-file> })`",
     );
   }
 
