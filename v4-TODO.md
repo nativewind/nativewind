@@ -4,6 +4,7 @@ nativewind
 
 - [ ] responsive design tests
 - [ ] svg tests
+- [ ] add a migration workflow from v2 for styled()
 
 react-native-css-interop
 
