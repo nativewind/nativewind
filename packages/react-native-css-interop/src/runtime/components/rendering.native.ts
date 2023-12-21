@@ -2,7 +2,6 @@ import {
   ComponentClass,
   ComponentType,
   FunctionComponent,
-  PropsWithChildren,
   ReactNode,
   createElement,
   forwardRef,
