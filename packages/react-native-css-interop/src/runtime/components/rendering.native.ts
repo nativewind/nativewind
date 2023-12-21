@@ -5,6 +5,7 @@ import {
   PropsWithChildren,
   ReactNode,
   createElement,
+  forwardRef,
 } from "react";
 import type {
   CssInterop,
@@ -34,8 +35,14 @@ export function render(jsx: any, type: any, props: any, ...args: any) {
       props.___ref = props.ref;
       delete props.ref;
     }
+    if (type.displayName === "NativeViewGestureHandler") {
+      console.log(type.displayName, props);
+    }
     return jsx(interop.type, props, ...args);
   } else {
+    if (type.displayName === "NativeViewGestureHandler") {
+      console.log(type.displayName, props);
+    }
     return jsx(type, props, ...args);
   }
 }
@@ -43,18 +50,12 @@ export function render(jsx: any, type: any, props: any, ...args: any) {
 export const cssInterop: CssInterop = (component, mapping) => {
   const config = getNormalizeConfig(mapping);
 
-  function CssInteropComponent({
-    children,
-    ___pressable,
-    ___ref,
-    ...props
-  }: PropsWithChildren<{
-    ___pressable?: true;
-    ___ref?: any;
-    [key: string]: any;
-  }>) {
-    if (___ref) {
-      props.ref = ___ref;
+  const CssInteropComponent = forwardRef<any, any>(function CssInteropComponent(
+    { children, ___pressable, ___ref, ...props },
+    ref,
+  ) {
+    if (___ref || ref) {
+      props.ref = ___ref || ref;
     }
 
     if (___pressable) {
@@ -85,7 +86,7 @@ export const cssInterop: CssInterop = (component, mapping) => {
         },
       });
     }
-  }
+  });
 
   if (process.env.NODE_ENV === "development") {
     if (typeof component === "string") {
