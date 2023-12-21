@@ -34,14 +34,8 @@ export function render(jsx: any, type: any, props: any, ...args: any) {
       props.___ref = props.ref;
       delete props.ref;
     }
-    if (type.displayName === "NativeViewGestureHandler") {
-      console.log(type.displayName, props);
-    }
     return jsx(interop.type, props, ...args);
   } else {
-    if (type.displayName === "NativeViewGestureHandler") {
-      console.log(type.displayName, props);
-    }
     return jsx(type, props, ...args);
   }
 }
