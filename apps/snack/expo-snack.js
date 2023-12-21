@@ -1,12 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { StyleSheet, unstable_styled } from "react-native-css-interop";
-import {
-  Platform,
-  Text as RNText,
-  View as RNView,
-  Pressable as RNPressable,
-} from "react-native";
+import { Platform, Text, View, Pressable } from "react-native";
 
 /*
 Expo Snack does not allow setting the JSX runtime to automatic, or running a custom server.
@@ -27,35 +21,33 @@ if (Platform.OS === "web") {
   tailwindScript.setAttribute("src", "https://cdn.tailwindcss.com");
   document.body.appendChild(tailwindScript);
 } else {
-  StyleSheet.unstable_hook_onClassName = (content) => {
-    content = content
-      .split(" ")
-      .filter((c) => !alreadyProcessed.has(c))
-      .join(" ");
-
-    if (!content) return;
-
-    fetch(`https://nativewind.dev/api/compile`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ content }),
-    })
-      .then((response) => response.json())
-      .then((body) => {
-        content.split(" ").forEach((c) => alreadyProcessed.add(c));
-        StyleSheet.registerCompiled(body);
-      })
-      .catch((error) => {
-        console.error("Error connecting to NativeWind snack server");
-      });
-  };
+  // StyleSheet.unstable_hook_onClassName = (content) => {
+  //   content = content
+  //     .split(" ")
+  //     .filter((c) => !alreadyProcessed.has(c))
+  //     .join(" ");
+  //   if (!content) return;
+  //   fetch(`https://nativewind.dev/api/compile`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ content }),
+  //   })
+  //     .then((response) => response.json())
+  //     .then((body) => {
+  //       content.split(" ").forEach((c) => alreadyProcessed.add(c));
+  //       StyleSheet.registerCompiled(body);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error connecting to NativeWind snack server");
+  //     });
+  // };
 }
 
-export const View = unstable_styled(RNView, { className: "style" });
-export const Text = unstable_styled(RNText, { className: "style" });
-export const Pressable = unstable_styled(RNPressable, { className: "style" });
+// export const View = unstable_styled(RNView, { className: "style" });
+// export const Text = unstable_styled(RNText, { className: "style" });
+// export const Pressable = unstable_styled(RNPressable, { className: "style" });
 
 export function withExpoSnack(Component) {
   return function WithExpoSnack() {

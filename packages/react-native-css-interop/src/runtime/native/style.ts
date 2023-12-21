@@ -1,3 +1,4 @@
+import type { EasingFunction, Time } from "lightningcss";
 import {
   StyleSheet,
   Platform,
@@ -46,7 +47,6 @@ import {
   testMediaQueries,
   testPseudoClasses,
 } from "./conditions";
-import type { EasingFunction, Time } from "lightningcss";
 import type {
   ExtractedAnimations,
   ExtractedTransition,
