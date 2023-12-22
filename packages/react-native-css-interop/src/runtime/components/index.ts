@@ -19,6 +19,7 @@ import {
 } from "react-native";
 
 import { cssInterop, remapProps } from "./rendering";
+export { render } from "./rendering";
 
 cssInterop(Image, { className: "style" });
 cssInterop(Switch, { className: "style" });

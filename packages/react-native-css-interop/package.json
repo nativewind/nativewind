@@ -71,7 +71,6 @@
     "react": ">=18",
     "react-native": "*",
     "react-native-reanimated": ">=3.3.0",
-    "react-native-safe-area-context": ">=4",
     "tailwindcss": "~3"
   },
   "peerDependenciesMeta": {
