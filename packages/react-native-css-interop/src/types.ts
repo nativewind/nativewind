@@ -423,7 +423,7 @@ export interface CommonStyleSheet {
     appearance?: typeof Appearance;
   }): void;
   [INTERNAL_FLAGS]: Record<string, string>;
-  unstable_hook_onClassName?(c: string): void;
+  unstable_hook_onClassName?(callback: (c: string) => void): void;
   register(options: StyleSheetRegisterOptions): void;
   registerCompiled(options: StyleSheetRegisterCompiledOptions): void;
   getFlag(name: string): string | undefined;

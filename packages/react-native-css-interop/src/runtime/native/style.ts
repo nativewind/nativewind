@@ -27,6 +27,7 @@ import {
   animationMap,
   colorScheme,
   globalVariables,
+  externalClassNameCompilerCallback,
   opaqueStyles,
   rem,
   styleSignals,
@@ -200,6 +201,7 @@ function render(
     };
 
     if (classNames) {
+      externalClassNameCompilerCallback.current?.(classNames);
       for (const className of classNames.split(/\s+/)) {
         let signal = styleSignals.get(className);
         if (!signal) continue;
