@@ -51,7 +51,7 @@ function fetchStyle(className: string) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: \`{"content":"${className}"}\`,
+    body: \`{"content":"\${className}"}\`,
   })
     .then(isOk)
     .then((body) => {
