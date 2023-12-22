@@ -1,78 +1,4 @@
 const { version } = require("../../../../packages/nativewind/package.json");
-const snackJS = `import { createElement, useState, useEffect } from "react";
-import { StyleSheet, unstable_styled } from "nativewind"
-import {
-  Platform,
-  Text as RNText,
-  View as RNView,
-  Pressable as RNPressable,
-} from "react-native";
-
-/*
-These examples are for demonstrative purposes only. They have known bugs/issues 
-and are not representative of NativeWind.
-
-Expo Snack does not allow the Tailwind compiler to run, hence these examples use
-an external server to compile the styles.
-
-Please do not use these APIs in your own projects.
-*/
-var tailwindScriptLoaded = false;
-const alreadyProcessed = new Set();
-if (Platform.OS === "web") {
-  var tailwindScript = document.createElement('script');
-  tailwindScript.addEventListener('load', () => { tailwindScriptLoaded = true });
-  tailwindScript.setAttribute('src','https://cdn.tailwindcss.com');
-  document.body.appendChild(tailwindScript);
-} else {
-  StyleSheet.unstable_hook_onClassName = (content) => {
-    content = content
-      .split(" ")
-      .filter((c) => !alreadyProcessed.has(c))
-      .join(" ");
-
-    if (!content) return;
-
-    fetch("https://${process.env.VERCEL_URL}/api/compile", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ content }),
-    })
-      .then((response) => response.json())
-      .then((body) => {
-        content.split(" ").forEach((c) => alreadyProcessed.add(c));
-        StyleSheet.registerCompiled(body);
-      })
-      .catch((error) => {
-        console.error("Error connecting to NativeWind snack server");
-      });
-  }
-}
-
-export const View = unstable_styled(RNView, { className: "style" });
-export const Text = unstable_styled(RNText, { className: "style" });
-export const Pressable = unstable_styled(RNPressable, { className: "style" });
-
-export function withExpoSnack(Component) {
-  return function WithExpoSnack() {
-    const [, rerender] = useState(false);
-    useEffect(() => {
-      return tailwindScript?.addEventListener("load", () => rerender(true));
-    }, []);
-
-    return Platform.OS === "web" ? (
-      tailwindScriptLoaded ? (
-        <Component />
-      ) : (
-        <></>
-      )
-    ) : (
-      <Component />
-    );
-  };
-}`;
 
 const parseParams = (paramString = "") => {
   const params = Object.fromEntries(new URLSearchParams(paramString));
@@ -106,11 +32,12 @@ async function toJsxNode(node) {
     node.value = `\n${node.value}`;
   }
 
-  const appCodeUrl = process.env.VERCEL_URL !== 'nativewind.dev' 
-    ? `, 'https://${process.env.VERCEL_URL}/api/snack'`
-    : ''
+  const appCodeUrl =
+    process.env.VERCEL_URL !== "nativewind.dev"
+      ? `, 'https://${process.env.VERCEL_URL}/api/snack'`
+      : "";
 
-  const appCode = `import { withNativeWind } from "nativewind/expo-snack";
+  const appCode = `import { withExpoSnack } from "nativewind";
 import { View, Text } from "react-native"
 ${node.value}
 
@@ -120,11 +47,11 @@ Please ignore:
  - any warnings about peerDependencies.
  - any flashes of unstyled content.
  - performance issues due to external compilation.
- - the use of nativewind/expo-snack & withNativeWind
+ - the use of withExpoSnack
 You should import View/Text/etc directly from 'react-native'
 Please see the documentation for proper setup application.
 */
-export default withNativeWind(App${appCodeUrl});`;
+export default withExpoSnack(App${appCodeUrl});`;
 
   const files = encodeURIComponent(
     JSON.stringify({
