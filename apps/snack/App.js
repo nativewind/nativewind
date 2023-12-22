@@ -1,4 +1,4 @@
-import "nativewind/expo-snack";
+import { withNativeWind } from "nativewind/expo-snack";
 import React from "react";
 import { View, Text } from "react-native";
 import { vars } from "nativewind";
@@ -15,4 +15,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default withNativeWind(App);

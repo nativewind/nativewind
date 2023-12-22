@@ -20,6 +20,8 @@
         "backgroundColor": "#ffffff"
       }
     },
-    "web": {}
+    "web": {
+      "bundler": "metro"
+    }
   }
 }

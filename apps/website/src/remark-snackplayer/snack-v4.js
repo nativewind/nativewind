@@ -106,8 +106,12 @@ async function toJsxNode(node) {
     node.value = `\n${node.value}`;
   }
 
-  const appCode = `// In your own projects, import from 'react-native' instead.
-import { View, Text, withExpoSnack } from "./expo-snack"
+  const appCodeUrl = process.env.VERCEL_URL !== 'nativewind.dev' 
+    ? `, 'https://${process.env.VERCEL_URL}/api/snack'`
+    : ''
+
+  const appCode = `import { withNativeWind } from "nativewind/expo-snack";
+import { View, Text } from "react-native"
 ${node.value}
 
 /*
@@ -116,21 +120,17 @@ Please ignore:
  - any warnings about peerDependencies.
  - any flashes of unstyled content.
  - performance issues due to external compilation.
- - the use of withExpoSnack() and internal/unstable APIs
+ - the use of nativewind/expo-snack & withNativeWind
 You should import View/Text/etc directly from 'react-native'
 Please see the documentation for proper setup application.
 */
-export default withExpoSnack(App);`;
+export default withNativeWind(App${appCodeUrl});`;
 
   const files = encodeURIComponent(
     JSON.stringify({
       [`App.${ext}`]: {
         type: "CODE",
         contents: appCode,
-      },
-      "expo-snack.js": {
-        type: "CODE",
-        contents: snackJS,
       },
     }),
   );
