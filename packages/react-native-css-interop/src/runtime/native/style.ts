@@ -1,3 +1,4 @@
+import type { EasingFunction, Time } from "lightningcss";
 import {
   StyleSheet,
   Platform,
@@ -26,6 +27,7 @@ import {
   animationMap,
   colorScheme,
   globalVariables,
+  externalClassNameCompilerCallback,
   opaqueStyles,
   rem,
   styleSignals,
@@ -46,7 +48,6 @@ import {
   testMediaQueries,
   testPseudoClasses,
 } from "./conditions";
-import type { EasingFunction, Time } from "lightningcss";
 import type {
   ExtractedAnimations,
   ExtractedTransition,
@@ -200,6 +201,7 @@ function render(
     };
 
     if (classNames) {
+      externalClassNameCompilerCallback.current?.(classNames);
       for (const className of classNames.split(/\s+/)) {
         let signal = styleSignals.get(className);
         if (!signal) continue;

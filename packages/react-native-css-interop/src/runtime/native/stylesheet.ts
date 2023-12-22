@@ -12,6 +12,7 @@ import {
   colorScheme,
   createColorSchemeSignal,
   globalVariables,
+  externalClassNameCompilerCallback,
   rem,
   styleSignals,
   vh,
@@ -35,7 +36,9 @@ const commonStyleSheet: CommonStyleSheet = {
   getFlag(name) {
     return this[INTERNAL_FLAGS][name];
   },
-  unstable_hook_onClassName() {},
+  unstable_hook_onClassName(callback) {
+    externalClassNameCompilerCallback.current = callback;
+  },
   register() {
     throw new Error("Stylesheet.register is not yet implemented");
   },

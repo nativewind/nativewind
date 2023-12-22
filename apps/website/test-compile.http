@@ -1,4 +1,4 @@
-POST https://nativewind.nativewind-1gheteii1-mwlawlor.vercel.app/api/compile
+POST https://nativewind.dev/api/compile
 content-type: application/json
 
 {

@@ -26,6 +26,12 @@ export const globalInlineCache = new WeakMap<object, InteropStore>();
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
 
+export const externalClassNameCompilerCallback: {
+  current?: (className: string) => void;
+} = {
+  current: undefined,
+};
+
 export const globalVariables = {
   root: new Map<string, ColorSchemeSignal>(),
   universal: new Map<string, ColorSchemeSignal>(),

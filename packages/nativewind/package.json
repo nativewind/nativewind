@@ -44,6 +44,7 @@
   "files": [
     "babel.js",
     "dist/",
+    "expo-snack.js",
     "jsx-dev-runtime/",
     "jsx-runtime/",
     "metro/",
