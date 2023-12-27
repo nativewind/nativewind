@@ -7,7 +7,7 @@ import Tailwind from "./_tailwind.mdx";
 
 :::info
 
-NativeWind works with both Expo and Vanilla React Native projects but Expo provides a more streamlined experience.
+NativeWind works with both Expo and framework-less React Native projects but Expo provides a more streamlined experience.
 
 **Web**: If you wish to use Metro to bundle for website or App Clip and you are **not** using Expo, you will need either: Expo's Metro config `@expo/metro-config` or manually use Tailwind CLI to generate a CSS file.
 
@@ -39,7 +39,7 @@ module.exports = {
 ```
 
 </TabItem>
-<TabItem value="vanilla" label="Vanilla">
+<TabItem value="framework-less" label="Framework-less">
 
 ```diff title="babel.config.js"
 module.exports = {
@@ -86,7 +86,7 @@ module.exports = {
 
   </TabItem>
 
-  <TabItem value="vanilla" label="Vanilla">
+  <TabItem value="frameworkless" label="Framework-less">
 
 ```diff title="metro.config.js"
 + const { withNativeWind } = require('nativewind/metro')
