@@ -10,7 +10,7 @@ Every library needs to solve a core problem
 
 ```tsx
 /*
-  This is a vanilla React Native component that changes backgroundColor based upon
+  This is a framework-less React Native component that changes backgroundColor based upon
   - UI State
   - Color scheme
   - Branding
@@ -50,7 +50,7 @@ export function MyButton(props) {
 }
 ```
 
-You may argue that the vanilla example isn't that complex, but this is _basic example_ with only 1 component and 4 states. As you add more UI states (focus, hover) the vanilla example will grow in complexity. As your project grows you will also need more features like overriding single styles or styling based upon a different components state.
+You may argue that the standard example isn't that complex, but this is _basic example_ with only 1 component and 4 states. As you add more UI states (focus, hover) the basic example will grow in complexity. As your project grows you will also need more features like overriding single styles or styling based upon a different components state.
 
 NativeWind solves the state issues for you and allows you to simply focus on your components appearance. If you need to extends or override a components styles, its as simple as passing the className prop.
 
