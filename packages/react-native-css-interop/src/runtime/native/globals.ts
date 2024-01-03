@@ -4,6 +4,7 @@ import {
   AppState,
   Appearance,
   Dimensions,
+  NativeEventSubscription,
 } from "react-native";
 import { Signal, createSignal, useComputed } from "../signals";
 import { INTERNAL_RESET, INTERNAL_SET, STYLE_SCOPES } from "../../shared";
@@ -125,14 +126,30 @@ export function createColorSchemeSignal(id: string) {
 }
 
 let appearance = Appearance;
+let appearanceListener: NativeEventSubscription | undefined;
+let appStateListener: NativeEventSubscription | undefined;
 
-let appearanceListener = appearance.addChangeListener((state) =>
-  _colorScheme.set(state.colorScheme ?? "light"),
-);
+function resetAppearanceListeners(
+  $appearance: typeof Appearance,
+  appState: typeof AppState,
+) {
+  appearance = $appearance;
+  appearanceListener?.remove();
+  appStateListener?.remove();
 
-AppState.addEventListener("change", () =>
-  _colorScheme.set(appearance.getColorScheme() ?? "light"),
-);
+  appearanceListener = appearance.addChangeListener((state) => {
+    if (AppState.currentState === "active") {
+      _colorScheme.set(state.colorScheme ?? "light");
+    }
+  });
+
+  appStateListener = appState.addEventListener("change", (type) => {
+    if (type === "active") {
+      _colorScheme.set(appearance.getColorScheme() ?? "light");
+    }
+  });
+}
+resetAppearanceListeners(appearance, AppState);
 
 const _colorScheme = createSignal<"light" | "dark" | "system">("system");
 export const colorScheme = {
@@ -155,13 +172,9 @@ export const colorScheme = {
     if (current === "system") current = appearance.getColorScheme() ?? "light";
     _colorScheme.set(current === "light" ? "dark" : "light");
   },
-  [INTERNAL_RESET]: ($appearance: typeof Appearance) => {
+  [INTERNAL_RESET]: (appearance: typeof Appearance) => {
     _colorScheme.set("system");
-    appearance = $appearance;
-    appearanceListener.remove();
-    appearanceListener = appearance.addChangeListener((state) =>
-      _colorScheme.set(state.colorScheme ?? "light"),
-    );
+    resetAppearanceListeners(appearance, AppState);
   },
 };
 
