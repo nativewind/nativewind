@@ -57,9 +57,8 @@ NativeWind works with both Expo and framework-less React Native projects but Exp
     };
     ```
   </TabItem>
-</TabItem>
 
-<TabItem value="framework-less" label="Framework-less">
+  <TabItem value="framework-less" label="Framework-less">
 
 ```diff title="babel.config.js"
 module.exports = {
@@ -68,40 +67,36 @@ module.exports = {
 };
 ```
 
-</TabItem>
+  </TabItem>
 </Tabs>
 
 ### 4. Modify your metro.config.js
 
 <Tabs groupId="framework">
-  <TabItem value="Expo">
-    <Tabs groupId="sdk">
-      <TabItem value="Expo SDK 49">
+  <TabItem value="Expo SDK 49">
 
-        ```js title="metro.config.js"
-        const { getDefaultConfig } = require("expo/metro-config");
-        const { withNativeWind } = require('nativewind/metro');
+    ```js title="metro.config.js"
+    const { getDefaultConfig } = require("expo/metro-config");
+    const { withNativeWind } = require('nativewind/metro');
 
-        const config = getDefaultConfig(__dirname, { isCSSEnabled: true })
+    const config = getDefaultConfig(__dirname, { isCSSEnabled: true })
 
-        module.exports = withNativeWind(config, { input: './global.css' })
-        ```
-      </TabItem>
-      <TabItem value="Expo SDK 50">
-
-        ```js title="metro.config.js"
-        const { getDefaultConfig } = require("expo/metro-config");
-        const { withNativeWind } = require('nativewind/metro');
-
-        const config = getDefaultConfig(__dirname)
-
-        module.exports = withNativeWind(config, { input: './global.css' })
-        ```
-
-        </TabItem >
-    </Tabs>
-
+    module.exports = withNativeWind(config, { input: './global.css' })
+    ```
   </TabItem>
+  <TabItem value="Expo SDK 50+">
+
+    ```js title="metro.config.js"
+    const { getDefaultConfig } = require("expo/metro-config");
+    const { withNativeWind } = require('nativewind/metro');
+
+    const config = getDefaultConfig(__dirname)
+
+    module.exports = withNativeWind(config, { input: './global.css' })
+    ```
+
+  </TabItem >
+
 
   <TabItem value="frameworkless" label="Framework-less">
 
