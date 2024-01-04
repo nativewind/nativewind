@@ -1,6 +1,6 @@
 # Next.js
 
-NativeWind can be used in a Next.js project that is already configured to use Expo or vanilla React Native Web.
+NativeWind can be used in a Next.js project that is already configured to use Expo or framework-less React Native Web.
 
 ## 1. Setup Tailwind CSS
 
