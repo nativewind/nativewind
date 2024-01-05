@@ -49,6 +49,7 @@ test("vw", () => {
   expect(component).toHaveStyle({ width: 75 });
 
   act(() => {
+    debugger;
     vw[INTERNAL_SET](100);
   });
 

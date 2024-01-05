@@ -15,6 +15,7 @@ import {
   ExtractedAnimation,
   ExtractionWarning,
   InteropStore,
+  StyleEffectParent,
 } from "../../types";
 
 export const styleSignals = new Map<string, Signal<GroupedRuntimeStyle>>();
@@ -38,13 +39,12 @@ export const globalVariables = {
   universal: new Map<string, ColorSchemeSignal>(),
 };
 
-const rootContext = {
-  inlineVariables: globalVariables.root,
+export const rootContext = {
   getContainer() {},
   getVariable(name: string) {
     return globalVariables.root.get(name)?.get();
   },
-} as unknown as InteropStore;
+} as unknown as StyleEffectParent;
 export const interopContext = createContext(rootContext);
 export const InteropProvider = interopContext.Provider;
 

@@ -5,8 +5,10 @@ import {
   useState,
   useRef,
   forwardRef,
+  useEffect,
   createElement,
 } from "react";
+import { Pressable, View } from "react-native";
 import {
   CssInterop,
   JSXFunction,
@@ -15,7 +17,11 @@ import {
   JSXFunctionType,
 } from "../../types";
 import { getNormalizeConfig } from "../config";
-import { getStyleStateFn } from "../native/component-signal";
+import {
+  getStyleStateFn,
+  styleEffectContext,
+} from "../native/component-signal";
+import { interopGlobal } from "../signals";
 
 // https://github.com/mobxjs/mobx/blob/55260aa158919033e862d219e60eea601a05ac61/packages/mobx-react-lite/src/observer.ts#L8C1-L12C87
 const hasSymbol = typeof Symbol === "function" && Symbol.for;
@@ -64,7 +70,7 @@ export const cssInterop: CssInterop = (baseComponent: any, mapping) => {
     }
 
     interopComponent = function CssInteropComponent({ ...props }, ref: any) {
-      const parent = useContext({} as any);
+      const parent = useContext(styleEffectContext);
       const forceUpdate = useState({});
 
       const styleStateRef = useRef<ReturnType<typeof getStyleStateFn>>();
@@ -76,13 +82,49 @@ export const cssInterop: CssInterop = (baseComponent: any, mapping) => {
         );
       }
 
-      const state = styleStateRef.current(parent, props);
+      useEffect(() => () => styleStateRef.current?.cleanup(), []);
 
-      const type = render.bind({
-        baseComponent,
-      })(state.props, ref);
+      const state = styleStateRef.current.update(parent, props);
 
-      return type;
+      let element: any = render(state.props, ref);
+
+      if (state.convertToPressable) {
+        if (baseComponent === View) {
+          state.props.___pressable = true;
+          element = (Pressable as any).type.render(state.props, ref);
+        }
+      } else {
+        element = render(state.props, ref);
+      }
+
+      if (state.context) {
+        element = createElement(styleEffectContext.Provider, {
+          value: state.context,
+          children: element,
+        });
+      }
+
+      return {
+        ...element,
+        get props() {
+          /**
+           * This is a hack to delay firing state updates for other components until we have finished
+           * rendering. The `prop` property will only be access by React after rendering is complete.
+           *
+           * Libraries like Preact implement this by Dispatcher tricks. I think this is a bit simpler,
+           * may might be more fragile.
+           */
+          if (interopGlobal.delayedEvents.size) {
+            for (const sub of interopGlobal.delayedEvents) {
+              sub();
+            }
+
+            interopGlobal.delayedEvents.clear();
+          }
+
+          return element.props;
+        },
+      };
     };
     interopComponent.displayName = `CssInterop.${baseComponent.displayName}`;
 

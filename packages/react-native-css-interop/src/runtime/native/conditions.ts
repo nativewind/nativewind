@@ -10,9 +10,10 @@ import type {
 import {
   AttributeCondition,
   ExtractedContainerQuery,
-  InteropStore,
   PseudoClassesQuery,
   SignalLike,
+  StyleEffect,
+  StyleEffectParent,
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
@@ -42,18 +43,18 @@ export function testMediaQuery(
 }
 
 export function testPseudoClasses(
-  state: InteropStore,
+  effect: StyleEffectParent,
   meta: PseudoClassesQuery,
 ) {
   let fail = false;
-  if (meta.active) fail ||= state.getInteraction("active") !== true;
-  if (meta.hover) fail ||= state.getInteraction("hover") !== true;
-  if (meta.focus) fail ||= state.getInteraction("focus") !== true;
+  if (meta.active) fail ||= effect.interaction.active?.get() !== true;
+  if (meta.hover) fail ||= effect.interaction.hover?.get() !== true;
+  if (meta.focus) fail ||= effect.interaction.focus?.get() !== true;
   return !fail;
 }
 
 export function testContainerQuery(
-  state: InteropStore,
+  state: StyleEffect,
   containerQuery: ExtractedContainerQuery[] | undefined,
 ) {
   // If there is no query, we passed

@@ -1,5 +1,4 @@
 import { useEffect, useReducer } from "react";
-import type { InteropStore } from "../types";
 
 export const interopGlobal: {
   delayUpdates: boolean;
@@ -19,7 +18,6 @@ type SignalSetFn<T> = (previous?: T) => T;
 export type Effect = {
   (): void;
   dependencies: Set<Signal<any>>;
-  state?: InteropStore;
 };
 
 export function createSignal<T = unknown>(value: T, id?: string) {
@@ -85,23 +83,15 @@ export interface Computed<T = unknown> extends Signal<T> {
   (): void;
   dependencies: Set<Signal<any>>;
   fn: SignalSetFn<T>;
-  runInEffect<T>(fn: () => T): T;
 }
 
-export function setupEffect(effect: Effect) {
+export function setupEffect<T extends Effect>(effect: T) {
   // Clean up the previous run
   cleanupEffect(effect);
   // Setup the new run
   context.push(effect);
   interopGlobal.delayedEvents.delete(effect);
   interopGlobal.current = effect;
-}
-
-export function runInEffect<T>(fn: () => T, effect: Effect) {
-  context.push(effect);
-  let value = fn();
-  context.pop();
-  return value;
 }
 
 export function teardownEffect(_effect: Computed<any>) {
@@ -140,15 +130,6 @@ export function createComputed<T>(
     {
       dependencies: new Set(),
       fn: fn,
-      /**
-       * Run a function in context, without cleaning up the dependencies
-       */
-      runInEffect<T>(fn: () => T) {
-        context.push(effect);
-        let value = fn();
-        context.pop();
-        return value;
-      },
     } satisfies {
       [K in keyof Omit<Computed, keyof Signal<any>>]: Computed<T>[K];
     },

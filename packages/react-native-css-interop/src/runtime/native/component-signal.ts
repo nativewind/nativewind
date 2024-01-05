@@ -1,5 +1,11 @@
 import { EasingFunction, Time } from "lightningcss";
-import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
+import {
+  LayoutChangeEvent,
+  PixelRatio,
+  Platform,
+  PlatformColor,
+  StyleSheet,
+} from "react-native";
 import {
   AnimatableValue,
   Easing,
@@ -10,22 +16,22 @@ import {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import { STYLE_SCOPES } from "../../shared";
+import { DEFAULT_CONTAINER_NAME, STYLE_SCOPES } from "../../shared";
 import {
-  AttributeDependency,
   ExtractedAnimations,
   ExtractedTransition,
-  HoistedTypes,
-  Interaction,
   Layers,
   NormalizedOptions,
   RuntimeStyle,
   RuntimeValue,
   RuntimeValueDescriptor,
-  Specificity,
+  StyleComputedSharedAttributes,
+  StyleEffect,
+  StyleEffectOptions,
+  StyleEffectParent,
+  StyleEffectUpdateOptions,
 } from "../../types";
 import {
-  Computed,
   Signal,
   createSignal,
   interopGlobal,
@@ -36,8 +42,10 @@ import {
   animationMap,
   colorScheme,
   externalClassNameCompilerCallback,
+  globalVariables,
   opaqueStyles,
   rem,
+  rootContext,
   styleSignals,
   vh,
   vw,
@@ -46,7 +54,12 @@ import {
   getTestAttributeValue,
   testAttribute,
   testMediaQueries,
+  testPseudoClasses,
 } from "./conditions";
+import { createContext } from "react";
+
+export const styleEffectContext = createContext(rootContext);
+export const StyleEffectContextProvider = styleEffectContext.Provider;
 
 export function getStyleStateFn(
   parent: any,
@@ -54,68 +67,217 @@ export function getStyleStateFn(
   options: NormalizedOptions,
 ) {
   const sourceSignals = new Set<ReturnType<typeof createStyleComputed>>();
+  const inlineVariables = new Map<string, Signal<any>>();
+  const inlineVariablesToRemove = new Set<string>();
+  const containerNames = new Set<string>();
+
+  /**
+   * Updating the context will rerender all child components, so we try to limit t.
+   * We only need to do so if the parent changes, a new variable/container-name is added
+   */
+  let shouldUpdateContext = false;
+
+  // These values are persisted across renders and used for all source signals
+  const shared: StyleComputedSharedAttributes = {
+    interaction: {},
+    parent,
+    getVariable(name) {
+      let value: any = undefined;
+      value ??= inlineVariables.get(name)?.get();
+      value ??= globalVariables.universal.get(name)?.get();
+      value ??= shared.parent.getVariable(name);
+      return value;
+    },
+    setVariable(name: string, value: any) {
+      inlineVariablesToRemove.delete(name);
+      const existing = inlineVariables.get(name);
+      if (!existing) {
+        shouldUpdateContext = true;
+        inlineVariables.set(name, createSignal(value, name));
+      } else {
+        existing.set(value);
+      }
+    },
+    getContainer(name: string) {
+      if (
+        shared.container &&
+        (containerNames.has(name) || name === DEFAULT_CONTAINER_NAME)
+      ) {
+        return shared.container.get();
+      } else {
+        return shared.parent.getContainer(name);
+      }
+    },
+    setContainer(name: string) {
+      if (!shared.container) {
+        shouldUpdateContext = true;
+        shared.container = createSignal<StyleEffectParent>(shared, name);
+      }
+      containerNames.add(name);
+    },
+  };
 
   for (const [target, source, nativeStyleToProp] of options.config) {
     const computed = createStyleComputed({
       parent,
       target,
       source,
+      shared,
       rerender,
       nativeStyleToProp: Object.entries(nativeStyleToProp || {}),
     });
+
     sourceSignals.add(computed);
   }
 
-  return function updateStyles(parent: any, props: any) {
+  let convertToPressable = false;
+  let context: StyleEffectParent | undefined;
+
+  function update(parent: any, originalProps: any) {
+    const props = { ...originalProps };
+    let hasActive = false;
+    let hasFocus = false;
+    let hasHover = false;
+    let requiresLayout = false;
+
+    const parentChanged = shared.parent !== parent;
+    shared.parent = parent;
+    shouldUpdateContext = false;
+
+    /**
+     * We want to preserve any inline variables that are still being used
+     * as they are tracking their dependencies. So we mark all existing
+     * and remove them only when they are no longer used.
+     */
+    inlineVariablesToRemove.clear();
+    for (const previousInlineVariable of inlineVariables.keys()) {
+      inlineVariablesToRemove.add(previousInlineVariable);
+    }
+
+    /**
+     * Clear the container names, so we can check if any are still being used
+     */
+    containerNames.clear();
+
     for (const signal of sourceSignals) {
       signal.updateDuringRender({ parent, props });
       Object.assign(props, signal.props);
       if (signal.target !== signal.source) {
         delete props[signal.source];
       }
+
+      const hasContainer = Boolean(shared.container);
+      hasActive ||= Boolean(shared.interaction.active) || hasContainer;
+      hasFocus ||= Boolean(shared.interaction.focus) || hasContainer;
+      hasHover ||= Boolean(shared.interaction.hover) || hasContainer;
+      convertToPressable ||= hasActive || hasFocus || hasHover;
+      requiresLayout ||=
+        signal.requiresLayoutWidth ||
+        signal.requiresLayoutHeight ||
+        signal.animationWaitingOnLayout;
+
+      for (const name of inlineVariablesToRemove) {
+        /**
+         * NOTE: we don't have to update the context here
+         * because we set the value to undefined, which will
+         * cause a rerender anyway
+         */
+        inlineVariables.get(name)?.set(undefined);
+        inlineVariables.delete(name);
+      }
     }
 
-    return { props };
+    if (hasActive) {
+      props.onPressIn = (event: unknown) => {
+        originalProps.onPressIn?.(event);
+        shared.interaction.active!.set(true);
+      };
+      props.onPressOut = (event: unknown) => {
+        originalProps.onPressOut?.(event);
+        shared.interaction.active!.set(false);
+      };
+    }
+
+    if (hasHover) {
+      props.onHoverIn = (event: unknown) => {
+        originalProps.onHoverIn?.(event);
+        shared.interaction.hover!.set(true);
+      };
+      props.onHoverOut = (event: unknown) => {
+        originalProps.onHoverOut?.(event);
+        shared.interaction.hover!.set(false);
+      };
+    }
+
+    if (hasFocus) {
+      props.onFocus = (event: unknown) => {
+        originalProps.onFocus?.(event);
+        shared.interaction.focus!.set(true);
+      };
+      props.onBlur = (event: unknown) => {
+        originalProps.onBlur?.(event);
+        shared.interaction.focus!.set(false);
+      };
+    }
+
+    if (convertToPressable) {
+      // This is an annoying quirk of RN. Pressable will only work if onPress is defined
+      props.onPress = originalProps.onPress ?? (() => {});
+    }
+
+    if (requiresLayout) {
+      props.onLayout ??= (event: LayoutChangeEvent) => {
+        originalProps.onLayout?.(event);
+
+        if (!shared.layout) {
+          // The first time this is called, we need to create the signal and rerender the component
+          shared.layout = createSignal<[number, number] | undefined>(undefined);
+          rerender();
+        }
+
+        const layout = event.nativeEvent.layout;
+        const [width, height] = shared.layout!.peek() ?? [0, 0];
+        if (layout.width !== width || layout.height !== height) {
+          shared.layout!.set([layout.width, layout.height]);
+        }
+      };
+    }
+
+    if (containerNames.size === 0) {
+      shared.container?.set(undefined);
+      shouldUpdateContext = true;
+    }
+
+    if (
+      !shouldUpdateContext &&
+      parentChanged &&
+      (inlineVariables.size || containerNames.size)
+    ) {
+      shouldUpdateContext = true;
+    }
+
+    if (shouldUpdateContext) {
+      context = { ...shared };
+    }
+
+    return { props, context, convertToPressable };
+  }
+
+  function cleanup() {
+    for (const signal of sourceSignals) {
+      signal.subscriptions.clear();
+      for (const dependency of signal.dependencies) {
+        dependency.subscriptions.delete(signal);
+      }
+      signal.dependencies.clear();
+    }
+  }
+
+  return {
+    update,
+    cleanup,
   };
 }
-
-type StyleEffectOptions = {
-  parent: any;
-  props: Record<string, any>;
-  source: string;
-  target: string;
-  nativeStyleToProp?: [string, string | true][];
-  rerender: () => void;
-  id?: string;
-};
-
-type StyleEffectUpdateOptions = {
-  parent: any;
-  props: Record<string, any>;
-};
-
-type StyleEffect = Computed<Record<string, any>> &
-  StyleEffectOptions & {
-    updateDuringRender(options: StyleEffectUpdateOptions): void;
-    props: Record<string, any>;
-    originalProps: Record<string, any>;
-    requiresLayoutWidth: boolean;
-    requiresLayoutHeight: boolean;
-    interaction: Interaction;
-    isAnimated: boolean;
-    animations?: Required<ExtractedAnimations>;
-    animationNames: Set<string>;
-    animationWaitingOnLayout?: boolean;
-    hoistedStyles?: [string, string, HoistedTypes][];
-    layout?: Signal<[number, number] | undefined>;
-    sharedValues: Record<string, ReturnType<typeof makeMutable>>;
-    transition?: Required<ExtractedTransition>;
-    shouldUpdateContext: boolean;
-    context?: StyleEffect;
-    attrDependencies: AttributeDependency[];
-    setVariable(name: string, value: any, specificity: Specificity): void;
-    convertToPressable?: boolean;
-  };
 
 export function createStyleComputed({
   parent,
@@ -124,15 +286,20 @@ export function createStyleComputed({
   id,
   rerender,
   nativeStyleToProp,
-}: Omit<StyleEffectOptions, "props">) {
+  shared,
+}: Omit<StyleEffectOptions, "props"> & {
+  shared: StyleComputedSharedAttributes;
+}) {
   const effect: StyleEffect = Object.assign(
     function () {
       setupEffect(effect);
       effect.set(effect.fn);
       teardownEffect(effect);
+      rerender();
     },
     createSignal({}, id),
     {
+      ...shared,
       rerender,
       dependencies: new Set<Signal<any>>(),
       parent,
@@ -140,26 +307,17 @@ export function createStyleComputed({
       target,
       props: {},
       originalProps: {},
-      interaction: {},
       requiresLayoutWidth: false,
       requiresLayoutHeight: false,
       isAnimated: false,
+      animationWaitingOnLayout: false,
       animationNames: new Set<string>(),
       attrDependencies: [],
       sharedValues: {},
       shouldUpdateContext: false,
-      setVariable(name: string, value: any) {
-        // effect.inlineVariablesToRemove.delete(name);
-        // const existing = effect.inlineVariables.get(name);
-        // if (!existing) {
-        //   effect.inlineVariables.set(name, createSignal(value, name));
-        // } else {
-        //   existing.set(value);
-        // }
-      },
-      runInEffect: () => {
-        return {} as any;
-      },
+      inlineVariablesToRemove: new Set<string>(),
+      inlineVariables: new Map<string, Signal<any>>(),
+      containerNames: new Set<string>(),
       updateDuringRender: (incoming: StyleEffectUpdateOptions) => {
         const current = effect.peek();
 
@@ -173,7 +331,9 @@ export function createStyleComputed({
           effect.originalProps = incoming.props;
 
           setupEffect(effect);
+          interopGlobal.delayUpdates = true;
           effect.set(effect.fn, false);
+          interopGlobal.delayUpdates = false;
           teardownEffect(effect);
         }
 
@@ -184,7 +344,7 @@ export function createStyleComputed({
         const inlineStyles = effect.props[target];
 
         effect.shouldUpdateContext = false;
-        // effect.inlineVariablesToRemove = new Set(effect.inlineVariables.keys());
+        effect.inlineVariablesToRemove = new Set(effect.inlineVariables.keys());
         effect.props = {};
         effect.attrDependencies = [];
 
@@ -565,14 +725,20 @@ export function reduceStyles(
       effect.context ??= effect;
     }
 
-    // if (style.pseudoClasses) {
-    //   effect.interaction.hasActive ||= Boolean(style.pseudoClasses.active);
-    //   effect.interaction.hasHover ||= Boolean(style.pseudoClasses.hover);
-    //   effect.interaction.hasFocus ||= Boolean(style.pseudoClasses.focus);
-    //   if (!testPseudoClasses(effect, style.pseudoClasses)) {
-    //     continue;
-    //   }
-    // }
+    if (style.pseudoClasses) {
+      if (style.pseudoClasses.active) {
+        effect.interaction.active ??= createSignal(false);
+      }
+      if (style.pseudoClasses.hover) {
+        effect.interaction.hover ??= createSignal(false);
+      }
+      if (style.pseudoClasses.focus) {
+        effect.interaction.focus ??= createSignal(false);
+      }
+      if (!testPseudoClasses(effect, style.pseudoClasses)) {
+        continue;
+      }
+    }
 
     if (style.media && !testMediaQueries(style.media)) {
       continue;
@@ -658,7 +824,7 @@ export function reduceStyles(
   return effect;
 }
 
-function parseValue(
+export function parseValue(
   value: RuntimeValueDescriptor | string | number | boolean,
 ): RuntimeValue {
   if (
@@ -684,12 +850,13 @@ function parseValue(
     }
     case "vw": {
       return function () {
+        debugger;
         return round((vw.get() / 100) * value.arguments[0]);
       };
     }
     case "em": {
       return function () {
-        const style = interopGlobal.current?.state?.props["style"];
+        const style = getCurrentEffect().props["style"];
         if (style && typeof style.fontSize === "number") {
           return round(Number((style.fontSize || 0) * value.arguments[0]));
         }
@@ -793,6 +960,10 @@ function parseValue(
   }
 }
 
+function getCurrentEffect() {
+  return interopGlobal.current as StyleEffect;
+}
+
 function resolve(
   args:
     | RuntimeValue
@@ -824,7 +995,7 @@ function resolve(
 }
 
 function getVariable(name: any) {
-  return resolve(interopGlobal.current?.state?.getVariable(name));
+  return resolve(getCurrentEffect().getVariable(name));
 }
 
 function resolveAnimationValue(
@@ -853,22 +1024,22 @@ function getDimensions(
   dimension: "width" | "height" | "both",
   prop = "style",
 ): any {
-  const state = interopGlobal.current?.state!;
-  const style = state.props[prop];
+  const effect = getCurrentEffect();
+  const style = effect.props[prop];
 
   if (dimension === "width") {
     if (typeof style?.width === "number") {
       return style.width;
     } else {
-      state.requiresLayoutWidth = true;
-      return state.layout?.get()?.[0] ?? 0;
+      effect.requiresLayoutWidth = true;
+      return effect.layout?.get()?.[0] ?? 0;
     }
   } else if (dimension === "height") {
     if (typeof style?.height === "number") {
       return style.height;
     } else {
-      state.requiresLayoutHeight = true;
-      return state.layout?.get()?.[1] ?? 0;
+      effect.requiresLayoutHeight = true;
+      return effect.layout?.get()?.[1] ?? 0;
     }
   } else {
     let width = 0;
@@ -876,14 +1047,14 @@ function getDimensions(
     if (typeof style?.width === "number") {
       width = style.width;
     } else {
-      state.requiresLayoutWidth = true;
-      width = state.layout?.get()?.[0] ?? 0;
+      effect.requiresLayoutWidth = true;
+      width = effect.layout?.get()?.[0] ?? 0;
     }
     if (typeof style?.height === "number") {
       height = style.height;
     } else {
-      state.requiresLayoutHeight = true;
-      height = state.layout?.get()?.[1] ?? 0;
+      effect.requiresLayoutHeight = true;
+      height = effect.layout?.get()?.[1] ?? 0;
     }
     return { width, height };
   }

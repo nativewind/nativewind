@@ -27,7 +27,7 @@ import type {
   ViewStyle,
 } from "react-native";
 import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
-import type { Effect, Signal } from "./runtime/signals";
+import type { Computed, Effect, Signal } from "./runtime/signals";
 import { makeMutable } from "react-native-reanimated";
 
 export type ReactComponent<P = any> =
@@ -43,6 +43,64 @@ export interface NormalizedOptions {
   sources: Source[];
   dependencies: (Prop & Source)[];
 }
+
+export type StyleEffectOptions = {
+  parent: StyleEffectParent;
+  props: Record<string, any>;
+  source: string;
+  target: string;
+  nativeStyleToProp?: [string, string | true][];
+  rerender: () => void;
+  id?: string;
+};
+
+export type StyleEffectUpdateOptions = {
+  parent: any;
+  props: Record<string, any>;
+};
+
+export type StyleComputedSharedAttributes = {
+  interaction: Interaction;
+  parent: StyleEffectParent;
+  layout?: Signal<[number, number] | undefined>;
+  container?: Signal<StyleEffectParent>;
+  getVariable(name: string): any;
+  setVariable(name: string, value: any, specificity: Specificity): void;
+  getContainer(name: string): StyleEffectParent | undefined;
+  setContainer(name: string): void;
+};
+
+export type StyleEffect = Effect &
+  Computed<Record<string, any>> &
+  StyleEffectOptions &
+  StyleComputedSharedAttributes & {
+    updateDuringRender(options: StyleEffectUpdateOptions): void;
+    props: Record<string, any>;
+    originalProps: Record<string, any>;
+    requiresLayoutWidth: boolean;
+    requiresLayoutHeight: boolean;
+    interaction: Interaction;
+    isAnimated: boolean;
+    animations?: Required<ExtractedAnimations>;
+    animationNames: Set<string>;
+    animationWaitingOnLayout: boolean;
+    hoistedStyles?: [string, string, HoistedTypes][];
+    layout?: Signal<[number, number] | undefined>;
+    sharedValues: Record<string, ReturnType<typeof makeMutable>>;
+    transition?: Required<ExtractedTransition>;
+    shouldUpdateContext: boolean;
+    context?: StyleEffect;
+    attrDependencies: AttributeDependency[];
+    getVariable(name: string): any;
+    convertToPressable?: boolean;
+    inlineVariablesToRemove: Set<string>;
+    inlineVariables: Map<string, Signal<any>>;
+  };
+
+export type StyleEffectParent = Pick<
+  StyleEffect,
+  "getVariable" | "getContainer" | "interaction" | "layout"
+>;
 
 export interface InteropStore {
   testId?: string;
@@ -304,9 +362,6 @@ export type Interaction = {
   active?: Signal<boolean>;
   hover?: Signal<boolean>;
   focus?: Signal<boolean>;
-  hasActive?: boolean;
-  hasHover?: boolean;
-  hasFocus?: boolean;
 };
 
 export type ExtractedContainer = {
