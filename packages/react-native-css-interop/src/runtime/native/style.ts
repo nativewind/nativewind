@@ -126,10 +126,11 @@ export function createInteropStore(
       }
     },
     getInteraction(name) {
-      if (!this.interaction[name]) {
-        this.interaction[name] = createSignal(false, name);
-      }
-      return this.interaction[name]!.get();
+      //   if (!this.interaction[name]) {
+      // this.interaction[name] = createSignal(false, name);
+      //   }
+      //   return this.interaction[name]!.get();
+      return false;
     },
     effect: Object.assign(
       () => {

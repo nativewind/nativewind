@@ -9,9 +9,12 @@ import type {
   SelectorComponent,
 } from "lightningcss";
 import type {
+  ClassicComponentClass,
+  ComponentClass,
   ComponentProps,
-  ElementType,
+  ComponentType,
   ForwardRefExoticComponent,
+  FunctionComponent,
   JSXElementConstructor,
   ReactElement,
   ReactNode,
@@ -27,9 +30,11 @@ import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
 import type { Effect, Signal } from "./runtime/signals";
 import { makeMutable } from "react-native-reanimated";
 
-export type ComponentType<P = any> =
-  | ForwardRefExoticComponent<P>
-  | ElementType<P>;
+export type ReactComponent<P = any> =
+  | ClassicComponentClass<P>
+  | ComponentClass<P>
+  | FunctionComponent<P>
+  | ForwardRefExoticComponent<P>;
 
 type Prop = string;
 type Source = string;
@@ -120,7 +125,7 @@ export type Layers = Record<0 | 1 | 2, Array<RuntimeStyle | object>> & {
 };
 
 export type CssInterop = <
-  const T extends ComponentType,
+  const T extends ReactComponent<any>,
   const M extends EnableCssInteropOptions<any>,
 >(
   component: T,
@@ -140,25 +145,17 @@ export type CssInteropGeneratedProps<T extends EnableCssInteropOptions<any>> = {
   [K in keyof T as K extends string
     ? T[K] extends undefined | false
       ? never
-      : T[K] extends true
+      : T[K] extends true | string
       ? K
-      : T[K] extends string
-      ? T[K]
-      : CssInteropOptionTargetToProp<T[K], K>
+      : T extends {
+          target: string | boolean;
+        }
+      ? T["target"] extends true | string
+        ? K
+        : never
+      : never
     : never]: string;
 };
-
-type CssInteropOptionTargetToProp<T, K extends string> = T extends {
-  target: string | boolean;
-}
-  ? T["target"] extends false
-    ? never
-    : T["target"] extends true
-    ? K
-    : T["target"] extends string
-    ? T["target"]
-    : never
-  : never;
 
 export type NativeStyleToProp<P> = {
   [K in keyof Style & string]?: K extends keyof P
@@ -166,15 +163,25 @@ export type NativeStyleToProp<P> = {
     : keyof P & string;
 };
 
-export type JSXFunction<P> = (
-  type: ComponentType<P>,
-  props: P,
-  key: string | undefined,
-  ...args: unknown[]
-) => any;
+export type JSXFunction = (
+  type: React.ComponentType,
+  props: Record<string, any>,
+  key: React.Key,
+  isStaticChildren: boolean,
+  __source: unknown,
+  __self: unknown,
+) => React.ElementType;
+
+type OmitFirstTwo<T extends any[]> = T extends [any, any, ...infer R]
+  ? R
+  : never;
+
+export type JSXFunctionType = Parameters<JSXFunction>[0];
+export type JSXFunctionProps = Parameters<JSXFunction>[1];
+export type JSXFunctionRest = OmitFirstTwo<Parameters<JSXFunction>>;
 
 export type BasicInteropFunction = <P>(
-  jsx: JSXFunction<P>,
+  jsx: JSXFunction,
   type: ComponentType<P>,
   props: P,
   key: string | undefined,
@@ -297,6 +304,9 @@ export type Interaction = {
   active?: Signal<boolean>;
   hover?: Signal<boolean>;
   focus?: Signal<boolean>;
+  hasActive?: boolean;
+  hasHover?: boolean;
+  hasFocus?: boolean;
 };
 
 export type ExtractedContainer = {

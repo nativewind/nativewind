@@ -18,7 +18,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-import { cssInterop, remapProps } from "./rendering";
+import { cssInterop, remapProps } from "./api";
 export { render } from "./rendering";
 
 cssInterop(Image, { className: "style" });

@@ -2,11 +2,11 @@ import { useEffect, useReducer } from "react";
 import type { InteropStore } from "../types";
 
 export const interopGlobal: {
-  isInComponent: boolean;
+  delayUpdates: boolean;
   current: Effect | null;
   delayedEvents: Set<() => void>;
 } = {
-  isInComponent: false,
+  delayUpdates: false,
   current: null,
   delayedEvents: new Set(),
 };
@@ -49,7 +49,7 @@ export function createSignal<T = unknown>(value: T, id?: string) {
      * If we are in a component, delay the update until the component is done rendering
      * as React cannot handle state updates during rendering
      */
-    set(nextValue: T | undefined | SignalSetFn<T>) {
+    set(nextValue: T | undefined | SignalSetFn<T>, notify = true) {
       if (typeof nextValue === "function") {
         nextValue = (nextValue as any)(value);
       }
@@ -57,13 +57,15 @@ export function createSignal<T = unknown>(value: T, id?: string) {
       if (Object.is(value, nextValue)) return;
       value = nextValue as T;
       // console.log("set", id);
-      if (interopGlobal.isInComponent) {
-        for (const sub of signal.subscriptions) {
-          interopGlobal.delayedEvents.add(sub);
-        }
-      } else {
-        for (const sub of Array.from(signal.subscriptions)) {
-          sub();
+      if (notify) {
+        if (interopGlobal.delayUpdates) {
+          for (const sub of signal.subscriptions) {
+            interopGlobal.delayedEvents.add(sub);
+          }
+        } else {
+          for (const sub of Array.from(signal.subscriptions)) {
+            sub();
+          }
         }
       }
     },
@@ -95,7 +97,14 @@ export function setupEffect(effect: Effect) {
   interopGlobal.current = effect;
 }
 
-function teardown(_effect: Computed<any>) {
+export function runInEffect<T>(fn: () => T, effect: Effect) {
+  context.push(effect);
+  let value = fn();
+  context.pop();
+  return value;
+}
+
+export function teardownEffect(_effect: Computed<any>) {
   context.pop();
 }
 
@@ -111,16 +120,23 @@ export function cleanupEffect(effect: Effect) {
 
 export function createComputed<T>(
   fn: SignalSetFn<T>,
-  runOnInitialization = true,
-  id?: string,
+  {
+    initialValue,
+    runOnInitialization = true,
+    id,
+  }: {
+    initialValue?: T;
+    runOnInitialization?: boolean;
+    id?: string;
+  } = {},
 ): Computed<T> {
   const effect: Computed<T> = Object.assign(
     function () {
       setupEffect(effect);
       effect.set(effect.fn);
-      teardown(effect);
+      teardownEffect(effect);
     },
-    createSignal<T>(undefined as T, id),
+    createSignal<T>(initialValue as T, id),
     {
       dependencies: new Set(),
       fn: fn,

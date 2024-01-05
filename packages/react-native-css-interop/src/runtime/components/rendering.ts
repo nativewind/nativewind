@@ -50,7 +50,7 @@ export function render(jsx: any, type: any, props: any, ...args: any) {
   return jsx(type, props, ...args);
 }
 
-export const cssInterop: CssInterop = (component, mapping) => {
+export const cssInterop: CssInterop = (component: any, mapping) => {
   interopComponents.set(component, getNormalizeConfig(mapping));
   return component;
 };

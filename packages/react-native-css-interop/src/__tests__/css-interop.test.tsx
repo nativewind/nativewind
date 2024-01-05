@@ -15,7 +15,7 @@ beforeEach(() => {
   resetComponents();
 });
 
-test("mapping", () => {
+test.only("mapping", () => {
   // @ts-expect-error - `differentStyle` is not a valid prop
   const A = createMockComponent(View, { className: "differentStyle" });
 

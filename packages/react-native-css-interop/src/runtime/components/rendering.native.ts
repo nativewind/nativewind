@@ -40,7 +40,7 @@ export function render(jsx: any, type: any, props: any, ...args: any) {
   }
 }
 
-export const cssInterop: CssInterop = (component, mapping) => {
+export const cssInterop: CssInterop = (component: any, mapping) => {
   const config = getNormalizeConfig(mapping);
 
   const CssInteropComponent = forwardRef<any, any>(function CssInteropComponent(
@@ -54,7 +54,7 @@ export const cssInterop: CssInterop = (component, mapping) => {
     if (___pressable) {
       return createElement(component, props, children);
     } else {
-      interopGlobal.isInComponent = true;
+      interopGlobal.delayUpdates = true;
       interopGlobal.current = null;
       const element = defaultCSSInterop(component, config, props, children);
       const originalType = element.props;
@@ -66,7 +66,7 @@ export const cssInterop: CssInterop = (component, mapping) => {
       return Object.create(element, {
         props: {
           get() {
-            interopGlobal.isInComponent = false;
+            interopGlobal.delayUpdates = false;
             interopGlobal.current = null;
             if (interopGlobal.delayedEvents.size) {
               for (const sub of interopGlobal.delayedEvents) {
@@ -131,7 +131,7 @@ export const cssInterop: CssInterop = (component, mapping) => {
   return component;
 };
 
-export const remapProps: CssInterop = (component, mapping) => {
+export const remapProps: CssInterop = (component: any, mapping) => {
   const { config } = getNormalizeConfig(mapping);
 
   let render: any = ({ ...props }: Record<string, any>) => {
