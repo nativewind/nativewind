@@ -6,8 +6,8 @@ import {
   TransportStyle,
 } from "../../types";
 import { createSignal } from "../signals";
-import { parseValue } from "./component-signal";
 import { styleSignals, warned, warnings } from "./globals";
+import { parseValue } from "./resolve-value";
 
 export function upsertStyleSignal(
   name: string,

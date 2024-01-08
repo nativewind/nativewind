@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useReducer, useEffect } from "react";
 
 export const interopGlobal: {
   delayUpdates: boolean;
@@ -17,6 +17,7 @@ type SignalSetFn<T> = (previous?: T) => T;
 
 export type Effect = {
   (): void;
+  id?: string;
   dependencies: Set<Signal<any>>;
 };
 
@@ -29,7 +30,7 @@ export function createSignal<T = unknown>(value: T, id?: string) {
     get() {
       const running = context[context.length - 1];
       if (running) {
-        // console.log("get", id, running.id);
+        // console.log("subscribe", running.id, " to ", id);
         signal.subscriptions.add(running);
         running.dependencies.add(signal);
       }
@@ -54,7 +55,7 @@ export function createSignal<T = unknown>(value: T, id?: string) {
 
       if (Object.is(value, nextValue)) return;
       value = nextValue as T;
-      // console.log("set", id);
+      // console.log("set", id, ` subscriptions: ${signal.subscriptions.size}`);
       if (notify) {
         if (interopGlobal.delayUpdates) {
           for (const sub of signal.subscriptions) {
@@ -94,13 +95,15 @@ export function setupEffect<T extends Effect>(effect: T) {
   interopGlobal.current = effect;
 }
 
-export function teardownEffect(_effect: Computed<any>) {
+export function teardownEffect(_effect: Effect) {
   context.pop();
+  interopGlobal.current = null;
 }
 
 export function cleanupEffect(effect: Effect) {
   for (const dep of effect.dependencies) {
     if ("subscriptions" in dep) {
+      // console.log("remove", effect.id, "from", dep.id);
       dep.subscriptions.delete(effect);
     }
   }

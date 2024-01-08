@@ -9,15 +9,16 @@ import type {
 
 import {
   AttributeCondition,
+  AttributeDependency,
   ExtractedContainerQuery,
   PseudoClassesQuery,
   SignalLike,
-  StyleEffect,
   StyleEffectParent,
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
+import type { ComponentStateParent } from "./component-state";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -54,7 +55,7 @@ export function testPseudoClasses(
 }
 
 export function testContainerQuery(
-  state: StyleEffect,
+  state: ComponentStateParent,
   containerQuery: ExtractedContainerQuery[] | undefined,
 ) {
   // If there is no query, we passed
@@ -260,6 +261,20 @@ function unwrap<T>(value: T | SignalLike<T>): T {
   return value && typeof value === "object" && "get" in value
     ? value.get()
     : value;
+}
+
+export function testAttributesChanged(
+  props: Record<string, any>,
+  attrDependencies: AttributeDependency[],
+) {
+  return attrDependencies.some((condition) => {
+    const current =
+      condition.type === "data-attribute"
+        ? props["dataSet"]?.[condition.name.replace("data-", "")]
+        : props[condition.name];
+
+    return current !== condition.previous;
+  });
 }
 
 export function getTestAttributeValue(

@@ -224,10 +224,10 @@ export type NativeStyleToProp<P> = {
 export type JSXFunction = (
   type: React.ComponentType,
   props: Record<string, any>,
-  key: React.Key,
-  isStaticChildren: boolean,
-  __source: unknown,
-  __self: unknown,
+  key?: React.Key,
+  isStaticChildren?: boolean,
+  __source?: unknown,
+  __self?: unknown,
 ) => React.ElementType;
 
 type OmitFirstTwo<T extends any[]> = T extends [any, any, ...infer R]

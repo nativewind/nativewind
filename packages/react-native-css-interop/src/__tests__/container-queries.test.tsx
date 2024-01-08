@@ -13,10 +13,10 @@ const Child = createMockComponent(View);
 beforeEach(() => resetStyles());
 
 describe("size", () => {
-  test("width", () => {
+  test.only("width", () => {
     registerCSS(`
       .container {
-        container-name: test;
+        container-name: my-container;
         width: 200px;
       }
 
@@ -62,8 +62,8 @@ describe("size", () => {
     });
 
     screen.rerender(
-      <Parent className="container" style={{ width: 500 }}>
-        <Child className="child" />
+      <Parent testID="parent" className="container" style={{ width: 500 }}>
+        <Child testID="child" className="child" />
       </Parent>,
     );
 

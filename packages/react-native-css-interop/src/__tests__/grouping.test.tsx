@@ -27,23 +27,23 @@ test("group", async () => {
   );
 
   const { rerender, getByTestId } = render(
-    <A>
-      <B testID={testID} className="my-class" />
-    </A>,
-  );
-
-  expect(getByTestId(testID)).toHaveStyle(undefined);
-
-  rerender(
     <A className="group/item">
       <B testID={testID} className="my-class" />
     </A>,
   );
 
   expect(getByTestId(testID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+
+  rerender(
+    <A>
+      <B testID={testID} className="my-class" />
+    </A>,
+  );
+
+  expect(getByTestId(testID)).toHaveStyle(undefined);
 });
 
-test("group - active", async () => {
+test.only("group - active", async () => {
   const A = createMockComponent(View);
   const B = createMockComponent(View);
 

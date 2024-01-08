@@ -1,14 +1,14 @@
-import { ComponentProps, forwardRef } from "react";
 import * as JSX from "react/jsx-runtime";
+import { render as tlRender } from "@testing-library/react-native";
 
 import { StyleSheet } from "../index";
 import { INTERNAL_RESET } from "../shared";
 import {
-  CssInteropGeneratedProps,
   CssToReactNativeRuntimeOptions,
   EnableCssInteropOptions,
   ReactComponent,
   Style,
+  CssInterop,
 } from "../types";
 import { cssToReactNativeRuntime } from "../css-to-rn";
 
@@ -33,44 +33,54 @@ declare global {
   }
 }
 
-const render = wrapJSX((JSX as any).jsx);
+export const renderJSX = wrapJSX((JSX as any).jsx);
+export const render: typeof tlRender = (component: any, options?: any) =>
+  tlRender(
+    renderJSX(component.type, component.props, component.key) as any,
+    options,
+  );
 
 /*
  * Creates a mocked component that renders with the defaultCSSInterop WITHOUT needing
  * set the jsxImportSource.
  */
-export function createMockComponent<
+export const createMockComponent = <
   const T extends ReactComponent<any>,
   const M extends EnableCssInteropOptions<any>,
 >(
   Component: T,
-  mapping: EnableCssInteropOptions<T> & M = {
+  mapping: M = {
     className: "style",
-  } as unknown as EnableCssInteropOptions<T> & M,
-) {
+  } as unknown as M,
+) => {
   cssInterop(Component, mapping);
 
   const mock: any = jest.fn(({ ...props }, ref) => {
     // props.ref = ref;
-    return render(Component, props, "", false, undefined, undefined);
+    return renderJSX(Component, props, "", false, undefined, undefined);
   });
 
   return Object.assign((props: any) => mock(props), { mock });
-}
+};
 
-export function createRemappedComponent<const T extends ReactComponent<any>>(
+export const createRemappedComponent: CssInterop = <
+  const T extends ReactComponent<any>,
+  const M extends EnableCssInteropOptions<any>,
+>(
   Component: T,
-  mapping: Parameters<typeof remapProps<any, any>>[1],
-) {
+  mapping: M = {
+    className: "style",
+  } as unknown as M,
+) => {
   remapProps(Component, mapping);
 
   const mock: any = jest.fn((props, ref) => {
     // props.ref = ref;
-    return render(Component, props, "", false, undefined, undefined);
+    return renderJSX(Component, props, "", false, undefined, undefined);
   });
 
-  return Object.assign(forwardRef(mock), { mock });
-}
+  return Object.assign((props: any) => mock(props), { mock });
+};
 
 export const resetStyles = () => {
   StyleSheet[INTERNAL_RESET]();

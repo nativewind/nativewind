@@ -1,6 +1,6 @@
 import { createElement as __createElement } from "react";
-import { interopJSX } from "./components/api.native";
 import type { JSXFunction } from "../types";
+import { interopComponents } from "./components/api.native";
 
 let hasAutoTagged = false;
 
@@ -11,7 +11,7 @@ export default function wrapJSX(jsx: JSXFunction): JSXFunction {
       hasAutoTagged = true;
     }
 
-    return interopJSX(jsx, type, props, ...rest);
+    return jsx.call(jsx, interopComponents.get(type) ?? type, props, ...rest);
   };
 }
 
