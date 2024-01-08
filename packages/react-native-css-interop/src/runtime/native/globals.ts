@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { useContext } from "react";
 import {
   AccessibilityInfo,
   AppState,
@@ -14,16 +14,12 @@ import {
   GroupedRuntimeStyle,
   ExtractedAnimation,
   ExtractionWarning,
-  InteropStore,
-  StyleEffectParent,
 } from "../../types";
+import { interopContext } from "./component-state";
 
 export const styleSignals = new Map<string, Signal<GroupedRuntimeStyle>>();
 export const opaqueStyles = new WeakMap<object, GroupedRuntimeStyle>();
 export const animationMap = new Map<string, ExtractedAnimation>();
-
-export const globalClassNameCache = new Map<string, InteropStore>();
-export const globalInlineCache = new WeakMap<object, InteropStore>();
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
@@ -38,15 +34,6 @@ export const globalVariables = {
   root: new Map<string, ColorSchemeSignal>(),
   universal: new Map<string, ColorSchemeSignal>(),
 };
-
-export const rootContext = {
-  getContainer() {},
-  getVariable(name: string) {
-    return globalVariables.root.get(name)?.get();
-  },
-} as unknown as StyleEffectParent;
-export const interopContext = createContext(rootContext);
-export const InteropProvider = interopContext.Provider;
 
 export const rem = createColorSchemeSignal("rem");
 export const vw = viewportUnit("width", Dimensions);

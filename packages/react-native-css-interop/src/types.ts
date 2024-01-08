@@ -16,8 +16,6 @@ import type {
   ForwardRefExoticComponent,
   FunctionComponent,
   JSXElementConstructor,
-  ReactElement,
-  ReactNode,
 } from "react";
 import type {
   Appearance,
@@ -27,8 +25,7 @@ import type {
   ViewStyle,
 } from "react-native";
 import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
-import type { Computed, Effect, Signal } from "./runtime/signals";
-import { makeMutable } from "react-native-reanimated";
+import type { Signal } from "./runtime/signals";
 
 export type ReactComponent<P = any> =
   | ClassicComponentClass<P>
@@ -42,106 +39,6 @@ export interface NormalizedOptions {
   config: [Prop, Source, NativeStyleToProp<any> | undefined][];
   sources: Source[];
   dependencies: (Prop & Source)[];
-}
-
-export type StyleEffectOptions = {
-  parent: StyleEffectParent;
-  props: Record<string, any>;
-  source: string;
-  target: string;
-  nativeStyleToProp?: [string, string | true][];
-  rerender: () => void;
-  id?: string;
-};
-
-export type StyleEffectUpdateOptions = {
-  parent: any;
-  props: Record<string, any>;
-};
-
-export type StyleComputedSharedAttributes = {
-  interaction: Interaction;
-  parent: StyleEffectParent;
-  layout?: Signal<[number, number] | undefined>;
-  container?: Signal<StyleEffectParent>;
-  getVariable(name: string): any;
-  setVariable(name: string, value: any, specificity: Specificity): void;
-  getContainer(name: string): StyleEffectParent | undefined;
-  setContainer(name: string): void;
-};
-
-export type StyleEffect = Effect &
-  Computed<Record<string, any>> &
-  StyleEffectOptions &
-  StyleComputedSharedAttributes & {
-    updateDuringRender(options: StyleEffectUpdateOptions): void;
-    props: Record<string, any>;
-    originalProps: Record<string, any>;
-    requiresLayoutWidth: boolean;
-    requiresLayoutHeight: boolean;
-    interaction: Interaction;
-    isAnimated: boolean;
-    animations?: Required<ExtractedAnimations>;
-    animationNames: Set<string>;
-    animationWaitingOnLayout: boolean;
-    hoistedStyles?: [string, string, HoistedTypes][];
-    layout?: Signal<[number, number] | undefined>;
-    sharedValues: Record<string, ReturnType<typeof makeMutable>>;
-    transition?: Required<ExtractedTransition>;
-    shouldUpdateContext: boolean;
-    context?: StyleEffect;
-    attrDependencies: AttributeDependency[];
-    getVariable(name: string): any;
-    convertToPressable?: boolean;
-    inlineVariablesToRemove: Set<string>;
-    inlineVariables: Map<string, Signal<any>>;
-  };
-
-export type StyleEffectParent = Pick<
-  StyleEffect,
-  "getVariable" | "getContainer" | "interaction" | "layout"
->;
-
-export interface InteropStore {
-  testId?: string;
-  version: number;
-  onChange?: () => void;
-  parent: InteropStore;
-  originalProps: Record<string, any>;
-  props: Record<string, any>;
-  options: NormalizedOptions;
-  scope: number;
-  interaction: Interaction;
-  hasActive: boolean;
-  hasHover: boolean;
-  hasFocus: boolean;
-  hasContainer: boolean;
-  convertToPressable: boolean;
-  shouldUpdateContext: boolean;
-  context?: InteropStore;
-  isAnimated: boolean;
-  animations?: Required<ExtractedAnimations>;
-  animationNames: Set<string>;
-  transition?: Required<ExtractedTransition>;
-  inlineVariablesToRemove: Set<string>;
-  inlineVariables: Map<string, Signal<any>>;
-  containerNames: Set<string>;
-  effect: Effect;
-  requiresLayoutWidth: boolean;
-  requiresLayoutHeight: boolean;
-  animationWaitingOnLayout: boolean;
-  layout?: Signal<[number, number] | undefined>;
-  dependencies: any[];
-  attrDependencies: AttributeDependency[];
-  hoistedStyles?: [string, string, HoistedTypes][];
-  sharedValues: Record<string, ReturnType<typeof makeMutable>>;
-  getInteraction(name: keyof Interaction): boolean;
-  getVariable(name: string): any;
-  setVariable(name: string, value: any, specificity: Specificity): void;
-  setContainer(name: string): void;
-  getContainer(name: string): InteropStore | undefined;
-  containerSignal?: Signal<InteropStore>;
-  rerender(parent?: InteropStore, originalProps?: Record<string, any>): void;
 }
 
 export type CssToReactNativeRuntimeOptions = {
@@ -237,28 +134,6 @@ type OmitFirstTwo<T extends any[]> = T extends [any, any, ...infer R]
 export type JSXFunctionType = Parameters<JSXFunction>[0];
 export type JSXFunctionProps = Parameters<JSXFunction>[1];
 export type JSXFunctionRest = OmitFirstTwo<Parameters<JSXFunction>>;
-
-export type BasicInteropFunction = <P>(
-  jsx: JSXFunction,
-  type: ComponentType<P>,
-  props: P,
-  key: string | undefined,
-  ...args: unknown[]
-) => any;
-
-export type InteropFunction = (
-  type: any,
-  options: NormalizedOptions,
-  props: Record<string, any>,
-  children: ReactNode,
-) => ReactElement;
-
-export type InteropFunctionOptions<P> = {
-  remappedProps: P;
-  options: NormalizedOptions;
-  dependencies: unknown[];
-  useWrapper: boolean;
-};
 
 export type CompilerStyleMeta = {
   specificity: Specificity;
@@ -368,10 +243,6 @@ export type ExtractedContainer = {
   names?: string[] | false;
   type: ContainerType;
 };
-
-export type GetInteraction = <T extends keyof Interaction>(
-  name: T,
-) => NonNullable<Interaction[T]>;
 
 export type ExtractedContainerQuery = {
   name?: string | null;

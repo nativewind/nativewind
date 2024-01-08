@@ -13,7 +13,6 @@ import {
   ExtractedContainerQuery,
   PseudoClassesQuery,
   SignalLike,
-  StyleEffectParent,
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
@@ -44,13 +43,13 @@ export function testMediaQuery(
 }
 
 export function testPseudoClasses(
-  effect: StyleEffectParent,
+  state: ComponentStateParent,
   meta: PseudoClassesQuery,
 ) {
   let fail = false;
-  if (meta.active) fail ||= effect.interaction.active?.get() !== true;
-  if (meta.hover) fail ||= effect.interaction.hover?.get() !== true;
-  if (meta.focus) fail ||= effect.interaction.focus?.get() !== true;
+  if (meta.active) fail ||= state.interaction.active?.get() !== true;
+  if (meta.hover) fail ||= state.interaction.hover?.get() !== true;
+  if (meta.focus) fail ||= state.interaction.focus?.get() !== true;
   return !fail;
 }
 
