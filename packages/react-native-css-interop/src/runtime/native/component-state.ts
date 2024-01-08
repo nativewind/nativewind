@@ -1,5 +1,6 @@
 import { ComponentType, createContext, createElement } from "react";
 import { LayoutChangeEvent, Pressable, View } from "react-native";
+import type { Time } from "lightningcss";
 import Animated, {
   SharedValue,
   cancelAnimation,
@@ -45,7 +46,6 @@ import {
   testPseudoClasses,
   testAttributesChanged,
 } from "./conditions";
-import { timeToMS } from "./style";
 import { defaultValues, getEasing, resolveAnimation } from "./resolve-value";
 
 const rootContext = {
@@ -937,6 +937,10 @@ function resolveObject<T extends object>(obj: T) {
     else obj[i] = typeof v === "function" ? v() : v;
   }
 }
+
+const timeToMS = (time: Time) => {
+  return time.type === "milliseconds" ? time.value : time.value * 1000;
+};
 
 export function specificityCompare(
   o1: object | RuntimeStyle,

@@ -13,11 +13,7 @@ import {
 import { cssToReactNativeRuntime } from "../css-to-rn";
 
 import "../runtime/components";
-import {
-  cssInterop,
-  remapProps,
-  interopComponents,
-} from "../runtime/components/api";
+import { cssInterop, remapProps, interopComponents } from "../runtime/api";
 import { opaqueStyles } from "../runtime/native/globals";
 import wrapJSX from "../runtime/wrap-jsx";
 

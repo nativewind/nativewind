@@ -10,7 +10,7 @@ import {
 } from "../testing-library";
 import { styleSignals } from "../runtime/native/globals";
 import { RefObject, useRef } from "react";
-import { remapProps } from "../runtime/components/api";
+import { remapProps } from "../runtime/api";
 
 const testID = "react-native-css-interop";
 

@@ -12,10 +12,10 @@ import {
   JSXFunctionProps,
   JSXFunctionRest,
   JSXFunctionType,
-} from "../../types";
-import { getNormalizeConfig } from "../config";
-import { ComponentState, interopContext } from "../native/component-state";
-import { opaqueStyles, styleSignals } from "../native/globals";
+} from "../types";
+import { getNormalizeConfig } from "./config";
+import { ComponentState, interopContext } from "./native/component-state";
+import { opaqueStyles, styleSignals } from "./native/globals";
 
 export const interopComponents = new Map<
   object | string,

@@ -1,6 +1,6 @@
 import { createElement as __createElement } from "react";
 import type { JSXFunction } from "../types";
-import { interopComponents } from "./components/api.native";
+import { interopComponents } from "./api.native";
 
 let hasAutoTagged = false;
 

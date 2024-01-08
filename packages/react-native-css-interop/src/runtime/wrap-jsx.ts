@@ -1,6 +1,6 @@
 import { ComponentType, createElement as __createElement } from "react";
 import type { CssInterop, JSXFunction, StyleProp } from "../types";
-import { interopComponents } from "./components/rendering";
+import { interopComponents } from "./api";
 import { getNormalizeConfig } from "./config";
 
 let hasAutoTagged = false;

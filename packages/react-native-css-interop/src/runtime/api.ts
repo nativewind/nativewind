@@ -1,6 +1,6 @@
 import { ComponentType } from "react";
-import { CssInterop, NormalizedOptions } from "../../types";
-import { getNormalizeConfig } from "../config";
+import { CssInterop, NormalizedOptions } from "../types";
+import { getNormalizeConfig } from "./config";
 
 export const interopComponents = new Map<object | string, NormalizedOptions>();
 
