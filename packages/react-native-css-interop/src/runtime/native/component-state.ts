@@ -196,12 +196,12 @@ export class ComponentState {
     this.appendEventHandlers(props, originalProps);
     this.processContainers();
 
-    // for (const name of this.variables.keys()) {
-    //   if (!seenVariables.has(name)) {
-    //     this.variables.get(name)?.set(undefined); // This will cause the children to rerender
-    //     this.variables.delete(name);
-    //   }
-    // }
+    for (const name of this.variables.keys()) {
+      if (!seenVariables.has(name)) {
+        this.variables.get(name)?.set(undefined); // This will cause the children to rerender
+        this.variables.delete(name);
+      }
+    }
 
     return this.renderElement(props);
   }
@@ -305,14 +305,7 @@ export class ComponentState {
     }
 
     if (this.isAnimated) {
-      /**
-       * This shouldn't need to be its own component, but Reanimated's Babel plugin isn't picking up
-       * the values
-       */
-      // delete props.testID; // On Reanimated 3.3.0, testID causes an infinite loop. No clue why
-      props.___component = createAnimatedComponent(component);
-      props.___skipInterop = true;
-      component = CSSInteropAnimationWrapper;
+      component = createAnimatedComponent(component);
     }
 
     if (this.context || this.resetContext) {
@@ -562,8 +555,7 @@ export class SourceComputed {
       this.reduceStyles(props, layers[2], maxScope, true);
     }
 
-    // TODO: This should be flagged and skipped if there are no props to resolve
-    if (props[target]) {
+    if (this.shouldResolveTarget && props[target]) {
       resolveObject(props[target]);
     }
 
@@ -933,37 +925,6 @@ export class SourceComputed {
   }
 }
 
-const animatedCache = new Map<
-  ComponentType<any> | string,
-  ComponentType<any>
->();
-export function createAnimatedComponent(Component: ComponentType<any>): any {
-  if (animatedCache.has(Component)) {
-    return animatedCache.get(Component)!;
-  } else if (Component.displayName?.startsWith("AnimatedComponent")) {
-    return Component;
-  }
-
-  if (
-    !(
-      typeof Component !== "function" ||
-      (Component.prototype && Component.prototype.isReactComponent)
-    )
-  ) {
-    throw new Error(
-      `Looks like you're passing an animation style to a function component \`${Component.name}\`. Please wrap your function component with \`React.forwardRef()\` or use a class component instead.`,
-    );
-  }
-
-  let AnimatedComponent = Animated.createAnimatedComponent(
-    Component as React.ComponentClass,
-  );
-
-  animatedCache.set(Component, AnimatedComponent);
-
-  return AnimatedComponent;
-}
-
 // Walk an object, resolving any getters
 function resolveObject<T extends object>(obj: T) {
   for (var i in obj) {
@@ -1038,12 +999,37 @@ const defaultTransition: Required<ExtractedTransition> = {
   timingFunction: [{ type: "linear" }],
 };
 
-/**
- * This code shouldn't be needed, but inline shared values are not working properly.
- * https://github.com/software-mansion/react-native-reanimated/issues/5296
- */
-export const CSSInteropAnimationWrapper = forwardRef(
-  ({ ___component, ...props }: any, ref: any) => {
+const animatedCache = new Map<
+  ComponentType<any> | string,
+  ComponentType<any>
+>();
+export function createAnimatedComponent(Component: ComponentType<any>): any {
+  if (animatedCache.has(Component)) {
+    return animatedCache.get(Component)!;
+  } else if (Component.displayName?.startsWith("AnimatedComponent")) {
+    return Component;
+  }
+
+  if (
+    !(
+      typeof Component !== "function" ||
+      (Component.prototype && Component.prototype.isReactComponent)
+    )
+  ) {
+    throw new Error(
+      `Looks like you're passing an animation style to a function component \`${Component.name}\`. Please wrap your function component with \`React.forwardRef()\` or use a class component instead.`,
+    );
+  }
+
+  let AnimatedComponent = Animated.createAnimatedComponent(
+    Component as React.ComponentClass,
+  );
+
+  const CSSInteropAnimationWrapper = forwardRef((props: any, ref: any) => {
+    /**
+     * This code shouldn't be needed, but inline shared values are not working properly.
+     * https://github.com/software-mansion/react-native-reanimated/issues/5296
+     */
     const style = useAnimatedStyle(() => {
       const style: any = {};
       const entries = Object.entries(props.style ?? {});
@@ -1069,6 +1055,10 @@ export const CSSInteropAnimationWrapper = forwardRef(
       return style;
     }, [true]);
 
-    return createElement(___component, { ...props, style, ref });
-  },
-);
+    return createElement(AnimatedComponent, { ...props, style, ref });
+  });
+
+  animatedCache.set(Component, CSSInteropAnimationWrapper);
+
+  return AnimatedComponent;
+}

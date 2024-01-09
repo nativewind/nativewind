@@ -23,10 +23,6 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
     props: Record<string, any>,
     ref: any,
   ) {
-    if (props.___skipInterop) {
-      return createElement(baseComponent, props, props.children);
-    }
-
     const parent = useContext(interopContext);
     const forceUpdate = useState({});
 
