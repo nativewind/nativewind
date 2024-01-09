@@ -1,4 +1,4 @@
-export { cssInterop, remapProps } from "../api.native";
+export { cssInterop, remapProps } from "../api";
 
 export { StyleSheet } from "./stylesheet";
 export {

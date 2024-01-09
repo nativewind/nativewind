@@ -1,4 +1,4 @@
-import { ComponentType, createContext, createElement } from "react";
+import { ComponentType, createContext, createElement, forwardRef } from "react";
 import { LayoutChangeEvent, Pressable, View } from "react-native";
 import type { Time } from "lightningcss";
 import Animated, {
@@ -94,7 +94,7 @@ export class ComponentState {
           source,
           rerender,
           Object.entries(nativeStyleToProp || {}),
-          `${this.testId}#${source}`,
+          `${this.testId}:${source}`,
         ),
       );
     }
@@ -108,7 +108,6 @@ export class ComponentState {
    * but it get confusing. E.g should the child View inherit the parent containerStyle's variables?
    */
   variables = new Map<string, Signal<any>>();
-  variablesToRemove = new Set<string>();
   getVariable(name: string) {
     let value: any = undefined;
     value ??= this.variables.get(name)?.get();
@@ -117,11 +116,10 @@ export class ComponentState {
     return value;
   }
   setVariable(name: string, value: any) {
-    this.variablesToRemove.delete(name);
     const existing = this.variables.get(name);
     if (!existing) {
       this.resetContext = true;
-      this.variables.set(name, createSignal(value, `${this.testId}#${name}`));
+      this.variables.set(name, createSignal(value, `${this.testId}:${name}`));
     } else {
       existing.set(value);
     }
@@ -143,12 +141,12 @@ export class ComponentState {
     }
   }
   setContainer(name: string) {
-    this.interaction.active ??= createSignal(false, `${this.testId}#__active`);
-    this.interaction.hover ??= createSignal(false, `${this.testId}#__hover`);
-    this.interaction.focus ??= createSignal(false, `${this.testId}#__focus`);
+    this.interaction.active ??= createSignal(false, `${this.testId}:__active`);
+    this.interaction.hover ??= createSignal(false, `${this.testId}:__hover`);
+    this.interaction.focus ??= createSignal(false, `${this.testId}:__focus`);
     this.layout ??= createSignal<[number, number] | undefined>(
       undefined,
-      `${this.testId}#__layout`,
+      `${this.testId}:__layout`,
     );
     this.requiresLayout = true;
     this.containerNames.add(name);
@@ -156,7 +154,7 @@ export class ComponentState {
       this.resetContext = true;
       this.container = createSignal<ComponentStateParent>(
         this,
-        `${this.testId}#__container:${name}`,
+        `${this.testId}:__container:${name}`,
       );
     }
   }
@@ -166,24 +164,46 @@ export class ComponentState {
     originalProps: Record<string, any>,
     ref: any,
   ) {
-    const props: Record<string, any> = { ...originalProps, ref };
+    let props: Record<string, any> = {};
     this.resetContext = this.parent !== parent;
     this.parent = parent;
     this.requiresLayout = false;
-    this.variablesToRemove = new Set(this.variables.keys());
     this.containerNames.clear();
+
+    const seenVariables = new Set();
+    const propsToDelete = new Set<string>();
 
     for (const signal of this.sourceSignals) {
       Object.assign(props, signal.getProps(parent, originalProps));
       if (signal.target !== signal.source) {
-        delete props[signal.source];
+        propsToDelete.add(signal.source);
       }
+      for (const name of signal.seenVariables) {
+        seenVariables.add(name);
+      }
+    }
+
+    props = {
+      ...originalProps,
+      ...props,
+      ref,
+    };
+
+    for (const prop of propsToDelete) {
+      delete props[prop];
     }
 
     this.appendEventHandlers(props, originalProps);
     this.processContainers();
-    this.processVariables();
-    return this.createElement(props);
+
+    // for (const name of this.variables.keys()) {
+    //   if (!seenVariables.has(name)) {
+    //     this.variables.get(name)?.set(undefined); // This will cause the children to rerender
+    //     this.variables.delete(name);
+    //   }
+    // }
+
+    return this.renderElement(props);
   }
 
   private appendEventHandlers(
@@ -225,6 +245,16 @@ export class ComponentState {
     }
 
     /**
+     * Some React Native components (e.g Text) will not apply interaction event handlers
+     * if `onPress` is not defined.
+     */
+    if (interaction.active || interaction.hover || interaction.focus) {
+      props.onPress = (event: unknown) => {
+        originalProps.onPress?.(event);
+      };
+    }
+
+    /**
      * Some signals may require a layout to be calculated, so add the callback
      */
     if (this.requiresLayout) {
@@ -233,7 +263,7 @@ export class ComponentState {
 
         this.layout ??= createSignal<[number, number] | undefined>(
           undefined,
-          `${this.testId}#__layout`,
+          `${this.testId}:__layout`,
         );
 
         const layout = event.nativeEvent.layout;
@@ -255,23 +285,13 @@ export class ComponentState {
     }
   }
 
-  private processVariables() {
-    /**
-     * Variables that were in the previous render but not in the current need to be removed
-     */
-    for (const name of this.variablesToRemove) {
-      this.variables.get(name)?.set(undefined); // This will cause the children to rerender
-      this.variables.delete(name);
-    }
-  }
-
   /**
    * Creates a the React Element and also "upgrades" the component if needed.
    *
    * Upgrading is a one-way process and should only happen during the initial render.
    * If it upgrades later, all state within the component is lost.
    */
-  private createElement(props: Record<string, any>) {
+  private renderElement(props: Record<string, any>) {
     let component = this.component;
 
     // TODO: We can probably remove this in favor of using `new Pressability()`
@@ -289,8 +309,9 @@ export class ComponentState {
        * This shouldn't need to be its own component, but Reanimated's Babel plugin isn't picking up
        * the values
        */
-      const $component = createAnimatedComponent(component);
-      props.__component = $component;
+      // delete props.testID; // On Reanimated 3.3.0, testID causes an infinite loop. No clue why
+      props.___component = createAnimatedComponent(component);
+      props.___skipInterop = true;
       component = CSSInteropAnimationWrapper;
     }
 
@@ -310,7 +331,7 @@ export class ComponentState {
     }
 
     // After the initial render, the user shouldn't upgrade the component
-    this.shouldPrintUpgradeWarnings = process.env.NODE_ENV !== "production";
+    // this.shouldPrintUpgradeWarnings = process.env.NODE_ENV !== "production";
 
     const element = createElement(component, props);
 
@@ -326,10 +347,11 @@ export class ComponentState {
            */
           interopGlobal.delayUpdates = false;
           if (interopGlobal.delayedEvents.size) {
-            for (const sub of interopGlobal.delayedEvents) {
+            const delayedEvents = [...interopGlobal.delayedEvents];
+            interopGlobal.delayedEvents.clear();
+            for (const sub of delayedEvents) {
               sub();
             }
-            interopGlobal.delayedEvents.clear();
           }
         }
         return target[prop];
@@ -358,6 +380,8 @@ export class SourceComputed {
   hoistedStyles: [string, string, HoistedTypes][] = [];
   attrDependencies: AttributeDependency[] = [];
 
+  shouldResolveTarget = false;
+  seenVariables = new Set<string>();
   sharedValues = {} as Record<string, SharedValue<any>>;
   animation?: Required<ExtractedAnimations>;
   animationNames = new Set<string>();
@@ -371,7 +395,7 @@ export class SourceComputed {
     public source: string,
     rerender: () => void,
     private nativeStyleToProp: [string, string | true][],
-    id?: string,
+    public id?: string,
     private signal = createSignal<Record<string, any>>({}, id),
   ) {
     this.effect = Object.assign(
@@ -388,6 +412,7 @@ export class SourceComputed {
           state.requiresLayout = true;
           state.layout ??= createSignal<[number, number] | undefined>(
             undefined,
+            "layout",
           );
           return state.layout?.get()?.[0] ?? 0;
         },
@@ -395,6 +420,7 @@ export class SourceComputed {
           state.requiresLayout = true;
           state.layout ??= createSignal<[number, number] | undefined>(
             undefined,
+            "layout",
           );
           return state.layout?.get()?.[1] ?? 0;
         },
@@ -409,15 +435,18 @@ export class SourceComputed {
     }
   }
 
-  getProps(parent: ComponentStateParent, props: Record<string, any>) {
-    const shouldUpdate =
+  private previousSource: string | undefined;
+  private previousTarget: any;
+  getProps(parent: ComponentStateParent, incomingProps: Record<string, any>) {
+    const shouldUpdate = Boolean(
       this.parent !== parent ||
-      !Object.is(props[this.source], this.originalProps[this.source]) ||
-      !Object.is(props[this.target], this.originalProps[this.target]) ||
-      testAttributesChanged(props, this.attrDependencies);
+        !Object.is(incomingProps[this.source], this.previousSource) ||
+        !Object.is(incomingProps[this.target], this.previousTarget) ||
+        testAttributesChanged(incomingProps, this.attrDependencies),
+    );
 
     this.parent = parent;
-    this.originalProps = props;
+    this.originalProps = incomingProps;
 
     if (shouldUpdate) {
       interopGlobal.delayUpdates = true;
@@ -427,15 +456,20 @@ export class SourceComputed {
     return this.signal.peek();
   }
 
-  _update = (delayedEvents = false) => {
+  _update = () => {
     setupEffect(this.effect);
     this.props = {};
     const props = this.props;
     const source = this.source;
     const target = this.target;
-    const classNames = this.originalProps[source];
-    const inlineStyles = this.originalProps[target];
 
+    this.previousSource = this.originalProps[source];
+
+    const classNames = this.previousSource;
+    const inlineStyles = (this.previousTarget = this.originalProps[target]);
+
+    this.shouldResolveTarget = false;
+    this.seenVariables.clear();
     this.hoistedStyles = [];
     this.attrDependencies = [];
     this.animation = undefined as Required<ExtractedAnimations> | undefined;
@@ -528,6 +562,7 @@ export class SourceComputed {
       this.reduceStyles(props, layers[2], maxScope, true);
     }
 
+    // TODO: This should be flagged and skipped if there are no props to resolve
     if (props[target]) {
       resolveObject(props[target]);
     }
@@ -685,7 +720,7 @@ export class SourceComputed {
 
           if (seenAnimatedProps.has(key)) continue;
 
-          let value = props[target][key] ?? defaultValues[key];
+          let value = props[target]?.[key] ?? defaultValues[key];
 
           if (typeof value === "function") {
             value = value();
@@ -715,11 +750,8 @@ export class SourceComputed {
             );
           }
 
-          Object.defineProperty(props[target], key, {
-            configurable: true,
-            enumerable: true,
-            value: sharedValue,
-          });
+          props[target] ??= {};
+          props[target][key] = sharedValue;
         }
       }
 
@@ -735,20 +767,21 @@ export class SourceComputed {
     for (let hoisted of this.hoistedStyles) {
       const prop = hoisted[0];
       const key = hoisted[1];
-      if (props[prop] && key in props[prop]) {
+      const targetObj = props[prop];
+      if (targetObj && key in targetObj) {
         switch (hoisted[2]) {
           case "transform":
-            props[prop].transform ??= [];
-            props[prop].transform.push({
-              [key]: props[prop][key],
+            targetObj.transform ??= [];
+            targetObj.transform.push({
+              [key]: targetObj[key],
             });
-            delete props[prop][key];
+            delete targetObj[key];
             break;
           case "shadow":
             const [type, shadowKey] = key.split(".");
-            props[prop][type] ??= {};
-            props[prop][type][shadowKey] = props[prop][key];
-            delete props[prop][key];
+            targetObj[type] ??= {};
+            targetObj[type][shadowKey] = targetObj[key];
+            delete targetObj[key];
             break;
         }
       }
@@ -798,13 +831,13 @@ export class SourceComputed {
 
       if (style.pseudoClasses) {
         if (style.pseudoClasses.active) {
-          state.interaction.active ??= createSignal(false);
+          state.interaction.active ??= createSignal(false, "active");
         }
         if (style.pseudoClasses.hover) {
-          state.interaction.hover ??= createSignal(false);
+          state.interaction.hover ??= createSignal(false, "hover");
         }
         if (style.pseudoClasses.focus) {
-          state.interaction.focus ??= createSignal(false);
+          state.interaction.focus ??= createSignal(false, "focus");
         }
         if (!testPseudoClasses(this.state, style.pseudoClasses)) {
           continue;
@@ -846,6 +879,7 @@ export class SourceComputed {
 
       if (style.variables) {
         for (const [key, value] of style.variables) {
+          this.seenVariables.add(key);
           state.setVariable(key, value);
         }
       }
@@ -875,6 +909,7 @@ export class SourceComputed {
       }
 
       if (style.props) {
+        this.shouldResolveTarget = true;
         for (let [prop, value] of style.props) {
           // The compiler maps to 'style' by default, but we may be rendering for a different prop
           if (target !== "style" && prop === "style") {
@@ -943,10 +978,13 @@ const timeToMS = (time: Time) => {
 };
 
 export function specificityCompare(
-  o1: object | RuntimeStyle,
-  o2: object | RuntimeStyle,
+  o1?: object | RuntimeStyle | null,
+  o2?: object | RuntimeStyle | null,
   treatAsInline = false,
 ) {
+  if (!o1) return -1;
+  if (!o2) return 1;
+
   // inline styles have no specificity and the order is preserved
   if (!("specificity" in o1) || !("specificity" in o2)) {
     return 0;
@@ -1004,34 +1042,33 @@ const defaultTransition: Required<ExtractedTransition> = {
  * This code shouldn't be needed, but inline shared values are not working properly.
  * https://github.com/software-mansion/react-native-reanimated/issues/5296
  */
-export function CSSInteropAnimationWrapper({
-  __component: Component,
-  ...props
-}: any) {
-  const style = useAnimatedStyle(() => {
-    const style: any = {};
-    const entries = Object.entries(props.style);
+export const CSSInteropAnimationWrapper = forwardRef(
+  ({ ___component, ...props }: any, ref: any) => {
+    const style = useAnimatedStyle(() => {
+      const style: any = {};
+      const entries = Object.entries(props.style ?? {});
 
-    for (const [key, value] of entries as any) {
-      if (typeof value === "object" && "value" in value) {
-        style[key] = value.value;
-      } else if (key === "transform") {
-        style.transform = value.map((v: any) => {
-          const [key, value] = Object.entries(v)[0] as any;
+      for (const [key, value] of entries as any) {
+        if (typeof value === "object" && "value" in value) {
+          style[key] = value.value;
+        } else if (key === "transform") {
+          style.transform = value.map((v: any) => {
+            const [key, value] = Object.entries(v)[0] as any;
 
-          if (typeof value === "object" && "value" in value) {
-            return { [key]: value.value };
-          } else {
-            return { [key]: value };
-          }
-        });
-      } else {
-        style[key] = value;
+            if (typeof value === "object" && "value" in value) {
+              return { [key]: value.value };
+            } else {
+              return { [key]: value };
+            }
+          });
+        } else {
+          style[key] = value;
+        }
       }
-    }
 
-    return style;
-  }, [props.style]);
+      return style;
+    }, [true]);
 
-  return createElement(Component, { ...props, style }, props.children);
-}
+    return createElement(Animated.Text, { ...props, style, ref });
+  },
+);

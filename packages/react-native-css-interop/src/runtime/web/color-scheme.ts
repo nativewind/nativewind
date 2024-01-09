@@ -34,7 +34,10 @@ if (darkMode === "media") {
     : "light";
 }
 
-const _colorScheme = createSignal<"light" | "dark" | "system">(initialColor);
+const _colorScheme = createSignal<"light" | "dark" | "system">(
+  initialColor,
+  "systemColorScheme",
+);
 export const colorScheme = {
   ..._colorScheme,
   set(value: "light" | "dark" | "system") {

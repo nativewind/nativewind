@@ -1,7 +1,5 @@
-import { ComponentType, createElement as __createElement } from "react";
-import type { CssInterop, JSXFunction, StyleProp } from "../types";
+import type { JSXFunction, StyleProp } from "../types";
 import { interopComponents } from "./api";
-import { getNormalizeConfig } from "./config";
 
 let hasAutoTagged = false;
 
@@ -47,11 +45,3 @@ export default function wrapJSX(jsx: JSXFunction): JSXFunction {
     return jsx.call(jsx, type, props, ...rest);
   };
 }
-
-export const createElement = wrapJSX(__createElement as any);
-export const cssInterop: CssInterop = (component, mapping) => {
-  interopComponents.set(component, getNormalizeConfig(mapping));
-  return component as ComponentType<any>;
-};
-// On web, these are the same
-export const remapProps = cssInterop;

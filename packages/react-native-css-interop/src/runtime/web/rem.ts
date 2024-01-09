@@ -12,6 +12,7 @@ export const rem = (function createRem(defaultValue: number = 16) {
             globalThis.window.document.documentElement,
           ).fontSize,
         ),
+    "rem",
   );
 
   const get = () => signal.get();

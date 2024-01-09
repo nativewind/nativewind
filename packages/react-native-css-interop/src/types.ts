@@ -76,7 +76,7 @@ export type EnableCssInteropOptions<
 > = Record<string, CSSInteropClassNamePropConfig<ComponentProps<T>>>;
 
 export type Layers = Record<0 | 1 | 2, Array<RuntimeStyle | object>> & {
-  classNames: string;
+  classNames?: string;
 };
 
 export type CssInterop = <

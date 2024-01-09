@@ -1,18 +1,12 @@
 import {
   useContext,
-  useState,
   useRef,
   forwardRef,
   useEffect,
   createElement,
+  useState,
 } from "react";
-import {
-  CssInterop,
-  JSXFunction,
-  JSXFunctionProps,
-  JSXFunctionRest,
-  JSXFunctionType,
-} from "../types";
+import { CssInterop, JSXFunction } from "../types";
 import { getNormalizeConfig } from "./config";
 import { ComponentState, interopContext } from "./native/component-state";
 import { opaqueStyles, styleSignals } from "./native/globals";
@@ -22,15 +16,6 @@ export const interopComponents = new Map<
   Parameters<JSXFunction>[0]
 >();
 
-export function interopJSX(
-  jsx: JSXFunction,
-  type: JSXFunctionType,
-  props: JSXFunctionProps,
-  ...rest: JSXFunctionRest
-) {
-  return jsx.call(jsx, interopComponents.get(type) ?? type, props, ...rest);
-}
-
 export const cssInterop: CssInterop = (baseComponent, mapping): any => {
   const config = getNormalizeConfig(mapping);
 
@@ -38,6 +23,10 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
     props: Record<string, any>,
     ref: any,
   ) {
+    if (props.___skipInterop) {
+      return createElement(baseComponent, props, props.children);
+    }
+
     const parent = useContext(interopContext);
     const forceUpdate = useState({});
 
@@ -52,7 +41,12 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
       );
     }
 
-    useEffect(() => () => componentRef.current?.cleanup(), []);
+    useEffect(
+      () => () => {
+        componentRef.current?.cleanup();
+      },
+      [],
+    );
 
     return componentRef.current.render(parent, props, ref);
   });

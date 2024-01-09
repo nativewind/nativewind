@@ -35,7 +35,7 @@ export async function tailwindCli(
 
   const env = {
     ...process.env,
-    NATIVEWIND_NATIVE: options.platform !== "web" ? "1" : undefined,
+    NATIVEWIND_NATIVE: options.platform === "web" ? undefined : "true",
     BROWSERSLIST: options.browserslist ?? undefined,
     BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
   };

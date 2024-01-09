@@ -50,7 +50,7 @@ test("numeric transition", () => {
   });
 
   // Width should only change after we advance time
-  jest.advanceTimersByTime(501);
+  jest.advanceTimersByTime(500);
   expect(component).toHaveAnimatedStyle({
     width: 150,
   });

@@ -2,7 +2,7 @@ import { vars } from "nativewind";
 import { Pressable, Text, View } from "react-native";
 
 const theme = vars({
-  "--theme-fg": "red",
+  "--theme-fg": "blue",
 });
 
 const App = () => {

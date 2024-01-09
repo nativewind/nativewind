@@ -55,7 +55,7 @@ export function createSignal<T = unknown>(value: T, id?: string) {
 
       if (Object.is(value, nextValue)) return;
       value = nextValue as T;
-      // console.log("set", id, ` subscriptions: ${signal.subscriptions.size}`);
+      // console.log("set", id, value);
       if (notify) {
         if (interopGlobal.delayUpdates) {
           for (const sub of signal.subscriptions) {
