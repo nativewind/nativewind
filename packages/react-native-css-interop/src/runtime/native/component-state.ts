@@ -1069,6 +1069,6 @@ export const CSSInteropAnimationWrapper = forwardRef(
       return style;
     }, [true]);
 
-    return createElement(Animated.Text, { ...props, style, ref });
+    return createElement(___component, { ...props, style, ref });
   },
 );

@@ -14,7 +14,7 @@ jest.useFakeTimers();
 
 beforeEach(() => resetStyles());
 
-test("numeric transition", () => {
+test.only("numeric transition", () => {
   registerCSS(`
     .transition {
       transition: width 1s linear;
