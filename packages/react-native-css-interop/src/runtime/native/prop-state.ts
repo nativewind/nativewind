@@ -1,13 +1,16 @@
 import {
   SharedValue,
-  cancelAnimation,
   makeMutable,
   withDelay,
   withRepeat,
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import { STYLE_SCOPES } from "../../shared";
+import {
+  STYLE_SCOPES,
+  shadowProperties,
+  transformProperties,
+} from "../../shared";
 import {
   AttributeDependency,
   ExtractedAnimations,
@@ -68,6 +71,7 @@ export class PropState {
   animationNames = new Set<string>();
   animationWaitingOnLayout = false;
   transition?: Required<ExtractedTransition>;
+  reanimatedFallbackValues = new Map<string, any>();
 
   constructor(
     private state: ComponentState,
@@ -140,6 +144,23 @@ export class PropState {
   _update = () => {
     setupEffect(this.effect);
     this.props = {};
+
+    if (this.reanimatedFallbackValues.size) {
+      this.props.style = {};
+
+      for (const [key, value] of this.reanimatedFallbackValues.entries()) {
+        if (transformProperties.has(key)) {
+          this.props.style.transform ??= [];
+          this.props.style.transform.push({ [key]: value });
+        } else if (shadowProperties.has(key)) {
+          this.props.style.shadow ??= [];
+          this.props.style.shadow[key] = value;
+        } else {
+          this.props.style[key] = value;
+        }
+      }
+    }
+
     const props = this.props;
     const source = this.source;
     const target = this.target;
@@ -250,6 +271,34 @@ export class PropState {
     if (target === "style") {
       const seenAnimatedProps = new Set();
 
+      /**
+       * Hack for react-native-reanimated (last seen 3.3.0)
+       *
+       * If a style property is absent from a render, Reanimated will preserve the previous value instead of resetting to the default.
+       * To prevent this, we force a default value to always be set.
+       *
+       * We only need to do this for non-animated props, so we track them here and on next render make sure they are set.
+       */
+      if (props.style && (this.animation || this.transition)) {
+        for (const key of Object.keys(props.style)) {
+          if (key === "transform") {
+            for (const transform of props.style.transform) {
+              for (const key of Object.keys(transform)) {
+                seenAnimatedProps.add(key);
+              }
+            }
+          } else {
+            let defaultValue = defaultValues[key];
+            this.reanimatedFallbackValues.set(
+              key,
+              typeof defaultValue === "function"
+                ? defaultValue()
+                : defaultValue,
+            );
+          }
+        }
+      }
+
       // Layer 4 - animations
       if (this.animation) {
         const {
@@ -276,11 +325,17 @@ export class PropState {
 
           names.push(name.value);
 
-          if (!this.animationNames.has(name.value)) {
-            shouldResetAnimations = true;
+          if (
+            this.animationNames.size === 0 || // If there were no previous animations
+            !this.animationNames.has(name.value) // Or there is a new animation
+          ) {
+            shouldResetAnimations = true; // Then reset everything
           }
         }
 
+        /**
+         * Animations should only be updated if the animation name changes
+         */
         if (shouldResetAnimations) {
           this.animationNames.clear();
           this.animationWaitingOnLayout = false;
@@ -394,50 +449,58 @@ export class PropState {
           timingFunction: timingFunctions,
         } = this.transition;
 
-        for (let index = 0; index < properties.length; index++) {
-          const key = properties[index];
+        /**
+         * If there is a 'none' transition we should skip this logic.
+         * In the sharedValues cleanup step the animation will be cancelled as the properties were not seen.
+         */
+        if (!properties.includes("none")) {
+          for (let index = 0; index < properties.length; index++) {
+            const property = properties[index];
 
-          if (seenAnimatedProps.has(key)) continue;
+            if (seenAnimatedProps.has(property)) continue;
 
-          let value = props[target]?.[key] ?? defaultValues[key];
+            let value = props[target]?.[property] ?? defaultValues[property];
 
-          if (typeof value === "function") {
-            value = value();
+            if (typeof value === "function") {
+              value = value();
+            }
+
+            if (value === undefined) continue;
+
+            seenAnimatedProps.add(property);
+
+            const duration = timeToMS(durations[index % durations.length]);
+            const delay = timeToMS(delays[index % delays.length]);
+            const easing = timingFunctions[index % timingFunctions.length];
+
+            let sharedValue = this.sharedValues[property];
+            if (!sharedValue) {
+              sharedValue = makeMutable(value);
+              this.sharedValues[property] = sharedValue;
+            }
+
+            if (value !== sharedValue.value) {
+              sharedValue.value = withDelay(
+                delay,
+                withTiming(value, {
+                  duration,
+                  easing: getEasing(easing),
+                }),
+              );
+            }
+
+            props[target] ??= {};
+            props[target][property] = sharedValue;
           }
-
-          if (value === undefined) continue;
-
-          seenAnimatedProps.add(key);
-
-          const duration = timeToMS(durations[index % durations.length]);
-          const delay = timeToMS(delays[index % delays.length]);
-          const easing = timingFunctions[index % timingFunctions.length];
-
-          let sharedValue = this.sharedValues[key];
-          if (!sharedValue) {
-            sharedValue = makeMutable(value);
-            this.sharedValues[key] = sharedValue;
-          }
-
-          if (value !== sharedValue.value) {
-            sharedValue.value = withDelay(
-              delay,
-              withTiming(value, {
-                duration,
-                easing: getEasing(easing),
-              }),
-            );
-          }
-
-          props[target] ??= {};
-          props[target][key] = sharedValue;
         }
       }
 
-      // Cleanup any sharedValues that are no longer used
+      /**
+       * If a sharedValue is not 'seen' by an animation or transition it should have it's animation cancelled
+       * and value reset to the current type or default value.
+       */
       for (const [key, value] of Object.entries(this.sharedValues)) {
         if (seenAnimatedProps.has(key)) continue;
-        cancelAnimation(value);
         value.value = props[target][key] ?? defaultValues[key];
       }
     }
@@ -500,12 +563,10 @@ export class PropState {
         continue;
       }
 
-      // If a style could possibly have a variable or a name, create the context
+      // If a style could possibly have a variable or be a container, forceCreate the context
       // This prevent children losing state if a context is suddenly created
-      if (style.variables || style.container?.names) {
-        if (!state.context) {
-          state.resetContext = true;
-        }
+      if ((style.variables || style.container) && !state.context) {
+        state.resetContext = true;
       }
 
       if (style.pseudoClasses) {
@@ -597,19 +658,20 @@ export class PropState {
       if (style.props) {
         this.shouldResolveTarget = true;
         for (let [prop, value] of style.props) {
+          if (!value) continue;
+
           // The compiler maps to 'style' by default, but we may be rendering for a different prop
           if (target !== "style" && prop === "style") {
             prop = target;
           }
+
           if (typeof value === "object" && "$$type" in value) {
             props[prop] = value.value;
-          } else if (value !== undefined) {
-            if (typeof value === "object") {
-              props[prop] ??= {};
-              Object.assign(props[prop], value);
-            } else {
-              props[prop] = value;
-            }
+          } else if (typeof value === "object") {
+            props[prop] ??= {};
+            Object.assign(props[prop], value);
+          } else {
+            props[prop] = value;
           }
         }
       }

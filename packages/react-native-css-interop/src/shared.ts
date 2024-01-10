@@ -20,3 +20,34 @@ export function isPropDescriptor(
 ): value is PropRuntimeValueDescriptor {
   return typeof value === "object" && value !== null && "$$type" in value;
 }
+
+export const transformProperties = new Set([
+  "perspective",
+  "translateX",
+  "translateY",
+  "translateZ",
+  "scale",
+  "scaleX",
+  "scaleY",
+  "scaleZ",
+  "rotate",
+  "rotateX",
+  "rotateY",
+  "rotateZ",
+  "skewX",
+  "skewY",
+  "skewZ",
+  "matrix",
+  "matrix3d",
+]);
+
+export const shadowProperties = new Set([
+  "-rn-shadow-offset.width",
+  "-rn-shadow-offset.height",
+  "-rn-text-shadow-offset.width",
+  "-rn-text-shadow-offset.height",
+  "shadow-offset.width",
+  "shadow-offset.height",
+  "text-shadow-offset.width",
+  "text-shadow-offset.height",
+]);

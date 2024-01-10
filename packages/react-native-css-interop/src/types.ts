@@ -266,7 +266,7 @@ export type ExtractedTransition = {
   /**
    * The property to transition.
    */
-  property?: AnimatableCSSProperty[];
+  property?: (AnimatableCSSProperty | "none")[];
   /**
    * The easing function for the transition.
    */

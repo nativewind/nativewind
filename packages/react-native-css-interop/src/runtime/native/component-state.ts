@@ -36,7 +36,7 @@ export class ComponentState {
     animated: UpgradeState.NONE,
     context: UpgradeState.NONE,
     pressable: UpgradeState.NONE,
-    shouldPrintUpgradeWarnings: false,
+    canWarn: false,
   };
 
   requiresLayout = false;
@@ -268,7 +268,7 @@ export class ComponentState {
   /**
    * Creates a the React Element and also "upgrades" the component if needed.
    *
-   * Upgrading is a one-way process and should only happen during the initial render.
+   * Upgrading  should only happen during the initial render.
    * If it upgrades later, all state within the component is lost.
    */
   private renderElement(
@@ -276,7 +276,7 @@ export class ComponentState {
     originalProps: Record<string, any>,
   ) {
     let component = this.component;
-    const shouldWarn = this.upgradeWarning.shouldPrintUpgradeWarnings;
+    const shouldWarn = this.upgradeWarning.canWarn;
 
     // TODO: We can probably remove this in favor of using `new Pressability()`
     if (
@@ -287,8 +287,9 @@ export class ComponentState {
     ) {
       component = Pressable;
       if (shouldWarn && this.upgradeWarning.pressable === UpgradeState.NONE) {
-        console.warn(
-          `CssInterop upgrade warning: Converting View to Pressable is a one-way process and should only happen during the initial render otherwise it will remount the View. To prevent this warning avoid adding styles which use pseudo-classes (e.g :hover, :active, :focus) to View components after the initial render, or change the View to a Pressable.`,
+        printUpgradeWarning(
+          `Converting View to Pressable should only happen during the initial render otherwise it will remount the View.\n\nTo prevent this warning avoid adding styles which use pseudo-classes (e.g :hover, :active, :focus) to View components after the initial render, or change the View to a Pressable`,
+          originalProps,
         );
       }
       this.upgradeWarning.pressable = UpgradeState.UPGRADED;
@@ -296,8 +297,9 @@ export class ComponentState {
 
     if (this.isAnimated) {
       if (shouldWarn && this.upgradeWarning.animated === UpgradeState.NONE) {
-        console.warn(
-          `CssInterop upgrade warning: Converting component to animated component is a one-way process and should only happen during the initial render otherwise it will remount the component.  To prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none", "transition-property: none".`,
+        printUpgradeWarning(
+          `Converting component to animated component should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none", "transition-property: none"`,
+          originalProps,
         );
       }
       this.upgradeWarning.animated = UpgradeState.UPGRADED;
@@ -306,8 +308,9 @@ export class ComponentState {
 
     if (this.context || this.resetContext) {
       if (shouldWarn && this.upgradeWarning.context === UpgradeState.NONE) {
-        console.warn(
-          `CssInterop upgrade warning: Making a component inheritable is a one-way process and should only happen during the initial render otherwise it will remount the component. To prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,
+        printUpgradeWarning(
+          `Making a component inheritable should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,
+          originalProps,
         );
       }
       this.upgradeWarning.context = UpgradeState.UPGRADED;
@@ -327,9 +330,8 @@ export class ComponentState {
       component = inheritanceContext.Provider;
     }
 
-    // After the initial render, the user shouldn't upgrade the component
-    this.upgradeWarning.shouldPrintUpgradeWarnings =
-      process.env.NODE_ENV !== "production";
+    // After the initial render, the user shouldn't upgrade the component. Avoid warning in production
+    this.upgradeWarning.canWarn = process.env.NODE_ENV !== "production";
 
     /**
      * This is a hack to delay firing state updates for other components until we have finished
@@ -429,4 +431,27 @@ export function createAnimatedComponent(Component: ComponentType<any>): any {
   animatedCache.set(Component, CSSInteropAnimationWrapper);
 
   return CSSInteropAnimationWrapper;
+}
+
+function printUpgradeWarning(
+  warning: string,
+  originalProps: Record<string, any>,
+) {
+  console.warn(
+    `CssInterop upgrade warning.\n\n${warning}.\n\nIf add/removing sibling components cause this warning, add a unique "key" prop so React can correctly track this component.`,
+  );
+  try {
+    // Not all props can be stringified
+    console.warn(
+      `The previous warning was caused by a component with these props: ${JSON.stringify(
+        originalProps,
+      )}`,
+    );
+  } catch {
+    console.warn(
+      `The previous warning was caused by a component with these props: ${JSON.stringify(
+        Object.keys(originalProps),
+      )}. Some props could not be stringified, so only the keys are shown.`,
+    );
+  }
 }
