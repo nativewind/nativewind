@@ -5,15 +5,15 @@ import {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
+import { EasingFunction, Time } from "lightningcss";
 import {
   RuntimeValue,
   RuntimeValueDescriptor,
   RuntimeValueFrame,
 } from "../../types";
 import { interopGlobal } from "../signals";
-import type { SourceComputedEffect } from "./component-state";
+import type { PropStateEffect } from "./prop-state";
 import { colorScheme, rem, vh, vw } from "./globals";
-import { EasingFunction } from "lightningcss";
 
 export function resolve(
   args:
@@ -222,12 +222,25 @@ export function parseValue(
   }
 }
 
+// Walk an object, resolving any getters
+export function resolveObject<T extends object>(obj: T) {
+  for (var i in obj) {
+    const v = obj[i];
+    if (typeof v == "object" && v != null) resolveObject(v);
+    else obj[i] = typeof v === "function" ? v() : v;
+  }
+}
+
+export const timeToMS = (time: Time) => {
+  return time.type === "milliseconds" ? time.value : time.value * 1000;
+};
+
 function round(number: number) {
   return Math.round((number + Number.EPSILON) * 100) / 100;
 }
 
 function getCurrentEffect() {
-  return interopGlobal.current as unknown as SourceComputedEffect;
+  return interopGlobal.current as unknown as PropStateEffect;
 }
 
 function getDimensions(

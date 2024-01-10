@@ -17,7 +17,7 @@ import {
 import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
-import type { ComponentStateParent } from "./component-state";
+import type { InheritedParentContext } from "./component-state";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -43,7 +43,7 @@ export function testMediaQuery(
 }
 
 export function testPseudoClasses(
-  state: ComponentStateParent,
+  state: InheritedParentContext,
   meta: PseudoClassesQuery,
 ) {
   let fail = false;
@@ -54,7 +54,7 @@ export function testPseudoClasses(
 }
 
 export function testContainerQuery(
-  state: ComponentStateParent,
+  state: InheritedParentContext,
   containerQuery: ExtractedContainerQuery[] | undefined,
 ) {
   // If there is no query, we passed

@@ -1,14 +1,13 @@
 import {
-  useContext,
-  useRef,
-  forwardRef,
-  useEffect,
   createElement,
+  forwardRef,
+  useContext,
+  useEffect,
   useState,
 } from "react";
 import { CssInterop, JSXFunction } from "../types";
 import { getNormalizeConfig } from "./config";
-import { ComponentState, interopContext } from "./native/component-state";
+import { ComponentState, inheritanceContext } from "./native/component-state";
 import { opaqueStyles, styleSignals } from "./native/globals";
 
 export const interopComponents = new Map<
@@ -23,28 +22,27 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
     props: Record<string, any>,
     ref: any,
   ) {
-    const parent = useContext(interopContext);
-    const forceUpdate = useState({});
-
-    const componentRef = useRef<ComponentState>();
-    if (!componentRef.current) {
-      componentRef.current = new ComponentState(
+    const parent = useContext(inheritanceContext);
+    const [state, setState] = useState(() => {
+      const component: ComponentState = new ComponentState(
         baseComponent,
         parent,
-        () => forceUpdate[1](() => ({})),
+        () => setState({ component }),
         config,
         props.testID,
       );
-    }
+
+      return { component };
+    });
 
     useEffect(
       () => () => {
-        componentRef.current?.cleanup();
+        state.component.cleanup();
       },
       [],
     );
 
-    return componentRef.current.render(parent, props, ref);
+    return state.component.render(parent, props, ref);
   });
   interopComponent.displayName = `CssInterop.${baseComponent.displayName}`;
   interopComponents.set(baseComponent, interopComponent);

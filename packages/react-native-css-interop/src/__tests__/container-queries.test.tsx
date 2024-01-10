@@ -13,7 +13,7 @@ const Child = createMockComponent(View);
 beforeEach(() => resetStyles());
 
 describe("size", () => {
-  test.only("width", () => {
+  test("width", () => {
     registerCSS(`
       .container {
         container-name: my-container;

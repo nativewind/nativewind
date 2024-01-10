@@ -15,7 +15,7 @@ import {
   ExtractedAnimation,
   ExtractionWarning,
 } from "../../types";
-import { interopContext } from "./component-state";
+import { inheritanceContext } from "./component-state";
 
 export const styleSignals = new Map<string, Signal<GroupedRuntimeStyle>>();
 export const opaqueStyles = new WeakMap<object, GroupedRuntimeStyle>();
@@ -206,6 +206,6 @@ export function vars(variables: Record<string, RuntimeValueDescriptor>) {
 }
 
 export const useUnstableNativeVariable = (name: string) => {
-  const state = useContext(interopContext);
+  const state = useContext(inheritanceContext);
   return useComputed(() => state.getVariable(name), state);
 };

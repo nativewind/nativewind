@@ -8,7 +8,7 @@ import {
   EnableCssInteropOptions,
   ReactComponent,
   Style,
-  CssInterop,
+  CssInteropGeneratedProps,
 } from "../types";
 import { cssToReactNativeRuntime } from "../css-to-rn";
 
@@ -16,6 +16,7 @@ import "../runtime/components";
 import { cssInterop, remapProps, interopComponents } from "../runtime/api";
 import { opaqueStyles } from "../runtime/native/globals";
 import wrapJSX from "../runtime/wrap-jsx";
+import { ComponentProps, ComponentType, forwardRef } from "react";
 
 export * from "../types";
 export { warnings } from "../runtime/native/globals";
@@ -42,7 +43,9 @@ export const render: typeof tlRender = (component: any, options?: any) =>
  */
 export const createMockComponent = <
   const T extends ReactComponent<any>,
-  const M extends EnableCssInteropOptions<any>,
+  const M extends EnableCssInteropOptions<any> = {
+    className: "style";
+  },
 >(
   Component: T,
   mapping: M = {
@@ -52,16 +55,20 @@ export const createMockComponent = <
   cssInterop(Component, mapping);
 
   const mock: any = jest.fn(({ ...props }, ref) => {
-    // props.ref = ref;
+    props.ref = ref;
     return renderJSX(Component, props, "", false, undefined, undefined);
   });
 
-  return Object.assign((props: any) => mock(props), { mock });
+  return Object.assign(forwardRef(mock), { mock }) as ComponentType<
+    ComponentProps<T> & CssInteropGeneratedProps<M>
+  >;
 };
 
-export const createRemappedComponent: CssInterop = <
+export const createRemappedComponent = <
   const T extends ReactComponent<any>,
-  const M extends EnableCssInteropOptions<any>,
+  const M extends EnableCssInteropOptions<any> = {
+    className: "style";
+  },
 >(
   Component: T,
   mapping: M = {
@@ -71,11 +78,13 @@ export const createRemappedComponent: CssInterop = <
   remapProps(Component, mapping);
 
   const mock: any = jest.fn((props, ref) => {
-    // props.ref = ref;
+    props.ref = ref;
     return renderJSX(Component, props, "", false, undefined, undefined);
   });
 
-  return Object.assign((props: any) => mock(props), { mock });
+  return Object.assign(forwardRef(mock), { mock }) as ComponentType<
+    ComponentProps<T> & CssInteropGeneratedProps<M>
+  >;
 };
 
 export const resetStyles = () => {
