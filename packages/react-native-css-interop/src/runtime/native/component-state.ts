@@ -2,7 +2,11 @@ import { ComponentType, createContext, createElement, forwardRef } from "react";
 import { LayoutChangeEvent, Pressable, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
-import { Interaction, NormalizedOptions, ReactComponent } from "../../types";
+import {
+  Interaction,
+  InteropComponentConfig,
+  ReactComponent,
+} from "../../types";
 import { Signal, createSignal, interopGlobal } from "../signals";
 import { globalVariables } from "./globals";
 import { PropState } from "./prop-state";
@@ -56,10 +60,10 @@ export class ComponentState {
     private component: ReactComponent<any>,
     private parent: InheritedParentContext,
     rerender: () => void,
-    options: NormalizedOptions,
+    config: InteropComponentConfig,
     private testId?: string,
   ) {
-    for (const [target, source, nativeStyleToProp] of options.config) {
+    for (const [target, source, nativeStyleToProp] of config) {
       if (target !== source) {
         this.propsToDelete.add(source);
       }

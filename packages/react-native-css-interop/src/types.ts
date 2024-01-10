@@ -35,11 +35,12 @@ export type ReactComponent<P = any> =
 
 type Prop = string;
 type Source = string;
-export interface NormalizedOptions {
-  config: [Prop, Source, NativeStyleToProp<any> | undefined][];
-  sources: Source[];
-  dependencies: (Prop & Source)[];
-}
+
+export type InteropComponentConfig = [
+  Prop,
+  Source,
+  NativeStyleToProp<any> | undefined,
+][];
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;

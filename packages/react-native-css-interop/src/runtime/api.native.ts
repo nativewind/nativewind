@@ -44,13 +44,15 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
 
     return state.component.render(parent, props, ref);
   });
-  interopComponent.displayName = `CssInterop.${baseComponent.displayName}`;
+  interopComponent.displayName = `CssInterop.${
+    baseComponent.displayName ?? baseComponent.name ?? "unknown"
+  }`;
   interopComponents.set(baseComponent, interopComponent);
   return interopComponent;
 };
 
 export const remapProps: CssInterop = (component: any, mapping): any => {
-  const { config } = getNormalizeConfig(mapping);
+  const config = getNormalizeConfig(mapping);
 
   const interopComponent = forwardRef(function RemapPropsComponent(
     { ...props }: Record<string, any>,
@@ -98,6 +100,5 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
   });
 
   interopComponents.set(component as any, interopComponent);
-
   return interopComponent;
 };

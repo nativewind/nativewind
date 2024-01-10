@@ -1,19 +1,16 @@
 import {
   EnableCssInteropOptions,
-  NormalizedOptions,
+  InteropComponentConfig,
   NativeStyleToProp,
 } from "../types";
 
 export function getNormalizeConfig(
   mapping: EnableCssInteropOptions<any>,
-): NormalizedOptions {
+): InteropComponentConfig {
   const config = new Map<
     string,
     [string, NativeStyleToProp<any> | undefined]
   >();
-  const dependencies = new Set<string>();
-  const sources = new Set<string>();
-
   for (const [key, options] of Object.entries(mapping) as Array<
     [string, EnableCssInteropOptions<any>[string]]
   >) {
@@ -39,16 +36,9 @@ export function getNormalizeConfig(
     }
 
     config.set(target, [key, nativeStyleToProp]);
-    dependencies.add(target);
-    dependencies.add(key);
-    sources.add(key);
   }
 
-  return {
-    dependencies: Array.from(dependencies),
-    sources: Array.from(sources),
-    config: Array.from(config.entries()).map(
-      ([key, [source, nativeStyleToProp]]) => [key, source, nativeStyleToProp],
-    ),
-  };
+  return Array.from(config.entries()).map(
+    ([key, [source, nativeStyleToProp]]) => [key, source, nativeStyleToProp],
+  );
 }
