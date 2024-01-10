@@ -1,8 +1,8 @@
-import type {
+import {
   EnableCssInteropOptions,
-  NativeStyleToProp,
   NormalizedOptions,
-} from "../../types";
+  NativeStyleToProp,
+} from "../types";
 
 export function getNormalizeConfig(
   mapping: EnableCssInteropOptions<any>,

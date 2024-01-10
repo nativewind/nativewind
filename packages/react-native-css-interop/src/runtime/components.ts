@@ -18,8 +18,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-import { cssInterop, remapProps } from "./rendering";
-export { render } from "./rendering";
+import { cssInterop, remapProps } from "./api";
 
 cssInterop(Image, { className: "style" });
 cssInterop(Switch, { className: "style" });

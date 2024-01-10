@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { fireEvent, render } from "@testing-library/react-native";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 
 import {
   createMockComponent,
@@ -14,7 +14,7 @@ jest.useFakeTimers();
 
 beforeEach(() => resetStyles());
 
-test("basic animation", () => {
+test.only("basic animation", () => {
   registerCSS(`
 .my-class {
   animation-duration: 3s;
@@ -39,6 +39,8 @@ test("basic animation", () => {
   expect(component).toHaveAnimatedStyle({
     marginLeft: "100%",
   });
+
+  screen.debug();
 
   jest.advanceTimersByTime(1501);
 

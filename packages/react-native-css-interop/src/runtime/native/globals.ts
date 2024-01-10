@@ -1,9 +1,10 @@
-import { createContext, useContext } from "react";
+import { useContext } from "react";
 import {
   AccessibilityInfo,
   AppState,
   Appearance,
   Dimensions,
+  NativeEventSubscription,
 } from "react-native";
 import { Signal, createSignal, useComputed } from "../signals";
 import { INTERNAL_RESET, INTERNAL_SET, STYLE_SCOPES } from "../../shared";
@@ -13,15 +14,12 @@ import {
   GroupedRuntimeStyle,
   ExtractedAnimation,
   ExtractionWarning,
-  InteropStore,
 } from "../../types";
+import { inheritanceContext } from "./component-state";
 
 export const styleSignals = new Map<string, Signal<GroupedRuntimeStyle>>();
 export const opaqueStyles = new WeakMap<object, GroupedRuntimeStyle>();
 export const animationMap = new Map<string, ExtractedAnimation>();
-
-export const globalClassNameCache = new Map<string, InteropStore>();
-export const globalInlineCache = new WeakMap<object, InteropStore>();
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
@@ -37,21 +35,14 @@ export const globalVariables = {
   universal: new Map<string, ColorSchemeSignal>(),
 };
 
-const rootContext = {
-  inlineVariables: globalVariables.root,
-  getContainer() {},
-  getVariable(name: string) {
-    return globalVariables.root.get(name)?.get();
-  },
-} as unknown as InteropStore;
-export const interopContext = createContext(rootContext);
-export const InteropProvider = interopContext.Provider;
-
 export const rem = createColorSchemeSignal("rem");
 export const vw = viewportUnit("width", Dimensions);
 export const vh = viewportUnit("height", Dimensions);
 function viewportUnit(key: "width" | "height", dimensions: Dimensions) {
-  const signal = createSignal<number>(dimensions.get("window")[key] || 0);
+  const signal = createSignal<number>(
+    dimensions.get("window")[key] || 0,
+    "viewport",
+  );
 
   let subscription = dimensions.addEventListener("change", ({ window }) => {
     signal.set(window[key]);
@@ -70,7 +61,7 @@ function viewportUnit(key: "width" | "height", dimensions: Dimensions) {
 }
 
 export const isReduceMotionEnabled = (function createIsReduceMotionEnabled() {
-  const signal = createSignal(false);
+  const signal = createSignal(false, "isReduceMotionEnabled");
   // Hopefully this resolves before the first paint...
   AccessibilityInfo.isReduceMotionEnabled()?.then(signal.set);
   AccessibilityInfo.addEventListener("reduceMotionChanged", signal.set);
@@ -125,16 +116,35 @@ export function createColorSchemeSignal(id: string) {
 }
 
 let appearance = Appearance;
+let appearanceListener: NativeEventSubscription | undefined;
+let appStateListener: NativeEventSubscription | undefined;
 
-let appearanceListener = appearance.addChangeListener((state) =>
-  _colorScheme.set(state.colorScheme ?? "light"),
+function resetAppearanceListeners(
+  $appearance: typeof Appearance,
+  appState: typeof AppState,
+) {
+  appearance = $appearance;
+  appearanceListener?.remove();
+  appStateListener?.remove();
+
+  appearanceListener = appearance.addChangeListener((state) => {
+    if (AppState.currentState === "active") {
+      _colorScheme.set(state.colorScheme ?? "light");
+    }
+  });
+
+  appStateListener = appState.addEventListener("change", (type) => {
+    if (type === "active") {
+      _colorScheme.set(appearance.getColorScheme() ?? "light");
+    }
+  });
+}
+resetAppearanceListeners(appearance, AppState);
+
+const _colorScheme = createSignal<"light" | "dark" | "system">(
+  "system",
+  "systemColorScheme",
 );
-
-AppState.addEventListener("change", () =>
-  _colorScheme.set(appearance.getColorScheme() ?? "light"),
-);
-
-const _colorScheme = createSignal<"light" | "dark" | "system">("system");
 export const colorScheme = {
   ..._colorScheme,
   set(value: "light" | "dark" | "system") {
@@ -155,13 +165,9 @@ export const colorScheme = {
     if (current === "system") current = appearance.getColorScheme() ?? "light";
     _colorScheme.set(current === "light" ? "dark" : "light");
   },
-  [INTERNAL_RESET]: ($appearance: typeof Appearance) => {
+  [INTERNAL_RESET]: (appearance: typeof Appearance) => {
     _colorScheme.set("system");
-    appearance = $appearance;
-    appearanceListener.remove();
-    appearanceListener = appearance.addChangeListener((state) =>
-      _colorScheme.set(state.colorScheme ?? "light"),
-    );
+    resetAppearanceListeners(appearance, AppState);
   },
 };
 
@@ -200,6 +206,6 @@ export function vars(variables: Record<string, RuntimeValueDescriptor>) {
 }
 
 export const useUnstableNativeVariable = (name: string) => {
-  const state = useContext(interopContext);
+  const state = useContext(inheritanceContext);
   return useComputed(() => state.getVariable(name), state);
 };

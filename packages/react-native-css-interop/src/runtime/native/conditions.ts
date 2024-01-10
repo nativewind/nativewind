@@ -9,14 +9,15 @@ import type {
 
 import {
   AttributeCondition,
+  AttributeDependency,
   ExtractedContainerQuery,
-  InteropStore,
   PseudoClassesQuery,
   SignalLike,
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
+import type { InheritedParentContext } from "./component-state";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -42,18 +43,18 @@ export function testMediaQuery(
 }
 
 export function testPseudoClasses(
-  state: InteropStore,
+  state: InheritedParentContext,
   meta: PseudoClassesQuery,
 ) {
   let fail = false;
-  if (meta.active) fail ||= state.getInteraction("active") !== true;
-  if (meta.hover) fail ||= state.getInteraction("hover") !== true;
-  if (meta.focus) fail ||= state.getInteraction("focus") !== true;
+  if (meta.active) fail ||= state.interaction.active?.get() !== true;
+  if (meta.hover) fail ||= state.interaction.hover?.get() !== true;
+  if (meta.focus) fail ||= state.interaction.focus?.get() !== true;
   return !fail;
 }
 
 export function testContainerQuery(
-  state: InteropStore,
+  state: InheritedParentContext,
   containerQuery: ExtractedContainerQuery[] | undefined,
 ) {
   // If there is no query, we passed
@@ -259,6 +260,20 @@ function unwrap<T>(value: T | SignalLike<T>): T {
   return value && typeof value === "object" && "get" in value
     ? value.get()
     : value;
+}
+
+export function testAttributesChanged(
+  props: Record<string, any>,
+  attrDependencies: AttributeDependency[],
+) {
+  return attrDependencies.some((condition) => {
+    const current =
+      condition.type === "data-attribute"
+        ? props["dataSet"]?.[condition.name.replace("data-", "")]
+        : props[condition.name];
+
+    return current !== condition.previous;
+  });
 }
 
 export function getTestAttributeValue(

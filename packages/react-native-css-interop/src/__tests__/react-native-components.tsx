@@ -11,19 +11,10 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
-import * as JSX from "react/jsx-runtime";
-import { render as tlRender, screen } from "@testing-library/react-native";
-
-import { registerCSS, resetStyles } from "../testing-library";
-import { render as renderJSX } from "../runtime/components/rendering";
+import { screen } from "@testing-library/react-native";
+import { registerCSS, resetStyles, render } from "../testing-library";
 
 const testID = "react-native-css-interop";
-
-function render(component: React.ReactElement<any>) {
-  return tlRender(
-    renderJSX((JSX as any).jsx, component.type, component.props, ""),
-  );
-}
 
 beforeEach(() => resetStyles());
 

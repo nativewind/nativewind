@@ -16,6 +16,8 @@ import {
   DEFAULT_CONTAINER_NAME,
   STYLE_SCOPES,
   isPropDescriptor,
+  shadowProperties,
+  transformProperties,
 } from "../shared";
 import {
   TransportStyle,
@@ -995,34 +997,3 @@ function getHoisted(property: string): HoistedTypes | undefined {
     return "shadow";
   }
 }
-
-const transformProperties = new Set([
-  "perspective",
-  "translateX",
-  "translateY",
-  "translateZ",
-  "scale",
-  "scaleX",
-  "scaleY",
-  "scaleZ",
-  "rotate",
-  "rotateX",
-  "rotateY",
-  "rotateZ",
-  "skewX",
-  "skewY",
-  "skewZ",
-  "matrix",
-  "matrix3d",
-]);
-
-const shadowProperties = new Set([
-  "-rn-shadow-offset.width",
-  "-rn-shadow-offset.height",
-  "-rn-text-shadow-offset.width",
-  "-rn-text-shadow-offset.height",
-  "shadow-offset.width",
-  "shadow-offset.height",
-  "text-shadow-offset.width",
-  "text-shadow-offset.height",
-]);

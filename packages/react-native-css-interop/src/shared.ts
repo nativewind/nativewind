@@ -1,7 +1,4 @@
-import type {
-  PropRuntimeValueDescriptor,
-  RuntimeValueDescriptor,
-} from "./types";
+import type { PropRuntimeValueDescriptor } from "./types";
 
 export const INTERNAL_RESET = Symbol();
 export const INTERNAL_SET = Symbol();
@@ -24,20 +21,33 @@ export function isPropDescriptor(
   return typeof value === "object" && value !== null && "$$type" in value;
 }
 
-export function isRuntimeValue(
-  value: unknown,
-): value is RuntimeValueDescriptor {
-  if (!value) {
-    return false;
-  } else if (Array.isArray(value)) {
-    return value.some((v) => isRuntimeValue(v));
-  } else if (typeof value === "object") {
-    if ((value as Record<string, unknown>).type === "runtime") {
-      return true;
-    } else {
-      return Object.values(value).some((v) => isRuntimeValue(v));
-    }
-  } else {
-    return false;
-  }
-}
+export const transformProperties = new Set([
+  "perspective",
+  "translateX",
+  "translateY",
+  "translateZ",
+  "scale",
+  "scaleX",
+  "scaleY",
+  "scaleZ",
+  "rotate",
+  "rotateX",
+  "rotateY",
+  "rotateZ",
+  "skewX",
+  "skewY",
+  "skewZ",
+  "matrix",
+  "matrix3d",
+]);
+
+export const shadowProperties = new Set([
+  "-rn-shadow-offset.width",
+  "-rn-shadow-offset.height",
+  "-rn-text-shadow-offset.width",
+  "-rn-text-shadow-offset.height",
+  "shadow-offset.width",
+  "shadow-offset.height",
+  "text-shadow-offset.width",
+  "text-shadow-offset.height",
+]);
