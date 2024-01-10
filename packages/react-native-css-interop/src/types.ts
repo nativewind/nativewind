@@ -9,12 +9,13 @@ import type {
   SelectorComponent,
 } from "lightningcss";
 import type {
+  ClassicComponentClass,
+  ComponentClass,
   ComponentProps,
-  ElementType,
+  ComponentType,
   ForwardRefExoticComponent,
+  FunctionComponent,
   JSXElementConstructor,
-  ReactElement,
-  ReactNode,
 } from "react";
 import type {
   Appearance,
@@ -24,12 +25,13 @@ import type {
   ViewStyle,
 } from "react-native";
 import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
-import type { Effect, Signal } from "./runtime/signals";
-import { makeMutable } from "react-native-reanimated";
+import type { Signal } from "./runtime/signals";
 
-export type ComponentType<P = any> =
-  | ForwardRefExoticComponent<P>
-  | ElementType<P>;
+export type ReactComponent<P = any> =
+  | ClassicComponentClass<P>
+  | ComponentClass<P>
+  | FunctionComponent<P>
+  | ForwardRefExoticComponent<P>;
 
 type Prop = string;
 type Source = string;
@@ -37,48 +39,6 @@ export interface NormalizedOptions {
   config: [Prop, Source, NativeStyleToProp<any> | undefined][];
   sources: Source[];
   dependencies: (Prop & Source)[];
-}
-
-export interface InteropStore {
-  testId?: string;
-  version: number;
-  onChange?: () => void;
-  parent: InteropStore;
-  originalProps: Record<string, any>;
-  props: Record<string, any>;
-  options: NormalizedOptions;
-  scope: number;
-  interaction: Interaction;
-  hasActive: boolean;
-  hasHover: boolean;
-  hasFocus: boolean;
-  hasContainer: boolean;
-  convertToPressable: boolean;
-  shouldUpdateContext: boolean;
-  context?: InteropStore;
-  isAnimated: boolean;
-  animations?: Required<ExtractedAnimations>;
-  animationNames: Set<string>;
-  transition?: Required<ExtractedTransition>;
-  inlineVariablesToRemove: Set<string>;
-  inlineVariables: Map<string, Signal<any>>;
-  containerNames: Set<string>;
-  effect: Effect;
-  requiresLayoutWidth: boolean;
-  requiresLayoutHeight: boolean;
-  animationWaitingOnLayout: boolean;
-  layout?: Signal<[number, number] | undefined>;
-  dependencies: any[];
-  attrDependencies: AttributeDependency[];
-  hoistedStyles?: [string, string, HoistedTypes][];
-  sharedValues: Record<string, ReturnType<typeof makeMutable>>;
-  getInteraction(name: keyof Interaction): boolean;
-  getVariable(name: string): any;
-  setVariable(name: string, value: any, specificity: Specificity): void;
-  setContainer(name: string): void;
-  getContainer(name: string): InteropStore | undefined;
-  containerSignal?: Signal<InteropStore>;
-  rerender(parent?: InteropStore, originalProps?: Record<string, any>): void;
 }
 
 export type CssToReactNativeRuntimeOptions = {
@@ -116,11 +76,11 @@ export type EnableCssInteropOptions<
 > = Record<string, CSSInteropClassNamePropConfig<ComponentProps<T>>>;
 
 export type Layers = Record<0 | 1 | 2, Array<RuntimeStyle | object>> & {
-  classNames: string;
+  classNames?: string;
 };
 
 export type CssInterop = <
-  const T extends ComponentType,
+  const T extends ReactComponent<any>,
   const M extends EnableCssInteropOptions<any>,
 >(
   component: T,
@@ -140,25 +100,17 @@ export type CssInteropGeneratedProps<T extends EnableCssInteropOptions<any>> = {
   [K in keyof T as K extends string
     ? T[K] extends undefined | false
       ? never
-      : T[K] extends true
+      : T[K] extends true | string
       ? K
-      : T[K] extends string
-      ? T[K]
-      : CssInteropOptionTargetToProp<T[K], K>
+      : T extends {
+          target: string | boolean;
+        }
+      ? T["target"] extends true | string
+        ? K
+        : never
+      : never
     : never]: string;
 };
-
-type CssInteropOptionTargetToProp<T, K extends string> = T extends {
-  target: string | boolean;
-}
-  ? T["target"] extends false
-    ? never
-    : T["target"] extends true
-    ? K
-    : T["target"] extends string
-    ? T["target"]
-    : never
-  : never;
 
 export type NativeStyleToProp<P> = {
   [K in keyof Style & string]?: K extends keyof P
@@ -166,34 +118,22 @@ export type NativeStyleToProp<P> = {
     : keyof P & string;
 };
 
-export type JSXFunction<P> = (
-  type: ComponentType<P>,
-  props: P,
-  key: string | undefined,
-  ...args: unknown[]
-) => any;
-
-export type BasicInteropFunction = <P>(
-  jsx: JSXFunction<P>,
-  type: ComponentType<P>,
-  props: P,
-  key: string | undefined,
-  ...args: unknown[]
-) => any;
-
-export type InteropFunction = (
-  type: any,
-  options: NormalizedOptions,
+export type JSXFunction = (
+  type: React.ComponentType,
   props: Record<string, any>,
-  children: ReactNode,
-) => ReactElement;
+  key?: React.Key,
+  isStaticChildren?: boolean,
+  __source?: unknown,
+  __self?: unknown,
+) => React.ElementType;
 
-export type InteropFunctionOptions<P> = {
-  remappedProps: P;
-  options: NormalizedOptions;
-  dependencies: unknown[];
-  useWrapper: boolean;
-};
+type OmitFirstTwo<T extends any[]> = T extends [any, any, ...infer R]
+  ? R
+  : never;
+
+export type JSXFunctionType = Parameters<JSXFunction>[0];
+export type JSXFunctionProps = Parameters<JSXFunction>[1];
+export type JSXFunctionRest = OmitFirstTwo<Parameters<JSXFunction>>;
 
 export type CompilerStyleMeta = {
   specificity: Specificity;
@@ -304,10 +244,6 @@ export type ExtractedContainer = {
   type: ContainerType;
 };
 
-export type GetInteraction = <T extends keyof Interaction>(
-  name: T,
-) => NonNullable<Interaction[T]>;
-
 export type ExtractedContainerQuery = {
   name?: string | null;
   condition?: ContainerCondition<Declaration>;
@@ -330,7 +266,7 @@ export type ExtractedTransition = {
   /**
    * The property to transition.
    */
-  property?: AnimatableCSSProperty[];
+  property?: (AnimatableCSSProperty | "none")[];
   /**
    * The easing function for the transition.
    */

@@ -6,7 +6,7 @@ import {
 
 import { CommonStyleSheet } from "../../types";
 import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
-import { upsertStyleSignal } from "./style";
+import { upsertStyleSignal } from "./style-store";
 import {
   animationMap,
   colorScheme,

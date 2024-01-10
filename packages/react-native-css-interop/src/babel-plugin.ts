@@ -11,7 +11,7 @@ import { Binding, NodePath } from "@babel/traverse";
 import { addNamed } from "@babel/helper-module-imports";
 
 const importMeta = [
-  "createElementAndCheckCssInterop",
+  "createInteropElement",
   "react-native-css-interop",
 ] as const;
 

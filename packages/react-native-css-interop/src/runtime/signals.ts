@@ -1,12 +1,11 @@
-import { useEffect, useReducer } from "react";
-import type { InteropStore } from "../types";
+import { useReducer, useEffect } from "react";
 
 export const interopGlobal: {
-  isInComponent: boolean;
+  delayUpdates: boolean;
   current: Effect | null;
   delayedEvents: Set<() => void>;
 } = {
-  isInComponent: false,
+  delayUpdates: false,
   current: null,
   delayedEvents: new Set(),
 };
@@ -18,8 +17,8 @@ type SignalSetFn<T> = (previous?: T) => T;
 
 export type Effect = {
   (): void;
+  id?: string;
   dependencies: Set<Signal<any>>;
-  state?: InteropStore;
 };
 
 export function createSignal<T = unknown>(value: T, id?: string) {
@@ -31,7 +30,7 @@ export function createSignal<T = unknown>(value: T, id?: string) {
     get() {
       const running = context[context.length - 1];
       if (running) {
-        // console.log("get", id, running.id);
+        // console.log("subscribe", running.id, " to ", id);
         signal.subscriptions.add(running);
         running.dependencies.add(signal);
       }
@@ -49,21 +48,23 @@ export function createSignal<T = unknown>(value: T, id?: string) {
      * If we are in a component, delay the update until the component is done rendering
      * as React cannot handle state updates during rendering
      */
-    set(nextValue: T | undefined | SignalSetFn<T>) {
+    set(nextValue: T | undefined | SignalSetFn<T>, notify = true) {
       if (typeof nextValue === "function") {
         nextValue = (nextValue as any)(value);
       }
 
       if (Object.is(value, nextValue)) return;
       value = nextValue as T;
-      // console.log("set", id);
-      if (interopGlobal.isInComponent) {
-        for (const sub of signal.subscriptions) {
-          interopGlobal.delayedEvents.add(sub);
-        }
-      } else {
-        for (const sub of Array.from(signal.subscriptions)) {
-          sub();
+      // console.log("set", id, value);
+      if (notify) {
+        if (interopGlobal.delayUpdates) {
+          for (const sub of signal.subscriptions) {
+            interopGlobal.delayedEvents.add(sub);
+          }
+        } else {
+          for (const sub of Array.from(signal.subscriptions)) {
+            sub();
+          }
         }
       }
     },
@@ -83,10 +84,9 @@ export interface Computed<T = unknown> extends Signal<T> {
   (): void;
   dependencies: Set<Signal<any>>;
   fn: SignalSetFn<T>;
-  runInEffect<T>(fn: () => T): T;
 }
 
-export function setupEffect(effect: Effect) {
+export function setupEffect<T extends Effect>(effect: T) {
   // Clean up the previous run
   cleanupEffect(effect);
   // Setup the new run
@@ -95,13 +95,15 @@ export function setupEffect(effect: Effect) {
   interopGlobal.current = effect;
 }
 
-function teardown(_effect: Computed<any>) {
+export function teardownEffect(_effect: Effect) {
   context.pop();
+  interopGlobal.current = null;
 }
 
 export function cleanupEffect(effect: Effect) {
   for (const dep of effect.dependencies) {
     if ("subscriptions" in dep) {
+      // console.log("remove", effect.id, "from", dep.id);
       dep.subscriptions.delete(effect);
     }
   }
@@ -111,28 +113,26 @@ export function cleanupEffect(effect: Effect) {
 
 export function createComputed<T>(
   fn: SignalSetFn<T>,
-  runOnInitialization = true,
-  id?: string,
+  {
+    initialValue,
+    runOnInitialization = true,
+    id,
+  }: {
+    initialValue?: T;
+    runOnInitialization?: boolean;
+    id?: string;
+  } = {},
 ): Computed<T> {
   const effect: Computed<T> = Object.assign(
     function () {
       setupEffect(effect);
       effect.set(effect.fn);
-      teardown(effect);
+      teardownEffect(effect);
     },
-    createSignal<T>(undefined as T, id),
+    createSignal<T>(initialValue as T, id),
     {
       dependencies: new Set(),
       fn: fn,
-      /**
-       * Run a function in context, without cleaning up the dependencies
-       */
-      runInEffect<T>(fn: () => T) {
-        context.push(effect);
-        let value = fn();
-        context.pop();
-        return value;
-      },
     } satisfies {
       [K in keyof Omit<Computed, keyof Signal<any>>]: Computed<T>[K];
     },

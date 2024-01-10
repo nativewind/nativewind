@@ -8,13 +8,14 @@ import {
 } from "../testing-library";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
 
 jest.useFakeTimers();
 
 beforeEach(() => resetStyles());
 
-test("numeric transition", () => {
+test.only("numeric transition", () => {
+  const A = createMockComponent(View);
+
   registerCSS(`
     .transition {
       transition: width 1s linear;
@@ -31,7 +32,7 @@ test("numeric transition", () => {
 
   render(<A testID={testID} className="transition first" />);
 
-  const component = screen.getByTestId(testID);
+  let component = screen.getByTestId(testID);
 
   // Should have a static width, no matter the time
   expect(component).toHaveAnimatedStyle({
@@ -50,7 +51,7 @@ test("numeric transition", () => {
   });
 
   // Width should only change after we advance time
-  jest.advanceTimersByTime(501);
+  jest.advanceTimersByTime(500);
   expect(component).toHaveAnimatedStyle({
     width: 150,
   });
@@ -66,6 +67,8 @@ test("numeric transition", () => {
   expect(component).toHaveAnimatedStyle({
     width: 200,
   });
+
+  debugger;
 });
 
 test("color transition", () => {

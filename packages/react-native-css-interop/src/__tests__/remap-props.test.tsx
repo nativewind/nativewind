@@ -9,8 +9,8 @@ import {
   revealStyles,
 } from "../testing-library";
 import { styleSignals } from "../runtime/native/globals";
-import { remapProps } from "../runtime/components/rendering";
 import { RefObject, useRef } from "react";
+import { remapProps } from "../runtime/api";
 
 const testID = "react-native-css-interop";
 
@@ -20,6 +20,7 @@ beforeEach(() => {
 });
 
 test("mapping", () => {
+  //@ts-expect-error
   const A = createRemappedComponent(View, { className: "differentStyle" });
 
   registerCSS(
