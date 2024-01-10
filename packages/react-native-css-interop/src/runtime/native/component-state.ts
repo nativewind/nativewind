@@ -22,10 +22,22 @@ export const inheritanceContext = createContext<InheritedParentContext>({
   },
 });
 
+const UpgradeState = {
+  NONE: 0,
+  UPGRADED: 1,
+  WARNED: 2,
+};
+
 export class ComponentState {
-  shouldPrintUpgradeWarnings = false;
   propStates = new Set<PropState>();
   propsToDelete = new Set<string>();
+
+  upgradeWarning = {
+    animated: UpgradeState.NONE,
+    context: UpgradeState.NONE,
+    pressable: UpgradeState.NONE,
+    shouldPrintUpgradeWarnings: false,
+  };
 
   requiresLayout = false;
   layout?: Signal<[number, number] | undefined>;
@@ -115,12 +127,22 @@ export class ComponentState {
     );
     this.requiresLayout = true;
     this.containerNames.add(name);
-    if (!this.container) {
+    if (!this.container?.peek()) {
       this.resetContext = true;
       this.container = createSignal<InheritedParentContext>(
         this,
         `${this.testId}:__container:${name}`,
       );
+    }
+  }
+  removeContainers() {
+    this.containerNames.clear();
+    this.container?.set(undefined);
+    /**
+     * We use
+     */
+    if (!this.context) {
+      this.resetContext = true;
     }
   }
 
@@ -161,7 +183,7 @@ export class ComponentState {
       }
     }
 
-    return this.renderElement(props);
+    return this.renderElement(props, originalProps);
   }
 
   private appendEventHandlers(
@@ -249,8 +271,12 @@ export class ComponentState {
    * Upgrading is a one-way process and should only happen during the initial render.
    * If it upgrades later, all state within the component is lost.
    */
-  private renderElement(props: Record<string, any>) {
+  private renderElement(
+    props: Record<string, any>,
+    originalProps: Record<string, any>,
+  ) {
     let component = this.component;
+    const shouldWarn = this.upgradeWarning.shouldPrintUpgradeWarnings;
 
     // TODO: We can probably remove this in favor of using `new Pressability()`
     if (
@@ -260,13 +286,32 @@ export class ComponentState {
         this.interaction.focus)
     ) {
       component = Pressable;
+      if (shouldWarn && this.upgradeWarning.pressable === UpgradeState.NONE) {
+        console.warn(
+          `CssInterop upgrade warning: Converting View to Pressable is a one-way process and should only happen during the initial render otherwise it will remount the View. To prevent this warning avoid adding styles which use pseudo-classes (e.g :hover, :active, :focus) to View components after the initial render, or change the View to a Pressable.`,
+        );
+      }
+      this.upgradeWarning.pressable = UpgradeState.UPGRADED;
     }
 
     if (this.isAnimated) {
+      if (shouldWarn && this.upgradeWarning.animated === UpgradeState.NONE) {
+        console.warn(
+          `CssInterop upgrade warning: Converting component to animated component is a one-way process and should only happen during the initial render otherwise it will remount the component.  To prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none", "transition-property: none".`,
+        );
+      }
+      this.upgradeWarning.animated = UpgradeState.UPGRADED;
       component = createAnimatedComponent(component);
     }
 
     if (this.context || this.resetContext) {
+      if (shouldWarn && this.upgradeWarning.context === UpgradeState.NONE) {
+        console.warn(
+          `CssInterop upgrade warning: Making a component inheritable is a one-way process and should only happen during the initial render otherwise it will remount the component. To prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,
+        );
+      }
+      this.upgradeWarning.context = UpgradeState.UPGRADED;
+
       if (this.resetContext) {
         this.context = {
           getContainer: this.getContainer.bind(this),
@@ -274,6 +319,7 @@ export class ComponentState {
           interaction: this.interaction,
         };
       }
+
       props = {
         value: this.context,
         children: createElement(component, props),
@@ -282,7 +328,8 @@ export class ComponentState {
     }
 
     // After the initial render, the user shouldn't upgrade the component
-    // this.shouldPrintUpgradeWarnings = process.env.NODE_ENV !== "production";
+    this.upgradeWarning.shouldPrintUpgradeWarnings =
+      process.env.NODE_ENV !== "production";
 
     /**
      * This is a hack to delay firing state updates for other components until we have finished
@@ -339,6 +386,10 @@ export function createAnimatedComponent(Component: ComponentType<any>): any {
     Component as React.ComponentClass,
   );
 
+  /**
+   * TODO: This wrapper shouldn't be needed, as we should just run the hook in the
+   * original component. However, we get an error about running on the JS thread?
+   */
   const CSSInteropAnimationWrapper = forwardRef((props: any, ref: any) => {
     /**
      * This code shouldn't be needed, but inline shared values are not working properly.
@@ -367,7 +418,7 @@ export function createAnimatedComponent(Component: ComponentType<any>): any {
       }
 
       return style;
-    }, [true]);
+    }, [props.style]);
 
     return createElement(AnimatedComponent, { ...props, style, ref });
   });

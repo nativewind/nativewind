@@ -581,9 +581,16 @@ export class PropState {
         );
       }
 
-      if (style.container?.names) {
-        for (const name of style.container.names) {
-          state.setContainer(name);
+      if (style.container) {
+        if (
+          style.container.type === "normal" ||
+          style.container.names === false
+        ) {
+          state.removeContainers();
+        } else if (style.container.names) {
+          for (const name of style.container.names) {
+            state.setContainer(name);
+          }
         }
       }
 
