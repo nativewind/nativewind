@@ -67,8 +67,6 @@ test.only("numeric transition", () => {
   expect(component).toHaveAnimatedStyle({
     width: 200,
   });
-
-  debugger;
 });
 
 test("color transition", () => {

@@ -24,8 +24,6 @@ test("vars", () => {
     <A testID={testID} className="my-class" style={vars({ test: "black" })} />,
   );
 
-  debugger;
-
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
