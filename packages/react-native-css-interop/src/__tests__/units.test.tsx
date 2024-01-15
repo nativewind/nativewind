@@ -108,9 +108,7 @@ test("rem - dynamic", () => {
   expect(rem.get()).toEqual(14);
   expect(component).toHaveStyle({ fontSize: 140 });
 
-  act(() => {
-    rem.set(10);
-  });
+  act(() => rem.set(10));
 
   expect(rem.get()).toEqual(10);
   expect(component).toHaveStyle({ fontSize: 100 });

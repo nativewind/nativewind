@@ -8,9 +8,9 @@ import {
   createRemappedComponent,
   revealStyles,
 } from "../testing-library";
-import { styleSignals } from "../runtime/native/globals";
 import { RefObject, useRef } from "react";
 import { remapProps } from "../runtime/api";
+import { globalStyles } from "../runtime/native/style-store";
 
 const testID = "react-native-css-interop";
 
@@ -20,7 +20,6 @@ beforeEach(() => {
 });
 
 test("mapping", () => {
-  //@ts-expect-error
   const A = createRemappedComponent(View, { className: "differentStyle" });
 
   registerCSS(
@@ -39,8 +38,8 @@ test("mapping", () => {
   expect(revealStyles(component.props)).toEqual({
     testID,
     differentStyle: [
-      styleSignals.get("bg-black")?.get(),
-      styleSignals.get("text-white")?.get(),
+      globalStyles.get("bg-black")?.get(),
+      globalStyles.get("text-white")?.get(),
     ],
   });
 });

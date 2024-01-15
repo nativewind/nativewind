@@ -1,5 +1,5 @@
 import { StyleSheet as RNStyleSheet } from "react-native";
-import { CommonStyleSheet } from "../../types";
+import { CssInteropStyleSheet } from "../../types";
 import { INTERNAL_RESET, INTERNAL_FLAGS } from "../../shared";
 
 const documentStyle: CSSStyleDeclaration | undefined =
@@ -7,7 +7,7 @@ const documentStyle: CSSStyleDeclaration | undefined =
     globalThis.window?.document.documentElement,
   );
 
-const commonStyleSheet: CommonStyleSheet = {
+const commonStyleSheet: CssInteropStyleSheet = {
   [INTERNAL_FLAGS]: {},
   getFlag(name) {
     return documentStyle?.getPropertyValue(`--css-interop-${name}`);
@@ -21,6 +21,9 @@ const commonStyleSheet: CommonStyleSheet = {
   },
   registerCompiled(_options) {
     throw new Error("Stylesheet.registerCompiled is not available on web");
+  },
+  getGlobalStyle() {
+    throw new Error("Stylesheet.getGlobalStyle is not available on web");
   },
 };
 

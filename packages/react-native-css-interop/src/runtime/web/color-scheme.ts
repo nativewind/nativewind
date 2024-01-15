@@ -1,32 +1,18 @@
-import { AppState, Appearance } from "react-native";
+import { AppState, Appearance, NativeEventSubscription } from "react-native";
 import { StyleSheet } from "./stylesheet";
-import { createSignal, useComputed } from "../signals";
 import { INTERNAL_RESET } from "../../shared";
+import { observable } from "../observable";
 
 let appearance = Appearance;
-
-let appearanceListener = appearance.addChangeListener((state) =>
-  _colorScheme.set(state.colorScheme ?? "light"),
-);
-
-AppState.addEventListener("change", () =>
-  _colorScheme.set(appearance.getColorScheme() ?? "light"),
-);
+let appearanceListener: NativeEventSubscription | undefined;
 
 // This shouldn't change, as its loaded from the CSS
 const [darkMode, darkModeValue] = StyleSheet.getFlag("darkMode")?.split(
   " ",
 ) ?? ["media"];
 
-let initialColor: "light" | "dark" | "system" = "system";
-if (darkMode === "media") {
-  initialColor = Appearance.getColorScheme() ?? "light";
-  Appearance.addChangeListener(({ colorScheme }) => {
-    if (darkMode === "media") {
-      _colorScheme.set(colorScheme ?? "light");
-    }
-  });
-} else if (darkMode === "class") {
+let initialColor: "light" | "dark" | undefined = undefined;
+if (darkMode === "class") {
   initialColor = globalThis.window.document.documentElement.classList.contains(
     darkModeValue,
   )
@@ -34,15 +20,17 @@ if (darkMode === "media") {
     : "light";
 }
 
-const _colorScheme = createSignal<"light" | "dark" | "system">(
-  initialColor,
-  "systemColorScheme",
+const systemColorScheme = observable<"light" | "dark">(
+  appearance.getColorScheme() ?? "light",
 );
-export const colorScheme = {
-  ..._colorScheme,
-  set(value: "light" | "dark" | "system") {
-    _colorScheme.set(value);
 
+const colorSchemeObservable = observable<"light" | "dark" | undefined>(
+  initialColor,
+  { fallback: systemColorScheme },
+);
+
+export const colorScheme = {
+  set(value: "light" | "dark" | "system") {
     if (darkMode === "media") {
       throw new Error(
         "Cannot manually set color scheme, as dark mode is type 'media'. Please use StyleSheet.setFlag('darkMode', 'class')",
@@ -55,6 +43,14 @@ export const colorScheme = {
       );
     }
 
+    if (value === "system") {
+      colorSchemeObservable.set(undefined);
+      appearance.setColorScheme(null);
+    } else {
+      colorSchemeObservable.set(value);
+      appearance.setColorScheme(value);
+    }
+
     if (value === "dark") {
       globalThis.window?.document.documentElement.classList.add(darkModeValue);
     } else {
@@ -63,32 +59,25 @@ export const colorScheme = {
       );
     }
   },
-  get() {
-    let current = _colorScheme.get();
-    if (current === "system") current = appearance.getColorScheme() ?? "light";
-    return current;
-  },
+  get: colorSchemeObservable.get,
   toggle() {
-    let current = _colorScheme.peek();
-    if (current === "system") current = appearance.getColorScheme() ?? "light";
-    colorScheme.set(current === "light" ? "dark" : "light");
+    let current = colorSchemeObservable.get();
+    if (current === undefined) current = appearance.getColorScheme() ?? "light";
+    colorSchemeObservable.set(current === "light" ? "dark" : "light");
   },
-  [INTERNAL_RESET]: ($appearance: typeof Appearance) => {
-    _colorScheme.set("system");
-    appearance = $appearance;
-    appearanceListener.remove();
-    appearanceListener = appearance.addChangeListener((state) =>
-      _colorScheme.set(state.colorScheme ?? "light"),
-    );
+  [INTERNAL_RESET]: (appearance: typeof Appearance) => {
+    colorSchemeObservable.set(undefined);
+    resetAppearanceListeners(appearance);
   },
 };
 
-export function useColorScheme() {
-  return useComputed(() => {
-    return {
-      colorScheme: colorScheme.get(),
-      setColorScheme: colorScheme.set,
-      toggleColorScheme: colorScheme.toggle,
-    };
+function resetAppearanceListeners($appearance: typeof Appearance) {
+  appearance = $appearance;
+  appearanceListener?.remove();
+  appearanceListener = appearance.addChangeListener((state) => {
+    if (AppState.currentState === "active") {
+      systemColorScheme.set(state.colorScheme ?? "light", true);
+    }
   });
 }
+resetAppearanceListeners(appearance);

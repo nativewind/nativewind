@@ -11,7 +11,7 @@ beforeEach(() => resetStyles());
 
 const grouping = ["^group(/.*)?"];
 
-test("group", async () => {
+test.only("group", async () => {
   const A = createMockComponent(View);
   const B = createMockComponent(View);
 
@@ -43,7 +43,7 @@ test("group", async () => {
   expect(getByTestId(testID)).toHaveStyle(undefined);
 });
 
-test.only("group - active", async () => {
+test("group - active", async () => {
   const A = createMockComponent(View);
   const B = createMockComponent(View);
 

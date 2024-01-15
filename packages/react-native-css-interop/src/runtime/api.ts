@@ -1,6 +1,8 @@
-import { createElement, forwardRef } from "react";
+import { createElement, forwardRef, useState } from "react";
 import { CssInterop, StyleProp, JSXFunction } from "../types";
 import { getNormalizeConfig } from "./config";
+import { Effect } from "./observable";
+import { colorScheme } from "./web";
 
 export const interopComponents = new Map<
   object | string,
@@ -8,19 +10,16 @@ export const interopComponents = new Map<
 >();
 
 export const cssInterop: CssInterop = (baseComponent, mapping): any => {
-  const config = getNormalizeConfig(mapping);
+  const configs = getNormalizeConfig(mapping);
 
   const interopComponent = forwardRef(function CssInteropComponent(
     { ...props }: Record<string, any>,
     ref: any,
   ) {
     props = { ...props, ref };
-    for (const entry of config) {
-      const key = entry[0];
-      const sourceProp = entry[1];
+    for (const config of configs) {
       const newStyles: StyleProp = [];
-
-      const value = props[sourceProp];
+      const value = props[config.source];
       if (typeof value === "string") {
         newStyles.push({
           $$css: true,
@@ -28,9 +27,9 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
         } as StyleProp);
       }
 
-      delete props[sourceProp];
+      delete props[config.source];
 
-      let styles: StyleProp = props[key];
+      let styles: StyleProp = props[config.target];
       if (Array.isArray(styles)) {
         styles = [...newStyles, ...styles];
       } else if (styles) {
@@ -39,7 +38,7 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
         styles = newStyles;
       }
 
-      props[key] = styles;
+      props[config.target] = styles;
     }
 
     return createElement(baseComponent, props);
@@ -53,3 +52,38 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
 
 // On web, these are the same
 export const remapProps = cssInterop;
+
+export function useColorScheme() {
+  const [effect, setEffect] = useState<Effect>(() => ({
+    rerender: () => setEffect((s) => ({ ...s })),
+    dependencies: new Set(),
+  }));
+
+  return {
+    colorScheme: colorScheme.get(effect),
+    setColorScheme: colorScheme.set,
+    toggleColorScheme: colorScheme.toggle,
+  };
+}
+
+export const useUnstableNativeVariable = (name: string) => {
+  if (process.env.NODE_ENV !== "production") {
+    console.log("useUnstableNativeVariable is not supported on web.");
+  }
+  return undefined;
+};
+
+export function vars<T extends Record<`--${string}`, string | number>>(
+  variables: T,
+) {
+  const $variables: Record<string, string> = {};
+
+  for (const [key, value] of Object.entries(variables)) {
+    if (key.startsWith("--")) {
+      $variables[key] = value.toString();
+    } else {
+      $variables[`--${key}`] = value.toString();
+    }
+  }
+  return $variables;
+}

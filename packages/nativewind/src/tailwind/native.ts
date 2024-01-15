@@ -72,25 +72,6 @@ const nativePlugins = plugin(function ({
   } as any);
 
   /**
-   * prop-[]:
-   */
-  matchVariant(
-    "prop",
-    (value = "\\*", { modifier, container }: any) => {
-      container.walkRules((rule: any) => {
-        rule.append(
-          new AtRule({
-            name: "rn-hoist",
-            params: `${value} ${modifier ?? ""}`,
-          }),
-        );
-      });
-      return `&`;
-    },
-    { values: { DEFAULT: undefined } },
-  );
-
-  /**
    * move-[]:
    */
   matchVariant(
@@ -100,7 +81,11 @@ const nativePlugins = plugin(function ({
         rule.append(
           new AtRule({
             name: "rn-move",
-            params: `${value} ${modifier ?? ""}`,
+            params: `${value} ${
+              modifier
+                ? `${modifier.replace(/^\^/, "-").replaceAll(".", "\\.")}`
+                : ""
+            }`,
           }),
         );
       });
@@ -115,7 +100,7 @@ const nativePlugins = plugin(function ({
   addVariant("selection", (({ container }: any) => {
     container.walkRules((rule: any) => {
       rule.append(
-        new AtRule({ name: "rn-hoist", params: "color selectionColor" }),
+        new AtRule({ name: "rn-move", params: "color -selectionColor" }),
       );
     });
     return "&";
@@ -124,7 +109,7 @@ const nativePlugins = plugin(function ({
   addVariant("placeholder", (({ container }: any) => {
     container.walkRules((rule: any) => {
       rule.append(
-        new AtRule({ name: "rn-hoist", params: "color placeholderTextColor" }),
+        new AtRule({ name: "rn-move", params: "color -placeholderTextColor" }),
       );
     });
     return "&";
@@ -143,7 +128,7 @@ const nativePlugins = plugin(function ({
     {
       "line-clamp": (value) => ({
         "&": {
-          "@rn-hoist -rn-number-of-lines": "true",
+          "@rn-move -rn-number-of-lines -number-of-lines": "true",
           overflow: "hidden",
           "-rn-number-of-lines": value,
         },
@@ -155,7 +140,7 @@ const nativePlugins = plugin(function ({
   addUtilities({
     ".line-clamp-none": {
       "&": {
-        "@rn-hoist -rn-number-of-lines": "true",
+        "@rn-move -rn-number-of-lines -number-of-lines": "true",
         overflow: "visible",
         "-rn-number-of-lines": "0",
       },
@@ -170,7 +155,7 @@ const nativePlugins = plugin(function ({
       ripple: (value) => {
         return {
           "&": {
-            "@rn-move color android_ripple": "true",
+            "@rn-move color -android_ripple\\.color": "true",
             color: toColorValue(value),
           },
         };
@@ -186,7 +171,7 @@ const nativePlugins = plugin(function ({
       ripple: (value) => {
         return {
           "&": {
-            "@rn-move -rn-borderless android_ripple": "true",
+            "@rn-move -rn-borderless -android_ripple\\.borderless": "true",
             "-rn-borderless": value,
           },
         };
@@ -206,7 +191,7 @@ const nativePlugins = plugin(function ({
       caret: (value) => {
         return {
           "&": {
-            "@rn-hoist caret-color cursor-color": "true",
+            "@rn-move caret-color -cursor-color": "true",
             "caret-color": toColorValue(value),
           },
         };
@@ -226,7 +211,7 @@ const nativePlugins = plugin(function ({
       fill: (value) => {
         return {
           "&": {
-            "@rn-hoist fill": "true",
+            "@rn-move -fill": "true",
             fill: `${toColorValue(value)}`,
           },
         };
@@ -239,7 +224,7 @@ const nativePlugins = plugin(function ({
     {
       stroke: (value) => ({
         "&": {
-          "@rn-hoist stroke": "true",
+          "@rn-move -stroke": "true",
           stroke: toColorValue(value),
         },
       }),
@@ -251,7 +236,7 @@ const nativePlugins = plugin(function ({
     {
       stroke: (value) => ({
         "&": {
-          "@rn-hoist stroke-width": "true",
+          "@rn-move -stroke-width": "true",
           strokeWidth: toColorValue(value),
         },
       }),

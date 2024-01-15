@@ -21,22 +21,19 @@ import {
 import { cssInterop, remapProps } from "./api";
 
 cssInterop(Image, { className: "style" });
-cssInterop(Switch, { className: "style" });
 cssInterop(Pressable, { className: "style" });
-cssInterop(Text, { className: "style" });
-cssInterop(View, { className: "style" });
 cssInterop(SafeAreaView, { className: "style" });
+cssInterop(Switch, { className: "style" });
+cssInterop(Text, { className: "style" });
+cssInterop(TouchableHighlight, { className: "style" });
+cssInterop(TouchableOpacity, { className: "style" });
+cssInterop(TouchableWithoutFeedback, { className: "style" });
+cssInterop(View, { className: "style" });
 cssInterop(ActivityIndicator, {
-  className: {
-    target: "style",
-    nativeStyleToProp: { color: true },
-  },
+  className: { target: "style", nativeStyleToProp: { color: true } },
 });
 cssInterop(StatusBar, {
-  className: {
-    target: false,
-    nativeStyleToProp: { backgroundColor: true },
-  },
+  className: { target: false, nativeStyleToProp: { backgroundColor: true } },
 });
 cssInterop(ScrollView, {
   className: "style",
@@ -44,16 +41,8 @@ cssInterop(ScrollView, {
   indicatorClassName: "indicatorStyle",
 });
 cssInterop(TextInput, {
-  className: {
-    target: "style",
-    nativeStyleToProp: {
-      textAlign: true,
-    },
-  },
+  className: { target: "style", nativeStyleToProp: { textAlign: true } },
 });
-cssInterop(TouchableOpacity, { className: "style" });
-cssInterop(TouchableHighlight, { className: "style" });
-cssInterop(TouchableWithoutFeedback, { className: "style" });
 
 remapProps(FlatList, {
   className: "style",

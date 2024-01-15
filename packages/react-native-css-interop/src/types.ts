@@ -25,7 +25,7 @@ import type {
   ViewStyle,
 } from "react-native";
 import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
-import type { Signal } from "./runtime/signals";
+import { Effect, Observable } from "./runtime/observable";
 
 export type ReactComponent<P = any> =
   | ClassicComponentClass<P>
@@ -33,14 +33,11 @@ export type ReactComponent<P = any> =
   | FunctionComponent<P>
   | ForwardRefExoticComponent<P>;
 
-type Prop = string;
-type Source = string;
-
-export type InteropComponentConfig = [
-  Prop,
-  Source,
-  NativeStyleToProp<any> | undefined,
-][];
+export type InteropComponentConfig = {
+  target: string;
+  source: string;
+  nativeStyleToProp?: NativeStyleToProp<any>;
+};
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
@@ -54,7 +51,7 @@ export type CssToReactNativeRuntimeOptions = {
 };
 
 export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
-  declarations: Map<string, CompilerStyleMeta[]>;
+  rules: Map<string, StyleRule[]>;
   keyframes: Map<string, ExtractedAnimation>;
   grouping: RegExp[];
   darkMode?: DarkMode;
@@ -66,19 +63,9 @@ export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
   rem?: StyleSheetRegisterOptions["rem"];
 }
 
-export type ExtractedStyleMapping = Record<
-  string,
-  | { hoist: string }
-  | { prop: string; attribute?: string; transform?: "append-object" }
->;
-
 export type EnableCssInteropOptions<
   T extends keyof JSX.IntrinsicElements | JSXElementConstructor<any>,
 > = Record<string, CSSInteropClassNamePropConfig<ComponentProps<T>>>;
-
-export type Layers = Record<0 | 1 | 2, Array<RuntimeStyle | object>> & {
-  classNames?: string;
-};
 
 export type CssInterop = <
   const T extends ReactComponent<any>,
@@ -110,7 +97,7 @@ export type CssInteropGeneratedProps<T extends EnableCssInteropOptions<any>> = {
         ? K
         : never
       : never
-    : never]: string;
+    : never]?: string;
 };
 
 export type NativeStyleToProp<P> = {
@@ -136,7 +123,45 @@ export type JSXFunctionType = Parameters<JSXFunction>[0];
 export type JSXFunctionProps = Parameters<JSXFunction>[1];
 export type JSXFunctionRest = OmitFirstTwo<Parameters<JSXFunction>>;
 
-export type CompilerStyleMeta = {
+/**
+ * Used by the compiler to detail how props should be set on the component
+ */
+export type PathTokens = string[];
+export type MoveTokenRecord = Record<string, PathTokens>;
+export type StyleDeclaration =
+  | [string, object] // [Prop, Styles]
+  | [string, string | number] // [Prop, value]
+  | [
+      AnimationPropertyKey,
+      PathTokens,
+      Exclude<RuntimeValueDescriptor, Array<any> | undefined>,
+    ] // Set a value
+  | [
+      AnimationPropertyKey,
+      PathTokens,
+      Exclude<RuntimeValueDescriptor, Array<any> | undefined>,
+      true,
+    ]; // Set a delayed value
+
+export type StyleRuleSet = {
+  $$type: "StyleRuleSet";
+  normal?: StyleRule[];
+  inline?: StyleRule[];
+  important?: StyleRule[];
+  warnings?: ExtractionWarning[];
+  classNames?: string;
+};
+
+export type RuntimeStyleRule = StyleRule | object;
+
+export type RuntimeStyleRuleSet = {
+  normal: RuntimeStyleRule[];
+  inline: RuntimeStyleRule[];
+  important: RuntimeStyleRule[];
+};
+
+export type StyleRule = {
+  $$type: "StyleRule";
   specificity: Specificity;
   media?: MediaQuery[];
   variables?: Array<[string, RuntimeValueDescriptor]>;
@@ -147,71 +172,48 @@ export type CompilerStyleMeta = {
   transition?: ExtractedTransition;
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
-  props: Record<string, Record<string, RuntimeValueDescriptor>>;
-  propSingleValue: Record<string, PropRuntimeValueDescriptor>;
+  declarations?: StyleDeclaration[];
   attrs?: AttributeCondition[];
-  hoistedStyles?: [string, string, HoistedTypes][];
-  scope: number;
   warnings?: ExtractionWarning[];
 };
 
-export type HoistedTypes = "transform" | "shadow";
-
-export type GroupedTransportStyles = {
-  0?: TransportStyle[];
-  1?: TransportStyle[];
-  2?: TransportStyle[];
-  warnings?: ExtractionWarning[];
-  scope: number;
-};
-
-export type TransportStyle = Omit<
-  CompilerStyleMeta,
-  "props" | "propSingleValue"
-> & {
-  props?: Array<
-    [
-      string,
-      PropRuntimeValueDescriptor | Array<[string, RuntimeValueDescriptor]>,
-    ]
-  >;
-};
-
-export type GroupedRuntimeStyle = {
-  0?: RuntimeStyle[];
-  1?: RuntimeStyle[];
-  2?: RuntimeStyle[];
-  scope: number;
-};
-
-export type RuntimeStyle = Omit<TransportStyle, "props"> & {
-  $$type: "runtime";
-  props?: Array<[string, RuntimeValue | Record<string, RuntimeValue>]>;
-};
-
-export type Layer = GroupedRuntimeStyle & {
-  classNames: string;
+export type PropAccumulator = {
+  props: Record<string, any>;
+  effect: Effect;
+  target: string;
+  resetContext: boolean;
+  animationValues: Record<string, any>;
+  requiresLayout: boolean;
+  delayedDeclarations: Extract<StyleDeclaration, Array<any>>[];
+  variables: Map<string, RuntimeValueDescriptor>;
+  isAnimated: boolean;
+  animation?: Required<ExtractedAnimations>;
+  transition?: Required<ExtractedTransition>;
+  containerNames: string[] | null;
+  getWidth(): number;
+  getHeight(): number;
+  getFontSize(): number;
+  getVariable(name?: string): RuntimeValueDescriptor;
 };
 
 export type RuntimeValueDescriptor =
   | string
   | number
+  | boolean
+  | undefined
+  | RuntimeValueDescriptor[]
   | {
       name: string;
-      arguments: any[];
+      arguments: RuntimeValueDescriptor[];
+      delay?: boolean;
     };
-
-export type PropRuntimeValueDescriptor = {
-  $$type: "prop";
-  value: RuntimeValueDescriptor;
-};
 
 export type RuntimeValue =
   | string
   | number
   | boolean
   | undefined
-  | (() => RuntimeValue);
+  | ((acc: PropAccumulator) => RuntimeValue);
 
 export type Specificity = {
   /** IDs - https://drafts.csswg.org/selectors/#specificity-rules */
@@ -230,19 +232,9 @@ export type Specificity = {
   inline?: number;
 };
 
-export interface SignalLike<T = unknown> {
-  get(): T;
-}
-
-export type Interaction = {
-  active?: Signal<boolean>;
-  hover?: Signal<boolean>;
-  focus?: Signal<boolean>;
-};
-
 export type ExtractedContainer = {
   names?: string[] | false;
-  type: ContainerType;
+  type?: ContainerType;
 };
 
 export type ExtractedContainerQuery = {
@@ -274,9 +266,12 @@ export type ExtractedTransition = {
   timingFunction?: EasingFunction[];
 };
 
+type AnimationPropertyKey = string;
 export type ExtractedAnimation = {
-  frames: Record<string, RuntimeValueFrame[]>;
-  hoistedStyles?: [string, string, HoistedTypes][];
+  frames: [
+    AnimationPropertyKey,
+    { values: RuntimeValueFrame[]; pathTokens: PathTokens },
+  ][];
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
 };
@@ -293,31 +288,29 @@ export type PseudoClassesQuery = {
 };
 
 export type StyleSheetRegisterCompiledOptions = {
-  declarations?: [string, GroupedTransportStyles][];
-  keyframes?: Record<string, ExtractedAnimation>;
-  rootVariables?: Record<string, VariableRecord>;
-  universalVariables?: Record<string, VariableRecord>;
-  rem?: { light?: number; dark?: number };
+  $$compiled: true;
+  rules?: [string, StyleRuleSet][];
+  keyframes?: [string, ExtractedAnimation][];
+  rootVariables?: VariableRecord;
+  universalVariables?: VariableRecord;
+  rem?: number;
   flags?: Record<string, unknown>;
 };
 
 export type StyleSheetRegisterOptions = {
-  declarations?: Record<string, TransportStyle | TransportStyle[]>;
+  declarations?: Record<string, any | any[]>;
   keyframes?: Record<string, ExtractedAnimation>;
-  rootVariables?: Record<string, VariableRecord>;
-  universalVariables?: Record<string, VariableRecord>;
-  rem?: { light?: number; dark?: number };
+  rootVariables?: VariableRecord;
+  universalVariables?: VariableRecord;
+  rem?: number;
   flags?: Record<string, unknown>;
 };
 
-export type VariableRecord = Record<
-  string,
-  {
-    darkApp?: RuntimeValueDescriptor;
-    darkDevice?: RuntimeValueDescriptor;
-    light?: RuntimeValueDescriptor;
-  }
->;
+export type ColorSchemeVariableValue = {
+  light?: RuntimeValueDescriptor;
+  dark?: RuntimeValueDescriptor;
+};
+export type VariableRecord = Record<string, ColorSchemeVariableValue>;
 
 export type Style = ViewStyle & TextStyle & ImageStyle;
 export type StyleProp = Style | StyleProp[] | undefined;
@@ -354,7 +347,7 @@ export type DarkMode =
   | { type: "class"; value: string }
   | { type: "attribute"; value: string };
 
-export interface CommonStyleSheet {
+export interface CssInteropStyleSheet {
   [INTERNAL_RESET](options?: {
     dimensions?: Dimensions;
     appearance?: typeof Appearance;
@@ -364,17 +357,17 @@ export interface CommonStyleSheet {
   register(options: StyleSheetRegisterOptions): void;
   registerCompiled(options: StyleSheetRegisterCompiledOptions): void;
   getFlag(name: string): string | undefined;
+  getGlobalStyle(name: string): Observable<StyleRuleSet> | undefined;
 }
-
-export type AttributeCondition = PropCondition | DataAttributeCondition;
-export type AttributeDependency = AttributeCondition & {
-  previous?: any;
-};
 
 type AttributeSelectorComponent = Extract<
   SelectorComponent,
   { type: "attribute" }
 >;
+export type AttributeCondition = PropCondition | DataAttributeCondition;
+export type AttributeDependency = AttributeCondition & {
+  previous?: any;
+};
 
 export type PropCondition = Omit<AttributeSelectorComponent, "operation"> & {
   operation?:
@@ -387,6 +380,25 @@ export type PropCondition = Omit<AttributeSelectorComponent, "operation"> & {
 export type DataAttributeCondition = Omit<PropCondition, "type"> & {
   type: "data-attribute";
 };
+
+export type TransformProperty =
+  | "perspective"
+  | "translateX"
+  | "translateY"
+  | "translateZ"
+  | "scale"
+  | "scaleX"
+  | "scaleY"
+  | "scaleZ"
+  | "rotate"
+  | "rotateX"
+  | "rotateY"
+  | "rotateZ"
+  | "skewX"
+  | "skewY"
+  | "skewZ"
+  | "matrix"
+  | "matrix3d";
 
 /*
  * This is a list of all the CSS properties that can be animated

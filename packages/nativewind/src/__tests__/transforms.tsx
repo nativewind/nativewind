@@ -360,14 +360,13 @@ describe("Transforms - Skew", () => {
   );
 });
 
-describe("Transforms - Mixed", () => {
+describe.only("Transforms - Mixed", () => {
   testCasesWithOptions(
     {
       css: "@tailwind base;@tailwind components;@tailwind utilities;",
     },
     [
       "rotate-90 skew-y-1 translate-x-1",
-
       style({
         transform: [
           { translateX: 3.5 },

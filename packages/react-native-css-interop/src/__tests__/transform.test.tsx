@@ -12,7 +12,7 @@ const A = createMockComponent(View);
 
 beforeEach(() => resetStyles());
 
-test.only("translateX percentage", () => {
+test("translateX percentage", () => {
   registerCSS(`.my-class { width: 120px; transform: translateX(10%); }`);
 
   const component = render(

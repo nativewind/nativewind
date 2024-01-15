@@ -1,5 +1,4 @@
-import { styleSignals } from "./runtime/native/globals";
-import { StyleSheet } from "./runtime/native/stylesheet";
+import { StyleSheet, globalStyles } from "./runtime/native/stylesheet";
 import { INTERNAL_FLAGS } from "./shared";
 
 export function verifyJSX() {
@@ -18,5 +17,5 @@ export function verifyReceivedData() {
 }
 
 export function verifyHasStyles() {
-  return styleSignals.size > 0;
+  return globalStyles.size > 0;
 }

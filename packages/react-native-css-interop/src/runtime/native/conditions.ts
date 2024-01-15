@@ -12,48 +12,94 @@ import {
   AttributeDependency,
   ExtractedContainerQuery,
   PseudoClassesQuery,
-  SignalLike,
+  StyleRule,
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
-import type { InheritedParentContext } from "./component-state";
+import { Effect } from "../observable";
+import { PropState } from "./use-prop-state";
+import { InheritedParentContext } from "./inherited-context";
 
 interface ConditionReference {
-  width: number | SignalLike<number>;
-  height: number | SignalLike<number>;
+  width: number | { get: (effect?: Effect) => number };
+  height: number | { get: (effect?: Effect) => number };
 }
 
-export function testMediaQueries(mediaQueries: MediaQuery[]) {
-  return mediaQueries.every((query) => testMediaQuery(query));
+export function testRule(
+  state: PropState,
+  context: InheritedParentContext,
+  declaration: StyleRule,
+  props: Record<string, any>,
+) {
+  if (declaration.pseudoClasses) {
+    if (!testPseudoClasses(state, context, declaration.pseudoClasses)) {
+      return false;
+    }
+  }
+
+  if (declaration.media && !testMediaQueries(state, declaration.media)) {
+    return false;
+  }
+
+  if (
+    declaration.containerQuery &&
+    !testContainerQuery(state, context, declaration.containerQuery)
+  ) {
+    return false;
+  }
+
+  if (declaration.attrs) {
+    for (const attrCondition of declaration.attrs) {
+      const attrValue = getTestAttributeValue(props, attrCondition);
+      state.attributes.push({
+        ...attrCondition,
+        previous: attrValue,
+      });
+
+      if (!testAttribute(attrValue, attrCondition)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+export function testMediaQueries(effect: Effect, mediaQueries: MediaQuery[]) {
+  return mediaQueries.every((query) => testMediaQuery(effect, query));
 }
 
 /**
  * Test a media query against current conditions
  */
 export function testMediaQuery(
+  effect: Effect,
   mediaQuery: MediaQuery,
   conditionReference: ConditionReference = {
     width: vw,
     height: vh,
   },
 ) {
-  const pass = testCondition(mediaQuery.condition, conditionReference);
+  const pass = testCondition(effect, mediaQuery.condition, conditionReference);
   return mediaQuery.qualifier === "not" ? !pass : pass;
 }
 
 export function testPseudoClasses(
-  state: InheritedParentContext,
+  effect: Effect,
+  context: InheritedParentContext,
   meta: PseudoClassesQuery,
 ) {
-  let fail = false;
-  if (meta.active) fail ||= state.interaction.active?.get() !== true;
-  if (meta.hover) fail ||= state.interaction.hover?.get() !== true;
-  if (meta.focus) fail ||= state.interaction.focus?.get() !== true;
-  return !fail;
+  /* If any of these conditions fail, it fails failed */
+  let passed = true;
+  if (meta.active) passed = context.getActive(effect) && passed;
+  if (meta.hover) passed = context.getHover(effect) && passed;
+  if (meta.focus) passed = context.getFocus(effect) && passed;
+  return passed;
 }
 
 export function testContainerQuery(
+  effect: Effect,
   state: InheritedParentContext,
   containerQuery: ExtractedContainerQuery[] | undefined,
 ) {
@@ -63,20 +109,23 @@ export function testContainerQuery(
   }
 
   return containerQuery.every((query) => {
-    let container = query.name ? state.getContainer(query.name) : null;
+    let container = query.name ? state.getContainer(query.name, effect) : null;
     // If the query has a name, but the container doesn't exist, we failed
     if (query.name && !container) return false;
 
     // If the query has a name, we use the container with that name
     // Otherwise default to the last container
-    if (!container) container = state.getContainer(DEFAULT_CONTAINER_NAME);
+    if (!container)
+      container = state.getContainer(DEFAULT_CONTAINER_NAME, effect);
 
     // We failed if the container doesn't exist (e.g no default container)
     if (!container) return false;
 
+    const context = container.get(effect)!;
+
     if (
       query.pseudoClasses &&
-      !testPseudoClasses(container, query.pseudoClasses)
+      !testPseudoClasses(effect, context, query.pseudoClasses)
     ) {
       return false;
     }
@@ -84,9 +133,9 @@ export function testContainerQuery(
     // If there is no condition, we passed (maybe only named as specified)
     if (!query.condition) return true;
 
-    const layout = container.layout!.get() || [0, 0];
+    const layout = context.getLayout(effect) || [0, 0];
 
-    return testCondition(query.condition, {
+    return testCondition(effect, query.condition, {
       width: layout[0],
       height: layout[1],
     });
@@ -98,6 +147,7 @@ export function testContainerQuery(
  * This is also used for container queries
  */
 export function testCondition(
+  effect: Effect,
   condition: ContainerCondition<Declaration> | null | undefined,
   conditionReference: ConditionReference,
 ): boolean {
@@ -105,35 +155,36 @@ export function testCondition(
 
   if (condition.type === "operation") {
     if (condition.operator === "and") {
-      return condition.conditions.every((c) =>
-        testCondition(c, conditionReference),
-      );
+      return condition.conditions.every((c) => {
+        return testCondition(effect, c, conditionReference);
+      });
     } else {
-      return condition.conditions.some((c) =>
-        testCondition(c, conditionReference),
-      );
+      return condition.conditions.some((c) => {
+        return testCondition(effect, c, conditionReference);
+      });
     }
   } else if (condition.type === "not") {
-    return !testCondition(condition.value, conditionReference);
+    return !testCondition(effect, condition.value, conditionReference);
   } else if (condition.type === "style") {
     // TODO
     return false;
   }
 
-  return Boolean(testFeature(condition.value, conditionReference));
+  return testFeature(effect, condition.value, conditionReference);
 }
 
 function testFeature(
+  effect: Effect,
   feature: QueryFeatureFor_MediaFeatureId,
   conditionReference: ConditionReference,
 ) {
   switch (feature.type) {
     case "plain":
-      return testPlainFeature(feature, conditionReference);
+      return testPlainFeature(effect, feature, conditionReference);
     case "range":
-      return testRange(feature, conditionReference);
+      return testRange(effect, feature, conditionReference);
     case "boolean":
-      return testBoolean(feature);
+      return testBoolean(effect, feature);
     case "interval":
       return false;
     default:
@@ -144,10 +195,11 @@ function testFeature(
 }
 
 function testPlainFeature(
+  effect: Effect,
   feature: Extract<QueryFeatureFor_MediaFeatureId, { type: "plain" }>,
   ref: ConditionReference,
 ) {
-  const value = getMediaFeatureValue(feature.value);
+  const value = getMediaFeatureValue(effect, feature.value);
 
   if (value === null) {
     return false;
@@ -157,29 +209,29 @@ function testPlainFeature(
     case "display-mode":
       return value === "native" || Platform.OS === value;
     case "prefers-color-scheme":
-      return colorScheme.get() === value;
+      return colorScheme.get(effect) === value;
     case "width":
-      return testComparison("equal", ref.width, value);
+      return testComparison(effect, "equal", ref.width, value);
     case "min-width":
-      return testComparison("greater-than-equal", ref.width, value);
+      return testComparison(effect, "greater-than-equal", ref.width, value);
     case "max-width":
-      return testComparison("less-than-equal", ref.width, value);
+      return testComparison(effect, "less-than-equal", ref.width, value);
     case "height":
-      return testComparison("equal", ref.height, value);
+      return testComparison(effect, "equal", ref.height, value);
     case "min-height":
-      return testComparison("greater-than-equal", ref.height, value);
+      return testComparison(effect, "greater-than-equal", ref.height, value);
     case "max-height":
-      return testComparison("less-than-equal", ref.height, value);
+      return testComparison(effect, "less-than-equal", ref.height, value);
     case "orientation":
       return value === "landscape"
-        ? testComparison("less-than", ref.height, ref.width)
-        : testComparison("greater-than-equal", ref.height, ref.width);
+        ? testComparison(effect, "less-than", ref.height, ref.width)
+        : testComparison(effect, "greater-than-equal", ref.height, ref.width);
     default:
       return false;
   }
 }
 
-function getMediaFeatureValue(value: MediaFeatureValue) {
+function getMediaFeatureValue(effect: Effect, value: MediaFeatureValue) {
   if (value.type === "number") {
     return value.value;
   } else if (value.type === "length") {
@@ -189,7 +241,7 @@ function getMediaFeatureValue(value: MediaFeatureValue) {
         case "px":
           return length.value;
         case "rem":
-          return length.value * rem.get();
+          return length.value * rem.get(effect);
         default:
           return null;
       }
@@ -204,10 +256,11 @@ function getMediaFeatureValue(value: MediaFeatureValue) {
 }
 
 function testRange(
+  effect: Effect,
   feature: Extract<QueryFeatureFor_MediaFeatureId, { type: "range" }>,
   ref: ConditionReference,
 ) {
-  const value = getMediaFeatureValue(feature.value);
+  const value = getMediaFeatureValue(effect, feature.value);
 
   if (value === null || typeof value !== "number") {
     return false;
@@ -215,21 +268,22 @@ function testRange(
 
   switch (feature.name) {
     case "height":
-      return testComparison(feature.operator, ref.height, value);
+      return testComparison(effect, feature.operator, ref.height, value);
     case "width":
-      return testComparison(feature.operator, ref.width, value);
+      return testComparison(effect, feature.operator, ref.width, value);
     default:
       return false;
   }
 }
 
 function testComparison(
+  effect: Effect,
   comparison: MediaFeatureComparison,
-  ref: number | SignalLike<number>,
+  ref: number | { get(effect: Effect): number },
   value: unknown,
 ) {
-  ref = unwrap(ref);
-  value = unwrap(value);
+  ref = unwrap(effect, ref);
+  value = unwrap(effect, value);
 
   if (typeof value !== "number") return false;
   switch (comparison) {
@@ -247,18 +301,19 @@ function testComparison(
 }
 
 function testBoolean(
+  effect: Effect,
   feature: Extract<QueryFeatureFor_MediaFeatureId, { type: "boolean" }>,
 ) {
   switch (feature.name) {
     case "prefers-reduced-motion":
-      return isReduceMotionEnabled.get();
+      return isReduceMotionEnabled.get(effect);
   }
   return false;
 }
 
-function unwrap<T>(value: T | SignalLike<T>): T {
+function unwrap<T>(effect: Effect, value: T | { get(effect: Effect): T }): T {
   return value && typeof value === "object" && "get" in value
-    ? value.get()
+    ? value.get(effect)
     : value;
 }
 
@@ -269,7 +324,7 @@ export function testAttributesChanged(
   return attrDependencies.some((condition) => {
     const current =
       condition.type === "data-attribute"
-        ? props["dataSet"]?.[condition.name.replace("data-", "")]
+        ? props["dataSet"]?.[condition.name]
         : props[condition.name];
 
     return current !== condition.previous;
@@ -281,7 +336,7 @@ export function getTestAttributeValue(
   condition: AttributeCondition,
 ) {
   return condition.type === "data-attribute"
-    ? props["dataSet"]?.[condition.name.replace("data-", "")]
+    ? props["dataSet"]?.[condition.name]
     : props[condition.name];
 }
 

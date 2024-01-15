@@ -4,88 +4,93 @@ import {
   Appearance,
 } from "react-native";
 
-import { CommonStyleSheet } from "../../types";
-import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
-import { upsertStyleSignal } from "./style-store";
 import {
-  animationMap,
+  CssInteropStyleSheet,
+  ExtractedAnimation,
+  StyleRuleSet,
+} from "../../types";
+import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
+import { observableNotifyQueue } from "../observable";
+import { globalStyles, upsertGlobalStyle } from "./style-store";
+import {
   colorScheme,
-  createColorSchemeSignal,
+  cssVariableObservable,
   globalVariables,
-  externalClassNameCompilerCallback,
+  externalCallbackRef,
   rem,
-  styleSignals,
   vh,
   vw,
   warned,
   warnings,
 } from "./globals";
 
-const commonStyleSheet: CommonStyleSheet = {
+export const opaqueStyles = new WeakMap<object, StyleRuleSet>();
+export const animationMap = new Map<string, ExtractedAnimation>();
+export { globalStyles };
+
+const commonStyleSheet: CssInteropStyleSheet = {
   [INTERNAL_FLAGS]: {},
   [INTERNAL_RESET]({ dimensions = Dimensions, appearance = Appearance } = {}) {
+    globalStyles.clear();
     animationMap.clear();
     warnings.clear();
     warned.clear();
-    rem.set(14);
-    styleSignals.clear();
+    rem.set(14, false);
     vw[INTERNAL_RESET](dimensions);
     vh[INTERNAL_RESET](dimensions);
     colorScheme[INTERNAL_RESET](appearance);
+    observableNotifyQueue.clear();
   },
   getFlag(name) {
     return this[INTERNAL_FLAGS][name];
   },
   unstable_hook_onClassName(callback) {
-    externalClassNameCompilerCallback.current = callback;
+    externalCallbackRef.current = callback;
   },
   register() {
     throw new Error("Stylesheet.register is not yet implemented");
   },
+  getGlobalStyle(name: string) {
+    return globalStyles.get(name);
+  },
   registerCompiled(options) {
     // console.log(JSON.stringify(options, null, 2));
     this[INTERNAL_FLAGS]["$$receivedData"] = "true";
+
     if (options.flags) {
       Object.assign(this[INTERNAL_FLAGS], options.flags);
     }
 
-    if (options.keyframes) {
-      for (const [name, keyframes] of Object.entries(options.keyframes)) {
-        animationMap.set(name, keyframes);
-      }
-    }
+    options.rules?.forEach((rule) => upsertGlobalStyle(rule[0], rule[1]));
 
-    if (options.declarations) {
-      for (let [name, styles] of options.declarations) {
-        upsertStyleSignal(name, styles);
-      }
-    }
+    options.keyframes?.forEach((keyframe) => {
+      animationMap.set(keyframe[0], keyframe[1]);
+    });
 
     if (options.rootVariables) {
       for (const [name, value] of Object.entries(options.rootVariables)) {
-        let signal = globalVariables.root.get(name);
-        if (!signal) {
-          signal = createColorSchemeSignal(`root:${name}`);
-          globalVariables.root.set(name, signal);
+        let variable = globalVariables.root.get(name);
+        if (!variable) {
+          variable = cssVariableObservable(value);
+          globalVariables.root.set(name, variable);
         }
-        signal.set(value);
+        variable.set(value);
       }
     }
 
     if (options.universalVariables) {
       for (const [name, value] of Object.entries(options.universalVariables)) {
         let signal = globalVariables.universal.get(name);
-        if (!signal) {
-          signal = createColorSchemeSignal(`root:${name}`);
+        if (signal) {
+          signal.set(value);
+        } else {
+          signal = cssVariableObservable(value, { name: `root:${name}` });
           globalVariables.universal.set(name, signal);
         }
-        signal.set(value);
       }
     }
 
-    if (options.rem) {
-      rem.set(options.rem);
-    }
+    if (options.rem) rem.set(options.rem);
   },
 };
 
