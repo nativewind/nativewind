@@ -1,3 +1,4 @@
+import { transformKeys } from "../shared";
 import {
   RuntimeValueDescriptor,
   StyleDeclaration,
@@ -70,6 +71,13 @@ function mergeStaticDeclarations(declarations: StyleRule["declarations"]) {
     }
 
     const [path, prop] = pathTokens;
+
+    // Transform keys need to be set
+    if (transformKeys.has(prop)) {
+      newDeclarations.push(declaration);
+      continue;
+    }
+
     merged[path] ??= {};
     merged[path][prop] = value;
   }

@@ -12,3 +12,18 @@ export const STYLE_SCOPES = {
   /** @description Style can affect other styles (sets variables, uses other styles) */
   SELF: 2,
 };
+
+export const transformKeys = new Set([
+  "perspective",
+  "translateX",
+  "translateY",
+  "rotate",
+  "rotateX",
+  "rotateY",
+  "rotateZ",
+  "scale",
+  "scaleX",
+  "scaleY",
+  "skewX",
+  "skewY",
+]);

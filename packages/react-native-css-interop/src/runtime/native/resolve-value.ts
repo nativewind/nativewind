@@ -13,6 +13,7 @@ import type {
 } from "../../types";
 import { rem, systemColorScheme, vh, vw } from "./globals";
 import { Effect } from "../observable";
+import { transformKeys } from "../../shared";
 
 export function resolve(
   acc: PropAccumulator,
@@ -287,21 +288,6 @@ export function setDeepStyle(
     }
   }
 }
-
-const transformKeys = new Set([
-  "perspective",
-  "translateX",
-  "translateY",
-  "rotate",
-  "rotateX",
-  "rotateY",
-  "rotateZ",
-  "scale",
-  "scaleX",
-  "scaleY",
-  "skewX",
-  "skewY",
-]);
 
 export const defaultValues: Record<
   string,
