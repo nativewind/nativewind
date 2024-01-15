@@ -53,10 +53,11 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
     const parent = useContext(inheritanceContext);
 
     useEffect(() => {
-      for (const sub of observableNotifyQueue) {
+      const queue = [...observableNotifyQueue];
+      observableNotifyQueue.clear();
+      for (const sub of queue) {
         sub();
       }
-      observableNotifyQueue.clear();
     });
 
     const stateRef = useRef<ComponentState>();
@@ -81,7 +82,7 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
           return value;
         },
         getActive(effect) {
-          state.active ??= observable(false);
+          state.active ??= observable(false, { name: "active" });
           return state.active.get(effect);
         },
         getHover(effect) {

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  SharedValue,
   makeMutable,
   withDelay,
   withRepeat,
@@ -14,32 +13,24 @@ import type {
   ExtractedAnimations,
   ExtractedTransition,
   StyleDeclaration,
-  AttributeDependency,
   PropAccumulator,
   InteropComponentConfig,
+  PropState,
 } from "../../types";
 import {
   defaultValues,
   getEasing,
   parseValue,
   resolveAnimation,
+  resolveTransitionValue,
   setDeepStyle,
   timeToMS,
 } from "./resolve-value";
-import { cleanupEffect, type Effect } from "../observable";
+import { cleanupEffect } from "../observable";
 import type { ComponentState } from "../api.native";
 import { StyleSheet, animationMap, opaqueStyles } from "./stylesheet";
 import { testAttributesChanged, testRule } from "./conditions";
 import { globalVariables } from "./globals";
-
-export type PropState = Effect & {
-  resetContext: boolean;
-  attributes: AttributeDependency[];
-  isAnimated: boolean;
-  sharedValues: Map<string, SharedValue<any>>;
-  animationNames: Set<string>;
-  animationWaitingOnLayout: boolean;
-};
 
 export function usePropState(
   componentState: ComponentState,
@@ -48,6 +39,7 @@ export function usePropState(
 ) {
   const [state, setState] = useState<PropState>(() => {
     return {
+      initialRender: true,
       dependencies: new Set(),
       attributes: [],
       resetContext: false,
@@ -55,9 +47,7 @@ export function usePropState(
       animationWaitingOnLayout: true,
       sharedValues: new Map(),
       isAnimated: false,
-      rerender: () => {
-        setState((state) => ({ ...state }));
-      },
+      rerender: () => setState((state) => ({ ...state })),
     };
   });
 
@@ -87,14 +77,14 @@ export function usePropState(
     };
 
     const acc: PropAccumulator = {
-      effect: state,
+      state: state,
       isAnimated: state.isAnimated,
+      transformLookup: {},
       target,
       resetContext: false,
       props: {},
       variables: new Map(),
       containerNames: [],
-      animationValues: {},
       requiresLayout: false,
       delayedDeclarations: [],
       getWidth() {
@@ -191,7 +181,7 @@ export function usePropState(
         } = acc.animation;
 
         state.isAnimated = true;
-        originalProps.style ??= {};
+        acc.props.style ??= {};
         let names: string[] = [];
 
         // Always reset if we are waiting on an animation
@@ -248,7 +238,7 @@ export function usePropState(
                 acc,
                 values,
                 animationKey,
-                acc.animationValues,
+                acc.props[target],
                 delay,
                 totalDuration,
                 easingFunction,
@@ -261,12 +251,12 @@ export function usePropState(
                 const layout = componentState.getLayout(state);
                 const needWidth =
                   animation.requiresLayoutWidth &&
-                  originalProps.style?.width === undefined &&
+                  acc.props.style?.width === undefined &&
                   layout?.[0] === undefined;
 
                 const needHeight =
                   animation.requiresLayoutHeight &&
-                  originalProps.style?.height === undefined &&
+                  acc.props.style?.height === undefined &&
                   layout?.[1] === undefined;
 
                 if (needWidth || needHeight) {
@@ -327,22 +317,35 @@ export function usePropState(
 
             if (seenAnimatedProps.has(property)) continue;
 
-            let value =
-              acc.animationValues[property] ??
-              acc.props[target]?.[property] ??
-              defaultValues[property];
+            let sharedValue = state.sharedValues.get(property);
+
+            let value = resolveTransitionValue(acc, property);
+
+            let defaultValue = defaultValues[property];
+            defaultValue =
+              typeof defaultValue === "function"
+                ? defaultValue(state)
+                : defaultValue;
+
+            if (value === undefined && !sharedValue) {
+              // We have never seen this value, and its undefined so do nothing
+              continue;
+            } else if (!sharedValue) {
+              // First time seeing this value. On the initial render don't transition,
+              // otherwise transition from the default value
+              const initialValue = state.initialRender ? value : defaultValue;
+              sharedValue = makeMutable(initialValue);
+              state.sharedValues.set(property, sharedValue);
+            } else if (value === undefined) {
+              // We previously saw this value, but now its gone
+              value = defaultValue;
+            }
 
             seenAnimatedProps.add(property);
 
             const duration = timeToMS(durations[index % durations.length]);
             const delay = timeToMS(delays[index % delays.length]);
             const easing = timingFunctions[index % timingFunctions.length];
-
-            let sharedValue = state.sharedValues.get(property);
-            if (!sharedValue) {
-              sharedValue = makeMutable(value);
-              state.sharedValues.set(property, sharedValue);
-            }
 
             if (value !== sharedValue.value) {
               sharedValue.value = withDelay(
@@ -353,8 +356,7 @@ export function usePropState(
                 }),
               );
             }
-
-            acc.props[target][property] = sharedValue;
+            setDeepStyle(acc, [property], sharedValue, acc.props[target]);
           }
         }
       }
@@ -381,6 +383,7 @@ export function usePropState(
     }
 
     acc.isAnimated = state.isAnimated;
+    state.initialRender = false;
 
     return acc;
   }, [componentState, state, classNames, inlineStyles, state.attributes]);
@@ -451,13 +454,11 @@ function applyDeclaration(
     if (queueDelayedDeclarations && typeof value === "object" && value.delay) {
       acc.delayedDeclarations.push(declaration);
     } else {
-      const animationKey = declaration[0];
       const pathTokens = [...declaration[1]];
 
       if (acc.target !== "style" && pathTokens[0] === "style") {
         pathTokens[0] = acc.target;
       }
-      acc.animationValues[animationKey] = value;
       setDeepStyle(acc, pathTokens, value);
     }
   }

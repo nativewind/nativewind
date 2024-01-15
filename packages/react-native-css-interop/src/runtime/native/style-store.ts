@@ -1,6 +1,5 @@
 import { StyleRuleSet } from "../../types";
 import { Observable, observable } from "../observable";
-import { warned, warnings } from "./globals";
 
 export const globalStyles = new Map<string, Observable<StyleRuleSet>>();
 
@@ -47,33 +46,31 @@ function deepEqual(obj1: any, obj2: any) {
 }
 
 function printWarnings(name: string, ruleSet: StyleRuleSet | object) {
-  if (!("$$type" in ruleSet) || !ruleSet.warnings) return;
-
-  for (const warning of ruleSet.warnings) {
-    if (process.env.NODE_ENV === "test") {
-      warnings.set(name, ruleSet.warnings);
-    } else {
-      warned.add(name);
-
-      switch (warning.type) {
-        case "IncompatibleNativeProperty":
-          console.log("IncompatibleNativeProperty ", warning.property);
-          break;
-        case "IncompatibleNativeValue":
-          console.log(
-            "IncompatibleNativeValue ",
-            warning.property,
-            warning.value,
-          );
-          break;
-        case "IncompatibleNativeFunctionValue":
-          console.log(
-            "IncompatibleNativeFunctionValue ",
-            warning.property,
-            warning.value,
-          );
-          break;
-      }
-    }
-  }
+  // if (!("$$type" in ruleSet) || !ruleSet.warnings) return;
+  // for (const warning of ruleSet.warnings) {
+  //   if (process.env.NODE_ENV === "test") {
+  //     warnings.set(name, ruleSet.warnings);
+  //   } else {
+  //     warned.add(name);
+  //     switch (warning.type) {
+  //       case "IncompatibleNativeProperty":
+  //         console.log("IncompatibleNativeProperty ", warning.property);
+  //         break;
+  //       case "IncompatibleNativeValue":
+  //         console.log(
+  //           "IncompatibleNativeValue ",
+  //           warning.property,
+  //           warning.value,
+  //         );
+  //         break;
+  //       case "IncompatibleNativeFunctionValue":
+  //         console.log(
+  //           "IncompatibleNativeFunctionValue ",
+  //           warning.property,
+  //           warning.value,
+  //         );
+  //         break;
+  //     }
+  //   }
+  // }
 }

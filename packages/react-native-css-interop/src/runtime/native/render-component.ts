@@ -1,15 +1,8 @@
-import {
-  ComponentType,
-  createElement,
-  forwardRef,
-  useMemo,
-  useRef,
-} from "react";
+import { ComponentType, createElement, forwardRef, useRef } from "react";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { ComponentState } from "../api.native";
 import { LayoutChangeEvent, Pressable, View } from "react-native";
 import { inheritanceContext } from "./inherited-context";
-import { defaultValues } from "./resolve-value";
 
 const animatedCache = new Map<
   ComponentType<any> | string,
@@ -172,28 +165,28 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
      * removed from the style object. This code is a workaround to manually set the default
      * value.
      */
-    useMemo(() => {
-      for (const [key, value] of Object.entries(props.style) as [
-        string,
-        any,
-      ][]) {
-        if (key === "transform") {
-          fallbackStyle.transform = value.flatMap((v: any) => {
-            const [key, value] = Object.entries(v)[0] as any;
-            return { [key]: value };
-          });
-        } else if (
-          typeof value === "object" &&
-          "_isReanimatedSharedValue" in value == false
-        ) {
-          for (const subKey of Object.keys(value)) {
-            fallbackStyle[key][subKey] = defaultValues[subKey];
-          }
-        } else {
-          fallbackStyle[key] = defaultValues[key];
-        }
-      }
-    }, [props.style]);
+    // useMemo(() => {
+    //   for (const [key, value] of Object.entries(props.style) as [
+    //     string,
+    //     any,
+    //   ][]) {
+    //     if (key === "transform") {
+    //       fallbackStyle.transform = value.flatMap((v: any) => {
+    //         const [key, value] = Object.entries(v)[0] as any;
+    //         return { [key]: value };
+    //       });
+    //     } else if (
+    //       typeof value === "object" &&
+    //       "_isReanimatedSharedValue" in value
+    //     ) {
+    //       fallbackStyle[key] = defaultValues[key];
+    //     } else {
+    //       for (const subKey of Object.keys(value)) {
+    //         fallbackStyle[key][subKey] = defaultValues[subKey];
+    //       }
+    //     }
+    //   }
+    // }, [props.style]);
 
     /**
      * This code shouldn't be needed, but inline shared values are not working properly.
@@ -209,7 +202,6 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
         } else if (key === "transform") {
           style.transform = value.map((v: any) => {
             const [key, value] = Object.entries(v)[0] as any;
-
             if (typeof value === "object" && "value" in value) {
               return { [key]: value.value };
             } else {

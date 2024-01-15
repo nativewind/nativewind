@@ -270,6 +270,10 @@ export function parseDeclaration(
     addWarning,
   } = options;
 
+  if ("vendorPrefix" in declaration && declaration.vendorPrefix.length) {
+    return;
+  }
+
   if (declaration.property === "unparsed") {
     if (!isValid(declaration.value.propertyId)) {
       return addWarning({
@@ -1313,18 +1317,18 @@ export function parseDeclaration(
       return addAnimationProp(declaration.property, declaration.value);
     case "transform": {
       if (declaration.value.length === 0) {
-        addTransformProp("perspective", undefined);
-        addTransformProp("translateX", undefined);
-        addTransformProp("translateY", undefined);
-        addTransformProp("rotate", undefined);
-        addTransformProp("rotateX", undefined);
-        addTransformProp("rotateY", undefined);
-        addTransformProp("rotateZ", undefined);
-        addTransformProp("scale", undefined);
-        addTransformProp("scaleX", undefined);
-        addTransformProp("scaleY", undefined);
-        addTransformProp("skewX", undefined);
-        addTransformProp("skewY", undefined);
+        addTransformProp("perspective", 1);
+        addTransformProp("translateX", 0);
+        addTransformProp("translateY", 0);
+        addTransformProp("rotate", "0deg");
+        addTransformProp("rotateX", "0deg");
+        addTransformProp("rotateY", "0deg");
+        addTransformProp("rotateZ", "0deg");
+        addTransformProp("scale", 1);
+        addTransformProp("scaleX", 1);
+        addTransformProp("scaleY", 1);
+        addTransformProp("skewX", "0deg");
+        addTransformProp("skewY", "0deg");
         break;
       }
 

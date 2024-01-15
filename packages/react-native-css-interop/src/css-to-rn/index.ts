@@ -472,7 +472,6 @@ function extractKeyFrames(
       frame.declarations.declarations,
       {
         ...extractOptions,
-        useInitialIfUndefined: true,
         requiresLayout(name) {
           if (name === "rnw") {
             animation.requiresLayoutWidth = true;
@@ -568,7 +567,6 @@ function extractKeyFrames(
 
 interface GetExtractedStyleOptions extends ExtractRuleOptions {
   requiresLayout?: (name: string) => void;
-  useInitialIfUndefined?: boolean;
 }
 
 function getExtractedStyles(
@@ -637,10 +635,6 @@ function declarationsToStyle(
    * E.g. `transform` accepts an array of transforms
    */
   function addStyleProp(attribute: string, value: any, moveTokens?: string[]) {
-    if (value === undefined && options.useInitialIfUndefined) {
-      value = "!INITIAL!";
-    }
-
     if (value === undefined) {
       return;
     }
@@ -654,14 +648,13 @@ function declarationsToStyle(
 
     if (moveTokens) {
       pathTokens = [...pathTokens.slice(0, -1), ...moveTokens];
-      props.push([attribute, pathTokens, value]);
-    } else {
-      props.push([attribute, pathTokens, value]);
     }
+
+    props.push([attribute, pathTokens, value]);
   }
 
   function addTransformProp(property: string, value: any) {
-    return addStyleProp(property, value, ["transform", property]);
+    return addStyleProp(property, value);
   }
 
   function handleTransformShorthand(

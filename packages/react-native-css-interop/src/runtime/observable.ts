@@ -34,7 +34,8 @@ export function observable<T>(
       if (Object.is(newValue, value)) return;
       value = newValue;
       if (notify) {
-        for (const sub of subscriptions) {
+        // We need to copy the subscriptions as new ones may be added during the render, causing an infinite growing subscriptions set
+        for (const sub of [...subscriptions]) {
           sub();
         }
       } else {

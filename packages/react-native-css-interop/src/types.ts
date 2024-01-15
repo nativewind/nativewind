@@ -26,6 +26,7 @@ import type {
 } from "react-native";
 import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
 import { Effect, Observable } from "./runtime/observable";
+import { SharedValue } from "react-native-reanimated";
 
 export type ReactComponent<P = any> =
   | ClassicComponentClass<P>
@@ -177,12 +178,22 @@ export type StyleRule = {
   warnings?: ExtractionWarning[];
 };
 
+export type PropState = Effect & {
+  initialRender: boolean;
+  resetContext: boolean;
+  attributes: AttributeDependency[];
+  isAnimated: boolean;
+  sharedValues: Map<string, SharedValue<any>>;
+  animationNames: Set<string>;
+  animationWaitingOnLayout: boolean;
+};
+
 export type PropAccumulator = {
   props: Record<string, any>;
-  effect: Effect;
+  transformLookup: Record<string, string>;
+  state: PropState;
   target: string;
   resetContext: boolean;
-  animationValues: Record<string, any>;
   requiresLayout: boolean;
   delayedDeclarations: Extract<StyleDeclaration, Array<any>>[];
   variables: Map<string, RuntimeValueDescriptor>;

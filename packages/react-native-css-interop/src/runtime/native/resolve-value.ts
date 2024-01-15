@@ -11,7 +11,8 @@ import type {
   RuntimeValueDescriptor,
   RuntimeValueFrame,
 } from "../../types";
-import { colorScheme, rem, vh, vw } from "./globals";
+import { rem, systemColorScheme, vh, vw } from "./globals";
+import { Effect } from "../observable";
 
 export function resolve(
   acc: PropAccumulator,
@@ -62,13 +63,13 @@ export function parseValue(
     case "vh": {
       const descriptor = resolve(acc, value.arguments[0]);
       return typeof descriptor === "number"
-        ? round((vh.get(acc.effect) / 100) * descriptor)
+        ? round((vh.get(acc.state) / 100) * descriptor)
         : undefined;
     }
     case "vw": {
       const descriptor = resolve(acc, value.arguments[0]);
       return typeof descriptor === "number"
-        ? round((vw.get(acc.effect) / 100) * descriptor)
+        ? round((vw.get(acc.state) / 100) * descriptor)
         : undefined;
     }
     case "em": {
@@ -80,7 +81,7 @@ export function parseValue(
     case "rem": {
       const descriptor = resolve(acc, value.arguments[0]);
       return typeof descriptor === "number"
-        ? round(rem.get(acc.effect) * descriptor)
+        ? round(rem.get(acc.state) * descriptor)
         : undefined;
     }
     case "rnh": {
@@ -180,7 +181,7 @@ export function resolveAnimation(
     acc,
     initialFrame.value,
     prop,
-    props.style,
+    props,
   );
 
   return [
@@ -188,7 +189,7 @@ export function resolveAnimation(
     ...frames.map((frame) => {
       return withDelay(
         delay,
-        withTiming(resolveAnimationValue(acc, frame.value, prop, props.style), {
+        withTiming(resolveAnimationValue(acc, frame.value, prop, props), {
           duration: totalDuration * frame.progress,
           easing: getEasing(timingFunction),
         }),
@@ -205,20 +206,21 @@ function resolveAnimationValue(
 ) {
   if (value === "!INHERIT!") {
     return style[prop] ?? defaultValues[prop];
-  } else if (value === "!INITIAL!") {
-    return defaultValues[prop];
   } else {
     return resolve(acc, value);
   }
 }
 
-// Walk an object, resolving any getters
-export function resolveObject<T extends object>(obj: T) {
-  for (var i in obj) {
-    const v = obj[i];
-    if (typeof v == "object" && v != null) resolveObject(v);
-    else obj[i] = typeof v === "function" ? v() : v;
+export function resolveTransitionValue(acc: PropAccumulator, property: string) {
+  let value: any;
+
+  if (transformKeys.has(property)) {
+    value = acc.transformLookup[property];
+  } else {
+    value = acc.props.style[property];
   }
+
+  return value;
 }
 
 export const timeToMS = (time: Time) => {
@@ -264,24 +266,21 @@ export function setDeepStyle(
 
     // The last token
     if (i === pathTokens.length - 1) {
-      if (Array.isArray(target)) {
-        // This is a transform array
-        const existing = target.find((t) => Object.keys(t)[0] === token);
+      value = parseValue(acc, value);
+      if (transformKeys.has(token)) {
+        target.transform ??= [];
+        const existing = target.transform.find(
+          (t: object) => Object.keys(t)[0] === token,
+        );
         if (existing) {
-          existing[token] = parseValue(acc, value);
+          existing[token] = value;
         } else {
-          target.push({ [token]: parseValue(acc, value) });
+          target.transform.push({ [token]: value });
         }
+        acc.transformLookup[token] = value;
       } else {
-        target[token] = parseValue(acc, value);
+        target[token] = value;
       }
-    } else if (Array.isArray(target)) {
-      const newTargetObj = {};
-      target.push(newTargetObj);
-      target = newTargetObj;
-    } else if (token === "transform") {
-      target.transform ??= [];
-      target = target.transform;
     } else {
       target[token] ??= {};
       target = target[token];
@@ -289,9 +288,24 @@ export function setDeepStyle(
   }
 }
 
+const transformKeys = new Set([
+  "perspective",
+  "translateX",
+  "translateY",
+  "rotate",
+  "rotateX",
+  "rotateY",
+  "rotateZ",
+  "scale",
+  "scaleX",
+  "scaleY",
+  "skewX",
+  "skewY",
+]);
+
 export const defaultValues: Record<
   string,
-  AnimatableValue | (() => AnimatableValue)
+  AnimatableValue | ((effect: Effect) => AnimatableValue)
 > = {
   backgroundColor: "transparent",
   borderBottomColor: "transparent",
@@ -308,8 +322,8 @@ export const defaultValues: Record<
   borderTopWidth: 0,
   borderWidth: 0,
   bottom: 0,
-  color: () => {
-    return colorScheme.get() === "dark" ? "white" : "black";
+  color: (effect) => {
+    return systemColorScheme.get(effect) === "dark" ? "white" : "black";
   },
   flex: 1,
   flexBasis: 1,

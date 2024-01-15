@@ -11,6 +11,7 @@ import {
   AttributeCondition,
   AttributeDependency,
   ExtractedContainerQuery,
+  PropState,
   PseudoClassesQuery,
   StyleRule,
 } from "../../types";
@@ -18,7 +19,6 @@ import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { Effect } from "../observable";
-import { PropState } from "./use-prop-state";
 import { InheritedParentContext } from "./inherited-context";
 
 interface ConditionReference {

@@ -33,7 +33,7 @@ export const globalVariables = {
 /**
  * Color scheme
  */
-const systemColorScheme = observable<"light" | "dark">(
+export const systemColorScheme = observable<"light" | "dark">(
   Appearance.getColorScheme() ?? "light",
 );
 const colorSchemeObservable = observable<"light" | "dark" | undefined>(
