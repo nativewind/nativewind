@@ -14,9 +14,9 @@ import { cssToReactNativeRuntime } from "../css-to-rn";
 
 import "../runtime/components";
 import { cssInterop, remapProps, interopComponents } from "../runtime/api";
-import { opaqueStyles } from "../runtime/native/globals";
 import wrapJSX from "../runtime/wrap-jsx";
 import { ComponentProps, ComponentType, forwardRef } from "react";
+import { opaqueStyles } from "../runtime/native/stylesheet";
 
 export * from "../types";
 export { warnings } from "../runtime/native/globals";
@@ -61,7 +61,7 @@ export const createMockComponent = <
 
   return Object.assign(forwardRef(mock), { mock }) as ComponentType<
     ComponentProps<T> & CssInteropGeneratedProps<M>
-  >;
+  > & { mock: typeof mock };
 };
 
 export const createRemappedComponent = <

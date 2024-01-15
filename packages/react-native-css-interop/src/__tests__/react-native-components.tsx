@@ -56,7 +56,7 @@ test("TextInput", () => {
   registerCSS(
     `.text-black { color: black } 
      .placeholder\\:text-white {
-       @rn-hoist color placeholderTextColor;
+       @rn-move color -placeholderTextColor;
        color: #fff
      }`,
   );
@@ -76,7 +76,7 @@ test("TextInput", () => {
   });
 });
 
-test("ActivityIndicator", () => {
+test.only("ActivityIndicator", () => {
   registerCSS(
     `.bg-black { background-color: black } .text-white { color: white }`,
   );

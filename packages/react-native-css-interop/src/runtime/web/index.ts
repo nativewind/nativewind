@@ -1,6 +1,11 @@
-export { cssInterop, remapProps } from "../api";
+export {
+  cssInterop,
+  remapProps,
+  useColorScheme,
+  useUnstableNativeVariable,
+  vars,
+} from "../api";
 
 export { StyleSheet } from "./stylesheet";
-export { colorScheme, useColorScheme } from "./color-scheme";
-export { useUnstableNativeVariable, vars } from "./variables";
+export { colorScheme } from "./color-scheme";
 export { rem } from "./rem";

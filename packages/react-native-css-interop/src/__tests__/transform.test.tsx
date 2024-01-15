@@ -12,7 +12,7 @@ const A = createMockComponent(View);
 
 beforeEach(() => resetStyles());
 
-test.only("translateX percentage", () => {
+test("translateX percentage", () => {
   registerCSS(`.my-class { width: 120px; transform: translateX(10%); }`);
 
   const component = render(
@@ -52,7 +52,7 @@ test("rotate-180", () => {
 
 test("rotate-45", () => {
   registerCSS(`
-*, ::before, ::after{
+* {
   --tw-translate-x: 0;
   --tw-translate-y: 0;
   --tw-rotate: 0deg;

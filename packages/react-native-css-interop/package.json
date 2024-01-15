@@ -36,7 +36,8 @@
     "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "build:watch": "tsc -p tsconfig.build.json -w",
-    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput"
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "cloc": "npm run build && cloc --by-file --exclude-ext=d.ts ./dist/runtime/native ./dist/runtime/api.native.js ./dist/runtime/observable.js ./dist/runtime/jsx-runtime.js ./dist/runtime/wrap-jsx.js ./dist/runtime/config.js"
   },
   "files": [
     "babel.js",

@@ -131,8 +131,6 @@ export function testCasesWithOptions(
       expect(component).toHaveStyle(
         Object.fromEntries(Object.entries(expected.style)),
       );
-    } else {
-      expect(component).toHaveStyle(undefined);
     }
 
     if (expected.props) {

@@ -1,5 +1,5 @@
 import { fireEvent, render } from "@testing-library/react-native";
-import { Text } from "react-native";
+import { Text, View, ViewProps } from "react-native";
 
 import {
   createMockComponent,
@@ -104,7 +104,7 @@ test("remapped - inline", () => {
   `);
 
   const MyText = createRemappedComponent(
-    ({ style, ...props }) => {
+    ({ style, ...props }: ViewProps) => {
       return <A {...props} style={[{ color: "black" }, style]} />;
     },
     { className2: "style" },
@@ -123,7 +123,7 @@ test("remapped - inline overwritten", () => {
   `);
 
   const MyText = createRemappedComponent(
-    ({ style, ...props }) => {
+    ({ style, ...props }: ViewProps) => {
       return <A {...props} style={[style, { color: "black" }]} />;
     },
     { className: "style" },
@@ -142,7 +142,7 @@ test("remapped - inline important", () => {
   `);
 
   const MyText = createRemappedComponent(
-    ({ style, ...props }) => {
+    ({ style, ...props }: ViewProps) => {
       return <A {...props} style={[style, { color: "black" }]} />;
     },
     { className: "style" },
@@ -162,7 +162,7 @@ test("remapped - inline important existing", () => {
   `);
 
   const MyText = createRemappedComponent(
-    ({ style, ...props }) => {
+    ({ style, ...props }: ViewProps) => {
       return (
         <A {...props} className="blue" style={[style, { color: "black" }]} />
       );

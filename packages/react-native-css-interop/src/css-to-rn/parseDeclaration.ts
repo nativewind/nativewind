@@ -43,7 +43,11 @@ import type {
 
 import type { ExtractionWarning, RuntimeValueDescriptor } from "../types";
 
-type AddStyleProp = (property: string, value: unknown) => void;
+type AddStyleProp = (
+  property: string,
+  value: unknown,
+  moveTokens?: string[],
+) => void;
 
 type HandleStyleShorthand = (
   property: string,
@@ -234,7 +238,9 @@ const validPropertiesLoose = new Set<string>(validProperties);
 export interface ParseDeclarationOptions {
   inlineRem?: number | false;
   addStyleProp: AddStyleProp;
+  addTransformProp: AddStyleProp;
   handleStyleShorthand: HandleStyleShorthand;
+  handleTransformShorthand: HandleStyleShorthand;
   addAnimationProp: AddAnimationDefaultProp;
   addContainerProp: AddContainerProp;
   addTransitionProp: AddTransitionProp;
@@ -255,12 +261,18 @@ export function parseDeclaration(
 ) {
   const {
     addStyleProp,
+    addTransformProp,
     handleStyleShorthand,
+    handleTransformShorthand,
     addAnimationProp,
     addContainerProp,
     addTransitionProp,
     addWarning,
   } = options;
+
+  if ("vendorPrefix" in declaration && declaration.vendorPrefix.length) {
+    return;
+  }
 
   if (declaration.property === "unparsed") {
     if (!isValid(declaration.value.propertyId)) {
@@ -291,16 +303,16 @@ export function parseDeclaration(
     if (declaration.value.propertyId.property === "transform") {
       for (const transform of declaration.value.value as any[]) {
         if (transform.value.name === "translate") {
-          addStyleProp(
+          addTransformProp(
             "translateX",
             parseUnparsed(transform.value.arguments[0], parseOptions),
           );
-          addStyleProp(
+          addTransformProp(
             "translateY",
             parseUnparsed(transform.value.arguments[2], parseOptions),
           );
         } else {
-          addStyleProp(
+          addTransformProp(
             transform.value.name,
             parseUnparsed(transform.value.arguments, parseOptions),
           );
@@ -1305,31 +1317,31 @@ export function parseDeclaration(
       return addAnimationProp(declaration.property, declaration.value);
     case "transform": {
       if (declaration.value.length === 0) {
-        addStyleProp("perspective", undefined);
-        addStyleProp("translateX", undefined);
-        addStyleProp("translateY", undefined);
-        addStyleProp("rotate", undefined);
-        addStyleProp("rotateX", undefined);
-        addStyleProp("rotateY", undefined);
-        addStyleProp("rotateZ", undefined);
-        addStyleProp("scale", undefined);
-        addStyleProp("scaleX", undefined);
-        addStyleProp("scaleY", undefined);
-        addStyleProp("skewX", undefined);
-        addStyleProp("skewY", undefined);
+        addTransformProp("perspective", 1);
+        addTransformProp("translateX", 0);
+        addTransformProp("translateY", 0);
+        addTransformProp("rotate", "0deg");
+        addTransformProp("rotateX", "0deg");
+        addTransformProp("rotateY", "0deg");
+        addTransformProp("rotateZ", "0deg");
+        addTransformProp("scale", 1);
+        addTransformProp("scaleX", 1);
+        addTransformProp("scaleY", 1);
+        addTransformProp("skewX", "0deg");
+        addTransformProp("skewY", "0deg");
         break;
       }
 
       for (const transform of declaration.value) {
         switch (transform.type) {
           case "perspective":
-            addStyleProp(
+            addTransformProp(
               "perspective",
               parseLength(transform.value, parseOptions),
             );
             break;
           case "translate":
-            addStyleProp(
+            addTransformProp(
               "translateX",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value[0],
@@ -1337,7 +1349,7 @@ export function parseDeclaration(
                 parseOptions,
               ),
             );
-            addStyleProp(
+            addTransformProp(
               "translateY",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value[1],
@@ -1347,7 +1359,7 @@ export function parseDeclaration(
             );
             break;
           case "translateX":
-            addStyleProp(
+            addTransformProp(
               "translateX",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value,
@@ -1357,7 +1369,7 @@ export function parseDeclaration(
             );
             break;
           case "translateY":
-            addStyleProp(
+            addTransformProp(
               "translateY",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value,
@@ -1367,38 +1379,68 @@ export function parseDeclaration(
             );
             break;
           case "rotate":
-            addStyleProp("rotate", parseAngle(transform.value, parseOptions));
+            addTransformProp(
+              "rotate",
+              parseAngle(transform.value, parseOptions),
+            );
             break;
           case "rotateX":
-            addStyleProp("rotateX", parseAngle(transform.value, parseOptions));
+            addTransformProp(
+              "rotateX",
+              parseAngle(transform.value, parseOptions),
+            );
             break;
           case "rotateY":
-            addStyleProp("rotateY", parseAngle(transform.value, parseOptions));
+            addTransformProp(
+              "rotateY",
+              parseAngle(transform.value, parseOptions),
+            );
             break;
           case "rotateZ":
-            addStyleProp("rotateZ", parseAngle(transform.value, parseOptions));
+            addTransformProp(
+              "rotateZ",
+              parseAngle(transform.value, parseOptions),
+            );
             break;
           case "scale":
-            handleStyleShorthand("scale", {
+            handleTransformShorthand("scale", {
               scaleX: parseLength(transform.value[0], parseOptions),
               scaleY: parseLength(transform.value[1], parseOptions),
             });
             break;
           case "scaleX":
-            addStyleProp("scaleX", parseLength(transform.value, parseOptions));
+            addTransformProp(
+              "scaleX",
+              parseLength(transform.value, parseOptions),
+            );
             break;
           case "scaleY":
-            addStyleProp("scaleY", parseLength(transform.value, parseOptions));
+            addTransformProp(
+              "scaleY",
+              parseLength(transform.value, parseOptions),
+            );
             break;
           case "skew":
-            addStyleProp("skewX", parseAngle(transform.value[0], parseOptions));
-            addStyleProp("skewY", parseAngle(transform.value[1], parseOptions));
+            addTransformProp(
+              "skewX",
+              parseAngle(transform.value[0], parseOptions),
+            );
+            addTransformProp(
+              "skewY",
+              parseAngle(transform.value[1], parseOptions),
+            );
             break;
           case "skewX":
-            addStyleProp("skewX", parseAngle(transform.value, parseOptions));
+            addTransformProp(
+              "skewX",
+              parseAngle(transform.value, parseOptions),
+            );
             break;
           case "skewY":
-            addStyleProp("skewY", parseAngle(transform.value, parseOptions));
+            addTransformProp(
+              "skewY",
+              parseAngle(transform.value, parseOptions),
+            );
             break;
 
           case "translateZ":
@@ -1559,7 +1601,7 @@ function reduceParseUnparsed(
   tokenOrValues: TokenOrValue[],
   options: ParseDeclarationOptionsWithValueWarning,
   allowUnwrap = false,
-) {
+): RuntimeValueDescriptor | RuntimeValueDescriptor[] {
   const result = tokenOrValues
     .flatMap((tokenOrValue) => parseUnparsed(tokenOrValue, options))
     .filter((v) => v !== undefined);
@@ -1576,11 +1618,11 @@ function reduceParseUnparsed(
 function unparsedFunction(
   token: Extract<TokenOrValue, { type: "function" }>,
   options: ParseDeclarationOptionsWithValueWarning,
-) {
+): RuntimeValueDescriptor {
+  const args = reduceParseUnparsed(token.value.arguments, options);
   return {
-    type: "runtime",
     name: token.value.name,
-    arguments: reduceParseUnparsed(token.value.arguments, options),
+    arguments: Array.isArray(args) ? args : [args],
   };
 }
 
@@ -1590,7 +1632,6 @@ function unparsedKnownShorthand(
 ) {
   return Object.entries(mapping).map(([name, tokenOrValue]) => {
     return {
-      type: "runtime",
       name,
       arguments: [parseUnparsed(tokenOrValue, options)],
     };
@@ -1602,10 +1643,16 @@ function unparsedKnownShorthand(
  * This function best efforts parsing it into a function that we can evaluate at runtime
  */
 function parseUnparsed(
-  tokenOrValue: TokenOrValue | TokenOrValue[] | string | number | undefined,
+  tokenOrValue:
+    | TokenOrValue
+    | TokenOrValue[]
+    | string
+    | number
+    | undefined
+    | null,
   options: ParseDeclarationOptionsWithValueWarning,
-): string | number | boolean | object | undefined {
-  if (tokenOrValue === undefined) {
+): RuntimeValueDescriptor | RuntimeValueDescriptor[] {
+  if (tokenOrValue === undefined || tokenOrValue === null) {
     return;
   }
 
@@ -1632,7 +1679,6 @@ function parseUnparsed(
       const value = tokenOrValue.value;
       if (value.type === "rgb") {
         return {
-          type: "runtime",
           name: "rgba",
           arguments: [
             round(value.r * 255),
@@ -1643,7 +1689,6 @@ function parseUnparsed(
         };
       } else {
         return {
-          type: "runtime",
           name: tokenOrValue.value.type,
           arguments: [
             value.h,
@@ -1656,9 +1701,12 @@ function parseUnparsed(
     }
     case "var": {
       return {
-        type: "runtime",
         name: "var",
-        arguments: [tokenOrValue.value.name.ident, tokenOrValue.value.fallback],
+        delay: true,
+        arguments: [
+          tokenOrValue.value.name.ident,
+          parseUnparsed(tokenOrValue.value.fallback, options),
+        ],
       };
     }
     case "function": {
@@ -1700,7 +1748,6 @@ function parseUnparsed(
           return unparsedFunction(tokenOrValue, options);
         case "hairlineWidth":
           return {
-            type: "runtime",
             name: tokenOrValue.value.name,
             arguments: [],
           };
@@ -1832,6 +1879,7 @@ export function parseLength(
         return {
           name: length.unit,
           arguments: [length.value],
+          delay: true,
         };
       case "in":
       case "cm":
@@ -1881,7 +1929,6 @@ export function parseLength(
         options.addValueWarning(`${length.value}${length.unit}`);
         return undefined;
     }
-
     length.unit satisfies never;
   } else {
     switch (length.type) {
@@ -2335,9 +2382,9 @@ function parseLineHeight(
       return undefined;
     case "number":
       return {
-        type: "runtime",
         name: "em",
         arguments: [lineHeight.value],
+        delay: true,
       };
     case "length": {
       const length = lineHeight.value;
@@ -2416,9 +2463,9 @@ function parseLengthOrCoercePercentageToRuntime(
   if (value.type === "percentage") {
     options.requiresLayout(runtimeName);
     return {
-      type: "runtime",
       name: runtimeName,
       arguments: [value.value],
+      delay: true,
     };
   } else {
     return parseLength(value, options);
@@ -2441,7 +2488,7 @@ function parseRNRuntimeSpecificsFunction(
   name: string,
   args: TokenOrValue[],
   options: ParseDeclarationOptionsWithValueWarning,
-) {
+): RuntimeValueDescriptor {
   let key: string | undefined;
   const runtimeArgs: Record<string, unknown> = {};
 
@@ -2510,10 +2557,9 @@ function parseRNRuntimeSpecificsFunction(
   }
 
   return {
-    type: "runtime",
     name,
     arguments: [runtimeArgs],
-  };
+  } as RuntimeValueDescriptor; // Type this later
 }
 
 function parseTextAlign(
@@ -2601,7 +2647,7 @@ function parseDisplay(
 function parseAspectRatio(
   // This is missing types
   aspectRatio: any,
-) {
+): RuntimeValueDescriptor {
   if (aspectRatio.auto) {
     return "auto";
   } else {
@@ -2616,7 +2662,7 @@ function parseAspectRatio(
 function parseDimension(
   { unit, value }: Extract<Token, { type: "dimension" }>,
   options: ParseDeclarationOptionsWithValueWarning,
-) {
+): RuntimeValueDescriptor {
   switch (unit) {
     case "px":
       return value;
@@ -2625,9 +2671,9 @@ function parseDimension(
     case "rnh":
     case "rnw":
       return {
-        type: "runtime",
         name: unit,
         arguments: [value / 100],
+        delay: true,
       };
     default: {
       return options.addValueWarning(`${value}${unit}`);

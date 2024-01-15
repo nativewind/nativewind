@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import {
   AccessibilityInfo,
   AppState,
@@ -6,115 +5,103 @@ import {
   Dimensions,
   NativeEventSubscription,
 } from "react-native";
-import { Signal, createSignal, useComputed } from "../signals";
-import { INTERNAL_RESET, INTERNAL_SET, STYLE_SCOPES } from "../../shared";
-import {
-  StyleProp,
-  RuntimeValueDescriptor,
-  GroupedRuntimeStyle,
-  ExtractedAnimation,
+import { INTERNAL_RESET, INTERNAL_SET } from "../../shared";
+import type {
+  ColorSchemeVariableValue,
   ExtractionWarning,
+  RuntimeValueDescriptor,
 } from "../../types";
-import { inheritanceContext } from "./component-state";
-
-export const styleSignals = new Map<string, Signal<GroupedRuntimeStyle>>();
-export const opaqueStyles = new WeakMap<object, GroupedRuntimeStyle>();
-export const animationMap = new Map<string, ExtractedAnimation>();
+import {
+  Effect,
+  Observable,
+  ObservableOptions,
+  observable,
+} from "../observable";
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
 
-export const externalClassNameCompilerCallback: {
-  current?: (className: string) => void;
-} = {
-  current: undefined,
+export const externalCallbackRef = {} as {
+  current: ((className: string) => void) | undefined;
 };
 
 export const globalVariables = {
-  root: new Map<string, ColorSchemeSignal>(),
-  universal: new Map<string, ColorSchemeSignal>(),
+  root: new Map<string, Observable<any>>(),
+  universal: new Map<string, Observable<any>>(),
 };
 
-export const rem = createColorSchemeSignal("rem");
-export const vw = viewportUnit("width", Dimensions);
-export const vh = viewportUnit("height", Dimensions);
-function viewportUnit(key: "width" | "height", dimensions: Dimensions) {
-  const signal = createSignal<number>(
-    dimensions.get("window")[key] || 0,
-    "viewport",
-  );
+/**
+ * Color scheme
+ */
+export const systemColorScheme = observable<"light" | "dark">(
+  Appearance.getColorScheme() ?? "light",
+);
+const colorSchemeObservable = observable<"light" | "dark" | undefined>(
+  undefined,
+  { fallback: systemColorScheme },
+);
 
-  let subscription = dimensions.addEventListener("change", ({ window }) => {
-    signal.set(window[key]);
-  });
-
-  const get = () => signal.get() || 0;
-  const reset = (dimensions: Dimensions) => {
-    signal.set(dimensions.get("window")[key] || 0);
-    subscription.remove();
-    subscription = dimensions.addEventListener("change", ({ window }) => {
-      signal.set(window[key]);
-    });
-  };
-
-  return { get, [INTERNAL_RESET]: reset, [INTERNAL_SET]: signal.set };
-}
-
-export const isReduceMotionEnabled = (function createIsReduceMotionEnabled() {
-  const signal = createSignal(false, "isReduceMotionEnabled");
-  // Hopefully this resolves before the first paint...
-  AccessibilityInfo.isReduceMotionEnabled()?.then(signal.set);
-  AccessibilityInfo.addEventListener("reduceMotionChanged", signal.set);
-
-  return { ...signal, [INTERNAL_RESET]: () => signal.set(false) };
-})();
-
-export type ColorSchemeSignal = ReturnType<typeof createColorSchemeSignal>;
+export const colorScheme = {
+  set(value: "light" | "dark" | "system") {
+    if (value === "system") {
+      colorSchemeObservable.set(undefined);
+      appearance.setColorScheme(null);
+    } else {
+      colorSchemeObservable.set(value);
+      appearance.setColorScheme(value);
+    }
+  },
+  get: colorSchemeObservable.get,
+  toggle() {
+    let current = colorSchemeObservable.get();
+    if (current === undefined) current = appearance.getColorScheme() ?? "light";
+    colorSchemeObservable.set(current === "light" ? "dark" : "light");
+  },
+  [INTERNAL_RESET]: (appearance: typeof Appearance) => {
+    colorSchemeObservable.set(undefined);
+    resetAppearanceListeners(appearance, AppState);
+  },
+};
 
 /**
- * A special signal that can be used to set a value for both light and dark color schemes.
- * Currently only used for root and universal variables.
+ * CSS Variables
+ *
+ * Variables can change based on color scheme. So we need to store two values.
  */
-export function createColorSchemeSignal(id: string) {
-  let light = createSignal<any>(undefined, `${id}#light`);
-  let dark = createSignal<any>(undefined, `${id}#dark`);
-
-  const get = () => {
-    return colorScheme.get() === "light"
-      ? light.get()
-      : dark.get() ?? light.get();
-  };
-
-  const peek = () => {
-    return colorScheme.peek() === "light"
-      ? light.peek()
-      : dark.peek() ?? light.peek();
-  };
-
-  const unsubscribe = (subscription: () => void) => {
-    dark.unsubscribe(subscription);
-    light.unsubscribe(subscription);
-  };
-
-  const set = (value: Record<string, any> | any) => {
-    if (typeof value === "object") {
-      if ("dark" in value) dark.set(value.dark);
-      if ("light" in value) light.set(value.light);
-    } else {
-      light.set(value);
-      dark.set(value);
-    }
-  };
+export function cssVariableObservable(
+  value?: ColorSchemeVariableValue,
+  { name }: ObservableOptions<never> = {},
+) {
+  const light = observable(value?.light, { name: `${name}#light` });
+  const dark = observable(value?.dark, {
+    name: `${name}#dark`,
+    fallback: light,
+  });
 
   return {
-    id,
-    get,
-    set,
-    peek,
-    unsubscribe,
+    get(effect?: Effect) {
+      return colorScheme.get(effect) === "light"
+        ? light.get(effect)
+        : dark.get(effect);
+    },
+    set(
+      value: ColorSchemeVariableValue | RuntimeValueDescriptor,
+      notify = false,
+    ) {
+      if (typeof value === "object" && value) {
+        if ("dark" in value) dark.set(value.dark, notify);
+        if ("light" in value) light.set(value.light, notify);
+      } else {
+        light.set(value, notify);
+        dark.set(value, notify);
+      }
+    },
   };
 }
 
+/**
+ * Appearance
+ */
 let appearance = Appearance;
 let appearanceListener: NativeEventSubscription | undefined;
 let appStateListener: NativeEventSubscription | undefined;
@@ -129,83 +116,60 @@ function resetAppearanceListeners(
 
   appearanceListener = appearance.addChangeListener((state) => {
     if (AppState.currentState === "active") {
-      _colorScheme.set(state.colorScheme ?? "light");
+      systemColorScheme.set(state.colorScheme ?? "light", true);
     }
   });
 
   appStateListener = appState.addEventListener("change", (type) => {
     if (type === "active") {
-      _colorScheme.set(appearance.getColorScheme() ?? "light");
+      systemColorScheme.set(appearance.getColorScheme() ?? "light", true);
     }
   });
 }
 resetAppearanceListeners(appearance, AppState);
 
-const _colorScheme = createSignal<"light" | "dark" | "system">(
-  "system",
-  "systemColorScheme",
-);
-export const colorScheme = {
-  ..._colorScheme,
-  set(value: "light" | "dark" | "system") {
-    _colorScheme.set(value);
-    if (value === "system") {
-      appearance.setColorScheme(null);
-    } else {
-      appearance.setColorScheme(value);
-    }
-  },
-  get() {
-    let current = _colorScheme.get();
-    if (current === "system") current = appearance.getColorScheme() ?? "light";
-    return current;
-  },
-  toggle() {
-    let current = _colorScheme.peek();
-    if (current === "system") current = appearance.getColorScheme() ?? "light";
-    _colorScheme.set(current === "light" ? "dark" : "light");
-  },
-  [INTERNAL_RESET]: (appearance: typeof Appearance) => {
-    _colorScheme.set("system");
-    resetAppearanceListeners(appearance, AppState);
-  },
-};
+/**
+ * rem unit value
+ */
+export const rem = observable(14);
 
-export function useColorScheme() {
-  return useComputed(() => ({
-    colorScheme: colorScheme.get(),
-    setColorScheme: colorScheme.set,
-    toggleColorScheme: colorScheme.toggle,
-  }));
-}
-
-export function vars(variables: Record<string, RuntimeValueDescriptor>) {
-  const style: StyleProp = {};
-  opaqueStyles.set(style, {
-    scope: STYLE_SCOPES.SELF,
-    1: [
-      {
-        $$type: "runtime",
-        scope: STYLE_SCOPES.SELF,
-        variables: Object.entries(variables).map(([name, value]) => {
-          return [name.startsWith("--") ? name : `--${name}`, value];
-        }),
-        specificity: {
-          A: 0,
-          B: 0,
-          C: 0,
-          I: 0,
-          O: 0,
-          S: 0,
-          inline: 1,
-        },
-      },
-    ],
+/**
+ * Viewport Units
+ */
+const viewport = observable(Dimensions.get("window"));
+let windowEventSubscription: ReturnType<typeof Dimensions.addEventListener>;
+const viewportReset = (dimensions: Dimensions) => {
+  viewport.set(dimensions.get("window"));
+  windowEventSubscription?.remove();
+  windowEventSubscription = dimensions.addEventListener("change", (size) => {
+    return viewport.set(size.window, true);
   });
-  return style;
-}
-
-export const useUnstableNativeVariable = (name: string) => {
-  const state = useContext(inheritanceContext);
-  return useComputed(() => state.getVariable(name), state);
 };
+viewportReset(Dimensions);
+export const vw = {
+  get: (effect?: Effect) => viewport.get(effect).width,
+  [INTERNAL_RESET]: viewportReset,
+  [INTERNAL_SET](value: number) {
+    viewport.set({ ...viewport.get(), width: value });
+  },
+};
+export const vh = {
+  get: (effect?: Effect) => viewport.get(effect).height,
+  [INTERNAL_RESET]: viewportReset,
+  [INTERNAL_SET](value: number) {
+    viewport.set({ ...viewport.get(), height: value });
+  },
+};
+
+/**
+ * isReduceMotionEnabled
+ */
+export const isReduceMotionEnabled = Object.assign(
+  observable<boolean>(false, { name: "isReduceMotionEnabled" }),
+  { [INTERNAL_RESET]: () => isReduceMotionEnabled.set(false) },
+);
+// Hopefully this resolves before the first paint...
+AccessibilityInfo.isReduceMotionEnabled()?.then(isReduceMotionEnabled.set);
+AccessibilityInfo.addEventListener("reduceMotionChanged", (value) => {
+  isReduceMotionEnabled.set(value, true);
+});

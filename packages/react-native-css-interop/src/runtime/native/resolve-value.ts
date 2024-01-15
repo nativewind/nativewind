@@ -5,47 +5,172 @@ import {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
-import { EasingFunction, Time } from "lightningcss";
-import {
-  RuntimeValue,
+import type { EasingFunction, Time } from "lightningcss";
+import type {
+  PropAccumulator,
   RuntimeValueDescriptor,
   RuntimeValueFrame,
 } from "../../types";
-import { interopGlobal } from "../signals";
-import type { PropStateEffect } from "./prop-state";
-import { colorScheme, rem, vh, vw } from "./globals";
+import { rem, systemColorScheme, vh, vw } from "./globals";
+import { Effect } from "../observable";
+import { transformKeys } from "../../shared";
 
 export function resolve(
-  args:
-    | RuntimeValue
-    | RuntimeValueDescriptor
-    | Array<RuntimeValue | RuntimeValueDescriptor>,
+  acc: PropAccumulator,
+  args: RuntimeValueDescriptor,
 ): any {
+  if (typeof args !== "object") {
+    return args;
+  }
+
+  if (!Array.isArray(args)) {
+    return "arguments" in args ? parseValue(acc, args) : args;
+  }
+
   let resolved = [];
-  if (args === undefined) return;
-  if (Array.isArray(args)) {
-    for (const arg of args) {
-      resolved.push(resolve(arg));
+
+  for (let value of args) {
+    value = resolve(acc, value);
+
+    if (value !== undefined) {
+      resolved.push(value);
     }
-    resolved = resolved.flat(10);
-    if (resolved.length === 0) {
-      return;
-    } else if (resolved.length === 1) {
-      return resolved[0];
-    } else {
-      return resolved;
-    }
-  } else if (typeof args === "function") {
-    return resolve(args());
-  } else {
-    const value = parseValue(args);
-    if (value === undefined || Number.isNaN(value)) return;
-    if (typeof value === "function") return resolve(value());
+  }
+
+  return resolved;
+}
+
+export function parseValue(
+  acc: PropAccumulator,
+  value: RuntimeValueDescriptor | string | number | boolean,
+): any {
+  if (typeof value !== "object" || !value) {
     return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((v) => parseValue(acc, v));
+  }
+
+  if (!("name" in value)) return value;
+
+  switch (value.name) {
+    case "var": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "string"
+        ? (acc.getVariable(descriptor) as any)
+        : undefined;
+    }
+    case "vh": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "number"
+        ? round((vh.get(acc.state) / 100) * descriptor)
+        : undefined;
+    }
+    case "vw": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "number"
+        ? round((vw.get(acc.state) / 100) * descriptor)
+        : undefined;
+    }
+    case "em": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "number"
+        ? round(acc.getFontSize() * descriptor)
+        : undefined;
+    }
+    case "rem": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "number"
+        ? round(rem.get(acc.state) * descriptor)
+        : undefined;
+    }
+    case "rnh": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "number"
+        ? round(acc.getHeight() * descriptor)
+        : undefined;
+    }
+    case "rnw": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "number"
+        ? round(acc.getWidth() * descriptor)
+        : undefined;
+    }
+    case "rgb":
+    case "rgba": {
+      const args = resolve(acc, value.arguments).flat(10);
+      if (args.length === 3) {
+        return `rgb(${args.join(", ")})`;
+      } else if (args.length === 4) {
+        return `rgba(${args.join(", ")})`;
+      } else {
+        return;
+      }
+    }
+    case "hsla": {
+      const args = resolve(acc, value.arguments).flat(10);
+      if (args.length === 3) {
+        return `hsl(${args.join(" ")})`;
+      } else if (args.length === 4) {
+        return `hsla(${args.join(" ")})`;
+      } else {
+        return;
+      }
+    }
+    case "hairlineWidth": {
+      return StyleSheet.hairlineWidth;
+    }
+    case "platformColor": {
+      return PlatformColor(...(value.arguments as any[])) as unknown as string;
+    }
+    case "platformSelect": {
+      return resolve(acc, Platform.select(value.arguments[0] as any));
+    }
+    case "getPixelSizeForLayoutSize": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "number"
+        ? PixelRatio.getPixelSizeForLayoutSize(descriptor)
+        : undefined;
+    }
+    case "fontScale": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "number"
+        ? PixelRatio.getFontScale() * descriptor
+        : undefined;
+    }
+    case "pixelScale": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "number"
+        ? PixelRatio.get() * descriptor
+        : undefined;
+    }
+    case "pixelScaleSelect": {
+      const specifics = value.arguments[0] as any;
+      return resolve(acc, specifics[PixelRatio.get()] ?? specifics["default"]);
+    }
+    case "fontScaleSelect": {
+      const specifics = value.arguments[0] as any;
+      return resolve(
+        acc,
+        specifics[PixelRatio.getFontScale()] ?? specifics["default"],
+      );
+    }
+    case "roundToNearestPixel": {
+      const descriptor = resolve(acc, value.arguments[0]);
+      return typeof descriptor === "number"
+        ? PixelRatio.roundToNearestPixel(descriptor)
+        : undefined;
+    }
+    default: {
+      const args = resolve(acc, value.arguments).join(",");
+      return `${value.name}(${args})`;
+    }
   }
 }
 
 export function resolveAnimation(
+  acc: PropAccumulator,
   [initialFrame, ...frames]: RuntimeValueFrame[],
   prop: string,
   props: Record<string, any>,
@@ -54,9 +179,10 @@ export function resolveAnimation(
   timingFunction: EasingFunction,
 ): [AnimatableValue, AnimatableValue, ...AnimatableValue[]] {
   const initialValue = resolveAnimationValue(
+    acc,
     initialFrame.value,
     prop,
-    props.style,
+    props,
   );
 
   return [
@@ -64,7 +190,7 @@ export function resolveAnimation(
     ...frames.map((frame) => {
       return withDelay(
         delay,
-        withTiming(resolveAnimationValue(frame.value, prop, props.style), {
+        withTiming(resolveAnimationValue(acc, frame.value, prop, props), {
           duration: totalDuration * frame.progress,
           easing: getEasing(timingFunction),
         }),
@@ -74,161 +200,28 @@ export function resolveAnimation(
 }
 
 function resolveAnimationValue(
+  acc: PropAccumulator,
   value: RuntimeValueDescriptor,
   prop: string,
   style: Record<string, any> = {},
 ) {
   if (value === "!INHERIT!") {
     return style[prop] ?? defaultValues[prop];
-  } else if (value === "!INITIAL!") {
-    return defaultValues[prop];
   } else {
-    return resolve(value);
+    return resolve(acc, value);
   }
 }
 
-export function parseValue(
-  value: RuntimeValueDescriptor | string | number | boolean,
-): RuntimeValue {
-  if (
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean"
-  ) {
-    return value;
+export function resolveTransitionValue(acc: PropAccumulator, property: string) {
+  let value: any;
+
+  if (transformKeys.has(property)) {
+    value = acc.transformLookup[property];
+  } else {
+    value = acc.props.style[property];
   }
 
-  if (!("name" in value)) return value;
-
-  switch (value.name) {
-    case "var": {
-      return function () {
-        return getVariable(value.arguments[0]);
-      };
-    }
-    case "vh": {
-      return function () {
-        return round((vh.get() / 100) * value.arguments[0]);
-      };
-    }
-    case "vw": {
-      return function () {
-        return round((vw.get() / 100) * value.arguments[0]);
-      };
-    }
-    case "em": {
-      return function () {
-        const style = getCurrentEffect().getProps().style;
-        if (style && typeof style.fontSize === "number") {
-          return round(Number((style.fontSize || 0) * value.arguments[0]));
-        }
-      };
-    }
-    case "rem": {
-      return function () {
-        return round(rem.get() * value.arguments[0]);
-      };
-    }
-    case "rnh": {
-      return function () {
-        return round(getDimensions("height") * value.arguments[0]);
-      };
-    }
-    case "rnw": {
-      return function () {
-        return round(getDimensions("width") * value.arguments[0]);
-      };
-    }
-    case "rgb":
-    case "rgba": {
-      return function () {
-        const args = resolve(value.arguments);
-        if (args.length === 3) {
-          return `rgb(${args.join(", ")})`;
-        } else if (args.length === 4) {
-          return `rgba(${args.join(", ")})`;
-        } else {
-          return;
-        }
-      };
-    }
-    case "hsla": {
-      return function () {
-        const args = resolve(value.arguments);
-        if (args.length === 3) {
-          return `hsl(${args.join(" ")})`;
-        } else if (args.length === 4) {
-          return `hsla(${args.join(" ")})`;
-        } else {
-          return;
-        }
-      };
-    }
-    case "hairlineWidth": {
-      return StyleSheet.hairlineWidth;
-    }
-    case "platformColor": {
-      return PlatformColor(...value.arguments) as unknown as string;
-    }
-    case "platformSelect": {
-      return function () {
-        return resolve([Platform.select(value.arguments[0])]);
-      };
-    }
-    case "getPixelSizeForLayoutSize": {
-      return function () {
-        return PixelRatio.getPixelSizeForLayoutSize(
-          Number(resolve(value.arguments[0])),
-        );
-      };
-    }
-    case "fontScale": {
-      return function () {
-        return PixelRatio.getFontScale() * Number(resolve(value.arguments[0]));
-      };
-    }
-    case "pixelScale": {
-      return function () {
-        return PixelRatio.get() * Number(resolve(value.arguments[0]));
-      };
-    }
-    case "pixelScaleSelect": {
-      return function () {
-        const specifics = value.arguments[0];
-        return resolve(specifics[PixelRatio.get()] ?? specifics["default"]);
-      };
-    }
-    case "fontScaleSelect": {
-      return function () {
-        const specifics = value.arguments[0];
-        return resolve(
-          specifics[PixelRatio.getFontScale()] ?? specifics["default"],
-        );
-      };
-    }
-    case "roundToNearestPixel": {
-      return function () {
-        return PixelRatio.roundToNearestPixel(
-          Number(resolve(value.arguments[0])),
-        );
-      };
-    }
-    default: {
-      return function () {
-        const args = resolve(value.arguments).join(",");
-        return `${value.name}(${args})`;
-      };
-    }
-  }
-}
-
-// Walk an object, resolving any getters
-export function resolveObject<T extends object>(obj: T) {
-  for (var i in obj) {
-    const v = obj[i];
-    if (typeof v == "object" && v != null) resolveObject(v);
-    else obj[i] = typeof v === "function" ? v() : v;
-  }
+  return value;
 }
 
 export const timeToMS = (time: Time) => {
@@ -237,36 +230,6 @@ export const timeToMS = (time: Time) => {
 
 function round(number: number) {
   return Math.round((number + Number.EPSILON) * 100) / 100;
-}
-
-function getCurrentEffect() {
-  return interopGlobal.current as unknown as PropStateEffect;
-}
-
-function getDimensions(
-  dimension: "width" | "height" | "both",
-  prop = "style",
-): any {
-  const effect = getCurrentEffect();
-  const style = effect.getProps()[prop];
-
-  if (dimension === "width") {
-    return typeof style?.width === "number" ? style.width : effect.getWidth();
-  } else if (dimension === "height") {
-    return typeof style?.height === "number"
-      ? style.height
-      : effect.getHeight();
-  } else {
-    return {
-      width: typeof style?.width === "number" ? style.width : effect.getWidth(),
-      height:
-        typeof style?.height === "number" ? style.height : effect.getHeight(),
-    };
-  }
-}
-
-function getVariable(name: any) {
-  return resolve(getCurrentEffect().getVariable(name));
 }
 
 export function getEasing(timingFunction: EasingFunction) {
@@ -293,9 +256,42 @@ export function getEasing(timingFunction: EasingFunction) {
   }
 }
 
+export function setDeepStyle(
+  acc: PropAccumulator,
+  pathTokens: string[],
+  value: any,
+  target: Record<string, any> = acc.props,
+) {
+  for (let i = 0; i < pathTokens.length; i++) {
+    const token = pathTokens[i];
+
+    // The last token
+    if (i === pathTokens.length - 1) {
+      value = parseValue(acc, value);
+      if (transformKeys.has(token)) {
+        target.transform ??= [];
+        const existing = target.transform.find(
+          (t: object) => Object.keys(t)[0] === token,
+        );
+        if (existing) {
+          existing[token] = value;
+        } else {
+          target.transform.push({ [token]: value });
+        }
+        acc.transformLookup[token] = value;
+      } else {
+        target[token] = value;
+      }
+    } else {
+      target[token] ??= {};
+      target = target[token];
+    }
+  }
+}
+
 export const defaultValues: Record<
   string,
-  AnimatableValue | (() => AnimatableValue)
+  AnimatableValue | ((effect: Effect) => AnimatableValue)
 > = {
   backgroundColor: "transparent",
   borderBottomColor: "transparent",
@@ -312,8 +308,8 @@ export const defaultValues: Record<
   borderTopWidth: 0,
   borderWidth: 0,
   bottom: 0,
-  color: () => {
-    return colorScheme.get() === "dark" ? "white" : "black";
+  color: (effect) => {
+    return systemColorScheme.get(effect) === "dark" ? "white" : "black";
   },
   flex: 1,
   flexBasis: 1,

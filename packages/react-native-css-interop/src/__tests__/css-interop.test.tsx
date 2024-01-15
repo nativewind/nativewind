@@ -16,7 +16,6 @@ beforeEach(() => {
 });
 
 test("mapping", () => {
-  // @ts-expect-error - `differentStyle` is not a valid prop
   const A = createMockComponent(View, { className: "differentStyle" });
 
   registerCSS(
@@ -37,7 +36,6 @@ test("mapping", () => {
 });
 
 test("multiple mapping", () => {
-  // @ts-expect-error - `differentStyle` is not a valid prop
   const A = createMockComponent(View, { a: "styleA", b: "styleB" });
 
   registerCSS(

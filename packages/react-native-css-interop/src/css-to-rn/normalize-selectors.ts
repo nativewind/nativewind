@@ -2,7 +2,7 @@ import type { MediaQuery, Selector, SelectorList } from "lightningcss";
 import {
   Specificity,
   ExtractRuleOptions,
-  CompilerStyleMeta,
+  StyleRule,
   AttributeCondition,
 } from "../types";
 
@@ -23,7 +23,7 @@ export type NormalizeSelector =
     };
 
 export function normalizeSelectors(
-  extractedStyle: CompilerStyleMeta,
+  extractedStyle: StyleRule,
   selectorList: SelectorList,
   options: ExtractRuleOptions,
   selectors: NormalizeSelector[] = [],
@@ -139,6 +139,7 @@ export function normalizeSelectors(
           if (component.name.startsWith("data-")) {
             selector.attrs.push({
               ...component,
+              name: toRNProperty(component.name.replace("data-", "")),
               type: "data-attribute",
             });
           } else {
@@ -323,4 +324,8 @@ function isDarkDefaultVariableSelector(
     second.value === "descendant" &&
     third.type === "universal"
   );
+}
+
+export function toRNProperty(str: string) {
+  return str.replace(/^-rn-/, "").replace(/-./g, (x) => x[1].toUpperCase());
 }

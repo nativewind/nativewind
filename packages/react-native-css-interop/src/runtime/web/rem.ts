@@ -1,28 +1,29 @@
 import { INTERNAL_RESET } from "../../shared";
-import { createSignal } from "../signals";
+import { Effect, observable } from "../observable";
 
 const isSSR = globalThis.window === undefined;
 
-export const rem = (function createRem(defaultValue: number = 16) {
-  const signal = createSignal<number>(
-    isSSR
-      ? defaultValue
-      : Number.parseFloat(
-          globalThis.window.getComputedStyle(
-            globalThis.window.document.documentElement,
-          ).fontSize,
-        ),
-    "rem",
-  );
+export const _rem = observable(
+  isSSR
+    ? 16
+    : Number.parseFloat(
+        globalThis.window.getComputedStyle(
+          globalThis.window.document.documentElement,
+        ).fontSize,
+      ) || 16,
+);
 
-  const get = () => signal.get();
-  const set = (nextValue: number) => {
-    signal.set(nextValue || defaultValue);
+export const rem = {
+  get(effect?: Effect) {
+    return _rem.get(effect);
+  },
+  set(value: number, notify = false) {
+    _rem.set(value, notify);
     if (!isSSR) {
-      globalThis.window.document.documentElement.style.fontSize = `${nextValue}px`;
+      globalThis.window.document.documentElement.style.fontSize = `${value}px`;
     }
-  };
-  const reset = () => set(defaultValue);
-
-  return { get, set, [INTERNAL_RESET]: reset };
-})();
+  },
+  [INTERNAL_RESET](value = 16) {
+    _rem.set(value, false);
+  },
+};

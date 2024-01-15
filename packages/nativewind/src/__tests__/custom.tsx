@@ -10,34 +10,33 @@ describe("Custom - Ripple Color", () => {
   ]);
 });
 
-describe("Custom - prop/<prop>", () => {
-  testCases(["prop/test:color-black", { props: { test: "rgba(0, 0, 0, 1)" } }]);
-});
-
-describe("Custom - prop-[attribute]/<prop>", () => {
-  testCases([
-    "prop-[font-size]/test:text-base",
-    { props: { test: 14 }, style: { lineHeight: 21 } },
-  ]);
-});
-
-describe("Custom - move/<prop>", () => {
-  testCases([
-    "move/test:text-base",
-    { props: { test: { fontSize: 14, lineHeight: 21 } } },
-  ]);
-});
-
-describe("Custom - move-[attribute]/<prop>", () => {
-  testCases([
-    "move-[font-size]/test:text-base",
-    { props: { test: { fontSize: 14 } }, style: { lineHeight: 21 } },
-  ]);
-});
-
 describe("Custom - Ripple Borderless", () => {
   testCases([
     "ripple-borderless",
     { props: { android_ripple: { borderless: true } } },
+  ]);
+});
+
+describe("Custom - prop/<props>", () => {
+  testCases(
+    ["move/^test:color-black", { props: { test: "rgba(0, 0, 0, 1)" } }],
+    [
+      "move/^test.nested:color-black",
+      { props: { test: { nested: "rgba(0, 0, 0, 1)" } } },
+    ],
+  );
+});
+
+describe("Custom - prop-[attribute]", () => {
+  testCases([
+    "move-[test]:color-black",
+    { style: { test: "rgba(0, 0, 0, 1)" } },
+  ]);
+});
+
+describe("Custom - prop-[attribute]/<prop>", () => {
+  testCases([
+    "move-[font-size]/^test:text-base",
+    { props: { test: 14 }, style: { lineHeight: 21 } },
   ]);
 });

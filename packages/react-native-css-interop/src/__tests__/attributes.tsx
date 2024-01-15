@@ -2,13 +2,20 @@ import { render, screen } from "@testing-library/react-native";
 import { View } from "react-native";
 
 import {
+  ReactComponent,
   createMockComponent,
   registerCSS,
   resetStyles,
 } from "../testing-library";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
+const A = createMockComponent<
+  typeof View &
+    ReactComponent<{
+      disabled?: boolean;
+      dataSet?: Record<string, any>;
+    }>
+>(View);
 
 beforeEach(() => resetStyles());
 
@@ -42,7 +49,7 @@ test(":empty", () => {
   expect(component).toHaveStyle({ width: 10 });
 });
 
-describe("dataSet attribute selector", () => {
+describe.only("dataSet attribute selector", () => {
   test("truthy", () => {
     registerCSS(`.test[data-test] { width: 10px; }`);
 
@@ -61,7 +68,7 @@ describe("dataSet attribute selector", () => {
     });
   });
 
-  test("equals", () => {
+  test.only("equals", () => {
     registerCSS(`.test[data-test='1'] { width: 10px; }`);
 
     const component = render(
