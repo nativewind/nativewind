@@ -14,11 +14,16 @@ import type {
 
 export const interopComponents = new Map<object | string, NormalizedOptions>();
 
-export function render(jsx: any, type: any, props: any, ...args: any) {
+export function render(
+  jsx: any,
+  type: any,
+  props: Record<string, any> | null,
+  ...args: any
+) {
   const config = interopComponents.get(type);
 
   if (config) {
-    props = { ...props };
+    props = props ? { ...props } : {};
     for (const entry of config.config) {
       const key = entry[0];
       const sourceProp = entry[1];
@@ -60,7 +65,7 @@ export const remapProps = cssInterop;
 
 export function createElementAndCheckCssInterop(
   type: string | FunctionComponent | ComponentClass,
-  props: Record<string, any>,
+  props: Record<string, any> | null,
   ...children: ReactNode[]
 ) {
   return render(createElement, type, props, ...children);

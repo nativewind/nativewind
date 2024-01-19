@@ -24,7 +24,9 @@ export const defaultCSSInterop: InteropFunction = (
   originalProps,
   children,
 ) => {
-  let props: Record<string, any> = { ...originalProps, children };
+  let props: Record<string, any> = originalProps
+    ? { ...originalProps, children }
+    : { children };
   const parent = useContext(interopContext);
   const storeRef = useRef<ReturnType<typeof createInteropStore>>();
   if (!storeRef.current) {

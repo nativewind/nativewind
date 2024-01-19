@@ -184,7 +184,7 @@ export type BasicInteropFunction = <P>(
 export type InteropFunction = (
   type: any,
   options: NormalizedOptions,
-  props: Record<string, any>,
+  props: Record<string, any> | null,
   children: ReactNode,
 ) => ReactElement;
 

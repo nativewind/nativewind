@@ -18,9 +18,9 @@ import { opaqueStyles, styleSignals } from "../native/globals";
 
 export type InteropComponent = {
   type: ComponentType<any>;
-  check: (props: Record<string, any>) => boolean;
+  check: (props: Record<string, any> | null) => boolean;
   createElement: (
-    props: Record<string, any>,
+    props: Record<string, any> | null,
     ...children: ReactNode[]
   ) => ReturnType<typeof createElement>;
 };
@@ -99,12 +99,14 @@ export const cssInterop: CssInterop = (component, mapping) => {
   const interopComponent: InteropComponent = {
     type: CssInteropComponent,
     createElement(props, ...children) {
-      if (props.children) {
+      if (props && props.children) {
         children = props.children;
       }
       return defaultCSSInterop(component, config, props, children);
     },
-    check(props: Record<string, unknown>) {
+    check(props: Record<string, unknown> | null) {
+      if (props === null) return false;
+
       for (const [targetProp, source, nativeStyleToProp] of config.config) {
         if (nativeStyleToProp) return true;
 
