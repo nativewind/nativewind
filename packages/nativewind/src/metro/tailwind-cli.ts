@@ -170,7 +170,7 @@ export async function tailwindCli(
     });
 }
 
-async function getAvailablePort(port = 8089): Promise<number> {
+async function getAvailablePort(port = 8082): Promise<number> {
   return checkAvailablePort(port).catch(() => getAvailablePort(port + 1));
 }
 
