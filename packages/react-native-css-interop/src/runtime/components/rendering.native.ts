@@ -201,7 +201,7 @@ export function createElementAndCheckCssInterop(
 
   return !interop || !interop.check(props)
     ? createElement(type, props, ...children)
-    : interop.createElement(props, children);
+    : interop.createElement(props, ...children);
 }
 
 function getNormalizeConfig(
