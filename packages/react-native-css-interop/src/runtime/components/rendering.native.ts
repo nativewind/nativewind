@@ -102,7 +102,7 @@ export const cssInterop: CssInterop = (component, mapping) => {
       if (props && props.children) {
         children = props.children;
       }
-      return defaultCSSInterop(component, config, props, children);
+      return defaultCSSInterop(component, config, props, ...children);
     },
     check(props: Record<string, unknown> | null) {
       if (props === null) return false;

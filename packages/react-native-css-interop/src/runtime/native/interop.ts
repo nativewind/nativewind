@@ -22,7 +22,7 @@ export const defaultCSSInterop: InteropFunction = (
   component,
   options,
   originalProps,
-  children,
+  ...children
 ) => {
   let props: Record<string, any> = originalProps
     ? { ...originalProps, children }
@@ -83,12 +83,12 @@ export const defaultCSSInterop: InteropFunction = (
   }
 
   if (state.context) {
-    children = createElement(component, props, children);
+    children = [createElement(component, props, ...children)];
     props = { value: state.context };
     component = InteropProvider;
   }
 
-  return createElement(component, props, children);
+  return createElement(component, props, ...children);
 };
 
 /**
