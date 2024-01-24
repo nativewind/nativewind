@@ -14,6 +14,7 @@ export function expoColorSchemeWarning() {
 
 function isExpo() {
   try {
+    require("expo");
     require("@expo/config");
     return true;
   } catch {
