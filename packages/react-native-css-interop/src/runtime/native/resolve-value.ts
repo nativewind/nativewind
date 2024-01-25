@@ -113,7 +113,9 @@ export function parseValue(
       if (args.length === 3) {
         return `hsl(${args.join(" ")})`;
       } else if (args.length === 4) {
-        return `hsla(${args.join(" ")})`;
+        return `hsla(${
+          args.slice(0, 3).join(' ') + ' / ' + args[3]
+        })`;
       } else {
         return;
       }
