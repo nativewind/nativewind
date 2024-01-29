@@ -59,8 +59,8 @@ export const defaultCSSInterop: InteropFunction = (
 
   // Merge the styled props with the props passed to the component
   props = {
-    ...props,
     ...state.props,
+    ...props,
   };
 
   // Delete any props that were used as sources
