@@ -16,7 +16,7 @@ module.exports = {
   },
   plugins: [
     // Set a default value on the `:root` element
-    ({ addBase }) => addBase({ ":root": "--color-primary: 255 0 0" }),
+    ({ addBase }) => addBase({ ":root": { "--color-primary": "255 0 0" } }),
   ],
 };
 ```
