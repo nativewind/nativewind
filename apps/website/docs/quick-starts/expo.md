@@ -22,8 +22,14 @@ You will need to install `nativewind` and it's peer dependency `tailwindcss`.
 
 ```bash
 yarn add nativewind
-yarn add --dev tailwindcss
+yarn add --dev tailwindcss@3.3.2
 ```
+
+:::warning
+
+ Make sure to install `tailwindcss` v3.3.2 as newer versions aren't compatible with `nativewind`. For more information follow this [discussion](https://github.com/marklawlor/nativewind/issues/498).
+
+:::
 
 ## 2. Setup Tailwind CSS
 
