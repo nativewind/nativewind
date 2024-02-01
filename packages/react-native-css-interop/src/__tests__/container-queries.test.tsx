@@ -66,6 +66,8 @@ test("container query width", () => {
     </Parent>,
   );
 
+  debugger;
+
   fireEvent(parent, "layout", {
     nativeEvent: {
       layout: {

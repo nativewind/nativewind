@@ -1,8 +1,10 @@
 import { ComponentType, createElement, forwardRef, useRef } from "react";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { ComponentState } from "../api.native";
 import { LayoutChangeEvent, Pressable, View } from "react-native";
-import { inheritanceContext } from "./inherited-context";
+import { containerContext, variableContext } from "./globals";
+
+import type { ComponentState } from "./native-interop";
+import { observable } from "../observable";
 
 const animatedCache = new Map<
   ComponentType<any> | string,
@@ -11,8 +13,9 @@ const animatedCache = new Map<
 
 export const UpgradeState = {
   NONE: 0,
-  UPGRADED: 1,
-  WARNED: 2,
+  SHOULD_UPGRADE: 1,
+  UPGRADED: 2,
+  WARNED: 3,
 };
 
 export function renderComponent(
@@ -20,11 +23,14 @@ export function renderComponent(
   state: ComponentState,
   props: Record<string, any>,
   originalProps: Record<string, any>,
-  resetContext: boolean,
+  variables: Record<string, any>,
+  containers: Record<string, any>,
 ) {
-  const shouldWarn = state.upgradeWarning.canWarn;
+  const shouldWarn = state.upgrades.canWarn;
+  const isContainer = state.upgrades.containers;
 
-  if (state.active) {
+  if (state.active || isContainer) {
+    state.active ??= observable(false);
     props.onPressIn = (event: unknown) => {
       originalProps.onPressIn?.(event);
       state.active!.set(true);
@@ -34,7 +40,8 @@ export function renderComponent(
       state.active!.set(false);
     };
   }
-  if (state.hover) {
+  if (state.hover || isContainer) {
+    state.hover ??= observable(false);
     props.onHoverIn = (event: unknown) => {
       originalProps.onHoverIn?.(event);
       state.hover!.set(true);
@@ -45,7 +52,8 @@ export function renderComponent(
     };
   }
 
-  if (state.focus) {
+  if (state.focus || isContainer) {
+    state.focus ??= observable(false);
     props.onFocus = (event: unknown) => {
       originalProps.onFocus?.(event);
       state.focus!.set(true);
@@ -65,7 +73,8 @@ export function renderComponent(
     };
   }
 
-  if (state.layout) {
+  if (state.layout || isContainer) {
+    state.layout ??= observable([0, 0]);
     props.onLayout = (event: LayoutChangeEvent) => {
       originalProps.onLayout?.(event);
       const layout = event.nativeEvent.layout;
@@ -79,55 +88,67 @@ export function renderComponent(
   // TODO: We can probably remove this in favor of using `new Pressability()`
   if (component === View && (state.hover || state.active || state.focus)) {
     component = Pressable;
-    if (shouldWarn && state.upgradeWarning.pressable === UpgradeState.NONE) {
+    if (shouldWarn && state.upgrades.pressable === UpgradeState.NONE) {
       printUpgradeWarning(
         `Converting View to Pressable should only happen during the initial render otherwise it will remount the View.\n\nTo prevent this warning avoid adding styles which use pseudo-classes (e.g :hover, :active, :focus) to View components after the initial render, or change the View to a Pressable`,
         originalProps,
       );
     }
-    state.upgradeWarning.pressable = UpgradeState.UPGRADED;
+    state.upgrades.pressable = UpgradeState.UPGRADED;
   }
 
-  if (state.isAnimated) {
-    if (shouldWarn && state.upgradeWarning.animated === UpgradeState.NONE) {
+  if (state.upgrades.animated) {
+    if (shouldWarn && state.upgrades.animated === UpgradeState.NONE) {
       printUpgradeWarning(
         `Converting component to animated component should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none", "transition-property: none"`,
         originalProps,
       );
     }
-    state.upgradeWarning.animated = UpgradeState.UPGRADED;
+    state.upgrades.animated = UpgradeState.UPGRADED;
     component = createAnimatedComponent(component);
   }
 
-  if (state.context || resetContext) {
-    if (shouldWarn && state.upgradeWarning.context === UpgradeState.NONE) {
+  if (state.upgrades.variables) {
+    if (
+      shouldWarn &&
+      state.upgrades.variables === UpgradeState.SHOULD_UPGRADE
+    ) {
       printUpgradeWarning(
         `Making a component inheritable should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,
         originalProps,
       );
     }
-    state.upgradeWarning.context = UpgradeState.UPGRADED;
-
-    if (resetContext) {
-      state.context = { ...state };
-    }
+    state.upgrades.variables = UpgradeState.UPGRADED;
 
     props = {
-      value: state.context,
+      value: variables,
       children: createElement(component, props),
     };
-    component = inheritanceContext.Provider;
+    component = variableContext.Provider;
+  }
+
+  if (state.upgrades.containers) {
+    if (
+      shouldWarn &&
+      state.upgrades.containers === UpgradeState.SHOULD_UPGRADE
+    ) {
+      printUpgradeWarning(
+        `Making a component inheritable should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,
+        originalProps,
+      );
+    }
+    state.upgrades.containers = UpgradeState.UPGRADED;
+
+    props = {
+      value: containers,
+      children: createElement(component, props),
+    };
+    component = containerContext.Provider;
   }
 
   // After the initial render, the user shouldn't upgrade the component. Avoid warning in production
-  state.upgradeWarning.canWarn = process.env.NODE_ENV !== "production";
+  state.upgrades.canWarn = process.env.NODE_ENV !== "production";
 
-  /**
-   * This is a hack to delay firing state updates for other components until we have finished
-   * rendering. The `key` property will only be access by React after rendering is complete.
-   *
-   * Libraries like Preact implement this by Dispatcher tricks. I think this is a bit simpler may might be more fragile.
-   */
   return createElement(component, props);
 }
 

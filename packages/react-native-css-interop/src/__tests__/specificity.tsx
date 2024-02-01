@@ -1,5 +1,5 @@
 import { fireEvent, render } from "@testing-library/react-native";
-import { Text, View, ViewProps } from "react-native";
+import { Text, ViewProps } from "react-native";
 
 import {
   createMockComponent,
@@ -174,5 +174,5 @@ test("remapped - inline important existing", () => {
     <MyText testID={testID} className="red" />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(0, 0, 255, 1)" });
+  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
 });

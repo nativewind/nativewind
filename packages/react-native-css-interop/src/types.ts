@@ -28,6 +28,11 @@ import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
 import { Effect, Observable } from "./runtime/observable";
 import { SharedValue } from "react-native-reanimated";
 
+export interface Effect2 {
+  update: () => void;
+  dependencies: Set<() => void>;
+}
+
 export type ReactComponent<P = any> =
   | ClassicComponentClass<P>
   | ComponentClass<P>
@@ -147,10 +152,12 @@ export type StyleDeclaration =
 export type StyleRuleSet = {
   $$type: "StyleRuleSet";
   normal?: StyleRule[];
-  inline?: StyleRule[];
   important?: StyleRule[];
   warnings?: ExtractionWarning[];
   classNames?: string;
+  variables?: boolean;
+  container?: boolean;
+  animation?: boolean;
 };
 
 export type RuntimeStyleRule = StyleRule | object;
@@ -228,17 +235,17 @@ export type RuntimeValue =
 
 export type Specificity = {
   /** IDs - https://drafts.csswg.org/selectors/#specificity-rules */
-  A: number;
+  A?: number;
   /** Classes, Attributes, Pseudo-Classes - https://drafts.csswg.org/selectors/#specificity-rules */
-  B: number;
+  B?: number;
   /** Elements, Pseudo-Elements - https://drafts.csswg.org/selectors/#specificity-rules */
-  C: number;
+  C?: number;
   /** Importance - https://developer.mozilla.org/en-US/docs/Web/CSS/Cascade#cascading_order */
-  I: number;
+  I?: number;
   /** StyleSheet Order */
-  S: number;
+  S?: number;
   /** Appearance Order */
-  O: number;
+  O?: number;
   /** Inline */
   inline?: number;
 };

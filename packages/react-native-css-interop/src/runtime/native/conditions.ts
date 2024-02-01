@@ -11,7 +11,6 @@ import {
   AttributeCondition,
   AttributeDependency,
   ExtractedContainerQuery,
-  PropState,
   PseudoClassesQuery,
   StyleRule,
 } from "../../types";
@@ -19,7 +18,8 @@ import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
 import { Platform } from "react-native";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { Effect } from "../observable";
-import { InheritedParentContext } from "./inherited-context";
+import type { ComponentState } from "./native-interop";
+import { StyleRuleObservable } from "./style-rule-observable";
 
 interface ConditionReference {
   width: number | { get: (effect?: Effect) => number };
@@ -27,32 +27,33 @@ interface ConditionReference {
 }
 
 export function testRule(
-  state: PropState,
-  context: InheritedParentContext,
-  declaration: StyleRule,
+  state: StyleRuleObservable,
+  styleRule: StyleRule,
   props: Record<string, any>,
 ) {
-  if (declaration.pseudoClasses) {
-    if (!testPseudoClasses(state, context, declaration.pseudoClasses)) {
+  if (styleRule.pseudoClasses) {
+    if (
+      !testPseudoClasses(state, state.componentState, styleRule.pseudoClasses)
+    ) {
       return false;
     }
   }
 
-  if (declaration.media && !testMediaQueries(state, declaration.media)) {
+  if (styleRule.media && !testMediaQueries(state, styleRule.media)) {
     return false;
   }
 
   if (
-    declaration.containerQuery &&
-    !testContainerQuery(state, context, declaration.containerQuery)
+    styleRule.containerQuery &&
+    !testContainerQuery(state, state.componentState, styleRule.containerQuery)
   ) {
     return false;
   }
 
-  if (declaration.attrs) {
-    for (const attrCondition of declaration.attrs) {
+  if (styleRule.attrs) {
+    for (const attrCondition of styleRule.attrs) {
       const attrValue = getTestAttributeValue(props, attrCondition);
-      state.attributes.push({
+      state.attributeDependencies.push({
         ...attrCondition,
         previous: attrValue,
       });
@@ -87,20 +88,20 @@ export function testMediaQuery(
 
 export function testPseudoClasses(
   effect: Effect,
-  context: InheritedParentContext,
+  state: ComponentState,
   meta: PseudoClassesQuery,
 ) {
   /* If any of these conditions fail, it fails failed */
   let passed = true;
-  if (meta.active) passed = context.getActive(effect) && passed;
-  if (meta.hover) passed = context.getHover(effect) && passed;
-  if (meta.focus) passed = context.getFocus(effect) && passed;
+  if (meta.active) passed = state.getActive(effect) && passed;
+  if (meta.hover) passed = state.getHover(effect) && passed;
+  if (meta.focus) passed = state.getFocus(effect) && passed;
   return passed;
 }
 
 export function testContainerQuery(
   effect: Effect,
-  state: InheritedParentContext,
+  state: ComponentState,
   containerQuery: ExtractedContainerQuery[] | undefined,
 ) {
   // If there is no query, we passed
@@ -109,23 +110,23 @@ export function testContainerQuery(
   }
 
   return containerQuery.every((query) => {
-    let container = query.name ? state.getContainer(query.name, effect) : null;
-    // If the query has a name, but the container doesn't exist, we failed
-    if (query.name && !container) return false;
+    let container: ComponentState | undefined;
+    if (query.name) {
+      container = state.containers[query.name];
+      // If the query has a name, but the container doesn't exist, we failed
+      if (!container) return false;
+    }
 
     // If the query has a name, we use the container with that name
     // Otherwise default to the last container
-    if (!container)
-      container = state.getContainer(DEFAULT_CONTAINER_NAME, effect);
+    if (!container) container = state.containers[DEFAULT_CONTAINER_NAME];
 
     // We failed if the container doesn't exist (e.g no default container)
     if (!container) return false;
 
-    const context = container.get(effect)!;
-
     if (
       query.pseudoClasses &&
-      !testPseudoClasses(effect, context, query.pseudoClasses)
+      !testPseudoClasses(effect, container, query.pseudoClasses)
     ) {
       return false;
     }
@@ -133,7 +134,7 @@ export function testContainerQuery(
     // If there is no condition, we passed (maybe only named as specified)
     if (!query.condition) return true;
 
-    const layout = context.getLayout(effect) || [0, 0];
+    const layout = container.getLayout(effect) || [0, 0];
 
     return testCondition(effect, query.condition, {
       width: layout[0],
