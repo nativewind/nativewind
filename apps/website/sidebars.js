@@ -40,6 +40,7 @@ const sidebars = {
         "guides/troubleshooting",
         "guides/custom-components",
         "guides/themes",
+        "guides/editor-setup",
       ],
     },
     {
