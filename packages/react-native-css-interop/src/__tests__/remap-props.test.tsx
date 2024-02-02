@@ -9,7 +9,7 @@ import {
   revealStyles,
 } from "../testing-library";
 import { RefObject, useRef } from "react";
-import { remapProps } from "../runtime/web/api";
+import { remapProps } from "../runtime/api";
 import { globalStyles } from "../runtime/native/style-store";
 
 const testID = "react-native-css-interop";

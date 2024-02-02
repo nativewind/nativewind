@@ -11,6 +11,9 @@ import { globalStyles } from "./stylesheet";
 import { interop } from "./native-interop";
 import { opaqueStyles } from "./style-store";
 
+export { StyleSheet } from "./stylesheet";
+export { colorScheme, rem } from "./globals";
+
 export const interopComponents = new Map<
   object | string,
   Parameters<JSXFunction>[0]
