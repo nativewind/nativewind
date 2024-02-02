@@ -3,6 +3,7 @@ import { Observable, observable } from "../observable";
 import { warned, warnings } from "./globals";
 
 export const globalStyles = new Map<string, Observable<StyleRuleSet>>();
+export const opaqueStyles = new WeakMap<object, StyleRuleSet>();
 
 export function upsertGlobalStyle(name: string, ruleSet: StyleRuleSet) {
   let styleObservable = globalStyles.get(name);

@@ -126,7 +126,7 @@ export function testCasesWithOptions(
     });
 
     if (animated) {
-      expect(component).toHaveAnimatedStyle(expected.style);
+      expect(component).toHaveAnimatedStyle(expected.style as any);
     } else if (expected.style) {
       expect(component).toHaveStyle(
         Object.fromEntries(Object.entries(expected.style)),

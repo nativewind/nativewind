@@ -17,6 +17,8 @@ import {
   ObservableOptions,
   observable,
 } from "../observable";
+import { createContext } from "react";
+import type { ComponentState } from "./native-interop";
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
@@ -25,10 +27,14 @@ export const externalCallbackRef = {} as {
   current: ((className: string) => void) | undefined;
 };
 
-export const globalVariables = {
-  root: new Map<string, Observable<any>>(),
-  universal: new Map<string, Observable<any>>(),
-};
+export const rootVariables: Record<string, Observable<any>> = {};
+export const universalVariables: Record<string, Observable<any>> = {};
+
+export const variableContext =
+  createContext<Record<string, any>>(rootVariables);
+export const containerContext = createContext<Record<string, ComponentState>>(
+  {},
+);
 
 /**
  * Color scheme
