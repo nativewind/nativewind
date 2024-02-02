@@ -9,13 +9,15 @@ import { PropStateObservable } from "./prop-state-observable";
 export type ComponentState = {
   originalProps: Record<string, any>;
   containers: Record<string, ComponentState>;
-  active?: Observable<boolean>;
+  interaction: {
+    active?: Observable<boolean>;
+    hover?: Observable<boolean>;
+    focus?: Observable<boolean>;
+    layout?: Observable<[number, number]>;
+  };
   getActive(effect: Effect): boolean;
-  hover?: Observable<boolean>;
   getHover(effect: Effect): boolean;
-  focus?: Observable<boolean>;
   getFocus(effect: Effect): boolean;
-  layout?: Observable<[number, number]>;
   getLayout(effect: Effect): [number, number];
   rerender(): void;
   upgrades: {
@@ -40,6 +42,7 @@ export function interop(
     return {
       originalProps,
       containers,
+      interaction: {},
       upgrades: {
         animated: UpgradeState.NONE,
         variables: UpgradeState.NONE,
@@ -51,20 +54,20 @@ export function interop(
         setComponentState((state) => ({ ...state }));
       },
       getActive(effect) {
-        this.active ??= observable(false);
-        return this.active.get(effect);
+        this.interaction.active ??= observable(false);
+        return this.interaction.active.get(effect);
       },
       getHover(effect) {
-        this.hover ??= observable(false);
-        return this.hover.get(effect);
+        this.interaction.hover ??= observable(false);
+        return this.interaction.hover.get(effect);
       },
       getFocus(effect) {
-        this.focus ??= observable(false);
-        return this.focus.get(effect);
+        this.interaction.focus ??= observable(false);
+        return this.interaction.focus.get(effect);
       },
       getLayout(effect) {
-        this.layout ??= observable([0, 0]);
-        return this.layout.get(effect);
+        this.interaction.layout ??= observable([0, 0]);
+        return this.interaction.layout.get(effect);
       },
     };
   });

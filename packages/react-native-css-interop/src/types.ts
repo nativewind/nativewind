@@ -25,8 +25,8 @@ import type {
   ViewStyle,
 } from "react-native";
 import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
-import { Effect, Observable } from "./runtime/observable";
-import { SharedValue } from "react-native-reanimated";
+import type { Effect, Observable } from "./runtime/observable";
+import type { SharedValue } from "react-native-reanimated";
 
 export interface Effect2 {
   update: () => void;

@@ -1,13 +1,5 @@
 import { ComponentState } from "react";
-import {
-  SharedValue,
-  cancelAnimation,
-  makeMutable,
-  withRepeat,
-  withSequence,
-  withDelay,
-  withTiming,
-} from "react-native-reanimated";
+import type { SharedValue } from "react-native-reanimated";
 import {
   InteropComponentConfig,
   ExtractedAnimations,
@@ -38,7 +30,7 @@ export class PropStateObservable implements Effect {
 
   // props to be passed to the component
   public props: Record<string, any> = {};
-  public variables: Record<string, any> = {};
+  public variables: Record<string, any> | undefined;
   public containerNames: false | string[] | undefined;
 
   // a flattened version of the props, used for comparison and lookups
@@ -69,6 +61,8 @@ export class PropStateObservable implements Effect {
   cleanup() {
     this.styleRule.cleanup();
     cleanupEffect(this);
+    const cancelAnimation = require("react-native-reanimated")
+      .cancelAnimation as typeof import("react-native-reanimated").cancelAnimation;
     for (const value of this.sharedValues.values()) {
       cancelAnimation(value);
     }
@@ -89,7 +83,7 @@ export class PropStateObservable implements Effect {
   getCSSVariable(name: string, style?: Record<string, any>) {
     if (!name) return;
     let value: any = undefined;
-    value ??= this.styleRule.variables[name];
+    value ??= this.styleRule.variables?.[name];
     value ??= universalVariables[name]?.get(this);
     if (value === undefined) {
       value = this.inheritedVariables[name];
@@ -143,6 +137,7 @@ export class PropStateObservable implements Effect {
     const props: Record<string, any> = {};
     const normalizedProps: Record<string, any> = {};
     const delayedValues: (() => void)[] = [];
+    const seenAnimatedProps = new Set<string>();
 
     this.processDeclarations(
       this.styleRule.declarations,
@@ -150,8 +145,6 @@ export class PropStateObservable implements Effect {
       normalizedProps,
       delayedValues,
     );
-
-    const seenAnimatedProps = new Set<string>();
 
     if (this.styleRule.animation) {
       this.processAnimations(
@@ -169,6 +162,10 @@ export class PropStateObservable implements Effect {
       delayedValues,
     );
 
+    for (const delayed of delayedValues) {
+      delayed();
+    }
+
     if (this.styleRule.transition) {
       this.processTransition(
         props,
@@ -178,18 +175,26 @@ export class PropStateObservable implements Effect {
       );
     }
 
-    for (const delayed of delayedValues) {
-      delayed();
-    }
-
     /**
      * If a sharedValue is not 'seen' by an animation or transition it should have it's animation cancelled
      * and value reset to the current type or default value.
      */
-    for (const entry of this.sharedValues) {
-      if (seenAnimatedProps.has(entry[0])) continue;
-      entry[1].value =
-        this.normalizedProps[entry[0]] ?? defaultValues[entry[0]];
+    if (this.sharedValues.size) {
+      for (const entry of this.sharedValues) {
+        if (seenAnimatedProps.has(entry[0])) continue;
+        let value =
+          props.style?.[entry[0]] ??
+          this.normalizedProps[entry[0]] ??
+          defaultValues[entry[0]];
+        if (typeof value === "function") {
+          value = value(this);
+        }
+        entry[1].value = value;
+        props.style?.[entry[0]] ??
+          this.normalizedProps[entry[0]] ??
+          defaultValues[entry[0]];
+        setDeep(props.style, [entry[0]], entry[1]);
+      }
     }
 
     if (this.config.target === "style" && this.config.nativeStyleToProp) {
@@ -223,6 +228,9 @@ export class PropStateObservable implements Effect {
       timingFunction: easingFuncs,
     }: Required<ExtractedAnimations>,
   ) {
+    const { makeMutable, withRepeat, withSequence } =
+      require("react-native-reanimated") as typeof import("react-native-reanimated");
+
     props.style ??= {};
     let names: string[] = [];
     // Always reset if we are waiting on an animation
@@ -344,6 +352,9 @@ export class PropStateObservable implements Effect {
       timingFunction: timingFunctions,
     }: Required<ExtractedTransition>,
   ) {
+    const { makeMutable, withDelay, withTiming } =
+      require("react-native-reanimated") as typeof import("react-native-reanimated");
+
     /**
      * If there is a 'none' transition we should skip this logic.
      * In the sharedValues cleanup step the animation will be cancelled as the properties were not seen.
@@ -359,6 +370,7 @@ export class PropStateObservable implements Effect {
           normalizedProps,
           property,
         );
+
         if (value === undefined && !sharedValue) {
           // We have never seen this value, and its undefined so do nothing
           continue;
@@ -396,11 +408,12 @@ export class PropStateObservable implements Effect {
   }
 
   processDeclarations(
-    declarations: StyleDeclaration[],
+    declarations: StyleDeclaration[] | undefined,
     props: Record<string, any>,
     normalizedProps: Record<string, any>,
     delayedValues: (() => void)[],
   ) {
+    if (!declarations) return;
     for (const declaration of declarations) {
       if (Array.isArray(declaration)) {
         if (declaration.length === 2) {

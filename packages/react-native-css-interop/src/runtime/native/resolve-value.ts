@@ -1,10 +1,5 @@
 import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
-import {
-  AnimatableValue,
-  Easing,
-  withDelay,
-  withTiming,
-} from "react-native-reanimated";
+import type { AnimatableValue } from "react-native-reanimated";
 import type { EasingFunction, Time } from "lightningcss";
 import type { RuntimeValueDescriptor, RuntimeValueFrame } from "../../types";
 import type { PropStateObservable } from "./prop-state-observable";
@@ -186,6 +181,9 @@ export function resolveAnimation(
   totalDuration: number,
   timingFunction: EasingFunction,
 ): [AnimatableValue, AnimatableValue, ...AnimatableValue[]] {
+  const { withDelay, withTiming } =
+    require("react-native-reanimated") as typeof import("react-native-reanimated");
+
   const initialValue = resolveAnimationValue(
     state,
     props,
@@ -265,6 +263,9 @@ function round(number: number) {
 }
 
 export function getEasing(timingFunction: EasingFunction) {
+  const { Easing } =
+    require("react-native-reanimated") as typeof import("react-native-reanimated");
+
   switch (timingFunction.type) {
     case "ease":
       return Easing.ease;

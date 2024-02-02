@@ -101,6 +101,7 @@ export function vars(variables: Record<string, RuntimeValueDescriptor>) {
   const style: Record<string, any> = {};
   opaqueStyles.set(style, {
     $$type: "StyleRuleSet",
+    variables: true,
     normal: [
       {
         $$type: "StyleRule",

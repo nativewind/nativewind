@@ -1,5 +1,4 @@
-import { ComponentState } from "react";
-import {
+import type {
   StyleDeclaration,
   RuntimeValueDescriptor,
   ExtractedAnimations,
@@ -9,9 +8,11 @@ import {
   Specificity,
   AttributeDependency,
 } from "../../types";
+import type { ComponentState } from "./native-interop";
+
+import { UpgradeState } from "./render-component";
 import { Effect, cleanupEffect } from "../observable";
 import { testRule } from "./conditions";
-import { UpgradeState } from "./render-component";
 import { globalStyles, opaqueStyles } from "./style-store";
 
 /**
@@ -28,9 +29,9 @@ export class StyleRuleObservable implements Effect {
   private trackedRules: StyleRule[] = [];
   public attributeDependencies: AttributeDependency[] = [];
 
-  public declarations: StyleDeclaration[] = [];
-  public importantDeclarations: StyleDeclaration[] = [];
-  public variables: Record<string, RuntimeValueDescriptor> = {};
+  public declarations: StyleDeclaration[] | undefined;
+  public importantDeclarations: StyleDeclaration[] | undefined;
+  public variables: Record<string, RuntimeValueDescriptor> | undefined;
   public containerNames: false | string[] | undefined;
   public animation: Required<ExtractedAnimations> | undefined;
   public transition: Required<ExtractedTransition> | undefined;
@@ -38,7 +39,7 @@ export class StyleRuleObservable implements Effect {
   constructor(
     private source: string,
     private target: string,
-    public componentState: ComponentState,
+    public component: ComponentState,
     private inheritedContainers: Record<string, any>,
     private notifyChanged: () => void,
   ) {
@@ -70,6 +71,8 @@ export class StyleRuleObservable implements Effect {
         return dependency.previous !== value;
       })
     ) {
+      if (this.classNames) {
+      }
       // Get the new StyleRule
       this.classNames = classNames;
       const forceChange = this.inlineStyles !== inlineStyles;
@@ -88,10 +91,6 @@ export class StyleRuleObservable implements Effect {
 
     let trackingIndex = 0;
     const trackedRules: StyleRule[] = [];
-
-    let variables = false;
-    let containers = false;
-    let animated = false;
 
     const normal: StyleRule[] = [];
     const important: StyleRule[] = [];
@@ -112,9 +111,17 @@ export class StyleRuleObservable implements Effect {
         return;
       }
 
-      variables ||= Boolean(ruleSet.variables);
-      containers ||= Boolean(ruleSet.container);
-      animated ||= Boolean(ruleSet.animation);
+      if (ruleSet.animation && !this.component.upgrades.animated) {
+        this.component.upgrades.animated = UpgradeState.SHOULD_UPGRADE;
+      }
+
+      if (ruleSet.variables && !this.component.upgrades.variables) {
+        this.component.upgrades.variables = UpgradeState.SHOULD_UPGRADE;
+      }
+
+      if (ruleSet.container && !this.component.upgrades.containers) {
+        this.component.upgrades.containers = UpgradeState.SHOULD_UPGRADE;
+      }
 
       if (ruleSet.normal) {
         for (const rule of ruleSet.normal) {
@@ -143,17 +150,6 @@ export class StyleRuleObservable implements Effect {
       for (const className of this.classNames.split(/\s+/)) {
         addStyle(className);
       }
-    }
-
-    if (animated) {
-      this.componentState.upgrades.animated ||= UpgradeState.SHOULD_UPGRADE;
-    }
-    if (variables) {
-      this.componentState.upgrades.variables ||= UpgradeState.SHOULD_UPGRADE;
-    }
-
-    if (containers) {
-      this.componentState.upgrades.containers ||= UpgradeState.SHOULD_UPGRADE;
     }
 
     if (
@@ -185,7 +181,7 @@ export class StyleRuleObservable implements Effect {
     this.importantDeclarations = [];
     this.animation = undefined;
     this.transition = undefined;
-    this.variables = {};
+    this.variables = undefined;
     this.containerNames = undefined;
 
     const addDeclarations = (
@@ -205,6 +201,7 @@ export class StyleRuleObservable implements Effect {
           }
 
           if (rule.variables) {
+            this.variables ??= {};
             for (const [key, value] of rule.variables) {
               this.variables[key] = value;
             }

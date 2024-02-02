@@ -32,9 +32,7 @@ export function testRule(
   props: Record<string, any>,
 ) {
   if (styleRule.pseudoClasses) {
-    if (
-      !testPseudoClasses(state, state.componentState, styleRule.pseudoClasses)
-    ) {
+    if (!testPseudoClasses(state, state.component, styleRule.pseudoClasses)) {
       return false;
     }
   }
@@ -45,7 +43,7 @@ export function testRule(
 
   if (
     styleRule.containerQuery &&
-    !testContainerQuery(state, state.componentState, styleRule.containerQuery)
+    !testContainerQuery(state, state.component, styleRule.containerQuery)
   ) {
     return false;
   }

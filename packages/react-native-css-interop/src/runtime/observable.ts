@@ -28,7 +28,7 @@ export function observable<T>(
       return value ?? fallback?.get(effect)!;
     },
 
-    set(newValue) {
+    set(newValue: any) {
       if (Object.is(newValue, value)) return;
       value = newValue;
       // We need to copy the subscriptions as new ones may be added during the render, causing an infinite growing subscriptions set

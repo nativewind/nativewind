@@ -1,5 +1,4 @@
 import { ComponentType, createElement, forwardRef, useRef } from "react";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { LayoutChangeEvent, Pressable, View } from "react-native";
 import { containerContext, variableContext } from "./globals";
 
@@ -29,64 +28,74 @@ export function renderComponent(
   const shouldWarn = state.upgrades.canWarn;
   const isContainer = state.upgrades.containers;
 
-  if (state.active || isContainer) {
-    state.active ??= observable(false);
+  if (state.interaction.active || isContainer) {
+    state.interaction.active ??= observable(false);
     props.onPressIn = (event: unknown) => {
       originalProps.onPressIn?.(event);
-      state.active!.set(true);
+      state.interaction.active!.set(true);
     };
     props.onPressOut = (event: unknown) => {
+      // console.log("----------------");
       originalProps.onPressOut?.(event);
-      state.active!.set(false);
+      state.interaction.active!.set(false);
     };
   }
-  if (state.hover || isContainer) {
-    state.hover ??= observable(false);
+  if (state.interaction.hover || isContainer) {
+    state.interaction.hover ??= observable(false);
     props.onHoverIn = (event: unknown) => {
       originalProps.onHoverIn?.(event);
-      state.hover!.set(true);
+      state.interaction.hover!.set(true);
     };
     props.onHoverOut = (event: unknown) => {
       originalProps.onHoverOut?.(event);
-      state.hover!.set(false);
+      state.interaction.hover!.set(false);
     };
   }
 
-  if (state.focus || isContainer) {
-    state.focus ??= observable(false);
+  if (state.interaction.focus || isContainer) {
+    state.interaction.focus ??= observable(false);
     props.onFocus = (event: unknown) => {
       originalProps.onFocus?.(event);
-      state.focus!.set(true);
+      state.interaction.focus!.set(true);
     };
     props.onBlur = (event: unknown) => {
       originalProps.onBlur?.(event);
-      state.focus!.set(false);
+      state.interaction.focus!.set(false);
     };
   }
   /**
    * Some React Native components (e.g Text) will not apply state event handlers
    * if `onPress` is not defined.
    */
-  if (state.active || state.hover || state.focus) {
+  if (
+    state.interaction.active ||
+    state.interaction.hover ||
+    state.interaction.focus
+  ) {
     props.onPress = (event: unknown) => {
       originalProps.onPress?.(event);
     };
   }
 
-  if (state.layout || isContainer) {
-    state.layout ??= observable([0, 0]);
+  if (state.interaction.layout || isContainer) {
+    state.interaction.layout ??= observable([0, 0]);
     props.onLayout = (event: LayoutChangeEvent) => {
       originalProps.onLayout?.(event);
       const layout = event.nativeEvent.layout;
-      const [width, height] = state.layout!.get() ?? [0, 0];
+      const [width, height] = state.interaction.layout!.get() ?? [0, 0];
       if (layout.width !== width || layout.height !== height) {
-        state.layout!.set([layout.width, layout.height]);
+        state.interaction.layout!.set([layout.width, layout.height]);
       }
     };
   }
 
   // TODO: We can probably remove this in favor of using `new Pressability()`
-  if (component === View && (state.hover || state.active || state.focus)) {
+  if (
+    component === View &&
+    (state.interaction.hover ||
+      state.interaction.active ||
+      state.interaction.focus)
+  ) {
     component = Pressable;
     if (shouldWarn && state.upgrades.pressable === UpgradeState.NONE) {
       printUpgradeWarning(
@@ -170,6 +179,9 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
     );
   }
 
+  const { default: Animated, useAnimatedStyle } =
+    require("react-native-reanimated") as typeof import("react-native-reanimated");
+
   let AnimatedComponent = Animated.createAnimatedComponent(
     Component as React.ComponentClass,
   );
@@ -237,7 +249,11 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
       return style;
     }, [props.style]);
 
-    return createElement(AnimatedComponent, { ...props, style, ref });
+    return createElement(AnimatedComponent, {
+      ...props,
+      style,
+      ref,
+    });
   });
   CSSInteropAnimationWrapper.displayName = `CSSInteropAnimationWrapper(${
     Component.displayName ?? Component.name
