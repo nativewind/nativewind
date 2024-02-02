@@ -3,6 +3,7 @@
   "compilerOptions": {
     "declaration": true,
     "noUnusedLocals": true,
-    "removeComments": true
+    "removeComments": true,
+    "esModuleInterop": true,
   }
 }
