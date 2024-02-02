@@ -24,7 +24,7 @@ export class StyleRuleObservable implements Effect {
 
   private classNames: string | undefined;
   private inlineStyles: any;
-  public originalProps: Record<string, any> = {};
+  public originalProps: Record<string, any> | null | undefined;
 
   private trackedRules: StyleRule[] = [];
   public attributeDependencies: AttributeDependency[] = [];
@@ -51,12 +51,12 @@ export class StyleRuleObservable implements Effect {
   }
 
   updateDuringRender(
-    originalProps: Record<string, any>,
+    originalProps: Record<string, any> | null,
     inheritedContainers: Record<string, any>,
   ) {
     this.originalProps = originalProps;
-    const classNames = originalProps[this.source];
-    const inlineStyles = originalProps[this.target];
+    const classNames = originalProps?.[this.source];
+    const inlineStyles = originalProps?.[this.target];
     let didUpdate = false;
 
     if (
@@ -67,7 +67,7 @@ export class StyleRuleObservable implements Effect {
         const value =
           dependency.type === "data-attribute"
             ? originalProps?.dataSet?.[dependency.name]
-            : originalProps[dependency.name];
+            : originalProps?.[dependency.name];
         return dependency.previous !== value;
       })
     ) {

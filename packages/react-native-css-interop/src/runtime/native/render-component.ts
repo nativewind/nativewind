@@ -21,7 +21,7 @@ export function renderComponent(
   component: ComponentType<any>,
   state: ComponentState,
   props: Record<string, any>,
-  originalProps: Record<string, any>,
+  originalProps: Record<string, any> | null | undefined,
   variables: Record<string, any>,
   containers: Record<string, any>,
 ) {
@@ -31,23 +31,22 @@ export function renderComponent(
   if (state.interaction.active || isContainer) {
     state.interaction.active ??= observable(false);
     props.onPressIn = (event: unknown) => {
-      originalProps.onPressIn?.(event);
+      originalProps?.onPressIn?.(event);
       state.interaction.active!.set(true);
     };
     props.onPressOut = (event: unknown) => {
-      // console.log("----------------");
-      originalProps.onPressOut?.(event);
+      originalProps?.onPressOut?.(event);
       state.interaction.active!.set(false);
     };
   }
   if (state.interaction.hover || isContainer) {
     state.interaction.hover ??= observable(false);
     props.onHoverIn = (event: unknown) => {
-      originalProps.onHoverIn?.(event);
+      originalProps?.onHoverIn?.(event);
       state.interaction.hover!.set(true);
     };
     props.onHoverOut = (event: unknown) => {
-      originalProps.onHoverOut?.(event);
+      originalProps?.onHoverOut?.(event);
       state.interaction.hover!.set(false);
     };
   }
@@ -55,11 +54,11 @@ export function renderComponent(
   if (state.interaction.focus || isContainer) {
     state.interaction.focus ??= observable(false);
     props.onFocus = (event: unknown) => {
-      originalProps.onFocus?.(event);
+      originalProps?.onFocus?.(event);
       state.interaction.focus!.set(true);
     };
     props.onBlur = (event: unknown) => {
-      originalProps.onBlur?.(event);
+      originalProps?.onBlur?.(event);
       state.interaction.focus!.set(false);
     };
   }
@@ -73,14 +72,14 @@ export function renderComponent(
     state.interaction.focus
   ) {
     props.onPress = (event: unknown) => {
-      originalProps.onPress?.(event);
+      originalProps?.onPress?.(event);
     };
   }
 
   if (state.interaction.layout || isContainer) {
     state.interaction.layout ??= observable([0, 0]);
     props.onLayout = (event: LayoutChangeEvent) => {
-      originalProps.onLayout?.(event);
+      originalProps?.onLayout?.(event);
       const layout = event.nativeEvent.layout;
       const [width, height] = state.interaction.layout!.get() ?? [0, 0];
       if (layout.width !== width || layout.height !== height) {
@@ -266,7 +265,7 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
 
 function printUpgradeWarning(
   warning: string,
-  originalProps: Record<string, any>,
+  originalProps: Record<string, any> | null | undefined,
 ) {
   console.warn(
     `CssInterop upgrade warning.\n\n${warning}.\n\nIf add/removing sibling components cause this warning, add a unique "key" prop so React can correctly track this component.`,
@@ -279,10 +278,12 @@ function printUpgradeWarning(
       )}`,
     );
   } catch {
-    console.warn(
-      `The previous warning was caused by a component with these props: ${JSON.stringify(
-        Object.keys(originalProps),
-      )}. Some props could not be stringified, so only the keys are shown.`,
-    );
+    if (originalProps) {
+      console.warn(
+        `The previous warning was caused by a component with these props: ${JSON.stringify(
+          Object.keys(originalProps),
+        )}. Some props could not be stringified, so only the keys are shown.`,
+      );
+    }
   }
 }

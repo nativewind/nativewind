@@ -29,7 +29,7 @@ interface ConditionReference {
 export function testRule(
   state: StyleRuleObservable,
   styleRule: StyleRule,
-  props: Record<string, any>,
+  props: Record<string, any> | null | undefined,
 ) {
   if (styleRule.pseudoClasses) {
     if (!testPseudoClasses(state, state.component, styleRule.pseudoClasses)) {
@@ -331,12 +331,12 @@ export function testAttributesChanged(
 }
 
 export function getTestAttributeValue(
-  props: Record<string, any>,
+  props: Record<string, any> | null | undefined,
   condition: AttributeCondition,
 ) {
   return condition.type === "data-attribute"
-    ? props["dataSet"]?.[condition.name]
-    : props[condition.name];
+    ? props?.["dataSet"]?.[condition.name]
+    : props?.[condition.name];
 }
 
 export function testAttribute(propValue: any, condition: AttributeCondition) {

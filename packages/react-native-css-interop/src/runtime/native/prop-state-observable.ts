@@ -103,7 +103,7 @@ export class PropStateObservable implements Effect {
   }
 
   updateDuringRender(
-    originalProps: Record<string, any>,
+    originalProps: Record<string, any> | null,
     variables: Record<string, any>,
     containers: Record<string, any>,
   ) {

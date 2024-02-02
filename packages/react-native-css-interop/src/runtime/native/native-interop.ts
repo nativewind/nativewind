@@ -7,7 +7,7 @@ import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { PropStateObservable } from "./prop-state-observable";
 
 export type ComponentState = {
-  originalProps: Record<string, any>;
+  originalProps: Record<string, any> | null;
   containers: Record<string, ComponentState>;
   interaction: {
     active?: Observable<boolean>;
@@ -32,7 +32,7 @@ export type ComponentState = {
 export function interop(
   baseComponent: ReactComponent<any>,
   configs: InteropComponentConfig[],
-  originalProps: Record<string, any>,
+  originalProps: Record<string, any> | null,
   ref: any,
 ) {
   let variables = useContext(variableContext);
