@@ -11,7 +11,6 @@ import {
   AttributeCondition,
   AttributeDependency,
   ExtractedContainerQuery,
-  PropState,
   PseudoClassesQuery,
   StyleRule,
 } from "../../types";
@@ -122,8 +121,6 @@ export function testContainerQuery(
 
     // We failed if the container doesn't exist (e.g no default container)
     if (!container) return false;
-
-    const context = container.get(effect)!;
 
     if (
       query.pseudoClasses &&

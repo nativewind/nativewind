@@ -34,7 +34,6 @@ const commonStyleSheet: CssInteropStyleSheet = {
     vw[INTERNAL_RESET](dimensions);
     vh[INTERNAL_RESET](dimensions);
     colorScheme[INTERNAL_RESET](appearance);
-    observableNotifyQueue.clear();
   },
   getFlag(name) {
     return this[INTERNAL_FLAGS][name];
