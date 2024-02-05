@@ -173,6 +173,8 @@ export function renderComponent(
     baseComponent.$$typeof === ForwardRefSymbol
   ) {
     return (baseComponent as any).render(props, props.ref);
+  } else if (component === baseComponent && typeof component === "function") {
+    return (component as any)(props);
   } else {
     return createElement(component, props);
   }

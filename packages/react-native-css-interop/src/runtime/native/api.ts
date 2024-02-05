@@ -2,6 +2,7 @@ import { createElement, forwardRef, useContext, useState } from "react";
 import type {
   CssInterop,
   JSXFunction,
+  ReactComponent,
   RuntimeValueDescriptor,
 } from "../../types";
 import { getNormalizeConfig } from "../config";
@@ -22,18 +23,24 @@ export const interopComponents = new Map<
 export const cssInterop: CssInterop = (baseComponent, mapping): any => {
   const configs = getNormalizeConfig(mapping);
 
-  const interopComponent = forwardRef(function CssInteropComponent(
-    originalProps: Record<string, any>,
-    ref: any,
-  ) {
-    return interop(baseComponent, configs, originalProps, ref);
-  });
+  let component: ReactComponent;
+  if (typeof baseComponent === "function") {
+    // We can directly render function components
+    component = (props: Record<string, any>) => {
+      return interop(baseComponent, configs, props, undefined);
+    };
+  } else {
+    // Class, forwardRef, object, string components need to be wrapped
+    component = forwardRef<unknown, Record<string, any>>((props, ref) => {
+      return interop(baseComponent, configs, props, ref);
+    });
+  }
 
-  interopComponent.displayName = `CssInterop.${
+  component.displayName = `CssInterop.${
     baseComponent.displayName ?? baseComponent.name ?? "unknown"
   }`;
-  interopComponents.set(baseComponent, interopComponent);
-  return interopComponent;
+  interopComponents.set(baseComponent, component);
+  return component;
 };
 
 export const remapProps: CssInterop = (component: any, mapping): any => {
