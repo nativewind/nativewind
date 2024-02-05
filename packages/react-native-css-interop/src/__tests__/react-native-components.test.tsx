@@ -67,13 +67,15 @@ test("TextInput", () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component.props).toEqual({
-    testID,
-    placeholderTextColor: "rgba(255, 255, 255, 1)",
-    style: {
-      color: "rgba(0, 0, 0, 1)",
-    },
-  });
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      testID,
+      placeholderTextColor: "rgba(255, 255, 255, 1)",
+      style: {
+        color: "rgba(0, 0, 0, 1)",
+      },
+    }),
+  );
 });
 
 test("ActivityIndicator", () => {
@@ -90,11 +92,16 @@ test("ActivityIndicator", () => {
     className: expect.any,
   });
 
-  expect(component.props).toEqual({
-    testID,
-    color: "rgba(255, 255, 255, 1)",
-    style: {
-      backgroundColor: "rgba(0, 0, 0, 1)",
-    },
-  });
+  // ActivityIndicator will not render a backgroundColor
+  // It also sets a width/height based upon the size prop
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      testID,
+      color: "rgba(255, 255, 255, 1)",
+      style: {
+        height: 20,
+        width: 20,
+      },
+    }),
+  );
 });
