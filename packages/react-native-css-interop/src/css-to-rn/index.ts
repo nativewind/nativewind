@@ -67,7 +67,7 @@ export function cssToReactNativeRuntime(
     rootVariables: {},
     universalVariables: {},
     flags: {},
-    appearanceOrder: 0,
+    appearanceOrder: 1,
     ...options,
     grouping,
   };
@@ -101,24 +101,29 @@ export function cssToReactNativeRuntime(
   for (const [name, styles] of extractOptions.rules) {
     if (styles.length === 0) continue;
 
-    const layer: StyleRuleSet = { $$type: "StyleRuleSet" };
+    const styleRuleSet: StyleRuleSet = { $$type: "StyleRuleSet" };
 
     for (const { warnings, ...style } of styles) {
       if (style.specificity.I) {
-        layer.important ??= [];
-        layer.important.push(style);
+        styleRuleSet.important ??= [];
+        styleRuleSet.important.push(style);
       } else {
-        layer.normal ??= [];
-        layer.normal.push(style);
+        styleRuleSet.normal ??= [];
+        styleRuleSet.normal.push(style);
       }
 
       if (warnings) {
-        layer.warnings ??= [];
-        layer.warnings.push(...warnings);
+        styleRuleSet.warnings ??= [];
+        styleRuleSet.warnings.push(...warnings);
       }
+
+      if (style.variables) styleRuleSet.variables = true;
+      if (style.container) styleRuleSet.container = true;
+      if (style.animations) styleRuleSet.animation = true;
+      if (style.transition) styleRuleSet.animation = true;
     }
 
-    rules.push([name, layer]);
+    rules.push([name, styleRuleSet]);
   }
 
   // Convert the extracted style declarations and animations from maps to objects and return them

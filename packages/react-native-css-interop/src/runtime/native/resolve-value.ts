@@ -1,36 +1,145 @@
 import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
-import {
-  AnimatableValue,
-  Easing,
-  withDelay,
-  withTiming,
-} from "react-native-reanimated";
+import type { AnimatableValue } from "react-native-reanimated";
 import type { EasingFunction, Time } from "lightningcss";
-import type {
-  PropAccumulator,
-  RuntimeValueDescriptor,
-  RuntimeValueFrame,
-} from "../../types";
-import { rem, systemColorScheme, vh, vw } from "./globals";
+import type { RuntimeValueDescriptor, RuntimeValueFrame } from "../../types";
+import { rem, systemColorScheme, universalVariables, vh, vw } from "./globals";
 import { Effect } from "../observable";
 import { transformKeys } from "../../shared";
+import { PropState } from "./native-interop";
+import { getWidth, getHeight } from "./utils";
 
-export function resolve(
-  acc: PropAccumulator,
+export function resolveValue(
+  state: PropState,
+  descriptor: RuntimeValueDescriptor | string | number | boolean,
+  style?: Record<string, any>,
+): any {
+  if (typeof descriptor !== "object" || !descriptor) return descriptor;
+
+  if (Array.isArray(descriptor)) {
+    return descriptor.map((v) => resolveValue(state, v, style));
+  }
+
+  switch (descriptor.name) {
+    case "var": {
+      const value = resolve(state, descriptor.arguments[0], style);
+      if (typeof value === "string") return getVar(state, value, style);
+    }
+    case "vh": {
+      const value = resolve(state, descriptor.arguments[0], style);
+      const vhValue = vh.get(state.styleEffect) / 100;
+      if (typeof value === "number") return round(vhValue * value);
+    }
+    case "vw": {
+      const value = resolve(state, descriptor.arguments[0], style);
+      const vwValue = vw.get(state.styleEffect) / 100;
+      if (typeof value === "number") return round(vwValue * value);
+    }
+    case "em": {
+      const value = resolve(state, descriptor.arguments[0], style);
+      const fontSize = style?.fontSize ?? rem.get(state.styleEffect);
+      if (typeof value === "number") return round(fontSize * value);
+    }
+    case "rem": {
+      const value = resolve(state, descriptor.arguments[0], style);
+      const remValue = rem.get(state.styleEffect);
+      if (typeof value === "number") return round(remValue * value);
+    }
+    case "rnh": {
+      const value = resolve(state, descriptor.arguments[0], style);
+      const height = style?.height ?? getHeight(state);
+      if (typeof value === "number") return round(height * value);
+    }
+    case "rnw": {
+      const value = resolve(state, descriptor.arguments[0], style);
+      const width = style?.width ?? getWidth(state);
+      if (typeof value === "number") return round(width * value);
+    }
+    case "rgb":
+    case "rgba": {
+      const args = resolve(state, descriptor.arguments, style).flat(10);
+      if (args.length === 3) return `rgb(${args.join(", ")})`;
+      if (args.length === 4) return `rgba(${args.join(", ")})`;
+    }
+    case "hsla": {
+      const args = resolve(state, descriptor.arguments, style).flat(10);
+      if (args.length === 3) return `hsl(${args.join(" ")})`;
+      if (args.length === 4) return `hsla(${args.join(" ")})`;
+    }
+    case "hairlineWidth": {
+      return StyleSheet.hairlineWidth;
+    }
+    case "platformColor": {
+      return PlatformColor(
+        ...(descriptor.arguments as any[]),
+      ) as unknown as string;
+    }
+    case "platformSelect": {
+      return resolve(
+        state,
+        Platform.select(descriptor.arguments[0] as any),
+        style,
+      );
+    }
+    case "getPixelSizeForLayoutSize": {
+      const v = resolve(state, descriptor.arguments[0], style);
+      if (typeof v === "number") return PixelRatio.getPixelSizeForLayoutSize(v);
+    }
+    case "fontScale": {
+      const value = resolve(state, descriptor.arguments[0], style);
+      if (typeof value === "number") return PixelRatio.getFontScale() * value;
+    }
+    case "pixelScale": {
+      const value = resolve(state, descriptor.arguments[0], style);
+      if (typeof value === "number") return PixelRatio.get() * value;
+    }
+    case "pixelScaleSelect": {
+      const specifics = descriptor.arguments[0] as any;
+      return resolve(
+        state,
+        specifics[PixelRatio.get()] ?? specifics["default"],
+        style,
+      );
+    }
+    case "fontScaleSelect": {
+      const specifics = descriptor.arguments[0] as any;
+      return resolve(
+        state,
+        specifics[PixelRatio.getFontScale()] ?? specifics["default"],
+        style,
+      );
+    }
+    case "roundToNearestPixel": {
+      const v = resolve(state, descriptor.arguments[0], style);
+      if (typeof v === "number") return PixelRatio.roundToNearestPixel(v);
+    }
+    default: {
+      if ("name" in descriptor && "arguments" in descriptor) {
+        const args = resolve(state, descriptor.arguments, style).join(",");
+        return `${descriptor.name}(${args})`;
+      } else {
+        return descriptor;
+      }
+    }
+  }
+}
+
+function resolve(
+  state: PropState,
   args: RuntimeValueDescriptor,
+  style?: Record<string, any>,
 ): any {
   if (typeof args !== "object") {
     return args;
   }
 
   if (!Array.isArray(args)) {
-    return "arguments" in args ? parseValue(acc, args) : args;
+    return "arguments" in args ? resolveValue(state, args, style) : args;
   }
 
   let resolved = [];
 
   for (let value of args) {
-    value = resolve(acc, value);
+    value = resolve(state, value, style);
 
     if (value !== undefined) {
       resolved.push(value);
@@ -40,149 +149,45 @@ export function resolve(
   return resolved;
 }
 
-export function parseValue(
-  acc: PropAccumulator,
-  value: RuntimeValueDescriptor | string | number | boolean,
-): any {
-  if (typeof value !== "object" || !value) {
-    return value;
+function getVar(
+  propState: PropState,
+  name: string,
+  style?: Record<string, any>,
+) {
+  if (!name) return;
+  let value: any = undefined;
+  value ??= propState.variables?.[name];
+  value ??= universalVariables[name]?.get(propState.styleEffect);
+  if (value === undefined) {
+    value = propState.refs.variables[name];
+    if (typeof value === "object" && "get" in value) {
+      value = value.get(propState.styleEffect);
+    }
+    propState.variableTracking ??= new Map();
+    propState.variableTracking.set(name, value);
   }
-
-  if (Array.isArray(value)) {
-    return value.map((v) => parseValue(acc, v));
-  }
-
-  if (!("name" in value)) return value;
-
-  switch (value.name) {
-    case "var": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "string"
-        ? (acc.getVariable(descriptor) as any)
-        : undefined;
-    }
-    case "vh": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "number"
-        ? round((vh.get(acc.state) / 100) * descriptor)
-        : undefined;
-    }
-    case "vw": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "number"
-        ? round((vw.get(acc.state) / 100) * descriptor)
-        : undefined;
-    }
-    case "em": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "number"
-        ? round(acc.getFontSize() * descriptor)
-        : undefined;
-    }
-    case "rem": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "number"
-        ? round(rem.get(acc.state) * descriptor)
-        : undefined;
-    }
-    case "rnh": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "number"
-        ? round(acc.getHeight() * descriptor)
-        : undefined;
-    }
-    case "rnw": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "number"
-        ? round(acc.getWidth() * descriptor)
-        : undefined;
-    }
-    case "rgb":
-    case "rgba": {
-      const args = resolve(acc, value.arguments).flat(10);
-      if (args.length === 3) {
-        return `rgb(${args.join(", ")})`;
-      } else if (args.length === 4) {
-        return `rgba(${args.join(", ")})`;
-      } else {
-        return;
-      }
-    }
-    case "hsla": {
-      const args = resolve(acc, value.arguments).flat(10);
-      if (args.length === 3) {
-        return `hsl(${args.join(" ")})`;
-      } else if (args.length === 4) {
-        return `hsla(${args.join(" ")})`;
-      } else {
-        return;
-      }
-    }
-    case "hairlineWidth": {
-      return StyleSheet.hairlineWidth;
-    }
-    case "platformColor": {
-      return PlatformColor(...(value.arguments as any[])) as unknown as string;
-    }
-    case "platformSelect": {
-      return resolve(acc, Platform.select(value.arguments[0] as any));
-    }
-    case "getPixelSizeForLayoutSize": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "number"
-        ? PixelRatio.getPixelSizeForLayoutSize(descriptor)
-        : undefined;
-    }
-    case "fontScale": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "number"
-        ? PixelRatio.getFontScale() * descriptor
-        : undefined;
-    }
-    case "pixelScale": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "number"
-        ? PixelRatio.get() * descriptor
-        : undefined;
-    }
-    case "pixelScaleSelect": {
-      const specifics = value.arguments[0] as any;
-      return resolve(acc, specifics[PixelRatio.get()] ?? specifics["default"]);
-    }
-    case "fontScaleSelect": {
-      const specifics = value.arguments[0] as any;
-      return resolve(
-        acc,
-        specifics[PixelRatio.getFontScale()] ?? specifics["default"],
-      );
-    }
-    case "roundToNearestPixel": {
-      const descriptor = resolve(acc, value.arguments[0]);
-      return typeof descriptor === "number"
-        ? PixelRatio.roundToNearestPixel(descriptor)
-        : undefined;
-    }
-    default: {
-      const args = resolve(acc, value.arguments).join(",");
-      return `${value.name}(${args})`;
-    }
-  }
+  return resolveValue(propState, value, style);
 }
 
 export function resolveAnimation(
-  acc: PropAccumulator,
+  state: PropState,
   [initialFrame, ...frames]: RuntimeValueFrame[],
-  prop: string,
-  props: Record<string, any>,
+  property: string,
+  props: Record<string, any> = {},
+  normalizedProps: Record<string, any>,
   delay: number,
   totalDuration: number,
   timingFunction: EasingFunction,
 ): [AnimatableValue, AnimatableValue, ...AnimatableValue[]] {
+  const { withDelay, withTiming, Easing } =
+    require("react-native-reanimated") as typeof import("react-native-reanimated");
+
   const initialValue = resolveAnimationValue(
-    acc,
-    initialFrame.value,
-    prop,
+    state,
     props,
+    normalizedProps,
+    property,
+    initialFrame.value,
   );
 
   return [
@@ -190,38 +195,61 @@ export function resolveAnimation(
     ...frames.map((frame) => {
       return withDelay(
         delay,
-        withTiming(resolveAnimationValue(acc, frame.value, prop, props), {
-          duration: totalDuration * frame.progress,
-          easing: getEasing(timingFunction),
-        }),
+        withTiming(
+          resolveAnimationValue(
+            state,
+            props,
+            normalizedProps,
+            property,
+            frame.value,
+          ),
+          {
+            duration: totalDuration * frame.progress,
+            easing: getEasing(timingFunction, Easing),
+          },
+        ),
       );
     }),
   ] as [AnimatableValue, AnimatableValue, ...AnimatableValue[]];
 }
 
 function resolveAnimationValue(
-  acc: PropAccumulator,
+  state: PropState,
+  props: Record<string, any> = {},
+  normalizedProps: Record<string, any>,
+  property: string,
   value: RuntimeValueDescriptor,
-  prop: string,
-  style: Record<string, any> = {},
 ) {
   if (value === "!INHERIT!") {
-    return style[prop] ?? defaultValues[prop];
+    value = normalizedProps[property] ?? props.style[property];
+    if (value === undefined) {
+      const defaultValueFn = defaultValues[property];
+      return typeof defaultValueFn === "function"
+        ? defaultValueFn(state.styleEffect)
+        : defaultValueFn;
+    }
+    return value;
   } else {
-    return resolve(acc, value);
+    return resolve(state, value, props);
   }
 }
 
-export function resolveTransitionValue(acc: PropAccumulator, property: string) {
-  let value: any;
+export function resolveTransitionValue(
+  state: PropState,
+  props: Record<string, any> = {},
+  normalizedProps: Record<string, any>,
+  property: string,
+) {
+  const defaultValueFn = defaultValues[property];
+  const defaultValue =
+    typeof defaultValueFn === "function"
+      ? defaultValueFn(state.styleEffect)
+      : defaultValueFn;
 
-  if (transformKeys.has(property)) {
-    value = acc.transformLookup[property];
-  } else {
-    value = acc.props.style[property];
-  }
-
-  return value;
+  return {
+    defaultValue,
+    value: normalizedProps[property] ?? props[state.target][property],
+  };
 }
 
 export const timeToMS = (time: Time) => {
@@ -232,7 +260,10 @@ function round(number: number) {
   return Math.round((number + Number.EPSILON) * 100) / 100;
 }
 
-export function getEasing(timingFunction: EasingFunction) {
+export function getEasing(
+  timingFunction: EasingFunction,
+  Easing: typeof import("react-native-reanimated")["Easing"],
+) {
   switch (timingFunction.type) {
     case "ease":
       return Easing.ease;
@@ -256,36 +287,33 @@ export function getEasing(timingFunction: EasingFunction) {
   }
 }
 
-export function setDeepStyle(
-  acc: PropAccumulator,
-  pathTokens: string[],
+export function setDeep(
+  target: Record<string, any>,
+  paths: string[],
   value: any,
-  target: Record<string, any> = acc.props,
 ) {
-  for (let i = 0; i < pathTokens.length; i++) {
-    const token = pathTokens[i];
-
-    // The last token
-    if (i === pathTokens.length - 1) {
-      value = parseValue(acc, value);
-      if (transformKeys.has(token)) {
-        target.transform ??= [];
-        const existing = target.transform.find(
-          (t: object) => Object.keys(t)[0] === token,
-        );
-        if (existing) {
-          existing[token] = value;
-        } else {
-          target.transform.push({ [token]: value });
-        }
-        acc.transformLookup[token] = value;
+  const prop = paths[paths.length - 1];
+  for (let i = 0; i < paths.length - 1; i++) {
+    const token = paths[i];
+    target[token] ??= {};
+    target = target[token];
+  }
+  if (transformKeys.has(prop)) {
+    if (target.transform) {
+      const existing = target.transform.find(
+        (t: any) => Object.keys(t)[0] === prop,
+      );
+      if (existing) {
+        existing[prop] = value;
       } else {
-        target[token] = value;
+        target.transform.push({ [prop]: value });
       }
     } else {
-      target[token] ??= {};
-      target = target[token];
+      target.transform ??= [];
+      target.transform.push({ [prop]: value });
     }
+  } else {
+    target[prop] = value;
   }
 }
 

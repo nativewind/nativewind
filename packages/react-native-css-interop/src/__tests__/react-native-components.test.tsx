@@ -76,7 +76,7 @@ test("TextInput", () => {
   });
 });
 
-test.only("ActivityIndicator", () => {
+test("ActivityIndicator", () => {
   registerCSS(
     `.bg-black { background-color: black } .text-white { color: white }`,
   );

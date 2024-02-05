@@ -112,7 +112,7 @@ export function normalizeSelectors(
       ...defaults,
       type: "className",
       className: "",
-      specificity: { A: 0, B: 0, C: 0 },
+      specificity: {},
     };
 
     let previousWasCombinator = true;
@@ -125,6 +125,7 @@ export function normalizeSelectors(
           isValid = false;
           break;
         case "id":
+          selector.specificity.A ??= 0;
           selector.specificity.A++;
           isValid = false;
           break;
@@ -134,6 +135,7 @@ export function normalizeSelectors(
             break;
           }
 
+          selector.specificity.B ??= 0;
           selector.specificity.B++;
           selector.attrs ??= [];
           if (component.name.startsWith("data-")) {
@@ -148,10 +150,12 @@ export function normalizeSelectors(
           break;
         }
         case "pseudo-element":
+          selector.specificity.C ??= 0;
           selector.specificity.C++;
           isValid = false;
           break;
         case "type": {
+          selector.specificity.C ??= 0;
           selector.specificity.C++;
           isValid = component.name === options.selectorPrefix;
           break;
@@ -171,6 +175,7 @@ export function normalizeSelectors(
             break;
           }
 
+          selector.specificity.B ??= 0;
           selector.specificity.B++;
 
           // We can only have two classnames in a selector if the first one is a valid group
@@ -203,6 +208,7 @@ export function normalizeSelectors(
             break;
           }
 
+          selector.specificity.B ??= 0;
           selector.specificity.B++;
 
           switch (component.kind) {

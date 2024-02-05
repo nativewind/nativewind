@@ -4,7 +4,7 @@ export {
   useColorScheme,
   useUnstableNativeVariable,
   vars,
-} from "../api";
+} from "../web/api";
 
 export { StyleSheet } from "./stylesheet";
 export { colorScheme, rem } from "./globals";

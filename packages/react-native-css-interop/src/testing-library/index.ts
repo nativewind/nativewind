@@ -1,7 +1,7 @@
 import * as JSX from "react/jsx-runtime";
 import { render as tlRender } from "@testing-library/react-native";
 
-import { StyleSheet } from "../index";
+import { StyleSheet } from "../runtime/native/api";
 import { INTERNAL_RESET } from "../shared";
 import {
   CssToReactNativeRuntimeOptions,
@@ -16,7 +16,7 @@ import "../runtime/components";
 import { cssInterop, remapProps, interopComponents } from "../runtime/api";
 import wrapJSX from "../runtime/wrap-jsx";
 import { ComponentProps, ComponentType, forwardRef } from "react";
-import { opaqueStyles } from "../runtime/native/stylesheet";
+import { opaqueStyles } from "../runtime/native/style-store";
 
 export * from "../types";
 export { warnings } from "../runtime/native/globals";
@@ -59,7 +59,7 @@ export const createMockComponent = <
     return renderJSX(Component, props, "", false, undefined, undefined);
   });
 
-  return Object.assign(forwardRef(mock), { mock }) as ComponentType<
+  return Object.assign(forwardRef(mock), { mock }) as unknown as ComponentType<
     ComponentProps<T> & CssInteropGeneratedProps<M>
   > & { mock: typeof mock };
 };
@@ -82,7 +82,7 @@ export const createRemappedComponent = <
     return renderJSX(Component, props, "", false, undefined, undefined);
   });
 
-  return Object.assign(forwardRef(mock), { mock }) as ComponentType<
+  return Object.assign(forwardRef(mock), { mock }) as unknown as ComponentType<
     ComponentProps<T> & CssInteropGeneratedProps<M>
   >;
 };
@@ -133,7 +133,7 @@ export function revealStyles(obj: any): any {
               if (Array.isArray(value)) {
                 return [key, value.map(revealStyles)];
               } else if (value) {
-                const style = opaqueStyles.get(value);
+                const style = opaqueStyles.get(value as any);
                 return [key, style ?? value];
               } else {
                 return [key, value];
