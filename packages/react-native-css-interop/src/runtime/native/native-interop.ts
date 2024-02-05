@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Effect, Observable, cleanupEffect } from "../observable";
 import {
-  AttributeDependency,
   ExtractedAnimations,
   ExtractedTransition,
   InteropComponentConfig,
@@ -22,7 +21,7 @@ import {
 import type { SharedValue } from "react-native-reanimated";
 import { globalStyles, opaqueStyles } from "./style-store";
 import { UpgradeState, renderComponent } from "./render-component";
-import { testAttributesChanged, testRule } from "./conditions";
+import { testRule } from "./conditions";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 
 export type ComponentState = {
@@ -61,7 +60,6 @@ export type PropState = InteropComponentConfig & {
 
   tracking: {
     inlineStyles?: any;
-    attributes?: AttributeDependency[];
     index: number;
     rules: StyleRule[];
     changed: boolean;
@@ -139,7 +137,7 @@ export function interop(
   componentState.refs.variables = variables;
 
   // Clone the props into a new object, as props will be frozen
-  props = { ...props, ref };
+  props = Object.assign({ ref }, props);
 
   // We need to rerun all the prop states to get the styled props
   for (const propState of componentState.propStates) {
@@ -154,10 +152,10 @@ export function interop(
     }
 
     if (propState.variables) {
-      variables = { ...variables, ...propState.variables };
+      variables = Object.assign({}, variables, propState.variables);
     }
     if (propState.containerNames) {
-      containers = { ...containers };
+      containers = Object.assign({}, containers);
       for (const name of propState.containerNames) {
         containers[name] = componentState;
       }
@@ -179,7 +177,9 @@ function createPropState(
   config: InteropComponentConfig,
 ) {
   const propState: PropState = {
-    ...config,
+    source: config.source,
+    target: config.target,
+    nativeStyleToProp: config.nativeStyleToProp,
     upgrades: componentState.upgrades,
     interaction: componentState.interaction,
     refs: componentState.refs,
@@ -199,10 +199,6 @@ function createPropState(
         const classNames = propState.refs.props?.[propState.source];
         const inlineStyles = propState.refs.props?.[config.target];
 
-        if (propState.refs.props?.testID) {
-          console.log("1", classNames);
-        }
-
         tracking.index = 0;
         tracking.changed = tracking.inlineStyles !== inlineStyles;
         tracking.inlineStyles = inlineStyles;
@@ -214,13 +210,6 @@ function createPropState(
           for (const className of classNames.split(/\s+/)) {
             addStyle(propState, className, normal, important);
           }
-        }
-
-        if (tracking.attributes) {
-          tracking.changed ||= testAttributesChanged(
-            tracking.attributes,
-            propState.refs.props,
-          );
         }
 
         tracking.changed ||=
@@ -384,8 +373,8 @@ function addDeclarations(
 
       if (rule.variables) {
         propState.variables ??= {};
-        for (const [key, value] of rule.variables) {
-          propState.variables[key] = value;
+        for (const variable of rule.variables) {
+          propState.variables[variable[0]] = variable[1];
         }
       }
 

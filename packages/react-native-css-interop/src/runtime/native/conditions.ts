@@ -9,7 +9,6 @@ import type {
 
 import {
   AttributeCondition,
-  AttributeDependency,
   ExtractedContainerQuery,
   PseudoClassesQuery,
   StyleRule,
@@ -27,35 +26,21 @@ interface ConditionReference {
 
 export function testRule(
   state: PropState,
-  styleRule: StyleRule,
+  rule: StyleRule,
   props: Record<string, any> | null | undefined,
 ) {
-  if (styleRule.pseudoClasses) {
-    if (!testPseudoClasses(state, styleRule.pseudoClasses)) {
-      return false;
-    }
-  }
-
-  if (styleRule.media && !testMediaQueries(state, styleRule.media)) {
+  if (rule.pseudoClasses && !testPseudoClasses(state, rule.pseudoClasses)) {
     return false;
   }
-
-  if (
-    styleRule.containerQuery &&
-    !testContainerQuery(state, styleRule.containerQuery)
-  ) {
+  if (rule.media && !testMediaQueries(state, rule.media)) {
     return false;
   }
-
-  if (styleRule.attrs) {
-    for (const attrCondition of styleRule.attrs) {
+  if (rule.containerQuery && !testContainerQuery(state, rule.containerQuery)) {
+    return false;
+  }
+  if (rule.attrs) {
+    for (const attrCondition of rule.attrs) {
       const attrValue = getTestAttributeValue(props, attrCondition);
-      state.tracking.attributes ??= [];
-      state.tracking.attributes.push({
-        ...attrCondition,
-        previous: attrValue,
-      });
-
       if (!testAttribute(attrValue, attrCondition)) {
         return false;
       }
@@ -323,20 +308,6 @@ function unwrap<T>(effect: Effect, value: T | { get(effect: Effect): T }): T {
   return value && typeof value === "object" && "get" in value
     ? value.get(effect)
     : (value as T);
-}
-
-export function testAttributesChanged(
-  attrDependencies: AttributeDependency[],
-  props?: Record<string, any> | null,
-) {
-  return attrDependencies.some((condition) => {
-    const current =
-      condition.type === "data-attribute"
-        ? props?.["dataSet"]?.[condition.name]
-        : props?.[condition.name];
-
-    return current !== condition.previous;
-  });
 }
 
 export function getTestAttributeValue(

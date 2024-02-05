@@ -5,6 +5,7 @@ import { containerContext, variableContext } from "./globals";
 import { ComponentState } from "./native-interop";
 import { observable } from "../observable";
 
+const ForwardRefSymbol = Symbol.for("react.forward_ref");
 const animatedCache = new Map<
   ComponentType<any> | string,
   ComponentType<any>
@@ -18,12 +19,13 @@ export const UpgradeState = {
 };
 
 export function renderComponent(
-  component: ComponentType<any>,
+  baseComponent: ComponentType<any>,
   state: ComponentState,
   props: Record<string, any>,
   variables: Record<string, any>,
   containers: Record<string, any>,
 ) {
+  let component = baseComponent;
   const shouldWarn = state.upgrades.canWarn;
   const isContainer = state.upgrades.containers;
 
@@ -95,6 +97,7 @@ export function renderComponent(
       state.interaction.focus)
   ) {
     component = Pressable;
+    props.cssInterop = false;
     if (
       shouldWarn &&
       state.upgrades.pressable === UpgradeState.SHOULD_UPGRADE
@@ -159,7 +162,20 @@ export function renderComponent(
   // After the initial render, the user shouldn't upgrade the component. Avoid warning in production
   state.upgrades.canWarn = process.env.NODE_ENV !== "production";
 
-  return createElement(component, props);
+  /*
+   * If we don't need to upgrade the component, we can just return the original component
+   * But we already are in a forwardRef, so if the component is also wrapped in a forwardRef,
+   * we can immediately call its render function
+   */
+  if (
+    component === baseComponent &&
+    "$$typeof" in baseComponent &&
+    baseComponent.$$typeof === ForwardRefSymbol
+  ) {
+    return (baseComponent as any).render(props, props.ref);
+  } else {
+    return createElement(component, props);
+  }
 }
 
 function createAnimatedComponent(Component: ComponentType<any>): any {

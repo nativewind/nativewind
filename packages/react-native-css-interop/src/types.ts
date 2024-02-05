@@ -188,7 +188,6 @@ export type StyleRule = {
 export type PropState = Effect & {
   initialRender: boolean;
   resetContext: boolean;
-  attributes: AttributeDependency[];
   isAnimated: boolean;
   sharedValues: Map<string, SharedValue<any>>;
   animationNames: Set<string>;
@@ -383,9 +382,6 @@ type AttributeSelectorComponent = Extract<
   { type: "attribute" }
 >;
 export type AttributeCondition = PropCondition | DataAttributeCondition;
-export type AttributeDependency = AttributeCondition & {
-  previous?: any;
-};
 
 export type PropCondition = Omit<AttributeSelectorComponent, "operation"> & {
   operation?:
