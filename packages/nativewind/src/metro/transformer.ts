@@ -48,7 +48,7 @@ StyleSheet.registerCompiled(JSON.parse('${config.nativewind.parsedOutput}'));`,
         config,
         projectRoot,
         filename,
-        Buffer.from(`require('${config.nativewind.outputPath}');`, "utf8"),
+        Buffer.from(`require('${config.nativewind.outputPath.replace(/\\/g, '\\\\')}');`, "utf8"),
         options,
       );
     } else {
