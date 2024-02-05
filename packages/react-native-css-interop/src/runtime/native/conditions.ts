@@ -326,14 +326,14 @@ function unwrap<T>(effect: Effect, value: T | { get(effect: Effect): T }): T {
 }
 
 export function testAttributesChanged(
-  props: Record<string, any>,
   attrDependencies: AttributeDependency[],
+  props?: Record<string, any> | null,
 ) {
   return attrDependencies.some((condition) => {
     const current =
       condition.type === "data-attribute"
-        ? props["dataSet"]?.[condition.name]
-        : props[condition.name];
+        ? props?.["dataSet"]?.[condition.name]
+        : props?.[condition.name];
 
     return current !== condition.previous;
   });

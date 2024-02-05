@@ -22,7 +22,7 @@ import {
 import type { SharedValue } from "react-native-reanimated";
 import { globalStyles, opaqueStyles } from "./style-store";
 import { UpgradeState, renderComponent } from "./render-component";
-import { testRule } from "./conditions";
+import { testAttributesChanged, testRule } from "./conditions";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 
 export type ComponentState = {
@@ -114,8 +114,14 @@ export function interop(
   useEffect(() => {
     return () => {
       for (const prop of componentState.propStates) {
+        /*
+         * Effects are a two-way dependency system, so we need to cleanup the references to avoid a memory leak
+         */
         cleanupEffect(prop.declarationEffect);
         cleanupEffect(prop.styleEffect);
+        /*
+         * If we have any shared values, we need to cancel any running animations
+         */
         if (prop.sharedValues?.size) {
           const { cancelAnimation } =
             require("react-native-reanimated") as typeof import("react-native-reanimated");
@@ -208,6 +214,13 @@ function createPropState(
           for (const className of classNames.split(/\s+/)) {
             addStyle(propState, className, normal, important);
           }
+        }
+
+        if (tracking.attributes) {
+          tracking.changed ||= testAttributesChanged(
+            tracking.attributes,
+            propState.refs.props,
+          );
         }
 
         tracking.changed ||=
