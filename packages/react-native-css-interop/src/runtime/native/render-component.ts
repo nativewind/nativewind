@@ -1,8 +1,8 @@
-import { ComponentType, createElement, forwardRef, useRef } from "react";
+import { ComponentType, createElement, forwardRef } from "react";
 import { LayoutChangeEvent, Pressable, View } from "react-native";
-import { containerContext, variableContext } from "./globals";
 
-import type { ComponentState } from "./native-interop";
+import { containerContext, variableContext } from "./globals";
+import { ComponentState } from "./native-interop";
 import { observable } from "../observable";
 
 const animatedCache = new Map<
@@ -21,7 +21,6 @@ export function renderComponent(
   component: ComponentType<any>,
   state: ComponentState,
   props: Record<string, any>,
-  originalProps: Record<string, any> | null | undefined,
   variables: Record<string, any>,
   containers: Record<string, any>,
 ) {
@@ -31,22 +30,22 @@ export function renderComponent(
   if (state.interaction.active || isContainer) {
     state.interaction.active ??= observable(false);
     props.onPressIn = (event: unknown) => {
-      originalProps?.onPressIn?.(event);
+      state.refs.props?.onPressIn?.(event);
       state.interaction.active!.set(true);
     };
     props.onPressOut = (event: unknown) => {
-      originalProps?.onPressOut?.(event);
+      state.refs.props?.onPressOut?.(event);
       state.interaction.active!.set(false);
     };
   }
   if (state.interaction.hover || isContainer) {
     state.interaction.hover ??= observable(false);
     props.onHoverIn = (event: unknown) => {
-      originalProps?.onHoverIn?.(event);
+      state.refs.props?.onHoverIn?.(event);
       state.interaction.hover!.set(true);
     };
     props.onHoverOut = (event: unknown) => {
-      originalProps?.onHoverOut?.(event);
+      state.refs.props?.onHoverOut?.(event);
       state.interaction.hover!.set(false);
     };
   }
@@ -54,11 +53,11 @@ export function renderComponent(
   if (state.interaction.focus || isContainer) {
     state.interaction.focus ??= observable(false);
     props.onFocus = (event: unknown) => {
-      originalProps?.onFocus?.(event);
+      state.refs.props?.onFocus?.(event);
       state.interaction.focus!.set(true);
     };
     props.onBlur = (event: unknown) => {
-      originalProps?.onBlur?.(event);
+      state.refs.props?.onBlur?.(event);
       state.interaction.focus!.set(false);
     };
   }
@@ -72,17 +71,17 @@ export function renderComponent(
     state.interaction.focus
   ) {
     props.onPress = (event: unknown) => {
-      originalProps?.onPress?.(event);
+      state.refs.props?.onPress?.(event);
     };
   }
 
   if (state.interaction.layout || isContainer) {
     state.interaction.layout ??= observable([0, 0]);
     props.onLayout = (event: LayoutChangeEvent) => {
-      originalProps?.onLayout?.(event);
+      state.refs.props?.onLayout?.(event);
       const layout = event.nativeEvent.layout;
-      const [width, height] = state.interaction.layout!.get() ?? [0, 0];
-      if (layout.width !== width || layout.height !== height) {
+      const prevLayout = state.interaction.layout!.get();
+      if (layout.width !== prevLayout[0] || layout.height !== prevLayout[0]) {
         state.interaction.layout!.set([layout.width, layout.height]);
       }
     };
@@ -96,20 +95,23 @@ export function renderComponent(
       state.interaction.focus)
   ) {
     component = Pressable;
-    if (shouldWarn && state.upgrades.pressable === UpgradeState.NONE) {
+    if (
+      shouldWarn &&
+      state.upgrades.pressable === UpgradeState.SHOULD_UPGRADE
+    ) {
       printUpgradeWarning(
         `Converting View to Pressable should only happen during the initial render otherwise it will remount the View.\n\nTo prevent this warning avoid adding styles which use pseudo-classes (e.g :hover, :active, :focus) to View components after the initial render, or change the View to a Pressable`,
-        originalProps,
+        state.refs.props,
       );
     }
     state.upgrades.pressable = UpgradeState.UPGRADED;
   }
 
   if (state.upgrades.animated) {
-    if (shouldWarn && state.upgrades.animated === UpgradeState.NONE) {
+    if (shouldWarn && state.upgrades.animated === UpgradeState.SHOULD_UPGRADE) {
       printUpgradeWarning(
         `Converting component to animated component should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none", "transition-property: none"`,
-        originalProps,
+        state.refs.props,
       );
     }
     state.upgrades.animated = UpgradeState.UPGRADED;
@@ -123,7 +125,7 @@ export function renderComponent(
     ) {
       printUpgradeWarning(
         `Making a component inheritable should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,
-        originalProps,
+        state.refs.props,
       );
     }
     state.upgrades.variables = UpgradeState.UPGRADED;
@@ -142,7 +144,7 @@ export function renderComponent(
     ) {
       printUpgradeWarning(
         `Making a component inheritable should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,
-        originalProps,
+        state.refs.props,
       );
     }
     state.upgrades.containers = UpgradeState.UPGRADED;
@@ -190,42 +192,12 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
    * original component. However, we get an error about running on the JS thread?
    */
   const CSSInteropAnimationWrapper = forwardRef((props: any, ref: any) => {
-    const fallbackStyle = useRef<Record<string, any>>({}).current;
-
-    /**
-     * Reanimated has a bug where it doesn't fallback to the default value if the value is
-     * removed from the style object. This code is a workaround to manually set the default
-     * value.
-     */
-    // useMemo(() => {
-    //   for (const [key, value] of Object.entries(props.style) as [
-    //     string,
-    //     any,
-    //   ][]) {
-    //     if (key === "transform") {
-    //       fallbackStyle.transform = value.flatMap((v: any) => {
-    //         const [key, value] = Object.entries(v)[0] as any;
-    //         return { [key]: value };
-    //       });
-    //     } else if (
-    //       typeof value === "object" &&
-    //       "_isReanimatedSharedValue" in value
-    //     ) {
-    //       fallbackStyle[key] = defaultValues[key];
-    //     } else {
-    //       for (const subKey of Object.keys(value)) {
-    //         fallbackStyle[key][subKey] = defaultValues[subKey];
-    //       }
-    //     }
-    //   }
-    // }, [props.style]);
-
     /**
      * This code shouldn't be needed, but inline shared values are not working properly.
      * https://github.com/software-mansion/react-native-reanimated/issues/5296
      */
     const style = useAnimatedStyle(() => {
-      const style: any = { ...fallbackStyle };
+      const style: any = {};
       const entries = Object.entries(props.style ?? {});
 
       for (const [key, value] of entries as any) {

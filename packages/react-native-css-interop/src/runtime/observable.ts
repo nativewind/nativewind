@@ -1,9 +1,10 @@
 export type Effect = {
-  rerun: () => void;
+  rerun: (isRendering?: boolean) => void;
   dependencies: Set<() => void>;
 };
 
 export type Observable<T> = {
+  name?: string;
   get(effect?: Effect): T;
   set(newValue: T, notify?: boolean): void;
 };
@@ -20,6 +21,7 @@ export function observable<T>(
   const subscriptions = new Set<() => void>();
 
   return {
+    name,
     get(effect) {
       if (effect) {
         subscriptions.add(effect.rerun);

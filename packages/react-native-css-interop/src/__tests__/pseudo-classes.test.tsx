@@ -27,7 +27,6 @@ test("hover", () => {
   expect(component).toHaveStyle({ width: 10 });
 
   fireEvent(component, "hoverOut");
-  debugger;
   expect(component).toHaveStyle(undefined);
 });
 

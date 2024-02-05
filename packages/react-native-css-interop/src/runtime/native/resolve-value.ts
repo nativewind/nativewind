@@ -2,122 +2,98 @@ import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
 import type { AnimatableValue } from "react-native-reanimated";
 import type { EasingFunction, Time } from "lightningcss";
 import type { RuntimeValueDescriptor, RuntimeValueFrame } from "../../types";
-import type { PropStateObservable } from "./prop-state-observable";
-import { rem, systemColorScheme, vh, vw } from "./globals";
+import { rem, systemColorScheme, universalVariables, vh, vw } from "./globals";
 import { Effect } from "../observable";
 import { transformKeys } from "../../shared";
+import { PropState } from "./native-interop";
+import { getWidth, getHeight } from "./utils";
 
 export function resolveValue(
-  state: PropStateObservable,
-  value: RuntimeValueDescriptor | string | number | boolean,
+  state: PropState,
+  descriptor: RuntimeValueDescriptor | string | number | boolean,
   style?: Record<string, any>,
 ): any {
-  if (typeof value !== "object" || !value) {
-    return value;
+  if (typeof descriptor !== "object" || !descriptor) return descriptor;
+
+  if (Array.isArray(descriptor)) {
+    return descriptor.map((v) => resolveValue(state, v, style));
   }
 
-  if (Array.isArray(value)) {
-    return value.map((v) => resolveValue(state, v, style));
-  }
-
-  if (!("name" in value)) return value;
-
-  switch (value.name) {
+  switch (descriptor.name) {
     case "var": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      return typeof descriptor === "string"
-        ? (state.getCSSVariable(descriptor, style) as any)
-        : undefined;
+      const value = resolve(state, descriptor.arguments[0], style);
+      if (typeof value === "string") return getVar(state, value, style);
     }
     case "vh": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      return typeof descriptor === "number"
-        ? round((vh.get(state) / 100) * descriptor)
-        : undefined;
+      const value = resolve(state, descriptor.arguments[0], style);
+      const vhValue = vh.get(state.styleEffect) / 100;
+      if (typeof value === "number") return round(vhValue * value);
     }
     case "vw": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      return typeof descriptor === "number"
-        ? round((vw.get(state) / 100) * descriptor)
-        : undefined;
+      const value = resolve(state, descriptor.arguments[0], style);
+      const vwValue = vw.get(state.styleEffect) / 100;
+      if (typeof value === "number") return round(vwValue * value);
     }
     case "em": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      const fontSize = style?.fontSize ?? rem.get(state);
-      return typeof descriptor === "number"
-        ? round(fontSize * descriptor)
-        : undefined;
+      const value = resolve(state, descriptor.arguments[0], style);
+      const fontSize = style?.fontSize ?? rem.get(state.styleEffect);
+      if (typeof value === "number") return round(fontSize * value);
     }
     case "rem": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      return typeof descriptor === "number"
-        ? round(rem.get(state) * descriptor)
-        : undefined;
+      const value = resolve(state, descriptor.arguments[0], style);
+      const remValue = rem.get(state.styleEffect);
+      if (typeof value === "number") return round(remValue * value);
     }
     case "rnh": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      const height = style?.height ?? state.componentState.getLayout(state)[1];
-      return typeof descriptor === "number"
-        ? round(height * descriptor)
-        : undefined;
+      const value = resolve(state, descriptor.arguments[0], style);
+      const height = style?.height ?? getHeight(state);
+      if (typeof value === "number") return round(height * value);
     }
     case "rnw": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      const width = style?.width ?? state.componentState.getLayout(state)[0];
-      return typeof descriptor === "number"
-        ? round(width * descriptor)
-        : undefined;
+      const value = resolve(state, descriptor.arguments[0], style);
+      const width = style?.width ?? getWidth(state);
+      if (typeof value === "number") return round(width * value);
     }
     case "rgb":
     case "rgba": {
-      const args = resolve(state, value.arguments, style).flat(10);
-      if (args.length === 3) {
-        return `rgb(${args.join(", ")})`;
-      } else if (args.length === 4) {
-        return `rgba(${args.join(", ")})`;
-      } else {
-        return;
-      }
+      const args = resolve(state, descriptor.arguments, style).flat(10);
+      if (args.length === 3) return `rgb(${args.join(", ")})`;
+      if (args.length === 4) return `rgba(${args.join(", ")})`;
     }
     case "hsla": {
-      const args = resolve(state, value.arguments, style).flat(10);
-      if (args.length === 3) {
-        return `hsl(${args.join(" ")})`;
-      } else if (args.length === 4) {
-        return `hsla(${args.join(" ")})`;
-      } else {
-        return;
-      }
+      const args = resolve(state, descriptor.arguments, style).flat(10);
+      if (args.length === 3) return `hsl(${args.join(" ")})`;
+      if (args.length === 4) return `hsla(${args.join(" ")})`;
     }
     case "hairlineWidth": {
       return StyleSheet.hairlineWidth;
     }
     case "platformColor": {
-      return PlatformColor(...(value.arguments as any[])) as unknown as string;
+      return PlatformColor(
+        ...(descriptor.arguments as any[]),
+      ) as unknown as string;
     }
     case "platformSelect": {
-      return resolve(state, Platform.select(value.arguments[0] as any), style);
+      return resolve(
+        state,
+        Platform.select(descriptor.arguments[0] as any),
+        style,
+      );
     }
     case "getPixelSizeForLayoutSize": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      return typeof descriptor === "number"
-        ? PixelRatio.getPixelSizeForLayoutSize(descriptor)
-        : undefined;
+      const v = resolve(state, descriptor.arguments[0], style);
+      if (typeof v === "number") return PixelRatio.getPixelSizeForLayoutSize(v);
     }
     case "fontScale": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      return typeof descriptor === "number"
-        ? PixelRatio.getFontScale() * descriptor
-        : undefined;
+      const value = resolve(state, descriptor.arguments[0], style);
+      if (typeof value === "number") return PixelRatio.getFontScale() * value;
     }
     case "pixelScale": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      return typeof descriptor === "number"
-        ? PixelRatio.get() * descriptor
-        : undefined;
+      const value = resolve(state, descriptor.arguments[0], style);
+      if (typeof value === "number") return PixelRatio.get() * value;
     }
     case "pixelScaleSelect": {
-      const specifics = value.arguments[0] as any;
+      const specifics = descriptor.arguments[0] as any;
       return resolve(
         state,
         specifics[PixelRatio.get()] ?? specifics["default"],
@@ -125,7 +101,7 @@ export function resolveValue(
       );
     }
     case "fontScaleSelect": {
-      const specifics = value.arguments[0] as any;
+      const specifics = descriptor.arguments[0] as any;
       return resolve(
         state,
         specifics[PixelRatio.getFontScale()] ?? specifics["default"],
@@ -133,20 +109,22 @@ export function resolveValue(
       );
     }
     case "roundToNearestPixel": {
-      const descriptor = resolve(state, value.arguments[0], style);
-      return typeof descriptor === "number"
-        ? PixelRatio.roundToNearestPixel(descriptor)
-        : undefined;
+      const v = resolve(state, descriptor.arguments[0], style);
+      if (typeof v === "number") return PixelRatio.roundToNearestPixel(v);
     }
     default: {
-      const args = resolve(state, value.arguments, style).join(",");
-      return `${value.name}(${args})`;
+      if ("name" in descriptor && "arguments" in descriptor) {
+        const args = resolve(state, descriptor.arguments, style).join(",");
+        return `${descriptor.name}(${args})`;
+      } else {
+        return descriptor;
+      }
     }
   }
 }
 
 function resolve(
-  state: PropStateObservable,
+  state: PropState,
   args: RuntimeValueDescriptor,
   style?: Record<string, any>,
 ): any {
@@ -171,8 +149,28 @@ function resolve(
   return resolved;
 }
 
+function getVar(
+  propState: PropState,
+  name: string,
+  style?: Record<string, any>,
+) {
+  if (!name) return;
+  let value: any = undefined;
+  value ??= propState.variables?.[name];
+  value ??= universalVariables[name]?.get(propState.styleEffect);
+  if (value === undefined) {
+    value = propState.refs.variables[name];
+    if (typeof value === "object" && "get" in value) {
+      value = value.get(propState.styleEffect);
+    }
+    propState.variableTracking ??= new Map();
+    propState.variableTracking.set(name, value);
+  }
+  return resolveValue(propState, value, style);
+}
+
 export function resolveAnimation(
-  state: PropStateObservable,
+  state: PropState,
   [initialFrame, ...frames]: RuntimeValueFrame[],
   property: string,
   props: Record<string, any> = {},
@@ -181,7 +179,7 @@ export function resolveAnimation(
   totalDuration: number,
   timingFunction: EasingFunction,
 ): [AnimatableValue, AnimatableValue, ...AnimatableValue[]] {
-  const { withDelay, withTiming } =
+  const { withDelay, withTiming, Easing } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
   const initialValue = resolveAnimationValue(
@@ -207,7 +205,7 @@ export function resolveAnimation(
           ),
           {
             duration: totalDuration * frame.progress,
-            easing: getEasing(timingFunction),
+            easing: getEasing(timingFunction, Easing),
           },
         ),
       );
@@ -216,7 +214,7 @@ export function resolveAnimation(
 }
 
 function resolveAnimationValue(
-  state: PropStateObservable,
+  state: PropState,
   props: Record<string, any> = {},
   normalizedProps: Record<string, any>,
   property: string,
@@ -227,7 +225,7 @@ function resolveAnimationValue(
     if (value === undefined) {
       const defaultValueFn = defaultValues[property];
       return typeof defaultValueFn === "function"
-        ? defaultValueFn(state)
+        ? defaultValueFn(state.styleEffect)
         : defaultValueFn;
     }
     return value;
@@ -237,7 +235,7 @@ function resolveAnimationValue(
 }
 
 export function resolveTransitionValue(
-  state: PropStateObservable,
+  state: PropState,
   props: Record<string, any> = {},
   normalizedProps: Record<string, any>,
   property: string,
@@ -245,12 +243,12 @@ export function resolveTransitionValue(
   const defaultValueFn = defaultValues[property];
   const defaultValue =
     typeof defaultValueFn === "function"
-      ? defaultValueFn(state)
+      ? defaultValueFn(state.styleEffect)
       : defaultValueFn;
 
   return {
     defaultValue,
-    value: normalizedProps[property] ?? props[state.config.target][property],
+    value: normalizedProps[property] ?? props[state.target][property],
   };
 }
 
@@ -262,10 +260,10 @@ function round(number: number) {
   return Math.round((number + Number.EPSILON) * 100) / 100;
 }
 
-export function getEasing(timingFunction: EasingFunction) {
-  const { Easing } =
-    require("react-native-reanimated") as typeof import("react-native-reanimated");
-
+export function getEasing(
+  timingFunction: EasingFunction,
+  Easing: typeof import("react-native-reanimated")["Easing"],
+) {
   switch (timingFunction.type) {
     case "ease":
       return Easing.ease;
