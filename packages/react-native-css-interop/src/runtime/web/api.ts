@@ -38,7 +38,7 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
         styles = [...newStyles, ...styles];
       } else if (styles) {
         styles = [...newStyles, styles];
-      } else {
+      } else if (newStyles.length) {
         styles = newStyles;
       }
 
