@@ -1,4 +1,4 @@
-import { ComponentType, createElement, forwardRef } from "react";
+import { Component, ComponentType, createElement, forwardRef } from "react";
 import { LayoutChangeEvent, Pressable, View } from "react-native";
 
 import { containerContext, variableContext } from "./globals";
@@ -169,11 +169,16 @@ export function renderComponent(
    */
   if (
     component === baseComponent &&
+    typeof component === "object" &&
     "$$typeof" in baseComponent &&
     baseComponent.$$typeof === ForwardRefSymbol
   ) {
     return (baseComponent as any).render(props, props.ref);
-  } else if (component === baseComponent && typeof component === "function") {
+  } else if (
+    component === baseComponent &&
+    typeof component === "function" &&
+    !(component.prototype instanceof Component)
+  ) {
     return (component as any)(props);
   } else {
     return createElement(component, props);
