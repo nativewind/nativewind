@@ -1,10 +1,10 @@
-import { JSXFunction } from "../types";
+import type { JSXFunction } from "../types";
 import { interopComponents } from "./api";
-
-if (process.env.NODE_ENV !== "test") require("./components");
 
 export default function wrapJSX(jsx: JSXFunction): JSXFunction {
   return function (type, props, ...rest) {
+    if (process.env.NODE_ENV !== "test") require("./components");
+
     if (props && props.cssInterop === false) {
       delete props.cssInterop;
     } else {
