@@ -6,6 +6,8 @@ import type {
 import { expoColorSchemeWarning } from "./expo";
 import { CssToReactNativeRuntimeOptions } from "../types";
 
+export { middleware, sendUpdate } from "./poll-updates-server";
+
 export type { CssToReactNativeRuntimeOptions };
 
 export type ComposableTransformerConfigT = TransformerConfigT & {
