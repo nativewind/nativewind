@@ -111,7 +111,7 @@ export type NativeStyleToProp<P> = {
 
 export type JSXFunction = (
   type: React.ComponentType,
-  props: Record<string, any>,
+  props: Record<string, any> | undefined | null,
   key?: React.Key,
   isStaticChildren?: boolean,
   __source?: unknown,

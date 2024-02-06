@@ -1,4 +1,4 @@
-import { createElement, forwardRef, useState } from "react";
+import { Component, createElement, forwardRef, useState } from "react";
 import { CssInterop, StyleProp, JSXFunction } from "../../types";
 import { getNormalizeConfig } from "../config";
 import { Effect } from "../observable";
@@ -12,6 +12,8 @@ export const interopComponents = new Map<
   object | string,
   Parameters<JSXFunction>[0]
 >();
+
+const ForwardRefSymbol = Symbol.for("react.forward_ref");
 
 export const cssInterop: CssInterop = (baseComponent, mapping): any => {
   const configs = getNormalizeConfig(mapping);
@@ -45,7 +47,19 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
       props[config.target] = styles;
     }
 
-    return createElement(baseComponent, props);
+    if (
+      "$$typeof" in baseComponent &&
+      baseComponent.$$typeof === ForwardRefSymbol
+    ) {
+      return (baseComponent as any).render(props, props.ref);
+    } else if (
+      typeof baseComponent === "function" &&
+      !(baseComponent.prototype instanceof Component)
+    ) {
+      return (baseComponent as any)(props);
+    } else {
+      return createElement(baseComponent, props);
+    }
   });
   interopComponent.displayName = `CssInterop.${
     baseComponent.displayName ?? baseComponent.name ?? "unknown"

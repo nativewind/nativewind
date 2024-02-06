@@ -5,7 +5,7 @@ if (process.env.NODE_ENV !== "test") require("./components");
 
 export default function wrapJSX(jsx: JSXFunction): JSXFunction {
   return function (type, props, ...rest) {
-    if (props.cssInterop === false) {
+    if (props && props.cssInterop === false) {
       delete props.cssInterop;
     } else {
       type = interopComponents.get(type) ?? type;
