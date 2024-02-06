@@ -49,6 +49,7 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
 
     if (
       "$$typeof" in baseComponent &&
+      typeof baseComponent === "function" &&
       baseComponent.$$typeof === ForwardRefSymbol
     ) {
       return (baseComponent as any).render(props, props.ref);

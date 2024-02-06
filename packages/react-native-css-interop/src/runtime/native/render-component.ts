@@ -169,7 +169,7 @@ export function renderComponent(
    */
   if (
     component === baseComponent &&
-    typeof component === "object" &&
+    typeof component === "function" &&
     "$$typeof" in baseComponent &&
     baseComponent.$$typeof === ForwardRefSymbol
   ) {
