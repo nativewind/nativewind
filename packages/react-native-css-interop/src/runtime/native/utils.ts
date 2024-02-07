@@ -36,7 +36,16 @@ export function processDeclarations(
       } else {
         // em / rnw / rnh units use other declarations, so we need to delay them
         if (typeof declaration[2] === "object" && declaration[2].delay) {
+          const uniqueValue = {};
+          // Set a placeholder value
+          normalizedProps[declaration[0]] = uniqueValue;
+
           delayedValues.push(() => {
+            // If the placeholder value has changed, then a more specific style overrode it
+            if (normalizedProps[declaration[0]] !== uniqueValue) {
+              return;
+            }
+
             const value = resolveValue(
               propState,
               declaration[2],

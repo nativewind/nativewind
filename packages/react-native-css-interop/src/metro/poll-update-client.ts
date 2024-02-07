@@ -15,14 +15,17 @@ async function pollServer(version = 1) {
     const body = await response.text();
 
     if (body.startsWith("data: ")) {
+      const data = JSON.parse(body.replace("data: ", ""));
+      version = data.version;
+
       StyleSheet.registerCompiled({
         $$compiled: true,
-        ...JSON.parse(body.slice(6)),
+        ...data.data,
       });
     }
 
     return pollServer(version);
-  } catch {}
+  } catch (error: any) {}
 }
 
 pollServer();

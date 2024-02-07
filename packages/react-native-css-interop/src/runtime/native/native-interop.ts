@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Effect, Observable, cleanupEffect } from "../observable";
+import { Effect, Observable, cleanupEffect, observable } from "../observable";
 import {
   ExtractedAnimations,
   ExtractedTransition,
@@ -444,7 +444,22 @@ function addStyle(
       ? opaqueStyles.get(style)
       : style;
 
-  if (!ruleSet) return;
+  if (!ruleSet) {
+    if (process.env.NODE_ENV !== "production") {
+      // This doesn't exist now, but it might in the future.
+      // So we create a placeholder style that we can observe
+      if (typeof style === "string") {
+        const styleObservable = observable<StyleRuleSet>(
+          { $$type: "StyleRuleSet" },
+          { name: style },
+        );
+        styleObservable.get(propState.declarationEffect);
+        globalStyles.set(style, styleObservable);
+      }
+    }
+
+    return;
+  }
 
   // This is an inline style object and not one we have generated
   if (!("$$type" in ruleSet)) {
