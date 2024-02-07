@@ -162,25 +162,46 @@ export function renderComponent(
   // After the initial render, the user shouldn't upgrade the component. Avoid warning in production
   state.upgrades.canWarn = process.env.NODE_ENV !== "production";
 
-  /*
-   * If we don't need to upgrade the component, we can just return the original component
-   * But we already are in a forwardRef, so if the component is also wrapped in a forwardRef,
-   * we can immediately call its render function
+  /**
+   * A hack to improve performance by avoiding adding duplicate components to the render tree
+   *
+   * The native interop already substitutes the component with a ForwardRef, so if we render a <View /> it actually renders
+   *
+   * <ForwardRef>
+   *   <ForwardRef>
+   *     <View>
+   *
+   * Instead of rendering the extra ForwardRef, we can compose them together (by directly calling the render function) into the same component, so it renders
+   * <ForwardRef>
+   *   <View>
+   *
+   * This improves performance by a meaningful amount.
+   *
+   * This isn't properly implemented. What we should be doing in the cssInterop function is generating a new component
+   * that matches the type of the original component (e.g Function components should just be function components, nof ForwardRefs)
+   * and passing a flag down if the component is composable.
    */
   if (
     component === baseComponent &&
-    typeof component === "function" &&
+    (typeof component === "function" || typeof component === "object") &&
     "$$typeof" in baseComponent &&
     baseComponent.$$typeof === ForwardRefSymbol
   ) {
     return (baseComponent as any).render(props, props.ref);
   } else if (
+    /*
+     * Function components can be composed into a ForwardRef, but like we said above, we should be matches the component type,
+     * Now we're wrapping function components in a ForwardRef.
+     */
     component === baseComponent &&
     typeof component === "function" &&
     !(component.prototype instanceof Component)
   ) {
     return (component as any)(props);
   } else {
+    /*
+     * Class/Object/String components are not composable, so they are added to the tree as normal
+     */
     return createElement(component, props);
   }
 }
