@@ -24,11 +24,19 @@ interface ConditionReference {
   height: number | { get: (effect?: Effect) => number };
 }
 
+/**
+ * Tests a rule against current component's state
+ * @param state
+ * @param rule
+ * @param props
+ * @returns
+ */
 export function testRule(
   state: PropState,
   rule: StyleRule,
   props: Record<string, any> | null | undefined,
 ) {
+  // Does the rule pass all the pseudo classes, media queries, and container queries?
   if (rule.pseudoClasses && !testPseudoClasses(state, rule.pseudoClasses)) {
     return false;
   }

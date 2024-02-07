@@ -18,6 +18,15 @@ export const UpgradeState = {
   WARNED: 3,
 };
 
+/**
+ * Render the baseComponent
+ * @param baseComponent
+ * @param state
+ * @param props
+ * @param variables
+ * @param containers
+ * @returns
+ */
 export function renderComponent(
   baseComponent: ComponentType<any>,
   state: ComponentState,

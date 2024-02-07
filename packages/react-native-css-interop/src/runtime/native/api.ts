@@ -20,10 +20,21 @@ export const interopComponents = new Map<
   Parameters<JSXFunction>[0]
 >();
 
+/**
+ * Generates a new Higher-Order component the wraps the base component and applies the styles.
+ * This is added to the `interopComponents` map so that it can be used in the `wrapJSX` function
+ * @param baseComponent
+ * @param mapping
+ */
 export const cssInterop: CssInterop = (baseComponent, mapping): any => {
   const configs = getNormalizeConfig(mapping);
 
   let component: ReactComponent;
+
+  /**
+   * This is a work-in-progress. We should be generating a new component that matches the
+   * type of the previous component. E.g ForwardRef should be a ForwardRef, Memo should be Memo
+   */
   if (typeof baseComponent === "function") {
     // We can directly render function components
     component = (props: Record<string, any>) => {
@@ -32,13 +43,14 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
   } else {
     // Class, forwardRef, object, string components need to be wrapped
     component = forwardRef<unknown, Record<string, any>>((props, ref) => {
+      // This function will change className->style, add the extra props and do the "magic"
       return interop(baseComponent, configs, props, ref);
+      // `interop` will return createElement(baseComponent, propsWithStylesAppliedAndEventHandlersAdded);
     });
   }
 
-  component.displayName = `CssInterop.${
-    baseComponent.displayName ?? baseComponent.name ?? "unknown"
-  }`;
+  const name = baseComponent.displayName ?? baseComponent.name ?? "unknown";
+  component.displayName = `CssInterop.${name}`;
   interopComponents.set(baseComponent, component);
   return component;
 };
