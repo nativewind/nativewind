@@ -1,9 +1,11 @@
 import { StyleSheet } from "../runtime";
 const url = require("react-native/Libraries/Core/Devtools/getDevServer")().url;
 
-async function pollServer() {
+async function pollServer(version = 1) {
   try {
-    const response = await fetch(`${url}__css_interop_update_endpoint`);
+    const response = await fetch(
+      `${url}__css_interop_update_endpoint?version=${version}`,
+    );
     if (!response.ok) {
       console.error(
         "There was a problem connecting to the react-native-css-interop Metro server",
@@ -19,7 +21,7 @@ async function pollServer() {
       });
     }
 
-    return pollServer();
+    return pollServer(version);
   } catch {}
 }
 

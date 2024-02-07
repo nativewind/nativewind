@@ -17,6 +17,8 @@ export interface TailwindCliOptions extends GetTransformOptionsOpts {
   browserslistEnv: string | null;
 }
 
+let version = 1;
+
 export async function tailwindCli(
   input: string,
   metroConfig: ComposableIntermediateConfigT,
@@ -104,7 +106,12 @@ export async function tailwindCli(
       nativewindOptions.rawOutput = rawOutput;
       nativewindOptions.outputPath = output;
 
-      sendUpdate(rawOutput, metroConfig.transformer.cssToReactNativeRuntime);
+      sendUpdate(
+        rawOutput,
+        version,
+        metroConfig.transformer.cssToReactNativeRuntime,
+      );
+      version++;
 
       done(nativewindOptions);
     });
