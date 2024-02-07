@@ -18,6 +18,12 @@ const ForwardRefSymbol = Symbol.for("react.forward_ref");
 export const cssInterop: CssInterop = (baseComponent, mapping): any => {
   const configs = getNormalizeConfig(mapping);
 
+  /**
+   * Turns this:
+   *   <View className="text-red-500" />
+   * Into this:
+   *   <View style={{ $$css: true, "text-red-500": "text-red-500"}} />
+   */
   const interopComponent = forwardRef(function CssInteropComponent(
     { ...props }: Record<string, any>,
     ref: any,

@@ -17,13 +17,13 @@ export const rem = {
   get(effect?: Effect) {
     return _rem.get(effect);
   },
-  set(value: number, notify = false) {
-    _rem.set(value, notify);
+  set(value: number) {
+    _rem.set(value);
     if (!isSSR) {
       globalThis.window.document.documentElement.style.fontSize = `${value}px`;
     }
   },
   [INTERNAL_RESET](value = 16) {
-    _rem.set(value, false);
+    _rem.set(value);
   },
 };

@@ -30,7 +30,7 @@ const commonStyleSheet: CssInteropStyleSheet = {
     animationMap.clear();
     warnings.clear();
     warned.clear();
-    rem.set(14, false);
+    rem.set(14);
     vw[INTERNAL_RESET](dimensions);
     vh[INTERNAL_RESET](dimensions);
     colorScheme[INTERNAL_RESET](appearance);

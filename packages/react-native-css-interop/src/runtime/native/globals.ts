@@ -95,11 +95,11 @@ export function cssVariableObservable(
       notify = false,
     ) {
       if (typeof value === "object" && value) {
-        if ("dark" in value) dark.set(value.dark, notify);
-        if ("light" in value) light.set(value.light, notify);
+        if ("dark" in value) dark.set(value.dark);
+        if ("light" in value) light.set(value.light);
       } else {
-        light.set(value, notify);
-        dark.set(value, notify);
+        light.set(value);
+        dark.set(value);
       }
     },
   };
@@ -122,13 +122,13 @@ function resetAppearanceListeners(
 
   appearanceListener = appearance.addChangeListener((state) => {
     if (AppState.currentState === "active") {
-      systemColorScheme.set(state.colorScheme ?? "light", true);
+      systemColorScheme.set(state.colorScheme ?? "light");
     }
   });
 
   appStateListener = appState.addEventListener("change", (type) => {
     if (type === "active") {
-      systemColorScheme.set(appearance.getColorScheme() ?? "light", true);
+      systemColorScheme.set(appearance.getColorScheme() ?? "light");
     }
   });
 }
@@ -148,7 +148,7 @@ const viewportReset = (dimensions: Dimensions) => {
   viewport.set(dimensions.get("window"));
   windowEventSubscription?.remove();
   windowEventSubscription = dimensions.addEventListener("change", (size) => {
-    return viewport.set(size.window, true);
+    return viewport.set(size.window);
   });
 };
 viewportReset(Dimensions);
@@ -177,5 +177,5 @@ export const isReduceMotionEnabled = Object.assign(
 // Hopefully this resolves before the first paint...
 AccessibilityInfo.isReduceMotionEnabled()?.then(isReduceMotionEnabled.set);
 AccessibilityInfo.addEventListener("reduceMotionChanged", (value) => {
-  isReduceMotionEnabled.set(value, true);
+  isReduceMotionEnabled.set(value);
 });

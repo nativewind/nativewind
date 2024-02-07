@@ -21,6 +21,7 @@ export function processDeclarations(
   delayedValues: (() => void)[],
 ) {
   if (!declarations) return;
+
   for (const declaration of declarations) {
     if (Array.isArray(declaration)) {
       if (declaration.length === 2) {
