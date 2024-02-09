@@ -1,26 +1,6 @@
-const React = require("react");
+const { createElement } = require("react");
 const { Platform } = require("react-native");
-
 const { StyleSheet } = require("react-native-css-interop");
-const {
-  createInteropElement,
-} = require("react-native-css-interop/jsx-runtime");
-
-const originalCreateElement = React.createElement;
-
-React.createElement = function (type, props, ...children) {
-  if (!props || type === React.Fragment) {
-    return originalCreateElement(type, props, ...children);
-  }
-
-  if (props.cssInterop === "snack") {
-    delete props.cssInterop;
-    return originalCreateElement(type, props, ...children);
-  }
-
-  props.cssInterop = "snack";
-  return createInteropElement(type, props, ...children);
-};
 
 const isOk = (response) => {
   return response.ok ? response.json() : Promise.reject(response);
@@ -78,9 +58,7 @@ function withNativeWind(
       return tailwindScript?.addEventListener("load", () => setLoaded(true));
     }, []);
 
-    return loaded
-      ? originalCreateElement(Component)
-      : originalCreateElement(React.Fragment);
+    return loaded ? createElement(Component) : createElement(React.Fragment);
   };
 }
 
