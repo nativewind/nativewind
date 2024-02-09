@@ -3,10 +3,9 @@ import type { AnimatableValue } from "react-native-reanimated";
 import type { EasingFunction, Time } from "lightningcss";
 import type { RuntimeValueDescriptor, RuntimeValueFrame } from "../../types";
 import { rem, systemColorScheme, universalVariables, vh, vw } from "./globals";
-import { Effect } from "../observable";
+import { Effect, observable } from "../observable";
 import { transformKeys } from "../../shared";
 import { PropState } from "./native-interop";
-import { getWidth, getHeight } from "./utils";
 
 /**
  * Get the final value of a value descriptor
@@ -346,6 +345,17 @@ export function setDeep(
   } else {
     target[prop] = value;
   }
+}
+
+function getLayout(state: PropState, interaction = state.interaction) {
+  interaction.layout ??= observable([0, 0]);
+  return interaction.layout.get(state.styleEffect);
+}
+export function getWidth(state: PropState) {
+  return getLayout(state)[0];
+}
+export function getHeight(state: PropState) {
+  return getLayout(state)[1];
 }
 
 export const defaultValues: Record<

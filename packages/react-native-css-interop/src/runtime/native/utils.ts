@@ -1,9 +1,10 @@
 import { InteropComponentConfig, StyleDeclaration } from "../../types";
-import { observable } from "../observable";
 import { UpgradeState } from "./render-component";
 import {
   defaultValues,
   getEasing,
+  getHeight,
+  getWidth,
   resolveAnimation,
   resolveTransitionValue,
   resolveValue,
@@ -326,15 +327,4 @@ export function nativeStyleToProp(
     props[targetProp] = sourceValue;
     delete props[config.target][source];
   }
-}
-
-function getLayout(state: PropState, interaction = state.interaction) {
-  interaction.layout ??= observable([0, 0]);
-  return interaction.layout.get(state.styleEffect);
-}
-export function getWidth(state: PropState) {
-  return getLayout(state)[0];
-}
-export function getHeight(state: PropState) {
-  return getLayout(state)[1];
 }

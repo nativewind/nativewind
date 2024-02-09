@@ -28,6 +28,10 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
     { ...props }: Record<string, any>,
     ref: any,
   ) {
+    if (props.cssInterop === false) {
+      return createElement(baseComponent, props);
+    }
+
     props = { ...props, ref };
     for (const config of configs) {
       const newStyles: StyleProp = [];
@@ -58,11 +62,13 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
       typeof baseComponent === "function" &&
       baseComponent.$$typeof === ForwardRefSymbol
     ) {
+      delete props.cssInterop;
       return (baseComponent as any).render(props, props.ref);
     } else if (
       typeof baseComponent === "function" &&
       !(baseComponent.prototype instanceof Component)
     ) {
+      delete props.cssInterop;
       return (baseComponent as any)(props);
     } else {
       return createElement(baseComponent, props);

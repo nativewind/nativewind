@@ -1,34 +1,25 @@
 const React = require("react");
-require("react-native-css-interop/dist/runtime/components");
-const { StyleSheet } = require("react-native-css-interop");
-const {
-  render,
-} = require("react-native-css-interop/dist/runtime/components/rendering");
 const { Platform } = require("react-native");
 
+const { StyleSheet } = require("react-native-css-interop");
+const {
+  createInteropElement,
+} = require("react-native-css-interop/jsx-runtime");
+
 const originalCreateElement = React.createElement;
+
 React.createElement = function (type, props, ...children) {
-  if (!props || type === React.Fragment || props.__preventSnackRenderLoop) {
-    if (props) {
-      delete props.__preventSnackRenderLoop;
-    }
+  if (!props || type === React.Fragment) {
     return originalCreateElement(type, props, ...children);
   }
 
-  props.__preventSnackRenderLoop = true;
-  if (children.length) {
-    props.children = children.length <= 1 ? children[0] : children;
+  if (props.cssInterop === "snack") {
+    delete props.cssInterop;
+    return originalCreateElement(type, props, ...children);
   }
 
-  return render(
-    (type, props) => {
-      return Array.isArray(props.children)
-        ? originalCreateElement(type, props, ...props.children)
-        : originalCreateElement(type, props, props.children);
-    },
-    type,
-    props,
-  );
+  props.cssInterop = "snack";
+  return createInteropElement(type, props, ...children);
 };
 
 const isOk = (response) => {
