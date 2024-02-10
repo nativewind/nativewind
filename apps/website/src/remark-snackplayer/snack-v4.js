@@ -5,48 +5,32 @@ const {
   version: interopVersion,
 } = require("../../../../packages/react-native-css-interop/package.json");
 
-const expoCode = `import React from "react";
-import { render, StyleSheet } from "react-native-css-interop";
-import { Platform } from "react-native";
+const expoCode = `
+import { useState, useEffect, Fragment, createElement } from "react";
+import RN, { Platform } from "react-native";
+const { StyleSheet, cssInterop } = require("react-native-css-interop");
+const jsx = require("@nativewind/jsx-runtime");
+const originalJSX = require("react/jsx-runtime");
 
-const originalCreateElement = React.createElement;
-React.createElement = function (type: any, props: any, ...children: any) {
-  if (!props || type === React.Fragment || props.__preventSnackRenderLoop) {
-    if (props) {
-      delete props.__preventSnackRenderLoop;
-    }
-    return originalCreateElement(type, props, ...children);
-  }
+Object.assign(originalJSX, jsx);
 
-  props.__preventSnackRenderLoop = true;
-  if (children.length) {
-    props.children = children.length <= 1 ? children[0] : children;
-  }
+export const View = cssInterop(RN.View, { className: "style" });
+export const Text = cssInterop(RN.Text, { className: "style" });
 
-  return render(
-    (type: any, props: any) => {
-      return Array.isArray(props.children)
-        ? originalCreateElement(type, props, ...props.children)
-        : originalCreateElement(type, props, props.children);
-    },
-    type,
-    props,
-  );
-};
-
-const isOk = (response: any) => {
+const isOk = (response) => {
   return response.ok ? response.json() : Promise.reject(response);
 };
 
 const alreadyProcessed = new Set();
+let fetchUrl = "https://nativewind.dev/api/compile";
 
-function fetchStyle(className: string) {
+function fetchStyle(className) {
   className = className
     .split(" ")
     .filter((c) => !alreadyProcessed.has(c))
     .join(" ");
   if (!className) return;
-  fetch(\`https://${process.env.VERCEL_URL}/api/snack\`, {
+  fetch(fetchUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -63,32 +47,37 @@ function fetchStyle(className: string) {
     });
 }
 
-StyleSheet.unstable_hook_onClassName?.(fetchStyle);
+StyleSheet.unstable_hook_onClassName(fetchStyle);
 
-var tailwindScript: any;
-if (Platform.OS === "web") {
+var tailwindScript;
+let tailwindScriptLoaded = Platform.OS === "web" ? !!window.tailwind : true;
+if (!tailwindScriptLoaded) {
   tailwindScript = document.createElement("script");
+  tailwindScript.addEventListener("load", () => {
+    tailwindScriptLoaded = true;
+  });
+  tailwindScript.id = "tailwindscript";
   tailwindScript.setAttribute("src", "https://cdn.tailwindcss.com");
   document.body.appendChild(tailwindScript);
 }
 
 export function withExpoSnack(
-  Component: any,
+  Component,
+  apiUrl = "https://nativewind.dev/api/compile",
 ) {
+  fetchUrl = apiUrl;
   return function WithExpoSnackLoader() {
-    const [loaded, setLoaded] = React.useState(
-      Platform.OS === "web" ? false : true,
-    );
-
-    React.useEffect(() => {
+    const [loaded, setLoaded] = useState(tailwindScriptLoaded);
+    useEffect(() => {
       return tailwindScript?.addEventListener("load", () => setLoaded(true));
     }, []);
 
-    return loaded
-      ? originalCreateElement(Component)
-      : originalCreateElement(React.Fragment);
+    return tailwindScriptLoaded
+      ? createElement(Component)
+      : createElement(Fragment);
   };
 }
+
 `;
 
 const parseParams = (paramString = "") => {
@@ -123,7 +112,8 @@ async function toJsxNode(node) {
     node.value = `\n${node.value}`;
   }
 
-  const appCode = `import { withExpoSnack } from "./expo-snack";
+  const appCode = `/** jsxImportSource @nativewind */
+import { withExpoSnack } from "./expo-snack";
 import { View, Text } from "react-native"
 ${node.value}
 
@@ -134,7 +124,6 @@ Please ignore:
  - any flashes of unstyled content.
  - performance issues due to external compilation.
  - the use of withExpoSnack
-You should import View/Text/etc directly from 'react-native'
 Please see the documentation for proper setup application.
 */
 export default withExpoSnack(App);`;

@@ -1,6 +1,13 @@
-const { createElement } = require("react");
-const { Platform } = require("react-native");
-const { StyleSheet } = require("react-native-css-interop");
+import { useState, useEffect, Fragment, createElement } from "react";
+import RN, { Platform } from "react-native";
+const { StyleSheet, cssInterop } = require("react-native-css-interop");
+const jsx = require("@nativewind/jsx-runtime");
+const originalJSX = require("react/jsx-runtime");
+
+Object.assign(originalJSX, jsx);
+
+export const View = cssInterop(RN.View, { className: "style" });
+export const Text = cssInterop(RN.Text, { className: "style" });
 
 const isOk = (response) => {
   return response.ok ? response.json() : Promise.reject(response);
@@ -24,7 +31,7 @@ function fetchStyle(className) {
   })
     .then(isOk)
     .then((body) => {
-      content.split(" ").forEach((c) => alreadyProcessed.add(c));
+      className.split(" ").forEach((c) => alreadyProcessed.add(c));
       StyleSheet.registerCompiled(body);
     })
     .catch(() => {
@@ -35,31 +42,30 @@ function fetchStyle(className) {
 StyleSheet.unstable_hook_onClassName(fetchStyle);
 
 var tailwindScript;
-if (Platform.OS === "web") {
+let tailwindScriptLoaded = Platform.OS === "web" ? !!window.tailwind : true;
+if (!tailwindScriptLoaded) {
   tailwindScript = document.createElement("script");
   tailwindScript.addEventListener("load", () => {
     tailwindScriptLoaded = true;
   });
+  tailwindScript.id = "tailwindscript";
   tailwindScript.setAttribute("src", "https://cdn.tailwindcss.com");
   document.body.appendChild(tailwindScript);
 }
 
-function withNativeWind(
+export function withExpoSnack(
   Component,
   apiUrl = "https://nativewind.dev/api/compile",
 ) {
   fetchUrl = apiUrl;
   return function WithExpoSnackLoader() {
-    const [loaded, setLoaded] = React.useState(
-      Platform.OS === "web" ? false : true,
-    );
-
-    React.useEffect(() => {
+    const [loaded, setLoaded] = useState(tailwindScriptLoaded);
+    useEffect(() => {
       return tailwindScript?.addEventListener("load", () => setLoaded(true));
     }, []);
 
-    return loaded ? createElement(Component) : createElement(React.Fragment);
+    return tailwindScriptLoaded
+      ? createElement(Component)
+      : createElement(Fragment);
   };
 }
-
-module.exports = { withNativeWind };

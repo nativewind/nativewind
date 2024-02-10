@@ -27,7 +27,6 @@ import { globalStyles, opaqueStyles } from "./style-store";
 import { UpgradeState, renderComponent } from "./render-component";
 import { testRule } from "./conditions";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
-import { StyleSheet } from "./stylesheet";
 
 export type ComponentState = {
   refs: {
@@ -289,6 +288,7 @@ function createPropState(
              * 3. Add it to either the normal or important array
              */
             addStyle(propState, className, normal, important);
+            externalCallbackRef.current?.(className);
           }
         }
 
@@ -441,9 +441,28 @@ function addStyle(
   normal: StyleRule[],
   important: StyleRule[],
 ) {
-  const ruleSet = getRuleSet(propState, style);
+  const ruleSet =
+    typeof style === "string"
+      ? globalStyles.get(style)?.get(propState.declarationEffect)
+      : opaqueStyles.has(style)
+      ? opaqueStyles.get(style)
+      : style;
 
-  if (!ruleSet) return;
+  if (!ruleSet) {
+    if (process.env.NODE_ENV !== "production") {
+      // This doesn't exist now, but it might in the future.
+      // So we create a placeholder style that we can observe
+      if (typeof style === "string") {
+        const styleObservable = observable<StyleRuleSet>(
+          { $$type: "StyleRuleSet" },
+          { name: style },
+        );
+        styleObservable.get(propState.declarationEffect);
+        globalStyles.set(style, styleObservable);
+      }
+    }
+    return;
+  }
 
   // This is an inline style object and not one we have generated
   if (!("$$type" in ruleSet)) {
@@ -483,36 +502,6 @@ function addStyle(
         tracking.changed ||= tracking.rules[tracking.index] !== rule;
         tracking.rules[tracking.index] = rule;
       }
-    }
-  }
-}
-
-function getRuleSet(propState: PropState, style: string | StyleRuleSet) {
-  const ruleSet =
-    typeof style === "string"
-      ? globalStyles.get(style)?.get(propState.declarationEffect)
-      : opaqueStyles.has(style)
-      ? opaqueStyles.get(style)
-      : style;
-
-  if (typeof style === "string" && StyleSheet.unstable_hook_onClassName) {
-    externalCallbackRef.current?.(style);
-  }
-
-  if (ruleSet) {
-    return ruleSet;
-  }
-
-  if (process.env.NODE_ENV !== "production") {
-    // This doesn't exist now, but it might in the future.
-    // So we create a placeholder style that we can observe
-    if (typeof style === "string") {
-      const styleObservable = observable<StyleRuleSet>(
-        { $$type: "StyleRuleSet" },
-        { name: style },
-      );
-      styleObservable.get(propState.declarationEffect);
-      globalStyles.set(style, styleObservable);
     }
   }
 }
