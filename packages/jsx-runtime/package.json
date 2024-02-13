@@ -1,5 +1,5 @@
 {
-  "version": "4.0.23",
+  "version": "4.0.24",
   "name": "@nativewind/jsx-runtime",
   "description": "The nativewind jsx-runtime reexported",
   "main": "index.js",
@@ -24,7 +24,7 @@
     "index.js"
   ],
   "dependencies": {
-    "nativewind": "4.0.23"
+    "nativewind": "4.0.24"
   },
   "publishConfig": {
     "access": "public"
