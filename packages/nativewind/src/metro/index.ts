@@ -1,7 +1,7 @@
+import connect from "connect";
 import type { GetTransformOptionsOpts } from "metro-config";
 import loadConfig from "tailwindcss/loadConfig";
 import tailwindPackage from "tailwindcss/package.json";
-import type { ServerOptions } from "ws";
 import micromatch from "micromatch";
 
 import path from "path";
@@ -9,6 +9,7 @@ import {
   withCssInterop,
   CssToReactNativeRuntimeOptions,
   ComposableIntermediateConfigT,
+  middleware as cssInteropMiddleware,
 } from "react-native-css-interop/metro";
 
 import { cssToReactNativeRuntimeOptions } from "./common";
@@ -19,7 +20,6 @@ interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
   projectRoot?: string;
   outputDir?: string;
   configPath?: string;
-  hotServerOptions?: ServerOptions;
   cliCommand?: string;
   browserslist?: string | null;
   browserslistEnv?: string | null;
@@ -38,10 +38,8 @@ export function withNativeWind(
       "../",
       tailwindPackage.bin.tailwindcss,
     )}`,
-    hotServerOptions = {},
     browserslist = "last 1 version",
     browserslistEnv = "native",
-    experiments,
   }: WithNativeWindOptions = {} as WithNativeWindOptions,
 ) {
   if (!input) {
@@ -61,13 +59,26 @@ export function withNativeWind(
   metroConfig = withCssInterop(metroConfig, {
     ...cssToReactNativeRuntimeOptions,
     inlineRem,
-    experiments,
     selectorPrefix:
       typeof importantConfig === "string" ? importantConfig : undefined,
   });
 
   // eslint-disable-next-line unicorn/prefer-module
   metroConfig.transformerPath = require.resolve("./transformer");
+
+  const existingEnhanceMiddleware = metroConfig.server.enhanceMiddleware;
+  metroConfig.server = {
+    ...metroConfig.server,
+    enhanceMiddleware(middleware, metroServer) {
+      if (existingEnhanceMiddleware) {
+        middleware = existingEnhanceMiddleware(middleware, metroServer);
+      }
+
+      return connect()
+        .use(...cssInteropMiddleware)
+        .use(middleware);
+    },
+  };
 
   const tailwindHasStarted: Record<string, boolean> = {
     native: false,
@@ -81,7 +92,6 @@ export function withNativeWind(
     ...metroConfig.transformer,
     nativewind: {
       input,
-      experiments,
     },
     getTransformOptions: async (
       entryPoints: ReadonlyArray<string>,
@@ -121,7 +131,6 @@ export function withNativeWind(
           ...options,
           output,
           cliCommand,
-          hotServerOptions,
           browserslist,
           browserslistEnv,
         });

@@ -25,8 +25,13 @@ import type {
   ViewStyle,
 } from "react-native";
 import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
-import { Effect, Observable } from "./runtime/observable";
-import { SharedValue } from "react-native-reanimated";
+import type { Effect, Observable } from "./runtime/observable";
+import type { SharedValue } from "react-native-reanimated";
+
+export interface Effect2 {
+  update: () => void;
+  dependencies: Set<() => void>;
+}
 
 export type ReactComponent<P = any> =
   | ClassicComponentClass<P>
@@ -46,9 +51,6 @@ export type CssToReactNativeRuntimeOptions = {
   ignorePropertyWarningRegex?: (string | RegExp)[];
   selectorPrefix?: string;
   stylesheetOrder?: number;
-  experiments?: {
-    inlineAnimations?: true;
-  };
 };
 
 export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
@@ -109,7 +111,7 @@ export type NativeStyleToProp<P> = {
 
 export type JSXFunction = (
   type: React.ComponentType,
-  props: Record<string, any>,
+  props: Record<string, any> | undefined | null,
   key?: React.Key,
   isStaticChildren?: boolean,
   __source?: unknown,
@@ -147,10 +149,12 @@ export type StyleDeclaration =
 export type StyleRuleSet = {
   $$type: "StyleRuleSet";
   normal?: StyleRule[];
-  inline?: StyleRule[];
   important?: StyleRule[];
   warnings?: ExtractionWarning[];
   classNames?: string;
+  variables?: boolean;
+  container?: boolean;
+  animation?: boolean;
 };
 
 export type RuntimeStyleRule = StyleRule | object;
@@ -181,7 +185,6 @@ export type StyleRule = {
 export type PropState = Effect & {
   initialRender: boolean;
   resetContext: boolean;
-  attributes: AttributeDependency[];
   isAnimated: boolean;
   sharedValues: Map<string, SharedValue<any>>;
   animationNames: Set<string>;
@@ -228,17 +231,17 @@ export type RuntimeValue =
 
 export type Specificity = {
   /** IDs - https://drafts.csswg.org/selectors/#specificity-rules */
-  A: number;
+  A?: number;
   /** Classes, Attributes, Pseudo-Classes - https://drafts.csswg.org/selectors/#specificity-rules */
-  B: number;
+  B?: number;
   /** Elements, Pseudo-Elements - https://drafts.csswg.org/selectors/#specificity-rules */
-  C: number;
+  C?: number;
   /** Importance - https://developer.mozilla.org/en-US/docs/Web/CSS/Cascade#cascading_order */
-  I: number;
+  I?: number;
   /** StyleSheet Order */
-  S: number;
+  S?: number;
   /** Appearance Order */
-  O: number;
+  O?: number;
   /** Inline */
   inline?: number;
 };
@@ -376,9 +379,6 @@ type AttributeSelectorComponent = Extract<
   { type: "attribute" }
 >;
 export type AttributeCondition = PropCondition | DataAttributeCondition;
-export type AttributeDependency = AttributeCondition & {
-  previous?: any;
-};
 
 export type PropCondition = Omit<AttributeSelectorComponent, "operation"> & {
   operation?:

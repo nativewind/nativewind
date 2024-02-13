@@ -4,27 +4,22 @@ import {
   Appearance,
 } from "react-native";
 
-import {
-  CssInteropStyleSheet,
-  ExtractedAnimation,
-  StyleRuleSet,
-} from "../../types";
+import { CssInteropStyleSheet, ExtractedAnimation } from "../../types";
 import { INTERNAL_FLAGS as INTERNAL_FLAGS, INTERNAL_RESET } from "../../shared";
-import { observableNotifyQueue } from "../observable";
 import { globalStyles, upsertGlobalStyle } from "./style-store";
 import {
   colorScheme,
   cssVariableObservable,
-  globalVariables,
   externalCallbackRef,
   rem,
+  rootVariables,
+  universalVariables,
   vh,
   vw,
   warned,
   warnings,
 } from "./globals";
 
-export const opaqueStyles = new WeakMap<object, StyleRuleSet>();
 export const animationMap = new Map<string, ExtractedAnimation>();
 export { globalStyles };
 
@@ -35,11 +30,10 @@ const commonStyleSheet: CssInteropStyleSheet = {
     animationMap.clear();
     warnings.clear();
     warned.clear();
-    rem.set(14, false);
+    rem.set(14);
     vw[INTERNAL_RESET](dimensions);
     vh[INTERNAL_RESET](dimensions);
     colorScheme[INTERNAL_RESET](appearance);
-    observableNotifyQueue.clear();
   },
   getFlag(name) {
     return this[INTERNAL_FLAGS][name];
@@ -69,10 +63,10 @@ const commonStyleSheet: CssInteropStyleSheet = {
 
     if (options.rootVariables) {
       for (const [name, value] of Object.entries(options.rootVariables)) {
-        let variable = globalVariables.root.get(name);
+        let variable = rootVariables[name];
         if (!variable) {
           variable = cssVariableObservable(value);
-          globalVariables.root.set(name, variable);
+          rootVariables[name] = variable;
         }
         variable.set(value);
       }
@@ -80,13 +74,12 @@ const commonStyleSheet: CssInteropStyleSheet = {
 
     if (options.universalVariables) {
       for (const [name, value] of Object.entries(options.universalVariables)) {
-        let signal = globalVariables.universal.get(name);
-        if (signal) {
-          signal.set(value);
-        } else {
-          signal = cssVariableObservable(value, { name: `root:${name}` });
-          globalVariables.universal.set(name, signal);
+        let variable = universalVariables[name];
+        if (!variable) {
+          variable = cssVariableObservable(value);
+          universalVariables[name] = variable;
         }
+        variable.set(value);
       }
     }
 

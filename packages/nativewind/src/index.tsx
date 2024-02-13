@@ -8,6 +8,7 @@ export {
   remapProps,
   StyleSheet,
   rem,
+  wrapJSX,
 } from "react-native-css-interop";
 
 export { useColorScheme } from "./stylesheet";

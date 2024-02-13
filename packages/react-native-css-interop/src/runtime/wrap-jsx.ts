@@ -1,10 +1,26 @@
-import { JSXFunction } from "../types";
+import type { JSXFunction } from "../types";
 import { interopComponents } from "./api";
 
-if (process.env.NODE_ENV !== "test") require("./components");
-
+/**
+ * Create a new JSX function that swaps the component type being rendered with
+ * the 'interop' version of the component if it exists.
+ */
 export default function wrapJSX(jsx: JSXFunction): JSXFunction {
   return function (type, props, ...rest) {
-    return jsx.call(jsx, interopComponents.get(type) ?? type, props, ...rest);
+    // Load the core React Native components and create the interop versions
+    // We avoid this in the test environment as we want more fine-grained control
+    // This call also need to be inside the JSX transform to avoid circular dependencies
+    if (process.env.NODE_ENV !== "test") require("./components");
+
+    // You can disable the css interop by setting `cssInterop` to false
+    if (props && props.cssInterop === false) {
+      delete props.cssInterop;
+    } else {
+      // Swap the component type with the interop version if it exists
+      type = interopComponents.get(type) ?? type;
+    }
+
+    // Call the original jsx function with the new type
+    return jsx.call(jsx, type, props, ...rest);
   };
 }

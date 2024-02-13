@@ -76,7 +76,7 @@ function resetAppearanceListeners($appearance: typeof Appearance) {
   appearanceListener?.remove();
   appearanceListener = appearance.addChangeListener((state) => {
     if (AppState.currentState === "active") {
-      systemColorScheme.set(state.colorScheme ?? "light", true);
+      systemColorScheme.set(state.colorScheme ?? "light");
     }
   });
 }

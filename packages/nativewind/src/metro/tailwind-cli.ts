@@ -1,22 +1,23 @@
-import net from "node:net";
 import { spawn } from "node:child_process";
-import { Stats, mkdirSync, readFileSync, statSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { dirname } from "node:path";
 
-import { ServerOptions, Server, WebSocket } from "ws";
 import type { GetTransformOptionsOpts } from "metro-config";
-import { ComposableIntermediateConfigT } from "react-native-css-interop/metro";
-import { cssToReactNativeRuntime } from "react-native-css-interop/css-to-rn";
+import {
+  ComposableIntermediateConfigT,
+  sendUpdate,
+} from "react-native-css-interop/metro";
 
 import { getOutput } from "./common";
 
 export interface TailwindCliOptions extends GetTransformOptionsOpts {
   output: string;
   cliCommand: string;
-  hotServerOptions: ServerOptions;
   browserslist: string | null;
   browserslistEnv: string | null;
 }
+
+let version = 1;
 
 export async function tailwindCli(
   input: string,
@@ -65,31 +66,8 @@ export async function tailwindCli(
     `"${output}"`,
   ];
 
-  let latestStat: Stats | undefined;
-  let latestStyleData: string = "{}";
-  let version = 0;
-  let startedWSServer = false;
-  const connections = new Map<WebSocket, number>();
-
   if (options.dev && options.hot) {
     spawnCommands.push("--watch");
-
-    if (options.platform !== "web") {
-      startedWSServer = true;
-
-      if (!options.hotServerOptions.port) {
-        options.hotServerOptions.port = await getAvailablePort();
-      }
-
-      nativewindOptions.fastRefreshPort = options.hotServerOptions.port;
-
-      const wss = new Server(options.hotServerOptions);
-      wss.on("connection", (ws) => {
-        connections.set(ws, version);
-        ws.on("close", () => connections.delete(ws));
-        ws.send(latestStyleData);
-      });
-    }
   }
 
   try {
@@ -122,34 +100,19 @@ export async function tailwindCli(
       }
 
       if (!data.includes("Done in")) return;
+      clearTimeout(timeout);
 
-      nativewindOptions.rawOutput = readFileSync(output, "utf-8");
+      const rawOutput = readFileSync(output, "utf-8");
+      nativewindOptions.rawOutput = rawOutput;
       nativewindOptions.outputPath = output;
 
-      if (startedWSServer) {
-        const stat = statSync(output);
+      sendUpdate(
+        rawOutput,
+        version,
+        metroConfig.transformer.cssToReactNativeRuntime,
+      );
+      version++;
 
-        if (stat.mtimeMs === latestStat?.mtimeMs) return;
-        latestStat = stat;
-        version = version + 1;
-
-        latestStyleData = JSON.stringify(
-          cssToReactNativeRuntime(
-            nativewindOptions.rawOutput,
-            metroConfig.transformer.cssToReactNativeRuntime,
-          ),
-        );
-        nativewindOptions.parsedOutput = latestStyleData;
-
-        for (const [ws, lastVersion] of connections) {
-          if (lastVersion !== version) {
-            ws.send(latestStyleData);
-            connections.set(ws, version);
-          }
-        }
-      }
-
-      clearTimeout(timeout);
       done(nativewindOptions);
     });
   } catch {
@@ -168,23 +131,4 @@ export async function tailwindCli(
       console.error("Command used: ", ...spawnCommands);
       process.exit(1);
     });
-}
-
-async function getAvailablePort(port = 8089): Promise<number> {
-  return checkAvailablePort(port).catch(() => getAvailablePort(port + 1));
-}
-
-function checkAvailablePort(port: number) {
-  return new Promise<number>((resolve, reject) => {
-    const server = net.createServer();
-    server.unref();
-    server.on("error", reject);
-
-    server.listen({ port }, () => {
-      const { port } = server.address() as net.AddressInfo;
-      server.close(() => {
-        resolve(port);
-      });
-    });
-  });
 }
