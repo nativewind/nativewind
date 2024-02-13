@@ -2,26 +2,19 @@
 
 Please refer to the [documentation on the Tailwind CSS website](https://tailwindcss.com/docs/editor-setup) for more information.
 
-## IntelliSense for VS Code
+## Custom ClassName props
 
-In order to make the most of the [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) extension for Visual Studio Code in a React Native scenario:
-- Make sure it checks `.jsx` and `.tsx` files by updating the `tailwindCSS.includeLanguages` property _(see below)_
-- Add the `style` class attribute _if you're using it_.
+`cssInterop`/`remapProps` allow you to create custom className props. You can follow the documentation of your choosen plugin to add this to the checked `classAttributes`.
 
-Here's an example updated `Settings.json` file for VS Code: 
+Here's an example where we are using VS Code and custom component `cssInterop(Component, { headerClassName: 'headerStyle' })`: 
 
 ```json
 {
   (...)
-  "tailwindCSS.includeLanguages": {
-    "typescriptreact": "html",
-    "javascriptreact": "html"
-  },
   "tailwindCSS.classAttributes": [
     "class",
     "className",
-    "ngClass",
-    "style"
+    "headerClassName"
   ]
 }
 ```
