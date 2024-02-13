@@ -21,7 +21,7 @@ export interface RenderTailwindOptions extends RenderOptions {
   animated?: boolean;
 }
 
-process.env.NATIVEWIND_NATIVE = Platform.OS !== "web" ? "1" : undefined;
+process.env.NATIVEWIND_NATIVE = Platform.OS;
 
 export async function renderTailwind<T extends { className: string }>(
   component: React.ReactElement<T>,

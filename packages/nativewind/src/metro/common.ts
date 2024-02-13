@@ -9,8 +9,3 @@ export const cssToReactNativeRuntimeOptions = {
   ignorePropertyWarningRegex: ["^--tw-"],
   grouping: ["^group(/.*)?"],
 };
-
-export function getOutput(output: string, options: { platform?: string }) {
-  // Force a platform and `.css` extensions (as they might be using `.sass` or another preprocessor
-  return `${output}.${options.platform !== "web" ? "native" : "web"}.css`;
-}

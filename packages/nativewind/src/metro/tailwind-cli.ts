@@ -8,8 +8,6 @@ import {
   sendUpdate,
 } from "react-native-css-interop/metro";
 
-import { getOutput } from "./common";
-
 export interface TailwindCliOptions extends GetTransformOptionsOpts {
   output: string;
   cliCommand: string;
@@ -26,7 +24,6 @@ export async function tailwindCli(
 ) {
   let done: (nativewindOptions?: Record<string, any>) => void;
   let reject: () => void = () => {};
-  let nativewindOptions: Record<string, any> = {};
   const deferred = new Promise<Record<string, any> | undefined>(
     (resolve, _reject) => {
       done = resolve;
@@ -36,7 +33,7 @@ export async function tailwindCli(
 
   const env = {
     ...process.env,
-    NATIVEWIND_NATIVE: options.platform === "web" ? undefined : "true",
+    NATIVEWIND_NATIVE: options.platform,
     BROWSERSLIST: options.browserslist ?? undefined,
     BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
   };
@@ -56,14 +53,12 @@ export async function tailwindCli(
 
   mkdirSync(dirname(options.output), { recursive: true });
 
-  const output = getOutput(options.output, options);
-
   const spawnCommands = [
     ...options.cliCommand.split(" "),
     "--input",
     `"${input}"`,
     "--output",
-    `"${output}"`,
+    `"${options.output}"`,
   ];
 
   if (options.dev && options.hot) {
@@ -79,7 +74,12 @@ export async function tailwindCli(
       windowsHide: true,
     });
 
-    cli.on("error", (error) => reject());
+    cli.on("error", (error) => {
+      console.error("NativeWind failed while running TailwindCLI");
+      console.error(error);
+      clearTimeout(timeout);
+      reject();
+    });
     cli.stderr.on("data", (data: Buffer | string) => {
       data = data.toString();
 
@@ -102,9 +102,7 @@ export async function tailwindCli(
       if (!data.includes("Done in")) return;
       clearTimeout(timeout);
 
-      const rawOutput = readFileSync(output, "utf-8");
-      nativewindOptions.rawOutput = rawOutput;
-      nativewindOptions.outputPath = output;
+      const rawOutput = readFileSync(options.output, "utf-8");
 
       sendUpdate(
         rawOutput,
@@ -113,9 +111,15 @@ export async function tailwindCli(
       );
       version++;
 
-      done(nativewindOptions);
+      done({
+        raw: rawOutput,
+        js: `require('${options.output.replace(/\\/g, "\\\\")}');`,
+      });
     });
-  } catch {
+  } catch (error) {
+    console.error("NativeWind had an unknown error while running TailwindCLI");
+    console.error(error);
+    clearTimeout(timeout);
     reject();
   }
 

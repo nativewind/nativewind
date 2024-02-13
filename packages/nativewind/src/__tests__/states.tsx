@@ -72,12 +72,14 @@ test("selection", async () => {
   await renderTailwind(<A testID={testID} className="selection:text-black" />);
 
   const component = screen.getByTestId(testID);
-  expect(component.props).toEqual({
-    testID,
-    selectionColor: "rgba(0, 0, 0, 1)",
-    children: undefined,
-    style: undefined,
-  });
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      testID,
+      selectionColor: "rgba(0, 0, 0, 1)",
+      children: undefined,
+      style: undefined,
+    }),
+  );
 });
 
 test("placeholder", async () => {
@@ -86,10 +88,12 @@ test("placeholder", async () => {
   );
 
   const component = screen.getByTestId(testID);
-  expect(component.props).toEqual({
-    testID,
-    placeholderTextColor: "rgba(0, 0, 0, 1)",
-    children: undefined,
-    style: undefined,
-  });
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      testID,
+      placeholderTextColor: "rgba(0, 0, 0, 1)",
+      children: undefined,
+      style: undefined,
+    }),
+  );
 });

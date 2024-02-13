@@ -80,10 +80,10 @@ export function withNativeWind(
     },
   };
 
-  const tailwindHasStarted: Record<string, boolean> = {
-    native: false,
-    web: false,
-  };
+  const tailwindCliPromises: Record<
+    string,
+    ReturnType<typeof tailwindCli>
+  > = {};
 
   // Use getTransformOptions to bootstrap the Tailwind CLI, but ensure
   // we still call the original
@@ -92,6 +92,7 @@ export function withNativeWind(
     ...metroConfig.transformer,
     nativewind: {
       input,
+      outputs: {},
     },
     getTransformOptions: async (
       entryPoints: ReadonlyArray<string>,
@@ -102,6 +103,7 @@ export function withNativeWind(
         projectRoot,
         path.join(outputDir, path.basename(input!)),
       );
+
       const matchesOutputDir = contentArray.some((pattern) => {
         if (typeof pattern !== "string") return false;
         return micromatch.isMatch(output, pattern);
@@ -120,25 +122,19 @@ export function withNativeWind(
         process.stdout.cursorTo(0);
       }
 
-      const platform = options.platform === "web" ? "web" : "native";
+      const platform = options.platform ?? "native";
 
-      // Ensure we only spawn the subprocesses once
-      if (!tailwindHasStarted[platform]) {
-        tailwindHasStarted[platform] = true;
+      // Generate the styles, only start the process onces per platform
+      tailwindCliPromises[platform] ||= tailwindCli(input!, metroConfig, {
+        ...options,
+        output: `${output}.${platform}.css`,
+        cliCommand,
+        browserslist,
+        browserslistEnv,
+      });
 
-        // Generate the styles
-        const cliOutput = await tailwindCli(input!, metroConfig, {
-          ...options,
-          output,
-          cliCommand,
-          browserslist,
-          browserslistEnv,
-        });
-
-        if (cliOutput) {
-          Object.assign((metroConfig as any).transformer.nativewind, cliOutput);
-        }
-      }
+      (metroConfig as any).transformer.nativewind.outputs[platform] =
+        await tailwindCliPromises[platform];
 
       return previousTransformOptions?.(
         entryPoints,

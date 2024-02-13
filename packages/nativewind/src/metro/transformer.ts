@@ -7,18 +7,8 @@ import path from "path";
 
 import { transform as cssInteropTransform } from "react-native-css-interop/metro/transformer";
 
-interface NativeWindJsTransformerConfig extends JsTransformerConfig {
-  transformerPath?: string;
-  nativewind: {
-    input: string;
-    fastRefreshPort: string;
-    rawOutput: string;
-    parsedOutput: string;
-    outputPath: string;
-  };
-}
 export async function transform(
-  config: NativeWindJsTransformerConfig,
+  config: JsTransformerConfig & { nativewind: Record<string, any> },
   projectRoot: string,
   filename: string,
   data: Buffer,
@@ -31,14 +21,14 @@ export async function transform(
         config,
         projectRoot,
         filename,
-        Buffer.from(
-          `require('${config.nativewind.outputPath.replace(/\\/g, "\\\\")}');`,
-          "utf8",
-        ),
+        Buffer.from(config.nativewind.outputs[options.platform].js, "utf8"),
         options,
       );
     } else {
-      data = Buffer.from(config.nativewind.rawOutput, "utf8");
+      data = Buffer.from(
+        config.nativewind.outputs[options.platform!].raw,
+        "utf8",
+      );
     }
   }
 
