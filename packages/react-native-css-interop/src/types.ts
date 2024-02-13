@@ -255,6 +255,7 @@ export type ExtractedContainerQuery = {
   name?: string | null;
   condition?: ContainerCondition<Declaration>;
   pseudoClasses?: PseudoClassesQuery;
+  attrs?: AttributeCondition[];
 };
 
 export type ExtractedAnimations = {

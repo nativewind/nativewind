@@ -46,13 +46,8 @@ export function testRule(
   if (rule.containerQuery && !testContainerQuery(state, rule.containerQuery)) {
     return false;
   }
-  if (rule.attrs) {
-    for (const attrCondition of rule.attrs) {
-      const attrValue = getTestAttributeValue(props, attrCondition);
-      if (!testAttribute(attrValue, attrCondition)) {
-        return false;
-      }
-    }
+  if (rule.attrs && !testAttributes(props, rule.attrs)) {
+    return false;
   }
 
   return true;
@@ -127,6 +122,10 @@ export function testContainerQuery(
       query.pseudoClasses &&
       !testPseudoClasses(state, query.pseudoClasses, container.interaction)
     ) {
+      return false;
+    }
+
+    if (query.attrs && !testAttributes(container.refs.props, query.attrs)) {
       return false;
     }
 
@@ -318,16 +317,27 @@ function unwrap<T>(effect: Effect, value: T | { get(effect: Effect): T }): T {
     : (value as T);
 }
 
-export function getTestAttributeValue(
+function testAttributes(
   props: Record<string, any> | null | undefined,
-  condition: AttributeCondition,
+  conditions: AttributeCondition[],
 ) {
-  return condition.type === "data-attribute"
-    ? props?.["dataSet"]?.[condition.name]
-    : props?.[condition.name];
+  if (!props) return false;
+
+  for (const condition of conditions) {
+    const attrValue =
+      condition.type === "data-attribute"
+        ? props?.["dataSet"]?.[condition.name]
+        : props?.[condition.name];
+
+    if (!testAttribute(attrValue, condition)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
-export function testAttribute(propValue: any, condition: AttributeCondition) {
+function testAttribute(propValue: any, condition: AttributeCondition) {
   const operation = condition.operation;
 
   if (operation == null) return propValue != null;
@@ -336,12 +346,13 @@ export function testAttribute(propValue: any, condition: AttributeCondition) {
     case "empty": {
       return propValue == null || propValue == "";
     }
-    case "includes":
     case "dash-match":
     case "prefix":
     case "substring":
     case "suffix":
       return false;
+    case "includes":
+      return propValue?.toString().includes(operation.value);
     case "equal": {
       return propValue?.toString() === operation.value.toString();
     }

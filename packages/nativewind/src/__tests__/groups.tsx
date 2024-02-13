@@ -56,3 +56,84 @@ test("Differentiating nested groups", async () => {
 
   expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
 });
+
+test("arbitrary groups - single className", async () => {
+  const { rerender } = await renderTailwind(
+    <Parent testID={parentID} className="group">
+      <Child testID={childID} className="group-[.test]:text-white" />
+    </Parent>,
+  );
+
+  const parent = screen.getByTestId(parentID);
+  const child = screen.getByTestId(childID);
+
+  expect(parent).toHaveStyle(undefined);
+  expect(child).toHaveStyle(undefined);
+
+  await rerender(
+    <Parent testID={parentID} className="group test">
+      <Child testID={childID} className="group-[.test]:text-white" />
+    </Parent>,
+  );
+
+  expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+});
+
+test("arbitrary groups - multiple className", async () => {
+  const { rerender } = await renderTailwind(
+    <Parent testID={parentID} className="group">
+      <Child testID={childID} className="group-[.test.test2]:text-white" />
+    </Parent>,
+  );
+
+  const parent = screen.getByTestId(parentID);
+  const child = screen.getByTestId(childID);
+
+  expect(parent).toHaveStyle(undefined);
+  expect(child).toHaveStyle(undefined);
+
+  await rerender(
+    <Parent testID={parentID} className="group test">
+      <Child testID={childID} className="group-[.test.test2]:text-white" />
+    </Parent>,
+  );
+
+  expect(parent).toHaveStyle(undefined);
+  expect(child).toHaveStyle(undefined);
+
+  await rerender(
+    <Parent testID={parentID} className="group test test2">
+      <Child testID={childID} className="group-[.test.test2]:text-white" />
+    </Parent>,
+  );
+
+  expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+});
+
+test("arbitrary groups - props", async () => {
+  const { rerender } = await renderTailwind(
+    <Parent testID={parentID} className="group" accessibilityLabel="test">
+      <Child
+        testID={childID}
+        className="group-[[accessibilityLabel=works]]:text-white"
+      />
+    </Parent>,
+  );
+
+  const parent = screen.getByTestId(parentID);
+  const child = screen.getByTestId(childID);
+
+  expect(parent).toHaveStyle(undefined);
+  expect(child).toHaveStyle(undefined);
+
+  await rerender(
+    <Parent testID={parentID} className="group" accessibilityLabel="works">
+      <Child
+        testID={childID}
+        className="group-[[accessibilityLabel=works]]:text-white"
+      />
+    </Parent>,
+  );
+
+  expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+});

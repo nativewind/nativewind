@@ -10,12 +10,11 @@ import {
 beforeEach(() => resetStyles());
 
 const grouping = ["^group(/.*)?"];
+const testID = "child";
 
-test.only("group", async () => {
+test("group", async () => {
   const A = createMockComponent(View);
   const B = createMockComponent(View);
-
-  const testID = "a";
 
   registerCSS(
     `.group\\/item .my-class {
@@ -102,4 +101,34 @@ test("invalid group", async () => {
   );
 
   expect(componentB).toHaveStyle(undefined);
+});
+
+test.only("group selector", async () => {
+  const A = createMockComponent(View);
+  const B = createMockComponent(View);
+
+  registerCSS(
+    `.group.test .my-class {
+      color: red;
+    }`,
+    {
+      grouping,
+    },
+  );
+
+  const { rerender, getByTestId } = render(
+    <A className="group test">
+      <B testID={testID} className="my-class" />
+    </A>,
+  );
+
+  expect(getByTestId(testID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+
+  rerender(
+    <A>
+      <B testID={testID} className="my-class" />
+    </A>,
+  );
+
+  expect(getByTestId(testID)).toHaveStyle(undefined);
 });

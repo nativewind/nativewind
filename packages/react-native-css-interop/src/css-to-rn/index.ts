@@ -395,6 +395,7 @@ function setStyleForSelectorList(
         groupPseudoClasses,
         darkMode,
         attrs,
+        groupAttrs,
       } = selector;
 
       const specificity = {
@@ -418,6 +419,7 @@ function setStyleForSelectorList(
         style.containerQuery.push({
           name: groupClassName,
           pseudoClasses: groupPseudoClasses,
+          attrs: groupAttrs,
         });
       }
 
