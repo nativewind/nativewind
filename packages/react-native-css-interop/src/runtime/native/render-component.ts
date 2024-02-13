@@ -249,11 +249,15 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
      * This code shouldn't be needed, but inline shared values are not working properly.
      * https://github.com/software-mansion/react-native-reanimated/issues/5296
      */
+    const propStyle = props.style;
     const style = useAnimatedStyle(() => {
-      const style: any = {};
-      const entries = Object.entries(props.style ?? {});
+      const style: Record<string, any> = {};
 
-      for (const [key, value] of entries as any) {
+      if (!propStyle) return style;
+
+      for (const key of Object.keys(propStyle)) {
+        const value = propStyle[key];
+
         if (typeof value === "object" && "_isReanimatedSharedValue" in value) {
           style[key] = value.value;
         } else if (key === "transform") {
@@ -271,7 +275,7 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
       }
 
       return style;
-    }, [props.style]);
+    }, [propStyle]);
 
     return createElement(AnimatedComponent, {
       ...props,

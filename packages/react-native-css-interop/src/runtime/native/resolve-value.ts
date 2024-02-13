@@ -283,7 +283,7 @@ export function resolveTransitionValue(
 
   return {
     defaultValue,
-    value: normalizedProps[property] ?? props[state.target][property],
+    value: normalizedProps[property] ?? props[state.target]?.[property],
   };
 }
 

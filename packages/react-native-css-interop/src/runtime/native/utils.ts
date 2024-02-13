@@ -278,6 +278,7 @@ export function processTransition(
           }),
         );
       }
+      props.style ??= {};
       setDeep(props.style, [property], sharedValue);
     }
   }
