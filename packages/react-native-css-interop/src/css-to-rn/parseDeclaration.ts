@@ -1714,7 +1714,13 @@ function parseUnparsed(
         case "rgb":
           tokenOrValue.value.name = "rgb";
           return unparsedFunction(tokenOrValue, options);
+        case "rgba":
+          tokenOrValue.value.name = "rgba";
+          return unparsedFunction(tokenOrValue, options);
         case "hsl":
+          tokenOrValue.value.name = "hsl";
+          return unparsedFunction(tokenOrValue, options);
+        case "hsla":
           tokenOrValue.value.name = "hsla";
           return unparsedFunction(tokenOrValue, options);
         case "translate":
