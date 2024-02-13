@@ -69,10 +69,15 @@ export function resolveValue(
       if (args.length === 3) return `rgb(${args.join(", ")})`;
       if (args.length === 4) return `rgba(${args.join(", ")})`;
     }
+    case "hsl": {
+      const args = resolve(state, descriptor.arguments, style).flat(10);
+      if (args.length === 3) return `hsl(${args.join(" ")})`;
+    }
     case "hsla": {
       const args = resolve(state, descriptor.arguments, style).flat(10);
       if (args.length === 3) return `hsl(${args.join(" ")})`;
-      if (args.length === 4) return `hsla(${args.slice(0, 3).join(' ') + ' / ' + args[3]})`;
+      if (args.length === 4)
+        return `hsla(${args.slice(0, 3).join(" ") + " / " + args[3]})`;
     }
     case "hairlineWidth": {
       return StyleSheet.hairlineWidth;
