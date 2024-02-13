@@ -6,7 +6,7 @@ I'm happy to announce the release of NativeWind v4! This release is the culminat
 
 ## The Updated Architecture
 
-NativeWind v4 is distinguished by its transition away from using a Babel plugin to a `jsxImportSource` transform. In the older architecture, Babel wrapped every component with a `className` prop in the `StyledComponent` wrapper (or you manually wrapped the component using `styled()`) and converted `className`->`style`. With the `jsxImportSource` transform, only native components need to be wrapped (`<View/>`,`<Text/>`, etc). This has has major advantages of:
+NativeWind v4 has transitioned away from using a Babel plugin to a `jsxImportSource` transform. In the older architecture, Babel wrapped every component with a `className` prop in the `StyledComponent` wrapper (or you manually wrapped the component using `styled()`) and converted `className`->`style`. With the `jsxImportSource` transform, only native components need to be wrapped (`<View/>`,`<Text/>`, etc). This has has major advantages of:
 
 1. **The `className` prop can accessed inside your components**.
 1. NativeWind will wrap less components and generally only components which are leaf nodes in the render tree
@@ -122,7 +122,7 @@ NativeWind v4 now supports the `group` and `group/<name>` syntax.
 
 https://tailwindcss.com/docs/hover-focus-and-other-states#differentiating-nested-groups
 
-### Container Queries (experimental)
+### Container Queries
 
 Container queries enable you to apply styles to an element based on the size of the element's container, making them extremely ideal for mobile styling. While technically not part of Tailwind CSS, they are available via the official plugin (TailwindCSS Container Queries)[https://github.com/tailwindlabs/tailwindcss-container-queries].
 
@@ -158,7 +158,7 @@ A subset of the Container Query spec is also available within your CSS
 
 ### Improved compilation
 
-NativeWind v4 resolves the majority of caching issues! **This includes hot reloading when you make change to your `tailwind.config.js` theme!**. This is a huge improvement over v2, which required you to restart the bundler, often without a cache, to see theme changes. This greatly improves the development experience and allows you to quickly iterate on designs made with NativeWind.
+NativeWind v4 improves hot-reloading, **including hot reloading when you make change to your `tailwind.config.js` theme!**. This greatly improves the development experience and allows you to quickly iterate on designs made with NativeWind.
 
 Additionally, the style compiler has be rewritten using [lightningcss](https://lightningcss.dev/) and should be significantly faster than v2.
 
@@ -439,32 +439,4 @@ Before using `cssInterop` you should could consider if `remapProps` would be mor
 
 ### `vars()`
 
-TODO
-
-### `useUnstableNativeVariables()`
-
-CSS variables, while highly useful, are largely write-only and cannot be read at runtime. This limitation is due to performance constraints on the web, particularly when attempting to retrieve the current value of a CSS variable for a given subtree.
-
-Web components are conventionally styled using either the className or style attributes, a strategy that makes efficient use of CSS variables. Regrettably, this approach isn't consistently adopted across the native ecosystem.
-
-To provide a solution for native components that need to access a CSS variable’s value, we have useUnstableNativeVariables(). This hook can be more efficient than nativeStyleToProp because it bypasses the need to engage enableCSSInterop on the component.
-
-> It's crucial to avoid using this hook within a web component and restrict its use to .native.js files.
-
-Moreover, this hook is not intended for access to static theme values. If you need to reference a static theme value, the Tailwind documentation provides examples on how to accomplish this in JavaScript: https://tailwindcss.com/docs/configuration#referencing-in-java-script
-
-While useUnstableNativeVariables() is a viable solution in certain situations, there are usually better design patterns to adopt. For example, if your use case involves a color value from a dynamically changing theme (such as a user-generated color palette), creating a Context Provider might be a more efficient and reliable approach. This provider can establish the context and assign the CSS variables accordingly.
-
-```tsx
-const ThemeContext = createContext();
-
-export function ThemeProvider({ value, children }) {
-  return (
-    <ThemeContext.Provider value={value}>
-      <View style={vars({ "--brand-color": value.brandColor })}>
-        {children}
-      </View>
-    </ThemeContext.Provider>
-  );
-}
-```
+`vars()` allow you can create inline CSS Variables that will be shared by React Context to all children.

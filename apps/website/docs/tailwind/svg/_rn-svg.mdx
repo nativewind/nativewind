@@ -1,6 +1,6 @@
 React Native does not have SVG components but universal SVG support can be achieved with 3rd party libraries such as [react-native-svg](https://github.com/react-native-svg/react-native-svg). While these docs use `react-native-svg`, the concept applies to all libraries.
 
-You will need to `enableCSSInterop()` on these components to properly style them for native.
+You will need to `cssInterop()` on these components to properly style them for native.
 
 <details>
   <summary>Example usage</summary>
@@ -9,21 +9,21 @@ You will need to `enableCSSInterop()` on these components to properly style them
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Circle, Rect from } 'react-native-svg';
-import { enableCSSInterop } from 'nativewind'
+import { cssInterop } from 'nativewind'
 
-enableCSSInterop(Svg, {
+cssInterop(Svg, {
   className: {
     target: "style",
     nativeStyleToProp: { width: true, height: true }
   },
 });
-enableCSSInterop(Circle, {
+cssInterop(Circle, {
   className: {
     target: "style",
     nativeStyleToProp: { width: true, height: true, stroke: true, strokeWidth: true, fill: true }
   },
 });
-enableCSSInterop(Rect, {
+cssInterop(Rect, {
   className: {
     target: "style",
     nativeStyleToProp: { width: true, height: true, stroke: true, strokeWidth: true, fill: true }

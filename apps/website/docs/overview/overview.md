@@ -4,36 +4,13 @@
 
 NativeWind allows you to use [Tailwind CSS](https://tailwindcss.com) to style your components in React Native. Styled components can be shared between all React Native platforms, using the best style engine for that platform; CSS StyleSheet on web and StyleSheet.create for native. It's goals are to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
 
-NativeWind processes your styles during your application's build step and uses a minimal runtime to selectively apply responsive styles (eg changes to device orientation, color scheme).
+On native platforms, NativeWind performs two functions. First, at build time, it compiles your Tailwind CSS styles into `StyleSheet.create` objects and determines the conditional logic of styles (e.g. hover, focus, active, etc). Second, it has an efficient runtime system that applies the styles to your components. This means you can use the full power of Tailwind CSS, including media queries, container queries, and custom values, while still having the performance of a native style system.
 
-```SnackPlayer name=Hello%20World&version=4
-import { vars } from "nativewind"
-
-const theme = vars({
-  "--theme-fg": "black",
-});
-
-const App = () => {
-  return (
-    <View
-      className="flex-1 items-center justify-center"
-      style={theme}
-    >
-      <Text className="text-[--theme-fg]">
-        Try editing me! 🎉
-      </Text>
-    </View>
-  );
-}
-```
+On web, NativeWind is a small polyfill for adding `className` support to React Native Web.
 
 ## Key Features
 
 🌐 **Universal** Uses the best style system for each platform.
-
-🛠️ **Build time** Uses the Tailwind CSS compile, styles are generated at build time
-
-🚀 **Fast runtime** Small runtime keeps everything fast. `~10kb` on native (without animations) and `3kb` on web.
 
 🖥️ **DevUX** Plugins for simple setup and improving intellisense support
 
@@ -65,9 +42,7 @@ A full featured style system should have
 
 React Native's StyleSheet system only provides static styles, with other features left for the user to implement. By using NativeWind you can focus on writing your system instead of building your own custom style system.
 
-On web, CSS already has all these features and is highly optimized. `StyleSheet.create` injects the CSS stylesheet at runtime, breaking SSR and slowing down performance. The majority of web frameworks have first-party support for Tailwind CSS, so we can leverage their build system.
-
-This is what makes NativeWind a universal style system - it allows you to use the same components with rich styles on all React Native platforms.
+On the web, it avoids injecting a StyleSheet at runtime by reusing the existing Tailwind CSS stylesheet, allowing you to use Server Side Rendering and much better initial page load performance.
 
 ## In action
 
@@ -127,13 +102,13 @@ And can even work with components that expect style attributes as props
 
 ```tsx
 import { Text } from "react-native";
-import { enableCSSInterop } from "nativewind";
+import { cssInterop } from "nativewind";
 import { Svg, Circle } from "react-native-svg";
 
 /**
  * Circle uses `height`/`width` props on native and className on web
  */
-const StyledSVG = enableCSSInterop(Svg, {
+const StyledSVG = cssInterop(Svg, {
   className: {
     target: "style",
     nativeStyleToProp: {
@@ -145,7 +120,7 @@ const StyledSVG = enableCSSInterop(Svg, {
 /**
  * Circle uses `fill`/`stroke`/`strokeWidth` props on native and className on web
  */
-const StyledCircle = enableCSSInterop(Circle, {
+const StyledCircle = cssInterop(Circle, {
   className: {
     target: "style",
     nativeStyleToProp: {
