@@ -124,6 +124,19 @@ export default App() {
 }
 ```
 
-### 6. TypeScript (optional)
+### 6. Modify your `app.json` (Expo only)
+
+Switch the bundler to use the [Metro bundler](https://docs.expo.dev/guides/customizing-metro/#web-support)
+```js
+{
+  "expo": {
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
+```
+
+### 7. TypeScript (optional)
 
 Please follow the [TypeScript guide](./typescript).
