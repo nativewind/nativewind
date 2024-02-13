@@ -188,7 +188,7 @@ const sidebars = {
         "tailwind/typography/text-underline-offset",
         "tailwind/typography/text-transform",
         "tailwind/typography/text-overflow",
-        "tailwind/typography/text-ident",
+        "tailwind/typography/text-indent",
         "tailwind/typography/vertical-align",
         "tailwind/typography/whitespace",
         "tailwind/typography/word-break",
