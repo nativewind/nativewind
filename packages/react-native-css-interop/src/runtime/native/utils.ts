@@ -35,6 +35,12 @@ export function processDeclarations(
           props[prop] = declaration[1];
         }
       } else {
+        const paths = [...declaration[1]];
+
+        if (propState.target !== "style" && paths[0] === "style") {
+          paths[0] = propState.target;
+        }
+
         // em / rnw / rnh units use other declarations, so we need to delay them
         if (typeof declaration[2] === "object" && declaration[2].delay) {
           const uniqueValue = {};
@@ -52,7 +58,7 @@ export function processDeclarations(
               declaration[2],
               props[propState.target],
             );
-            setDeep(props, declaration[1], value);
+            setDeep(props, paths, value);
             normalizedProps[declaration[0]] = value;
           });
         } else {
@@ -61,7 +67,7 @@ export function processDeclarations(
             declaration[2],
             props[propState.target],
           );
-          setDeep(props, declaration[1], value);
+          setDeep(props, paths, value);
           normalizedProps[declaration[0]] = value;
         }
       }
