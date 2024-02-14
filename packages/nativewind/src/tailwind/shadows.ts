@@ -26,8 +26,6 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
     return elevation;
   }
 
-  let transformValue = transformThemeValue("boxShadow");
-
   addDefaults("box-shadow", {
     "--tw-ring-offset-shadow": "0 0 #0000",
     "--tw-ring-shadow": "0 0 #0000",
@@ -51,8 +49,8 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
       shadow: (value) => {
         const elevation = getElevation(value);
 
+        let transformValue = transformThemeValue("boxShadow");
         value = transformValue(value);
-
         let ast = parseBoxShadowValue(value);
 
         const firstValid = ast.find((shadow: any) => shadow.valid);
