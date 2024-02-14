@@ -33,7 +33,6 @@ export function renderComponent(
   props: Record<string, any>,
   variables: Record<string, any>,
   containers: Record<string, any>,
-  ref: any,
 ) {
   let component = baseComponent;
   const shouldWarn = state.upgrades.canWarn;
@@ -197,6 +196,8 @@ export function renderComponent(
     "$$typeof" in baseComponent &&
     baseComponent.$$typeof === ForwardRefSymbol
   ) {
+    const ref = props.ref;
+    delete props.ref;
     return (baseComponent as any).render(props, ref);
   } else if (
     /*
@@ -212,7 +213,6 @@ export function renderComponent(
     /*
      * Class/Object/String components are not composable, so they are added to the tree as normal
      */
-    props.ref = ref;
     return createElement(component, props);
   }
 }

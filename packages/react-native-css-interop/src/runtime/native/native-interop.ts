@@ -163,7 +163,7 @@ export function interop(
   componentState.refs.variables = variables;
 
   // Clone the props into a new object, as props will be frozen
-  props = { ...props };
+  props = Object.assign({ ref }, props);
 
   // We need to rerun all the prop states to get the styled props
   for (const propState of componentState.propStates) {
@@ -206,7 +206,6 @@ export function interop(
     props,
     variables,
     containers,
-    ref,
   );
 }
 
