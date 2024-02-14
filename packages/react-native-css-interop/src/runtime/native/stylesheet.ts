@@ -48,7 +48,6 @@ const commonStyleSheet: CssInteropStyleSheet = {
     return globalStyles.get(name);
   },
   registerCompiled(options) {
-    // console.log(JSON.stringify(options, null, 2));
     this[INTERNAL_FLAGS]["$$receivedData"] = "true";
 
     if (options.flags) {

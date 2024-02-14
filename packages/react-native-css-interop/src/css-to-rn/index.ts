@@ -288,16 +288,19 @@ function extractMedia(
 
   // Iterate over all media queries in the mediaRule
   for (const mediaQuery of mediaRule.query.mediaQueries) {
-    // Check if the media type is screen
-    let isScreen = mediaQuery.mediaType !== "print";
-    if (mediaQuery.qualifier === "not") {
-      isScreen = !isScreen;
+    if (
+      // If this is only a media query
+      (mediaQuery.mediaType === "print" && mediaQuery.qualifier !== "not") ||
+      // If this is a @media not print {}
+      // We can only do this if there are no conditions, as @media not print and (min-width: 100px) could be valid
+      (mediaQuery.mediaType !== "print" &&
+        mediaQuery.qualifier === "not" &&
+        mediaQuery.condition === null)
+    ) {
+      continue;
     }
 
-    // If it's a screen media query, add it to the media array
-    if (isScreen) {
-      media.push(mediaQuery);
-    }
+    media.push(mediaQuery);
   }
 
   if (media.length === 0) {

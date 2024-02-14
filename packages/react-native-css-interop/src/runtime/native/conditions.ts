@@ -68,7 +68,9 @@ export function testMediaQuery(
     height: vh,
   },
 ) {
-  const pass = testCondition(state, mediaQuery.condition, conditionReference);
+  const pass =
+    mediaQuery.mediaType !== "print" &&
+    testCondition(state, mediaQuery.condition, conditionReference);
   return mediaQuery.qualifier === "not" ? !pass : pass;
 }
 

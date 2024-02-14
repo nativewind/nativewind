@@ -168,3 +168,27 @@ test("max-width", () => {
     color: "rgba(255, 0, 0, 1)",
   });
 });
+
+test("not all", () => {
+  // This reads not (all and min-width: 640px)
+  // It is the same as max-width: 639px
+  registerCSS(`
+@media not all and (min-width: 640px) { 
+  .my-class { color: red; }
+}`);
+  // Make larger than 640
+  act(() => vw[INTERNAL_SET](1000));
+
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle(undefined);
+
+  // Make smaller than 640
+  act(() => vw[INTERNAL_SET](300));
+
+  expect(component).toHaveStyle({
+    color: "rgba(255, 0, 0, 1)",
+  });
+});
