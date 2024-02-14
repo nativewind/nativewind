@@ -34,27 +34,28 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
 
     props = { ...props, ref };
     for (const config of configs) {
-      const newStyles: StyleProp = [];
-      const value = props[config.source];
-      if (typeof value === "string") {
+      let newStyles: StyleProp = [];
+      const source = props[config.source];
+      const target: StyleProp = props[config.target];
+
+      if (typeof source === "string") {
         newStyles.push({
           $$css: true,
-          [value]: value,
+          [source]: source,
         } as StyleProp);
       }
 
       delete props[config.source];
 
-      let styles: StyleProp = props[config.target];
-      if (Array.isArray(styles)) {
-        styles = [...newStyles, ...styles];
-      } else if (styles) {
-        styles = [...newStyles, styles];
-      } else {
-        styles = newStyles;
+      if (Array.isArray(target)) {
+        newStyles.push(...target);
+      } else if (target) {
+        newStyles.push(target);
       }
 
-      props[config.target] = styles;
+      if (newStyles.length > 0) {
+        props[config.target] = newStyles;
+      }
     }
 
     if (
