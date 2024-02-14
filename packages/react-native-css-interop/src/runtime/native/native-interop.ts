@@ -449,17 +449,15 @@ function addStyle(
       : style;
 
   if (!ruleSet) {
-    if (process.env.NODE_ENV !== "production") {
-      // This doesn't exist now, but it might in the future.
-      // So we create a placeholder style that we can observe
-      if (typeof style === "string") {
-        const styleObservable = observable<StyleRuleSet>(
-          { $$type: "StyleRuleSet" },
-          { name: style },
-        );
-        styleObservable.get(propState.declarationEffect);
-        globalStyles.set(style, styleObservable);
-      }
+    // This doesn't exist now, but it might in the future.
+    // So we create a placeholder style that we can observe
+    if (typeof style === "string") {
+      const styleObservable = observable<StyleRuleSet>(
+        { $$type: "StyleRuleSet" },
+        { name: style },
+      );
+      styleObservable.get(propState.declarationEffect);
+      globalStyles.set(style, styleObservable);
     }
     return;
   }
