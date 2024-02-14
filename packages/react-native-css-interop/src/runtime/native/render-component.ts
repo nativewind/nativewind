@@ -33,6 +33,7 @@ export function renderComponent(
   props: Record<string, any>,
   variables: Record<string, any>,
   containers: Record<string, any>,
+  ref: any,
 ) {
   let component = baseComponent;
   const shouldWarn = state.upgrades.canWarn;
@@ -196,7 +197,7 @@ export function renderComponent(
     "$$typeof" in baseComponent &&
     baseComponent.$$typeof === ForwardRefSymbol
   ) {
-    return (baseComponent as any).render(props, props.ref);
+    return (baseComponent as any).render(props, ref);
   } else if (
     /*
      * Function components can be composed into a ForwardRef, but like we said above, we should be matches the component type,
@@ -211,6 +212,7 @@ export function renderComponent(
     /*
      * Class/Object/String components are not composable, so they are added to the tree as normal
      */
+    props.ref = ref;
     return createElement(component, props);
   }
 }
