@@ -63,21 +63,18 @@ export function resolveValue(
       const width = style?.width ?? getWidth(state);
       if (typeof value === "number") return round(width * value);
     }
+    case "hwb":
+      const args = resolve(state, descriptor.arguments, style).flat(10);
+      return getColorArgs(args, { 3: "hwb" });
     case "rgb":
     case "rgba": {
       const args = resolve(state, descriptor.arguments, style).flat(10);
-      if (args.length === 3) return `rgb(${args.join(", ")})`;
-      if (args.length === 4) return `rgba(${args.join(", ")})`;
+      return getColorArgs(args, { 3: "rgb", 4: "rgba" });
     }
-    case "hsl": {
-      const args = resolve(state, descriptor.arguments, style).flat(10);
-      if (args.length === 3) return `hsl(${args.join(" ")})`;
-    }
+    case "hsl":
     case "hsla": {
       const args = resolve(state, descriptor.arguments, style).flat(10);
-      if (args.length === 3) return `hsl(${args.join(" ")})`;
-      if (args.length === 4)
-        return `hsla(${args.slice(0, 3).join(" ") + " / " + args[3]})`;
+      return getColorArgs(args, { 3: "hsl", 4: "hsla" });
     }
     case "hairlineWidth": {
       return StyleSheet.hairlineWidth;
@@ -350,6 +347,20 @@ export function setDeep(
   } else {
     target[prop] = value;
   }
+}
+
+function getColorArgs(args: any[], config: Record<number, string>) {
+  // Do we perfectly match a function?
+  if (config[args.length]) return `${config[args.length]}(${args.join(", ")})`;
+  // Otherwise, we need to split the args and remove any empty strings
+  // e.g ["255 0 0", 1] => ["255", "0", "0", 1]
+  args = args.flatMap((arg) => {
+    return typeof arg === "string"
+      ? arg.split(/[,\s\/]/g).filter(Boolean)
+      : arg;
+  });
+  // Now do we match a function?
+  if (config[args.length]) return `${config[args.length]}(${args.join(", ")})`;
 }
 
 function getLayout(state: PropState, interaction = state.interaction) {
