@@ -51,7 +51,7 @@ describe("hsl", () => {
       <A testID={testID} className="my-class" />,
     ).getByTestId(testID);
 
-    expect(component).toHaveStyle({ color: "hsl(0 84.2% 60.2%)" });
+    expect(component).toHaveStyle({ color: "hsl(0, 84.2%, 60.2%)" });
   });
 
   test("function with comma", () => {
@@ -64,7 +64,7 @@ describe("hsl", () => {
       <A testID={testID} className="my-class" />,
     ).getByTestId(testID);
 
-    expect(component).toHaveStyle({ color: "hsl(0 84.2% 60.2%)" });
+    expect(component).toHaveStyle({ color: "hsl(0, 84.2%, 60.2%)" });
   });
 });
 
@@ -107,7 +107,7 @@ describe("hsla", () => {
       <A testID={testID} className="my-class" />,
     ).getByTestId(testID);
 
-    expect(component).toHaveStyle({ color: "hsla(0 84.2% 60.2% / 60%)" });
+    expect(component).toHaveStyle({ color: "hsla(0, 84.2%, 60.2%, 60%)" });
   });
 
   test("function with comma", () => {
@@ -120,6 +120,6 @@ describe("hsla", () => {
       <A testID={testID} className="my-class" />,
     ).getByTestId(testID);
 
-    expect(component).toHaveStyle({ color: "hsla(0 84.2% 60.2% / 60%)" });
+    expect(component).toHaveStyle({ color: "hsla(0, 84.2%, 60.2%, 60%)" });
   });
 });
