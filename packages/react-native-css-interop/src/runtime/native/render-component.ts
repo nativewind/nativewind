@@ -1,11 +1,11 @@
-import { Component, ComponentType, createElement, forwardRef } from "react";
+import { ComponentType, createElement, forwardRef } from "react";
 import { LayoutChangeEvent, Pressable, View } from "react-native";
 
 import { containerContext, variableContext } from "./globals";
 import { ComponentState } from "./native-interop";
 import { observable } from "../observable";
+import { getComponentType } from "./utils";
 
-const ForwardRefSymbol = Symbol.for("react.forward_ref");
 const animatedCache = new Map<
   ComponentType<any> | string,
   ComponentType<any>
@@ -190,25 +190,21 @@ export function renderComponent(
    * that matches the type of the original component (e.g Function components should just be function components, nof ForwardRefs)
    * and passing a flag down if the component is composable.
    */
-  if (
-    component === baseComponent &&
-    (typeof component === "function" || typeof component === "object") &&
-    "$$typeof" in baseComponent &&
-    baseComponent.$$typeof === ForwardRefSymbol
-  ) {
-    const ref = props.ref;
-    delete props.ref;
-    return (baseComponent as any).render(props, ref);
-  } else if (
-    /*
-     * Function components can be composed into a ForwardRef, but like we said above, we should be matches the component type,
-     * Now we're wrapping function components in a ForwardRef.
-     */
-    component === baseComponent &&
-    typeof component === "function" &&
-    !(component.prototype instanceof Component)
-  ) {
-    return (component as any)(props);
+  if (component === baseComponent) {
+    switch (getComponentType(component)) {
+      case "forwardRef": {
+        const ref = props.ref;
+        delete props.ref;
+        return (component as any).render(props, ref);
+      }
+      case "function":
+        return (component as any)(props);
+      case "string":
+      case "object":
+      case "class":
+      case "unknown":
+        return createElement(component, props);
+    }
   } else {
     /*
      * Class/Object/String components are not composable, so they are added to the tree as normal

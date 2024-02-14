@@ -93,12 +93,12 @@ test("ActivityIndicator", () => {
   });
 
   // ActivityIndicator will not render a backgroundColor
-  // It also sets a width/height based upon the size prop
   expect(component.props).toEqual(
     expect.objectContaining({
       testID,
       color: "rgba(255, 255, 255, 1)",
       style: {
+        // ActivityIndicator does not accept styles. It overrides them with its own size styles
         height: 20,
         width: 20,
       },

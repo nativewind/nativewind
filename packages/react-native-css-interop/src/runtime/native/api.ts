@@ -11,6 +11,7 @@ import { Effect, cleanupEffect } from "../observable";
 import { globalStyles } from "./stylesheet";
 import { interop } from "./native-interop";
 import { opaqueStyles } from "./style-store";
+import { getComponentType } from "./utils";
 
 export { StyleSheet } from "./stylesheet";
 export { colorScheme, rem } from "./globals";
@@ -30,18 +31,17 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
   const configs = getNormalizeConfig(mapping);
 
   let component: ReactComponent;
+  const type = getComponentType(baseComponent);
 
   /**
    * This is a work-in-progress. We should be generating a new component that matches the
    * type of the previous component. E.g ForwardRef should be a ForwardRef, Memo should be Memo
    */
-  if (typeof baseComponent === "function") {
-    // We can directly render function components
+  if (type === "function") {
     component = (props: Record<string, any>) => {
       return interop(baseComponent, configs, props, undefined);
     };
   } else {
-    // Class, forwardRef, object, string components need to be wrapped
     component = forwardRef<unknown, Record<string, any>>((props, ref) => {
       // This function will change className->style, add the extra props and do the "magic"
       return interop(baseComponent, configs, props, ref);
