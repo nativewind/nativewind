@@ -291,7 +291,11 @@ export function normalizeSelectors(
               break;
             case "disabled":
               attrs ??= [];
-              attrs.push({ type: "attribute", name: "disabled" });
+              attrs.push({
+                type: "attribute",
+                name: "disabled",
+                operation: { operator: "truthy" },
+              });
               break;
             case "empty":
               attrs ??= [];

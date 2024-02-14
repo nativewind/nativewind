@@ -1,15 +1,18 @@
-import { TextInput } from "react-native";
+import { TextInput as RNTextInput, Switch as RNSwitch } from "react-native";
 import { createMockComponent, renderTailwind } from "../test-utils";
 import { fireEvent, screen } from "@testing-library/react-native";
 import { resetStyles } from "react-native-css-interop/testing-library";
 
-const A = createMockComponent(TextInput);
+const TextInput = createMockComponent(RNTextInput);
+const Switch = createMockComponent(RNSwitch);
 const testID = "component";
 
 beforeEach(() => resetStyles());
 
 test("hover", async () => {
-  await renderTailwind(<A testID={testID} className="hover:text-white" />);
+  await renderTailwind(
+    <TextInput testID={testID} className="hover:text-white" />,
+  );
 
   const component = screen.getByTestId(testID);
 
@@ -23,7 +26,9 @@ test("hover", async () => {
 });
 
 test("focus", async () => {
-  await renderTailwind(<A testID={testID} className="focus:text-white" />);
+  await renderTailwind(
+    <TextInput testID={testID} className="focus:text-white" />,
+  );
 
   const component = screen.getByTestId(testID);
 
@@ -37,7 +42,9 @@ test("focus", async () => {
 });
 
 test("active", async () => {
-  await renderTailwind(<A testID={testID} className="active:text-white" />);
+  await renderTailwind(
+    <TextInput testID={testID} className="active:text-white" />,
+  );
 
   const component = screen.getByTestId(testID);
 
@@ -52,7 +59,7 @@ test("active", async () => {
 
 test("mixed", async () => {
   await renderTailwind(
-    <A testID={testID} className="active:hover:focus:text-white" />,
+    <TextInput testID={testID} className="active:hover:focus:text-white" />,
   );
 
   const component = screen.getByTestId(testID);
@@ -69,7 +76,9 @@ test("mixed", async () => {
 });
 
 test("selection", async () => {
-  await renderTailwind(<A testID={testID} className="selection:text-black" />);
+  await renderTailwind(
+    <TextInput testID={testID} className="selection:text-black" />,
+  );
 
   const component = screen.getByTestId(testID);
   expect(component.props).toEqual(
@@ -84,7 +93,7 @@ test("selection", async () => {
 
 test("placeholder", async () => {
   await renderTailwind(
-    <A testID={testID} className="placeholder:text-black" />,
+    <TextInput testID={testID} className="placeholder:text-black" />,
   );
 
   const component = screen.getByTestId(testID);
@@ -94,6 +103,56 @@ test("placeholder", async () => {
       placeholderTextColor: "rgba(0, 0, 0, 1)",
       children: undefined,
       style: undefined,
+    }),
+  );
+});
+
+test("disabled", async () => {
+  const { rerender } = await renderTailwind(
+    <Switch testID={testID} className="disabled:bg-black" />,
+  );
+
+  const component = screen.getByTestId(testID);
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      testID,
+      style: {
+        height: 31,
+        width: 51,
+      },
+    }),
+  );
+
+  await rerender(
+    <Switch testID={testID} disabled className="disabled:bg-black" />,
+  );
+
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      testID,
+      style: [
+        {
+          height: 31,
+          width: 51,
+        },
+        {
+          backgroundColor: "rgba(0, 0, 0, 1)",
+        },
+      ],
+    }),
+  );
+
+  await rerender(
+    <Switch testID={testID} disabled={false} className="disabled:bg-black" />,
+  );
+
+  expect(component.props).toEqual(
+    expect.objectContaining({
+      testID,
+      style: {
+        height: 31,
+        width: 51,
+      },
     }),
   );
 });

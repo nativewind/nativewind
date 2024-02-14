@@ -385,7 +385,7 @@ export type PropCondition = Omit<AttributeSelectorComponent, "operation"> & {
   operation?:
     | AttributeSelectorComponent["operation"]
     | {
-        operator: "empty";
+        operator: "empty" | "truthy";
       };
 };
 

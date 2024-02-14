@@ -345,9 +345,16 @@ function testAttribute(propValue: any, condition: AttributeCondition) {
   if (operation == null) return propValue != null;
 
   switch (operation.operator) {
+    /* These are non-standard operators */
     case "empty": {
+      // Mostly used for detecting empty children
       return propValue == null || propValue == "";
     }
+    case "truthy": {
+      // Does the attribute exist with a truthy value
+      return Boolean(propValue);
+    }
+    /* These are the standard operators */
     case "dash-match":
     case "prefix":
     case "substring":
@@ -356,7 +363,7 @@ function testAttribute(propValue: any, condition: AttributeCondition) {
     case "includes":
       return propValue?.toString().includes(operation.value);
     case "equal": {
-      return propValue?.toString() === operation.value.toString();
+      return propValue?.toString() == operation.value;
     }
   }
 }
