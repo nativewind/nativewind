@@ -225,9 +225,17 @@ function testPlainFeature(
     case "max-height":
       return testComparison(state, "less-than-equal", ref.height, value);
     case "orientation":
-      return value === "landscape"
-        ? testComparison(state, "less-than", ref.height, ref.width)
-        : testComparison(state, "greater-than-equal", ref.height, ref.width);
+      switch (value) {
+        case "landscape":
+          return testComparison(state, "less-than", ref.height, ref.width);
+        case "portrait":
+          return testComparison(
+            state,
+            "greater-than-equal",
+            ref.height,
+            ref.width,
+          );
+      }
     default:
       return false;
   }
