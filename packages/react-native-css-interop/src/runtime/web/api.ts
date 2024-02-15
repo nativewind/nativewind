@@ -38,7 +38,7 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
       const source = props[config.source];
       const target: StyleProp = props[config.target];
 
-      if (typeof source === "string") {
+      if (typeof source === "string" && source) {
         newStyles.push({
           $$css: true,
           [source]: source,
