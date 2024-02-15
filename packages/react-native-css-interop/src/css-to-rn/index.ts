@@ -396,9 +396,9 @@ function setStyleForSelectorList(
         groupClassName,
         pseudoClasses,
         groupPseudoClasses,
-        darkMode,
         attrs,
         groupAttrs,
+        media,
       } = selector;
 
       const specificity = {
@@ -426,19 +426,9 @@ function setStyleForSelectorList(
         });
       }
 
-      if (darkMode) {
+      if (media) {
         style.media ??= [];
-        style.media.push({
-          mediaType: "all",
-          condition: {
-            type: "feature",
-            value: {
-              type: "plain",
-              name: "prefers-color-scheme",
-              value: { type: "ident", value: "dark" },
-            },
-          },
-        });
+        style.media.push(...media);
       }
 
       addDeclaration(declarations, className, {

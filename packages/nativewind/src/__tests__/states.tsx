@@ -1,8 +1,13 @@
-import { TextInput as RNTextInput, Switch as RNSwitch } from "react-native";
+import {
+  TextInput as RNTextInput,
+  Switch as RNSwitch,
+  View as RNView,
+} from "react-native";
 import { createMockComponent, renderTailwind } from "../test-utils";
 import { fireEvent, screen } from "@testing-library/react-native";
 import { resetStyles } from "react-native-css-interop/testing-library";
 
+const View = createMockComponent(RNView);
 const TextInput = createMockComponent(RNTextInput);
 const Switch = createMockComponent(RNSwitch);
 const testID = "component";
@@ -89,6 +94,15 @@ test("selection", async () => {
       style: undefined,
     }),
   );
+});
+
+test("ltr:", async () => {
+  await renderTailwind(<View testID={testID} className="ltr:text-black" />);
+
+  const component = screen.getByTestId(testID);
+  expect(component).toHaveStyle({
+    color: "rgba(0, 0, 0, 1)",
+  });
 });
 
 test("placeholder", async () => {

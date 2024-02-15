@@ -14,7 +14,7 @@ import {
   StyleRule,
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
-import { Platform } from "react-native";
+import { I18nManager, Platform } from "react-native";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { Effect, observable } from "../observable";
 import type { ComponentState, PropState } from "./native-interop";
@@ -317,6 +317,10 @@ function testBoolean(
   switch (feature.name) {
     case "prefers-reduced-motion":
       return isReduceMotionEnabled.get(state.declarationEffect);
+    case "ltr":
+      return I18nManager.isRTL === false;
+    case "rtl":
+      return I18nManager.isRTL;
   }
   return false;
 }

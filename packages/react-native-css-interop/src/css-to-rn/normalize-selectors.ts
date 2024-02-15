@@ -18,8 +18,8 @@ export type NormalizeSelector =
     }
   | {
       type: "className";
-      darkMode?: boolean;
       className: string;
+      media?: MediaQuery[];
       groupClassName?: string;
       pseudoClasses?: Record<string, true>;
       groupPseudoClasses?: Record<string, true>;
@@ -103,13 +103,26 @@ export function normalizeSelectors(
     // Matches:  .dark <selector> {}
     if (isDarkClassSelector(cssSelector, options)) {
       const [_, __, third, ...rest] = cssSelector;
+
       normalizeSelectors(
         extractedStyle,
         [[third, ...rest]],
         options,
         selectors,
         {
-          darkMode: true,
+          media: [
+            {
+              mediaType: "all",
+              condition: {
+                type: "feature",
+                value: {
+                  type: "plain",
+                  name: "prefers-color-scheme",
+                  value: { type: "ident", value: "dark" },
+                },
+              },
+            },
+          ],
         },
       );
       continue;
@@ -144,6 +157,28 @@ export function normalizeSelectors(
           isValid = false;
           break;
         case "attribute": {
+          if (!selector.groupClassName && !selector.className) {
+            if (
+              component.name === "dir" &&
+              component.operation?.operator === "equal"
+            ) {
+              selector.media ??= [];
+              selector.media.push({
+                mediaType: "all",
+                condition: {
+                  type: "feature",
+                  value: {
+                    type: "boolean",
+                    name: component.operation.value,
+                  },
+                },
+              });
+            } else {
+              isValid = false;
+            }
+            break;
+          }
+
           // Turn attribute selectors into AttributeConditions
           selector.specificity.B ??= 0;
           selector.specificity.B++;
