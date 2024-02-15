@@ -1,10 +1,11 @@
 import Compatibility from "../tailwind/_compatibility.mdx";
+import TwDocs from "../tailwind/_tw-docs.mdx";
 
 # Hover, Focus and Other States
 
 Please refer to the [documentation on the Tailwind CSS website](https://tailwindcss.com/docs/hover-focus-and-other-states) for more information.
 
-## Pseudo-classes
+## Pseudo-classes <TwDocs href="https://tailwindcss.com/docs/hover-focus-and-other-states#pseudo-classes" />
 
 :::tip
 
@@ -12,7 +13,7 @@ If a `<View />` has a class which requires an event listener, it will be automat
 
 :::
 
-### Hover, focus, and active
+### Hover, focus, and active <TwDocs href="https://tailwindcss.com/docs/hover-focus-and-other-states#hover-focus-and-active" />
 
 NativeWind implements a subset of the Tailwind pseudo-classes by adding event listeners on your components, hence they will only work on components that can accept the listener.
 
@@ -24,7 +25,7 @@ The supported pseudo-classes and their related listeners are:
 | `focus`  | `onBlur`, `onFocus`        |
 | `active` | `onPressIn`, `onPressOut`, |
 
-### Opt in Pointer Events
+#### Opt in Pointer Events 
 
 React Native 0.71 supports opt-in [Pointer Events](https://reactnative.dev/blog/2023/01/12/version-071#events). If enabled NativeWind will use these instead, allowing for hover support on native when used with a pointer device.
 
@@ -34,7 +35,32 @@ React Native 0.71 supports opt-in [Pointer Events](https://reactnative.dev/blog/
 | `focus`  | `onBlur`, `onFocus`             |
 | `active` | `onPressIn`, `onPressOut`,      |
 
-## Styling based on parent state
+### First, last, odd, and even <TwDocs href="https://tailwindcss.com/docs/hover-focus-and-other-states#first-last-odd-and-even" />
+
+
+<Compatibility none={["first:", "last:", "odd:", "even:"]} legend={false} />
+
+### Form States <TwDocs href="https://tailwindcss.com/docs/hover-focus-and-other-states#form-states" />
+
+
+<Compatibility partial={["disabled:"]} none={["required:", "invalid:"]} legend={false} />
+
+:::caution
+
+On native, `"disabled:"` is only available for components with a `disabled` prop.
+
+Unfortunately `<TextInput>` uses `enabled={false}` instead of `disabled={true}`, so it will not work with `"disabled:"`.
+
+:::
+
+:::info
+
+We are looking for contributors to add more support for `"disabled:"`.
+
+:::
+
+
+### Styling based on parent state <TwDocs href="https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state" />
 
 **Styling based on parent state (group-\{modifier\})**
 
@@ -43,6 +69,55 @@ NativeWind supports the [`group`](https://tailwindcss.com/docs/hover-focus-and-o
 **Differentiating nested groups**
 
 NativeWind supports the [`group/{name}`](https://tailwindcss.com/docs/hover-focus-and-other-states#differentiating-nested-groups) class name and it can be used with any supported modifier
+
+**Arbitrary groups**
+
+<Compatibility supported={["Class selectors", "Attribute selectors"]} none={["Pseudo-classes selectors", "Pseudo-elements selectors", "Elements selectors", "Moving group via `&`"]} legend={false} />
+
+:::tip
+
+Native supports multiple selectors, e.g `group-[.classOne.classTwo[attribute=value]]`
+
+:::
+
+
+### Styling based on sibling state <TwDocs href="https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-sibling-state" />
+
+**Styling based on parent state (peer-\{modifier\})**
+
+<Compatibility none={["peer", "peer-*", "peer-invalid"]} legend={false} />
+
+### Styling direct children <TwDocs href="https://tailwindcss.com/docs/hover-focus-and-other-states#styling-direct-children" />
+
+**Styling based on parent state (*-)**
+
+<Compatibility none={["*-"]} legend={false} />
+
+### Styling based on descendants <TwDocs href="https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-descendants" />
+
+**Styling based on descendants (has-\{modifier\})**
+
+<Compatibility none={["has-"]} legend={false} />
+
+:::info
+
+We are looking for contributors to add more support for `has-`.
+
+:::
+
+## Pseudo-elements
+
+### Placeholder text
+
+:::tip
+
+On native, `placeholder:` only supports the `text-*` or `color-*` classes. It will map to the `placeholderTextColor` on native.
+
+We are looking for contributors to add more support for `placeholder:`.
+
+:::
+
+<Compatibility partial={["placeholder:"]} legend={false} />
 
 ## Media and feature queries
 
@@ -107,42 +182,3 @@ Use the open modifier to conditionally add styles when a `<details/>` or `<dialo
 ## Custom modifiers
 
 Custom modifiers are possible, but are not yet documented. More information to come.
-
-## Contributors
-
-<details>
-  <summary>We are looking for contributors for the following:</summary>
-
-**Responsive breakpoints**
-
-What are good responsive breakpoints for mobile devices?
-
-**Add `placeholder:`**
-
-`placeholder:text-color` should support mapping to `placeholderTextColor`
-
-**Add `selection:`**
-
-NativeWind could export a custom `<em>` component. `selection:` will style this component.
-
-**Add `first-line:`**
-
-`first-line:` should map to `<Text numberOfLines={1} style={styles}>{letter}</Text>`
-
-**Add `first-letter:`**
-
-`first-letter:` should map to `<Text style={styles}>{letter}</Text>`
-
-**Explore `backdrop:`**
-
-Could this be used with `<Modal />`?
-
-**Explore `aria-[n]:`**
-
-Could this be used with the accessibility props?
-
-**Explore `data-[n]:`**
-
-Could this be used with the data props? Should we auto strip these props on native?
-
-</details>
