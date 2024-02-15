@@ -7,6 +7,11 @@ import { interopComponents } from "./api";
  */
 export default function wrapJSX(jsx: JSXFunction): JSXFunction {
   return function (type, props, ...rest) {
+    // This is invalid react code. Its used by the doctor to check if the JSX pragma is set correctly
+    if ((type as any) === "react-native-css-interop-jsx-pragma-check") {
+      return true as any;
+    }
+
     // Load the core React Native components and create the interop versions
     // We avoid this in the test environment as we want more fine-grained control
     // This call also need to be inside the JSX transform to avoid circular dependencies
