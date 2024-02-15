@@ -1,7 +1,9 @@
 import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 
-const isNative = Boolean(process.env.NATIVEWIND_NATIVE);
+const isWeb =
+  process.env.NATIVEWIND_NATIVE === undefined ||
+  process.env.NATIVEWIND_NATIVE === "web";
 
 export const darkModeAtRule = plugin(function ({ config, addBase }) {
   const darkMode = config<Config["darkMode"]>("darkMode");
@@ -30,17 +32,17 @@ export const darkModeAtRule = plugin(function ({ config, addBase }) {
     }
   }
 
-  if (isNative) {
-    const atRule = ["@cssInterop set darkMode", type, value]
-      .filter(Boolean)
-      .join(" ");
-
-    addBase({ [atRule]: "" });
-  } else {
+  if (isWeb) {
     addBase({
       ":root": {
         "--css-interop-darkMode": [type, value].filter(Boolean).join(" "),
       },
     });
+  } else {
+    const atRule = ["@cssInterop set darkMode", type, value]
+      .filter(Boolean)
+      .join(" ");
+
+    addBase({ [atRule]: "" });
   }
 });

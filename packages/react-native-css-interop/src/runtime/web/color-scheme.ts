@@ -45,10 +45,8 @@ export const colorScheme = {
 
     if (value === "system") {
       colorSchemeObservable.set(undefined);
-      appearance.setColorScheme(null);
     } else {
       colorSchemeObservable.set(value);
-      appearance.setColorScheme(value);
     }
 
     if (value === "dark") {
@@ -63,7 +61,7 @@ export const colorScheme = {
   toggle() {
     let current = colorSchemeObservable.get();
     if (current === undefined) current = appearance.getColorScheme() ?? "light";
-    colorSchemeObservable.set(current === "light" ? "dark" : "light");
+    colorScheme.set(current === "light" ? "dark" : "light");
   },
   [INTERNAL_RESET]: (appearance: typeof Appearance) => {
     colorSchemeObservable.set(undefined);
@@ -80,4 +78,5 @@ function resetAppearanceListeners($appearance: typeof Appearance) {
     }
   });
 }
+console.log(appearance);
 resetAppearanceListeners(appearance);
