@@ -1,5 +1,5 @@
+import type { NextHandleFunction } from "connect";
 import connect from "connect";
-import type { GetTransformOptionsOpts } from "metro-config";
 import loadConfig from "tailwindcss/loadConfig";
 import tailwindPackage from "tailwindcss/package.json";
 import micromatch from "micromatch";
@@ -25,6 +25,9 @@ interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
   browserslistEnv?: string | null;
 }
 
+const tailwindCliPromises: Record<string, ReturnType<typeof tailwindCli>> = {};
+const cliOutputs: Record<string, Awaited<ReturnType<typeof tailwindCli>>> = {};
+
 export function withNativeWind(
   metroConfig: ComposableIntermediateConfigT,
   {
@@ -49,23 +52,23 @@ export function withNativeWind(
   }
 
   input = path.resolve(input);
-
-  const { important: importantConfig, content } = loadConfig(
-    path.resolve(tailwindConfigPath),
+  const output = path.resolve(
+    projectRoot,
+    path.join(outputDir, path.basename(input!)),
   );
 
-  const contentArray = "files" in content ? content.files : content;
+  const { important } = getTailwindConfig(tailwindConfigPath, output);
 
+  // Get the CssInterop modified Metro Config (this includes its transform)
   metroConfig = withCssInterop(metroConfig, {
     ...cssToReactNativeRuntimeOptions,
     inlineRem,
-    selectorPrefix:
-      typeof importantConfig === "string" ? importantConfig : undefined,
+    selectorPrefix: typeof important === "string" ? important : undefined,
   });
-
-  // eslint-disable-next-line unicorn/prefer-module
+  // Override CSS Interop's transformer with our own (we call it ourselves)
   metroConfig.transformerPath = require.resolve("./transformer");
 
+  // This is marked as deprecated, Expo SDK HEAVY RELIES on this, so its not going anywhere anytime soon
   const existingEnhanceMiddleware = metroConfig.server.enhanceMiddleware;
   metroConfig.server = {
     ...metroConfig.server,
@@ -76,73 +79,66 @@ export function withNativeWind(
 
       return connect()
         .use(...cssInteropMiddleware)
+        .use("/", nativewindMiddleware)
         .use(middleware);
     },
   };
 
-  const tailwindCliPromises: Record<
-    string,
-    ReturnType<typeof tailwindCli>
-  > = {};
+  const nativewindMiddleware: NextHandleFunction = async (req, _res, next) => {
+    const url = new URL(req.url!, "http://localhost");
+    const platform = url.searchParams.get("platform");
+
+    if (!platform) {
+      next();
+      return;
+    }
+
+    // Only start the Tailwind CLI process onces per platform
+    tailwindCliPromises[platform] ||= tailwindCli(input!, metroConfig, {
+      dev: url.searchParams.get("dev") !== "false",
+      hot: url.searchParams.get("hot") !== "true",
+      platform,
+      projectRoot,
+      input,
+      output: `${output}.${platform}.css`,
+      cliCommand,
+      browserslist,
+      browserslistEnv,
+    });
+
+    // Make sure we have some output before we start
+    cliOutputs[platform] = await tailwindCliPromises[platform];
+
+    next();
+  };
 
   // Use getTransformOptions to bootstrap the Tailwind CLI, but ensure
   // we still call the original
-  const previousTransformOptions = metroConfig.transformer?.getTransformOptions;
   metroConfig.transformer = {
     ...metroConfig.transformer,
     nativewind: {
       input,
-      outputs: {},
-    },
-    getTransformOptions: async (
-      entryPoints: ReadonlyArray<string>,
-      options: GetTransformOptionsOpts,
-      getDependenciesOf: (filePath: string) => Promise<string[]>,
-    ) => {
-      const output = path.resolve(
-        projectRoot,
-        path.join(outputDir, path.basename(input!)),
-      );
-
-      const matchesOutputDir = contentArray.some((pattern) => {
-        if (typeof pattern !== "string") return false;
-        return micromatch.isMatch(output, pattern);
-      });
-
-      if (matchesOutputDir) {
-        throw new Error(
-          `NativeWind: Your '${tailwindConfigPath}#content' includes the output file ${output} which will cause an infinite loop. Please read https://tailwindcss.com/docs/content-configuration#styles-rebuild-in-an-infinite-loop`,
-        );
-      }
-
-      // Clear Metro's progress bar and move to the start of the line
-      // We will print out own output before letting Metro print again
-      if (process.stdout.isTTY) {
-        process.stdout.clearLine(0);
-        process.stdout.cursorTo(0);
-      }
-
-      const platform = options.platform ?? "native";
-
-      // Generate the styles, only start the process onces per platform
-      tailwindCliPromises[platform] ||= tailwindCli(input!, metroConfig, {
-        ...options,
-        output: `${output}.${platform}.css`,
-        cliCommand,
-        browserslist,
-        browserslistEnv,
-      });
-
-      (metroConfig as any).transformer.nativewind.outputs[platform] =
-        await tailwindCliPromises[platform];
-
-      return previousTransformOptions?.(
-        entryPoints,
-        options,
-        getDependenciesOf,
-      );
+      outputs: cliOutputs,
     },
   };
 
   return metroConfig;
+}
+
+function getTailwindConfig(tailwindConfigPath: string, output: string) {
+  const config = loadConfig(path.resolve(tailwindConfigPath));
+  const content = config.content;
+  const contentArray = "files" in content ? content.files : content;
+  const matchesOutputDir = contentArray.some((pattern) => {
+    if (typeof pattern !== "string") return false;
+    return micromatch.isMatch(output, pattern);
+  });
+
+  if (matchesOutputDir) {
+    throw new Error(
+      `NativeWind: Your '${tailwindConfigPath}#content' includes the output file ${output} which will cause an infinite loop. Please read https://tailwindcss.com/docs/content-configuration#styles-rebuild-in-an-infinite-loop`,
+    );
+  }
+
+  return config;
 }

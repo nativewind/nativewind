@@ -9,6 +9,8 @@ import {
 } from "react-native-css-interop/metro";
 
 export interface TailwindCliOptions extends GetTransformOptionsOpts {
+  projectRoot: string;
+  input: string;
   output: string;
   cliCommand: string;
   browserslist: string | null;
@@ -38,13 +40,12 @@ export async function tailwindCli(
     BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
   };
 
-  const platform = options.platform === "web" ? "web" : "native";
-  process.stdout.write(`tailwindcss(${platform}) rebuilding... `);
+  process.stdout.write(`tailwindcss(${options.platform}) rebuilding... `);
 
   const timeout = setTimeout(() => {
     if (options.dev && !process.env.CI) {
       console.warn(
-        `tailwindcss(${platform}) is taking a long time to build, please read https://tailwindcss.com/docs/content-configuration#pattern-recommendations to speed up your build time`,
+        `tailwindcss(${options.platform}) is taking a long time to build, please read https://tailwindcss.com/docs/content-configuration#pattern-recommendations to speed up your build time`,
       );
     }
     reject();
@@ -111,9 +112,18 @@ export async function tailwindCli(
       );
       version++;
 
+      // The output is an absolute path, we need to make it relative Metro's require roots
+      // We makes the assumption that if the output is in node_modules, then that should be included int the Metro paths
+      // If you make this a relative or absolute path Metro just doesn't find it.
+      let jsRequirePath = options.output;
+      if (jsRequirePath.includes("node_modules")) {
+        jsRequirePath = jsRequirePath.split("node_modules")[1].slice(1);
+      }
+      jsRequirePath.replace(/\\/g, "\\\\");
+
       done({
         raw: rawOutput,
-        js: `require('${options.output.replace(/\\/g, "\\\\")}');`,
+        js: `require('${jsRequirePath}');`,
       });
     });
   } catch (error) {
