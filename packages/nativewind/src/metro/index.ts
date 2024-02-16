@@ -1,4 +1,3 @@
-import type { NextHandleFunction } from "connect";
 import connect from "connect";
 import loadConfig from "tailwindcss/loadConfig";
 import tailwindPackage from "tailwindcss/package.json";
@@ -25,8 +24,8 @@ interface WithNativeWindOptions extends CssToReactNativeRuntimeOptions {
   browserslistEnv?: string | null;
 }
 
-const tailwindCliPromises: Record<string, ReturnType<typeof tailwindCli>> = {};
-const cliOutputs: Record<string, Awaited<ReturnType<typeof tailwindCli>>> = {};
+const cliPromises: Record<string, ReturnType<typeof tailwindCli>> = {};
+const outputCSS: Record<string, string> = {};
 
 export function withNativeWind(
   metroConfig: ComposableIntermediateConfigT,
@@ -59,44 +58,11 @@ export function withNativeWind(
 
   const { important } = getTailwindConfig(tailwindConfigPath, output);
 
-  // Get the CssInterop modified Metro Config (this includes its transform)
-  metroConfig = withCssInterop(metroConfig, {
-    ...cssToReactNativeRuntimeOptions,
-    inlineRem,
-    selectorPrefix: typeof important === "string" ? important : undefined,
-  });
-  // Override CSS Interop's transformer with our own (we call it ourselves)
-  metroConfig.transformerPath = require.resolve("./transformer");
-
-  // This is marked as deprecated, Expo SDK HEAVY RELIES on this, so its not going anywhere anytime soon
-  const existingEnhanceMiddleware = metroConfig.server.enhanceMiddleware;
-  metroConfig.server = {
-    ...metroConfig.server,
-    enhanceMiddleware(middleware, metroServer) {
-      if (existingEnhanceMiddleware) {
-        middleware = existingEnhanceMiddleware(middleware, metroServer);
-      }
-
-      return connect()
-        .use(...cssInteropMiddleware)
-        .use("/", nativewindMiddleware)
-        .use(middleware);
-    },
-  };
-
-  const nativewindMiddleware: NextHandleFunction = async (req, _res, next) => {
-    const url = new URL(req.url!, "http://localhost");
-    const platform = url.searchParams.get("platform");
-
-    if (!platform) {
-      next();
-      return;
-    }
-
+  function startCli(platform: string, hot: boolean, dev: boolean) {
     // Only start the Tailwind CLI process onces per platform
-    tailwindCliPromises[platform] ||= tailwindCli(input!, metroConfig, {
-      dev: url.searchParams.get("dev") !== "false",
-      hot: url.searchParams.get("hot") !== "true",
+    cliPromises[platform] ||= tailwindCli(input!, metroConfig, {
+      dev,
+      hot,
       platform,
       projectRoot,
       input,
@@ -104,21 +70,72 @@ export function withNativeWind(
       cliCommand,
       browserslist,
       browserslistEnv,
+    }).then((css) => {
+      console.log("setting", !!css);
+      if (css) {
+        outputCSS[platform] = css;
+      }
+      return css;
     });
 
-    // Make sure we have some output before we start
-    cliOutputs[platform] = await tailwindCliPromises[platform];
+    return cliPromises[platform];
+  }
 
-    next();
+  // Get the CssInterop modified Metro Config (this includes its transform)
+  metroConfig = withCssInterop(metroConfig, {
+    ...cssToReactNativeRuntimeOptions,
+    inlineRem,
+    selectorPrefix: typeof important === "string" ? important : undefined,
+  });
+
+  // This is marked as deprecated, Expo SDK HEAVY RELIES on this, so its not going anywhere anytime soon
+  const enhanceMiddleware = metroConfig.server.enhanceMiddleware;
+  const getTransformOptions = metroConfig.transformer.getTransformOptions;
+
+  metroConfig.transformerPath = require.resolve("./transformer");
+
+  metroConfig.server = {
+    ...metroConfig.server,
+    enhanceMiddleware(middleware, metroServer) {
+      let server = connect()
+        .use(...cssInteropMiddleware)
+        .use("/", async (req, _res, next) => {
+          const url = new URL(req.url!, "http://localhost");
+          const platform = url.searchParams.get("platform");
+
+          if (platform) {
+            try {
+              await startCli(
+                platform,
+                url.searchParams.get("dev") !== "false",
+                url.searchParams.get("hot") !== "true",
+              );
+            } catch (error) {
+              return next(error);
+            }
+          }
+
+          next();
+        });
+
+      if (enhanceMiddleware) {
+        server = server.use(enhanceMiddleware(middleware, metroServer));
+      }
+
+      return server;
+    },
   };
 
-  // Use getTransformOptions to bootstrap the Tailwind CLI, but ensure
-  // we still call the original
   metroConfig.transformer = {
     ...metroConfig.transformer,
+    async getTransformOptions(entryPoints, options, getDependenciesOf) {
+      await startCli(options.platform!, options.dev, options.hot);
+      return getTransformOptions(entryPoints, options, getDependenciesOf);
+    },
     nativewind: {
       input,
-      outputs: cliOutputs,
+      output,
+      css: outputCSS,
     },
   };
 

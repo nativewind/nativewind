@@ -24,14 +24,12 @@ export async function tailwindCli(
   metroConfig: ComposableIntermediateConfigT,
   options: TailwindCliOptions,
 ) {
-  let done: (nativewindOptions?: Record<string, any>) => void;
+  let done: (css: string) => void;
   let reject: () => void = () => {};
-  const deferred = new Promise<Record<string, any> | undefined>(
-    (resolve, _reject) => {
-      done = resolve;
-      reject = _reject;
-    },
-  );
+  const deferred = new Promise<string | undefined>((resolve, _reject) => {
+    done = resolve;
+    reject = _reject;
+  });
 
   const env = {
     ...process.env,
@@ -112,19 +110,7 @@ export async function tailwindCli(
       );
       version++;
 
-      // The output is an absolute path, we need to make it relative Metro's require roots
-      // We makes the assumption that if the output is in node_modules, then that should be included int the Metro paths
-      // If you make this a relative or absolute path Metro just doesn't find it.
-      let jsRequirePath = options.output;
-      if (jsRequirePath.includes("node_modules")) {
-        jsRequirePath = jsRequirePath.split("node_modules")[1].slice(1);
-      }
-      jsRequirePath.replace(/\\/g, "\\\\");
-
-      done({
-        raw: rawOutput,
-        js: `require('${jsRequirePath}');`,
-      });
+      done(rawOutput);
     });
   } catch (error) {
     console.error("NativeWind had an unknown error while running TailwindCLI");
