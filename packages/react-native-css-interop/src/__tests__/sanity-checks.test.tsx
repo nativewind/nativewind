@@ -43,3 +43,19 @@ test("dynamic variables should not unmount children", () => {
   expect(onUnMount).not.toHaveBeenCalled();
   expect(onMount).toHaveBeenCalledTimes(1);
 });
+
+test("empty className", () => {
+  const component = render(<A testID={testID} className="" />).getByTestId(
+    testID,
+  );
+
+  expect(component.props.className).not.toBeDefined();
+  expect(component).toHaveStyle(undefined);
+});
+
+test("missing className", () => {
+  const component = render(<A testID={testID} />).getByTestId(testID);
+
+  expect(component.props.className).not.toBeDefined();
+  expect(component.props.style).not.toBeDefined();
+});
