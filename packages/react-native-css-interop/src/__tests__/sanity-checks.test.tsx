@@ -49,11 +49,13 @@ test("empty className", () => {
     testID,
   );
 
+  expect(component.props.className).not.toBeDefined();
   expect(component).toHaveStyle(undefined);
 });
 
 test("missing className", () => {
   const component = render(<A testID={testID} />).getByTestId(testID);
 
-  expect(component).toHaveStyle(undefined);
+  expect(component.props.className).not.toBeDefined();
+  expect(component.props.style).not.toBeDefined();
 });

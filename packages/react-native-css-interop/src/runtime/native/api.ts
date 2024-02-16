@@ -67,7 +67,9 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
 
       const source = props?.[config.source];
 
+      // If the source is not a string or is empty, skip this config
       if (typeof source !== "string" || !source) continue;
+
       delete props[config.source];
 
       for (const className of source.split(/\s+/)) {
