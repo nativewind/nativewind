@@ -62,7 +62,7 @@
     "@types/micromatch": "^4.0.4",
     "jest": "^29.3.1",
     "jest-expo": "^50.0.1",
-    "tailwindcss": "^3.3.3"
+    "tailwindcss": "3.4.1"
   },
   "peerDependencies": {
     "tailwindcss": ">3.3.0"

@@ -88,9 +88,6 @@ export function cssToReactNativeRuntime(
       cssInterop: {
         prelude: "<custom-ident>+",
       },
-      "rn-hoist": {
-        prelude: "<custom-ident>+",
-      },
       "rn-move": {
         prelude: "<custom-ident>+",
       },
@@ -213,20 +210,19 @@ function getRnMoveMapping<D, M>(rules?: any[]): MoveTokenRecord {
     );
 
     if (tokens) {
-      if (tokens.startsWith("-")) {
-        tokens = tokens.replace("-", "");
-        mapping[toRNProperty(first)] = tokens.split(".").map(toRNProperty);
-      } else {
+      if (tokens.startsWith("&")) {
         mapping[toRNProperty(first)] = [
           "style",
-          ...tokens.split(".").map(toRNProperty),
+          ...tokens.replace("&", "").split(".").map(toRNProperty),
         ];
+      } else {
+        mapping[toRNProperty(first)] = tokens.split(".").map(toRNProperty);
       }
     } else {
-      if (first.startsWith("-")) {
-        mapping["*"] = [toRNProperty(first.replace("-", ""))];
+      if (first.startsWith("&")) {
+        mapping["*"] = ["style", toRNProperty(first.replace("&", ""))];
       } else {
-        mapping["*"] = ["style", toRNProperty(first)];
+        mapping["*"] = [toRNProperty(first)];
       }
     }
   }

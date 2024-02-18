@@ -56,7 +56,7 @@ test("TextInput", () => {
   registerCSS(
     `.text-black { color: black } 
      .placeholder\\:text-white {
-       @rn-move color -placeholderTextColor;
+       @rn-move color placeholderTextColor;
        color: #fff
      }`,
   );

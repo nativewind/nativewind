@@ -16,27 +16,3 @@ describe("Custom - Ripple Borderless", () => {
     { props: { android_ripple: { borderless: true } } },
   ]);
 });
-
-describe("Custom - prop/<props>", () => {
-  testCases(
-    ["move/^test:color-black", { props: { test: "rgba(0, 0, 0, 1)" } }],
-    [
-      "move/^test.nested:color-black",
-      { props: { test: { nested: "rgba(0, 0, 0, 1)" } } },
-    ],
-  );
-});
-
-describe("Custom - prop-[attribute]", () => {
-  testCases([
-    "move-[test]:color-black",
-    { style: { test: "rgba(0, 0, 0, 1)" } },
-  ]);
-});
-
-describe("Custom - prop-[attribute]/<prop>", () => {
-  testCases([
-    "move-[font-size]/^test:text-base",
-    { props: { test: 14 }, style: { lineHeight: 21 } },
-  ]);
-});

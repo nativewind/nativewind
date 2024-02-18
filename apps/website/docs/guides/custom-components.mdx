@@ -1,8 +1,18 @@
 # How to write custom components
 
-## Passing styles to components
+:::tip
 
-Pass the `className` prop down to your custom component
+This guide is about writing your own components. If you are looking for a guide on how to use NativeWind with third-party components, see the [third-party components](./third-party-components) guide.
+
+Unless you are styling a custom native component, you should never have to use `cssInterop` or `remapProps` when writing your own components. These are only used when working with third-party components.
+
+:::
+
+## Your first component
+
+NativeWind works by passing class names to components. This is the same pattern as Tailwind CSS, which uses utility classes to style elements.
+
+To create a component with default styles, simply merge the className string.
 
 ```tsx
 function MyComponent({ className }) {
@@ -13,7 +23,7 @@ function MyComponent({ className }) {
 <MyComponent className="font-bold" />;
 ```
 
-This pattern is very useful for creating components with variants
+You can expand this pattern to create more complex components. For example, you can create a `Button` component with different variants.
 
 ```tsx
 const variantStyles = {
@@ -22,20 +32,21 @@ const variantStyles = {
   secondary: "bg-white-500 text-black",
 };
 
-function MyComponent({ variant }) {
+function MyComponent({ variant, className, ...props }) {
   return (
     <Text
       className={`
-      font-bold
-      ${variantStyles.default}
-      ${variantStyles[variant]}
-    `}
+        ${variantStyles.default}
+        ${variantStyles[variant]}
+        ${className}
+      `}
+      {....props }
     />
   );
 }
 ```
 
-Creating your own variants and quickly become complex. We recommend using a class name management library to simplify the process
+Creating your own variants can quickly become complex. We recommend using a class name management library to simplify the process.
 
 - [tailwind-variants](https://www.tailwind-variants.org/)
 - [cva](https://cva.style/docs)
@@ -43,13 +54,9 @@ Creating your own variants and quickly become complex. We recommend using a clas
 - [clsx](https://www.npmjs.com/package/clsx)
 - [classnames](https://www.npmjs.com/package/classnames)
 
-NativeWind previously exported a `styled()` helper function, but it has been removed in favor of these libraries.
-
-Each of these library has multiple "component" variants, so you can choose the one that best fits your needs.
-
 ## Merging with inline styles
 
-NativeWind will automatically merge with inline-styles. Inline styles have a higher priority.
+NativeWind will automatically merge with inline-styles. [Read more about style specificity](./../core-concepts/style-specificity) documentation.
 
 ```tsx
 <Text className="text-white" style={{ color: "black" }} /> // Will be black
@@ -57,92 +64,14 @@ NativeWind will automatically merge with inline-styles. Inline styles have a hig
 
 ## Handling components with multiple style props
 
-In React Native, some components may require style props for their internal child components. If you're designing such a component using NativeWind, we have a couple of recommended simply creating multiple class name props
+Custom components can have multiple style props. For example, a `Button` component may have an `outerClassName` and an `innerClassName`.
 
 ```tsx title=MyComponent.tsx
-Copy code
-function MyComponent({ outerClass, innerClass }) {
+function MyComponent({ className, textClassName }) {
   return (
-      <View className={outerClass}>
-          <Text className={innerClass}>Hello, NativeWind!</Text>
-      </View>
+    <View className={className}>
+      <Text className={innerClassinnerClassName}>Hello, NativeWind!</Text>
+    </View>
   );
-}
-```
-
-If you're working with a third-party component that you can't modify directly, NativeWind provides a utility, `remapProps`. This function allows you to create and map className props for the component.
-
-```tsx
-import { remapProps } from "nativewind";
-
-const CustomizedButton = remapProps(ThirdPartyButton, {
-  buttonClass: "nativeButtonClass",
-  labelClass: "nativeLabelClass",
-});
-
-// Usage
-<CustomizedButton buttonClass="bg-blue-500" labelClass="text-white" />;
-```
-
-See the [remapProps](./../api/remap-props) documentation for more information.
-
-## Handling components with style attribute props
-
-Some components may require style attributes to be passed as props. For example, React Native's `<StatusBar />` component accepts a `backgroundColor` prop.
-
-NativeWind can automatically move style attributes to props, but it requires the styles to be resolved. You will need to "tag" your component using `cssInterop` and create a mapping configuration
-
-See the [cssInterop](./../api/css-interop) documentation for more information.
-
-## TypeScript
-
-Both `remapProps` and `cssInterop` will return a typed version of your component. However, you can globally defined the types in a new declaration file.
-
-```tsx title=custom-components-env.d.ts
-declare module "<3rd party package>" {
-  interface 3rdPartyComponentProps {
-    customClassName?: string;
-  }
-}
-```
-
-**Example**
-
-Setting global types requires in-depth knowledge of TypeScript. Your interface declaration needs to **exactly match** the 3rd party declaration (including `extends` and generics).
-
-For example, NativeWind uses the follow types for React Native's `<FlatList />`, which uses multiple interfaces for its props, across multiple packages.
-
-```tsx title=custom-components-env.d.ts
-import {
-  ScrollViewProps,
-  ScrollViewPropsAndroid,
-  ScrollViewPropsIOS,
-  Touchable,
-  VirtualizedListProps,
-} from "react-native";
-
-declare module "@react-native/virtualized-lists" {
-  export interface VirtualizedListWithoutRenderItemProps<ItemT>
-    extends ScrollViewProps {
-    ListFooterComponentClassName?: string;
-    ListHeaderComponentClassName?: string;
-  }
-}
-
-declare module "react-native" {
-  interface ScrollViewProps
-    extends ViewProps,
-      ScrollViewPropsIOS,
-      ScrollViewPropsAndroid,
-      Touchable {
-    contentContainerClassName?: string;
-    indicatorClassName?: string;
-  }
-  interface FlatListProps<ItemT> extends VirtualizedListProps<ItemT> {
-    columnWrapperClassName?: string;
-  }
-  interface ViewProps {
-    className?: string;
-  }
 }
 ```

@@ -9,7 +9,7 @@ export const nativeSwitch = plugin(function ({ matchUtilities, theme }) {
       thumb: (value) => {
         return {
           "&": {
-            "@rn-move caret-color -thumbColor": "true",
+            "@rn-move caret-color thumbColor": "true",
             "caret-color": toColorValue(value),
           },
         };

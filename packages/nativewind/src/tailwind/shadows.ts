@@ -64,9 +64,9 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
         return {
           "--tw-shadow-color": value === "none" ? "#0000" : color,
           "-rn-shadow-color": "var(--tw-shadow-color)",
-          "@rn-move -rn-shadow-offset-width shadow-offset\\.width": "true",
+          "@rn-move -rn-shadow-offset-width \\&shadow-offset\\.width": "true",
           "-rn-shadow-offset-width": x,
-          "@rn-move -rn-shadow-offset-height shadow-offset\\.height": "true",
+          "@rn-move -rn-shadow-offset-height \\&shadow-offset\\.height": "true",
           "-rn-shadow-offset-height": y,
           "-rn-shadow-radius": blur ?? 0,
           "-rn-shadow-opacity": 1,

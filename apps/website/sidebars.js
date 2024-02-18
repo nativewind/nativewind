@@ -39,6 +39,7 @@ const sidebars = {
       items: [
         "guides/troubleshooting",
         "guides/custom-components",
+        "guides/third-party-components",
         "guides/themes",
         "guides/editor-setup",
       ],
@@ -77,7 +78,6 @@ const sidebars = {
         "api/remap-props",
         "api/css-interop",
         "api/use-color-scheme",
-        "api/native-wind-style-sheet",
       ],
     },
     {

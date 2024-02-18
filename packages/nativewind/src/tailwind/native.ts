@@ -15,6 +15,13 @@ import { shadows } from "./shadows";
 import { allowedColors } from "./common";
 import { nativeSwitch } from "./switch";
 
+const kebabCase = (str: string) => {
+  return str.replace(
+    /[A-Z]+(?![a-z])|[A-Z]/g,
+    ($, ofs) => (ofs ? "-" : "") + $.toLowerCase(),
+  );
+};
+
 const nativePlugins = plugin(function ({
   addBase,
   addUtilities,
@@ -75,17 +82,24 @@ const nativePlugins = plugin(function ({
    * move-[]:
    */
   matchVariant(
-    "move",
-    (value = "\\*", { modifier, container }: any) => {
+    "{}",
+    (value = "", { modifier, container }: any) => {
+      value = kebabCase(value.replace(/&/, "\\&").replaceAll(".", "\\."));
+
+      if (modifier) {
+        modifier = modifier.replace(/&/, "\\&").replaceAll(".", "\\.");
+      }
+
+      if (modifier && !value) {
+        value = modifier;
+        modifier = undefined;
+      }
+
       container.walkRules((rule: any) => {
         rule.append(
           new AtRule({
             name: "rn-move",
-            params: `${value} ${
-              modifier
-                ? `${modifier.replace(/^\^/, "-").replaceAll(".", "\\.")}`
-                : ""
-            }`,
+            params: `${modifier ?? "\\*"} ${value}`,
           }),
         );
       });
@@ -100,7 +114,7 @@ const nativePlugins = plugin(function ({
   addVariant("selection", (({ container }: any) => {
     container.walkRules((rule: any) => {
       rule.append(
-        new AtRule({ name: "rn-move", params: "color -selectionColor" }),
+        new AtRule({ name: "rn-move", params: "color selectionColor" }),
       );
     });
     return "&";
@@ -109,7 +123,7 @@ const nativePlugins = plugin(function ({
   addVariant("placeholder", (({ container }: any) => {
     container.walkRules((rule: any) => {
       rule.append(
-        new AtRule({ name: "rn-move", params: "color -placeholderTextColor" }),
+        new AtRule({ name: "rn-move", params: "color placeholderTextColor" }),
       );
     });
     return "&";
@@ -128,7 +142,7 @@ const nativePlugins = plugin(function ({
     {
       "line-clamp": (value) => ({
         "&": {
-          "@rn-move -rn-number-of-lines -number-of-lines": "true",
+          "@rn-move -rn-number-of-lines number-of-lines": "true",
           overflow: "hidden",
           "-rn-number-of-lines": value,
         },
@@ -140,7 +154,7 @@ const nativePlugins = plugin(function ({
   addUtilities({
     ".line-clamp-none": {
       "&": {
-        "@rn-move -rn-number-of-lines -number-of-lines": "true",
+        "@rn-move -rn-number-of-lines number-of-lines": "true",
         overflow: "visible",
         "-rn-number-of-lines": "0",
       },
@@ -155,7 +169,7 @@ const nativePlugins = plugin(function ({
       ripple: (value) => {
         return {
           "&": {
-            "@rn-move color -android_ripple\\.color": "true",
+            "@rn-move color android_ripple\\.color": "true",
             color: toColorValue(value),
           },
         };
@@ -171,7 +185,7 @@ const nativePlugins = plugin(function ({
       ripple: (value) => {
         return {
           "&": {
-            "@rn-move -rn-borderless -android_ripple\\.borderless": "true",
+            "@rn-move -rn-borderless android_ripple\\.borderless": "true",
             "-rn-borderless": value,
           },
         };
@@ -191,7 +205,7 @@ const nativePlugins = plugin(function ({
       caret: (value) => {
         return {
           "&": {
-            "@rn-move caret-color -cursor-color": "true",
+            "@rn-move caret-color cursor-color": "true",
             "caret-color": toColorValue(value),
           },
         };
@@ -211,7 +225,7 @@ const nativePlugins = plugin(function ({
       fill: (value) => {
         return {
           "&": {
-            "@rn-move -fill": "true",
+            "@rn-move fill": "true",
             fill: `${toColorValue(value)}`,
           },
         };
@@ -224,7 +238,7 @@ const nativePlugins = plugin(function ({
     {
       stroke: (value) => ({
         "&": {
-          "@rn-move -stroke": "true",
+          "@rn-move stroke": "true",
           stroke: toColorValue(value),
         },
       }),
@@ -236,7 +250,7 @@ const nativePlugins = plugin(function ({
     {
       stroke: (value) => ({
         "&": {
-          "@rn-move -stroke-width": "true",
+          "@rn-move stroke-width": "true",
           strokeWidth: toColorValue(value),
         },
       }),
