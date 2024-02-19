@@ -1,4 +1,5 @@
 import StartCoding from "../\_start-coding.md"
+import Dependencies from "../\_dependencies.mdx"
 
 # Create React Native App
 
@@ -14,12 +15,7 @@ Choose "Default new app" and then move into the project's directory.
 cd my-nativewind-app
 ```
 
-You will need to install `nativewind` and it's peer dependency `tailwindcss`.
-
-```bash
-yarn add nativewind
-yarn add --dev tailwindcss
-```
+<Dependencies />
 
 ## 2. Setup Tailwind CSS
 

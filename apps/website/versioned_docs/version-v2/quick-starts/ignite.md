@@ -1,13 +1,10 @@
+import Dependencies from "../\_dependencies.mdx"
+
 # Ignite
 
 ## 1. Add NativeWind
 
-You will need to install `nativewind` and it's peer dependency `tailwindcss`.
-
-```bash
-yarn add nativewind
-yarn add --dev tailwindcss
-```
+<Dependencies />
 
 ## 2. Setup Tailwind CSS
 
