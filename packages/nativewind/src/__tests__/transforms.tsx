@@ -133,6 +133,20 @@ describe("Transforms - Rotate", () => {
         ],
       }),
     ],
+    [
+      "rotate-[30deg]",
+      style({
+        transform: [
+          { translateX: 0 },
+          { translateY: 0 },
+          { rotate: "30deg" },
+          { skewX: "0deg" },
+          { skewY: "0deg" },
+          { scaleX: 1 },
+          { scaleY: 1 },
+        ],
+      }),
+    ],
   );
 });
 
