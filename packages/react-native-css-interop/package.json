@@ -26,7 +26,7 @@
     "url": "https://github.com/marklawlor/nativewind/issues"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "scripts": {
     "test": "jest",
