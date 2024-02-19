@@ -71,7 +71,6 @@ export function withNativeWind(
       browserslist,
       browserslistEnv,
     }).then((css) => {
-      console.log("setting", !!css);
       if (css) {
         outputCSS[platform] = css;
       }

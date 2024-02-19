@@ -78,5 +78,4 @@ function resetAppearanceListeners($appearance: typeof Appearance) {
     }
   });
 }
-console.log(appearance);
 resetAppearanceListeners(appearance);
