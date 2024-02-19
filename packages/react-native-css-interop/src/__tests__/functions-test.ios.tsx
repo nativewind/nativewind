@@ -12,39 +12,55 @@ const A = createMockComponent(View);
 
 beforeEach(() => resetStyles());
 
-describe("functions - ios", () => {
-  test("platformSelect", () => {
-    registerCSS(
-      `.my-class {
+test("platformSelect", () => {
+  registerCSS(
+    `.my-class {
         --test: black;
         color: green;
         color: platformSelect(ios/var(--test), android/blue);
       }`,
-    );
+  );
 
-    const component = render(
-      <A testID={testID} className="my-class" />,
-    ).getByTestId(testID);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-    expect(component).toHaveStyle({
-      color: "black",
-    });
+  expect(component).toHaveStyle({
+    color: "black",
   });
+});
 
-  test("hairlineWidth", () => {
-    registerCSS(
-      `.my-class {
+test("hairlineWidth", () => {
+  registerCSS(
+    `.my-class {
         --test: hairlineWidth();
         width: var(--test);
       }`,
-    );
+  );
 
-    const component = render(
-      <A testID={testID} className="my-class" />,
-    ).getByTestId(testID);
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
 
-    expect(component).toHaveStyle({
-      width: RNStyleSheet.hairlineWidth,
-    });
+  expect(component).toHaveStyle({
+    width: RNStyleSheet.hairlineWidth,
+  });
+});
+
+test("mixed", () => {
+  registerCSS(
+    `.my-class {
+      color: platformSelect(ios/platformColor(systemRed),android/platformColor(\?android\:colorError),default/red)
+    }`,
+  );
+
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({
+    color: {
+      semantic: ["systemRed"],
+    } as any,
   });
 });
