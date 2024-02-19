@@ -14,7 +14,6 @@ describe("Effects - Box Shadow", () => {
     [
       "shadow-sm",
       style({
-        elevation: 1,
         shadowColor: "rgba(0, 0, 0, 0.3490196168422699)",
         shadowOpacity: 1,
         shadowOffset: {
@@ -27,7 +26,6 @@ describe("Effects - Box Shadow", () => {
     [
       "shadow",
       style({
-        elevation: 3,
         shadowColor: "rgba(0, 0, 0, 0.3490196168422699)",
         shadowOpacity: 1,
         shadowOffset: {
@@ -40,7 +38,6 @@ describe("Effects - Box Shadow", () => {
     [
       "shadow-none",
       style({
-        elevation: 0,
         shadowColor: "rgba(0, 0, 0, 0)",
         shadowOpacity: 1,
         shadowOffset: {

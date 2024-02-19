@@ -33,16 +33,18 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
     "--tw-shadow-colored": "0 0 #0000",
   });
 
-  matchUtilities(
-    {
-      elevation: (value) => {
-        return {
-          "-rn-elevation": value,
-        } as any;
+  if (process.env.NATIVEWIND_NATIVE === "android") {
+    matchUtilities(
+      {
+        elevation: (value) => {
+          return {
+            "-rn-elevation": value,
+          } as any;
+        },
       },
-    },
-    { values: theme("elevation") },
-  );
+      { values: theme("elevation") },
+    );
+  }
 
   matchUtilities(
     {
@@ -61,7 +63,7 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
 
         const { x, y, blur, color } = firstValid;
 
-        return {
+        const shadow = {
           "--tw-shadow-color": value === "none" ? "#0000" : color,
           "-rn-shadow-color": "var(--tw-shadow-color)",
           "@rn-move -rn-shadow-offset-width \\&shadow-offset\\.width": "true",
@@ -70,8 +72,13 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
           "-rn-shadow-offset-height": y,
           "-rn-shadow-radius": blur ?? 0,
           "-rn-shadow-opacity": 1,
-          "-rn-elevation": elevation,
         } as any;
+
+        if (process.env.NATIVEWIND_NATIVE === "android") {
+          shadow["-rn-elevation"] = elevation;
+        }
+
+        return shadow;
       },
     },
     { values: theme("boxShadow"), type: ["shadow"] },
