@@ -3,6 +3,7 @@ export { verifyInstallation } from "./doctor";
 export {
   createElement,
   useUnstableNativeVariable,
+  useSafeAreaEnv,
   vars,
   cssInterop,
   remapProps,
