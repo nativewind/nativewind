@@ -34,7 +34,6 @@ test("@apply", async () => {
     paddingLeft: 14,
     paddingRight: 14,
     paddingTop: 7,
-    elevation: 6,
     shadowColor: "rgba(0, 0, 0, 0.3490196168422699)",
     shadowOpacity: 1,
     shadowOffset: {

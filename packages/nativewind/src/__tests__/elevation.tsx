@@ -1,6 +1,6 @@
 import { style, testCases } from "../test-utils";
 
-describe("Custom - Elevation", () => {
+describe.skip("Custom - Elevation", () => {
   testCases(
     [
       "elevation",

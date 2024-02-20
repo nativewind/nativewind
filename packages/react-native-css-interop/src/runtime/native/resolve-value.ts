@@ -21,9 +21,9 @@ export function resolveValue(
   descriptor: RuntimeValueDescriptor | string | number | boolean,
   style?: Record<string, any>,
 ): any {
-  if (!descriptor) return;
-
   switch (typeof descriptor) {
+    case "undefined":
+      return;
     case "boolean":
     case "number":
     case "function":

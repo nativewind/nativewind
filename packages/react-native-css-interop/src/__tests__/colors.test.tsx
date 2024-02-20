@@ -13,7 +13,7 @@ const A = createMockComponent(View);
 beforeEach(() => resetStyles());
 
 describe("hsl", () => {
-  test("inline with slash", () => {
+  test("inline", () => {
     registerCSS(`.my-class { 
     color: hsl(0 84.2% 60.2%); 
   }`);
@@ -41,7 +41,7 @@ describe("hsl", () => {
     });
   });
 
-  test("function with slash", () => {
+  test("var with spaces", () => {
     registerCSS(`.my-class { 
     --primary: 0 84.2% 60.2%;
     color: hsl(var(--primary)); 
@@ -54,7 +54,7 @@ describe("hsl", () => {
     expect(component).toHaveStyle({ color: "hsl(0, 84.2%, 60.2%)" });
   });
 
-  test("function with comma", () => {
+  test("var with comma", () => {
     registerCSS(`.my-class { 
     --primary: 0, 84.2%, 60.2%;
     color: hsl(var(--primary)); 
