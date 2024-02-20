@@ -64,7 +64,7 @@ const sidebars = {
         "core-concepts/units",
         "core-concepts/differences",
         "core-concepts/style-specificity",
-        "tailwind/new-concepts/safe-area-insets",
+        // "tailwind/new-concepts/safe-area-insets",
       ],
     },
     {
