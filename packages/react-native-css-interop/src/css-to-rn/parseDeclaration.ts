@@ -1766,6 +1766,8 @@ function parseUnparsed(
             tokenOrValue.value.arguments,
             options,
           );
+        case "calc":
+          return parseCalc(tokenOrValue.value.arguments, options);
         default: {
           options.addFunctionValueWarning(tokenOrValue.value.name);
           return;
@@ -1884,6 +1886,7 @@ export function parseLength(
         }
       case "vw":
       case "vh":
+      case "em":
         return {
           name: length.unit,
           arguments: [length.value],
@@ -1895,7 +1898,6 @@ export function parseLength(
       case "q":
       case "pt":
       case "pc":
-      case "em":
       case "ex":
       case "rex":
       case "ch":
@@ -1955,7 +1957,6 @@ export function parseLength(
       }
     }
   }
-  return undefined;
 }
 
 function parseAngle(
@@ -2405,11 +2406,9 @@ function parseLineHeight(
           options.addValueWarning(length.value);
           return undefined;
       }
-
       length satisfies never;
     }
   }
-
   lineHeight satisfies never;
 }
 
@@ -2761,4 +2760,122 @@ function parseEnv(
     case "custom":
     case "unknown":
   }
+}
+
+function parseCalc(
+  args: TokenOrValue[],
+  options: ParseDeclarationOptionsWithValueWarning,
+): RuntimeValueDescriptor {
+  const parsed: RuntimeValueDescriptor[] = [];
+
+  let mode: "number" | "percentage" | undefined;
+
+  for (const arg of args) {
+    switch (arg.type) {
+      case "var":
+      case "function":
+      case "unresolved-color": {
+        const value = parseUnparsed(arg, options);
+
+        if (value === undefined) {
+          return undefined;
+        }
+
+        if (Array.isArray(value)) {
+          parsed.push(...value);
+        } else {
+          parsed.push(value);
+        }
+        break;
+      }
+      case "length":
+        const value = parseLength(arg.value, options);
+
+        if (!mode) {
+          if (typeof value === "number") {
+            mode = "number";
+          } else if (typeof value === "string" && value.endsWith("%")) {
+            mode = "percentage";
+          }
+        }
+
+        if (mode === "number" && typeof value === "number") {
+          parsed.push(value);
+          break;
+        } else if (
+          mode === "percentage" &&
+          typeof value === "string" &&
+          value.endsWith("%")
+        ) {
+          parsed.push(value);
+          break;
+        } else {
+          return;
+        }
+      case "color":
+      case "url":
+      case "env":
+      case "angle":
+      case "time":
+      case "resolution":
+      case "dashed-ident":
+        break;
+      case "token":
+        switch (arg.value.type) {
+          case "delim":
+            switch (arg.value.value) {
+              case "+":
+              case "-":
+              case "*":
+              case "/":
+                parsed.push(arg.value.value);
+                break;
+            }
+            break;
+          case "percentage":
+            if (!mode) mode = "percentage";
+            if (mode !== "percentage") return;
+            parsed.push(`${arg.value.value * 100}%`);
+            break;
+          case "number":
+            if (!mode) mode = "number";
+            if (mode !== "number") return;
+            parsed.push(arg.value.value);
+            break;
+          case "string":
+          case "function":
+          case "ident":
+          case "at-keyword":
+          case "hash":
+          case "id-hash":
+          case "unquoted-url":
+          case "dimension":
+          case "white-space":
+          case "comment":
+          case "colon":
+          case "semicolon":
+          case "comma":
+          case "include-match":
+          case "dash-match":
+          case "prefix-match":
+          case "suffix-match":
+          case "substring-match":
+          case "cdo":
+          case "cdc":
+          case "parenthesis-block":
+          case "square-bracket-block":
+          case "curly-bracket-block":
+          case "bad-url":
+          case "bad-string":
+          case "close-parenthesis":
+          case "close-square-bracket":
+          case "close-curly-bracket":
+        }
+    }
+  }
+
+  return {
+    name: "calc",
+    arguments: parsed,
+  };
 }

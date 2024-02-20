@@ -53,9 +53,18 @@ const sidebars = {
         "core-concepts/states",
         "core-concepts/responsive-design",
         "core-concepts/dark-mode",
+        "core-concepts/functions-and-directives",
+      ],
+    },
+    {
+      type: "category",
+      label: "React Native concepts",
+      collapsed: false,
+      items: [
         "core-concepts/units",
         "core-concepts/differences",
         "core-concepts/style-specificity",
+        "tailwind/new-concepts/safe-area-insets",
       ],
     },
     {
@@ -78,15 +87,6 @@ const sidebars = {
         "api/remap-props",
         "api/css-interop",
         "api/use-color-scheme",
-      ],
-    },
-    {
-      type: "category",
-      label: "New ⭐",
-      collapsed: false,
-      items: [
-        "tailwind/plugins/container-queries",
-        "tailwind/new-concepts/safe-area-insets",
       ],
     },
     {
@@ -352,6 +352,12 @@ const sidebars = {
       label: "Accessibility",
       collapsed: false,
       items: ["tailwind/accessibility/screen-readers"],
+    },
+    {
+      type: "category",
+      label: "Plugins",
+      collapsed: false,
+      items: ["tailwind/plugins/container-queries"],
     },
   ],
 };

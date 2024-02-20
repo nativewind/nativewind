@@ -21,7 +21,18 @@ export function resolveValue(
   descriptor: RuntimeValueDescriptor | string | number | boolean,
   style?: Record<string, any>,
 ): any {
-  if (typeof descriptor !== "object" || !descriptor) return descriptor;
+  if (!descriptor) return;
+
+  switch (typeof descriptor) {
+    case "boolean":
+    case "number":
+    case "function":
+      return descriptor;
+    case "string":
+      return descriptor.endsWith("px") // Inline vars() might set a value with a px suffix
+        ? parseInt(descriptor.slice(0, -2), 10)
+        : descriptor;
+  }
 
   if (Array.isArray(descriptor)) {
     return descriptor.map((v) => resolveValue(state, v, style));
@@ -31,6 +42,9 @@ export function resolveValue(
     case "var": {
       const value = resolve(state, descriptor.arguments[0], style);
       if (typeof value === "string") return getVar(state, value, style);
+    }
+    case "calc": {
+      return calc(state, descriptor.arguments, style);
     }
     case "vh": {
       // 50vh = 50% of the viewport height
@@ -436,3 +450,109 @@ export const defaultValues: Record<
   translateY: 0,
   zIndex: 0,
 };
+
+const calcPrecedence: Record<string, number> = {
+  "+": 1,
+  "-": 1,
+  "*": 2,
+  "/": 2,
+};
+
+function applyCalcOperator(
+  operator: string,
+  b: number, // These are reversed because we pop them off the stack
+  a: number,
+  values: number[],
+) {
+  switch (operator) {
+    case "+":
+      return values.push(a + b);
+    case "-":
+      return values.push(a - b);
+    case "*":
+      return values.push(a * b);
+    case "/":
+      return values.push(a / b);
+  }
+}
+
+export function calc(
+  state: PropState,
+  expression: RuntimeValueDescriptor[],
+  style?: Record<string, any>,
+) {
+  const values: number[] = [];
+  const ops: string[] = [];
+
+  let mode;
+
+  for (let token of expression) {
+    switch (typeof token) {
+      case "undefined":
+        // Fail on an undefined value
+        return;
+      case "number":
+        if (!mode) mode = "number";
+        if (mode !== "number") return;
+        values.push(token);
+        continue;
+      case "object": {
+        // All values should resolve to a numerical value
+        const value = resolveValue(state, token, style);
+        switch (typeof value) {
+          case "number": {
+            if (!mode) mode = "number";
+            if (mode !== "number") return;
+            values.push(value);
+            continue;
+          }
+          case "string": {
+            if (!value.endsWith("%")) {
+              return;
+            }
+            if (!mode) mode = "percentage";
+            if (mode !== "percentage") return;
+            values.push(Number.parseFloat(value.slice(0, -1)));
+            continue;
+          }
+          default:
+            return;
+        }
+      }
+      case "string": {
+        if (token === "(") {
+          ops.push(token);
+        } else if (token === ")") {
+          // Resolve all values within the brackets
+          while (ops.length && ops[ops.length - 1] !== "(") {
+            applyCalcOperator(ops.pop()!, values.pop()!, values.pop()!, values);
+          }
+          ops.pop();
+        } else if (token.endsWith("%")) {
+          if (!mode) mode = "percentage";
+          if (mode !== "percentage") return;
+          values.push(Number.parseFloat(token.slice(0, -1)));
+        } else {
+          // This means we have an operator
+          while (
+            ops.length &&
+            calcPrecedence[ops[ops.length - 1]] >= calcPrecedence[token]
+          ) {
+            applyCalcOperator(ops.pop()!, values.pop()!, values.pop()!, values);
+          }
+          ops.push(token);
+        }
+      }
+    }
+  }
+
+  while (ops.length) {
+    applyCalcOperator(ops.pop()!, values.pop()!, values.pop()!, values);
+  }
+
+  if (!mode) return;
+
+  const value = round(values[0]);
+
+  return mode === "percentage" ? `${value}%` : value;
+}
