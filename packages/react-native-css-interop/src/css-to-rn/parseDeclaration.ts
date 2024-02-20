@@ -1767,7 +1767,14 @@ function parseUnparsed(
             options,
           );
         case "calc":
-          return parseCalc(tokenOrValue.value.arguments, options);
+        case "max":
+        case "min":
+        case "clamp":
+          return parseCalcFn(
+            tokenOrValue.value.name,
+            tokenOrValue.value.arguments,
+            options,
+          );
         default: {
           options.addFunctionValueWarning(tokenOrValue.value.name);
           return;
@@ -2762,10 +2769,24 @@ function parseEnv(
   }
 }
 
-function parseCalc(
-  args: TokenOrValue[],
+function parseCalcFn(
+  name: string,
+  tokens: TokenOrValue[],
   options: ParseDeclarationOptionsWithValueWarning,
 ): RuntimeValueDescriptor {
+  const args = parseCalcArguments(tokens, options);
+  if (args) {
+    return {
+      name,
+      arguments: args,
+    };
+  }
+}
+
+function parseCalcArguments(
+  args: TokenOrValue[],
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
   const parsed: RuntimeValueDescriptor[] = [];
 
   let mode: "number" | "percentage" | undefined;
@@ -2874,8 +2895,5 @@ function parseCalc(
     }
   }
 
-  return {
-    name: "calc",
-    arguments: parsed,
-  };
+  return parsed;
 }

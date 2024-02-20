@@ -47,6 +47,76 @@ test("hairlineWidth", () => {
   });
 });
 
+test("max", () => {
+  registerCSS(
+    `.my-class {
+      width: max(var(--test, 1px), 10px)
+    }`,
+  );
+
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({ width: 10 });
+});
+
+test("min", () => {
+  registerCSS(
+    `.my-class {
+      width: min(var(--test, 1px), 10px)
+    }`,
+  );
+
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({ width: 1 });
+});
+
+test("clamp - value", () => {
+  registerCSS(
+    `.my-class {
+      width: clamp(var(--test, 1px), 5px 10px)
+    }`,
+  );
+
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({ width: 5 });
+});
+
+test("clamp - min", () => {
+  registerCSS(
+    `.my-class {
+      width: clamp(var(--test, 1px), 0px 10px)
+    }`,
+  );
+
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({ width: 1 });
+});
+
+test("clamp - max", () => {
+  registerCSS(
+    `.my-class {
+      width: clamp(var(--test, 1px), 20px, 10px)
+    }`,
+  );
+
+  const component = render(
+    <A testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({ width: 10 });
+});
+
 test("mixed", () => {
   registerCSS(
     `.my-class {

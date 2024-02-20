@@ -40,11 +40,61 @@ export function resolveValue(
 
   switch (descriptor.name) {
     case "var": {
-      const value = resolve(state, descriptor.arguments[0], style);
-      if (typeof value === "string") return getVar(state, value, style);
+      let value = resolve(state, descriptor.arguments[0], style);
+      if (typeof value === "string") value = getVar(state, value, style);
+      if (value === undefined && descriptor.arguments[1]) {
+        value = resolveValue(state, descriptor.arguments[1], style);
+      }
+
+      return value;
     }
     case "calc": {
-      return calc(state, descriptor.arguments, style);
+      return calc(state, descriptor.arguments, style)?.value;
+    }
+    case "max": {
+      let mode;
+      let values: number[] = [];
+
+      for (const arg of descriptor.arguments) {
+        const result = calc(state, arg, style);
+        if (result) {
+          if (!mode) mode = result?.mode;
+          if (result.mode === mode) {
+            values.push(result.raw);
+          }
+        }
+      }
+
+      const max = Math.max(...values);
+      return mode === "percentage" ? `${max}%` : max;
+    }
+    case "min": {
+      let mode;
+      let values: number[] = [];
+
+      for (const arg of descriptor.arguments) {
+        const result = calc(state, arg, style);
+        if (result) {
+          if (!mode) mode = result?.mode;
+          if (result.mode === mode) {
+            values.push(result.raw);
+          }
+        }
+      }
+
+      const min = Math.min(...values);
+      return mode === "percentage" ? `${min}%` : min;
+    }
+    case "clamp": {
+      const min = calc(state, descriptor.arguments[0], style);
+      const val = calc(state, descriptor.arguments[1], style);
+      const max = calc(state, descriptor.arguments[2], style);
+
+      if (!min || !val || !max) return;
+      if (min.mode !== val.mode && max.mode !== val.mode) return;
+
+      const value = Math.max(min.raw, Math.min(val.raw, max.raw));
+      return val.mode === "percentage" ? `${value}%` : value;
     }
     case "vh": {
       // 50vh = 50% of the viewport height
@@ -478,13 +528,17 @@ function applyCalcOperator(
 
 export function calc(
   state: PropState,
-  expression: RuntimeValueDescriptor[],
+  expression: RuntimeValueDescriptor,
   style?: Record<string, any>,
 ) {
   const values: number[] = [];
   const ops: string[] = [];
 
   let mode;
+
+  if (!Array.isArray(expression)) {
+    expression = [expression];
+  }
 
   for (let token of expression) {
     switch (typeof token) {
@@ -554,5 +608,9 @@ export function calc(
 
   const value = round(values[0]);
 
-  return mode === "percentage" ? `${value}%` : value;
+  return {
+    mode,
+    raw: value,
+    value: mode === "percentage" ? `${value}%` : value,
+  };
 }
