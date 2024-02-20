@@ -120,3 +120,7 @@ export function vars<T extends Record<`--${string}`, string | number>>(
   }
   return $variables;
 }
+
+export function useSafeAreaEnv(): {} | undefined {
+  return undefined;
+}

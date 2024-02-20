@@ -82,6 +82,15 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "New ⭐",
+      collapsed: false,
+      items: [
+        "tailwind/plugins/container-queries",
+        "tailwind/new-concepts/safe-area-insets",
+      ],
+    },
+    {
+      type: "category",
       label: "Layout",
       collapsed: false,
       items: [
@@ -343,12 +352,6 @@ const sidebars = {
       label: "Accessibility",
       collapsed: false,
       items: ["tailwind/accessibility/screen-readers"],
-    },
-    {
-      type: "category",
-      label: "Plugins",
-      collapsed: false,
-      items: ["tailwind/plugins/container-queries"],
     },
   ],
 };

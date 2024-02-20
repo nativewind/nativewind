@@ -39,6 +39,7 @@ import type {
   UserSelect,
   SVGPaint,
   ColorOrAuto,
+  EnvironmentVariable,
 } from "lightningcss";
 
 import type { ExtractionWarning, RuntimeValueDescriptor } from "../types";
@@ -1841,8 +1842,9 @@ function parseUnparsed(
       }
     case "color":
       return parseColor(tokenOrValue.value, options);
-    case "url":
     case "env":
+      return parseEnv(tokenOrValue.value, options);
+    case "url":
     case "time":
     case "resolution":
     case "dashed-ident":
@@ -2728,3 +2730,35 @@ function parseDimensionPercentageFor_LengthValue(
 }
 
 const allowAuto = new Set(["pointer-events"]);
+
+function parseEnv(
+  value: EnvironmentVariable,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  switch (value.name.type) {
+    case "ua":
+      switch (value.name.value) {
+        case "safe-area-inset-top":
+        case "safe-area-inset-right":
+        case "safe-area-inset-bottom":
+        case "safe-area-inset-left":
+          return {
+            name: "var",
+            delay: true,
+            arguments: [
+              `--___css-interop___${value.name.value}`,
+              parseUnparsed(value.fallback, options),
+            ],
+          };
+        case "viewport-segment-width":
+        case "viewport-segment-height":
+        case "viewport-segment-top":
+        case "viewport-segment-left":
+        case "viewport-segment-bottom":
+        case "viewport-segment-right":
+      }
+      break;
+    case "custom":
+    case "unknown":
+  }
+}
