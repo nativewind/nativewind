@@ -6,7 +6,7 @@ Fully dynamic React Native applications often make use of helper functions such 
 
 ## platformSelect
 
-platformSelect is the equivalent to (`Platform.select()`)[https://reactnative.dev/docs/platform#select]
+`platformSelect` is the equivalent to (`Platform.select()`)[https://reactnative.dev/docs/platform#select].
 
 ```js
 // tailwind.config.js
@@ -51,7 +51,7 @@ module.exports = {
 
 ### hairlineWidth()
 
-Equivalent of ()`StyleSheet.hairlineWidth`)[https://reactnative.dev/docs/stylesheet#hairlinewidth]
+Equivalent of (`StyleSheet.hairlineWidth`)[https://reactnative.dev/docs/stylesheet#hairlinewidth]
 
 ```ts title=tailwind.config.js
 const { hairlineWidth } = require("nativewind/theme");
