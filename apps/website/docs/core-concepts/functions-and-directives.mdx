@@ -4,9 +4,35 @@
 
 NativeWind allows the same functions and directives as Tailwind CSS. Please refer to the [Tailwind CSS documentation](https://tailwindcss.com/docs/functions-and-directives).
 
-These functions can be used within your `.css` file with within an arbitrary class name.
+These functions can be used within your theme, arbitrary class names, or within your custom CSS.
 
-In addition to the functions and directives provided by Tailwind CSS, NativeWind also supports the following:
+In addition to the functions and directives provided by Tailwind CSS, NativeWind polyfills the following CSS functions:
+
+## var()
+
+`var()` is a CSS function that allows you to use the value of a custom property (sometimes called a "CSS variable") inside the value of another property.
+
+```js title="tailwind.config.js"
+module.exports = {
+  theme: {
+    extend: {
+      color: {
+        custom: "var(--my-custom-color)",
+      },
+    },
+  },
+};
+```
+
+```tsx
+// style: { color: "red" }
+<Text className="text-custom [--my-custom-color:red]">
+
+// style: { color: "green" }
+<View style={vars({ "--my-custom-color": "green" })}>
+  <Text className="text-custom">
+</View>
+```
 
 ## calc()
 
@@ -19,8 +45,18 @@ Support for `calc()` is limited and will be improved in the future.
 `calc()` is a CSS function that allows you to perform calculations when specifying CSS property values. It can be used to perform addition, subtraction, multiplication, and division and can be used with other CSS functions such as `var()`
 
 ```CSS
+// Can be used to calculate a value
 .element {
   width: calc(var(--my-variable) - (20px + 2rem));
+}
+
+// Or part of a value
+.element {
+  background-color: hsl(
+    calc(var(--H) + 20),
+    calc(var(--S) - 10%),
+    calc(var(--L) + 30%)
+  )
 }
 ```
 

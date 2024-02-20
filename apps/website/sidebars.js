@@ -84,9 +84,10 @@ const sidebars = {
       collapsed: false,
       items: [
         "api/with-nativewind",
+        "api/vars",
+        "api/use-color-scheme",
         "api/remap-props",
         "api/css-interop",
-        "api/use-color-scheme",
       ],
     },
     {
