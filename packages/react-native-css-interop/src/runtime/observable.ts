@@ -1,3 +1,4 @@
+import { unstable_batchedUpdates } from 'react-native';
 /**
  * Observer pattern implementation
  *
@@ -50,9 +51,11 @@ export function observable<T>(
       value = newValue;
       // We changed, so rerun all subscribed effects
       // We need to copy the effects set because rerunning an effect might resubscribe it
-      for (const effect of [...effects]) {
-        effect.rerun();
-      }
+      unstable_batchedUpdates(() => {
+        for (const effect of [...effects]) {
+          effect.rerun();
+        }
+      });
     },
   };
 }
