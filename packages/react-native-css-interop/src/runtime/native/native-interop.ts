@@ -569,8 +569,6 @@ export function specificityCompare(
     return a.C - b.C; /* Styles */
   } else if (a.S && b.S && a.S !== b.S) {
     return a.S - b.S; /* StyleSheet Order */
-  } else if (a.O && b.O && a.O !== b.O) {
-    return a.O - b.O; /* Appearance Order */
   } else {
     return 0; /* Appearance Order */
   }
