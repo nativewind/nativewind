@@ -11,6 +11,7 @@ import {
 export interface TailwindCliOptions extends GetTransformOptionsOpts {
   projectRoot: string;
   input: string;
+  config: string;
   output: string;
   cliCommand: string;
   browserslist: string | null;
@@ -56,6 +57,8 @@ export async function tailwindCli(
     ...options.cliCommand.split(" "),
     "--input",
     `"${input}"`,
+    "--config",
+    `"${options.config}"`,
     "--output",
     `"${options.output}"`,
   ];
