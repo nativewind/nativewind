@@ -17,10 +17,10 @@ pluginTester({
 export default function App() {
   return /*#__PURE__*/ _react.default.createElement(_reactNative.Text, {})
 }`,
-      output: `import * as __ReactNativeCSSInterop from "react-native-css-interop";
+      output: `import * as _ReactNativeCSSInterop from "react-native-css-interop";
 var _react = _interopRequireDefault(require("react"));
 export default function App() {
-  return /*#__PURE__*/ __ReactNativeCSSInterop.createInteropElement(
+  return /*#__PURE__*/ _ReactNativeCSSInterop.createInteropElement(
     _reactNative.Text,
     {}
   );
@@ -32,10 +32,10 @@ export default function App() {
 export default function App() {
   return createElement("div", {}, "Hello World");
 }`,
-      output: `import * as __ReactNativeCSSInterop from "react-native-css-interop";
+      output: `import * as _ReactNativeCSSInterop from "react-native-css-interop";
 import { createElement } from "react";
 export default function App() {
-  return __ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
+  return _ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
 }`,
 
       babelOptions: { filename: "/someFile.js" },
@@ -45,10 +45,10 @@ export default function App() {
 export default function App() {
   return React.createElement("div", {}, "Hello World");
 }`,
-      output: `import * as __ReactNativeCSSInterop from "react-native-css-interop";
+      output: `import * as _ReactNativeCSSInterop from "react-native-css-interop";
 import React from "react";
 export default function App() {
-  return __ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
+  return _ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
 }`,
 
       babelOptions: { filename: "/someFile.js" },
@@ -59,10 +59,10 @@ export default function App() {
 export default function App() {
   return createElement("div", {}, "Hello World");
 }`,
-      output: `import * as __ReactNativeCSSInterop from "react-native-css-interop";
+      output: `import * as _ReactNativeCSSInterop from "react-native-css-interop";
 const { createElement } = require("react");
 export default function App() {
-  return __ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
+  return _ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
 }`,
       babelOptions: { filename: "/someFile.js" },
     },
@@ -71,10 +71,10 @@ export default function App() {
 export default function App() {
   return React.createElement("div", {}, "Hello World");
 }`,
-      output: `import * as __ReactNativeCSSInterop from "react-native-css-interop";
+      output: `import * as _ReactNativeCSSInterop from "react-native-css-interop";
 import * as React from "react";
 export default function App() {
-  return __ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
+  return _ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
 }`,
       babelOptions: { filename: "/someFile.js" },
     },
@@ -83,10 +83,10 @@ export default function App() {
 export default function App() {
   return react.createElement("div", {}, "Hello World");
 }`,
-      output: `import * as __ReactNativeCSSInterop from "react-native-css-interop";
+      output: `import * as _ReactNativeCSSInterop from "react-native-css-interop";
 import * as react from "react";
 export default function App() {
-  return __ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
+  return _ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
 }`,
       babelOptions: { filename: "/someFile.js" },
     },
@@ -95,10 +95,10 @@ export default function App() {
 export default function App() {
   return react.createElement("div", {}, "Hello World");
 }`,
-      output: `import * as __ReactNativeCSSInterop from "react-native-css-interop";
+      output: `import * as _ReactNativeCSSInterop from "react-native-css-interop";
 var react = require("react");
 export default function App() {
-  return __ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
+  return _ReactNativeCSSInterop.createInteropElement("div", {}, "Hello World");
 }`,
       babelOptions: { filename: "/someFile.js" },
     },
@@ -134,11 +134,11 @@ export default function App() {
     return originalCreateElement(type, props, ...children);
   };
 }`,
-      output: `import * as __ReactNativeCSSInterop from "react-native-css-interop";
+      output: `import * as _ReactNativeCSSInterop from "react-native-css-interop";
 import * as React from "react";
 export default function App() {
-  const originalCreateElement = __ReactNativeCSSInterop.createInteropElement;
-  return (__ReactNativeCSSInterop.createInteropElement = (
+  const originalCreateElement = _ReactNativeCSSInterop.createInteropElement;
+  return (_ReactNativeCSSInterop.createInteropElement = (
     type,
     props,
     ...children

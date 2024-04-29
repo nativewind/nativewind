@@ -11,15 +11,12 @@ import {
   identifier
 } from "@babel/types";
 import { Binding, NodePath } from "@babel/traverse";
-import template from "@babel/template";
+import { addNamespace } from "@babel/helper-module-imports";
 
 const importFunction = "createInteropElement";
 const importModule = "react-native-css-interop";
-const importAs = "__ReactNativeCSSInterop";
+const importAs = "ReactNativeCSSInterop";
 
-const importAst = template(`
-  import * as ${importAs} from "${importModule}";
-`)();
 
 const allowedFileRegex =
   /^(?!.*[\/\\](react|react-native|react-native-web|react-native-css-interop)[\/\\]).*$/;
@@ -33,9 +30,9 @@ export default function () {
           let newExpression: null | MemberExpression = null;
           const insertImportStatement = () => {
             if (newExpression === null) {
-              path.unshiftContainer("body",importAst);
+              const importAsIdentifier = addNamespace(path, importModule, { nameHint: importAs })
               newExpression = memberExpression(
-                identifier(importAs),
+                importAsIdentifier,
                 identifier(importFunction)
               );
             }
