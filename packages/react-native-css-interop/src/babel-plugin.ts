@@ -1,26 +1,24 @@
 import {
   Identifier,
   MemberExpression,
+  Program,
   isCallExpression,
   isIdentifier,
   isImportDeclaration,
   isMemberExpression,
   isStringLiteral,
+  memberExpression,
+  identifier
 } from "@babel/types";
 import { Binding, NodePath } from "@babel/traverse";
 import template from "@babel/template";
-import { addNamed } from "@babel/helper-module-imports";
 
-const importMeta = [
-  "createInteropElement",
-  "react-native-css-interop",
-] as const;
 const importFunction = "createInteropElement";
 const importModule = "react-native-css-interop";
 const importAs = "__ReactNativeCSSInterop";
 
 const importAst = template(`
-  import * as ${importFunction} from "${importModule}";
+  import * as ${importAs} from "${importModule}";
 `)();
 
 const allowedFileRegex =
@@ -30,10 +28,20 @@ export default function () {
   return {
     name: "react-native-css-interop-imports",
     visitor: {
-      Program(path: NodePath, state: any) {
+      Program(path: NodePath<Program>, state: any) {
         if (allowedFileRegex.test(state.filename)) {
-          let importStatementInitialised = false;
-          path.traverse(visitor, {...state, importStatementInitialised});
+          let newExpression: null | MemberExpression = null;
+          const insertImportStatement = () => {
+            if (newExpression === null) {
+              path.unshiftContainer("body",importAst);
+              newExpression = memberExpression(
+                identifier(importAs),
+                identifier(importFunction)
+              );;
+            }
+            return newExpression
+          }
+          path.traverse(visitor, {...state, insertImportStatement});
         }
       },
     },
@@ -41,7 +49,7 @@ export default function () {
 }
 
 const visitor = {
-  MemberExpression(path: NodePath<MemberExpression>, state: any) {
+  MemberExpression(path: NodePath<MemberExpression>, state: {insertImportStatement: () => MemberExpression, filename: string}) {
     if (
       allowedFileRegex.test(state.filename) &&
       isIdentifier(path.node.property, { name: "createElement" })
@@ -67,17 +75,20 @@ const visitor = {
 
       if (!shouldReplace) return;
 
-      path.replaceWith(addNamed(path, ...importMeta));
+      const newExpression = state.insertImportStatement()
+
+      path.replaceWith(newExpression);
     }
   },
-  Identifier(path: NodePath<Identifier>, state: any) {
+  Identifier(path: NodePath<Identifier>, state: {insertImportStatement: () => MemberExpression, filename: string}) {
     if (
       allowedFileRegex.test(state.filename) &&
       path.node.name === "createElement" &&
       path.parentPath.isCallExpression() &&
       isImportedFromReact(path.scope.getBinding("createElement"))
     ) {
-      path.replaceWith(addNamed(path, ...importMeta));
+      const newExpression = state.insertImportStatement()
+      path.replaceWith(newExpression);
     }
   },
 }
