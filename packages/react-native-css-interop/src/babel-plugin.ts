@@ -25,7 +25,7 @@ export default function () {
   return {
     name: "react-native-css-interop-imports",
     visitor: {
-      Program(path: NodePath<Program>, state: any) {
+      Program(path: NodePath<Program>, state: { filename: string }) {
         if (allowedFileRegex.test(state.filename)) {
           let newExpression: null | MemberExpression = null;
           const insertImportStatement = () => {
