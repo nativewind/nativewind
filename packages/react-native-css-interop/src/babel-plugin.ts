@@ -8,12 +8,20 @@ import {
   isStringLiteral,
 } from "@babel/types";
 import { Binding, NodePath } from "@babel/traverse";
+import template from "@babel/template";
 import { addNamed } from "@babel/helper-module-imports";
 
 const importMeta = [
   "createInteropElement",
   "react-native-css-interop",
 ] as const;
+const importFunction = "createInteropElement";
+const importModule = "react-native-css-interop";
+const importAs = "__ReactNativeCSSInterop";
+
+const importAst = template(`
+  import * as ${importFunction} from "${importModule}";
+`)();
 
 const allowedFileRegex =
   /^(?!.*[\/\\](react|react-native|react-native-web|react-native-css-interop)[\/\\]).*$/;
@@ -22,47 +30,56 @@ export default function () {
   return {
     name: "react-native-css-interop-imports",
     visitor: {
-      MemberExpression(path: NodePath<MemberExpression>, state: any) {
-        if (
-          allowedFileRegex.test(state.filename) &&
-          isIdentifier(path.node.property, { name: "createElement" })
-        ) {
-          let shouldReplace = false;
-
-          if (
-            isIdentifier(path.node.object, { name: "react" }) ||
-            isIdentifier(path.node.object, { name: "React" })
-          ) {
-            shouldReplace = isImportedFromReact(
-              path.scope.getBinding(path.node.object.name),
-            );
-          } else if (
-            isMemberExpression(path.node.object) &&
-            isIdentifier(path.node.object.object, { name: "_react" }) &&
-            isIdentifier(path.node.object.property, { name: "default" })
-          ) {
-            shouldReplace = isImportedFromReact(
-              path.scope.getBinding(path.node.object.object.name),
-            );
-          }
-
-          if (!shouldReplace) return;
-
-          path.replaceWith(addNamed(path, ...importMeta));
-        }
-      },
-      Identifier(path: NodePath<Identifier>, state: any) {
-        if (
-          allowedFileRegex.test(state.filename) &&
-          path.node.name === "createElement" &&
-          path.parentPath.isCallExpression() &&
-          isImportedFromReact(path.scope.getBinding("createElement"))
-        ) {
-          path.replaceWith(addNamed(path, ...importMeta));
+      Program(path: NodePath, state: any) {
+        if (allowedFileRegex.test(state.filename)) {
+          let importStatementInitialised = false;
+          path.traverse(visitor, {...state, importStatementInitialised});
         }
       },
     },
   };
+}
+
+const visitor = {
+  MemberExpression(path: NodePath<MemberExpression>, state: any) {
+    if (
+      allowedFileRegex.test(state.filename) &&
+      isIdentifier(path.node.property, { name: "createElement" })
+    ) {
+      let shouldReplace = false;
+
+      if (
+        isIdentifier(path.node.object, { name: "react" }) ||
+        isIdentifier(path.node.object, { name: "React" })
+      ) {
+        shouldReplace = isImportedFromReact(
+          path.scope.getBinding(path.node.object.name),
+        );
+      } else if (
+        isMemberExpression(path.node.object) &&
+        isIdentifier(path.node.object.object, { name: "_react" }) &&
+        isIdentifier(path.node.object.property, { name: "default" })
+      ) {
+        shouldReplace = isImportedFromReact(
+          path.scope.getBinding(path.node.object.object.name),
+        );
+      }
+
+      if (!shouldReplace) return;
+
+      path.replaceWith(addNamed(path, ...importMeta));
+    }
+  },
+  Identifier(path: NodePath<Identifier>, state: any) {
+    if (
+      allowedFileRegex.test(state.filename) &&
+      path.node.name === "createElement" &&
+      path.parentPath.isCallExpression() &&
+      isImportedFromReact(path.scope.getBinding("createElement"))
+    ) {
+      path.replaceWith(addNamed(path, ...importMeta));
+    }
+  },
 }
 
 function isImportedFromReact(binding?: Binding): boolean {
