@@ -37,7 +37,7 @@ export default function () {
               newExpression = memberExpression(
                 identifier(importAs),
                 identifier(importFunction)
-              );;
+              );
             }
             return newExpression
           }
