@@ -51,7 +51,6 @@ export default function () {
 const visitor = {
   MemberExpression(path: NodePath<MemberExpression>, state: {insertImportStatement: () => MemberExpression, filename: string}) {
     if (
-      allowedFileRegex.test(state.filename) &&
       isIdentifier(path.node.property, { name: "createElement" })
     ) {
       let shouldReplace = false;
@@ -82,7 +81,6 @@ const visitor = {
   },
   Identifier(path: NodePath<Identifier>, state: {insertImportStatement: () => MemberExpression, filename: string}) {
     if (
-      allowedFileRegex.test(state.filename) &&
       path.node.name === "createElement" &&
       path.parentPath.isCallExpression() &&
       isImportedFromReact(path.scope.getBinding("createElement"))
