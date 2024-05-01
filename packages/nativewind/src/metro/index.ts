@@ -32,7 +32,7 @@ export function withNativeWind(
     outputDir = ["node_modules", ".cache", "nativewind"].join(path.sep),
     projectRoot = process.cwd(),
     inlineRem = 14,
-    configPath: tailwindConfigPath = "tailwind.config.js",
+    configPath: tailwindConfigPath = "tailwind.config",
     cliCommand = `node ${path.join(
       require.resolve("tailwindcss/package.json"),
       "../",
