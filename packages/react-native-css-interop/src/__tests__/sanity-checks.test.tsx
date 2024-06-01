@@ -1,12 +1,13 @@
-import { fireEvent, render } from "@testing-library/react-native";
 import { View } from "react-native";
+import { useEffect } from "react";
 
 import {
+  fireEvent,
+  render,
   createMockComponent,
   registerCSS,
   resetStyles,
-} from "../testing-library";
-import { useEffect } from "react";
+} from "test-utils";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);

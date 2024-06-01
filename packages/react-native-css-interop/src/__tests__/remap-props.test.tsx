@@ -1,13 +1,15 @@
 import { FlatList, View } from "react-native";
-import { render, screen } from "@testing-library/react-native";
+import {} from "@testing-library/react-native";
 
 import {
+  render,
+  screen,
   registerCSS,
   resetComponents,
   resetStyles,
   createRemappedComponent,
   revealStyles,
-} from "../testing-library";
+} from "test-utils";
 import { RefObject, useRef } from "react";
 import { remapProps } from "../runtime/api";
 import { globalStyles } from "../runtime/native/style-store";

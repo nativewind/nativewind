@@ -6,6 +6,7 @@ import type {
   MediaQuery,
   QueryFeatureFor_MediaFeatureId,
 } from "lightningcss";
+import { I18nManager, Platform } from "react-native";
 
 import {
   AttributeCondition,
@@ -14,10 +15,9 @@ import {
   StyleRule,
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, rem, vh, vw } from "./globals";
-import { I18nManager, Platform } from "react-native";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { Effect, observable } from "../observable";
-import type { ComponentState, PropState } from "./native-interop";
+import { ReducerTracking, Refs, RenderingGuard, SharedState } from "./types";
 
 interface ConditionReference {
   width: number | { get: (effect?: Effect) => number };
@@ -32,36 +32,46 @@ interface ConditionReference {
  * @returns
  */
 export function testRule(
-  state: PropState,
   rule: StyleRule,
-  props: Record<string, any> | null | undefined,
+  refs: Refs,
+  tracking: ReducerTracking,
 ) {
   // Does the rule pass all the pseudo classes, media queries, and container queries?
-  if (rule.pseudoClasses && !testPseudoClasses(state, rule.pseudoClasses)) {
+  if (
+    rule.pseudoClasses &&
+    !testPseudoClasses(refs.sharedState, tracking, rule.pseudoClasses)
+  ) {
     return false;
   }
-  if (rule.media && !testMediaQueries(state, rule.media)) {
+  if (rule.media && !testMediaQueries(refs.sharedState, tracking, rule.media)) {
     return false;
   }
-  if (rule.containerQuery && !testContainerQuery(state, rule.containerQuery)) {
+  if (
+    rule.containerQuery &&
+    !testContainerQuery(refs, tracking, rule.containerQuery)
+  ) {
     return false;
   }
-  if (rule.attrs && !testAttributes(props, rule.attrs)) {
+  if (rule.attrs && !testAttributes(refs, tracking, rule.attrs)) {
     return false;
   }
 
   return true;
 }
 
-export function testMediaQueries(state: PropState, mediaQueries: MediaQuery[]) {
-  return mediaQueries.every((query) => testMediaQuery(state, query));
+export function testMediaQueries(
+  state: SharedState,
+  tracking: ReducerTracking,
+  mediaQueries: MediaQuery[],
+) {
+  return mediaQueries.every((query) => testMediaQuery(tracking, query));
 }
 
 /**
  * Test a media query against current conditions
  */
 export function testMediaQuery(
-  state: PropState,
+  tracking: ReducerTracking,
   mediaQuery: MediaQuery,
   conditionReference: ConditionReference = {
     width: vw,
@@ -70,34 +80,35 @@ export function testMediaQuery(
 ) {
   const pass =
     mediaQuery.mediaType !== "print" &&
-    testCondition(state, mediaQuery.condition, conditionReference);
+    testCondition(tracking, mediaQuery.condition, conditionReference);
   return mediaQuery.qualifier === "not" ? !pass : pass;
 }
 
 export function testPseudoClasses(
-  propState: PropState,
+  state: SharedState,
+  tracking: ReducerTracking,
   meta: PseudoClassesQuery,
-  interaction = propState.interaction,
 ) {
   /* If any of these conditions fail, it fails failed */
-  let passed = true;
-  if (meta.active) {
-    interaction.active ??= observable(false);
-    passed = interaction.active.get(propState.declarationEffect) && passed;
+  let passing = true;
+  if (meta.hover && passing) {
+    state.hover ??= observable(false);
+    passing = state.hover.get(tracking.effect);
   }
-  if (meta.hover) {
-    interaction.hover ??= observable(false);
-    passed = interaction.hover.get(propState.declarationEffect) && passed;
+  if (meta.active && passing) {
+    state.active ??= observable(false);
+    passing = state.active.get(tracking.effect);
   }
-  if (meta.focus) {
-    interaction.focus ??= observable(false);
-    passed = interaction.focus.get(propState.declarationEffect) && passed;
+  if (meta.focus && passing) {
+    state.focus ??= observable(false);
+    passing = state.focus.get(tracking.effect);
   }
-  return passed;
+  return passing;
 }
 
 export function testContainerQuery(
-  state: PropState,
+  refs: Refs,
+  tracking: ReducerTracking,
   containerQuery: ExtractedContainerQuery[] | undefined,
 ) {
   // If there is no query, we passed
@@ -106,41 +117,48 @@ export function testContainerQuery(
   }
 
   return containerQuery.every((query) => {
-    let container: ComponentState | undefined;
-    if (query.name) {
-      container = state.refs.containers[query.name];
-      // If the query has a name, but the container doesn't exist, we failed
+    const guard: RenderingGuard = (refs) => {
+      let container;
+      if (query.name) {
+        container = refs.containers[query.name];
+        // If the query has a name, but the container doesn't exist, we failed
+        if (!container) return false;
+      }
+
+      // If the query has a name, we use the container with that name
+      // Otherwise default to the last container
+      if (!container) container = refs.containers[DEFAULT_CONTAINER_NAME];
+
+      // We failed if the container doesn't exist (e.g no default container)
       if (!container) return false;
-    }
 
-    // If the query has a name, we use the container with that name
-    // Otherwise default to the last container
-    if (!container) container = state.refs.containers[DEFAULT_CONTAINER_NAME];
+      if (
+        query.pseudoClasses &&
+        !testPseudoClasses(container, tracking, query.pseudoClasses)
+      ) {
+        return false;
+      }
 
-    // We failed if the container doesn't exist (e.g no default container)
-    if (!container) return false;
+      if (query.attrs && !testAttributes(refs, tracking, query.attrs)) {
+        return false;
+      }
 
-    if (
-      query.pseudoClasses &&
-      !testPseudoClasses(state, query.pseudoClasses, container.interaction)
-    ) {
-      return false;
-    }
+      // If there is no condition, we passed (maybe only named as specified)
+      if (!query.condition) return true;
 
-    if (query.attrs && !testAttributes(container.refs.props, query.attrs)) {
-      return false;
-    }
+      // Containers will always have a layout interaction
+      const layout = container.layout?.get(tracking.effect);
+      if (!layout) return false;
 
-    // If there is no condition, we passed (maybe only named as specified)
-    if (!query.condition) return true;
+      return testCondition(tracking, query.condition, {
+        width: layout[0],
+        height: layout[1],
+      });
+    };
 
-    // Containers will always have a layout interaction
-    const layout = container.interaction.layout!.get(state.declarationEffect);
+    tracking.guards.push(guard);
 
-    return testCondition(state, query.condition, {
-      width: layout[0],
-      height: layout[1],
-    });
+    return guard(refs);
   });
 }
 
@@ -149,7 +167,7 @@ export function testContainerQuery(
  * This is also used for container queries
  */
 export function testCondition(
-  state: PropState,
+  tracking: ReducerTracking,
   condition: ContainerCondition<Declaration> | null | undefined,
   conditionReference: ConditionReference,
 ): boolean {
@@ -158,35 +176,35 @@ export function testCondition(
   if (condition.type === "operation") {
     if (condition.operator === "and") {
       return condition.conditions.every((c) => {
-        return testCondition(state, c, conditionReference);
+        return testCondition(tracking, c, conditionReference);
       });
     } else {
       return condition.conditions.some((c) => {
-        return testCondition(state, c, conditionReference);
+        return testCondition(tracking, c, conditionReference);
       });
     }
   } else if (condition.type === "not") {
-    return !testCondition(state, condition.value, conditionReference);
+    return !testCondition(tracking, condition.value, conditionReference);
   } else if (condition.type === "style") {
     // TODO
     return false;
   }
 
-  return testFeature(state, condition.value, conditionReference);
+  return testFeature(tracking, condition.value, conditionReference);
 }
 
 function testFeature(
-  state: PropState,
+  tracking: ReducerTracking,
   feature: QueryFeatureFor_MediaFeatureId,
   conditionReference: ConditionReference,
 ) {
   switch (feature.type) {
     case "plain":
-      return testPlainFeature(state, feature, conditionReference);
+      return testPlainFeature(tracking, feature, conditionReference);
     case "range":
-      return testRange(state, feature, conditionReference);
+      return testRange(tracking, feature, conditionReference);
     case "boolean":
-      return testBoolean(state, feature);
+      return testBoolean(tracking, feature);
     case "interval":
       return false;
     default:
@@ -197,11 +215,11 @@ function testFeature(
 }
 
 function testPlainFeature(
-  state: PropState,
+  tracking: ReducerTracking,
   feature: Extract<QueryFeatureFor_MediaFeatureId, { type: "plain" }>,
   ref: ConditionReference,
 ) {
-  const value = getMediaFeatureValue(state, feature.value);
+  const value = getMediaFeatureValue(tracking, feature.value);
 
   if (value === null) {
     return false;
@@ -211,26 +229,26 @@ function testPlainFeature(
     case "display-mode":
       return value === "native" || Platform.OS === value;
     case "prefers-color-scheme":
-      return colorScheme.get(state.declarationEffect) === value;
+      return colorScheme.get(tracking.effect) === value;
     case "width":
-      return testComparison(state, "equal", ref.width, value);
+      return testComparison(tracking, "equal", ref.width, value);
     case "min-width":
-      return testComparison(state, "greater-than-equal", ref.width, value);
+      return testComparison(tracking, "greater-than-equal", ref.width, value);
     case "max-width":
-      return testComparison(state, "less-than-equal", ref.width, value);
+      return testComparison(tracking, "less-than-equal", ref.width, value);
     case "height":
-      return testComparison(state, "equal", ref.height, value);
+      return testComparison(tracking, "equal", ref.height, value);
     case "min-height":
-      return testComparison(state, "greater-than-equal", ref.height, value);
+      return testComparison(tracking, "greater-than-equal", ref.height, value);
     case "max-height":
-      return testComparison(state, "less-than-equal", ref.height, value);
+      return testComparison(tracking, "less-than-equal", ref.height, value);
     case "orientation":
       switch (value) {
         case "landscape":
-          return testComparison(state, "less-than", ref.height, ref.width);
+          return testComparison(tracking, "less-than", ref.height, ref.width);
         case "portrait":
           return testComparison(
-            state,
+            tracking,
             "greater-than-equal",
             ref.height,
             ref.width,
@@ -241,7 +259,10 @@ function testPlainFeature(
   }
 }
 
-function getMediaFeatureValue(state: PropState, value: MediaFeatureValue) {
+function getMediaFeatureValue(
+  tracking: ReducerTracking,
+  value: MediaFeatureValue,
+) {
   if (value.type === "number") {
     return value.value;
   } else if (value.type === "length") {
@@ -251,7 +272,7 @@ function getMediaFeatureValue(state: PropState, value: MediaFeatureValue) {
         case "px":
           return length.value;
         case "rem":
-          return length.value * rem.get(state.declarationEffect);
+          return length.value * rem.get(tracking.effect);
         default:
           return null;
       }
@@ -266,11 +287,11 @@ function getMediaFeatureValue(state: PropState, value: MediaFeatureValue) {
 }
 
 function testRange(
-  state: PropState,
+  tracking: ReducerTracking,
   feature: Extract<QueryFeatureFor_MediaFeatureId, { type: "range" }>,
   ref: ConditionReference,
 ) {
-  const value = getMediaFeatureValue(state, feature.value);
+  const value = getMediaFeatureValue(tracking, feature.value);
 
   if (value === null || typeof value !== "number") {
     return false;
@@ -278,22 +299,22 @@ function testRange(
 
   switch (feature.name) {
     case "height":
-      return testComparison(state, feature.operator, ref.height, value);
+      return testComparison(tracking, feature.operator, ref.height, value);
     case "width":
-      return testComparison(state, feature.operator, ref.width, value);
+      return testComparison(tracking, feature.operator, ref.width, value);
     default:
       return false;
   }
 }
 
 function testComparison(
-  state: PropState,
+  tracking: ReducerTracking,
   comparison: MediaFeatureComparison,
   ref: number | { get(effect: Effect): number },
   value: unknown,
 ) {
-  ref = unwrap(state.declarationEffect, ref);
-  value = unwrap(state.declarationEffect, value);
+  ref = unwrap(ref, tracking.effect);
+  value = unwrap(value, tracking.effect);
 
   if (typeof value !== "number") return false;
   switch (comparison) {
@@ -311,12 +332,12 @@ function testComparison(
 }
 
 function testBoolean(
-  state: PropState,
+  tracking: ReducerTracking,
   feature: Extract<QueryFeatureFor_MediaFeatureId, { type: "boolean" }>,
 ) {
   switch (feature.name) {
     case "prefers-reduced-motion":
-      return isReduceMotionEnabled.get(state.declarationEffect);
+      return isReduceMotionEnabled.get(tracking.effect);
     case "ltr":
       return I18nManager.isRTL === false;
     case "rtl":
@@ -325,23 +346,32 @@ function testBoolean(
   return false;
 }
 
-function unwrap<T>(effect: Effect, value: T | { get(effect: Effect): T }): T {
+function unwrap<T>(value: T | { get(effect: Effect): T }, effect: Effect): T {
   return value && typeof value === "object" && "get" in value
     ? value.get(effect)
     : (value as T);
 }
 
 function testAttributes(
-  props: Record<string, any> | null | undefined,
+  refs: Refs,
+  tracking: ReducerTracking,
   conditions: AttributeCondition[],
 ) {
-  if (!props) return false;
-
   for (const condition of conditions) {
+    const props = refs.props;
     const attrValue =
       condition.type === "data-attribute"
         ? props?.["dataSet"]?.[condition.name]
         : props?.[condition.name];
+
+    tracking.guards.push((nextRefs) => {
+      const nextValue =
+        condition.type === "data-attribute"
+          ? nextRefs.props?.["dataSet"]?.[condition.name]
+          : nextRefs.props?.[condition.name];
+
+      return attrValue !== nextValue;
+    });
 
     if (!testAttribute(attrValue, condition)) {
       return false;
