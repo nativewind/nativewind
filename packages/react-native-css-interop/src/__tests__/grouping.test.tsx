@@ -1,11 +1,13 @@
-import { fireEvent, render, screen } from "@testing-library/react-native";
 import { View } from "react-native";
 
 import {
+  fireEvent,
+  render,
+  screen,
   createMockComponent,
   registerCSS,
   resetStyles,
-} from "../testing-library";
+} from "test-utils";
 
 beforeEach(() => resetStyles());
 

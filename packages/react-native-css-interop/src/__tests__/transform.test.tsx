@@ -1,11 +1,11 @@
-import { render } from "@testing-library/react-native";
 import { View } from "react-native";
 
 import {
+  render,
   createMockComponent,
   registerCSS,
   resetStyles,
-} from "../testing-library";
+} from "test-utils";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
@@ -63,8 +63,8 @@ test("rotate-45", () => {
   --tw-pan-x:  ;
   --tw-pan-y:  ;
 }
-  
-.rotate-45 { 
+
+.rotate-45 {
   --tw-rotate: 45deg;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
 }`);

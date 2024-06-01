@@ -1,17 +1,17 @@
-import { act, render } from "@testing-library/react-native";
-
+import { View } from "react-native";
 import {
   colorScheme,
   isReduceMotionEnabled,
   vw,
 } from "../runtime/native/globals";
 import {
+  act,
+  render,
   createMockComponent,
   registerCSS,
   resetStyles,
-} from "../testing-library";
+} from "test-utils";
 import { INTERNAL_SET } from "../shared";
-import { View } from "react-native";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
@@ -173,7 +173,7 @@ test("not all", () => {
   // This reads not (all and min-width: 640px)
   // It is the same as max-width: 639px
   registerCSS(`
-@media not all and (min-width: 640px) { 
+@media not all and (min-width: 640px) {
   .my-class { color: red; }
 }`);
   // Make larger than 640

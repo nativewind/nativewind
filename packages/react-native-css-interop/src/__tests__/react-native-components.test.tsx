@@ -11,8 +11,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
-import { screen } from "@testing-library/react-native";
-import { registerCSS, resetStyles, render } from "../testing-library";
+import { screen, registerCSS, resetStyles, render } from "test-utils";
 
 const testID = "react-native-css-interop";
 
@@ -54,7 +53,7 @@ test("Component types", () => {
 
 test("TextInput", () => {
   registerCSS(
-    `.text-black { color: black } 
+    `.text-black { color: black }
      .placeholder\\:text-white {
        @rn-move color placeholderTextColor;
        color: #fff
