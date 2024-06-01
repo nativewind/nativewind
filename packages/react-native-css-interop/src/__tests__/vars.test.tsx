@@ -1,11 +1,12 @@
-import { render, screen } from "@testing-library/react-native";
 import { View } from "react-native";
-
 import {
+  render,
+  screen,
   createMockComponent,
   registerCSS,
   resetStyles,
-} from "../testing-library";
+} from "test-utils";
+
 import { vars } from "../runtime/api";
 
 const testID = "react-native-css-interop";

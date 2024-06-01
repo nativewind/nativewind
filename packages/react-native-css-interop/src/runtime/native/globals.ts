@@ -8,6 +8,7 @@ import {
 import { INTERNAL_RESET, INTERNAL_SET } from "../../shared";
 import type {
   ColorSchemeVariableValue,
+  ContainerRecord,
   ExtractionWarning,
   RuntimeValueDescriptor,
 } from "../../types";
@@ -18,7 +19,6 @@ import {
   observable,
 } from "../observable";
 import { createContext } from "react";
-import type { ComponentState } from "./native-interop";
 
 export const warnings = new Map<string, ExtractionWarning[]>();
 export const warned = new Set<string>();
@@ -30,11 +30,7 @@ export const externalCallbackRef = {} as {
 export const rootVariables: Record<string, Observable<any>> = {};
 export const universalVariables: Record<string, Observable<any>> = {};
 
-export const variableContext =
-  createContext<Record<string, any>>(rootVariables);
-export const containerContext = createContext<Record<string, ComponentState>>(
-  {},
-);
+export const containerContext = createContext<ContainerRecord>({});
 
 /**
  * Color scheme
@@ -90,10 +86,7 @@ export function cssVariableObservable(
         ? light.get(effect)
         : dark.get(effect);
     },
-    set(
-      value: ColorSchemeVariableValue | RuntimeValueDescriptor,
-      notify = false,
-    ) {
+    set(value: ColorSchemeVariableValue | RuntimeValueDescriptor) {
       if (typeof value === "object" && value) {
         if ("dark" in value) dark.set(value.dark);
         if ("light" in value) light.set(value.light);

@@ -1,11 +1,11 @@
-import { render } from "@testing-library/react-native";
 import { StyleSheet as RNStyleSheet, View } from "react-native";
 
 import {
+  render,
   createMockComponent,
   registerCSS,
   resetStyles,
-} from "../testing-library";
+} from "test-utils";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);

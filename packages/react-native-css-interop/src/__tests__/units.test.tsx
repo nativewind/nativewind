@@ -1,4 +1,3 @@
-import { act, render } from "@testing-library/react-native";
 import { View } from "react-native";
 
 import { rem, vh, vw } from "../runtime/native/globals";
@@ -7,7 +6,9 @@ import {
   createMockComponent,
   registerCSS,
   resetStyles,
-} from "../testing-library";
+  act,
+  render,
+} from "test-utils";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);

@@ -4,14 +4,14 @@ import {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { render } from "@testing-library/react-native";
 import { ViewProps } from "react-native";
 
 import {
+  render,
   createMockComponent,
   registerCSS,
   resetStyles,
-} from "../testing-library";
+} from "test-utils";
 
 const testID = "react-native-css-interop";
 

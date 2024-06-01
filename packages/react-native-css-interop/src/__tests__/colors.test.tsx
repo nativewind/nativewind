@@ -1,11 +1,11 @@
-import { render } from "@testing-library/react-native";
 import { View } from "react-native";
 
 import {
+  render,
   createMockComponent,
   registerCSS,
   resetStyles,
-} from "../testing-library";
+} from "test-utils";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);
@@ -14,8 +14,8 @@ beforeEach(() => resetStyles());
 
 describe("hsl", () => {
   test("inline", () => {
-    registerCSS(`.my-class { 
-    color: hsl(0 84.2% 60.2%); 
+    registerCSS(`.my-class {
+    color: hsl(0 84.2% 60.2%);
   }`);
 
     const component = render(
@@ -28,8 +28,8 @@ describe("hsl", () => {
   });
 
   test("inline with comma", () => {
-    registerCSS(`.my-class { 
-    color: hsl(0, 84.2%, 60.2%); 
+    registerCSS(`.my-class {
+    color: hsl(0, 84.2%, 60.2%);
   }`);
 
     const component = render(
@@ -42,9 +42,9 @@ describe("hsl", () => {
   });
 
   test("var with spaces", () => {
-    registerCSS(`.my-class { 
+    registerCSS(`.my-class {
     --primary: 0 84.2% 60.2%;
-    color: hsl(var(--primary)); 
+    color: hsl(var(--primary));
   }`);
 
     const component = render(
@@ -55,9 +55,9 @@ describe("hsl", () => {
   });
 
   test("var with comma", () => {
-    registerCSS(`.my-class { 
+    registerCSS(`.my-class {
     --primary: 0, 84.2%, 60.2%;
-    color: hsl(var(--primary)); 
+    color: hsl(var(--primary));
   }`);
 
     const component = render(
@@ -70,8 +70,8 @@ describe("hsl", () => {
 
 describe("hsla", () => {
   test("inline with slash", () => {
-    registerCSS(`.my-class { 
-    color: hsla(0 84.2% 60.2% / 60%); 
+    registerCSS(`.my-class {
+    color: hsla(0 84.2% 60.2% / 60%);
   }`);
 
     const component = render(
@@ -84,8 +84,8 @@ describe("hsla", () => {
   });
 
   test("inline with comma", () => {
-    registerCSS(`.my-class { 
-    color: hsla(0, 84.2%, 60.2%, 60%); 
+    registerCSS(`.my-class {
+    color: hsla(0, 84.2%, 60.2%, 60%);
   }`);
 
     const component = render(
@@ -98,9 +98,9 @@ describe("hsla", () => {
   });
 
   test("function with slash", () => {
-    registerCSS(`.my-class { 
+    registerCSS(`.my-class {
     --primary: 0 84.2% 60.2% / 60%;
-    color: hsla(var(--primary)); 
+    color: hsla(var(--primary));
   }`);
 
     const component = render(
@@ -111,9 +111,9 @@ describe("hsla", () => {
   });
 
   test("function with comma", () => {
-    registerCSS(`.my-class { 
+    registerCSS(`.my-class {
     --primary: 0, 84.2%, 60.2%, 60%;
-    color: hsla(var(--primary)); 
+    color: hsla(var(--primary));
   }`);
 
     const component = render(
