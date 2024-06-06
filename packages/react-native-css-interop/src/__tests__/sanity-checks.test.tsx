@@ -25,14 +25,14 @@ test("dynamic variables should not unmount children", () => {
   const onUnMount = jest.fn();
   const onMount = jest.fn(() => onUnMount);
 
-  const Child = (props: { assertMount: () => () => void }) => {
+  const Child = (props: { assertMount: () => () => void; testID?: string }) => {
     useEffect(props.assertMount, []);
     return null;
   };
 
   const component = render(
     <A testID={testID} className="my-class">
-      <Child assertMount={onMount} />
+      <Child testID="child" assertMount={onMount} />
     </A>,
   ).getByTestId(testID);
 

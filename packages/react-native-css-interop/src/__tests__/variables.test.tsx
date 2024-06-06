@@ -6,8 +6,8 @@ import {
   createMockComponent,
   registerCSS,
   resetStyles,
+  useUnstableNativeVariable,
 } from "test-utils";
-import { useUnstableNativeVariable } from "../runtime/api";
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);

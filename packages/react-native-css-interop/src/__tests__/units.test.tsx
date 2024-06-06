@@ -1,14 +1,17 @@
 import { View } from "react-native";
 
-import { rem, vh, vw } from "../runtime/native/globals";
-import { INTERNAL_SET } from "../shared";
 import {
   createMockComponent,
   registerCSS,
   resetStyles,
   act,
   render,
+  native,
+  INTERNAL_SET,
+  rem,
 } from "test-utils";
+
+const { vw, vh } = native;
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);

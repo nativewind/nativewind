@@ -2,11 +2,13 @@ import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
 import type { AnimatableValue } from "react-native-reanimated";
 import type { EasingFunction, Time } from "lightningcss";
 import type { RuntimeValueDescriptor, RuntimeValueFrame } from "../../types";
-import { rem, systemColorScheme, vh, vw } from "./globals";
 import { Effect, observable } from "../observable";
 import { transformKeys } from "../../shared";
 import { ReducerState, ReducerTracking, Refs } from "./types";
 import { getUniversalVariable, getVariable } from "./$$styles";
+import { rem } from "../api";
+import { systemColorScheme } from "./appearance-observables";
+import { vh, vw } from "./unit-observables";
 
 /**
  * Get the final value of a value descriptor
@@ -342,7 +344,7 @@ function getVar(
   if (!name) return;
   let value: any = undefined;
   // Get the value from the inline style
-  value ??= state.variables?.[name];
+  value ??= getVariable(name, state.variables);
   // Get the value from the universal variables
   value ??= getUniversalVariable(name, tracking.effect);
 

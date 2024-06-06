@@ -28,7 +28,7 @@ test("group", async () => {
   );
 
   const { rerender, getByTestId } = render(
-    <A className="group/item">
+    <A testID="parent" className="group/item">
       <B testID={testID} className="my-class" />
     </A>,
   );
@@ -36,7 +36,7 @@ test("group", async () => {
   expect(getByTestId(testID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
 
   rerender(
-    <A>
+    <A testID="parent">
       <B testID={testID} className="my-class" />
     </A>,
   );
@@ -105,7 +105,7 @@ test("invalid group", async () => {
   expect(componentB).toHaveStyle(undefined);
 });
 
-test.only("group selector", async () => {
+test("group selector", async () => {
   const A = createMockComponent(View);
   const B = createMockComponent(View);
 

@@ -1,11 +1,11 @@
 import { createContext } from "react";
 import { Effect, Observable, observable } from "../observable";
+import { cssVariableObservable } from "./appearance-observables";
 import type {
   ExtractedAnimation,
   StyleRuleSet,
   StyleSheetRegisterCompiledOptions,
 } from "../../types";
-import { cssVariableObservable } from "./globals";
 
 export type InjectedStyleContextValue = {
   styles: Record<string, Observable<StyleRuleSet>>;
@@ -40,9 +40,11 @@ export function getAnimation(name: string, effect: Effect) {
 }
 export function getVariable(
   name: string,
-  store: Record<string, any> | Map<string, any>,
-  effect: Effect,
+  store?: Record<string, any> | Map<string, any>,
+  effect?: Effect,
 ) {
+  if (!store) return;
+
   let obs = store instanceof Map ? store.get(name) : store[name];
   if (!obs) {
     obs = cssVariableObservable(undefined);

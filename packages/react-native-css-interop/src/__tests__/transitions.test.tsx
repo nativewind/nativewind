@@ -14,7 +14,7 @@ jest.useFakeTimers();
 
 beforeEach(() => resetStyles());
 
-test("numeric transition", () => {
+test.only("numeric transition", () => {
   const A = createMockComponent(View);
 
   registerCSS(`

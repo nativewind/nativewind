@@ -17,8 +17,8 @@ import {
   ExtractedTransition,
   RemappedClassName,
 } from "../../types";
-import { containerContext } from "../native/globals";
-import { UpgradeState, renderComponent } from "../native/render-component";
+import { containerContext } from "./globals";
+import { UpgradeState, renderComponent } from "./render-component";
 import { testRule } from "./conditions";
 import {
   SharedState,
@@ -40,6 +40,8 @@ import {
 } from "./resolve-value";
 
 import { VariableContext, getAnimation, getStyle } from "./$$styles";
+import { DEFAULT_CONTAINER_NAME } from "../../shared";
+import { LayoutChangeEvent, View } from "react-native";
 
 export const opaqueStyles = new WeakMap<
   object,
@@ -49,15 +51,19 @@ export const opaqueStyles = new WeakMap<
 export function interop(
   component: ReactComponent<any>,
   configs: InteropComponentConfig[],
-  { ...props }: Record<string, any> | null,
+  originalProps: Record<string, any> | null,
   ref: any,
 ): ReactNode {
   // These are inherited from the parent components
   const inheritedVariables = useContext(VariableContext);
   const inheritedContainers = useContext(containerContext);
 
+  const props = { ...originalProps };
+
   // This shouldn't be here, but its failing if in the global scope?
-  require("./poll-updates");
+  if (process.env.NODE_ENV === "development") {
+    require("./poll-updates");
+  }
 
   /*
    * Holds the shared state between all the configs
@@ -70,7 +76,7 @@ export function interop(
    * manage their own setup/cleanup
    */
   const sharedState = useState<SharedState>({
-    originalProps: props,
+    originalProps,
     props: {},
     guardsEnabled: false,
     canUpgradeWarn: false,
@@ -141,7 +147,10 @@ export function interop(
     if (sharedState.guardsEnabled) {
       if (state.declarationTracking.guards.some((guard) => guard(refs))) {
         // If needed, update the declarations
-        dispatch({ type: "declarations", className: props?.[config.source] });
+        dispatch({
+          type: "declarations",
+          className: props?.[config.source] || null,
+        });
       } else if (state.styleTracking.guards.some((guard) => guard(refs))) {
         // If needed, we can jump straight to updating the props
         dispatch({ type: "styles" });
@@ -159,16 +168,23 @@ export function interop(
    * This is a memoized value, as variables and containers are used for Context.Providers
    */
   const memoOutput = useMemo(() => {
-    const containers: string[] = [];
-    const variables =
+    let variables =
+      // RootVariables are a map, inheritedVariables are an object
       inheritedVariables instanceof Map
         ? Object.fromEntries(inheritedVariables)
         : { ...inheritedVariables };
 
-    const props = {};
+    let containers = { ...inheritedContainers };
+
+    const props: Record<string, any> = {};
 
     let hasVariables = false;
+    let hasContainer = false;
+    let hasNullContainer = false;
 
+    /**
+     * Loop over all the states and collect the props, variables and containers
+     */
     for (const state of states) {
       Object.assign(props, state.props);
 
@@ -177,15 +193,102 @@ export function interop(
         Object.assign(variables, state.variables);
       }
 
-      if (state.containerNames) {
-        containers.push(...state.containerNames);
+      if (state.containerNames !== undefined) {
+        hasContainer = true;
+
+        if (state.containerNames === false) {
+          hasNullContainer = true;
+        } else if (!hasNullContainer) {
+          for (const container of state.containerNames) {
+            containers[container] = sharedState;
+          }
+          containers[DEFAULT_CONTAINER_NAME] = sharedState;
+        }
       }
+    }
+
+    if (sharedState.active || sharedState.containers) {
+      sharedState.active ??= observable(false);
+      props.onPressIn = (event: unknown) => {
+        sharedState.originalProps?.onPressIn?.(event);
+        sharedState.active!.set(true);
+      };
+      props.onPressOut = (event: unknown) => {
+        sharedState.originalProps?.onPressOut?.(event);
+        sharedState.active!.set(false);
+      };
+    }
+    if (sharedState.hover || sharedState.containers) {
+      sharedState.hover ??= observable(false);
+      props.onHoverIn = (event: unknown) => {
+        sharedState.originalProps?.onHoverIn?.(event);
+        sharedState.hover!.set(true);
+      };
+      props.onHoverOut = (event: unknown) => {
+        sharedState.originalProps?.onHoverOut?.(event);
+        sharedState.hover!.set(false);
+      };
+    }
+
+    if (sharedState.focus || sharedState.containers) {
+      sharedState.focus ??= observable(false);
+      props.onFocus = (event: unknown) => {
+        sharedState.originalProps?.onFocus?.(event);
+        sharedState.focus!.set(true);
+      };
+      props.onBlur = (event: unknown) => {
+        sharedState.originalProps?.onBlur?.(event);
+        sharedState.focus!.set(false);
+      };
+    }
+    /**
+     * Some React Native components (e.g Text) will not apply state event handlers
+     * if `onPress` is not defined.
+     */
+    if (sharedState.active || sharedState.hover || sharedState.focus) {
+      if (component === View) {
+        sharedState.pressable ||= UpgradeState.SHOULD_UPGRADE;
+      }
+      props.onPress = (event: unknown) => {
+        sharedState.originalProps?.onPress?.(event);
+      };
+    }
+
+    if (sharedState.layout || sharedState.containers) {
+      sharedState.layout ??= observable([0, 0]);
+      props.onLayout = (event: LayoutChangeEvent) => {
+        sharedState.originalProps?.onLayout?.(event);
+        const layout = event.nativeEvent.layout;
+        const prevLayout = sharedState.layout!.get();
+        if (layout.width !== prevLayout[0] || layout.height !== prevLayout[0]) {
+          sharedState.layout!.set([layout.width, layout.height]);
+        }
+      };
+    }
+
+    /**
+     * Determine the next variables and containers. If something has upgraded, then we always need a value
+     */
+    let nextVariables: Record<string, any> | undefined;
+    if (hasVariables) {
+      nextVariables = variables;
+    } else if (sharedState.variables !== UpgradeState.NONE) {
+      nextVariables = inheritedVariables;
+    }
+
+    let nextContainers: Record<string, any> | undefined;
+    if (hasNullContainer) {
+      nextContainers = inheritedContainers;
+    } else if (hasContainer) {
+      nextContainers = containers;
+    } else if (sharedState.containers !== UpgradeState.NONE) {
+      nextContainers = inheritedContainers;
     }
 
     return {
       props,
-      variables: hasVariables ? variables : undefined,
-      containers: containers.length ? containers : undefined,
+      variables: nextVariables,
+      containers: nextContainers,
     };
   }, states);
 
@@ -201,7 +304,7 @@ export function interop(
 
   // Update the shared state with the latest values
   sharedState.props = memoOutput.props;
-  sharedState.originalProps = props;
+  sharedState.originalProps = originalProps;
   sharedState.guardsEnabled = true;
 
   return renderComponent(
@@ -262,18 +365,28 @@ function getDeclarations(
 
   const state: ReducerState = {
     ...previousState,
-    // Keep the same className, unless it has changed
-    className: className || previousState.className,
     // Reset the declarations
     normal: [],
     important: [],
+    // Reset containers and variables
+    containerNames: undefined,
+    variables: undefined,
+    // Reset the inline styles
     inline: refs.props?.[config.target],
+    // Keep the same effect, but reset the guards
     declarationTracking: {
       effect: previousState.declarationTracking.effect,
       guards: [],
       previous: refs.props?.[config.source],
     },
   };
+
+  // If the className is null, then we need to reset the styles. Otherwise use the new className
+  if (className) {
+    state.className = className;
+  } else if (className === null) {
+    state.className = undefined;
+  }
 
   state.declarationTracking.guards.push(
     (refs) =>
@@ -292,7 +405,7 @@ function getDeclarations(
         continue;
       }
 
-      handleUpgrades(ruleSet, refs);
+      handleUpgrades(refs.sharedState, ruleSet);
       collectRules(state, refs, ruleSet, normalRules, "normal");
       collectRules(state, refs, ruleSet, importantRules, "important");
     }
@@ -317,7 +430,8 @@ function getDeclarations(
     previousState.inline === state.inline &&
     arraysAreEqual(previousState.normal, state.normal) &&
     arraysAreEqual(previousState.important, state.important) &&
-    objectsAreEqual(previousState.variables, state.variables);
+    objectsAreEqual(previousState.variables, state.variables) &&
+    containersAreEqual(previousState.containerNames, state.containerNames);
 
   return areEqual ? previousState : state;
 }
@@ -602,12 +716,18 @@ export function retainSharedValues(
   }
 }
 
+function handleUpgrades(state: SharedState, ruleSet: StyleRuleSet) {
+  if (ruleSet.animation) state.animated ||= UpgradeState.SHOULD_UPGRADE;
+  if (ruleSet.variables) state.variables ||= UpgradeState.SHOULD_UPGRADE;
+  if (ruleSet.container) state.containers ||= UpgradeState.SHOULD_UPGRADE;
+}
+
 /**
  * Mutates the props object to move native styles to props
  * @param props
  * @param config
  */
-export function nativeStyleToProp(
+function nativeStyleToProp(
   props: Record<string, any>,
   config: InteropComponentConfig,
 ) {
@@ -629,6 +749,13 @@ function arraysAreEqual(a: any[], b: any[]) {
 
 function objectsAreEqual(a?: Record<string, any>, b?: Record<string, any>) {
   return a && b && arraysAreEqual(Object.values(a), Object.values(b));
+}
+
+function containersAreEqual(
+  a?: ReducerState["containerNames"],
+  b?: ReducerState["containerNames"],
+) {
+  return a == b || (a && b && arraysAreEqual(a, b));
 }
 
 export function applyRules(
@@ -742,20 +869,6 @@ const transformKeys = new Set([
   "transformOrigin",
 ]);
 
-function handleUpgrades(ruleSet: StyleRuleSet, refs: Refs) {
-  const sharedState = refs.sharedState;
-
-  if (ruleSet.animation && sharedState.animated === UpgradeState.NONE) {
-    sharedState.animated = UpgradeState.SHOULD_UPGRADE;
-  }
-  if (ruleSet.variables && sharedState.variables === UpgradeState.NONE) {
-    sharedState.variables = UpgradeState.SHOULD_UPGRADE;
-  }
-  if (ruleSet.container && sharedState.containers === UpgradeState.NONE) {
-    sharedState.containers = UpgradeState.SHOULD_UPGRADE;
-  }
-}
-
 function collectRules(
   state: ReducerState,
   refs: Refs,
@@ -786,6 +899,10 @@ function collectRules(
             state.variables ??= {};
             state.variables[variable[0]] = observable(variable[1]);
           }
+        }
+
+        if (rule.container) {
+          state.containerNames = rule.container.names;
         }
 
         if (rule.declarations) {
