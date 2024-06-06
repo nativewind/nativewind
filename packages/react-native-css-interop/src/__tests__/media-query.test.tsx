@@ -1,17 +1,16 @@
 import { View } from "react-native";
 import {
-  colorScheme,
-  isReduceMotionEnabled,
-  vw,
-} from "../runtime/native/globals";
-import {
   act,
   render,
   createMockComponent,
   registerCSS,
   resetStyles,
+  INTERNAL_SET,
+  colorScheme,
+  native,
 } from "test-utils";
-import { INTERNAL_SET } from "../shared";
+
+const { isReduceMotionEnabled, vw } = native;
 
 const testID = "react-native-css-interop";
 const A = createMockComponent(View);

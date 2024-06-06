@@ -2,12 +2,12 @@ import * as JSX from "react/jsx-runtime";
 import { ComponentProps, ComponentType, forwardRef } from "react";
 import { render as tlRender } from "@testing-library/react-native";
 
-import { StyleSheet } from "../../runtime/native/stylesheet";
-import { INTERNAL_RESET } from "../../shared";
-import { cssToReactNativeRuntime } from "../../css-to-rn";
-import { cssInterop, remapProps, interopComponents } from "../../runtime/api";
 import wrapJSX from "../../runtime/wrap-jsx";
+import { INTERNAL_SET } from "../../shared";
+import { cssInterop, remapProps, interopComponents } from "../../runtime/api";
+import { cssToReactNativeRuntime } from "../../css-to-rn";
 import { injectData, resetData } from "../../runtime/native/$$styles";
+import { vh, vw } from "../../runtime/native/unit-observables";
 import {
   CssToReactNativeRuntimeOptions,
   EnableCssInteropOptions,
@@ -15,10 +15,12 @@ import {
   Style,
   CssInteropGeneratedProps,
 } from "../../types";
+import { isReduceMotionEnabled } from "../../runtime/native/appearance-observables";
 
+export * from "../../index";
 export * from "../../types";
 export * from "@testing-library/react-native";
-// export { warnings } from "../runtime/native/globals";
+export { INTERNAL_SET } from "../../shared";
 
 declare global {
   namespace jest {
@@ -31,7 +33,19 @@ declare global {
 
 beforeEach(() => {
   resetData();
+  vw[INTERNAL_SET](750);
+  vw[INTERNAL_SET](750);
 });
+
+export const native: {
+  vw: typeof vw;
+  vh: typeof vh;
+  isReduceMotionEnabled: typeof isReduceMotionEnabled;
+} = {
+  vw,
+  vh,
+  isReduceMotionEnabled,
+};
 
 const renderJSX = wrapJSX((JSX as any).jsx);
 export const render: typeof tlRender = (component: any, options?: any) => {
@@ -89,7 +103,7 @@ export const createRemappedComponent = <
 };
 
 export const resetStyles = () => {
-  StyleSheet[INTERNAL_RESET]();
+  // StyleSheet[INTERNAL_RESET]();
 };
 
 export const resetComponents = () => {
