@@ -5,14 +5,15 @@ import type {
   RuntimeValueDescriptor,
 } from "../../types";
 import { getNormalizeConfig } from "../config";
-import { colorScheme } from "./globals";
 import { Effect, cleanupEffect } from "../observable";
 import { interop, opaqueStyles } from "./native-interop";
 import { getComponentType } from "./unwrap-components";
 import { VariableContext, getVariable } from "./$$styles";
+import { colorScheme } from "./appearance-observables";
 
 export { StyleSheet } from "./stylesheet";
-export { colorScheme, rem } from "./globals";
+export { colorScheme } from "./appearance-observables";
+export { rem } from "./unit-observables";
 
 export const interopComponents = new Map<
   object | string,

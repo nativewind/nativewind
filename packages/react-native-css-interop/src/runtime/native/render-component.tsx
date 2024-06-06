@@ -1,8 +1,7 @@
 import { ComponentType, createElement, forwardRef } from "react";
-import { LayoutChangeEvent, Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 
 import { containerContext } from "./globals";
-import { observable } from "../observable";
 import { SharedState } from "./types";
 import { VariableContext } from "./$$styles";
 
@@ -36,66 +35,9 @@ export function renderComponent(
 ) {
   let component = baseComponent;
   const shouldWarn = state.canUpgradeWarn;
-  const isContainer = state.containers;
-
-  if (state.active || isContainer) {
-    state.active ??= observable(false);
-    props.onPressIn = (event: unknown) => {
-      state.originalProps?.onPressIn?.(event);
-      state.active!.set(true);
-    };
-    props.onPressOut = (event: unknown) => {
-      state.originalProps?.onPressOut?.(event);
-      state.active!.set(false);
-    };
-  }
-  if (state.hover || isContainer) {
-    state.hover ??= observable(false);
-    props.onHoverIn = (event: unknown) => {
-      state.originalProps?.onHoverIn?.(event);
-      state.hover!.set(true);
-    };
-    props.onHoverOut = (event: unknown) => {
-      state.originalProps?.onHoverOut?.(event);
-      state.hover!.set(false);
-    };
-  }
-
-  if (state.focus || isContainer) {
-    state.focus ??= observable(false);
-    props.onFocus = (event: unknown) => {
-      state.originalProps?.onFocus?.(event);
-      state.focus!.set(true);
-    };
-    props.onBlur = (event: unknown) => {
-      state.originalProps?.onBlur?.(event);
-      state.focus!.set(false);
-    };
-  }
-  /**
-   * Some React Native components (e.g Text) will not apply state event handlers
-   * if `onPress` is not defined.
-   */
-  if (state.active || state.hover || state.focus) {
-    props.onPress = (event: unknown) => {
-      state.originalProps?.onPress?.(event);
-    };
-  }
-
-  if (state.layout || isContainer) {
-    state.layout ??= observable([0, 0]);
-    props.onLayout = (event: LayoutChangeEvent) => {
-      state.originalProps?.onLayout?.(event);
-      const layout = event.nativeEvent.layout;
-      const prevLayout = state.layout!.get();
-      if (layout.width !== prevLayout[0] || layout.height !== prevLayout[0]) {
-        state.layout!.set([layout.width, layout.height]);
-      }
-    };
-  }
 
   // TODO: We can probably remove this in favor of using `new Pressability()`
-  if (component === View && (state.hover || state.active || state.focus)) {
+  if (state.pressable !== UpgradeState.NONE) {
     component = Pressable;
     props.cssInterop = false;
     if (shouldWarn && state.pressable === UpgradeState.SHOULD_UPGRADE) {
@@ -107,7 +49,7 @@ export function renderComponent(
     state.pressable = UpgradeState.UPGRADED;
   }
 
-  if (state.animated) {
+  if (state.animated !== UpgradeState.NONE) {
     if (shouldWarn && state.animated === UpgradeState.SHOULD_UPGRADE) {
       printUpgradeWarning(
         `Converting component to animated component should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none", "transition-property: none"`,
@@ -118,7 +60,7 @@ export function renderComponent(
     component = createAnimatedComponent(component);
   }
 
-  if (state.variables) {
+  if (state.variables !== UpgradeState.NONE) {
     if (shouldWarn && state.variables === UpgradeState.SHOULD_UPGRADE) {
       printUpgradeWarning(
         `Making a component inheritable should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,
@@ -134,7 +76,7 @@ export function renderComponent(
     component = VariableContext.Provider;
   }
 
-  if (state.containers) {
+  if (state.containers !== UpgradeState.NONE) {
     if (shouldWarn && state.containers === UpgradeState.SHOULD_UPGRADE) {
       printUpgradeWarning(
         `Making a component inheritable should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,

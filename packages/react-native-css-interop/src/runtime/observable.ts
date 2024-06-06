@@ -15,6 +15,8 @@ export type Observable<T> = {
   set(newValue: T): void;
 };
 
+export type ReadableObservable<T> = Pick<Observable<T>, "get" | "name">;
+
 /**
  * An Effect is a function that will be rerun when its dependencies change.
  */
