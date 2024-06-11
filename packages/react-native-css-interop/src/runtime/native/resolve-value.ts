@@ -409,7 +409,7 @@ function resolveAnimationValue(
   value: RuntimeValueDescriptor,
 ) {
   if (value === "!INHERIT!") {
-    value = state.styleLookup[property] ?? state.props.style[property];
+    value = state.styleLookup[property] ?? state.props?.style?.[property];
     if (value === undefined) {
       const defaultValueFn = defaultValues[property];
       return typeof defaultValueFn === "function"
@@ -433,7 +433,7 @@ export function resolveTransitionValue(state: ReducerState, property: string) {
     defaultValue,
     value:
       state.styleLookup[property] ??
-      state.props[state.config.target]?.[property],
+      state.props?.[state.config.target]?.[property],
   };
 }
 
@@ -447,7 +447,7 @@ function round(number: number) {
 
 export function getEasing(
   timingFunction: EasingFunction,
-  Easing: typeof import("react-native-reanimated")["Easing"],
+  Easing: (typeof import("react-native-reanimated"))["Easing"],
 ) {
   switch (timingFunction.type) {
     case "ease":

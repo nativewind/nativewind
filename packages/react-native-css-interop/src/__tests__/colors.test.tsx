@@ -1,16 +1,10 @@
+/** @jsxImportSource react-native-css-interop */
 import { View } from "react-native";
 
-import {
-  render,
-  createMockComponent,
-  registerCSS,
-  resetStyles,
-} from "test-utils";
+import { render, screen, registerCSS, setupAllComponents } from "test-utils";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
-
-beforeEach(() => resetStyles());
+setupAllComponents();
 
 describe("hsl", () => {
   test("inline", () => {
@@ -18,9 +12,8 @@ describe("hsl", () => {
     color: hsl(0 84.2% 60.2%);
   }`);
 
-    const component = render(
-      <A testID={testID} className="my-class" />,
-    ).getByTestId(testID);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({
       color: "rgba(239, 68, 68, 1)",
@@ -33,7 +26,7 @@ describe("hsl", () => {
   }`);
 
     const component = render(
-      <A testID={testID} className="my-class" />,
+      <View testID={testID} className="my-class" />,
     ).getByTestId(testID);
 
     expect(component).toHaveStyle({
@@ -47,9 +40,8 @@ describe("hsl", () => {
     color: hsl(var(--primary));
   }`);
 
-    const component = render(
-      <A testID={testID} className="my-class" />,
-    ).getByTestId(testID);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({ color: "hsl(0, 84.2%, 60.2%)" });
   });
@@ -60,9 +52,8 @@ describe("hsl", () => {
     color: hsl(var(--primary));
   }`);
 
-    const component = render(
-      <A testID={testID} className="my-class" />,
-    ).getByTestId(testID);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({ color: "hsl(0, 84.2%, 60.2%)" });
   });
@@ -74,9 +65,8 @@ describe("hsla", () => {
     color: hsla(0 84.2% 60.2% / 60%);
   }`);
 
-    const component = render(
-      <A testID={testID} className="my-class" />,
-    ).getByTestId(testID);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({
       color: "rgba(239, 68, 68, 0.6000000238418579)",
@@ -88,9 +78,8 @@ describe("hsla", () => {
     color: hsla(0, 84.2%, 60.2%, 60%);
   }`);
 
-    const component = render(
-      <A testID={testID} className="my-class" />,
-    ).getByTestId(testID);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({
       color: "rgba(239, 68, 68, 0.6000000238418579)",
@@ -103,9 +92,8 @@ describe("hsla", () => {
     color: hsla(var(--primary));
   }`);
 
-    const component = render(
-      <A testID={testID} className="my-class" />,
-    ).getByTestId(testID);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({ color: "hsla(0, 84.2%, 60.2%, 60%)" });
   });
@@ -116,9 +104,8 @@ describe("hsla", () => {
     color: hsla(var(--primary));
   }`);
 
-    const component = render(
-      <A testID={testID} className="my-class" />,
-    ).getByTestId(testID);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({ color: "hsla(0, 84.2%, 60.2%, 60%)" });
   });

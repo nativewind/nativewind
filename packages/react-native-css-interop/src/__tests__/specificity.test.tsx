@@ -1,24 +1,26 @@
+/** @jsxImportSource react-native-css-interop */
 import { Text, ViewProps } from "react-native";
 
 import {
   fireEvent,
   render,
-  createMockComponent,
   createRemappedComponent,
   registerCSS,
-  resetStyles,
+  setupAllComponents,
 } from "test-utils";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(Text);
-
-beforeEach(() => resetStyles());
+setupAllComponents();
 
 test("inline styles", () => {
   registerCSS(`.red { background-color: red; }`);
 
   const component = render(
-    <A testID={testID} className="red" style={{ backgroundColor: "blue" }} />,
+    <Text
+      testID={testID}
+      className="red"
+      style={{ backgroundColor: "blue" }}
+    />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({ backgroundColor: "blue" });
@@ -28,7 +30,7 @@ test("specificity order", () => {
   registerCSS(`.red { color: red; } .blue { color: blue; }`);
 
   const component = render(
-    <A testID={testID} className="blue red" />,
+    <Text testID={testID} className="blue red" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({ color: "rgba(0, 0, 255, 1)" });
@@ -40,7 +42,7 @@ test("specificity modifiers", () => {
   );
 
   const component = render(
-    <A testID={testID} className="blue redOrGreen " />,
+    <Text testID={testID} className="blue redOrGreen " />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle(
@@ -59,7 +61,7 @@ test("important - no wrapper", () => {
   `);
 
   const component = render(
-    <A testID={testID} className="blue red" />,
+    <Text testID={testID} className="blue red" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({ color: "rgba(0, 0, 255, 1)" });
@@ -71,7 +73,11 @@ test("important - inline", () => {
   `);
 
   const component = render(
-    <A testID={testID} className="blue" style={{ backgroundColor: "red" }} />,
+    <Text
+      testID={testID}
+      className="blue"
+      style={{ backgroundColor: "red" }}
+    />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({ backgroundColor: "rgba(0, 0, 255, 1)" });
@@ -85,7 +91,7 @@ test("important - modifiers", () => {
   `);
 
   const component = render(
-    <A testID={testID} className="blue red" />,
+    <Text testID={testID} className="blue red" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle(
@@ -106,7 +112,7 @@ test("remapped - inline", () => {
 
   const MyText = createRemappedComponent(
     ({ style, ...props }: ViewProps) => {
-      return <A {...props} style={[{ color: "black" }, style]} />;
+      return <Text {...props} style={[{ color: "black" }, style]} />;
     },
     { className2: "style" },
   );
@@ -115,7 +121,8 @@ test("remapped - inline", () => {
     <MyText testID={testID} className2="red" />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  // Black wins because it is inline
+  expect(component).toHaveStyle({ color: "black" });
 });
 
 test("remapped - inline overwritten", () => {
@@ -125,7 +132,7 @@ test("remapped - inline overwritten", () => {
 
   const MyText = createRemappedComponent(
     ({ style, ...props }: ViewProps) => {
-      return <A {...props} style={[style, { color: "black" }]} />;
+      return <Text {...props} style={[style, { color: "black" }]} />;
     },
     { className: "style" },
   );
@@ -134,6 +141,7 @@ test("remapped - inline overwritten", () => {
     <MyText testID={testID} className="red" />,
   ).getByTestId(testID);
 
+  // Black wins because it comes after red in the style order
   expect(component).toHaveStyle({ color: "black" });
 });
 
@@ -144,7 +152,7 @@ test("remapped - inline important", () => {
 
   const MyText = createRemappedComponent(
     ({ style, ...props }: ViewProps) => {
-      return <A {...props} style={[style, { color: "black" }]} />;
+      return <Text {...props} style={[style, { color: "black" }]} />;
     },
     { className: "style" },
   );
@@ -153,6 +161,7 @@ test("remapped - inline important", () => {
     <MyText testID={testID} className="red" />,
   ).getByTestId(testID);
 
+  // Red wins because it is important and overrides the inline style
   expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
 });
 
@@ -165,7 +174,7 @@ test("remapped - inline important existing", () => {
   const MyText = createRemappedComponent(
     ({ style, ...props }: ViewProps) => {
       return (
-        <A {...props} className="blue" style={[style, { color: "black" }]} />
+        <Text {...props} className="blue" style={[style, { color: "black" }]} />
       );
     },
     { className: "style" },
@@ -175,5 +184,6 @@ test("remapped - inline important existing", () => {
     <MyText testID={testID} className="red" />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  // Blue wins, because 'red' and 'blue' are both important, but 'blue' has a higher 'order'
+  expect(component).toHaveStyle({ color: "rgba(0, 0, 255, 1)" });
 });

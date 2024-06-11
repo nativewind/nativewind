@@ -93,14 +93,14 @@ export type CssInteropGeneratedProps<T extends EnableCssInteropOptions<any>> = {
     ? T[K] extends undefined | false
       ? never
       : T[K] extends true | string
-      ? K
-      : T extends {
-          target: string | boolean;
-        }
-      ? T["target"] extends true | string
         ? K
-        : never
-      : never
+        : T extends {
+              target: string | boolean;
+            }
+          ? T["target"] extends true | string
+            ? K
+            : never
+          : never
     : never]?: string;
 };
 
@@ -160,7 +160,7 @@ export type StyleRuleSet = {
 
 export type RemappedClassName = {
   $type: "RemappedClassName";
-  className: string;
+  classNames: string[];
 };
 
 export type RuntimeStyleRule = StyleRule | object;

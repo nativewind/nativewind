@@ -1,3 +1,4 @@
+/** @jsxImportSource react-native-css-interop */
 import {
   PureComponent,
   createRef,
@@ -6,18 +7,9 @@ import {
 } from "react";
 import { ViewProps } from "react-native";
 
-import {
-  render,
-  createMockComponent,
-  registerCSS,
-  resetStyles,
-} from "test-utils";
+import { render, createMockComponent, registerCSS } from "test-utils";
 
 const testID = "react-native-css-interop";
-
-beforeEach(() => {
-  resetStyles();
-});
 
 const FunctionComponent = createMockComponent<any>((props: ViewProps) => null);
 
