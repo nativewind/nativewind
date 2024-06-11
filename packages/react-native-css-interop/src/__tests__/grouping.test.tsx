@@ -1,23 +1,20 @@
+/** @jsxImportSource react-native-css-interop */
 import { View } from "react-native";
 
 import {
   fireEvent,
   render,
   screen,
-  createMockComponent,
   registerCSS,
-  resetStyles,
+  setupAllComponents,
 } from "test-utils";
 
-beforeEach(() => resetStyles());
-
 const grouping = ["^group(/.*)?"];
-const testID = "child";
+const parentID = "parent";
+const childID = "child";
+setupAllComponents();
 
 test("group", async () => {
-  const A = createMockComponent(View);
-  const B = createMockComponent(View);
-
   registerCSS(
     `.group\\/item .my-class {
       color: red;
@@ -28,29 +25,23 @@ test("group", async () => {
   );
 
   const { rerender, getByTestId } = render(
-    <A testID="parent" className="group/item">
-      <B testID={testID} className="my-class" />
-    </A>,
+    <View testID={parentID} className="group/item">
+      <View testID={childID} className="my-class" />
+    </View>,
   );
 
-  expect(getByTestId(testID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  expect(getByTestId(childID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
 
   rerender(
-    <A testID="parent">
-      <B testID={testID} className="my-class" />
-    </A>,
+    <View testID={parentID}>
+      <View testID={childID} className="my-class" />
+    </View>,
   );
 
-  expect(getByTestId(testID)).toHaveStyle(undefined);
+  expect(getByTestId(childID)).toHaveStyle(undefined);
 });
 
 test("group - active", async () => {
-  const A = createMockComponent(View);
-  const B = createMockComponent(View);
-
-  const parentID = "parent";
-  const childID = "child";
-
   registerCSS(
     `.group\\/item:active .my-class {
       color: red;
@@ -61,9 +52,9 @@ test("group - active", async () => {
   );
 
   render(
-    <A testID={parentID} className="group/item">
-      <B testID={childID} className="my-class" />
-    </A>,
+    <View testID={parentID} className="group/item">
+      <View testID={childID} className="my-class" />
+    </View>,
   );
 
   const parent = screen.getByTestId(parentID);
@@ -77,11 +68,6 @@ test("group - active", async () => {
 });
 
 test("invalid group", async () => {
-  const A = createMockComponent(View);
-  const B = createMockComponent(View);
-
-  const testID = "b";
-
   registerCSS(
     `.invalid .my-class {
       color: red;
@@ -91,24 +77,21 @@ test("invalid group", async () => {
     },
   );
 
-  const { rerender } = render(<B testID={testID} className="my-class" />);
-  const componentB = screen.findAllByTestId(testID);
+  const { rerender } = render(<View testID={childID} className="my-class" />);
+  const componentB = screen.findAllByTestId(childID);
 
   expect(componentB).toHaveStyle(undefined);
 
   rerender(
-    <A testID="A" className="invalid">
-      <B testID={testID} className="my-class" />
-    </A>,
+    <View testID={parentID} className="invalid">
+      <View testID={childID} className="my-class" />
+    </View>,
   );
 
   expect(componentB).toHaveStyle(undefined);
 });
 
 test("group selector", async () => {
-  const A = createMockComponent(View);
-  const B = createMockComponent(View);
-
   registerCSS(
     `.group.test .my-class {
       color: red;
@@ -119,18 +102,18 @@ test("group selector", async () => {
   );
 
   const { rerender, getByTestId } = render(
-    <A className="group test">
-      <B testID={testID} className="my-class" />
-    </A>,
+    <View className="group test">
+      <View testID={childID} className="my-class" />
+    </View>,
   );
 
-  expect(getByTestId(testID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  expect(getByTestId(childID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
 
   rerender(
-    <A>
-      <B testID={testID} className="my-class" />
-    </A>,
+    <View>
+      <View testID={childID} className="my-class" />
+    </View>,
   );
 
-  expect(getByTestId(testID)).toHaveStyle(undefined);
+  expect(getByTestId(childID)).toHaveStyle(undefined);
 });

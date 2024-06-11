@@ -1,18 +1,16 @@
+/** @jsxImportSource react-native-css-interop */
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { View, ViewProps } from "react-native";
 
 import {
-  createMockComponent,
   registerCSS,
-  resetStyles,
   render,
+  setupAllComponents,
+  useSafeAreaEnv,
 } from "test-utils";
-import { useSafeAreaEnv } from "../runtime";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
-
-beforeEach(() => resetStyles());
+setupAllComponents();
 
 test("safe-area-inset-*", () => {
   registerCSS(`.my-class {
@@ -24,7 +22,7 @@ test("safe-area-inset-*", () => {
 
   const SafeView = (props: ViewProps) => {
     const safeAreaEnv = useSafeAreaEnv();
-    return <A testID={testID} {...props} style={safeAreaEnv} />;
+    return <View testID={testID} {...props} style={safeAreaEnv} />;
   };
 
   const component = render(

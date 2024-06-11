@@ -6,9 +6,9 @@ import type {
 } from "../../types";
 import { getNormalizeConfig } from "../config";
 import { Effect, cleanupEffect } from "../observable";
-import { interop, opaqueStyles } from "./native-interop";
+import { interop } from "./native-interop";
 import { getComponentType } from "./unwrap-components";
-import { VariableContext, getVariable } from "./$$styles";
+import { VariableContext, getVariable, opaqueStyles } from "./$$styles";
 import { colorScheme } from "./appearance-observables";
 
 export { StyleSheet } from "./stylesheet";
@@ -61,6 +61,7 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
     { ...props }: Record<string, any>,
     ref: any,
   ) {
+    debugger;
     for (const config of configs) {
       const source = props?.[config.source];
 
@@ -70,7 +71,7 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
       const placeholder = {};
       opaqueStyles.set(placeholder, {
         $type: "RemappedClassName",
-        className: source,
+        classNames: source.split(/\s+/),
       });
 
       delete props[config.source];

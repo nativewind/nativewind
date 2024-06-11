@@ -3,6 +3,7 @@ import { Effect, Observable, observable } from "../observable";
 import { cssVariableObservable } from "./appearance-observables";
 import type {
   ExtractedAnimation,
+  RemappedClassName,
   StyleRuleSet,
   StyleSheetRegisterCompiledOptions,
 } from "../../types";
@@ -24,6 +25,10 @@ const universalVariables: Extract<
   VariableContextValue,
   Map<any, any>
 > = new Map();
+export const opaqueStyles = new WeakMap<
+  object,
+  RemappedClassName | StyleRuleSet
+>();
 
 export const VariableContext =
   createContext<VariableContextValue>(rootVariables);
@@ -33,6 +38,27 @@ export function getStyle(name: string, effect?: Effect) {
   if (!obs) styles.set(name, (obs = observable(undefined)));
   return obs.get(effect);
 }
+export function getOpaqueStyles(
+  style: Record<string, any>,
+  effect?: Effect,
+): (StyleRuleSet | Record<string, any> | void)[] {
+  const opaqueStyle = opaqueStyles.get(style);
+
+  if (!opaqueStyle) {
+    return [style];
+  }
+
+  if (opaqueStyle.$type === "RemappedClassName") {
+    return opaqueStyle.classNames.map((className) => {
+      return getStyle(className, effect);
+    });
+  } else if (opaqueStyle.$type === "StyleRuleSet") {
+    return [opaqueStyle];
+  }
+
+  return [];
+}
+
 export function getAnimation(name: string, effect: Effect) {
   let obs = keyframes.get(name);
   if (!obs) keyframes.set(name, (obs = observable(undefined)));

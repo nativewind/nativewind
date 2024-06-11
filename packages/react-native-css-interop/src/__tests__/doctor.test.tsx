@@ -1,8 +1,6 @@
 import { verifyReceivedData } from "../doctor";
 import { verifyHasStyles } from "../doctor.native";
-import { registerCSS, resetStyles } from "test-utils";
-
-beforeEach(() => resetStyles());
+import { registerCSS } from "test-utils";
 
 test("verifyReceivedData", () => {
   registerCSS(`.my-class {

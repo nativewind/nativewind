@@ -1,22 +1,16 @@
+/** @jsxImportSource react-native-css-interop */
 import { View } from "react-native";
 
-import {
-  render,
-  createMockComponent,
-  registerCSS,
-  resetStyles,
-} from "test-utils";
+import { render, registerCSS, setupAllComponents } from "test-utils";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
-
-beforeEach(() => resetStyles());
+setupAllComponents();
 
 test("translateX percentage", () => {
   registerCSS(`.my-class { width: 120px; transform: translateX(10%); }`);
 
   const component = render(
-    <A testID={testID} className="my-class" />,
+    <View testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({
@@ -29,7 +23,7 @@ test("translateY percentage", () => {
   registerCSS(`.my-class { height: 120px; transform: translateY(10%); }`);
 
   const component = render(
-    <A testID={testID} className="my-class" />,
+    <View testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({
@@ -42,7 +36,7 @@ test("rotate-180", () => {
   registerCSS(`.my-class { transform: rotate(180deg); }`);
 
   const component = render(
-    <A testID={testID} className="my-class" />,
+    <View testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({
@@ -70,7 +64,7 @@ test("rotate-45", () => {
 }`);
 
   const component = render(
-    <A testID={testID} className="rotate-45" />,
+    <View testID={testID} className="rotate-45" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({

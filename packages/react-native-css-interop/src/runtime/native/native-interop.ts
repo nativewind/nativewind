@@ -15,7 +15,6 @@ import {
   StyleRuleSet,
   ExtractedAnimations,
   ExtractedTransition,
-  RemappedClassName,
 } from "../../types";
 import { containerContext } from "./globals";
 import { UpgradeState, renderComponent } from "./render-component";
@@ -27,7 +26,7 @@ import {
   Refs,
   ProcessedStyleDeclaration,
 } from "./types";
-import { cleanupEffect, observable } from "../observable";
+import { Effect, cleanupEffect, observable } from "../observable";
 import {
   defaultValues,
   getEasing,
@@ -39,14 +38,14 @@ import {
   timeToMS,
 } from "./resolve-value";
 
-import { VariableContext, getAnimation, getStyle } from "./$$styles";
+import {
+  VariableContext,
+  getAnimation,
+  getOpaqueStyles,
+  getStyle,
+} from "./$$styles";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { LayoutChangeEvent, View } from "react-native";
-
-export const opaqueStyles = new WeakMap<
-  object,
-  StyleRuleSet | RemappedClassName
->();
 
 export function interop(
   component: ReactComponent<any>,
@@ -412,7 +411,14 @@ function getDeclarations(
   }
 
   if (refs.props?.[config.target]) {
-    collectInlineRules(state, refs, refs.props[config.target], normalRules);
+    collectInlineRules(
+      state,
+      refs,
+      refs.props[config.target],
+      state.declarationTracking.effect,
+      normalRules,
+      importantRules,
+    );
   }
 
   state.normal = normalRules
@@ -825,7 +831,7 @@ export function applyRules(
   }
 }
 
-const inlineSpecificity: Specificity = { inline: 1 };
+const inlineSpecificity: Specificity = { inline: 1, I: 0 };
 export function specificityCompare(
   o1?: object | StyleRule | null,
   o2?: object | StyleRule | null,
@@ -836,20 +842,20 @@ export function specificityCompare(
   const a = "specificity" in o1 ? o1.specificity : inlineSpecificity;
   const b = "specificity" in o2 ? o2.specificity : inlineSpecificity;
 
-  if (a.I && b.I && a.I !== b.I) {
-    return a.I - b.I; /* Important */
-  } else if (a.inline && b.inline && a.inline !== b.inline) {
-    return a.inline ? 1 : -1; /* Inline */
-  } else if (a.A && b.A && a.A !== b.A) {
-    return a.A - b.A; /* Ids */
-  } else if (a.B && b.B && a.B !== b.B) {
-    return a.B - b.B; /* Classes */
-  } else if (a.C && b.C && a.C !== b.C) {
-    return a.C - b.C; /* Styles */
-  } else if (a.S && b.S && a.S !== b.S) {
-    return a.S - b.S; /* StyleSheet Order */
-  } else if (a.O && b.O && a.O !== b.O) {
-    return a.O - b.O; /* Appearance Order */
+  if (a.I !== b.I) {
+    return (a.I || 0) - (b.I || 0); /* Important */
+  } else if (a.inline !== b.inline) {
+    return (a.inline || 0) - (b.inline || 0); /* Inline */
+  } else if (a.A !== b.A) {
+    return (a.A || 0) - (b.A || 0); /* Ids */
+  } else if (a.B !== b.B) {
+    return (a.B || 0) - (b.B || 0); /* Classes */
+  } else if (a.C !== b.C) {
+    return (a.C || 0) - (b.C || 0); /* Styles */
+  } else if (a.S !== b.S) {
+    return (a.S || 0) - (b.S || 0); /* StyleSheet Order */
+  } else if (a.O !== b.O) {
+    return (a.O || 0) - (b.O || 0); /* Appearance Order */
   } else {
     return 0; /* Appearance Order */
   }
@@ -923,20 +929,30 @@ function collectInlineRules(
   state: ReducerState,
   refs: Refs,
   target: Record<string, any> | Record<string, any>[],
-  collection: ProcessedStyleRules[],
+  effect: Effect,
+  normal: ProcessedStyleRules[],
+  important: ProcessedStyleRules[],
 ) {
   if (Array.isArray(target)) {
     for (const t of target) {
-      collectInlineRules(state, refs, t, collection);
+      collectInlineRules(state, refs, t, effect, normal, important);
     }
-  } else {
-    const style = opaqueStyles.get(target) || target;
+  } else if (target) {
+    const styles = getOpaqueStyles(target, effect);
 
-    if (typeof style === "object" && "$type" in style) {
-      collectRules(state, refs, style as StyleRuleSet, collection, "normal");
-      collectRules(state, refs, style as StyleRuleSet, collection, "important");
-    } else {
-      collection.push(style);
+    for (const style of styles) {
+      if (typeof style === "object" && "$type" in style) {
+        collectRules(state, refs, style as StyleRuleSet, normal, "normal");
+        collectRules(
+          state,
+          refs,
+          style as StyleRuleSet,
+          important,
+          "important",
+        );
+      } else if (style) {
+        normal.push(style);
+      }
     }
   }
 }

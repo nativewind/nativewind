@@ -1,21 +1,21 @@
+/** @jsxImportSource react-native-css-interop */
 import { View } from "react-native";
+
 import {
   act,
+  screen,
   render,
-  createMockComponent,
   registerCSS,
-  resetStyles,
   INTERNAL_SET,
   colorScheme,
   native,
+  setupAllComponents,
 } from "test-utils";
 
 const { isReduceMotionEnabled, vw } = native;
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
-
-beforeEach(() => resetStyles());
+setupAllComponents();
 
 test("color scheme", () => {
   registerCSS(`
@@ -25,9 +25,8 @@ test("color scheme", () => {
   .my-class { color: red; }
 }`);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
@@ -51,9 +50,8 @@ test("prefers-reduced-motion", () => {
     }
   `);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
@@ -76,9 +74,8 @@ test("width (plain)", () => {
   .my-class { color: red; }
 }`);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
@@ -101,9 +98,8 @@ test("width (range)", () => {
   .my-class { color: red; }
 }`);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
@@ -126,9 +122,8 @@ test("min-width", () => {
   .my-class { color: red; }
 }`);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
     color: "rgba(255, 0, 0, 1)",
@@ -151,9 +146,8 @@ test("max-width", () => {
   .my-class { color: red; }
 }`);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
     color: "rgba(0, 0, 255, 1)",
@@ -178,9 +172,8 @@ test("not all", () => {
   // Make larger than 640
   act(() => vw[INTERNAL_SET](1000));
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle(undefined);
 
