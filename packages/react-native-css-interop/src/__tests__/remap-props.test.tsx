@@ -1,49 +1,92 @@
+/** @jsxImportSource react-native-css-interop */
 import { FlatList, View } from "react-native";
-import {} from "@testing-library/react-native";
 
+import { RefObject, useRef } from "react";
 import {
   render,
   screen,
   registerCSS,
   resetComponents,
-  resetStyles,
-  createRemappedComponent,
-  revealStyles,
+  remapProps,
+  getOpaqueStyles,
 } from "test-utils";
-import { RefObject, useRef } from "react";
-import { remapProps } from "../runtime/api";
-import { globalStyles } from "../runtime/native/style-store";
 
 const testID = "react-native-css-interop";
 
 beforeEach(() => {
-  resetStyles();
   resetComponents();
 });
 
 test("mapping", () => {
-  const A = createRemappedComponent(View, { className: "differentStyle" });
+  remapProps(View as any, { className: "differentStyle" });
 
   registerCSS(
     `.bg-black { background-color: black } .text-white { color: white }`,
   );
 
-  render(<A testID={testID} className="bg-black text-white" />);
+  render(<View testID={testID} className="bg-black text-white" />);
 
   const component = screen.getByTestId(testID);
 
   expect(component.props).toEqual({
     testID,
-    differentStyle: [{}, {}],
+    differentStyle: {},
   });
 
-  expect(revealStyles(component.props)).toEqual({
-    testID,
-    differentStyle: [
-      globalStyles.get("bg-black")?.get(),
-      globalStyles.get("text-white")?.get(),
-    ],
-  });
+  expect(getOpaqueStyles(component.props.differentStyle)).toEqual([
+    {
+      $type: "StyleRuleSet",
+      normal: [
+        {
+          $type: "StyleRule",
+          attrs: undefined,
+          declarations: [
+            [
+              "style",
+              {
+                backgroundColor: "rgba(0, 0, 0, 1)",
+              },
+            ],
+          ],
+          pseudoClasses: undefined,
+          specificity: {
+            A: 0,
+            B: 1,
+            C: 0,
+            I: 0,
+            O: 1,
+            S: 1,
+          },
+        },
+      ],
+    },
+    {
+      $type: "StyleRuleSet",
+      normal: [
+        {
+          $type: "StyleRule",
+          attrs: undefined,
+          declarations: [
+            [
+              "style",
+              {
+                color: "rgba(255, 255, 255, 1)",
+              },
+            ],
+          ],
+          pseudoClasses: undefined,
+          specificity: {
+            A: 0,
+            B: 1,
+            C: 0,
+            I: 0,
+            O: 2,
+            S: 1,
+          },
+        },
+      ],
+    },
+  ]);
 });
 
 test("works with ref", () => {

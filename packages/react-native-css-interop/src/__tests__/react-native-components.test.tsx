@@ -1,3 +1,4 @@
+/** @jsxImportSource react-native-css-interop */
 import {
   View,
   Text,
@@ -11,11 +12,10 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
-import { screen, registerCSS, resetStyles, render } from "test-utils";
+import { screen, registerCSS, render, setupAllComponents } from "test-utils";
 
 const testID = "react-native-css-interop";
-
-beforeEach(() => resetStyles());
+setupAllComponents();
 
 test("Component types", () => {
   [
@@ -97,9 +97,7 @@ test("ActivityIndicator", () => {
       testID,
       color: "rgba(255, 255, 255, 1)",
       style: {
-        // ActivityIndicator does not accept styles. It overrides them with its own size styles
-        height: 20,
-        width: 20,
+        backgroundColor: "rgba(0, 0, 0, 1)",
       },
     }),
   );

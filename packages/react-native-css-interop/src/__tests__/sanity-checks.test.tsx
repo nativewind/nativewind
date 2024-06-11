@@ -1,18 +1,11 @@
+/** @jsxImportSource react-native-css-interop */
 import { View } from "react-native";
 import { useEffect } from "react";
 
-import {
-  fireEvent,
-  render,
-  createMockComponent,
-  registerCSS,
-  resetStyles,
-} from "test-utils";
+import { fireEvent, render, registerCSS, setupAllComponents } from "test-utils";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
-
-beforeEach(() => resetStyles());
+setupAllComponents();
 
 test("dynamic variables should not unmount children", () => {
   /**
@@ -31,9 +24,9 @@ test("dynamic variables should not unmount children", () => {
   };
 
   const component = render(
-    <A testID={testID} className="my-class">
+    <View testID={testID} className="my-class">
       <Child testID="child" assertMount={onMount} />
-    </A>,
+    </View>,
   ).getByTestId(testID);
 
   expect(onUnMount).not.toHaveBeenCalled();
@@ -46,7 +39,7 @@ test("dynamic variables should not unmount children", () => {
 });
 
 test("empty className", () => {
-  const component = render(<A testID={testID} className="" />).getByTestId(
+  const component = render(<View testID={testID} className="" />).getByTestId(
     testID,
   );
 
@@ -55,7 +48,7 @@ test("empty className", () => {
 });
 
 test("missing className", () => {
-  const component = render(<A testID={testID} />).getByTestId(testID);
+  const component = render(<View testID={testID} />).getByTestId(testID);
 
   expect(component.props.className).not.toBeDefined();
   expect(component.props.style).not.toBeDefined();

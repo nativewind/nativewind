@@ -1,10 +1,10 @@
+/** @jsxImportSource react-native-css-interop */
 import { View } from "react-native";
 
-import { render, createMockComponent, registerCSS } from "test-utils";
-import { vars } from "../runtime";
+import { vars, render, registerCSS, setupAllComponents } from "test-utils";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
+setupAllComponents();
 
 describe("css", () => {
   test("calc(10px + 100px)", () => {
@@ -15,7 +15,7 @@ describe("css", () => {
     );
 
     const component = render(
-      <A testID={testID} className="my-class" />,
+      <View testID={testID} className="my-class" />,
     ).getByTestId(testID);
 
     expect(component).toHaveStyle({
@@ -32,7 +32,7 @@ describe("css", () => {
     );
 
     const component = render(
-      <A testID={testID} className="my-class" />,
+      <View testID={testID} className="my-class" />,
     ).getByTestId(testID);
 
     expect(component).toHaveStyle(undefined);
@@ -48,7 +48,7 @@ describe("css", () => {
     );
 
     const component = render(
-      <A testID={testID} className="my-class" />,
+      <View testID={testID} className="my-class" />,
     ).getByTestId(testID);
 
     expect(component).toHaveStyle({
@@ -65,7 +65,7 @@ describe("css", () => {
     );
 
     const component = render(
-      <A testID={testID} className="my-class" />,
+      <View testID={testID} className="my-class" />,
     ).getByTestId(testID);
 
     expect(component).toHaveStyle({
@@ -81,7 +81,7 @@ describe("css", () => {
     );
 
     const component = render(
-      <A
+      <View
         testID={testID}
         className="my-class"
         style={vars({
@@ -103,7 +103,7 @@ describe("css", () => {
     );
 
     const component = render(
-      <A
+      <View
         testID={testID}
         className="my-class"
         style={vars({
@@ -130,7 +130,7 @@ test("calc & colors", () => {
   );
 
   const component = render(
-    <A
+    <View
       testID={testID}
       className="my-class"
       style={vars({

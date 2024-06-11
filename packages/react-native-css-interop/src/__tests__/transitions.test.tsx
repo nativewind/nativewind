@@ -1,22 +1,14 @@
+/** @jsxImportSource react-native-css-interop */
 import { View } from "react-native";
 
-import {
-  render,
-  screen,
-  createMockComponent,
-  registerCSS,
-  resetStyles,
-} from "test-utils";
+import { render, screen, registerCSS, setupAllComponents } from "test-utils";
 
 const testID = "react-native-css-interop";
+setupAllComponents();
 
 jest.useFakeTimers();
 
-beforeEach(() => resetStyles());
-
-test.only("numeric transition", () => {
-  const A = createMockComponent(View);
-
+test("numeric transition", () => {
   registerCSS(`
     .transition {
       transition: width 1s linear;
@@ -31,7 +23,7 @@ test.only("numeric transition", () => {
     }
 `);
 
-  render(<A testID={testID} className="transition first" />);
+  render(<View testID={testID} className="transition first" />);
 
   let component = screen.getByTestId(testID);
 
@@ -44,7 +36,7 @@ test.only("numeric transition", () => {
     width: 100,
   });
 
-  screen.rerender(<A testID={testID} className="transition second" />);
+  screen.rerender(<View testID={testID} className="transition second" />);
 
   // Directly after rerender, should still have the old width
   expect(component).toHaveAnimatedStyle({
@@ -71,8 +63,6 @@ test.only("numeric transition", () => {
 });
 
 test("color transition", () => {
-  const A = createMockComponent(View);
-
   registerCSS(`
     .transition {
       transition: color 1s linear;
@@ -88,7 +78,7 @@ test("color transition", () => {
 `);
 
   const { rerender, getByTestId } = render(
-    <A testID={testID} className="transition first" />,
+    <View testID={testID} className="transition first" />,
   );
 
   const component = getByTestId(testID);
@@ -102,7 +92,7 @@ test("color transition", () => {
     color: "rgba(255, 0, 0, 1)",
   });
 
-  rerender(<A testID={testID} className="transition second" />);
+  rerender(<View testID={testID} className="transition second" />);
 
   // Directly after rerender, should still have the old width
   expect(component).toHaveAnimatedStyle({

@@ -1,19 +1,11 @@
+/** @jsxImportSource react-native-css-interop */
 import { View } from "react-native";
-
-import {
-  fireEvent,
-  render,
-  createMockComponent,
-  registerCSS,
-  resetStyles,
-} from "test-utils";
+import { fireEvent, render, registerCSS, setupAllComponents } from "test-utils";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
+setupAllComponents();
 
 jest.useFakeTimers();
-
-beforeEach(() => resetStyles());
 
 test("basic animation", () => {
   registerCSS(`
@@ -34,7 +26,7 @@ test("basic animation", () => {
 `);
 
   const component = render(
-    <A testID={testID} className="my-class" />,
+    <View testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
   expect(component).toHaveAnimatedStyle({
@@ -69,7 +61,7 @@ test("single frame", () => {
 `);
 
   const component = render(
-    <A testID={testID} className="my-class" />,
+    <View testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
   expect(component).toHaveAnimatedStyle({
@@ -105,7 +97,7 @@ test("transform - starting", () => {
 `);
 
   const component = render(
-    <A testID={testID} className="my-class" />,
+    <View testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
   expect(component).toHaveAnimatedStyle({
@@ -145,7 +137,7 @@ test("bounce", () => {
 `);
 
   const component = render(
-    <A testID={testID} className="my-class" />,
+    <View testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
   // Initial frame is incorrect due to missing layout
@@ -155,10 +147,6 @@ test("bounce", () => {
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
-      { rotateX: "0deg" },
-      { rotateY: "0deg" },
-      { rotateZ: "0deg" },
-      { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
       { skewX: "0deg" },
@@ -183,10 +171,6 @@ test("bounce", () => {
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
-      { rotateX: "0deg" },
-      { rotateY: "0deg" },
-      { rotateZ: "0deg" },
-      { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
       { skewX: "0deg" },
@@ -202,10 +186,6 @@ test("bounce", () => {
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
-      { rotateX: "0deg" },
-      { rotateY: "0deg" },
-      { rotateZ: "0deg" },
-      { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
       { skewX: "0deg" },
@@ -221,10 +201,6 @@ test("bounce", () => {
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
-      { rotateX: "0deg" },
-      { rotateY: "0deg" },
-      { rotateZ: "0deg" },
-      { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
       { skewX: "0deg" },
