@@ -1,7 +1,10 @@
-import * as JSX from "react/jsx-runtime";
-import { ComponentProps, ComponentType, forwardRef } from "react";
+import { ComponentProps, ComponentType, ReactElement, forwardRef } from "react";
+import {
+  render as tlRender,
+  RenderOptions as TLRenderOptions,
+} from "@testing-library/react-native";
 
-import wrapJSX from "../../runtime/wrap-jsx";
+import { createInteropElement } from "../../runtime";
 import { INTERNAL_SET } from "../../shared";
 import { cssInterop, remapProps, interopComponents } from "../../runtime/api";
 import { cssToReactNativeRuntime } from "../../css-to-rn";
@@ -47,7 +50,22 @@ export const native: {
   isReduceMotionEnabled,
 };
 
-const renderJSX = wrapJSX((JSX as any).jsx);
+export interface RenderOptions extends TLRenderOptions {
+  css?: string;
+}
+
+export function render<T>(
+  component: ReactElement<T>,
+  { css, ...options }: RenderOptions = {},
+) {
+  if (css) {
+    registerCSS(css);
+  }
+
+  return tlRender(component, {
+    ...options,
+  });
+}
 
 /*
  * Creates a mocked component that renders with the defaultCSSInterop WITHOUT needing
@@ -66,12 +84,13 @@ export const createMockComponent = <
 ) => {
   cssInterop(Component, mapping);
 
-  const mock: any = jest.fn(({ ...props }, ref) => {
-    props.ref = ref;
-    return renderJSX(Component, props, "", false, undefined, undefined);
+  const mock = jest.fn(({ ...props }, ref) => {
+    return createInteropElement(Component, { ...props, ref });
   });
 
-  return Object.assign(forwardRef(mock), { mock }) as unknown as ComponentType<
+  return Object.assign(forwardRef(mock as any), {
+    mock,
+  }) as unknown as ComponentType<
     ComponentProps<T> & CssInteropGeneratedProps<M>
   > & { mock: typeof mock };
 };
@@ -89,14 +108,15 @@ export const createRemappedComponent = <
 ) => {
   remapProps(Component, mapping);
 
-  const mock: any = jest.fn(({ ...props }, ref) => {
-    props.ref = ref;
-    return renderJSX(Component, props, "", false, undefined, undefined);
+  const mock = jest.fn(({ ...props }, ref) => {
+    return createInteropElement(Component, { ...props, ref });
   });
 
-  return Object.assign(forwardRef(mock), { mock }) as unknown as ComponentType<
+  return Object.assign(forwardRef(mock as any), {
+    mock,
+  }) as unknown as ComponentType<
     ComponentProps<T> & CssInteropGeneratedProps<M>
-  >;
+  > & { mock: typeof mock };
 };
 
 export const resetComponents = () => {

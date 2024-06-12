@@ -1,12 +1,18 @@
 import { createContext } from "react";
 import { Effect, Observable, observable } from "../observable";
-import { cssVariableObservable } from "./appearance-observables";
+import {
+  colorScheme,
+  cssVariableObservable,
+  isReduceMotionEnabled,
+} from "./appearance-observables";
 import type {
   ExtractedAnimation,
   RemappedClassName,
   StyleRuleSet,
   StyleSheetRegisterCompiledOptions,
 } from "../../types";
+import { INTERNAL_RESET } from "./unit-observables";
+import { Appearance } from "react-native";
 
 export type InjectedStyleContextValue = {
   styles: Record<string, Observable<StyleRuleSet>>;
@@ -88,6 +94,8 @@ export function resetData() {
   keyframes.clear();
   universalVariables.clear();
   rootVariables.clear();
+  colorScheme[INTERNAL_RESET](Appearance);
+  isReduceMotionEnabled[INTERNAL_RESET]();
 }
 
 export function injectData(data: StyleSheetRegisterCompiledOptions) {
