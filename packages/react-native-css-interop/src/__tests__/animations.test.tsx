@@ -1,6 +1,12 @@
 /** @jsxImportSource react-native-css-interop */
 import { View } from "react-native";
-import { fireEvent, render, registerCSS, setupAllComponents } from "test-utils";
+import {
+  fireEvent,
+  screen,
+  render,
+  registerCSS,
+  setupAllComponents,
+} from "test-utils";
 
 const testID = "react-native-css-interop";
 setupAllComponents();
@@ -25,9 +31,9 @@ test("basic animation", () => {
 }
 `);
 
-  const component = render(
-    <View testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveAnimatedStyle({
     marginLeft: "100%",
