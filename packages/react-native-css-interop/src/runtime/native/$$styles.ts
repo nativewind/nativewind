@@ -1,3 +1,4 @@
+import { Appearance } from "react-native";
 import { createContext } from "react";
 import { Effect, Observable, observable } from "../observable";
 import {
@@ -12,7 +13,6 @@ import type {
   StyleSheetRegisterCompiledOptions,
 } from "../../types";
 import { INTERNAL_RESET } from "./unit-observables";
-import { Appearance } from "react-native";
 
 export type InjectedStyleContextValue = {
   styles: Record<string, Observable<StyleRuleSet>>;

@@ -1,4 +1,3 @@
-import loadConfig from "tailwindcss/loadConfig";
 import type { MetroConfig } from "metro-config";
 import path from "path";
 import {
@@ -7,7 +6,7 @@ import {
 } from "react-native-css-interop/metro";
 
 import { cssToReactNativeRuntimeOptions } from "./common";
-import { tailwindCli } from "./tailwind";
+import { tailwindCli, tailwindConfig } from "./tailwind";
 
 interface WithNativeWindOptions extends WithCssInteropOptions {
   input: string;
@@ -31,7 +30,7 @@ export function withNativeWind(
 ): MetroConfig {
   if (input) input = path.resolve(input);
 
-  const { important } = loadConfig(path.resolve(tailwindConfigPath));
+  const { important } = tailwindConfig(path.resolve(tailwindConfigPath));
 
   return withCssInterop(config, {
     ...cssToReactNativeRuntimeOptions,

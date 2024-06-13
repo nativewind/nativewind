@@ -206,8 +206,7 @@ export function interop(
       }
     }
 
-    if (sharedState.active || sharedState.containers) {
-      sharedState.active ??= observable(false);
+    if (sharedState.active) {
       props.onPressIn = (event: unknown) => {
         sharedState.originalProps?.onPressIn?.(event);
         sharedState.active!.set(true);
@@ -217,8 +216,7 @@ export function interop(
         sharedState.active!.set(false);
       };
     }
-    if (sharedState.hover || sharedState.containers) {
-      sharedState.hover ??= observable(false);
+    if (sharedState.hover) {
       props.onHoverIn = (event: unknown) => {
         sharedState.originalProps?.onHoverIn?.(event);
         sharedState.hover!.set(true);
@@ -229,8 +227,7 @@ export function interop(
       };
     }
 
-    if (sharedState.focus || sharedState.containers) {
-      sharedState.focus ??= observable(false);
+    if (sharedState.focus) {
       props.onFocus = (event: unknown) => {
         sharedState.originalProps?.onFocus?.(event);
         sharedState.focus!.set(true);
@@ -722,10 +719,36 @@ export function retainSharedValues(
   }
 }
 
-function handleUpgrades(state: SharedState, ruleSet: StyleRuleSet) {
-  if (ruleSet.animation) state.animated ||= UpgradeState.SHOULD_UPGRADE;
-  if (ruleSet.variables) state.variables ||= UpgradeState.SHOULD_UPGRADE;
-  if (ruleSet.container) state.containers ||= UpgradeState.SHOULD_UPGRADE;
+function handleUpgrades(sharedState: SharedState, ruleSet: StyleRuleSet) {
+  if (ruleSet.active) {
+    sharedState.active ||= observable(false, {
+      name: `${ruleSet.classNames}:active`,
+    });
+  }
+  if (ruleSet.hover) {
+    sharedState.hover ||= observable(false, {
+      name: `${ruleSet.classNames}:hover`,
+    });
+  }
+  if (ruleSet.focus) {
+    sharedState.focus ||= observable(false, {
+      name: `${ruleSet.classNames}:focus`,
+    });
+  }
+  if (ruleSet.animation) sharedState.animated ||= UpgradeState.SHOULD_UPGRADE;
+  if (ruleSet.variables) sharedState.variables ||= UpgradeState.SHOULD_UPGRADE;
+  if (ruleSet.container) {
+    sharedState.containers ||= UpgradeState.SHOULD_UPGRADE;
+    sharedState.active ||= observable(false, {
+      name: `${ruleSet.classNames}:active`,
+    });
+    sharedState.hover ||= observable(false, {
+      name: `${ruleSet.classNames}:hover`,
+    });
+    sharedState.focus ||= observable(false, {
+      name: `${ruleSet.classNames}:focus`,
+    });
+  }
 }
 
 /**
