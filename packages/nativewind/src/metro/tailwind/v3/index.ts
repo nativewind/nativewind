@@ -63,3 +63,19 @@ export function tailwindCliV3(options: TailwindCliOptions) {
     });
   });
 }
+
+export function tailwindConfigV3(path: string) {
+  const config = require("tailwindcss/loadConfig")(path);
+
+  const hasPreset = config.presets?.some((preset: any) => {
+    return preset.nativewind;
+  });
+
+  if (!hasPreset) {
+    throw new Error(
+      "Tailwind CSS has not been configured with the NativeWind preset",
+    );
+  }
+
+  return config;
+}

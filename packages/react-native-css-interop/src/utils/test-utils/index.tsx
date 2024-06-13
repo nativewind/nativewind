@@ -52,14 +52,15 @@ export const native: {
 
 export interface RenderOptions extends TLRenderOptions {
   css?: string;
+  cssOptions?: CssToReactNativeRuntimeOptions;
 }
 
 export function render<T>(
   component: ReactElement<T>,
-  { css, ...options }: RenderOptions = {},
+  { css, cssOptions, ...options }: RenderOptions = {},
 ) {
   if (css) {
-    registerCSS(css);
+    registerCSS(css, cssOptions);
   }
 
   return tlRender(component, {

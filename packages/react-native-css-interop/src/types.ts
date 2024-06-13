@@ -156,6 +156,9 @@ export type StyleRuleSet = {
   variables?: boolean;
   container?: boolean;
   animation?: boolean;
+  active?: boolean;
+  hover?: boolean;
+  focus?: boolean;
 };
 
 export type RemappedClassName = {
