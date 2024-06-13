@@ -15,7 +15,7 @@ import {
   StyleRule,
 } from "../../types";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
-import { Effect, ReadableObservable, observable } from "../observable";
+import { Effect, ReadableObservable } from "../observable";
 import { ReducerTracking, Refs, SharedState } from "./types";
 import { colorScheme, rem } from "../api";
 import { isReduceMotionEnabled } from "./appearance-observables";
@@ -91,18 +91,19 @@ export function testPseudoClasses(
   meta: PseudoClassesQuery,
   tracking?: ReducerTracking,
 ) {
-  /* If any of these conditions fail, it fails failed */
+  /*
+   * Fail if any of these conditions fail
+   * State should already have hover,active,focus on it.
+   *   If not, there was a problem with the compiler
+   */
   let passing = true;
-  if (meta.hover && passing) {
-    state.hover ??= observable(false);
+  if (meta.hover && state.hover && passing) {
     passing = state.hover.get(tracking?.effect);
   }
-  if (meta.active && passing) {
-    state.active ??= observable(false);
+  if (meta.active && state.active && passing) {
     passing = state.active.get(tracking?.effect);
   }
-  if (meta.focus && passing) {
-    state.focus ??= observable(false);
+  if (meta.focus && state.focus && passing) {
     passing = state.focus.get(tracking?.effect);
   }
   return passing;

@@ -118,6 +118,9 @@ export function cssToReactNativeRuntime(
       if (style.container) styleRuleSet.container = true;
       if (style.animations) styleRuleSet.animation = true;
       if (style.transition) styleRuleSet.animation = true;
+      if (style.pseudoClasses?.active) styleRuleSet.active = true;
+      if (style.pseudoClasses?.hover) styleRuleSet.hover = true;
+      if (style.pseudoClasses?.focus) styleRuleSet.focus = true;
     }
 
     rules.push([name, styleRuleSet]);
@@ -501,10 +504,10 @@ function extractKeyFrames(
         selector.type === "percentage"
           ? selector.value * 100
           : selector.type === "from"
-          ? 0
-          : selector.type === "to"
-          ? 100
-          : undefined;
+            ? 0
+            : selector.type === "to"
+              ? 100
+              : undefined;
 
       if (keyframe === undefined) continue;
 

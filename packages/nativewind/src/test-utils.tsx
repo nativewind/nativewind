@@ -11,6 +11,7 @@ import {
   screen,
   setupAllComponents,
 } from "react-native-css-interop/test-utils";
+import { cssToReactNativeRuntimeOptions } from "./metro/common";
 
 export {
   createMockComponent,
@@ -18,7 +19,7 @@ export {
   fireEvent,
 } from "react-native-css-interop/test-utils";
 
-export * from "../dist";
+export * from "../src/index";
 
 beforeEach(() => {
   resetData();
@@ -60,7 +61,11 @@ export async function render(
     }),
   ]).process(css, { from: undefined });
 
-  return interopRender(component, { ...options, css: output });
+  return interopRender(component, {
+    ...options,
+    css: output,
+    cssOptions: cssToReactNativeRuntimeOptions,
+  });
 }
 
 function getClassNames(
@@ -89,6 +94,9 @@ type ClassNameTestCase =
   | [string, Record<string, any>]
   | [string, Record<string, any> | undefined, Record<string, any>];
 
+/**
+ * Test each className
+ */
 export function testEachClassName(
   tests: ClassNameTestCase[],
   options?: RenderOptions,
