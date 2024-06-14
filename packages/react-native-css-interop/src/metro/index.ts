@@ -49,7 +49,10 @@ const virtualModules = new Set<string>();
 const processedCSS: Partial<
   Record<
     string,
-    | { pollVersion: number; promise: Promise<{ css: Buffer; js: Buffer }> }
+    | {
+        pollVersion: number;
+        promise: Promise<{ data: any; css: Buffer; js: Buffer }>;
+      }
     | undefined
   >
 > = {};
@@ -87,6 +90,7 @@ export function withCssInterop(
 
       current.pollVersion++;
       current.promise = Promise.resolve({
+        data,
         css: Buffer.from(css),
         js: getInjectedStyles(data),
       });
@@ -126,9 +130,11 @@ export function withCssInterop(
     processedCSS[platform] = {
       pollVersion: 0,
       promise: getPlatformCSS(platform, dev, onUpdate).then((css) => {
+        const data = cssToReactNativeRuntime(css, options);
         return {
+          data,
           css: Buffer.from(css),
-          js: getInjectedStyles(cssToReactNativeRuntime(css, options)),
+          js: getInjectedStyles(data),
         };
       }),
     };
@@ -223,7 +229,7 @@ export function withCssInterop(
           if (current && version !== current.pollVersion) {
             res.write(
               `data: {"version":${current.pollVersion},"data":${JSON.stringify(
-                await current.promise,
+                (await current.promise).data,
               )}}\n\n`,
             );
             res.end();
