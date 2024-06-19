@@ -8,7 +8,7 @@ import { createInteropElement } from "../../runtime";
 import { INTERNAL_SET } from "../../shared";
 import { cssInterop, remapProps, interopComponents } from "../../runtime/api";
 import { cssToReactNativeRuntime } from "../../css-to-rn";
-import { injectData, resetData } from "../../runtime/native/$$styles";
+import { injectData } from "../../runtime/native/styles";
 import { vh, vw } from "../../runtime/native/unit-observables";
 import {
   CssToReactNativeRuntimeOptions,
@@ -18,9 +18,10 @@ import {
   CssInteropGeneratedProps,
 } from "../../types";
 import { isReduceMotionEnabled } from "../../runtime/native/appearance-observables";
+import { resetData } from "../../runtime/native/styles";
 
 export * from "../../index";
-export * from "../../runtime/native/$$styles";
+export * from "../../runtime/native/styles";
 export * from "../../types";
 export * from "@testing-library/react-native";
 export { INTERNAL_SET } from "../../shared";

@@ -18,49 +18,53 @@ const child_file = __dirname + "/child.js";
 
 export function tailwindCliV3(options: TailwindCliOptions) {
   return new Promise<string>((resolve, reject) => {
-    const env = {
-      ...process.env,
-      NATIVEWIND_INPUT: options.input,
-      NATIVEWIND_WATCH: `${options.dev}`,
-      NATIVEWIND_NATIVE: options.platform,
-      BROWSERSLIST: options.browserslist ?? undefined,
-      BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
-    };
+    try {
+      const env = {
+        ...process.env,
+        NATIVEWIND_INPUT: options.input,
+        NATIVEWIND_WATCH: `${options.dev}`,
+        NATIVEWIND_NATIVE: options.platform,
+        BROWSERSLIST: options.browserslist ?? undefined,
+        BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
+      };
 
-    // Spawn child process
-    const child = fork(child_file, { stdio: "pipe", env });
+      // Spawn child process
+      const child = fork(child_file, { stdio: "pipe", env });
 
-    let initialMessage = true;
-    let initialDoneIn = true;
+      let initialMessage = true;
+      let initialDoneIn = true;
 
-    child.stderr!.on("data", (data) => {
-      data = data.toString();
-      if (data.includes("Done in")) {
-        if (initialDoneIn) {
-          initialDoneIn = false;
-        } else {
-          console.log(
-            `Rebuilt NativeWind in ${data.replace("Done in", "").trim()}`,
-          );
+      child.stderr?.on("data", (data) => {
+        data = data.toString();
+        if (data.includes("Done in")) {
+          if (initialDoneIn) {
+            initialDoneIn = false;
+          } else {
+            // console.log(
+            //   `Rebuilt NativeWind in ${data.replace("Done in", "").trim()}`,
+            // );
+          }
+          return;
+        } else if (data.includes("warn -")) {
+          console.warn(data);
         }
-        return;
-      } else if (data.includes("warn -")) {
-        console.warn(data);
-      }
-    });
+      });
 
-    child.stdout!.on("data", (data) => {
-      data = data.toString();
-    });
+      child.stdout?.on("data", (data) => {
+        data = data.toString();
+      });
 
-    child.on("message", (message) => {
-      if (initialMessage) {
-        resolve(message.toString());
-        initialMessage = false;
-      } else {
-        options.onChange(message.toString());
-      }
-    });
+      child.on("message", (message) => {
+        if (initialMessage) {
+          resolve(message.toString());
+          initialMessage = false;
+        } else {
+          options.onChange(message.toString());
+        }
+      });
+    } catch (e) {
+      reject(e);
+    }
   });
 }
 
