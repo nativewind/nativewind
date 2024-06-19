@@ -1,6 +1,4 @@
 import connect from "connect";
-import { readFileSync } from "fs";
-import { IncomingMessage, ServerResponse } from "http";
 import type { MetroConfig } from "metro-config";
 import type MetroServer from "metro/src/Server";
 import type { FileSystem } from "metro-file-map";
@@ -13,49 +11,51 @@ import { cssToReactNativeRuntime } from "../css-to-rn";
  * Injects the CSS into the React Native runtime.
  *
  * Web:
- *  - The input file is changed into a virtual module.
- *  - On changes, the haste server is updated
+ *  - The contexts of the input file are replaced with the result of getPlatformCSS
  *
  * Native:
- *  - The $$style file is changed into a virtual module, with the initial styles injected.
- *  - Updates are provided via a custom polling server
- *
- * The custom polling server is a hack due to fast-refresh not working on native.
- * Cause the styles are "global", I need to work within the fast-refresh rule set so
- * the entire application isn't reloaded. These are not well documented, and I'm not sure
- * its possible, so the polling server is a workaround.
+ *  - The context of the input file are replaced with the compiled version of getPlatfomCSS
  */
 export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
   input: string;
   getPlatformCSS: GetPlatformCSS;
 };
 
-const $$injectedFilePath = require.resolve(
-  `react-native-css-interop/dist/runtime/native/$$styles.js`,
-);
-const fileTemplate = readFileSync($$injectedFilePath, "utf-8");
-const connections = new Map<string, Set<ServerResponse<IncomingMessage>>>();
+const getNativeJS = (data = {}, dev = false) => {
+  let output = `
+ "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const __inject_1 = require("react-native-css-interop/dist/runtime/native/styles");
+(0, __inject_1.injectData)(${JSON.stringify(data)}); 
+`;
 
-const getInjectedStyles = (data = {}) => {
-  return Buffer.from(
-    fileTemplate.replace(
-      "injectData(CSS_INTEROP_INJECTION);",
-      `injectData(${JSON.stringify(data)});`,
-    ),
-  );
+  if (dev) {
+    output += `
+/**
+ * This is a hack for Expo Router. It's _layout files export 'unstable_settings' which break Fast Refresh
+ * Expo Router only supports Metro as a bundler
+ */
+if (typeof metroRequire !== "undefined" && typeof __METRO_GLOBAL_PREFIX__ !== "undefined") {
+  const Refresh = global[__METRO_GLOBAL_PREFIX__ + "__ReactRefresh"] || metroRequire.Refresh
+  const isLikelyComponentType = Refresh.isLikelyComponentType
+  const expoRouterExports = new WeakSet()
+  Object.assign(Refresh, {
+    isLikelyComponentType(value) {
+      if (typeof value === "object" && "unstable_settings" in value) {
+        expoRouterExports.add(value.unstable_settings)
+      }
+      return expoRouterExports.has(value) || isLikelyComponentType(value)
+    }
+  })
+}
+`;
+  }
+
+  return Buffer.from(output);
 };
 
-const virtualModules = new Set<string>();
-const processedCSS: Partial<
-  Record<
-    string,
-    | {
-        pollVersion: number;
-        promise: Promise<{ data: any; css: Buffer; js: Buffer }>;
-      }
-    | undefined
-  >
-> = {};
+let haste: any;
+const virtualModules = new Map<string, Promise<Buffer>>();
 
 export type GetPlatformCSS = (
   platform: string,
@@ -65,37 +65,110 @@ export type GetPlatformCSS = (
 
 export function withCssInterop(
   config: MetroConfig,
-  { input, getPlatformCSS, ...options }: WithCssInteropOptions,
+  options: WithCssInteropOptions,
 ): MetroConfig {
   expoColorSchemeWarning();
   const originalResolver = config.resolver?.resolveRequest;
   const originalMiddleware = config.server?.enhanceMiddleware;
 
-  let haste: any;
+  return {
+    ...config,
+    resolver: {
+      ...config.resolver,
+      sourceExts: [...(config?.resolver?.sourceExts || []), "css"],
+      resolveRequest: (context, moduleName, platform) => {
+        /**
+         * Change the `input` import statements to point to a virtual module
+         */
+        platform = platform || "native";
 
-  const initPreprocessedFile = async (
-    filePath: string,
-    platform: string,
-    dev: boolean,
-  ) => {
-    if (processedCSS[platform]) {
-      return;
-    }
+        const resolved =
+          originalResolver?.(context, moduleName, platform) ||
+          context.resolveRequest(context, moduleName, platform);
 
-    const onUpdate = (css: string) => {
-      const current = processedCSS[platform];
-      if (!current) return;
+        // We only care about the input file
+        if (!("filePath" in resolved && resolved.filePath === options.input)) {
+          return resolved;
+        }
 
-      const data = cssToReactNativeRuntime(css, options);
+        // Generate a fake name for our virtual module. Make it platform specific
+        const platformFilePath = `${resolved.filePath}.${platform}.js`;
 
-      current.pollVersion++;
-      current.promise = Promise.resolve({
-        data,
-        css: Buffer.from(css),
-        js: getInjectedStyles(data),
-      });
+        // Start the css processor
+        initPreprocessedFile(
+          platformFilePath,
+          platform,
+          options,
+          (context as any).dev,
+        );
 
-      if (platform === "web") {
+        // Make the input file instead resolve to our virtual module
+        return {
+          ...resolved,
+          filePath: platformFilePath,
+        };
+      },
+    },
+    server: {
+      ...config.server,
+      enhanceMiddleware: (middleware, metroServer) => {
+        /**
+         * We need to patch Metro internals to add virtual modules.
+         *
+         * The easiest way is through the Metro middleware, where we can
+         * access the bundlers.
+         */
+        const server = connect();
+        const bundler = metroServer.getBundler().getBundler();
+
+        const initPromise = bundler
+          .getDependencyGraph()
+          .then(async (graph: any) => {
+            haste = graph._haste;
+            ensureFileSystemPatched(graph._fileSystem);
+            ensureBundlerPatched(bundler);
+          });
+
+        // Patching is async, so we need to delay everything until all patches have been applied
+        server.use(async (_, __, next) => {
+          await initPromise;
+          next();
+        });
+
+        return originalMiddleware
+          ? server.use(originalMiddleware(middleware, metroServer))
+          : server.use(middleware);
+      },
+    },
+  };
+}
+
+async function initPreprocessedFile(
+  filePath: string,
+  platform: string,
+  { input, getPlatformCSS, ...options }: WithCssInteropOptions,
+  dev: boolean,
+) {
+  if (virtualModules.has(filePath)) {
+    return;
+  }
+
+  virtualModules.set(
+    filePath,
+    getPlatformCSS(
+      platform,
+      dev,
+      // This should only be called in development when a file changes
+      (css: string) => {
+        virtualModules.set(
+          filePath,
+          Promise.resolve(
+            platform === "web"
+              ? Buffer.from(css)
+              : getNativeJS(cssToReactNativeRuntime(css, options), dev),
+          ),
+        );
+
         haste.emit("change", {
           eventsQueue: [
             {
@@ -109,162 +182,18 @@ export function withCssInterop(
             },
           ],
         });
-      } else {
-        // This is where we should emit haste changes
-        // Instead we update the clients
-        const connectionSet = connections.get(platform);
-
-        if (!connectionSet) return;
-        for (const connection of connectionSet) {
-          connection.write(
-            `data: {"version":${current.pollVersion},"data":${JSON.stringify(
-              data,
-            )}}\n\n`,
-          );
-          connection.end();
-        }
-      }
-    };
-
-    virtualModules.add(filePath);
-    processedCSS[platform] = {
-      pollVersion: 0,
-      promise: getPlatformCSS(platform, dev, onUpdate).then((css) => {
-        const data = cssToReactNativeRuntime(css, options);
-        return {
-          data,
-          css: Buffer.from(css),
-          js: getInjectedStyles(data),
-        };
-      }),
-    };
-  };
-
-  return {
-    ...config,
-    resolver: {
-      ...config.resolver,
-      sourceExts: [...(config?.resolver?.sourceExts || []), "css"],
-      resolveRequest: (context, moduleName, platform) => {
-        platform = platform || "native";
-
-        const resolved =
-          originalResolver?.(context, moduleName, platform) ||
-          context.resolveRequest(context, moduleName, platform);
-
-        if (!("filePath" in resolved)) {
-          return resolved;
-        }
-
-        if (platform === "web") {
-          // Override the input file to the transformed CSS
-          if (resolved.filePath === input) {
-            initPreprocessedFile(
-              resolved.filePath,
-              platform,
-              (context as any).dev,
-            );
-          }
-
-          return resolved;
-        } else {
-          if (resolved.filePath === input) {
-            // Native ignores the input file.
-            return { type: "empty" };
-          } else if (resolved.filePath === $$injectedFilePath) {
-            // Instead, we inject the processed CSS.
-            const platform$$injectedFilePath = `${$$injectedFilePath}.${platform}.js`;
-
-            initPreprocessedFile(
-              platform$$injectedFilePath,
-              platform,
-              (context as any).dev,
-            );
-
-            return {
-              ...resolved,
-              filePath: platform$$injectedFilePath,
-            };
-          } else {
-            return resolved;
-          }
-        }
       },
-    },
-    server: {
-      ...config.server,
-      enhanceMiddleware: (middleware, metroServer) => {
-        const bundler = metroServer.getBundler().getBundler();
-
-        const initPromise = bundler
-          .getDependencyGraph()
-          .then(async (graph: any) => {
-            haste = graph._haste;
-            ensureFileSystemPatched(graph._fileSystem);
-            ensureBundlerPatched(bundler);
-          });
-
-        let server = connect();
-
-        // Delay requests until the initialization is done.
-        server.use(async (_, __, next) => {
-          await initPromise;
-          next();
-        });
-
-        // This is used to get updates on Native
-        server.use("/__css_interop_update_endpoint", async (req, res) => {
-          const url = new URL(req.url || "", "http://localhost");
-          const platform = url.searchParams.get("platform") || "native";
-          const version = parseInt(url.searchParams.get("version") || "0");
-
-          const current = processedCSS[platform];
-          let connectionSet = connections.get(platform);
-          if (!connectionSet) {
-            connectionSet = new Set();
-            connections.set(platform, connectionSet);
-          }
-
-          // Response with the current version if the client is out of sync
-          if (current && version !== current.pollVersion) {
-            res.write(
-              `data: {"version":${current.pollVersion},"data":${JSON.stringify(
-                (await current.promise).data,
-              )}}\n\n`,
-            );
-            res.end();
-            return;
-          }
-
-          // Otherwise wait for the next update
-          connectionSet.add(res);
-
-          res.writeHead(200, {
-            "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache",
-            Connection: "keep-alive",
-          });
-
-          setTimeout(() => {
-            res.end();
-            connectionSet.delete(res);
-          }, 30000);
-
-          req.on("close", () => connectionSet.delete(res));
-        });
-
-        if (originalMiddleware) {
-          server.use(originalMiddleware(middleware, metroServer));
-        } else {
-          server.use(middleware);
-        }
-
-        return server;
-      },
-    },
-  };
+    ).then((css) => {
+      return platform === "web"
+        ? Buffer.from(css)
+        : getNativeJS(cssToReactNativeRuntime(css, options), dev);
+    }),
+  );
 }
 
+/**
+ * Patch the Metro File system to new cache virtual modules
+ */
 function ensureFileSystemPatched(
   fs: FileSystem & {
     getSha1: {
@@ -287,6 +216,9 @@ function ensureFileSystemPatched(
   return fs;
 }
 
+/**
+ * Patch the bundler to use virtual modules
+ */
 function ensureBundlerPatched(
   bundler: ReturnType<ReturnType<MetroServer["getBundler"]>["getBundler"]> & {
     transformFile: { __css_interop__patched?: boolean };
@@ -303,25 +235,12 @@ function ensureBundlerPatched(
     transformOptions,
     fileBuffer,
   ) {
-    const platform = transformOptions.platform || "native";
-
-    if (virtualModules.has(filePath)) {
-      const promise = processedCSS[platform]!.promise;
-      if (!promise) {
-        throw new Error(`No promise found for virtual module ${filePath}`);
-      }
-
-      if (platform === "web") {
-        const { css } = await promise;
-        fileBuffer = css;
-      } else {
-        const { js } = await promise;
-        fileBuffer = js;
-      }
+    const virtualModule = virtualModules.get(filePath);
+    if (virtualModule) {
+      fileBuffer = await virtualModule;
     }
 
     return originalTransformFile(filePath, transformOptions, fileBuffer);
   };
-
   bundler.transformFile.__css_interop__patched = true;
 }

@@ -8,8 +8,6 @@ export { StyleSheet } from "./stylesheet";
 export { colorScheme } from "./color-scheme";
 export { rem } from "./rem";
 
-import "./$$style";
-
 export const interopComponents = new Map<
   object | string,
   Parameters<JSXFunction>[0]

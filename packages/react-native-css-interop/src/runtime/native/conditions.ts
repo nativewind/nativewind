@@ -17,9 +17,8 @@ import {
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { Effect, ReadableObservable } from "../observable";
 import { ReducerTracking, Refs, SharedState } from "./types";
-import { colorScheme, rem } from "../api";
-import { isReduceMotionEnabled } from "./appearance-observables";
-import { vw, vh } from "./unit-observables";
+import { colorScheme, isReduceMotionEnabled } from "./appearance-observables";
+import { vw, vh, rem } from "./unit-observables";
 
 interface ConditionReference {
   width: number | ReadableObservable<number>;

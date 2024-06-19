@@ -7,7 +7,7 @@ import {
   ContainerRecord,
 } from "../../types";
 import { Effect, Observable } from "../observable";
-import { VariableContextValue } from "./$$styles";
+import { VariableContextValue } from "./styles";
 
 export type Callback = () => void;
 export type GetInteraction = (

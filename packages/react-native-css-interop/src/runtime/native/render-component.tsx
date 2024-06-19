@@ -3,7 +3,7 @@ import { Pressable } from "react-native";
 
 import { containerContext } from "./globals";
 import { SharedState } from "./types";
-import { VariableContext } from "./$$styles";
+import { VariableContext } from "./styles";
 
 const animatedCache = new Map<
   ComponentType<any> | string,
@@ -52,7 +52,7 @@ export function renderComponent(
   if (state.animated !== UpgradeState.NONE) {
     if (shouldWarn && state.animated === UpgradeState.SHOULD_UPGRADE) {
       printUpgradeWarning(
-        `Converting component to animated component should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none", "transition-property: none"`,
+        `Components need to be animated during the initial render otherwise they will remount.\n\nTo prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none"/"transition-property: none"`,
         state.originalProps,
       );
     }
@@ -63,7 +63,7 @@ export function renderComponent(
   if (state.variables !== UpgradeState.NONE) {
     if (shouldWarn && state.variables === UpgradeState.SHOULD_UPGRADE) {
       printUpgradeWarning(
-        `Making a component inheritable should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,
+        `Components need to set a variable during the initial render otherwise they will remount.\n\nTo prevent this warning avoid dynamically adding CSS variables components after the initial render, or ensure it has a default style that sets either a CSS variable`,
         state.originalProps,
       );
     }
@@ -79,7 +79,7 @@ export function renderComponent(
   if (state.containers !== UpgradeState.NONE) {
     if (shouldWarn && state.containers === UpgradeState.SHOULD_UPGRADE) {
       printUpgradeWarning(
-        `Making a component inheritable should only happen during the initial render otherwise it will remount the component.\n\nTo prevent this warning avoid dynamically adding CSS variables or 'container' styles to components after the initial render, or ensure it has a default style that sets either a CSS variable, "container: none" or "container-type: none"`,
+        `Components need to marked as a container during the initial render otherwise they will remount.\n\nTo prevent this warning avoid dynamically container styles to a component after the initial render, or ensure it has a default style that sets "container: none" or "container-type: none"`,
         state.originalProps,
       );
     }
@@ -92,7 +92,7 @@ export function renderComponent(
     component = containerContext.Provider;
   }
 
-  // After the initial render, the user shouldn't upgrade the component. Avoid warning in production
+  // We cannot warn on the first render, or while in production
   state.canUpgradeWarn = process.env.NODE_ENV !== "production";
 
   /**
@@ -218,23 +218,36 @@ function printUpgradeWarning(
   warning: string,
   originalProps: Record<string, any> | null | undefined,
 ) {
-  console.warn(
-    `CssInterop upgrade warning.\n\n${warning}.\n\nIf add/removing sibling components cause this warning, add a unique "key" prop so React can correctly track this component.`,
+  console.log(
+    `CssInterop upgrade warning.\n\n${warning}.\n\nThis warning was caused by a component with the props:\n${stringify(originalProps)}\n\nIf adding or removing sibling components caused this warning you should add a unique "key" prop to your components. https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key\n`,
   );
-  try {
-    // Not all props can be stringified
-    console.warn(
-      `The previous warning was caused by a component with these props: ${JSON.stringify(
-        originalProps,
-      )}`,
-    );
-  } catch {
-    if (originalProps) {
-      console.warn(
-        `The previous warning was caused by a component with these props: ${JSON.stringify(
-          Object.keys(originalProps),
-        )}. Some props could not be stringified, so only the keys are shown.`,
-      );
-    }
-  }
+}
+
+function stringify(object: any) {
+  const seen = new WeakSet();
+  return JSON.stringify(
+    object,
+    function replace(_, value) {
+      if (!(value !== null && typeof value === "object")) {
+        return value;
+      }
+
+      if (seen.has(value)) {
+        return "[Circular]";
+      }
+
+      seen.add(value);
+
+      const newValue: any = Array.isArray(value) ? [] : {};
+
+      for (const entry of Object.entries(value)) {
+        newValue[entry[0]] = replace(entry[0], entry[1]);
+      }
+
+      seen.delete(value);
+
+      return newValue;
+    },
+    2,
+  );
 }

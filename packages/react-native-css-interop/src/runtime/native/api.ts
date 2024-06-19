@@ -8,7 +8,7 @@ import { getNormalizeConfig } from "../config";
 import { Effect, cleanupEffect } from "../observable";
 import { interop } from "./native-interop";
 import { getComponentType } from "./unwrap-components";
-import { VariableContext, getVariable, opaqueStyles } from "./$$styles";
+import { VariableContext, getVariable, opaqueStyles } from "./styles";
 import { colorScheme } from "./appearance-observables";
 
 export { StyleSheet } from "./stylesheet";
@@ -61,7 +61,6 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
     { ...props }: Record<string, any>,
     ref: any,
   ) {
-    debugger;
     for (const config of configs) {
       const source = props?.[config.source];
 
