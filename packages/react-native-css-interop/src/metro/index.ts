@@ -35,8 +35,8 @@ const __inject_1 = require("react-native-css-interop/dist/runtime/native/styles"
  * This is a hack for Expo Router. It's _layout files export 'unstable_settings' which break Fast Refresh
  * Expo Router only supports Metro as a bundler
  */
-if (typeof metroRequire !== "undefined" && typeof __METRO_GLOBAL_PREFIX__ !== "undefined") {
-  const Refresh = global[__METRO_GLOBAL_PREFIX__ + "__ReactRefresh"] || metroRequire.Refresh
+if (typeof __METRO_GLOBAL_PREFIX__ !== "undefined" && global[__METRO_GLOBAL_PREFIX__ + "__ReactRefresh"]) {
+  const Refresh = global[__METRO_GLOBAL_PREFIX__ + "__ReactRefresh"]
   const isLikelyComponentType = Refresh.isLikelyComponentType
   const expoRouterExports = new WeakSet()
   Object.assign(Refresh, {
@@ -44,6 +44,16 @@ if (typeof metroRequire !== "undefined" && typeof __METRO_GLOBAL_PREFIX__ !== "u
       if (typeof value === "object" && "unstable_settings" in value) {
         expoRouterExports.add(value.unstable_settings)
       }
+
+      if (typeof value === "object" && "ErrorBoundary" in value) {
+        expoRouterExports.add(value.ErrorBoundary)
+      }
+
+      // When ErrorBoundary is exported, the inverse dependency will also include the _ctx file. So we need to account for it as well
+      if (typeof value === "object" && "ctx" in value && value.ctx.name === "metroContext") {
+        expoRouterExports.add(value.ctx)
+      }
+
       return expoRouterExports.has(value) || isLikelyComponentType(value)
     }
   })
