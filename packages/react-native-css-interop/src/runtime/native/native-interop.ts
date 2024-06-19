@@ -43,7 +43,7 @@ import {
   getAnimation,
   getOpaqueStyles,
   getStyle,
-} from "./$$styles";
+} from "./styles";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { LayoutChangeEvent, View } from "react-native";
 
@@ -58,11 +58,6 @@ export function interop(
   const inheritedContainers = useContext(containerContext);
 
   const props = { ...originalProps };
-
-  // This shouldn't be here, but its failing if in the global scope?
-  if (process.env.NODE_ENV === "development") {
-    require("./poll-updates");
-  }
 
   /*
    * Holds the shared state between all the configs
@@ -620,7 +615,7 @@ function processAnimations(
   }
 }
 
-export function processTransition(
+function processTransition(
   state: ReducerState,
   refs: Refs,
   seenAnimatedProps: Set<string>,
@@ -693,7 +688,7 @@ export function processTransition(
   }
 }
 
-export function retainSharedValues(
+function retainSharedValues(
   state: ReducerState,
   seenAnimatedProps: Set<string>,
 ) {
@@ -787,7 +782,7 @@ function containersAreEqual(
   return a == b || (a && b && arraysAreEqual(a, b));
 }
 
-export function applyRules(
+function applyRules(
   state: ReducerState,
   refs: Refs,
   declarations: ProcessedStyleDeclaration[],
@@ -855,7 +850,7 @@ export function applyRules(
 }
 
 const inlineSpecificity: Specificity = { inline: 1, I: 0 };
-export function specificityCompare(
+function specificityCompare(
   o1?: object | StyleRule | null,
   o2?: object | StyleRule | null,
 ) {
@@ -965,14 +960,10 @@ function collectInlineRules(
 
     for (const style of styles) {
       if (typeof style === "object" && "$type" in style) {
-        collectRules(state, refs, style as StyleRuleSet, normal, "normal");
-        collectRules(
-          state,
-          refs,
-          style as StyleRuleSet,
-          important,
-          "important",
-        );
+        const ruleSet = style as StyleRuleSet;
+        handleUpgrades(refs.sharedState, ruleSet);
+        collectRules(state, refs, ruleSet, normal, "normal");
+        collectRules(state, refs, ruleSet, important, "important");
       } else if (style) {
         normal.push(style);
       }

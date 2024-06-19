@@ -24,13 +24,27 @@ export type VariableContextValue =
   | Map<string, ReturnType<typeof cssVariableObservable>>
   | Record<string, ReturnType<typeof cssVariableObservable>>;
 
-const styles: Map<string, Observable<StyleRuleSet | void>> = new Map();
-const keyframes: Map<string, Observable<ExtractedAnimation | void>> = new Map();
-const rootVariables: Extract<VariableContextValue, Map<any, any>> = new Map();
-const universalVariables: Extract<
-  VariableContextValue,
-  Map<any, any>
-> = new Map();
+declare global {
+  var __css_interop: {
+    styles: Map<string, Observable<StyleRuleSet | void>>;
+    keyframes: Map<string, Observable<ExtractedAnimation | void>>;
+    rootVariables: Map<string, ReturnType<typeof cssVariableObservable>>;
+    universalVariables: Map<string, ReturnType<typeof cssVariableObservable>>;
+  };
+}
+
+global.__css_interop ??= {
+  styles: new Map(),
+  keyframes: new Map(),
+  rootVariables: new Map(),
+  universalVariables: new Map(),
+};
+
+const styles = global.__css_interop.styles;
+const keyframes = global.__css_interop.keyframes;
+const rootVariables = global.__css_interop.rootVariables;
+const universalVariables = global.__css_interop.universalVariables;
+
 export const opaqueStyles = new WeakMap<
   object,
   RemappedClassName | StyleRuleSet
@@ -143,9 +157,3 @@ export function injectData(data: StyleSheetRegisterCompiledOptions) {
     }
   }
 }
-
-const CSS_INTEROP_INJECTION: StyleSheetRegisterCompiledOptions = {
-  $compiled: true,
-};
-// This line will be replaced by Metro
-injectData(CSS_INTEROP_INJECTION);

@@ -23,21 +23,28 @@
     return originalMkdir(path, ...args);
   };
 
-  const originalWriteFile = fs.promises.writeFile.bind(fs.promises.writeFile);
+  let previousData = "";
   fs.promises.writeFile = async (
     path: string,
     data: string | Buffer,
     ...args: any
   ) => {
-    if (path === fakeOutput) {
-      if (!process.send) {
-        process.exit(42);
-      }
-
-      process.send(data.toString());
-      return;
+    if (path !== fakeOutput) {
+      throw new Error(`Tailwind CLI attempted to write file ${path}`);
     }
-    return originalWriteFile(path, data, ...args);
+
+    if (!process.send) {
+      process.exit(42);
+    }
+
+    const newData = data.toString();
+
+    if (previousData !== newData) {
+      previousData = newData;
+      process.send(newData);
+    }
+
+    return;
   };
 
   const { build } = require("tailwindcss/lib/cli/build");

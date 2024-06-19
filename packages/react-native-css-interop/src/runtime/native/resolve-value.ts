@@ -5,10 +5,9 @@ import type { RuntimeValueDescriptor, RuntimeValueFrame } from "../../types";
 import { Effect, observable } from "../observable";
 import { transformKeys } from "../../shared";
 import { ReducerState, ReducerTracking, Refs } from "./types";
-import { getUniversalVariable, getVariable } from "./$$styles";
-import { rem } from "../api";
+import { getUniversalVariable, getVariable } from "./styles";
 import { systemColorScheme } from "./appearance-observables";
-import { vh, vw } from "./unit-observables";
+import { rem, vh, vw } from "./unit-observables";
 
 /**
  * Get the final value of a value descriptor
