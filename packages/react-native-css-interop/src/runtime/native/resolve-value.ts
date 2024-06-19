@@ -1,7 +1,8 @@
-import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
 import type { AnimatableValue } from "react-native-reanimated";
 import type { EasingFunction, Time } from "lightningcss";
 import type { RuntimeValueDescriptor, RuntimeValueFrame } from "../../types";
+
+import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
 import { Effect, observable } from "../observable";
 import { transformKeys } from "../../shared";
 import { ReducerState, ReducerTracking, Refs } from "./types";

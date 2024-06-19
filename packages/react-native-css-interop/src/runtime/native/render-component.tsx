@@ -1,4 +1,4 @@
-import { ComponentType, createElement, forwardRef } from "react";
+import { ComponentType, createElement } from "react";
 import { Pressable } from "react-native";
 
 import { containerContext } from "./globals";
@@ -19,12 +19,6 @@ export const UpgradeState = {
 
 /**
  * Render the baseComponent
- * @param baseComponent
- * @param state
- * @param props
- * @param variables
- * @param containers
- * @returns
  */
 export function renderComponent(
   baseComponent: ComponentType<any>,
@@ -115,20 +109,20 @@ export function renderComponent(
    * and passing a flag down if the component is composable.
    */
   if (component === baseComponent) {
-    // switch (getComponentType(component)) {
-    //   case "forwardRef": {
-    //     const ref = props.ref;
-    //     delete props.ref;
-    //     return (component as any).render(props, ref);
-    //   }
-    //   case "function":
-    //     return (component as any)(props);
-    //   case "string":
-    //   case "object":
-    //   case "class":
-    //   case "unknown":
-    return createElement(component, props);
-    // }
+    switch (getComponentType(component)) {
+      case "forwardRef": {
+        const ref = props.ref;
+        delete props.ref;
+        return (component as any).render(props, ref);
+      }
+      case "function":
+        return (component as any)(props);
+      case "string":
+      case "object":
+      case "class":
+      case "unknown":
+        return createElement(component, props);
+    }
   } else {
     /*
      * Class/Object/String components are not composable, so they are added to the tree as normal
@@ -155,63 +149,16 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
     );
   }
 
-  const { default: Animated, useAnimatedStyle } =
+  const { default: Animated } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
   let AnimatedComponent = Animated.createAnimatedComponent(
     Component as React.ComponentClass,
   );
 
-  /**
-   * TODO: This wrapper shouldn't be needed, as we should just run the hook in the
-   * original component. However, we get an error about running on the JS thread?
-   */
-  const CSSInteropAnimationWrapper = forwardRef((props: any, ref: any) => {
-    /**
-     * This code shouldn't be needed, but inline shared values are not working properly.
-     * https://github.com/software-mansion/react-native-reanimated/issues/5296
-     */
-    const propStyle = props.style;
-    const style = useAnimatedStyle(() => {
-      const style: Record<string, any> = {};
+  animatedCache.set(Component, AnimatedComponent);
 
-      if (!propStyle) return style;
-
-      for (const key of Object.keys(propStyle)) {
-        const value = propStyle[key];
-
-        if (typeof value === "object" && "_isReanimatedSharedValue" in value) {
-          style[key] = value.value;
-        } else if (key === "transform") {
-          style.transform = value.map((v: any) => {
-            const [key, value] = Object.entries(v)[0] as any;
-            if (typeof value === "object" && "value" in value) {
-              return { [key]: value.value };
-            } else {
-              return { [key]: value };
-            }
-          });
-        } else {
-          style[key] = value;
-        }
-      }
-
-      return style;
-    }, [propStyle]);
-
-    return createElement(AnimatedComponent, {
-      ...props,
-      style,
-      ref,
-    });
-  });
-  CSSInteropAnimationWrapper.displayName = `CSSInteropAnimationWrapper(${
-    Component.displayName ?? Component.name
-  })`;
-
-  animatedCache.set(Component, CSSInteropAnimationWrapper);
-
-  return CSSInteropAnimationWrapper;
+  return AnimatedComponent;
 }
 
 function printUpgradeWarning(
@@ -250,4 +197,19 @@ function stringify(object: any) {
     },
     2,
   );
+}
+
+const ForwardRefSymbol = Symbol.for("react.forward_ref");
+function getComponentType(component: any) {
+  switch (typeof component) {
+    case "function":
+    case "object":
+      return "$$typeof" in component && component.$$typeof === ForwardRefSymbol
+        ? "forwardRef"
+        : component.prototype?.isReactComponent
+          ? "class"
+          : typeof component;
+    default:
+      return "unknown";
+  }
 }
