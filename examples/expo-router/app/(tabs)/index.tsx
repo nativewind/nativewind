@@ -15,10 +15,11 @@ const App = () => {
       >
         Transitions
       </Text>
+      <Text key={1} className="font-bold text-green-800 animate-spin">
+        Animations!!!
+      </Text>
     </View>
   );
 };
 
 export default App;
-
-// <Text className="font-bold text-blue-500 animate-bounce">Animations</Text>
