@@ -1,6 +1,7 @@
 import {
   ActivityIndicator,
   FlatList,
+  SectionList,
   ImageBackground,
   KeyboardAvoidingView,
   Pressable,
@@ -49,6 +50,13 @@ remapProps(FlatList, {
   ListFooterComponentClassName: "ListFooterComponentStyle",
   ListHeaderComponentClassName: "ListHeaderComponentStyle",
   columnWrapperClassName: "columnWrapperStyle",
+  contentContainerClassName: "contentContainerStyle",
+  indicatorClassName: "indicatorStyle",
+});
+remapProps(SectionList, {
+  className: "style",
+  ListFooterComponentClassName: "ListFooterComponentStyle",
+  ListHeaderComponentClassName: "ListHeaderComponentStyle",
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
