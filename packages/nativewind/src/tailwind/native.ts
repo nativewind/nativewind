@@ -11,6 +11,7 @@ import { darkModeAtRule } from "./dark-mode";
 import { color } from "./color";
 import { verify } from "./verify";
 import { translateX, translateY } from "./translate";
+import { safeArea } from "./safe-area";
 import { shadows } from "./shadows";
 import { allowedColors } from "./common";
 import { nativeSwitch } from "./switch";
@@ -332,6 +333,7 @@ const preset: Config = {
   plugins: [
     color,
     darkModeAtRule,
+    safeArea,
     shadows,
     translateX,
     translateY,
