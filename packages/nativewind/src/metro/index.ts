@@ -21,7 +21,7 @@ interface WithNativeWindOptions extends WithCssInteropOptions {
 export function withNativeWind(
   config: MetroConfig,
   {
-    input,
+    `"${input}"`,
     inlineRem = 14,
     configPath: tailwindConfigPath = "tailwind.config",
     browserslist = "last 1 version",
