@@ -1,5 +1,12 @@
 /** @jsxImportSource react-native-css-interop */
-import { View } from "react-native";
+import { useState } from "react";
+import { Button, View } from "react-native";
+import Animated, {
+  getAnimatedStyle,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import {
   fireEvent,
   screen,
@@ -16,7 +23,7 @@ jest.useFakeTimers();
 test("basic animation", () => {
   registerCSS(`
 .my-class {
-  animation-duration: 3s;
+  animation-duration: 3000ms;
   animation-name: slidein;
 }
 
@@ -41,7 +48,7 @@ test("basic animation", () => {
 
   jest.advanceTimersByTime(1501);
 
-  expect(component).toHaveAnimatedStyle({
+  expect(getAnimatedStyle(component)).toEqual({
     marginLeft: "50%",
   });
 
@@ -153,6 +160,10 @@ test("bounce", () => {
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
       { skewX: "0deg" },
@@ -177,6 +188,10 @@ test("bounce", () => {
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
       { skewX: "0deg" },
@@ -192,6 +207,10 @@ test("bounce", () => {
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
       { skewX: "0deg" },
@@ -207,6 +226,10 @@ test("bounce", () => {
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
       { scaleX: 1 },
       { scaleY: 1 },
       { skewX: "0deg" },

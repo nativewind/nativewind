@@ -46,6 +46,7 @@ import {
 } from "./styles";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { LayoutChangeEvent, View } from "react-native";
+import { Easing, withSequence } from "react-native-reanimated";
 
 export function interop(
   component: ReactComponent<any>,
@@ -170,17 +171,23 @@ export function interop(
 
     let containers = { ...inheritedContainers };
 
-    const props: Record<string, any> = {};
+    const possiblyAnimatedProps: Record<string, any> = {};
+    const handlers: Record<string, any> = {};
 
     let hasVariables = false;
     let hasContainer = false;
     let hasNullContainer = false;
+    const animatedDeps = [];
 
     /**
      * Loop over all the states and collect the props, variables and containers
      */
     for (const state of states) {
-      Object.assign(props, state.props);
+      Object.assign(possiblyAnimatedProps, state.props);
+
+      if (state.sharedValues?.size) {
+        animatedDeps.push(...state.sharedValues.values());
+      }
 
       if (state.variables) {
         hasVariables = true;
@@ -202,32 +209,32 @@ export function interop(
     }
 
     if (sharedState.active) {
-      props.onPressIn = (event: unknown) => {
+      handlers.onPressIn = (event: unknown) => {
         sharedState.originalProps?.onPressIn?.(event);
         sharedState.active!.set(true);
       };
-      props.onPressOut = (event: unknown) => {
+      handlers.onPressOut = (event: unknown) => {
         sharedState.originalProps?.onPressOut?.(event);
         sharedState.active!.set(false);
       };
     }
     if (sharedState.hover) {
-      props.onHoverIn = (event: unknown) => {
+      handlers.onHoverIn = (event: unknown) => {
         sharedState.originalProps?.onHoverIn?.(event);
         sharedState.hover!.set(true);
       };
-      props.onHoverOut = (event: unknown) => {
+      handlers.onHoverOut = (event: unknown) => {
         sharedState.originalProps?.onHoverOut?.(event);
         sharedState.hover!.set(false);
       };
     }
 
     if (sharedState.focus) {
-      props.onFocus = (event: unknown) => {
+      handlers.onFocus = (event: unknown) => {
         sharedState.originalProps?.onFocus?.(event);
         sharedState.focus!.set(true);
       };
-      props.onBlur = (event: unknown) => {
+      handlers.onBlur = (event: unknown) => {
         sharedState.originalProps?.onBlur?.(event);
         sharedState.focus!.set(false);
       };
@@ -240,14 +247,14 @@ export function interop(
       if (component === View) {
         sharedState.pressable ||= UpgradeState.SHOULD_UPGRADE;
       }
-      props.onPress = (event: unknown) => {
+      handlers.onPress = (event: unknown) => {
         sharedState.originalProps?.onPress?.(event);
       };
     }
 
     if (sharedState.layout || sharedState.containers) {
       sharedState.layout ??= observable([0, 0]);
-      props.onLayout = (event: LayoutChangeEvent) => {
+      handlers.onLayout = (event: LayoutChangeEvent) => {
         sharedState.originalProps?.onLayout?.(event);
         const layout = event.nativeEvent.layout;
         const prevLayout = sharedState.layout!.get();
@@ -277,9 +284,11 @@ export function interop(
     }
 
     return {
-      props,
+      possiblyAnimatedProps,
+      handlers,
       variables: nextVariables,
       containers: nextContainers,
+      animatedDeps,
     };
   }, states);
 
@@ -294,16 +303,18 @@ export function interop(
   }, []);
 
   // Update the shared state with the latest values
-  sharedState.props = memoOutput.props;
+  // sharedState.props = memoOutput.props;
   sharedState.originalProps = originalProps;
   sharedState.guardsEnabled = true;
 
   return renderComponent(
     component,
     sharedState,
-    { ...props, ...memoOutput.props, ref },
+    { ...props, ...memoOutput.handlers, ref },
+    memoOutput.possiblyAnimatedProps,
     memoOutput.variables,
     memoOutput.containers,
+    memoOutput.animatedDeps,
   );
 }
 
@@ -449,29 +460,65 @@ function applyStyles(state: ReducerState, refs: Refs) {
 
   const seenAnimatedProps = new Set<string>();
 
+  /**
+   * Render order TLDR:
+   *
+   * 1. Normal styles
+   * 2. Inline styles
+   * 3. Animations
+   * 4. Important styles
+   * 5. Transitions
+   *
+   * @see: https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance#understanding_the_cascade
+   *
+   * Important notes:
+   *  - Animations cannot be important
+   *  - Transitions overwrite animations, but only for the affected props
+   *
+   * Where break these rules:
+   *
+   * .my-font: {
+   *   font-size: 16px !important
+   * }
+   *
+   * .my-line-height: {
+   *   line-height: 3em
+   * }
+   *
+   * With this CSS, we cannot calculate the value of line-height until font-size has been resolved.
+   * But font-size is important is calculated AFTER the normal styles.
+   *
+   * To fix this, we introduce a new layer "delayed styles". Delayed styles
+   * cannot be calculated immediately and are processed between important and
+   * transitions. So the actual order is:
+   *
+   * 1. Normal styles
+   * 2. Inline styles
+   * 3. Animations
+   * 4. Important styles
+   * 5. Delayed styles
+   * 6. Transitions
+   */
+
+  // 1 & 2 normal and inline styles
   applyRules(state, refs, state.normal, delayedValues);
 
-  // Same as processDeclarations, but for animations (working with SharedValues)
+  // 3: Animations
   processAnimations(state, refs, seenAnimatedProps);
 
-  // Now we need to apply the important styles
+  // 4: Important
   applyRules(state, refs, state.important, delayedValues);
 
-  // Some declarations will have values that had dependencies on other styles
-  // e.g
-  //  - lineHeight: '2rem' depends on the fontSize
-  //  - color: var(--theme-fg) depends on the --theme-fg variable that could be present
+  // 5: Delayed values
   for (const delayed of delayedValues) {
     delayed();
   }
-
-  // Look at what has changed between renders, replace their values with SharedValues
-  // that interpolate between the old and new values
+  // 6: Transitions
   processTransition(state, refs, seenAnimatedProps);
 
-  // Animations and Transitions screw with things. Once an component has been upgraded to an
-  // animated component, some of its props will be SharedValues. We need to keep these props
-  // as shared values.
+  // Animations and Transitions screw with things.
+  // Once an component has been upgraded to an animated component
+  // we need to retain these values
   retainSharedValues(state, seenAnimatedProps);
 
   // Moves styles to the correct props
@@ -497,12 +544,11 @@ function processAnimations(
     name: animationNames,
     duration: durations,
     delay: delays,
-    iterationCount: iterationCounts,
     timingFunction: easingFuncs,
     waitingLayout,
   } = state.animation;
 
-  const { makeMutable, withRepeat, withSequence } =
+  const { makeMutable } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
   let names: string[] = [];
@@ -546,7 +592,6 @@ function processAnimations(
       const totalDuration = timeToMS(durations[index % name.length]);
       const delay = timeToMS(delays[index % delays.length]);
       const easingFunction = easingFuncs[index % easingFuncs.length];
-      const iterations = iterationCounts[index % iterationCounts.length];
 
       for (const frame of animation.frames) {
         const animationKey = frame[0];
@@ -592,10 +637,12 @@ function processAnimations(
           sharedValue.value = initialValue;
         }
 
-        sharedValue.value = withRepeat(
-          withSequence(...sequence),
-          iterations.type === "infinite" ? -1 : iterations.value,
-        );
+        // sharedValue.value = withRepeat(
+        //   withSequence(...sequence),
+        //   iterations.type === "infinite" ? -1 : iterations.value,
+        // );
+
+        sharedValue.value = withSequence(...sequence);
 
         setDeep(props, pathTokens, sharedValue);
       }
@@ -630,14 +677,14 @@ function processTransition(
     property: properties,
     duration: durations,
     delay: delays,
-    timingFunction: timingFunctions,
+    timingFunction: easingFunctions,
   } = state.transition;
 
   /**
    * Make this inline to avoid importing reanimated if we don't need it
    * This also fixes circular dependency issues where Reanimated may use the jsx transform
    */
-  const { makeMutable, withDelay, withTiming, Easing } =
+  const { makeMutable, withTiming, withDelay } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
   /**
@@ -665,23 +712,25 @@ function processTransition(
 
         sharedValue = makeMutable(initialValue);
         state.sharedValues.set(property, sharedValue);
-      } else if (value === undefined) {
-        // We previously saw this value, but now its gone
-        value = defaultValue;
+      } else {
+        // If the value is undefined or null, then it should be the default
+        value ??= defaultValue;
+
+        if (value !== sharedValue.value) {
+          const duration = timeToMS(durations[index % durations.length]);
+          const delay = timeToMS(delays[index % delays.length]);
+          const easing = easingFunctions[index % easingFunctions.length];
+          sharedValue.value = withDelay(
+            delay,
+            withTiming(value, {
+              duration,
+              easing: getEasing(easing, Easing),
+            }),
+          );
+        }
       }
+
       seenAnimatedProps.add(property);
-      const duration = timeToMS(durations[index % durations.length]);
-      const delay = timeToMS(delays[index % delays.length]);
-      const easing = timingFunctions[index % timingFunctions.length];
-      if (value !== sharedValue.value) {
-        sharedValue.value = withDelay(
-          delay,
-          withTiming(value, {
-            duration,
-            easing: getEasing(easing, Easing),
-          }),
-        );
-      }
       props.style ??= {};
       setDeep(props.style, [property], sharedValue);
     }
