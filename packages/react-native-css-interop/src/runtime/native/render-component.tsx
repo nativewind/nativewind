@@ -4,6 +4,7 @@ import { Pressable } from "react-native";
 import { containerContext } from "./globals";
 import { SharedState } from "./types";
 import { VariableContext } from "./styles";
+import { SharedValue, useAnimatedStyle } from "react-native-reanimated";
 
 const animatedCache = new Map<
   ComponentType<any> | string,
@@ -24,8 +25,10 @@ export function renderComponent(
   baseComponent: ComponentType<any>,
   state: SharedState,
   props: Record<string, any>,
+  possiblyAnimatedProps: Record<string, any>,
   variables?: Record<string, any>,
   containers?: Record<string, any>,
+  animatedDeps?: Array<SharedValue>,
 ) {
   let component = baseComponent;
   const shouldWarn = state.canUpgradeWarn;
@@ -52,6 +55,14 @@ export function renderComponent(
     }
     state.animated = UpgradeState.UPGRADED;
     component = createAnimatedComponent(component);
+
+    const style = useAnimatedStyle(() => {
+      return flattenAnimatedProps(possiblyAnimatedProps.style);
+    }, [Object.values(possiblyAnimatedProps.style)]);
+
+    props = { ...props, style };
+  } else {
+    props = { ...props, ...possiblyAnimatedProps };
   }
 
   if (state.variables !== UpgradeState.NONE) {
@@ -108,27 +119,27 @@ export function renderComponent(
    * that matches the type of the original component (e.g Function components should just be function components, nof ForwardRefs)
    * and passing a flag down if the component is composable.
    */
-  if (component === baseComponent) {
-    switch (getComponentType(component)) {
-      case "forwardRef": {
-        const ref = props.ref;
-        delete props.ref;
-        return (component as any).render(props, ref);
-      }
-      case "function":
-        return (component as any)(props);
-      case "string":
-      case "object":
-      case "class":
-      case "unknown":
-        return createElement(component, props);
-    }
-  } else {
-    /*
-     * Class/Object/String components are not composable, so they are added to the tree as normal
-     */
-    return createElement(component, props);
-  }
+  // if (component === baseComponent) {
+  //   switch (getComponentType(component)) {
+  //     case "forwardRef": {
+  //       const ref = props.ref;
+  //       delete props.ref;
+  //       return (component as any).render(props, ref);
+  //     }
+  //     case "function":
+  //       return (component as any)(props);
+  //     case "string":
+  //     case "object":
+  //     case "class":
+  //     case "unknown":
+  //       return createElement(component, props);
+  //   }
+  // } else {
+  /*
+   * Class/Object/String components are not composable, so they are added to the tree as normal
+   */
+  return createElement(component, props);
+  // }
 }
 
 function createAnimatedComponent(Component: ComponentType<any>): any {
@@ -152,9 +163,12 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
   const { default: Animated } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
-  let AnimatedComponent = Animated.createAnimatedComponent(
+  return Animated.View;
+
+  const AnimatedComponent = Animated.createAnimatedComponent(
     Component as React.ComponentClass,
   );
+  AnimatedComponent.displayName = `Animated.${Component.displayName || Component.name || "Unknown"}`;
 
   animatedCache.set(Component, AnimatedComponent);
 
@@ -199,17 +213,32 @@ function stringify(object: any) {
   );
 }
 
-const ForwardRefSymbol = Symbol.for("react.forward_ref");
-function getComponentType(component: any) {
-  switch (typeof component) {
-    case "function":
-    case "object":
-      return "$$typeof" in component && component.$$typeof === ForwardRefSymbol
-        ? "forwardRef"
-        : component.prototype?.isReactComponent
-          ? "class"
-          : typeof component;
-    default:
-      return "unknown";
+// const ForwardRefSymbol = Symbol.for("react.forward_ref");
+// function getComponentType(component: any) {
+//   switch (typeof component) {
+//     case "function":
+//     case "object":
+//       return "$$typeof" in component && component.$$typeof === ForwardRefSymbol
+//         ? "forwardRef"
+//         : component.prototype?.isReactComponent
+//           ? "class"
+//           : typeof component;
+//     default:
+//       return "unknown";
+//   }
+// }
+
+function flattenAnimatedProps(style: any): any {
+  // Primative or null
+  if (typeof style !== "object" || !style) return style;
+  // Shared value
+  if ("_isReanimatedSharedValue" in style && "value" in style) {
+    return style.value;
   }
+  if (Array.isArray(style)) return style.map(flattenAnimatedProps);
+  return Object.fromEntries(
+    Object.entries(style).map(([key, style]: any) => {
+      return [key, flattenAnimatedProps(style)];
+    }),
+  );
 }
