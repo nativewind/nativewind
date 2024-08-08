@@ -28,13 +28,13 @@ test("numeric transition", () => {
   let component = screen.getByTestId(testID);
 
   // Should have a static width, and should not animate
-  // expect(component).toHaveAnimatedStyle({
-  //   width: 100,
-  // });
-  // jest.advanceTimersByTime(1000);
-  // expect(component).toHaveAnimatedStyle({
-  //   width: 100,
-  // });
+  expect(component).toHaveAnimatedStyle({
+    width: 100,
+  });
+  jest.advanceTimersByTime(1000);
+  expect(component).toHaveAnimatedStyle({
+    width: 100,
+  });
 
   // Rerender with a new width, triggering the animation
   screen.rerender(<View testID={testID} className="transition second" />);
@@ -50,17 +50,17 @@ test("numeric transition", () => {
     width: 150,
   });
 
-  // // At the end of the transition
-  // jest.advanceTimersByTime(500);
-  // expect(component).toHaveAnimatedStyle({
-  //   width: 200,
-  // });
+  // At the end of the transition
+  jest.advanceTimersByTime(500);
+  expect(component).toHaveAnimatedStyle({
+    width: 200,
+  });
 
-  // // Width should not change after the transition is done
-  // jest.advanceTimersByTime(500);
-  // expect(component).toHaveAnimatedStyle({
-  //   width: 200,
-  // });
+  // Width should not change after the transition is done
+  jest.advanceTimersByTime(500);
+  expect(component).toHaveAnimatedStyle({
+    width: 200,
+  });
 });
 
 test("color transition", () => {

@@ -2,6 +2,7 @@ import {
   KeyframesRule,
   Animation,
   Declaration,
+  EasingFunction,
   transform as lightningcss,
   DeclarationBlock,
   MediaQuery,
@@ -458,16 +459,16 @@ function extractKeyFrames(
   extractOptions: ExtractRuleOptions,
 ) {
   const animation: ExtractedAnimation = { frames: [] };
-  const frames: {
-    [index: string]: { values: RuntimeValueFrame[]; pathTokens: PathTokens };
-  } = {};
-
-  let rawFrames: Array<{ selector: number; values: StyleDeclaration[] }> = [];
+  let rawFrames: Array<{
+    selector: number;
+    values: StyleDeclaration[];
+    easingFunction?: EasingFunction;
+  }> = [];
 
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
 
-    const { declarations: props } = declarationsToStyle(
+    const { declarations: props, animations } = declarationsToStyle(
       frame.declarations.declarations,
       {
         ...extractOptions,
@@ -499,6 +500,8 @@ function extractKeyFrames(
 
     if (values.length === 0) continue;
 
+    const easingFunction = animations?.timingFunction?.[0];
+
     for (const selector of frame.selectors) {
       const keyframe =
         selector.type === "percentage"
@@ -513,13 +516,13 @@ function extractKeyFrames(
 
       switch (selector.type) {
         case "percentage":
-          rawFrames.push({ selector: selector.value, values });
+          rawFrames.push({ selector: selector.value, values, easingFunction });
           break;
         case "from":
-          rawFrames.push({ selector: 0, values });
+          rawFrames.push({ selector: 0, values, easingFunction });
           break;
         case "to":
-          rawFrames.push({ selector: 1, values });
+          rawFrames.push({ selector: 1, values, easingFunction });
           break;
         default:
           selector satisfies never;
@@ -530,11 +533,22 @@ function extractKeyFrames(
   // Need to sort afterwards, as the order of the frames is not guaranteed
   rawFrames = rawFrames.sort((a, b) => a.selector - b.selector);
 
+  // Convert the rawFrames into frames
+  const frames: {
+    [index: string]: { values: RuntimeValueFrame[]; pathTokens: PathTokens };
+  } = {};
+
+  const easingFunctions: EasingFunction[] = [];
+
   for (let i = 0; i < rawFrames.length; i++) {
     const rawFrame = rawFrames[i];
     const animationProgress = rawFrame.selector;
     const previousProgress = i === 0 ? 0 : rawFrames[i - 1].selector;
     const progress = animationProgress - previousProgress;
+
+    if (rawFrame.easingFunction) {
+      easingFunctions[i] = rawFrame.easingFunction;
+    }
 
     for (const frameValue of rawFrame.values) {
       // This will never happen, as this an a later optimization
@@ -560,6 +574,15 @@ function extractKeyFrames(
   }
 
   animation.frames = Object.entries(frames);
+
+  if (easingFunctions.length) {
+    // This is a holey array and may contain undefined values
+    animation.easingFunctions = Array.from<EasingFunction | undefined>(
+      easingFunctions,
+    ).map((value) => {
+      return value ?? { type: "!PLACEHOLDER!" };
+    });
+  }
 
   extractOptions.keyframes.set(keyframes.name.value, animation);
 }

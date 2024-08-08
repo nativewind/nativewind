@@ -1,5 +1,9 @@
-import { testEachClassName } from "../test-utils";
+import { renderCurrentTest } from "../test-utils";
 
 describe("Preset - color-*", () => {
-  testEachClassName([["color-black", { style: { color: "rgba(0, 0, 0, 1)" } }]]);
+  test("color-black", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { color: "rgba(0, 0, 0, 1)" } },
+    });
+  });
 });

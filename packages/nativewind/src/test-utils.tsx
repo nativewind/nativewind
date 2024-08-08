@@ -5,6 +5,7 @@ import postcss from "postcss";
 import tailwind, { Config } from "tailwindcss";
 
 import {
+  getWarnings,
   render as interopRender,
   RenderOptions as InteropRenderOptions,
   resetData,
@@ -21,6 +22,8 @@ export {
 
 export * from "../src/index";
 
+const testID = "nativewind";
+
 beforeEach(() => {
   resetData();
   setupAllComponents();
@@ -36,7 +39,36 @@ export interface RenderOptions extends InteropRenderOptions {
   };
 }
 
-process.env.NATIVEWIND_NATIVE = Platform.OS;
+export type RenderCurrentTestOptions = RenderOptions & {
+  className?: string;
+};
+
+process.env.NATIVEWIND_OS = Platform.OS;
+
+export async function renderCurrentTest({
+  className = expect.getState().currentTestName?.split(/\s+/).at(-1),
+  ...options
+}: RenderCurrentTestOptions = {}) {
+  if (!className) {
+    throw new Error(
+      "unable to detect className, please manually set a className",
+    );
+  }
+
+  await render(<View testID={testID} className={className} />, options);
+  const component = screen.getByTestId(testID, { hidden: true });
+
+  // Strip the testID and the children
+  const { testID: _testID, children, ...props } = component.props;
+
+  const invalid = getInvalid();
+
+  if (invalid) {
+    return { props, invalid };
+  } else {
+    return { props };
+  }
+}
 
 export async function render(
   component: React.ReactElement<any>,
@@ -90,43 +122,39 @@ function getClassNames(
   return classNames;
 }
 
-type ClassNameTestCase =
-  | [string, Record<string, any>]
-  | [string, Record<string, any> | undefined, Record<string, any>];
+function getInvalid() {
+  const style: Record<string, any> = {};
+  const properties: string[] = [];
 
-/**
- * Test each className
- */
-export function testEachClassName(
-  tests: ClassNameTestCase[],
-  options?: RenderOptions,
-) {
-  test.each(tests)(
-    "%s",
-    (
-      className: string,
-      expectedProps?: Record<string, any>,
-      warningOrDone?: Record<string, any> | (() => void),
-    ) => {
-      const promise = new Promise<void>(async (resolve) => {
-        const testID = "nativewind";
-        await render(<View testID={testID} className={className} />, options);
-        const component = screen.getByTestId(testID, { hidden: true });
+  let hasStyles = false;
 
-        for (const [key, expected] of Object.entries(expectedProps ?? {})) {
-          expect(component.props[key]).toEqual(expected);
+  for (const warnings of getWarnings().values()) {
+    for (const warning of warnings) {
+      switch (warning.type) {
+        case "IncompatibleNativeProperty":
+          properties.push(warning.property);
+          break;
+        case "IncompatibleNativeValue": {
+          hasStyles = true;
+          style[warning.property] = warning.value;
+          break;
         }
-
-        resolve();
-      });
-
-      if (typeof warningOrDone == "function") {
-        warningOrDone();
-      } else {
-        return promise;
+        case "IncompatibleNativeFunctionValue":
+        // TODO
       }
-    },
-  );
+    }
+  }
+
+  if (properties.length && hasStyles) {
+    return {
+      style,
+      properties,
+    };
+  } else if (properties.length) {
+    return { properties };
+  } else if (hasStyles) {
+    return { style };
+  }
 }
 
 export function invalidProperty(...properties: string[]) {

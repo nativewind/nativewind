@@ -295,11 +295,19 @@ export type ExtractedTransition = {
 };
 
 type AnimationPropertyKey = string;
+export type AnimationEasingFunction =
+  | EasingFunction
+  | { type: "!PLACEHOLDER!" };
+
 export type ExtractedAnimation = {
   frames: [
     AnimationPropertyKey,
     { values: RuntimeValueFrame[]; pathTokens: PathTokens },
   ][];
+  /**
+   * The easing function for each frame
+   */
+  easingFunctions?: AnimationEasingFunction[];
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
 };

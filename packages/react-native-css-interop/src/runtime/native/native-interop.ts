@@ -46,7 +46,7 @@ import {
 } from "./styles";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { LayoutChangeEvent, View } from "react-native";
-import { Easing, withSequence } from "react-native-reanimated";
+import { Easing, withRepeat, withSequence } from "react-native-reanimated";
 
 export function interop(
   component: ReactComponent<any>,
@@ -544,7 +544,8 @@ function processAnimations(
     name: animationNames,
     duration: durations,
     delay: delays,
-    timingFunction: easingFuncs,
+    timingFunction: baseEasingFuncs,
+    iterationCount: iterations,
     waitingLayout,
   } = state.animation;
 
@@ -589,9 +590,16 @@ function processAnimations(
         continue;
       }
 
+      const baseEasingFunc = baseEasingFuncs[index % baseEasingFuncs.length];
+
+      const easingFuncs =
+        animation.easingFunctions?.map((value) => {
+          return value.type === "!PLACEHOLDER!" ? baseEasingFunc : value;
+        }) || baseEasingFunc;
+
       const totalDuration = timeToMS(durations[index % name.length]);
       const delay = timeToMS(delays[index % delays.length]);
-      const easingFunction = easingFuncs[index % easingFuncs.length];
+      const iterationCount = iterations[index % iterations.length];
 
       for (const frame of animation.frames) {
         const animationKey = frame[0];
@@ -606,11 +614,9 @@ function processAnimations(
           refs,
           valueFrames,
           animationKey,
-          props,
-          state.styleLookup,
           delay,
           totalDuration,
-          easingFunction,
+          easingFuncs,
         );
 
         if (animation.requiresLayoutWidth || animation.requiresLayoutHeight) {
@@ -637,12 +643,10 @@ function processAnimations(
           sharedValue.value = initialValue;
         }
 
-        // sharedValue.value = withRepeat(
-        //   withSequence(...sequence),
-        //   iterations.type === "infinite" ? -1 : iterations.value,
-        // );
-
-        sharedValue.value = withSequence(...sequence);
+        sharedValue.value = withRepeat(
+          withSequence(...sequence),
+          iterationCount.type === "infinite" ? -1 : iterationCount.value,
+        );
 
         setDeep(props, pathTokens, sharedValue);
       }
