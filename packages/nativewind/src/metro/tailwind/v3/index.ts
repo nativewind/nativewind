@@ -23,7 +23,7 @@ export function tailwindCliV3(options: TailwindCliOptions) {
         ...process.env,
         NATIVEWIND_INPUT: options.input,
         NATIVEWIND_WATCH: `${options.dev}`,
-        NATIVEWIND_NATIVE: options.platform,
+        NATIVEWIND_OS: options.platform,
         BROWSERSLIST: options.browserslist ?? undefined,
         BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
       };

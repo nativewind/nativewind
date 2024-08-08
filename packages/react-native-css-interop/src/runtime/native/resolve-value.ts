@@ -372,11 +372,9 @@ export function resolveAnimation(
   refs: Refs,
   [initialFrame, ...frames]: RuntimeValueFrame[],
   property: string,
-  props: Record<string, any> = {},
-  styleLookup: Record<string, any>,
   delay: number,
   totalDuration: number,
-  timingFunction: EasingFunction,
+  easingFuncs: EasingFunction | EasingFunction[],
 ): [AnimatableValue, AnimatableValue, ...AnimatableValue[]] {
   const { withDelay, withTiming, Easing } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
@@ -390,14 +388,25 @@ export function resolveAnimation(
 
   return [
     initialValue,
-    ...frames.map((frame) => {
-      return withDelay(
-        delay,
-        withTiming(resolveAnimationValue(state, refs, property, frame.value), {
+    ...frames.map((frame, index) => {
+      const easingFunction = Array.isArray(easingFuncs)
+        ? easingFuncs[index]
+        : easingFuncs;
+
+      let value = withTiming(
+        resolveAnimationValue(state, refs, property, frame.value),
+        {
           duration: totalDuration * frame.progress,
-          easing: getEasing(timingFunction, Easing),
-        }),
+          easing: getEasing(easingFunction, Easing),
+        },
       );
+
+      // You can only have a delay between the initial and first frame
+      if (index === 1) {
+        value = withDelay(delay, value);
+      }
+
+      return value;
     }),
   ] as [AnimatableValue, AnimatableValue, ...AnimatableValue[]];
 }

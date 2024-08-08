@@ -13,6 +13,7 @@ import type {
   StyleSheetRegisterCompiledOptions,
 } from "../../types";
 import { INTERNAL_RESET } from "./unit-observables";
+import { warnings } from "./globals";
 
 export type InjectedStyleContextValue = {
   styles: Record<string, Observable<StyleRuleSet>>;
@@ -56,8 +57,18 @@ export const VariableContext =
 export function getStyle(name: string, effect?: Effect) {
   let obs = styles.get(name);
   if (!obs) styles.set(name, (obs = observable(undefined)));
-  return obs.get(effect);
+  const style = obs.get(effect);
+
+  const styleWarnings = style?.warnings;
+
+  if (styleWarnings) {
+    if (warnings.has(name)) return;
+    warnings.set(name, styleWarnings);
+  }
+
+  return style;
 }
+
 export function getOpaqueStyles(
   style: Record<string, any>,
   effect?: Effect,
@@ -106,6 +117,7 @@ export const getUniversalVariable = (name: string, effect: Effect) => {
 export function resetData() {
   styles.clear();
   keyframes.clear();
+  warnings.clear();
   universalVariables.clear();
   rootVariables.clear();
   colorScheme[INTERNAL_RESET](Appearance);
