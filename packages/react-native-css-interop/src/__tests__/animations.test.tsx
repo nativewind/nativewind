@@ -1,12 +1,6 @@
 /** @jsxImportSource react-native-css-interop */
-import { useState } from "react";
-import { Button, View } from "react-native";
-import Animated, {
-  getAnimatedStyle,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { View } from "react-native";
+import { getAnimatedStyle } from "react-native-reanimated";
 import {
   fireEvent,
   screen,
@@ -25,6 +19,7 @@ test("basic animation", () => {
 .my-class {
   animation-duration: 3000ms;
   animation-name: slidein;
+  animation-timing-function: linear;
 }
 
 @keyframes slidein {
@@ -46,7 +41,7 @@ test("basic animation", () => {
     marginLeft: "100%",
   });
 
-  jest.advanceTimersByTime(1501);
+  jest.advanceTimersByTime(1500);
 
   expect(getAnimatedStyle(component)).toEqual({
     marginLeft: "50%",
@@ -64,6 +59,7 @@ test("single frame", () => {
     .my-class {
       animation-duration: 3s;
       animation-name: spin;
+      animation-timing-function: linear;
     }
 
     @keyframes spin {
@@ -81,7 +77,7 @@ test("single frame", () => {
     transform: [{ rotate: "0deg" }],
   });
 
-  jest.advanceTimersByTime(1501);
+  jest.advanceTimersByTime(1500);
 
   expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "180deg" }],
@@ -99,6 +95,7 @@ test("transform - starting", () => {
     .my-class {
       animation-duration: 3s;
       animation-name: spin;
+      animation-timing-function: linear;
       transform: rotate(180deg);
     }
 
@@ -117,7 +114,7 @@ test("transform - starting", () => {
     transform: [{ rotate: "180deg" }],
   });
 
-  jest.advanceTimersByTime(1501);
+  jest.advanceTimersByTime(1500);
 
   expect(component).toHaveAnimatedStyle({
     transform: [{ rotate: "270deg" }],
@@ -180,7 +177,7 @@ test("bounce", () => {
     },
   });
 
-  jest.advanceTimersByTime(1);
+  jest.advanceTimersByTime(0);
 
   expect(component).toHaveAnimatedStyle({
     transform: [
@@ -218,7 +215,7 @@ test("bounce", () => {
     ],
   });
 
-  jest.advanceTimersByTime(501);
+  jest.advanceTimersByTime(500);
 
   expect(component).toHaveAnimatedStyle({
     transform: [
@@ -235,5 +232,57 @@ test("bounce", () => {
       { skewX: "0deg" },
       { skewY: "0deg" },
     ],
+  });
+});
+
+test("per-frame timing function", () => {
+  registerCSS(`
+    .my-class {
+      animation: spin 1s infinite linear
+    }
+
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+      0% {
+        transform: rotate(0deg);
+      }
+      50% {
+        transform: rotate(180deg);
+        animation-timing-function: cubic-bezier(0,0,0.2,1);
+      }
+    }
+`);
+
+  const component = render(
+    <View testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  fireEvent(component, "layout", {
+    nativeEvent: { layout: { width: 200, height: 100 } },
+  });
+
+  jest.advanceTimersByTime(250);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "90deg" }],
+  });
+
+  jest.advanceTimersByTime(250);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "180deg" }],
+  });
+
+  jest.advanceTimersByTime(250);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "330.801517737818deg" }],
+  });
+
+  jest.advanceTimersByTime(251);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "360deg" }],
   });
 });

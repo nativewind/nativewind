@@ -1,13 +1,25 @@
-import { testEachClassName } from "../test-utils";
+import { renderCurrentTest } from "../test-utils";
 
 describe("SVG - Fill", () => {
-  testEachClassName([["fill-black", { fill: "rgba(0, 0, 0, 1)" }]]);
+  test("fill-black", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { fill: "rgba(0, 0, 0, 1)" },
+    });
+  });
 });
 
 describe("SVG - Stroke", () => {
-  testEachClassName([["stroke-black", { stroke: "rgba(0, 0, 0, 1)" }]]);
+  test("stroke-black", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { stroke: "rgba(0, 0, 0, 1)" },
+    });
+  });
 });
 
 describe("SVG - Stroke Width", () => {
-  testEachClassName([["stroke-1", { strokeWidth: 1 }]]);
+  test("stroke-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { strokeWidth: 1 },
+    });
+  });
 });

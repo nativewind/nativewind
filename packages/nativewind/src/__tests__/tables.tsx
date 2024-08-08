@@ -1,36 +1,103 @@
-import { invalidProperty, testEachClassName } from "../test-utils";
+import { renderCurrentTest } from "../test-utils";
 
 describe("Tables - Border Collapse", () => {
-  testEachClassName([
-    ["border-collapse", undefined, invalidProperty("border-collapse")],
-    ["border-separate", undefined, invalidProperty("border-collapse")],
-  ]);
+  test("border-collapse", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-collapse"] },
+    });
+  });
+  test("border-separate", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-collapse"] },
+    });
+  });
 });
 
 describe("Tables - Border Spacing", () => {
-  testEachClassName([
-    ["border-spacing-0", undefined, invalidProperty("border-spacing")],
-    ["border-spacing-x-0", undefined, invalidProperty("border-spacing")],
-    ["border-spacing-y-0", undefined, invalidProperty("border-spacing")],
-    ["border-spacing-px", undefined, invalidProperty("border-spacing")],
-    ["border-spacing-x-px", undefined, invalidProperty("border-spacing")],
-    ["border-spacing-y-px", undefined, invalidProperty("border-spacing")],
-    ["border-spacing-1", undefined, invalidProperty("border-spacing")],
-    ["border-spacing-x-1", undefined, invalidProperty("border-spacing")],
-    ["border-spacing-y-1", undefined, invalidProperty("border-spacing")],
-  ]);
+  test("border-spacing-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-x-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-y-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-px", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-x-px", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-y-px", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-x-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-y-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
 });
 
 describe("Tables - Table Layout", () => {
-  testEachClassName([
-    ["table-auto", undefined, invalidProperty("table-layout")],
-    ["table-fixed", undefined, invalidProperty("table-layout")],
-  ]);
+  test("table-auto", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["table-layout"] },
+    });
+  });
+  test("table-fixed", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["table-layout"] },
+    });
+  });
 });
 
 describe("Tables - Caption Side", () => {
-  testEachClassName([
-    ["caption-top", undefined, invalidProperty("caption-side")],
-    ["caption-bottom", undefined, invalidProperty("caption-side")],
-  ]);
+  test("caption-top", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["caption-side"] },
+    });
+  });
+  test("caption-bottom", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["caption-side"] },
+    });
+  });
 });

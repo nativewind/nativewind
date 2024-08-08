@@ -19,6 +19,7 @@ import {
 } from "../../types";
 import { isReduceMotionEnabled } from "../../runtime/native/appearance-observables";
 import { resetData } from "../../runtime/native/styles";
+import { warnings } from "../../runtime/native/globals";
 
 export * from "../../index";
 export * from "../../runtime/native/styles";
@@ -67,6 +68,10 @@ export function render<T>(
   return tlRender(component, {
     ...options,
   });
+}
+
+export function getWarnings() {
+  return warnings;
 }
 
 /*

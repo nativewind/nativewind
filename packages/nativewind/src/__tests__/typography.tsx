@@ -1,375 +1,657 @@
-import {
-  invalidProperty,
-  invalidValue,
-  testEachClassName,
-} from "../test-utils";
+import { renderCurrentTest } from "../test-utils";
 
 describe("Typography - Font Family", () => {
-  testEachClassName([
-    ["font-sans", { style: { fontFamily: "system font" } }],
-    ["font-serif", { style: { fontFamily: "Georgia" } }],
-    ["font-mono", { style: { fontFamily: "Courier New" } }],
-  ]);
+  test("font-sans", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { fontFamily: "system font" } },
+    });
+  });
+  test("font-serif", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { fontFamily: "Georgia" } },
+    });
+  });
+  test("font-mono", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { fontFamily: "Courier New" } },
+    });
+  });
 });
 
 describe("Typography - Font Size", () => {
-  testEachClassName([
-    ["text-xs", { style: { fontSize: 10.5, lineHeight: 14 } }],
-    ["text-base", { style: { fontSize: 14, lineHeight: 21 } }],
-  ]);
+  test("text-xs", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { fontSize: 10.5, lineHeight: 14 } },
+    });
+  });
+  test("text-base", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { fontSize: 14, lineHeight: 21 } },
+    });
+  });
 });
 
 describe("Typography - Font Smoothing", () => {
-  testEachClassName([
-    [
-      "antialiased",
-      {
-        warning: () =>
-          new Map([
-            [
-              "antialiased",
-              [
-                {
-                  property: "-webkit-font-smoothing",
-                  type: "IncompatibleNativeProperty",
-                },
-                {
-                  property: "-moz-osx-font-smoothing",
-                  type: "IncompatibleNativeProperty",
-                },
-              ],
-            ],
-          ]),
+  test("antialiased", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: {
+        properties: ["-webkit-font-smoothing", "-moz-osx-font-smoothing"],
       },
-    ],
-    [
-      "subpixel-antialiased",
-      {
-        warning: () =>
-          new Map([
-            [
-              "subpixel-antialiased",
-              [
-                {
-                  property: "-webkit-font-smoothing",
-                  type: "IncompatibleNativeProperty",
-                },
-                {
-                  property: "-moz-osx-font-smoothing",
-                  type: "IncompatibleNativeProperty",
-                },
-              ],
-            ],
-          ]),
+    });
+  });
+  test("subpixel-antialiased", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: {
+        properties: ["-webkit-font-smoothing", "-moz-osx-font-smoothing"],
       },
-    ],
-  ]);
+    });
+  });
 });
 
 describe("Typography - Font Style", () => {
-  testEachClassName([
-    ["italic", { style: { fontStyle: "italic" } }],
-    ["not-italic", { style: { fontStyle: "normal" } }],
-  ]);
+  test("italic", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { fontStyle: "italic" } },
+    });
+  });
+  test("not-italic", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { fontStyle: "normal" } },
+    });
+  });
 });
 
 describe("Typography - Font Weight", () => {
-  testEachClassName([
-    ["font-thin", { style: { fontWeight: "100" } }],
-    ["font-normal", { style: { fontWeight: "400" } }],
-    ["font-black", { style: { fontWeight: "900" } }],
-  ]);
+  test("font-thin", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { fontWeight: "100" } },
+    });
+  });
+  test("font-normal", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { fontWeight: "400" } },
+    });
+  });
+  test("font-black", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { fontWeight: "900" } },
+    });
+  });
 });
 
 describe("Typography - Font Variant Numeric", () => {
-  testEachClassName([
-    ["normal-nums", undefined, invalidProperty("font-variant-numeric")],
-    ["ordinal", undefined, invalidProperty("font-variant-numeric")],
-    ["slashed-zero", undefined, invalidProperty("font-variant-numeric")],
-    ["lining-nums", undefined, invalidProperty("font-variant-numeric")],
-    ["oldstyle-nums", undefined, invalidProperty("font-variant-numeric")],
-    ["proportional-nums", undefined, invalidProperty("font-variant-numeric")],
-    ["tabular-nums", undefined, invalidProperty("font-variant-numeric")],
-    ["diagonal-fractions", undefined, invalidProperty("font-variant-numeric")],
-    ["stacked-fractions", undefined, invalidProperty("font-variant-numeric")],
-  ]);
+  test("normal-nums", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["font-variant-numeric"] },
+    });
+  });
+  test("ordinal", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["font-variant-numeric"] },
+    });
+  });
+  test("slashed-zero", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["font-variant-numeric"] },
+    });
+  });
+  test("lining-nums", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["font-variant-numeric"] },
+    });
+  });
+  test("oldstyle-nums", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["font-variant-numeric"] },
+    });
+  });
+  test("proportional-nums", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["font-variant-numeric"] },
+    });
+  });
+  test("tabular-nums", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["font-variant-numeric"] },
+    });
+  });
+  test("diagonal-fractions", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["font-variant-numeric"] },
+    });
+  });
+  test("stacked-fractions", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["font-variant-numeric"] },
+    });
+  });
 });
 
 describe("Typography - Letter Spacing", () => {
-  testEachClassName([
-    ["tracking-tighter", { style: { letterSpacing: -0.5 } }],
-    ["tracking-tight", { style: { letterSpacing: -0.25 } }],
-    ["tracking-normal", { style: { letterSpacing: 0 } }],
-    ["tracking-wide", { style: { letterSpacing: 0.25 } }],
-    ["tracking-wider", { style: { letterSpacing: 0.5 } }],
-    ["tracking-widest", { style: { letterSpacing: 1 } }],
-  ]);
+  test("tracking-tighter", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { letterSpacing: -0.5 } },
+    });
+  });
+  test("tracking-tight", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { letterSpacing: -0.25 } },
+    });
+  });
+  test("tracking-normal", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { letterSpacing: 0 } },
+    });
+  });
+  test("tracking-wide", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { letterSpacing: 0.25 } },
+    });
+  });
+  test("tracking-wider", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { letterSpacing: 0.5 } },
+    });
+  });
+  test("tracking-widest", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { letterSpacing: 1 } },
+    });
+  });
 });
 
-describe.only("Typography - Line Clamp", () => {
-  testEachClassName([
-    // [
-    //   "line-clamp-1",
-    //   { props: { numberOfLines: 1 }, {style:  { overflow: "hidden" }}},
-    // ],
-    // [
-    //   "line-clamp-2",
-    //   { props: { numberOfLines: 2 }, {style:  { overflow: "hidden" }}},
-    // ],
-    // [
-    //   "line-clamp-3",
-    //   { props: { numberOfLines: 3 }, {style:  { overflow: "hidden" }}},
-    // ],
-    // [
-    //   "line-clamp-4",
-    //   { props: { numberOfLines: 4 }, {style:  { overflow: "hidden" }}},
-    // ],
-    // [
-    //   "line-clamp-5",
-    //   { props: { numberOfLines: 5 }, {style:  { overflow: "hidden" }}},
-    // ],
-    // [
-    //   "line-clamp-6",
-    //   { props: { numberOfLines: 6 }, {style:  { overflow: "hidden" }}},
-    // ],
-    [
-      "line-clamp-none",
-      { numberOfLines: 0 },
-      { style: { overflow: "visible" } },
-    ],
-  ]);
+describe("Typography - Line Clamp", () => {
+  test("line-clamp-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { numberOfLines: 1, style: { overflow: "hidden" } },
+    });
+  });
+  test("line-clamp-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { numberOfLines: 2, style: { overflow: "hidden" } },
+    });
+  });
+  test("line-clamp-3", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { numberOfLines: 3, style: { overflow: "hidden" } },
+    });
+  });
+  test("line-clamp-4", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { numberOfLines: 4, style: { overflow: "hidden" } },
+    });
+  });
+  test("line-clamp-5", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { numberOfLines: 5, style: { overflow: "hidden" } },
+    });
+  });
+  test("line-clamp-6", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { numberOfLines: 6, style: { overflow: "hidden" } },
+    });
+  });
+  test("line-clamp-none", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        numberOfLines: 0,
+        style: { overflow: "visible" },
+      },
+    });
+  });
 });
 
 describe("Typography - Line Height", () => {
-  testEachClassName([
-    ["leading-3", { style: { lineHeight: 10.5 } }],
-    ["leading-4", { style: { lineHeight: 14 } }],
-  ]);
+  test("leading-3", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { lineHeight: 10.5 } },
+    });
+  });
+  test("leading-4", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { lineHeight: 14 } },
+    });
+  });
 });
 
 describe("Typography - List Style Image", () => {
-  testEachClassName([
-    ["list-image-none", undefined, invalidProperty("list-{style: i}age")],
-  ]);
+  test("list-image-none", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["list-style-image"] },
+    });
+  });
 });
 
 describe("Typography - List Style Position", () => {
-  testEachClassName([
-    ["list-inside", undefined, invalidProperty("list-{style: p}sition")],
-    ["list-outside", undefined, invalidProperty("list-{style: p}sition")],
-  ]);
+  test("list-inside", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["list-style-position"] },
+    });
+  });
+  test("list-outside", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["list-style-position"] },
+    });
+  });
 });
 
 describe("Typography - List Style Type", () => {
-  testEachClassName([
-    ["list-none", undefined, invalidProperty("list-{style: t}pe")],
-    ["list-disc", undefined, invalidProperty("list-{style: t}pe")],
-    ["list-decimal", undefined, invalidProperty("list-{style: t}pe")],
-  ]);
+  test("list-none", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["list-style-type"] },
+    });
+  });
+  test("list-disc", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["list-style-type"] },
+    });
+  });
+  test("list-decimal", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["list-style-type"] },
+    });
+  });
 });
 
 describe("Typography - Text Align", () => {
-  testEachClassName([
-    ["text-left", { style: { textAlign: "left" } }],
-    ["text-center", { style: { textAlign: "center" } }],
-    ["text-right", { style: { textAlign: "right" } }],
-    ["text-justify", { style: { textAlign: "justify" } }],
-  ]);
+  test("text-left", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textAlign: "left" } },
+    });
+  });
+  test("text-center", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textAlign: "center" } },
+    });
+  });
+  test("text-right", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textAlign: "right" } },
+    });
+  });
+  test("text-justify", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textAlign: "justify" } },
+    });
+  });
 });
 
 describe("Typography - Text Color", () => {
-  testEachClassName([
-    ["text-black", { style: { color: "rgba(0, 0, 0, 1)" } }],
-    ["text-white", { style: { color: "rgba(255, 255, 255, 1)" } }],
-    ["text-transparent", { style: { color: "rgba(0, 0, 0, 0)" } }],
-    ["text-slate-50", { style: { color: "rgba(248, 250, 252, 1)" } }],
-    [
-      "text-white/50",
-      { style: { color: "rgba(255, 255, 255, 0.501960813999176)" } },
-    ],
-    ["text-current", undefined, invalidValue({ color: "currentcolor" })],
-    ["text-inherit", undefined, invalidValue({ color: "inherit" })],
-  ]);
+  test("text-black", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { color: "rgba(0, 0, 0, 1)" } },
+    });
+  });
+  test("text-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { color: "rgba(255, 255, 255, 1)" } },
+    });
+  });
+  test("text-transparent", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { color: "rgba(0, 0, 0, 0)" } },
+    });
+  });
+  test("text-slate-50", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { color: "rgba(248, 250, 252, 1)" } },
+    });
+  });
+  test("text-white/50", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { color: "rgba(255, 255, 255, 0.501960813999176)" } },
+    });
+  });
+  test("text-current", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { color: "currentcolor" } },
+    });
+  });
+  test("text-inherit", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { color: "inherit" } },
+    });
+  });
 });
 
 describe("Typography - Text Decoration", () => {
-  testEachClassName([
-    ["underline", { style: { textDecorationLine: "underline" } }],
-    ["line-through", { style: { textDecorationLine: "line-through" } }],
-    ["no-underline", { style: { textDecorationLine: "none" } }],
-    [
-      "overline",
-      undefined,
-      invalidValue({ "text-decoration-line": "overline" }),
-    ],
-  ]);
+  test("underline", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationLine: "underline" } },
+    });
+  });
+  test("line-through", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationLine: "line-through" } },
+    });
+  });
+  test("no-underline", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationLine: "none" } },
+    });
+  });
+  test("overline", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "text-decoration-line": "overline" } },
+    });
+  });
 });
 
 describe("Typography - Text Decoration Color", () => {
-  testEachClassName([
-    [
-      "decoration-black",
-      { style: { textDecorationColor: "rgba(0, 0, 0, 1)" } },
-    ],
-    [
-      "decoration-white",
-      { style: { textDecorationColor: "rgba(255, 255, 255, 1)" } },
-    ],
-    [
-      "decoration-transparent",
-      { style: { textDecorationColor: "rgba(0, 0, 0, 0)" } },
-    ],
-    [
-      "decoration-slate-50",
-      { style: { textDecorationColor: "rgba(248, 250, 252, 1)" } },
-    ],
-    [
-      "decoration-current",
-      undefined,
-      invalidValue({ "text-decoration-color": "currentcolor" }),
-    ],
-    [
-      "decoration-inherit",
-      undefined,
-      invalidValue({ "text-decoration-color": "inherit" }),
-    ],
-  ]);
+  test("decoration-black", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationColor: "rgba(0, 0, 0, 1)" } },
+    });
+  });
+  test("decoration-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationColor: "rgba(255, 255, 255, 1)" } },
+    });
+  });
+  test("decoration-transparent", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationColor: "rgba(0, 0, 0, 0)" } },
+    });
+  });
+  test("decoration-slate-50", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationColor: "rgba(248, 250, 252, 1)" } },
+    });
+  });
+  test("decoration-current", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "text-decoration-color": "currentcolor" } },
+    });
+  });
+  test("decoration-inherit", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "text-decoration-color": "inherit" } },
+    });
+  });
 });
 
 describe("Typography - Text Decoration Style", () => {
-  testEachClassName([
-    ["decoration-solid", { style: { textDecorationStyle: "solid" } }],
-    ["decoration-double", { style: { textDecorationStyle: "double" } }],
-    ["decoration-dotted", { style: { textDecorationStyle: "dotted" } }],
-    ["decoration-dashed", { style: { textDecorationStyle: "dashed" } }],
-    [
-      "decoration-wavy",
-      undefined,
-      invalidValue({ "text-decoration-style": "wavy" }),
-    ],
-  ]);
+  test("decoration-solid", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationStyle: "solid" } },
+    });
+  });
+  test("decoration-double", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationStyle: "double" } },
+    });
+  });
+  test("decoration-dotted", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationStyle: "dotted" } },
+    });
+  });
+  test("decoration-dashed", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textDecorationStyle: "dashed" } },
+    });
+  });
+  test("decoration-wavy", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "text-decoration-style": "wavy" } },
+    });
+  });
 });
 
 describe("Typography - Text Decoration Thickness", () => {
-  testEachClassName([
-    [
-      "decoration-auto",
-      undefined,
-      invalidProperty("text-decoration-thickness"),
-    ],
-    [
-      "decoration-from-font",
-      undefined,
-      invalidProperty("text-decoration-thickness"),
-    ],
-    ["decoration-0", undefined, invalidProperty("text-decoration-thickness")],
-    ["decoration-1", undefined, invalidProperty("text-decoration-thickness")],
-  ]);
+  test("decoration-auto", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-decoration-thickness"] },
+    });
+  });
+  test("decoration-from-font", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-decoration-thickness"] },
+    });
+  });
+  test("decoration-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-decoration-thickness"] },
+    });
+  });
+  test("decoration-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-decoration-thickness"] },
+    });
+  });
 });
 
 describe("Typography - Text Underline Offset", () => {
-  testEachClassName([
-    [
-      "underline-offset-auto",
-      undefined,
-      invalidProperty("text-underline-offset"),
-    ],
-    ["underline-offset-0", undefined, invalidProperty("text-underline-offset")],
-  ]);
+  test("underline-offset-auto", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-underline-offset"] },
+    });
+  });
+  test("underline-offset-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-underline-offset"] },
+    });
+  });
 });
 
 describe("Typography - Text Transform", () => {
-  testEachClassName([
-    ["uppercase", { style: { textTransform: "uppercase" } }],
-    ["lowercase", { style: { textTransform: "lowercase" } }],
-    ["capitalize", { style: { textTransform: "capitalize" } }],
-    ["normal-case", { style: { textTransform: "none" } }],
-  ]);
+  test("uppercase", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textTransform: "uppercase" } },
+    });
+  });
+  test("lowercase", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textTransform: "lowercase" } },
+    });
+  });
+  test("capitalize", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textTransform: "capitalize" } },
+    });
+  });
+  test("normal-case", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { textTransform: "none" } },
+    });
+  });
 });
 
 describe("Typography - Text Overflow", () => {
-  testEachClassName([
-    ["text-ellipsis", undefined, invalidProperty("text-overflow")],
-    ["text-clip", undefined, invalidProperty("text-overflow")],
-  ]);
+  test("text-ellipsis", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-overflow"] },
+    });
+  });
+  test("text-clip", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-overflow"] },
+    });
+  });
 });
 
 describe("Typography - Text Indent", () => {
-  testEachClassName([
-    ["indent-px", undefined, invalidProperty("text-indent")],
-    ["indent-0", undefined, invalidProperty("text-indent")],
-    ["indent-1", undefined, invalidProperty("text-indent")],
-  ]);
+  test("indent-px", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-indent"] },
+    });
+  });
+  test("indent-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-indent"] },
+    });
+  });
+  test("indent-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["text-indent"] },
+    });
+  });
 });
 
 describe("Typography - Vertical Align", () => {
-  testEachClassName([
-    [
-      "align-baseline",
-      undefined,
-      invalidValue({ "vertical-align": "baseline" }),
-    ],
-    ["align-top", { style: { verticalAlign: "top" } }],
-    ["align-middle", { style: { verticalAlign: "middle" } }],
-    ["align-bottom", { style: { verticalAlign: "bottom" } }],
-    [
-      "align-text-top",
-      undefined,
-      invalidValue({ "vertical-align": "text-top" }),
-    ],
-    [
-      "align-text-bottom",
-      undefined,
-      invalidValue({ "vertical-align": "text-bottom" }),
-    ],
-    ["align-sub", undefined, invalidValue({ "vertical-align": "sub" })],
-    ["align-super", undefined, invalidValue({ "vertical-align": "super" })],
-  ]);
+  test("align-baseline", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "vertical-align": "baseline" } },
+    });
+  });
+  test("align-top", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { verticalAlign: "top" } },
+    });
+  });
+  test("align-middle", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { verticalAlign: "middle" } },
+    });
+  });
+  test("align-bottom", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { verticalAlign: "bottom" } },
+    });
+  });
+  test("align-text-top", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "vertical-align": "text-top" } },
+    });
+  });
+  test("align-text-bottom", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "vertical-align": "text-bottom" } },
+    });
+  });
+  test("align-sub", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "vertical-align": "sub" } },
+    });
+  });
+  test("align-super", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "vertical-align": "super" } },
+    });
+  });
 });
 
 describe("Typography - Whitespace", () => {
-  testEachClassName([
-    ["whitespace-normal", undefined, invalidProperty("white-space")],
-    ["whitespace-nowrap", undefined, invalidProperty("white-space")],
-    ["whitespace-pre", undefined, invalidProperty("white-space")],
-    ["whitespace-pre-line", undefined, invalidProperty("white-space")],
-    ["whitespace-pre-wrap", undefined, invalidProperty("white-space")],
-  ]);
+  test("whitespace-normal", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["white-space"] },
+    });
+  });
+  test("whitespace-nowrap", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["white-space"] },
+    });
+  });
+  test("whitespace-pre", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["white-space"] },
+    });
+  });
+  test("whitespace-pre-line", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["white-space"] },
+    });
+  });
+  test("whitespace-pre-wrap", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["white-space"] },
+    });
+  });
 });
 
 describe("Typography - Word Break", () => {
-  testEachClassName([
-    [
-      "break-normal",
-      {
-        warning: () =>
-          new Map([
-            [
-              "break-normal",
-              [
-                {
-                  property: "overflow-wrap",
-                  type: "IncompatibleNativeProperty",
-                },
-                { property: "word-break", type: "IncompatibleNativeProperty" },
-              ],
-            ],
-          ]),
+  test("break-normal", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: {
+        properties: ["overflow-wrap", "word-break"],
       },
-    ],
-    ["break-words", undefined, invalidProperty("overflow-wrap")],
-    ["break-all", undefined, invalidProperty("word-break")],
-  ]);
+    });
+  });
+  test("break-words", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["overflow-wrap"] },
+    });
+  });
+  test("break-all", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["word-break"] },
+    });
+  });
 });
 
 describe("Typography - Hyphens", () => {
-  testEachClassName([
-    ["hyphens-none", undefined, invalidProperty("hyphens")],
-    ["hyphens-manual", undefined, invalidProperty("hyphens")],
-    ["hyphens-auto", undefined, invalidProperty("hyphens")],
-  ]);
+  test("hyphens-none", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["hyphens"] },
+    });
+  });
+  test("hyphens-manual", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["hyphens"] },
+    });
+  });
+  test("hyphens-auto", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["hyphens"] },
+    });
+  });
 });
 
 describe("Typography - Content", () => {
-  testEachClassName([["content-none", undefined, invalidProperty("content")]]);
+  test("content-none", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["content"] },
+    });
+  });
 });

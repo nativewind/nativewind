@@ -151,6 +151,15 @@ const nativePlugins = plugin(function ({
     { values: theme("lineClamp") },
   );
 
+  matchUtilities(
+    {
+      elevation: (value) => ({
+        "-rn-elevation": value,
+      }),
+    },
+    { values: theme("elevation") },
+  );
+
   addUtilities({
     ".line-clamp-none": {
       "&": {
