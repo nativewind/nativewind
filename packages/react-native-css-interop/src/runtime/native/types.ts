@@ -1,13 +1,13 @@
-import { SharedValue } from "react-native-reanimated";
-import {
+import type { SharedValue } from "react-native-reanimated";
+import type {
   InteropComponentConfig,
   StyleDeclaration,
   ExtractedAnimations,
   ExtractedTransition,
   ContainerRecord,
 } from "../../types";
-import { Effect, Observable } from "../observable";
-import { VariableContextValue } from "./styles";
+import type { Effect, Observable } from "../observable";
+import type { VariableContextValue } from "./styles";
 
 export type Callback = () => void;
 export type GetInteraction = (
