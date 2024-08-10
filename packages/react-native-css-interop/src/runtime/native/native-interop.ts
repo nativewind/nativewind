@@ -6,6 +6,7 @@ import {
   useReducer,
   useState,
 } from "react";
+import { LayoutChangeEvent, View } from "react-native";
 import {
   ReactComponent,
   InteropComponentConfig,
@@ -45,8 +46,6 @@ import {
   getStyle,
 } from "./styles";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
-import { LayoutChangeEvent, View } from "react-native";
-import { Easing, withRepeat, withSequence } from "react-native-reanimated";
 
 export function interop(
   component: ReactComponent<any>,
@@ -542,7 +541,7 @@ function processAnimations(
     waitingLayout,
   } = state.animation;
 
-  const { makeMutable } =
+  const { makeMutable, withRepeat, withSequence } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
   let names: string[] = [];
@@ -681,7 +680,7 @@ function processTransition(
    * Make this inline to avoid importing reanimated if we don't need it
    * This also fixes circular dependency issues where Reanimated may use the jsx transform
    */
-  const { makeMutable, withTiming, withDelay } =
+  const { makeMutable, withTiming, withDelay, Easing } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
   /**

@@ -27,7 +27,7 @@ import type {
 import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
 import type { Effect, Observable } from "./runtime/observable";
 import type { SharedValue } from "react-native-reanimated";
-import { SharedState } from "./runtime/native/types";
+import type { SharedState } from "./runtime/native/types";
 
 export interface Effect2 {
   update: () => void;
