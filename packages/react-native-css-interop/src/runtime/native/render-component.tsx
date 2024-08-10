@@ -4,7 +4,6 @@ import { Pressable } from "react-native";
 import { containerContext } from "./globals";
 import { SharedState } from "./types";
 import { VariableContext } from "./styles";
-import { useAnimatedStyle } from "react-native-reanimated";
 
 const animatedCache = new Map<
   ComponentType<any> | string,
@@ -55,11 +54,32 @@ export function renderComponent(
     state.animated = UpgradeState.UPGRADED;
     component = createAnimatedComponent(component);
 
-    const style = useAnimatedStyle(() => {
-      return flattenAnimatedProps(possiblyAnimatedProps.style);
-    }, [Object.values(possiblyAnimatedProps.style)]);
+    const { useAnimatedStyle } =
+      require("react-native-reanimated") as typeof import("react-native-reanimated");
 
-    props = { ...props, style };
+    props.style = useAnimatedStyle(() => {
+      function flattenAnimatedProps(style: any): any {
+        // Primitive or null
+        if (typeof style !== "object" || !style) return style;
+        // Shared value
+        if ("_isReanimatedSharedValue" in style && "value" in style) {
+          return style.value;
+        }
+        if (Array.isArray(style)) return style.map(flattenAnimatedProps);
+        return Object.fromEntries(
+          Object.entries(style).map(([key, value]: any) => {
+            return [key, flattenAnimatedProps(value)];
+          }),
+        );
+      }
+
+      try {
+        return flattenAnimatedProps(possiblyAnimatedProps.style);
+      } catch (error: any) {
+        console.log(`css-interop error: ${error.message}`);
+        return {};
+      }
+    }, [possiblyAnimatedProps.style]);
   } else {
     props = { ...props, ...possiblyAnimatedProps };
   }
@@ -162,8 +182,6 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
   const { default: Animated } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
-  return Animated.View;
-
   const AnimatedComponent = Animated.createAnimatedComponent(
     Component as React.ComponentClass,
   );
@@ -226,18 +244,3 @@ function stringify(object: any) {
 //       return "unknown";
 //   }
 // }
-
-function flattenAnimatedProps(style: any): any {
-  // Primitive or null
-  if (typeof style !== "object" || !style) return style;
-  // Shared value
-  if ("_isReanimatedSharedValue" in style && "value" in style) {
-    return style.value;
-  }
-  if (Array.isArray(style)) return style.map(flattenAnimatedProps);
-  return Object.fromEntries(
-    Object.entries(style).map(([key, style]: any) => {
-      return [key, flattenAnimatedProps(style)];
-    }),
-  );
-}
