@@ -87,11 +87,6 @@ export function withCssInterop(
       ...config.resolver,
       sourceExts: [...(config?.resolver?.sourceExts || []), "css"],
       resolveRequest: (context, moduleName, platform) => {
-        /**
-         * Change the `input` import statements to point to a virtual module
-         */
-        platform = platform || "native";
-
         const resolved =
           originalResolver?.(context, moduleName, platform) ||
           context.resolveRequest(context, moduleName, platform);
@@ -101,8 +96,13 @@ export function withCssInterop(
           return resolved;
         }
 
+        /**
+         * Change the `input` import statements to point to a virtual module
+         */
+        platform = platform || "native";
+
         // Generate a fake name for our virtual module. Make it platform specific
-        const platformFilePath = `${resolved.filePath}.${platform}.js`;
+        const platformFilePath = `${resolved.filePath}.${platform}.${platform === "web" ? "css" : "js"}`;
 
         // Start the css processor
         initPreprocessedFile(

@@ -177,17 +177,12 @@ export function interop(
     let hasVariables = false;
     let hasContainer = false;
     let hasNullContainer = false;
-    const animatedDeps = [];
 
     /**
      * Loop over all the states and collect the props, variables and containers
      */
     for (const state of states) {
       Object.assign(possiblyAnimatedProps, state.props);
-
-      if (state.sharedValues?.size) {
-        animatedDeps.push(...state.sharedValues.values());
-      }
 
       if (state.variables) {
         hasVariables = true;
@@ -288,7 +283,6 @@ export function interop(
       handlers,
       variables: nextVariables,
       containers: nextContainers,
-      animatedDeps,
     };
   }, states);
 
@@ -314,7 +308,6 @@ export function interop(
     memoOutput.possiblyAnimatedProps,
     memoOutput.variables,
     memoOutput.containers,
-    memoOutput.animatedDeps,
   );
 }
 
