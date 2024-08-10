@@ -4,7 +4,7 @@ import { Pressable } from "react-native";
 import { containerContext } from "./globals";
 import { SharedState } from "./types";
 import { VariableContext } from "./styles";
-import { SharedValue, useAnimatedStyle } from "react-native-reanimated";
+import { useAnimatedStyle } from "react-native-reanimated";
 
 const animatedCache = new Map<
   ComponentType<any> | string,
@@ -28,7 +28,6 @@ export function renderComponent(
   possiblyAnimatedProps: Record<string, any>,
   variables?: Record<string, any>,
   containers?: Record<string, any>,
-  animatedDeps?: Array<SharedValue>,
 ) {
   let component = baseComponent;
   const shouldWarn = state.canUpgradeWarn;
@@ -229,7 +228,7 @@ function stringify(object: any) {
 // }
 
 function flattenAnimatedProps(style: any): any {
-  // Primative or null
+  // Primitive or null
   if (typeof style !== "object" || !style) return style;
   // Shared value
   if ("_isReanimatedSharedValue" in style && "value" in style) {
