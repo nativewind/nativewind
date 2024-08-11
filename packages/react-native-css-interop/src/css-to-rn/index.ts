@@ -33,6 +33,8 @@ import { DEFAULT_CONTAINER_NAME } from "../shared";
 import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
 import { optimizeRules } from "./optimize-rules";
 
+import { versions } from "node:process";
+
 type CSSInteropAtRule = {
   type: "custom";
   value: {
@@ -54,6 +56,10 @@ export function cssToReactNativeRuntime(
   code: Buffer | string,
   options: CssToReactNativeRuntimeOptions = {},
 ): StyleSheetRegisterCompiledOptions {
+  if (Number(versions.node.split(".")[0]) < 18) {
+    throw new Error("react-native-css-interop only supports NodeJS >18");
+  }
+
   // Parse the grouping options to create an array of regular expressions
   const grouping =
     options.grouping?.map((value) => {

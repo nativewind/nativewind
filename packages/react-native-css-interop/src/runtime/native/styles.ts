@@ -13,7 +13,7 @@ import type {
   StyleSheetRegisterCompiledOptions,
 } from "../../types";
 import { INTERNAL_RESET } from "./unit-observables";
-import { warnings } from "./globals";
+import { flags, warnings } from "./globals";
 
 export type InjectedStyleContextValue = {
   styles: Record<string, Observable<StyleRuleSet>>;
@@ -166,6 +166,13 @@ export function injectData(data: StyleSheetRegisterCompiledOptions) {
       } else {
         universalVariables.set(entry[0], cssVariableObservable(entry[1]));
       }
+    }
+  }
+
+  flags.set("enabled", "true");
+  if (data.flags) {
+    for (const [key, value] of Object.entries(data.flags)) {
+      flags.set(key, value);
     }
   }
 }
