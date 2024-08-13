@@ -9,6 +9,10 @@
 <img alt="npm" src="https://img.shields.io/npm/v/nativewind">
 <img alt="npm" src="https://img.shields.io/npm/dt/nativewind">
 <img alt="GitHub" src="https://img.shields.io/github/license/marklawlor/nativewind">
+<img alt="Discord" src="https://img.shields.io/discord/968718419904057416?logo=discord&logoColor=ffffff&label=Discord&color=5865F2">
+<img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/nativewindcss">
+
+
 </div>
 <br />
 
