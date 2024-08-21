@@ -1,5 +1,5 @@
 /** @jsxImportSource nativewind */
-import { render, screen } from "../test-utils";
+import { fireEvent, render, screen } from "../test-utils";
 import { View } from "react-native";
 import { getAnimatedStyle } from "react-native-reanimated";
 
@@ -135,5 +135,83 @@ test("animate-spin", async () => {
   jest.advanceTimersByTime(250);
   expect(getAnimatedStyle(component)).toStrictEqual({
     transform: [{ rotate: "90deg" }],
+  });
+});
+
+test("changing animations", async () => {
+  await render(<View testID={testID} className="animate-spin h-4" />, {
+    config: {
+      safelist: ["animate-bounce"],
+    },
+  });
+
+  let component = screen.getByTestId(testID);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    height: 14,
+    transform: [{ rotate: "0deg" }],
+  });
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    height: 14,
+    transform: [{ rotate: "180deg" }],
+  });
+
+  screen.rerender(<View testID={testID} className="animate-bounce h-4" />);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    height: 14,
+    transform: [{ rotate: "0deg" }],
+  });
+
+  jest.advanceTimersByTime(1);
+
+  fireEvent(component, "layout", {
+    nativeEvent: {
+      layout: {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      },
+    },
+  });
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    height: 14,
+    transform: [
+      { translateY: 0 },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
+    ],
+  });
+
+  jest.advanceTimersByTime(100);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    height: 14,
+    transform: [
+      { translateY: 0 },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
+    ],
   });
 });

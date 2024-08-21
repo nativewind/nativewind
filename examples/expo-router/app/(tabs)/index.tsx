@@ -7,15 +7,15 @@ const theme = vars({
 
 const App = () => {
   return (
-    <View className="flex-1 items-center justify-center" style={theme}>
-      <Text className="font-bold text-[--theme-fg]">Variables!!!</Text>
+    <View className="flex-1 justify-center items-center">
+      <Text className="text-[--theme-fg]">Variables!!!</Text>
       <Text
         suppressHighlighting
-        className="font-bold active:scale-150 active:text-[--theme-fg] transition"
+        className="active:scale-150 active:text-[--theme-fg] transition"
       >
         Transitions
       </Text>
-      <Text key={1} className="font-bold text-green-800 animate-spin">
+      <Text testID="a" key={1} className="animate-bounce">
         Animations!!!
       </Text>
     </View>
