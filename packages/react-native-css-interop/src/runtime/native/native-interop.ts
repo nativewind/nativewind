@@ -330,6 +330,7 @@ function initReducer({
       styleLookup: {},
       normal: [],
       important: [],
+      currentRenderAnimation: {},
       declarationTracking: {
         effect: {
           dependencies: new Set(),
@@ -362,6 +363,7 @@ function getDeclarations(
     // Reset the declarations
     normal: [],
     important: [],
+    currentRenderAnimation: {},
     // Reset containers and variables
     containerNames: undefined,
     variables: undefined,
@@ -525,134 +527,183 @@ function processAnimations(
   refs: Refs,
   seenAnimatedProps: Set<string>,
 ) {
-  if (!state.animation) return;
-  state.sharedValues ??= new Map();
-  state.animationNames ??= new Set();
+  // TODO - check for animation: "none"
+  if (state.currentRenderAnimation?.name?.length) {
+    state.sharedValues ??= new Map();
+    state.animationNames ??= new Set();
 
-  state.props ??= {};
-  const props = state.props;
+    state.props ??= {};
+    const props = state.props;
 
-  const {
-    name: animationNames,
-    duration: durations,
-    delay: delays,
-    timingFunction: baseEasingFuncs,
-    iterationCount: iterations,
-    waitingLayout,
-  } = state.animation;
+    const {
+      name: animationNames,
+      duration: durations = defaultAnimation.duration,
+      delay: delays = defaultAnimation.delay,
+      timingFunction: baseEasingFuncs = defaultAnimation.timingFunction,
+      iterationCount: iterations = defaultAnimation.iterationCount,
+    } = state.currentRenderAnimation;
 
-  const { makeMutable, withRepeat, withSequence } =
-    require("react-native-reanimated") as typeof import("react-native-reanimated");
+    const {
+      name: prevAnimationNames = [],
+      duration: prevDurations = defaultAnimation.duration,
+      delay: prevDelays = defaultAnimation.delay,
+      timingFunction: prevBaseEasingFuncs = defaultAnimation.timingFunction,
+      iterationCount: prevIterations = defaultAnimation.iterationCount,
+    } = state.previousAnimation || {};
 
-  let names: string[] = [];
-  // Always reset if we are waiting on an animation
-  let shouldResetAnimations = waitingLayout;
+    const waitingLayout = state.isWaitingLayout;
 
-  for (const name of animationNames) {
-    if (name.type === "none") {
-      names = [];
+    const { makeMutable, withRepeat, withSequence } =
+      require("react-native-reanimated") as typeof import("react-native-reanimated");
+
+    let shouldResetAnimations =
+      waitingLayout || // Always reset if we are waiting on an animation
+      isDeepEqual(prevAnimationNames, animationNames) ||
+      isDeepEqual(prevDurations, durations) ||
+      isDeepEqual(prevDelays, delays) ||
+      isDeepEqual(prevBaseEasingFuncs, baseEasingFuncs) ||
+      isDeepEqual(prevIterations, iterations);
+
+    let names: string[] = [];
+
+    for (const name of animationNames) {
+      if (name.type === "none") {
+        resetAnimation(state);
+        break;
+      }
+
+      names.push(name.value);
+
+      if (
+        state.animationNames.size === 0 || // If there were no previous animations
+        !state.animationNames.has(name.value) // Or there is a new animation
+      ) {
+        shouldResetAnimations = true; // Then reset everything
+      }
+    }
+
+    /*
+     * Animations should only be updated if the animation name changes
+     */
+    if (shouldResetAnimations) {
       state.animationNames.clear();
-      break;
-    }
+      state.isWaitingLayout = false;
 
-    names.push(name.value);
+      // Loop in reverse order
+      for (let index = names.length - 1; index >= 0; index--) {
+        const name = names[index % names.length];
+        state.animationNames.add(name);
 
-    if (
-      state.animationNames.size === 0 || // If there were no previous animations
-      !state.animationNames.has(name.value) // Or there is a new animation
-    ) {
-      shouldResetAnimations = true; // Then reset everything
-    }
-  }
+        const animation = getAnimation(name, state.styleTracking.effect);
+        if (!animation) {
+          continue;
+        }
 
-  /*
-   * Animations should only be updated if the animation name changes
-   */
-  if (shouldResetAnimations) {
-    state.animationNames.clear();
-    state.animation.waitingLayout = false;
+        const baseEasingFunc = baseEasingFuncs[index % baseEasingFuncs.length];
 
-    // Loop in reverse order
-    for (let index = names.length - 1; index >= 0; index--) {
-      const name = names[index % names.length];
-      state.animationNames.add(name);
+        const easingFuncs =
+          animation.easingFunctions?.map((value) => {
+            return value.type === "!PLACEHOLDER!" ? baseEasingFunc : value;
+          }) || baseEasingFunc;
 
-      const animation = getAnimation(name, state.styleTracking.effect);
-      if (!animation) {
-        continue;
-      }
+        const totalDuration = timeToMS(durations[index % name.length]);
+        const delay = timeToMS(delays[index % delays.length]);
+        const iterationCount = iterations[index % iterations.length];
 
-      const baseEasingFunc = baseEasingFuncs[index % baseEasingFuncs.length];
+        for (const frame of animation.frames) {
+          const animationKey = frame[0];
+          const valueFrames = frame[1].values;
+          const pathTokens = frame[1].pathTokens;
 
-      const easingFuncs =
-        animation.easingFunctions?.map((value) => {
-          return value.type === "!PLACEHOLDER!" ? baseEasingFunc : value;
-        }) || baseEasingFunc;
+          if (seenAnimatedProps.has(animationKey)) continue;
+          seenAnimatedProps.add(animationKey);
 
-      const totalDuration = timeToMS(durations[index % name.length]);
-      const delay = timeToMS(delays[index % delays.length]);
-      const iterationCount = iterations[index % iterations.length];
+          const [initialValue, ...sequence] = resolveAnimation(
+            state,
+            refs,
+            valueFrames,
+            animationKey,
+            delay,
+            totalDuration,
+            easingFuncs,
+          );
 
-      for (const frame of animation.frames) {
-        const animationKey = frame[0];
-        const valueFrames = frame[1].values;
-        const pathTokens = frame[1].pathTokens;
+          if (animation.requiresLayoutWidth || animation.requiresLayoutHeight) {
+            const needWidth =
+              animation.requiresLayoutWidth &&
+              props.style?.width === undefined &&
+              getWidth(state, refs, state.styleTracking) === 0;
 
-        if (seenAnimatedProps.has(animationKey)) continue;
-        seenAnimatedProps.add(animationKey);
+            const needHeight =
+              animation.requiresLayoutHeight &&
+              props.style?.height === undefined &&
+              getHeight(state, refs, state.styleTracking) === 0;
 
-        const [initialValue, ...sequence] = resolveAnimation(
-          state,
-          refs,
-          valueFrames,
-          animationKey,
-          delay,
-          totalDuration,
-          easingFuncs,
-        );
-
-        if (animation.requiresLayoutWidth || animation.requiresLayoutHeight) {
-          const needWidth =
-            animation.requiresLayoutWidth &&
-            props.style?.width === undefined &&
-            getWidth(state, refs, state.styleTracking) === 0;
-
-          const needHeight =
-            animation.requiresLayoutHeight &&
-            props.style?.height === undefined &&
-            getHeight(state, refs, state.styleTracking) === 0;
-
-          if (needWidth || needHeight) {
-            state.animation.waitingLayout = true;
+            if (needWidth || needHeight) {
+              state.isWaitingLayout = true;
+            }
           }
+
+          let sharedValue = state.sharedValues.get(animationKey);
+          if (!sharedValue) {
+            sharedValue = makeMutable(initialValue);
+            state.sharedValues.set(animationKey, sharedValue);
+          } else {
+            sharedValue.value = initialValue;
+          }
+
+          sharedValue.value = withRepeat(
+            withSequence(...sequence),
+            iterationCount.type === "infinite" ? -1 : iterationCount.value,
+          );
+
+          setDeep(props, pathTokens, sharedValue);
         }
+      }
+    } else {
+      for (const name of names) {
+        const keyframes = getAnimation(name, state.styleTracking.effect);
+        if (!keyframes) continue;
 
-        let sharedValue = state.sharedValues.get(animationKey);
-        if (!sharedValue) {
-          sharedValue = makeMutable(initialValue);
-          state.sharedValues.set(animationKey, sharedValue);
-        } else {
-          sharedValue.value = initialValue;
+        props[state.config.target] ??= {};
+
+        for (const [animationKey, { pathTokens }] of keyframes.frames) {
+          setDeep(props, pathTokens, state.sharedValues.get(animationKey));
+          seenAnimatedProps.add(animationKey);
         }
-
-        sharedValue.value = withRepeat(
-          withSequence(...sequence),
-          iterationCount.type === "infinite" ? -1 : iterationCount.value,
-        );
-
-        setDeep(props, pathTokens, sharedValue);
       }
     }
-  } else {
-    for (const name of names) {
-      const keyframes = getAnimation(name, state.styleTracking.effect);
-      if (!keyframes) continue;
+  } else if (state.animationNames?.size) {
+    resetAnimation(state);
+  }
+}
 
-      props[state.config.target] ??= {};
+function resetAnimation(state: ReducerState) {
+  if (!state.animationNames) return;
 
-      for (const [animationKey, { pathTokens }] of keyframes.frames) {
-        setDeep(props, pathTokens, state.sharedValues.get(animationKey));
-        seenAnimatedProps.add(animationKey);
+  for (const name of state.animationNames) {
+    const animation = getAnimation(name, state.styleTracking.effect);
+
+    if (!animation) {
+      continue;
+    }
+
+    state.sharedValues ??= new Map();
+
+    const { cancelAnimation } =
+      require("react-native-reanimated") as typeof import("react-native-reanimated");
+
+    for (const [propertyName] of animation.frames) {
+      let defaultValue = defaultValues[propertyName];
+
+      if (typeof defaultValue === "function") {
+        defaultValue = defaultValue(state.styleTracking.effect);
+      }
+
+      let sharedValue = state.sharedValues.get(propertyName);
+      if (sharedValue) {
+        cancelAnimation(sharedValue);
+        state.sharedValues.delete(propertyName);
       }
     }
   }
@@ -958,8 +1009,7 @@ function collectRules(
     if (testRule(rule, refs, state.declarationTracking)) {
       if ("$type" in rule) {
         if (rule.animations) {
-          state.animation ??= { ...defaultAnimation, waitingLayout: false };
-          Object.assign(state.animation, rule.animations);
+          Object.assign(state.currentRenderAnimation, rule.animations);
         }
 
         if (rule.transition) {
@@ -1061,4 +1111,25 @@ function setDeep(target: Record<string, any>, paths: string[], value: any) {
   } else {
     target[prop] = value;
   }
+}
+
+/**
+ * Perform a DeepEqual comparison that cares about order
+ * of arrays and the order of object keys
+ */
+function isDeepEqual(a: any, b: any): boolean {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+
+  if (Array.isArray(a)) {
+    return (
+      a.length === b.length &&
+      a.every((aValue, index) => isDeepEqual(aValue, b[index]))
+    );
+  } else if (typeof a === "object" && a && b) {
+    // We need to do a truthy check, as typeof null === 'object'
+    return isDeepEqual(Object.entries(a), Object.entries(b));
+  }
+
+  return a === b;
 }

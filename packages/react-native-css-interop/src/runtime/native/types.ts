@@ -28,7 +28,9 @@ export type ReducerState = {
   props: Record<string, any>;
   variables?: Record<string, any>;
   containerNames?: false | string[];
-  animation?: Required<ExtractedAnimations> & { waitingLayout: boolean };
+  currentRenderAnimation: ExtractedAnimations;
+  previousAnimation?: ExtractedAnimations;
+  isWaitingLayout?: boolean;
   transition?: Required<ExtractedTransition>;
   sharedValues?: Map<string, SharedValue<any>>;
   animationNames?: Set<string>;
