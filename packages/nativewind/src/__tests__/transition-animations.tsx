@@ -1,5 +1,5 @@
 /** @jsxImportSource nativewind */
-import { fireEvent, render, screen } from "../test-utils";
+import { render, screen } from "../test-utils";
 import { View } from "react-native";
 import { getAnimatedStyle } from "react-native-reanimated";
 
@@ -139,7 +139,7 @@ test("animate-spin", async () => {
 });
 
 test("changing animations", async () => {
-  await render(<View testID={testID} className="animate-spin h-4" />, {
+  await render(<View testID={testID} className="animate-spin" />, {
     config: {
       safelist: ["animate-bounce"],
     },
@@ -148,39 +148,26 @@ test("changing animations", async () => {
   let component = screen.getByTestId(testID);
 
   expect(getAnimatedStyle(component)).toStrictEqual({
-    height: 14,
     transform: [{ rotate: "0deg" }],
   });
   jest.advanceTimersByTime(500);
   expect(getAnimatedStyle(component)).toStrictEqual({
-    height: 14,
     transform: [{ rotate: "180deg" }],
   });
 
-  screen.rerender(<View testID={testID} className="animate-bounce h-4" />);
+  screen.rerender(<View testID={testID} className="animate-bounce" />);
 
+  // It takes 1 tick for reanimated to realize that the SharedValues have changed
   expect(getAnimatedStyle(component)).toStrictEqual({
-    height: 14,
     transform: [{ rotate: "0deg" }],
   });
 
-  jest.advanceTimersByTime(1);
-
-  fireEvent(component, "layout", {
-    nativeEvent: {
-      layout: {
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 100,
-      },
-    },
-  });
+  // Advance to the next tick
+  jest.advanceTimersToNextTimer();
 
   expect(getAnimatedStyle(component)).toStrictEqual({
-    height: 14,
     transform: [
-      { translateY: 0 },
+      { translateY: "-25%" },
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
@@ -195,12 +182,30 @@ test("changing animations", async () => {
     ],
   });
 
-  jest.advanceTimersByTime(100);
+  jest.advanceTimersByTime(500);
 
   expect(getAnimatedStyle(component)).toStrictEqual({
-    height: 14,
     transform: [
-      { translateY: 0 },
+      { translateY: "0%" },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
+    ],
+  });
+
+  jest.advanceTimersByTime(501);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [
+      { translateY: "-25%" },
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
