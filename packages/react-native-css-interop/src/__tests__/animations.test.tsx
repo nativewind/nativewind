@@ -296,3 +296,134 @@ test("per-frame timing function", () => {
     transform: [{ rotate: "360deg" }],
   });
 });
+
+test("stop animating when the animation is removed", () => {
+  registerCSS(`
+    .my-class {
+      animation-duration: 3s;
+      animation-name: spin;
+      animation-timing-function: linear;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .bg-white {
+      background-color: white;
+    }
+`);
+
+  render(<View testID={testID} className="my-class" />);
+
+  const component = screen.getByTestId(testID);
+
+  // Half way though the animation
+  jest.advanceTimersByTime(1500);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "180deg" }],
+  });
+
+  // Remove the animation
+  screen.rerender(<View testID={testID} className="bg-white" />);
+
+  jest.advanceTimersToNextTimer();
+
+  // The animation should have reset
+  // Reanimated is keeping the transform prop
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    backgroundColor: "rgba(255, 255, 255, 1)",
+    transform: [
+      {
+        rotate: "0deg",
+      },
+    ],
+  });
+});
+
+test("stop animating when the animation-none is added", () => {
+  registerCSS(`
+    .my-class {
+      animation-duration: 3s;
+      animation-name: spin;
+      animation-timing-function: linear;
+    }
+
+    .animate-none {
+      animation-name: none;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+`);
+
+  render(<View testID={testID} className="my-class" />);
+
+  const component = screen.getByTestId(testID);
+
+  jest.advanceTimersByTime(1500);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "180deg" }],
+  });
+
+  screen.rerender(<View testID={testID} className="my-class animate-none" />);
+
+  jest.advanceTimersToNextTimer();
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "0deg" }],
+  });
+});
+
+test("can change the duration mid animation", () => {
+  registerCSS(`
+    .my-class {
+      animation-duration: 3s;
+      animation-name: spin;
+      animation-timing-function: linear;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .new-duration {
+      animation-duration: 1s;
+    }
+`);
+
+  render(<View testID={testID} className="my-class" />);
+
+  const component = screen.getByTestId(testID);
+
+  // Half way though the animation
+  jest.advanceTimersByTime(1500);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "180deg" }],
+  });
+
+  // Change the duration
+  screen.rerender(<View testID={testID} className="my-class new-duration" />);
+
+  // The animation should have reset
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "0deg" }],
+  });
+
+  // Now the half-way point is at 500ms
+  jest.advanceTimersByTime(500);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "180deg" }],
+  });
+});
