@@ -43,6 +43,7 @@ import type {
 } from "lightningcss";
 
 import type { ExtractionWarning, RuntimeValueDescriptor } from "../types";
+import { FeatureFlagStatus } from "./feature-flags";
 
 type AddStyleProp = (
   property: string,
@@ -247,6 +248,7 @@ export interface ParseDeclarationOptions {
   addTransitionProp: AddTransitionProp;
   addWarning: AddWarning;
   requiresLayout: (name: string) => void;
+  features: FeatureFlagStatus;
 }
 
 export interface ParseDeclarationOptionsWithValueWarning
@@ -1950,6 +1952,7 @@ export function parseLength(
   } else {
     switch (length.type) {
       case "calc": {
+        // TODO: Add the calc polyfill
         return undefined;
       }
       case "number": {
@@ -2474,7 +2477,10 @@ function parseLengthOrCoercePercentageToRuntime(
   runtimeName: string,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
-  if (value.type === "percentage") {
+  if (
+    options.features.transformPercentagePolyfill &&
+    value.type === "percentage"
+  ) {
     options.requiresLayout(runtimeName);
     return {
       name: runtimeName,

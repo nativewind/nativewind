@@ -34,6 +34,7 @@ import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
 import { optimizeRules } from "./optimize-rules";
 
 import { versions } from "node:process";
+import { defaultFeatureFlags } from "./feature-flags";
 
 type CSSInteropAtRule = {
   type: "custom";
@@ -56,6 +57,8 @@ export function cssToReactNativeRuntime(
   code: Buffer | string,
   options: CssToReactNativeRuntimeOptions = {},
 ): StyleSheetRegisterCompiledOptions {
+  const features = Object.assign({}, defaultFeatureFlags, options.features);
+
   if (Number(versions.node.split(".")[0]) < 18) {
     throw new Error("react-native-css-interop only supports NodeJS >18");
   }
@@ -76,6 +79,7 @@ export function cssToReactNativeRuntime(
     flags: {},
     appearanceOrder: 1,
     ...options,
+    features,
     grouping,
   };
 
@@ -907,6 +911,7 @@ function declarationsToStyle(
   }
 
   const parseDeclarationOptions: ParseDeclarationOptions = {
+    features: {},
     addStyleProp,
     addTransformProp,
     handleStyleShorthand,

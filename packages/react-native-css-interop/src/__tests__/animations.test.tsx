@@ -127,7 +127,7 @@ test("transform - starting", () => {
   });
 });
 
-test("bounce", () => {
+test("timing functions per frame", () => {
   registerCSS(`
     .my-class {
       animation: bounce 1s infinite;
@@ -153,7 +153,7 @@ test("bounce", () => {
   // Initial frame is incorrect due to missing layout
   expect(component).toHaveAnimatedStyle({
     transform: [
-      { translateY: 0 },
+      { translateY: "-25%" },
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
@@ -168,20 +168,11 @@ test("bounce", () => {
     ],
   });
 
-  fireEvent(component, "layout", {
-    nativeEvent: {
-      layout: {
-        width: 200,
-        height: 100,
-      },
-    },
-  });
-
-  jest.advanceTimersByTime(0);
+  jest.advanceTimersByTime(250);
 
   expect(component).toHaveAnimatedStyle({
     transform: [
-      { translateY: -25 },
+      { translateY: "-20.981126534630565%" },
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
@@ -196,11 +187,11 @@ test("bounce", () => {
     ],
   });
 
-  jest.advanceTimersByTime(501);
+  jest.advanceTimersByTime(250);
 
   expect(component).toHaveAnimatedStyle({
     transform: [
-      { translateY: 0 },
+      { translateY: "0%" },
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
@@ -215,11 +206,30 @@ test("bounce", () => {
     ],
   });
 
-  jest.advanceTimersByTime(500);
+  jest.advanceTimersByTime(250);
 
   expect(component).toHaveAnimatedStyle({
     transform: [
-      { translateY: -25 },
+      { translateY: "-20.944655241363616%" },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
+    ],
+  });
+
+  jest.advanceTimersByTime(251);
+
+  expect(component).toHaveAnimatedStyle({
+    transform: [
+      { translateY: "-25%" },
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
