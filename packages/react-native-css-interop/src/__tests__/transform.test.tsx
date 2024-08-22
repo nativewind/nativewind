@@ -7,7 +7,22 @@ const testID = "react-native-css-interop";
 setupAllComponents();
 
 test("translateX percentage", () => {
-  registerCSS(`.my-class { width: 120px; transform: translateX(10%); }`);
+  registerCSS(`.my-class { transform: translateX(10%); }`);
+  const component = render(
+    <View testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({
+    transform: [{ translateX: "10%" }],
+  });
+});
+
+test("translateX percentage - with polyfill", () => {
+  registerCSS(`.my-class { width: 120px; transform: translateX(10%); }`, {
+    features: {
+      transformPercentagePolyfill: true,
+    },
+  });
 
   const component = render(
     <View testID={testID} className="my-class" />,
@@ -20,7 +35,23 @@ test("translateX percentage", () => {
 });
 
 test("translateY percentage", () => {
-  registerCSS(`.my-class { height: 120px; transform: translateY(10%); }`);
+  registerCSS(`.my-class { transform: translateY(10%); }`);
+
+  const component = render(
+    <View testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({
+    transform: [{ translateY: "10%" }],
+  });
+});
+
+test("translateY percentage - with polyfill", () => {
+  registerCSS(`.my-class { height: 120px; transform: translateY(10%); }`, {
+    features: {
+      transformPercentagePolyfill: true,
+    },
+  });
 
   const component = render(
     <View testID={testID} className="my-class" />,

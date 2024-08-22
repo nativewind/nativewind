@@ -28,6 +28,7 @@ import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
 import type { Effect, Observable } from "./runtime/observable";
 import type { SharedValue } from "react-native-reanimated";
 import type { SharedState } from "./runtime/native/types";
+import type { FeatureFlagStatus } from "./css-to-rn/feature-flags";
 
 export interface Effect2 {
   update: () => void;
@@ -52,6 +53,7 @@ export type CssToReactNativeRuntimeOptions = {
   ignorePropertyWarningRegex?: (string | RegExp)[];
   selectorPrefix?: string;
   stylesheetOrder?: number;
+  features?: FeatureFlagStatus;
 };
 
 export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
