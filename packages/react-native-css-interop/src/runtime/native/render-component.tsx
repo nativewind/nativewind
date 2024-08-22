@@ -33,15 +33,15 @@ export function renderComponent(
 
   // TODO: We can probably remove this in favor of using `new Pressability()`
   if (state.pressable !== UpgradeState.NONE) {
-    component = Pressable;
-    props.cssInterop = false;
     if (shouldWarn && state.pressable === UpgradeState.SHOULD_UPGRADE) {
       printUpgradeWarning(
         `Converting View to Pressable should only happen during the initial render otherwise it will remount the View.\n\nTo prevent this warning avoid adding styles which use pseudo-classes (e.g :hover, :active, :focus) to View components after the initial render, or change the View to a Pressable`,
         state.originalProps,
       );
     }
+    component = Pressable;
     state.pressable = UpgradeState.UPGRADED;
+    props.cssInterop = false;
   }
 
   if (state.animated !== UpgradeState.NONE) {
@@ -50,36 +50,37 @@ export function renderComponent(
         `Components need to be animated during the initial render otherwise they will remount.\n\nTo prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none"/"transition-property: none"`,
         state.originalProps,
       );
-    }
-    state.animated = UpgradeState.UPGRADED;
-    component = createAnimatedComponent(component);
+    } else {
+      state.animated = UpgradeState.UPGRADED;
+      component = createAnimatedComponent(component);
 
-    const { useAnimatedStyle } =
-      require("react-native-reanimated") as typeof import("react-native-reanimated");
+      const { useAnimatedStyle } =
+        require("react-native-reanimated") as typeof import("react-native-reanimated");
 
-    props.style = useAnimatedStyle(() => {
-      function flattenAnimatedProps(style: any): any {
-        // Primitive or null
-        if (typeof style !== "object" || !style) return style;
-        // Shared value
-        if ("_isReanimatedSharedValue" in style && "value" in style) {
-          return style.value;
+      props.style = useAnimatedStyle(() => {
+        function flattenAnimatedProps(style: any): any {
+          // Primitive or null
+          if (typeof style !== "object" || !style) return style;
+          // Shared value
+          if ("_isReanimatedSharedValue" in style && "value" in style) {
+            return style.value;
+          }
+          if (Array.isArray(style)) return style.map(flattenAnimatedProps);
+          return Object.fromEntries(
+            Object.entries(style).map(([key, value]: any) => {
+              return [key, flattenAnimatedProps(value)];
+            }),
+          );
         }
-        if (Array.isArray(style)) return style.map(flattenAnimatedProps);
-        return Object.fromEntries(
-          Object.entries(style).map(([key, value]: any) => {
-            return [key, flattenAnimatedProps(value)];
-          }),
-        );
-      }
 
-      try {
-        return flattenAnimatedProps(possiblyAnimatedProps.style);
-      } catch (error: any) {
-        console.log(`css-interop error: ${error.message}`);
-        return {};
-      }
-    }, [possiblyAnimatedProps.style]);
+        try {
+          return flattenAnimatedProps(possiblyAnimatedProps.style);
+        } catch (error: any) {
+          console.log(`css-interop error: ${error.message}`);
+          return {};
+        }
+      }, [possiblyAnimatedProps.style]);
+    }
   } else {
     props = { ...props, ...possiblyAnimatedProps };
   }
