@@ -32,19 +32,28 @@ export function withNativeWind(
 
   const { important } = tailwindConfig(path.resolve(tailwindConfigPath));
 
+  const cli = tailwindCli();
+
   return withCssInterop(config, {
     ...cssToReactNativeRuntimeOptions,
     inlineRem,
     selectorPrefix: typeof important === "string" ? important : undefined,
     input,
-    getPlatformCSS: (platform, dev, onChange) => {
-      return tailwindCli({
+    processPROD: (platform) => {
+      return cli.processPROD({
         platform,
-        dev,
-        onChange,
         input,
         browserslist,
         browserslistEnv,
+      });
+    },
+    processDEV: (platform, onChange) => {
+      return cli.processDEV({
+        platform,
+        input,
+        browserslist,
+        browserslistEnv,
+        onChange,
       });
     },
   });
