@@ -45,3 +45,7 @@ if (typeof __METRO_GLOBAL_PREFIX__ !== "undefined" && global[__METRO_GLOBAL_PREF
 export function platformPath(filePath: string, platform: string) {
   return `${filePath}.${platform}.${platform === "web" ? "css" : "js"}`;
 }
+
+export function resolverPath(filePath: string) {
+  return filePath.replace(/\.[^/.]+$/, "");
+}

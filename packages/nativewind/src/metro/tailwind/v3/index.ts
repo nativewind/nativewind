@@ -44,10 +44,6 @@ export const tailwindCliV3 = {
       `${path.basename(options.input)}.${options.platform}.css`,
     );
 
-    console.log({
-      command: `${cliLocation} --input ${options.input} --output ${output}`,
-    });
-
     execSync(`${cliLocation} --input ${options.input} --output ${output}`, {
       env: getEnv(options),
     });

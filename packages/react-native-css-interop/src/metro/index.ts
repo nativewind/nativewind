@@ -1,4 +1,5 @@
 import connect from "connect";
+import fsPromises from "fs/promises";
 import fs from "fs";
 import path from "path";
 import type { MetroConfig } from "metro-config";
@@ -21,6 +22,7 @@ import { getNativeJS, platformPath } from "./shared";
  */
 export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
   input: string;
+  platforms?: string[];
   processPROD: (platform: string) => string | Buffer;
   processDEV: (
     platform: string,
@@ -33,21 +35,76 @@ const virtualModules = new Map<string, Promise<Buffer>>();
 
 export function withCssInterop(
   config: MetroConfig,
-  options: WithCssInteropOptions,
+  {
+    platforms = ["ios", "android", "web", "native"],
+    ...options
+  }: WithCssInteropOptions,
 ): MetroConfig {
   expoColorSchemeWarning();
   const originalResolver = config.resolver?.resolveRequest;
   const originalMiddleware = config.server?.enhanceMiddleware;
 
+  // Ensure the production files exist before Metro starts
+  const prodOutputDir = path.join(
+    path.dirname(require.resolve("react-native-css-interop/package.json")),
+    ".cache",
+  );
+
+  fs.mkdirSync(prodOutputDir, { recursive: true });
+
+  for (const platform of platforms) {
+    fs.writeFileSync(
+      path.join(
+        prodOutputDir,
+        `${platform}.${platform === "web" ? "css" : "js"}`,
+      ),
+      "",
+    );
+  }
+
   return {
     ...config,
+    transformer: {
+      ...config.transformer,
+      async getTransformOptions(
+        entryPoints,
+        transformOptions,
+        getDependenciesOf,
+      ) {
+        // Generate the production file before we start processing it
+        if (!transformOptions.dev) {
+          const platform = transformOptions.platform || "native";
+
+          await fsPromises.mkdir(prodOutputDir, { recursive: true });
+
+          const output = path.join(
+            prodOutputDir,
+            `${platform}.${platform === "web" ? "css" : "js"}`,
+          );
+
+          await fsPromises.writeFile(
+            output,
+            getNativeJS(
+              cssToReactNativeRuntime(options.processPROD(platform), options),
+            ),
+          );
+        }
+
+        return (
+          config.transformer?.getTransformOptions?.(
+            entryPoints,
+            transformOptions,
+            getDependenciesOf,
+          ) || {}
+        );
+      },
+    },
     resolver: {
       ...config.resolver,
       sourceExts: [...(config?.resolver?.sourceExts || []), "css"],
       resolveRequest: (context, moduleName, platform) => {
-        const resolved =
-          originalResolver?.(context, moduleName, platform) ||
-          context.resolveRequest(context, moduleName, platform);
+        const resolver = originalResolver ?? context.resolveRequest;
+        const resolved = resolver(context, moduleName, platform);
 
         // We only care about the input file
         if (!("filePath" in resolved && resolved.filePath === options.input)) {
@@ -59,10 +116,6 @@ export function withCssInterop(
         const isDev = (context as any).dev;
 
         if (isDev) {
-          /**
-           * Change the `input` import statements to point to a virtual module
-           */
-
           // Generate a fake name for our virtual module. Make it platform specific
           const platformFilePath = platformPath(resolved.filePath, platform);
 
@@ -70,36 +123,13 @@ export function withCssInterop(
           initPreprocessedFile(platformFilePath, platform, options, true);
 
           // Make the input file instead resolve to our virtual module
-          return {
-            ...resolved,
-            filePath: platformFilePath,
-          };
+          return resolver(context, removeExt(platformFilePath), platform);
         } else {
-          const outputDir = path.join(
-            path.dirname(
-              require.resolve("react-native-css-interop/package.json"),
-            ),
-            ".cache",
-          );
-
-          fs.mkdirSync(outputDir, { recursive: true });
-
-          const output = path.join(
-            outputDir,
-            path.basename(platformPath(resolved.filePath, platform)),
-          );
-
-          fs.writeFileSync(
-            output,
-            getNativeJS(
-              cssToReactNativeRuntime(options.processPROD(platform), options),
-            ),
-          );
-
-          return {
-            ...resolved,
-            filePath: output,
-          };
+          return resolver(
+            context,
+            path.join("react-native-css-interop", ".cache", platform),
+            platform,
+          ) as any;
         }
       },
     },
@@ -239,4 +269,13 @@ function ensureBundlerPatched(
     return originalTransformFile(filePath, transformOptions, fileBuffer);
   };
   bundler.transformFile.__css_interop__patched = true;
+}
+
+/**
+ * Remove the last extension from a filePath
+ * @param filePath
+ * @returns
+ */
+function removeExt(filePath: string) {
+  return filePath.replace(/\.[^/.]+$/, "");
 }
