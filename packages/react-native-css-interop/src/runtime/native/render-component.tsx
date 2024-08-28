@@ -74,7 +74,7 @@ export function renderComponent(
         }
 
         try {
-          return flattenAnimatedProps(possiblyAnimatedProps.style);
+          return flattenAnimatedProps(possiblyAnimatedProps.style) || {};
         } catch (error: any) {
           console.log(`css-interop error: ${error.message}`);
           return {};
