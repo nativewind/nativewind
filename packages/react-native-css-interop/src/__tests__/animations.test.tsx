@@ -380,6 +380,12 @@ test("stop animating when the animation-none is added", () => {
   expect(getAnimatedStyle(component)).toStrictEqual({
     transform: [{ rotate: "0deg" }],
   });
+
+  jest.advanceTimersByTime(1500);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "0deg" }],
+  });
 });
 
 test("can change the duration mid animation", () => {
