@@ -96,10 +96,10 @@ export type CssInteropGeneratedProps<T extends EnableCssInteropOptions<any>> = {
       ? never
       : T[K] extends true | string
         ? K
-        : T extends {
+        : T[K] extends {
               target: string | boolean;
             }
-          ? T["target"] extends true | string
+          ? T[K]["target"] extends true | string
             ? K
             : never
           : never
