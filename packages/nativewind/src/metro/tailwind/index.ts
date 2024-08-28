@@ -1,12 +1,11 @@
 import tailwindPackage from "tailwindcss/package.json";
-import { TailwindCliOptions } from "./types";
 import { tailwindCliV3, tailwindConfigV3 } from "./v3";
 
 const isV3 = tailwindPackage.version.split(".")[0].includes("3");
 
-export function tailwindCli(options: TailwindCliOptions): Promise<string> {
+export function tailwindCli() {
   if (isV3) {
-    return tailwindCliV3(options);
+    return tailwindCliV3;
   }
 
   throw new Error("NativeWind only supports Tailwind CSS v3");

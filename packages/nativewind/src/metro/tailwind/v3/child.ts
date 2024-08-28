@@ -52,6 +52,6 @@
   await build({
     "--input": process.env.NATIVEWIND_INPUT,
     "--output": fakeOutput,
-    "--watch": process.env.NATIVEWIND_WATCH === "true",
+    "--watch": true,
   });
 })();

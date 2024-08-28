@@ -1,4 +1,6 @@
-import { fork } from "child_process";
+import { execSync, fork } from "child_process";
+import fs from "fs";
+import path from "path";
 import { TailwindCliOptions } from "../types";
 
 /**
@@ -16,57 +18,81 @@ import { TailwindCliOptions } from "../types";
 
 const child_file = __dirname + "/child.js";
 
-export function tailwindCliV3(options: TailwindCliOptions) {
-  return new Promise<string>((resolve, reject) => {
-    try {
-      const env = {
-        ...process.env,
-        NATIVEWIND_INPUT: options.input,
-        NATIVEWIND_WATCH: `${options.dev}`,
-        NATIVEWIND_OS: options.platform,
-        BROWSERSLIST: options.browserslist ?? undefined,
-        BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
-      };
+const getEnv = (options: TailwindCliOptions) => {
+  return {
+    ...process.env,
+    NATIVEWIND_INPUT: options.input,
+    NATIVEWIND_OS: options.platform,
+    BROWSERSLIST: options.browserslist ?? undefined,
+    BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
+  };
+};
 
-      // Spawn child process
-      const child = fork(child_file, { stdio: "pipe", env });
+export const tailwindCliV3 = {
+  processPROD(options: TailwindCliOptions) {
+    const cliLocation = require.resolve("tailwindcss/lib/cli.js");
 
-      let initialMessage = true;
-      let initialDoneIn = true;
+    const outputPath = path.join(
+      path.dirname(require.resolve("nativewind/package.json")),
+      ".cache/",
+    );
 
-      child.stderr?.on("data", (data) => {
-        data = data.toString();
-        if (data.includes("Done in")) {
-          if (initialDoneIn) {
-            initialDoneIn = false;
-          } else {
-            // console.log(
-            //   `Rebuilt NativeWind in ${data.replace("Done in", "").trim()}`,
-            // );
+    fs.mkdirSync(outputPath, { recursive: true });
+
+    const output = path.join(
+      outputPath,
+      `${path.basename(options.input)}.${options.platform}.css`,
+    );
+
+    console.log({
+      command: `${cliLocation} --input ${options.input} --output ${output}`,
+    });
+
+    execSync(`${cliLocation} --input ${options.input} --output ${output}`, {
+      env: getEnv(options),
+    });
+
+    return fs.readFileSync(output);
+  },
+  processDEV(
+    options: TailwindCliOptions & { onChange: (css: string) => void },
+  ) {
+    return new Promise<string>((resolve, reject) => {
+      try {
+        const child = fork(child_file, { stdio: "pipe", env: getEnv(options) });
+
+        let initialMessage = true;
+        let initialDoneIn = true;
+
+        child.stderr?.on("data", (data) => {
+          data = data.toString();
+          if (data.includes("Done in")) {
+            if (initialDoneIn) {
+              initialDoneIn = false;
+            }
+          } else if (data.includes("warn -")) {
+            console.warn(data);
           }
-          return;
-        } else if (data.includes("warn -")) {
-          console.warn(data);
-        }
-      });
+        });
 
-      child.stdout?.on("data", (data) => {
-        data = data.toString();
-      });
+        child.stdout?.on("data", (data) => {
+          data = data.toString();
+        });
 
-      child.on("message", (message) => {
-        if (initialMessage) {
-          resolve(message.toString());
-          initialMessage = false;
-        } else {
-          options.onChange(message.toString());
-        }
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
-}
+        child.on("message", (message) => {
+          if (initialMessage) {
+            resolve(message.toString());
+            initialMessage = false;
+          } else {
+            options.onChange(message.toString());
+          }
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  },
+};
 
 export function tailwindConfigV3(path: string) {
   const config = require("tailwindcss/loadConfig")(path);

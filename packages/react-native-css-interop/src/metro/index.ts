@@ -1,4 +1,6 @@
 import connect from "connect";
+import fs from "fs";
+import path from "path";
 import type { MetroConfig } from "metro-config";
 import type MetroServer from "metro/src/Server";
 import type { FileSystem } from "metro-file-map";
@@ -6,72 +8,28 @@ import type { FileSystem } from "metro-file-map";
 import { expoColorSchemeWarning } from "./expo";
 import { CssToReactNativeRuntimeOptions } from "../types";
 import { cssToReactNativeRuntime } from "../css-to-rn";
+import { getNativeJS, platformPath } from "./shared";
 
 /**
  * Injects the CSS into the React Native runtime.
  *
  * Web:
- *  - The contexts of the input file are replaced with the result of getPlatformCSS
+ *  - The contexts of the input file are replaced with the result of getDevelopment
  *
  * Native:
- *  - The context of the input file are replaced with the compiled version of getPlatfomCSS
+ *  - The context of the input file are replaced with the compiled version of getDevelopment
  */
 export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
   input: string;
-  getPlatformCSS: GetPlatformCSS;
-};
-
-const getNativeJS = (data = {}, dev = false) => {
-  let output = `
- "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const __inject_1 = require("react-native-css-interop/dist/runtime/native/styles");
-(0, __inject_1.injectData)(${JSON.stringify(data)}); 
-`;
-
-  if (dev) {
-    output += `
-/**
- * This is a hack for Expo Router. It's _layout files export 'unstable_settings' which break Fast Refresh
- * Expo Router only supports Metro as a bundler
- */
-if (typeof __METRO_GLOBAL_PREFIX__ !== "undefined" && global[__METRO_GLOBAL_PREFIX__ + "__ReactRefresh"]) {
-  const Refresh = global[__METRO_GLOBAL_PREFIX__ + "__ReactRefresh"]
-  const isLikelyComponentType = Refresh.isLikelyComponentType
-  const expoRouterExports = new WeakSet()
-  Object.assign(Refresh, {
-    isLikelyComponentType(value) {
-      if (typeof value === "object" && "unstable_settings" in value) {
-        expoRouterExports.add(value.unstable_settings)
-      }
-
-      if (typeof value === "object" && "ErrorBoundary" in value) {
-        expoRouterExports.add(value.ErrorBoundary)
-      }
-
-      // When ErrorBoundary is exported, the inverse dependency will also include the _ctx file. So we need to account for it as well
-      if (typeof value === "object" && "ctx" in value && value.ctx.name === "metroContext") {
-        expoRouterExports.add(value.ctx)
-      }
-
-      return expoRouterExports.has(value) || isLikelyComponentType(value)
-    }
-  })
-}
-`;
-  }
-
-  return Buffer.from(output);
+  processPROD: (platform: string) => string | Buffer;
+  processDEV: (
+    platform: string,
+    next: (update: string) => void,
+  ) => Promise<string>;
 };
 
 let haste: any;
 const virtualModules = new Map<string, Promise<Buffer>>();
-
-export type GetPlatformCSS = (
-  platform: string,
-  dev: boolean,
-  next: (update: string) => void,
-) => Promise<string>;
 
 export function withCssInterop(
   config: MetroConfig,
@@ -96,31 +54,60 @@ export function withCssInterop(
           return resolved;
         }
 
-        /**
-         * Change the `input` import statements to point to a virtual module
-         */
         platform = platform || "native";
 
-        // Generate a fake name for our virtual module. Make it platform specific
-        const platformFilePath = `${resolved.filePath}.${platform}.${platform === "web" ? "css" : "js"}`;
+        const isDev = (context as any).dev;
 
-        // Start the css processor
-        initPreprocessedFile(
-          platformFilePath,
-          platform,
-          options,
-          (context as any).dev,
-        );
+        if (isDev) {
+          /**
+           * Change the `input` import statements to point to a virtual module
+           */
 
-        // Make the input file instead resolve to our virtual module
-        return {
-          ...resolved,
-          filePath: platformFilePath,
-        };
+          // Generate a fake name for our virtual module. Make it platform specific
+          const platformFilePath = platformPath(resolved.filePath, platform);
+
+          // Start the css processor
+          initPreprocessedFile(platformFilePath, platform, options, true);
+
+          // Make the input file instead resolve to our virtual module
+          return {
+            ...resolved,
+            filePath: platformFilePath,
+          };
+        } else {
+          const outputDir = path.join(
+            path.dirname(
+              require.resolve("react-native-css-interop/package.json"),
+            ),
+            ".cache",
+          );
+
+          fs.mkdirSync(outputDir, { recursive: true });
+
+          const output = path.join(
+            outputDir,
+            path.basename(platformPath(resolved.filePath, platform)),
+          );
+
+          fs.writeFileSync(
+            output,
+            getNativeJS(
+              cssToReactNativeRuntime(options.processPROD(platform), options),
+            ),
+          );
+
+          return {
+            ...resolved,
+            filePath: output,
+          };
+        }
       },
     },
     server: {
       ...config.server,
+      /**
+       * NOTE: enhanceMiddleware is commonly only called in development environment
+       */
       enhanceMiddleware: (middleware, metroServer) => {
         /**
          * We need to patch Metro internals to add virtual modules.
@@ -156,7 +143,7 @@ export function withCssInterop(
 async function initPreprocessedFile(
   filePath: string,
   platform: string,
-  { input, getPlatformCSS, ...options }: WithCssInteropOptions,
+  { input, processDEV, ...options }: WithCssInteropOptions,
   dev: boolean,
 ) {
   if (virtualModules.has(filePath)) {
@@ -165,9 +152,8 @@ async function initPreprocessedFile(
 
   virtualModules.set(
     filePath,
-    getPlatformCSS(
+    processDEV(
       platform,
-      dev,
       // This should only be called in development when a file changes
       (css: string) => {
         virtualModules.set(
