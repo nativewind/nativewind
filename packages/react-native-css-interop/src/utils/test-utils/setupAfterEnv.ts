@@ -8,6 +8,6 @@ expect.extend({
     const receivedStyle = received?.props?.style
       ? Object.fromEntries(Object.entries(received?.props?.style))
       : undefined;
-    return matchers.toEqual(receivedStyle, style);
+    return matchers.toStrictEqual(receivedStyle, style);
   },
 });
