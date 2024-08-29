@@ -2,7 +2,13 @@
 import { View } from "react-native";
 import { useEffect } from "react";
 
-import { fireEvent, render, registerCSS, setupAllComponents } from "test-utils";
+import {
+  screen,
+  fireEvent,
+  render,
+  registerCSS,
+  setupAllComponents,
+} from "test-utils";
 
 const testID = "react-native-css-interop";
 setupAllComponents();
@@ -47,9 +53,58 @@ test("empty className", () => {
   expect(component).toHaveStyle(undefined);
 });
 
+test("rerender empty className", () => {
+  registerCSS(`.bg-red-500 { color: red; }`);
+
+  render(<View testID={testID} className="bg-red-500" />);
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+
+  screen.rerender(<View testID={testID} className="" />);
+});
+
 test("missing className", () => {
   const component = render(<View testID={testID} />).getByTestId(testID);
 
   expect(component.props.className).not.toBeDefined();
+  expect(component.props.style).not.toBeDefined();
+});
+
+test("rerender missing className", () => {
+  registerCSS(`.bg-red-500 { color: red; }`);
+
+  render(<View testID={testID} className="bg-red-500" />);
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+
+  screen.rerender(<View testID={testID} />);
+
+  expect(component.props.style).not.toBeDefined();
+});
+
+test("null className", () => {
+  const component = render(
+    <View testID={testID} className={null as any} />,
+  ).getByTestId(testID);
+
+  expect(component.props.className).not.toBeDefined();
+  expect(component.props.style).not.toBeDefined();
+});
+
+test("rerender null className", () => {
+  registerCSS(`.bg-red-500 { color: red; }`);
+
+  render(<View testID={testID} className="bg-red-500" />);
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+
+  screen.rerender(<View testID={testID} className={null as any} />);
+
   expect(component.props.style).not.toBeDefined();
 });
