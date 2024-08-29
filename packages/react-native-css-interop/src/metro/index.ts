@@ -15,10 +15,27 @@ import { getNativeJS, platformPath } from "./shared";
  * Injects the CSS into the React Native runtime.
  *
  * Web:
- *  - The contexts of the input file are replaced with the result of getDevelopment
+ *  @expo/metro-config provides all the code needed to handle .css files
+ *  This is why we can only support Expo for web projects for the time being
+ *  The user will import their .css file, we need to catch this in the resolution
+ *  and replace it either with the virtual module (development) or the Tailwind output (production)
  *
  * Native:
- *  - The context of the input file are replaced with the compiled version of getDevelopment
+ *  When the user imports their .css file, we need to swap it out for a JavaScript file
+ *  that injects the global styles. In development we swap to a virtual module and in production we
+ *  swap to a .js file generated in the node_modules
+ *
+ * Metro notes:
+ *  - Expo uses a custom Metro server than the community CLI
+ *  - @expo/cli and eas use slightly different Metro servers
+ *    - eas skips the customMiddleware and the dev server is never started
+ *    - expo export also skip the customMiddleware, but the dev server is started
+ *  - Metro uses a virtual file system.
+ *    - Metro can be configured to only react to ADD events in development
+ *    - This means all files need to be present on the file system BEFORE Metro generates the file tree
+ *  - Metro is undocumented. Good luck
+ *
+ * For these reasons we need to take multiple approaches with redundancies to ensure everything goes smoothly
  */
 export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
   input: string;
@@ -44,7 +61,12 @@ export function withCssInterop(
   const originalResolver = config.resolver?.resolveRequest;
   const originalMiddleware = config.server?.enhanceMiddleware;
 
-  // Ensure the production files exist before Metro starts
+  /*
+   * Ensure the production files exist before Metro starts
+   * Metro (or who ever is controlling Metro) will need to get the config before
+   * its started, so we can generate these placeholder files to ensure that the
+   * production files make it into the virtual file tree
+   */
   const prodOutputDir = path.join(
     path.dirname(require.resolve("react-native-css-interop/package.json")),
     ".cache",
@@ -71,7 +93,20 @@ export function withCssInterop(
         transformOptions,
         getDependenciesOf,
       ) {
-        // Generate the production file before we start processing it
+        /*
+         * PRODUCTION ONLY!
+         *
+         * In production there might not be a dev server, so we don't actually know what is being processed
+         * The best option is hook into the transform options which are called before the transform workers
+         * are spawned.
+         *
+         * In production, we replace our placeholder files with the production ones
+         * There is most likely some race condition here, but since this is the only async function before
+         * files get processed, we can delay there server until everything is ready.
+         *
+         * Surprisingly, even in production, Metro registers the file update event and will update its file tree
+         * (or maybe the file tree hasn't read the files yet? Or this breaks cache SHA1 hash?)
+         */
         if (!transformOptions.dev) {
           const platform = transformOptions.platform || "native";
 
@@ -99,14 +134,58 @@ export function withCssInterop(
         );
       },
     },
+    server: {
+      ...config.server,
+      /*
+       * DEVELOPMENT ONLY
+       *
+       * A better version than using getTransformOptions is to hook directly into the development server
+       * All development clients (including websites) need to request the JS bundle. We can delay this as
+       * we generate the virtual module
+       *
+       * Patching the MetroServer.fileSystem for virtual module support is a bit tricky, but its much more reliable
+       * than listening to fileSystem events.
+       *
+       * This is also the only place the Metro exposes the MetroServer to the config.
+       */
+      enhanceMiddleware: (middleware, metroServer) => {
+        const server = connect();
+        const bundler = metroServer.getBundler().getBundler();
+
+        const initPromise = bundler
+          .getDependencyGraph()
+          .then(async (graph: any) => {
+            haste = graph._haste;
+            ensureFileSystemPatched(graph._fileSystem);
+            ensureBundlerPatched(bundler);
+          });
+
+        server.use(async (_, __, next) => {
+          // Wait until the bundler patching has completed
+          await initPromise;
+          next();
+        });
+
+        return originalMiddleware
+          ? server.use(originalMiddleware(middleware, metroServer))
+          : server.use(middleware);
+      },
+    },
     resolver: {
       ...config.resolver,
       sourceExts: [...(config?.resolver?.sourceExts || []), "css"],
+      /*
+       * PRODUCTION & DEVELOPMENT
+       *
+       * resolveRequest is where we switch the import of the CSS file for something different
+       * In development this should be the virtual module
+       * In production this is the generated file
+       */
       resolveRequest: (context, moduleName, platform) => {
         const resolver = originalResolver ?? context.resolveRequest;
         const resolved = resolver(context, moduleName, platform);
 
-        // We only care about the input file
+        // We only care about the input file, ignore everything else
         if (!("filePath" in resolved && resolved.filePath === options.input)) {
           return resolved;
         }
@@ -119,11 +198,17 @@ export function withCssInterop(
           // Generate a fake name for our virtual module. Make it platform specific
           const platformFilePath = platformPath(resolved.filePath, platform);
 
-          // Start the css processor
-          initPreprocessedFile(platformFilePath, platform, options, true);
+          startCSSProcessor(platformFilePath, platform, options, true);
 
-          // Make the input file instead resolve to our virtual module
-          return resolver(context, removeExt(platformFilePath), platform);
+          /*
+           * Return a final Resolution.
+           * We ideally we should call the resolver again with the new filepath,
+           * but we can't control what it does. E.g it might check that the file actually exists
+           */
+          return {
+            ...resolved,
+            filePath: platformFilePath,
+          };
         } else {
           return resolver(
             context,
@@ -133,88 +218,57 @@ export function withCssInterop(
         }
       },
     },
-    server: {
-      ...config.server,
-      /**
-       * NOTE: enhanceMiddleware is commonly only called in development environment
-       */
-      enhanceMiddleware: (middleware, metroServer) => {
-        /**
-         * We need to patch Metro internals to add virtual modules.
-         *
-         * The easiest way is through the Metro middleware, where we can
-         * access the bundlers.
-         */
-        const server = connect();
-        const bundler = metroServer.getBundler().getBundler();
-
-        const initPromise = bundler
-          .getDependencyGraph()
-          .then(async (graph: any) => {
-            haste = graph._haste;
-            ensureFileSystemPatched(graph._fileSystem);
-            ensureBundlerPatched(bundler);
-          });
-
-        // Patching is async, so we need to delay everything until all patches have been applied
-        server.use(async (_, __, next) => {
-          await initPromise;
-          next();
-        });
-
-        return originalMiddleware
-          ? server.use(originalMiddleware(middleware, metroServer))
-          : server.use(middleware);
-      },
-    },
   };
 }
 
-async function initPreprocessedFile(
+async function startCSSProcessor(
   filePath: string,
   platform: string,
   { input, processDEV, ...options }: WithCssInteropOptions,
   dev: boolean,
 ) {
+  // Ensure that we only start the processor once per file
   if (virtualModules.has(filePath)) {
     return;
   }
 
-  virtualModules.set(
-    filePath,
-    processDEV(
-      platform,
-      // This should only be called in development when a file changes
-      (css: string) => {
-        virtualModules.set(
-          filePath,
-          Promise.resolve(
-            platform === "web"
-              ? Buffer.from(css)
-              : getNativeJS(cssToReactNativeRuntime(css, options), dev),
-          ),
-        );
+  /*
+   * The virtualStyles is a promise that will resolve with the initial value
+   * If the `processDEV` needs to change the styles (e.g hot-reload) then it will use the callback function
+   */
+  const virtualStyles = processDEV(platform, (css: string) => {
+    // Change the cached version with the new updated version
+    virtualModules.set(
+      filePath,
+      Promise.resolve(
+        platform === "web"
+          ? Buffer.from(css)
+          : getNativeJS(cssToReactNativeRuntime(css, options), dev),
+      ),
+    );
 
-        haste.emit("change", {
-          eventsQueue: [
-            {
-              filePath,
-              metadata: {
-                modifiedTime: Date.now(),
-                size: 1, // Can be anything
-                type: "virtual", // Can be anything
-              },
-              type: "change",
-            },
-          ],
-        });
-      },
-    ).then((css) => {
-      return platform === "web"
-        ? Buffer.from(css)
-        : getNativeJS(cssToReactNativeRuntime(css, options), dev);
-    }),
-  );
+    // Tell Metro that the virtual module has changed
+    // It will think this is a fileSystem event and update its virtual fileTree
+    haste.emit("change", {
+      eventsQueue: [
+        {
+          filePath,
+          metadata: {
+            modifiedTime: Date.now(),
+            size: 1, // Can be anything
+            type: "virtual", // Can be anything
+          },
+          type: "change",
+        },
+      ],
+    });
+  }).then((css) => {
+    return platform === "web"
+      ? Buffer.from(css)
+      : getNativeJS(cssToReactNativeRuntime(css, options), dev);
+  });
+
+  virtualModules.set(filePath, virtualStyles);
 }
 
 /**
@@ -269,13 +323,4 @@ function ensureBundlerPatched(
     return originalTransformFile(filePath, transformOptions, fileBuffer);
   };
   bundler.transformFile.__css_interop__patched = true;
-}
-
-/**
- * Remove the last extension from a filePath
- * @param filePath
- * @returns
- */
-function removeExt(filePath: string) {
-  return filePath.replace(/\.[^/.]+$/, "");
 }
