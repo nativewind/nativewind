@@ -1,15 +1,15 @@
 export { verifyInstallation } from "./doctor";
 
 export {
-  createElement,
-  useUnstableNativeVariable,
-  vars,
-  cssInterop,
-  remapProps,
   StyleSheet,
   colorScheme,
+  createInteropElement,
+  cssInterop,
   rem,
-  wrapJSX,
+  remapProps,
+  useSafeAreaEnv,
+  useUnstableNativeVariable,
+  vars,
 } from "react-native-css-interop";
 
 export { useColorScheme } from "./stylesheet";
