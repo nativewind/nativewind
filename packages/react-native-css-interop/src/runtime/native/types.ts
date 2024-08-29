@@ -16,11 +16,12 @@ export type GetInteraction = (
 ) => boolean;
 
 export type ReducerAction =
-  | { type: "declarations"; className?: string }
+  | { type: "new-declarations"; className: string | undefined | null }
+  | { type: "rerender-declarations" }
   | { type: "styles" };
 
 export type ReducerState = {
-  className?: string;
+  className?: string | undefined | null;
   config: InteropComponentConfig;
   normal: ProcessedStyleDeclaration[];
   inline?: ProcessedStyleDeclaration | ProcessedStyleDeclaration[];

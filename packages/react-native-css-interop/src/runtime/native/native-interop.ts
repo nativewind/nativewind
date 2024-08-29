@@ -101,8 +101,9 @@ export function interop(
    */
   function reducer(state: ReducerState, action: ReducerAction) {
     switch (action.type) {
-      case "declarations":
-        const nextState = getDeclarations(state, refs, action.className);
+      case "rerender-declarations":
+      case "new-declarations":
+        const nextState = getDeclarations(state, refs, action);
         // If the declarations have changed, then we need to update the styles
         return Object.is(nextState, state)
           ? state
@@ -142,8 +143,8 @@ export function interop(
       if (state.declarationTracking.guards.some((guard) => guard(refs))) {
         // If needed, update the declarations
         dispatch({
-          type: "declarations",
-          className: props?.[config.source] || null,
+          type: "new-declarations",
+          className: props?.[config.source],
         });
       } else if (state.styleTracking.guards.some((guard) => guard(refs))) {
         // If needed, we can jump straight to updating the props
@@ -334,7 +335,7 @@ function initReducer({
       declarationTracking: {
         effect: {
           dependencies: new Set(),
-          run: () => dispatch({ type: "declarations" }),
+          run: () => dispatch({ type: "rerender-declarations" }),
         },
         guards: [],
       },
@@ -346,14 +347,17 @@ function initReducer({
         guards: [],
       },
     },
-    { type: "declarations" },
+    { type: "new-declarations", className },
   );
 }
 
 function getDeclarations(
   previousState: ReducerState,
   refs: Refs,
-  className?: string,
+  action: Extract<
+    ReducerAction,
+    { type: "new-declarations" | "rerender-declarations" }
+  >,
 ): ReducerState {
   const config = previousState.config;
   cleanupEffect(previousState.declarationTracking.effect);
@@ -377,11 +381,8 @@ function getDeclarations(
     },
   };
 
-  // If the className is null, then we need to reset the styles. Otherwise use the new className
-  if (className) {
-    state.className = className;
-  } else if (className === null) {
-    state.className = undefined;
+  if (action.type === "new-declarations") {
+    state.className = action.className;
   }
 
   state.declarationTracking.guards.push(
