@@ -14,6 +14,7 @@ import { translateX, translateY } from "./translate";
 import { shadows } from "./shadows";
 import { allowedColors } from "./common";
 import { nativeSwitch } from "./switch";
+import { safeArea } from "./safe-area";
 
 const kebabCase = (str: string) => {
   return str.replace(
@@ -339,6 +340,7 @@ const preset: Config = {
     },
   },
   plugins: [
+    safeArea,
     color,
     darkModeAtRule,
     shadows,

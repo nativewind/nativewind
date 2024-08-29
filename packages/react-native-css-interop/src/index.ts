@@ -5,14 +5,14 @@ export { default as wrapJSX } from "./runtime/wrap-jsx";
 export * from "./doctor";
 
 export {
-  cssInterop,
-  remapProps,
-  createInteropElement,
   StyleSheet,
   colorScheme,
-  useColorScheme,
-  useUnstableNativeVariable,
-  useSafeAreaEnv,
-  vars,
+  createInteropElement,
+  cssInterop,
   rem,
+  remapProps,
+  useColorScheme,
+  useSafeAreaEnv,
+  useUnstableNativeVariable,
+  vars,
 } from "./runtime";
