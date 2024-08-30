@@ -1,12 +1,12 @@
 /** @jsxImportSource react-native-css-interop */
-import { View } from "react-native";
+import { TextInput, View } from "react-native";
 
 import {
-  render,
-  screen,
-  registerCSS,
-  resetComponents,
   cssInterop,
+  registerCSS,
+  render,
+  resetComponents,
+  screen,
 } from "test-utils";
 
 const testID = "react-native-css-interop";
@@ -54,5 +54,67 @@ test("multiple mapping", () => {
     styleB: {
       color: "rgba(255, 255, 255, 1)",
     },
+  });
+});
+
+test("nativeStyleToProp target:string", () => {
+  cssInterop(TextInput as any, {
+    fooClassName: {
+      target: "fooStyle",
+      nativeStyleToProp: {
+        color: "barTextColor",
+        backgroundColor: true,
+      },
+    },
+  });
+
+  registerCSS(
+    `.bg-black { background-color: black } .text-white { color: white } .flex { display: flex }`,
+  );
+
+  render(
+    <TextInput
+      testID={testID}
+      {...{ fooClassName: "flex bg-black text-white" }}
+    />,
+  );
+
+  const component = screen.getByTestId(testID);
+
+  expect(component.props).toEqual({
+    testID,
+    fooStyle: {
+      display: "flex",
+    },
+    backgroundColor: "rgba(0, 0, 0, 1)",
+    barTextColor: "rgba(255, 255, 255, 1)",
+  });
+});
+
+test("nativeStyleToProp target:boolean", () => {
+  cssInterop(TextInput as any, {
+    fooClassName: {
+      target: false,
+      nativeStyleToProp: {
+        color: "barTextColor",
+        backgroundColor: true,
+      },
+    },
+  });
+
+  registerCSS(
+    `.bg-black { background-color: black } .text-white { color: white }`,
+  );
+
+  render(
+    <TextInput testID={testID} {...{ fooClassName: "bg-black text-white" }} />,
+  );
+
+  const component = screen.getByTestId(testID);
+
+  expect(component.props).toEqual({
+    testID,
+    backgroundColor: "rgba(0, 0, 0, 1)",
+    barTextColor: "rgba(255, 255, 255, 1)",
   });
 });

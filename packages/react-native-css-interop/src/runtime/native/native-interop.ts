@@ -153,9 +153,7 @@ export function interop(
     }
 
     states.push(state);
-    if (state.config.source !== state.config.target) {
-      delete props?.[state.config.source];
-    }
+    delete props?.[state.config.source];
   }
 
   /*
@@ -408,7 +406,7 @@ function getDeclarations(
     }
   }
 
-  if (refs.props?.[config.target]) {
+  if (refs.props?.[config.target] && config.target !== config.source) {
     collectInlineRules(
       state,
       refs,
@@ -520,6 +518,9 @@ function applyStyles(state: ReducerState, refs: Refs) {
   // { style: { fill: 'red' } -> { fill: 'red' }
   nativeStyleToProp(state.props, state.config);
 
+  if (state.config.target === state.config.source) {
+    delete state.props[state.config.source];
+  }
   return state;
 }
 
@@ -852,7 +853,7 @@ function nativeStyleToProp(
   props: Record<string, any>,
   config: InteropComponentConfig,
 ) {
-  if (config.target !== "style" || !config.nativeStyleToProp) return;
+  if (!config.nativeStyleToProp) return;
 
   for (let move of Object.entries(config.nativeStyleToProp)) {
     const source = move[0];
