@@ -49,6 +49,7 @@
     "jsx-runtime/",
     "metro/",
     "preset/",
+    "test/",
     "theme/",
     "types.d.ts"
   ],

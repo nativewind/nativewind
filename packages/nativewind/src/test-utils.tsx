@@ -20,8 +20,6 @@ export {
   fireEvent,
 } from "react-native-css-interop/test-utils";
 
-export * from "../src/index";
-
 const testID = "nativewind";
 
 beforeEach(() => {
@@ -70,6 +68,8 @@ export async function renderCurrentTest({
   }
 }
 
+let isCompilerLoggingEnabled = false;
+
 export async function render(
   component: React.ReactElement<any>,
   { config, css, layers = {}, ...options }: RenderOptions = {},
@@ -83,21 +83,33 @@ export async function render(
     return enabled ? `${acc}@tailwind ${layer};` : acc;
   }, "");
 
+  const content = getClassNames(component);
+
   let { css: output } = await postcss([
     tailwind({
       theme: {},
       ...config,
       presets: [require("./tailwind")],
       plugins: [tailwindcssContainerQueries],
-      content: getClassNames(component),
+      content,
     }),
   ]).process(css, { from: undefined });
+
+  if (isCompilerLoggingEnabled) {
+    const classNames = content.map(({ raw }) => `  ${raw}`);
+    console.log(`Detected classNames:\n${classNames.join("\n")}\n\n`);
+  }
 
   return interopRender(component, {
     ...options,
     css: output,
     cssOptions: cssToReactNativeRuntimeOptions,
+    logOutput: isCompilerLoggingEnabled,
   });
+}
+
+export function enableCompilerLogging(enable: boolean) {
+  isCompilerLoggingEnabled = enable;
 }
 
 function getClassNames(

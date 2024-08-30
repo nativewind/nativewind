@@ -1,0 +1,4 @@
+{
+  "main": "../dist/test-utils",
+  "types": "../dist/test-utils"
+}
