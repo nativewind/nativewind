@@ -1,4 +1,4 @@
 {
-  "main": "../dist/test-utils",
-  "types": "../dist/test-utils"
+  "main": "../dist/test",
+  "types": "../dist/test"
 }

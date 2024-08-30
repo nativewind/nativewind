@@ -7,7 +7,7 @@ import {
   screen,
   registerCSS,
   setupAllComponents,
-} from "test-utils";
+} from "test";
 
 const parentID = "parent";
 const childID = "child";

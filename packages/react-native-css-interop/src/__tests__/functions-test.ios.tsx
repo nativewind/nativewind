@@ -1,7 +1,7 @@
 /** @jsxImportSource react-native-css-interop */
 import { StyleSheet as RNStyleSheet, View } from "react-native";
 
-import { render, screen, registerCSS, setupAllComponents } from "test-utils";
+import { render, screen, registerCSS, setupAllComponents } from "test";
 
 const testID = "react-native-css-interop";
 setupAllComponents();

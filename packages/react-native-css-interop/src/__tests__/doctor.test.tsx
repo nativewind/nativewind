@@ -1,5 +1,5 @@
 /** @jsxImportSource nativewind */
-import { registerCSS, verifyData } from "test-utils";
+import { registerCSS, verifyData } from "test";
 
 test("verifyData", () => {
   expect(verifyData()).toBe(false);

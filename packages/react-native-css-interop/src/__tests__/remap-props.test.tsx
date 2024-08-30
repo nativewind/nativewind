@@ -9,7 +9,7 @@ import {
   resetComponents,
   remapProps,
   getOpaqueStyles,
-} from "test-utils";
+} from "test";
 
 const testID = "react-native-css-interop";
 
