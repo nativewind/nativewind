@@ -406,7 +406,7 @@ function getDeclarations(
     }
   }
 
-  if (refs.props?.[config.target] && config.target !== config.source) {
+  if (config.source !== config.target && refs.props?.[config.target]) {
     collectInlineRules(
       state,
       refs,
@@ -514,9 +514,9 @@ function applyStyles(state: ReducerState, refs: Refs) {
   // we need to retain these values
   retainSharedValues(state, seenAnimatedProps);
 
-  // Moves styles to the correct props
+  // Moves styles to the correct props or removes the props if they shouldn't exist
   // { style: { fill: 'red' } -> { fill: 'red' }
-  nativeStyleToProp(state.props, state.config);
+  cleanup(state.props, state.config);
 
   if (state.config.target === state.config.source) {
     delete state.props[state.config.source];
@@ -849,10 +849,7 @@ function handleUpgrades(sharedState: SharedState, ruleSet: StyleRuleSet) {
  * @param props
  * @param config
  */
-function nativeStyleToProp(
-  props: Record<string, any>,
-  config: InteropComponentConfig,
-) {
+function cleanup(props: Record<string, any>, config: InteropComponentConfig) {
   if (!config.nativeStyleToProp) return;
 
   for (let move of Object.entries(config.nativeStyleToProp)) {
@@ -862,6 +859,10 @@ function nativeStyleToProp(
     const targetProp = move[1] === true ? move[0] : move[1];
     props[targetProp] = sourceValue;
     delete props[config.target][source];
+  }
+
+  if (config.removeTarget) {
+    delete props[config.target];
   }
 }
 
