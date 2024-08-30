@@ -132,9 +132,12 @@ export const resetComponents = () => {
 
 export function registerCSS(
   css: string,
-  options?: CssToReactNativeRuntimeOptions,
+  { debug, ...options }: CssToReactNativeRuntimeOptions & { debug?: true } = {},
 ) {
   const compiled = cssToReactNativeRuntime(css, options);
+  if (debug) {
+    console.log(JSON.stringify({ compiled }, null, 2));
+  }
   injectData(compiled);
 }
 
