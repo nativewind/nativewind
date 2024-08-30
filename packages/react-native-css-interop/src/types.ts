@@ -96,18 +96,21 @@ export type CssInteropGeneratedProps<T extends EnableCssInteropOptions<any>> = {
       ? never
       : T[K] extends true | string
         ? K
-        : T[K] extends {
-              target: string | boolean;
-            }
-          ? T[K]["target"] extends true | string
-            ? K
-            : never
+        : T[K] extends
+              | {
+                  target: string | true;
+                }
+              | {
+                  target: false;
+                  nativeStyleToProp: Record<string, true>;
+                }
+          ? K
           : never
     : never]?: string;
 };
 
 export type NativeStyleToProp<P> = {
-  [K in keyof Style & string]?: K extends keyof P
+  [K in (keyof Style | "fill" | "stroke") & string]?: K extends keyof P
     ? (keyof P & string) | true
     : keyof P & string;
 };
