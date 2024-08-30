@@ -14,6 +14,7 @@ export function getNormalizeConfig(
   >) {
     let target: string;
     let nativeStyleToProp: NativeStyleToProp<any> | undefined;
+    let removeTarget: true | undefined;
 
     if (!options) continue;
 
@@ -21,12 +22,26 @@ export function getNormalizeConfig(
       target = source;
     } else if (typeof options === "string") {
       target = options;
+    } else if (options.target === false) {
+      /*
+       * Even when target == false, you still need to process as normal. As nativeStyleToProp may move a style
+       * Once the styles are moved, you then need to remove the prop as there maybe left over styles
+       * e.g paddingTop: calc(10 + 2em). The user may also set a fontSize here to force a value of the `em`
+       */
+      target = source;
+      nativeStyleToProp = options.nativeStyleToProp;
+      removeTarget = true;
     } else {
-      target = typeof options.target === "boolean" ? source : options.target;
+      target = options.target === true ? source : options.target;
       nativeStyleToProp = options.nativeStyleToProp;
     }
 
-    config.set(target, { target, source, nativeStyleToProp });
+    config.set(target, {
+      nativeStyleToProp,
+      source,
+      target,
+      removeTarget,
+    });
   }
 
   return Array.from(config.values());

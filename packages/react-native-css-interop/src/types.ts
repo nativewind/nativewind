@@ -44,6 +44,7 @@ export type ReactComponent<P = any> =
 export type InteropComponentConfig = {
   target: string;
   source: string;
+  removeTarget?: true | undefined;
   nativeStyleToProp?: NativeStyleToProp<any>;
 };
 
