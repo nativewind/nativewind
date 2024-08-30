@@ -10,7 +10,7 @@ import {
   INTERNAL_SET,
   rem,
   setupAllComponents,
-} from "test-utils";
+} from "test";
 
 const { vw, vh } = native;
 

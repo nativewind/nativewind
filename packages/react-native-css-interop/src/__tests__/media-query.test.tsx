@@ -10,7 +10,7 @@ import {
   colorScheme,
   native,
   setupAllComponents,
-} from "test-utils";
+} from "test";
 
 const { isReduceMotionEnabled, vw } = native;
 

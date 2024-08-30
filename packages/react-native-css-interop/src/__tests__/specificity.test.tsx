@@ -7,7 +7,7 @@ import {
   createRemappedComponent,
   registerCSS,
   setupAllComponents,
-} from "test-utils";
+} from "test";
 
 const testID = "react-native-css-interop";
 setupAllComponents();

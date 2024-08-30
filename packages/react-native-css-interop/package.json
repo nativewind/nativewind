@@ -47,7 +47,7 @@
     "jsx-dev-runtime/",
     "jsx-runtime/",
     "metro/",
-    "testing-library/",
+    "test/",
     "types.d.ts"
   ],
   "dependencies": {

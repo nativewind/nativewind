@@ -1,5 +1,5 @@
 import { TextInput } from "react-native";
-import { screen, cssInterop, registerCSS, render } from "test-utils";
+import { screen, cssInterop, registerCSS, render } from "test";
 
 const testID = "react-native-css-interop";
 

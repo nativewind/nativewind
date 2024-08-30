@@ -9,8 +9,8 @@
     "noEmit": false,
     "sourceMap": true,
     "paths": {
-      "test-utils": [
-        "./src/utils/test-utils"
+      "test": [
+        "./src/utils/test"
       ]
     }
   },

@@ -8,7 +8,7 @@ import {
   useUnstableNativeVariable,
   setupAllComponents,
   cssInterop,
-} from "test-utils";
+} from "test";
 
 const testID = "react-native-css-interop";
 setupAllComponents();

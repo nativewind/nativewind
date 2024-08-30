@@ -1,13 +1,7 @@
 /** @jsxImportSource react-native-css-interop */
 import { View } from "react-native";
 
-import {
-  render,
-  screen,
-  registerCSS,
-  resetComponents,
-  cssInterop,
-} from "test-utils";
+import { render, screen, registerCSS, resetComponents, cssInterop } from "test";
 
 const testID = "react-native-css-interop";
 

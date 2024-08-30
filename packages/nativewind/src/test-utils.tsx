@@ -11,14 +11,16 @@ import {
   resetData,
   screen,
   setupAllComponents,
-} from "react-native-css-interop/test-utils";
+} from "react-native-css-interop/test";
 import { cssToReactNativeRuntimeOptions } from "./metro/common";
 
 export {
   createMockComponent,
   screen,
   fireEvent,
-} from "react-native-css-interop/test-utils";
+} from "react-native-css-interop/test";
+
+export * from "./index";
 
 const testID = "nativewind";
 

@@ -7,7 +7,7 @@ import {
 } from "react";
 import { ViewProps } from "react-native";
 
-import { render, createMockComponent, registerCSS } from "test-utils";
+import { render, createMockComponent, registerCSS } from "test";
 
 const testID = "react-native-css-interop";
 

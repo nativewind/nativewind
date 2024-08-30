@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
-import { screen, registerCSS, render, setupAllComponents } from "test-utils";
+import { screen, registerCSS, render, setupAllComponents } from "test";
 
 const testID = "react-native-css-interop";
 setupAllComponents();
