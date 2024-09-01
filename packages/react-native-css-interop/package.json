@@ -43,6 +43,7 @@
     "babel.js",
     "css-to-rn/",
     "dist/",
+    "src/",
     "doctor/",
     "jsx-dev-runtime/",
     "jsx-runtime/",
