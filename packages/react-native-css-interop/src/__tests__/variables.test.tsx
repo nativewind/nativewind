@@ -1,4 +1,4 @@
-/** @jsxImportSource react-native-css-interop */
+/** @jsxImportSource test */
 import { memo, useEffect } from "react";
 import { View, ViewProps } from "react-native";
 import {

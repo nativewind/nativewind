@@ -11,6 +11,9 @@
     "paths": {
       "test": [
         "./src/utils/test"
+      ],
+      "test/jsx-runtime": [
+        "./src/utils/test"
       ]
     }
   },

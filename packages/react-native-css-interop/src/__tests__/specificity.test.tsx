@@ -1,4 +1,4 @@
-/** @jsxImportSource react-native-css-interop */
+/** @jsxImportSource test */
 import { Text, ViewProps } from "react-native";
 
 import {
