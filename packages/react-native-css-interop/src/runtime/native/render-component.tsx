@@ -33,11 +33,13 @@ export function renderComponent(
 
   // TODO: We can probably remove this in favor of using `new Pressability()`
   if (state.pressable !== UpgradeState.NONE) {
-    if (shouldWarn && state.pressable === UpgradeState.SHOULD_UPGRADE) {
-      printUpgradeWarning(
-        `Converting View to Pressable should only happen during the initial render otherwise it will remount the View.\n\nTo prevent this warning avoid adding styles which use pseudo-classes (e.g :hover, :active, :focus) to View components after the initial render, or change the View to a Pressable`,
-        state.originalProps,
-      );
+    if (process.env.NODE_ENV !== "production") {
+      if (shouldWarn && state.pressable === UpgradeState.SHOULD_UPGRADE) {
+        printUpgradeWarning(
+          `Converting View to Pressable should only happen during the initial render otherwise it will remount the View.\n\nTo prevent this warning avoid adding styles which use pseudo-classes (e.g :hover, :active, :focus) to View components after the initial render, or change the View to a Pressable`,
+          state.originalProps,
+        );
+      }
     }
     component = Pressable;
     state.pressable = UpgradeState.UPGRADED;
@@ -46,10 +48,12 @@ export function renderComponent(
 
   if (state.animated !== UpgradeState.NONE) {
     if (shouldWarn && state.animated === UpgradeState.SHOULD_UPGRADE) {
-      printUpgradeWarning(
-        `Components need to be animated during the initial render otherwise they will remount.\n\nTo prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none"/"transition-property: none"`,
-        state.originalProps,
-      );
+      if (process.env.NODE_ENV !== "production") {
+        printUpgradeWarning(
+          `Components need to be animated during the initial render otherwise they will remount.\n\nTo prevent this warning avoid dynamically adding animation/transition styles to components after the initial render, or add a default style that sets "animation: none"/"transition-property: none"`,
+          state.originalProps,
+        );
+      }
     } else {
       state.animated = UpgradeState.UPGRADED;
       component = createAnimatedComponent(component);
@@ -86,11 +90,13 @@ export function renderComponent(
   }
 
   if (state.variables !== UpgradeState.NONE) {
-    if (shouldWarn && state.variables === UpgradeState.SHOULD_UPGRADE) {
-      printUpgradeWarning(
-        `Components need to set a variable during the initial render otherwise they will remount.\n\nTo prevent this warning avoid dynamically adding CSS variables components after the initial render, or ensure it has a default style that sets either a CSS variable`,
-        state.originalProps,
-      );
+    if (process.env.NODE_ENV !== "production") {
+      if (shouldWarn && state.variables === UpgradeState.SHOULD_UPGRADE) {
+        printUpgradeWarning(
+          `Components need to set a variable during the initial render otherwise they will remount.\n\nTo prevent this warning avoid dynamically adding CSS variables components after the initial render, or ensure it has a default style that sets either a CSS variable`,
+          state.originalProps,
+        );
+      }
     }
     state.variables = UpgradeState.UPGRADED;
 
@@ -102,11 +108,13 @@ export function renderComponent(
   }
 
   if (state.containers !== UpgradeState.NONE) {
-    if (shouldWarn && state.containers === UpgradeState.SHOULD_UPGRADE) {
-      printUpgradeWarning(
-        `Components need to marked as a container during the initial render otherwise they will remount.\n\nTo prevent this warning avoid dynamically container styles to a component after the initial render, or ensure it has a default style that sets "container: none" or "container-type: none"`,
-        state.originalProps,
-      );
+    if (process.env.NODE_ENV !== "production") {
+      if (shouldWarn && state.containers === UpgradeState.SHOULD_UPGRADE) {
+        printUpgradeWarning(
+          `Components need to marked as a container during the initial render otherwise they will remount.\n\nTo prevent this warning avoid dynamically container styles to a component after the initial render, or ensure it has a default style that sets "container: none" or "container-type: none"`,
+          state.originalProps,
+        );
+      }
     }
     state.containers = UpgradeState.UPGRADED;
 
