@@ -3,4 +3,5 @@ module.exports = {
   roots: ["src"],
   setupFiles: ["react-native-css-interop/test/setup"],
   setupFilesAfterEnv: ["react-native-css-interop/test/setupAfterEnv"],
+  modulePathIgnorePatterns: ["<rootDir>/src/test"],
 };

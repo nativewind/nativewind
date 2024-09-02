@@ -77,7 +77,7 @@ export async function render(
   { config, css, layers = {}, logOutput, ...options }: RenderOptions = {},
 ) {
   css ??= Object.entries({
-    base: false,
+    base: true,
     components: true,
     utilities: true,
     ...layers,

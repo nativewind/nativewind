@@ -10,9 +10,6 @@ test("darkMode: media", async () => {
     config: {
       darkMode: "media",
     },
-    layers: {
-      base: true,
-    },
   });
 
   const component = screen.getByTestId(testID);
@@ -61,9 +58,6 @@ test("darkMode: class", async () => {
     config: {
       darkMode: "class",
     },
-    layers: {
-      base: true,
-    },
   });
 
   const component = screen.getByTestId(testID);
@@ -79,9 +73,6 @@ test("darkMode: class - on custom prop", async () => {
   await render(<View testID={testID} className="dark:fill-black" />, {
     config: {
       darkMode: "class",
-    },
-    layers: {
-      base: true,
     },
   });
 
@@ -166,9 +157,6 @@ test("useColorScheme().setColorScheme() with darkMode: class", async () => {
     config: {
       darkMode: "class",
     },
-    layers: {
-      base: true,
-    },
   });
 
   const text = screen.getByTestId(testIds.TEXT);
@@ -214,9 +202,6 @@ test("useColorScheme().toggleColorScheme() with darkMode: class", async () => {
     );
   }
   await render(<UseColorScheme />, {
-    layers: {
-      base: true,
-    },
     config: {
       darkMode: "class",
       safelist: ["dark:text-red-500"],
