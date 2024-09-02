@@ -7,15 +7,14 @@
   ],
   "scripts": {
     "test": "turbo test --continue",
-    "snapshot": "npx changeset version --snapshot && npx changeset publish --tag snapshot && git restore .",
+    "snapshot": "npm run build && npx changeset version --snapshot && npx changeset publish --tag snapshot && git restore .",
     "build": "turbo run build --filter='./packages/*'",
     "build:watch": "turbo run build:watch --filter='./packages/*'",
     "dev": "npm_config_loglevel=silent turbo dev",
     "example": "npm start --workspace=examples/expo-router --",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i",
     "publish-packages": "turbo run build lint test && changeset version && changeset publish",
-    "website": "vercel dev",
-    "publish:snapshot": "git checkout -b \"snapshot-$(git rev-parse --short HEAD)\" && changeset version --snapshot && changeset publish --no-git-tag --snapshot --tag snapshot"
+    "website": "vercel dev"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
