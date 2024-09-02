@@ -17,15 +17,8 @@ import type {
   FunctionComponent,
   JSXElementConstructor,
 } from "react";
-import type {
-  Appearance,
-  Dimensions,
-  ImageStyle,
-  TextStyle,
-  ViewStyle,
-} from "react-native";
-import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
-import type { Effect, Observable } from "./runtime/observable";
+import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
+import type { Effect } from "./runtime/observable";
 import type { SharedValue } from "react-native-reanimated";
 import type { SharedState } from "./runtime/native/types";
 import type { FeatureFlagStatus } from "./css-to-rn/feature-flags";
@@ -391,16 +384,11 @@ export type DarkMode =
   | { type: "attribute"; value: string };
 
 export interface CssInteropStyleSheet {
-  [INTERNAL_RESET](options?: {
-    dimensions?: Dimensions;
-    appearance?: typeof Appearance;
-  }): void;
-  [INTERNAL_FLAGS]: Record<string, string>;
   unstable_hook_onClassName?(callback: (c: string) => void): void;
   register(options: StyleSheetRegisterOptions): void;
   registerCompiled(options: StyleSheetRegisterCompiledOptions): void;
   getFlag(name: string): string | undefined;
-  getGlobalStyle(name: string): Observable<StyleRuleSet> | undefined;
+  getGlobalStyle(name: string): StyleRuleSet | undefined;
 }
 
 type AttributeSelectorComponent = Extract<
