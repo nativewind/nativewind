@@ -1,6 +1,7 @@
 import { execSync, fork } from "child_process";
 import fs from "fs";
 import path from "path";
+import { type Config } from 'tailwindcss';
 import { TailwindCliOptions } from "../types";
 
 /**
@@ -90,10 +91,18 @@ export const tailwindCliV3 = {
   },
 };
 
-export function tailwindConfigV3(path: string) {
-  const config = require("tailwindcss/loadConfig")(path);
+const flattenPresets = (configs: Partial<Config>[] = []): Partial<Config>[] => {
+  if (!configs) return [];
+  return configs.flatMap(config => [
+    config,
+    ...flattenPresets(config.presets)
+  ]);
+};
 
-  const hasPreset = config.presets?.some((preset: any) => {
+export function tailwindConfigV3(path: string) {
+  const config: Config = require("tailwindcss/loadConfig")(path);
+
+  const hasPreset = flattenPresets(config.presets).some((preset) => {
     return preset.nativewind;
   });
 
