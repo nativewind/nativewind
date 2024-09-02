@@ -17,12 +17,14 @@ export async function transform(
 ): Promise<TransformResponse> {
   if (path.resolve(process.cwd(), filename) === config.nativewind.input) {
     if (options.platform === "web") {
+      const windowsCompatibleOutputPath = config.nativewind.output.replace(/\\/g, '\\\\');
+
       // Frameworks like Expo correctly handle the CSS, so just redirect to the Tailwind generated file
       return worker.transform(
         config,
         projectRoot,
         filename,
-        Buffer.from(`require('${config.nativewind.output}');`, "utf8"),
+        Buffer.from(`require('${windowsCompatibleOutputPath}');`, "utf8"),
         options,
       );
     } else {
