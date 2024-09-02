@@ -66,6 +66,7 @@ export function withNativeWind(
       platform,
       projectRoot,
       input,
+      config: tailwindConfigPath,
       output: `${output}.${platform}.css`,
       cliCommand,
       browserslist,
