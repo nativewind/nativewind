@@ -1,4 +1,4 @@
-import { renderCurrentTest } from "../test-utils";
+import { renderCurrentTest } from "../test";
 
 describe("Interactivity - Accent Color", () => {
   test("accent-inherit", async () => {

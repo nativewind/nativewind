@@ -4,7 +4,7 @@ import {
   Switch as Switch,
   View as View,
 } from "react-native";
-import { render, fireEvent, screen } from "../test-utils";
+import { render, fireEvent, screen } from "../test";
 
 const testID = "component";
 

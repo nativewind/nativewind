@@ -1,4 +1,4 @@
-import { renderCurrentTest } from "../test-utils";
+import { renderCurrentTest } from "../test";
 
 describe("Custom - Ripple Color", () => {
   test("ripple-black", async () =>

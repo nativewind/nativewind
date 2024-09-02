@@ -1,7 +1,7 @@
 /** @jsxImportSource nativewind */
 import { View } from "react-native";
 
-import { render } from "../test-utils";
+import { render } from "../test";
 
 import { verifyFlag } from "react-native-css-interop";
 

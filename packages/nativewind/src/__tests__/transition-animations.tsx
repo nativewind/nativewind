@@ -1,5 +1,5 @@
 /** @jsxImportSource nativewind */
-import { render, screen } from "../test-utils";
+import { render, screen } from "../test";
 import { View } from "react-native";
 import { getAnimatedStyle } from "react-native-reanimated";
 

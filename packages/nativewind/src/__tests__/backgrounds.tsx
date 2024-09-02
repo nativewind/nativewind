@@ -1,4 +1,4 @@
-import { renderCurrentTest } from "../test-utils";
+import { renderCurrentTest } from "../test";
 
 describe("Backgrounds - Background Attachment", () => {
   test("bg-fixed", async () => {
