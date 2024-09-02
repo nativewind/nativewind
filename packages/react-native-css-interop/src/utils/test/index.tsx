@@ -62,16 +62,16 @@ export function render<T>(
   component: ReactElement<T>,
   { css, cssOptions, ...options }: RenderOptions = {},
 ) {
-  if (css) {
-    registerCSS(css, cssOptions);
-  }
-
   if (options.logOutput) {
     if (css) {
       console.log(`Generated css:\n\n${css}`);
     } else {
       console.log(`Generated css:\n\n<empty string>`);
     }
+  }
+
+  if (css) {
+    registerCSS(css, { ...cssOptions, logOutput: options.logOutput });
   }
 
   return tlRender(component, {
@@ -141,13 +141,10 @@ export const resetComponents = () => {
 
 export function registerCSS(
   css: string,
-  {
-    logOutput,
-    ...options
-  }: CssToReactNativeRuntimeOptions & { logOutput?: true } = {},
+  options: CssToReactNativeRuntimeOptions & { logOutput?: boolean } = {},
 ) {
   const compiled = cssToReactNativeRuntime(css, options);
-  if (logOutput) {
+  if (options.logOutput) {
     console.log(`Compiled styles:\n\n${JSON.stringify({ compiled }, null, 2)}`);
   }
   injectData(compiled);

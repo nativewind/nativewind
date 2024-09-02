@@ -29,8 +29,13 @@ beforeEach(() => {
   setupAllComponents();
 });
 
+// I don't know why I can't use Omit. It narrows the type too much?
+export type ConfigWithoutContent = {
+  [K in keyof Config as K extends "content" ? never : K]: Config[K];
+};
+
 export interface RenderOptions extends InteropRenderOptions {
-  config?: Omit<Config, "content">;
+  config?: ConfigWithoutContent;
   css?: string;
   layers?: {
     base?: boolean;
@@ -102,7 +107,7 @@ export async function render(
       theme: {},
       ...config,
       presets: [require("./tailwind")],
-      plugins: [tailwindcssContainerQueries],
+      plugins: [tailwindcssContainerQueries, ...(config?.plugins || [])],
       content,
     }),
   ]).process(css, { from: undefined });
@@ -124,11 +129,11 @@ function getClassNames(
 ): Array<{ raw: string; extension?: string }> {
   const classNames: Array<{ raw: string; extension?: string }> = [];
 
-  if (component.props.className) {
+  if (component.props?.className) {
     classNames.push({ raw: component.props.className });
   }
 
-  if (component.props.children) {
+  if (component.props?.children) {
     const children: React.ReactElement<any>[] = Array.isArray(
       component.props.children,
     )
