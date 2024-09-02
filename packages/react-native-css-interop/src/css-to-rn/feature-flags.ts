@@ -20,5 +20,5 @@ export const defaultFeatureFlags = Object.fromEntries(
 );
 
 export function isFeatureEnabled(key: keyof typeof featureFlags) {
-  return semver.satisfies(featureFlags[key], rnPackageJSON.version);
+  return semver.satisfies(rnPackageJSON.version, featureFlags[key]);
 }
