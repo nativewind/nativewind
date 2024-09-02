@@ -1,4 +1,4 @@
-import { renderCurrentTest } from "../test-utils";
+import { renderCurrentTest } from "../test";
 
 describe("Layout - Aspect Ratio", () => {
   test("aspect-square", async () => {

@@ -1,6 +1,6 @@
 /** @jsxImportSource nativewind */
 import { View } from "react-native";
-import { render, fireEvent, screen } from "../test-utils";
+import { render, fireEvent, screen } from "../test";
 
 const grandparentID = "grandparentID";
 const parentID = "parent";

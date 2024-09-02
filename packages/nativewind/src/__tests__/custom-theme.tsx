@@ -1,6 +1,6 @@
 /** @jsxImportSource nativewind */
 import { View } from "react-native";
-import { render } from "../test-utils";
+import { render } from "../test";
 import { act, screen } from "@testing-library/react-native";
 import { colorScheme } from "react-native-css-interop";
 

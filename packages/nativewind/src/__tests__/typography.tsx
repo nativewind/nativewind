@@ -1,4 +1,4 @@
-import { renderCurrentTest } from "../test-utils";
+import { renderCurrentTest } from "../test";
 
 describe("Typography - Font Family", () => {
   test("font-sans", async () => {

@@ -1,4 +1,4 @@
-import { renderCurrentTest } from "../test-utils";
+import { renderCurrentTest } from "../test";
 
 describe("Flexbox & Grid - Flex Basis", () => {
   test("basis-auto", async () => {

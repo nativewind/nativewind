@@ -1,5 +1,5 @@
 import { Dimensions } from "react-native";
-import { renderCurrentTest } from "../test-utils";
+import { renderCurrentTest } from "../test";
 
 describe("Sizing - Width", () => {
   test("w-0", async () => {
