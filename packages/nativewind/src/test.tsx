@@ -74,7 +74,7 @@ let isCompilerLoggingEnabled = false;
 
 export async function render(
   component: React.ReactElement<any>,
-  { config, css, layers = {}, ...options }: RenderOptions = {},
+  { config, css, layers = {}, logOutput, ...options }: RenderOptions = {},
 ) {
   css ??= Object.entries({
     base: false,
@@ -84,8 +84,18 @@ export async function render(
   }).reduce((acc, [layer, enabled]) => {
     return enabled ? `${acc}@tailwind ${layer};` : acc;
   }, "");
+  logOutput ||= isCompilerLoggingEnabled;
 
   const content = getClassNames(component);
+
+  if (logOutput) {
+    const classNames = content.map(({ raw }) => `  ${raw}`);
+    console.log(`Detected classNames:\n${classNames.join("\n")}\n\n`);
+
+    if (config?.safelist) {
+      console.log(`Detected safelist:\n${config.safelist.join("\n")}\n\n`);
+    }
+  }
 
   let { css: output } = await postcss([
     tailwind({
@@ -97,16 +107,11 @@ export async function render(
     }),
   ]).process(css, { from: undefined });
 
-  if (isCompilerLoggingEnabled) {
-    const classNames = content.map(({ raw }) => `  ${raw}`);
-    console.log(`Detected classNames:\n${classNames.join("\n")}\n\n`);
-  }
-
   return interopRender(component, {
     ...options,
     css: output,
     cssOptions: cssToReactNativeRuntimeOptions,
-    logOutput: isCompilerLoggingEnabled,
+    logOutput,
   });
 }
 
