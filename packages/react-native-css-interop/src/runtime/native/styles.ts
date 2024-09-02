@@ -27,8 +27,8 @@ export type VariableContextValue =
 
 declare global {
   var __css_interop: {
-    styles: Map<string, Observable<StyleRuleSet | void>>;
-    keyframes: Map<string, Observable<ExtractedAnimation | void>>;
+    styles: Map<string, Observable<StyleRuleSet | undefined>>;
+    keyframes: Map<string, Observable<ExtractedAnimation | undefined>>;
     rootVariables: Map<string, ReturnType<typeof cssVariableObservable>>;
     universalVariables: Map<string, ReturnType<typeof cssVariableObservable>>;
   };
