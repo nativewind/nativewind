@@ -1,4 +1,4 @@
-/** @jsxImportSource react-native-css-interop */
+/** @jsxImportSource test */
 import { TextInput } from "react-native";
 
 import {

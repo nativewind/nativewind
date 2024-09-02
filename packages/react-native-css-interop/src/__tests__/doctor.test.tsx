@@ -1,4 +1,4 @@
-/** @jsxImportSource nativewind */
+/** @jsxImportSource test */
 import { registerCSS, verifyData } from "test";
 
 test("verifyData", () => {

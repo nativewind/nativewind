@@ -1,4 +1,4 @@
-/** @jsxImportSource react-native-css-interop */
+/** @jsxImportSource test */
 import { StyleSheet as RNStyleSheet, View } from "react-native";
 
 import { render, screen, registerCSS, setupAllComponents } from "test";

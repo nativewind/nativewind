@@ -1,4 +1,4 @@
-/** @jsxImportSource react-native-css-interop */
+/** @jsxImportSource test */
 import { View } from "react-native";
 import { getAnimatedStyle } from "react-native-reanimated";
 import {

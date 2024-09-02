@@ -1,4 +1,4 @@
-/** @jsxImportSource react-native-css-interop */
+/** @jsxImportSource test */
 import { FlatList, View } from "react-native";
 
 import { RefObject, useRef } from "react";

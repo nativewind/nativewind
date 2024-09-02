@@ -1,4 +1,4 @@
-/** @jsxImportSource react-native-css-interop */
+/** @jsxImportSource test */
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { View, ViewProps } from "react-native";
 
