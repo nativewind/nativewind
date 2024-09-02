@@ -9,6 +9,7 @@ export {
   StyleSheet,
   colorScheme,
   useColorScheme,
+  useSafeAreaEnv,
   useUnstableNativeVariable,
   vars,
   rem,

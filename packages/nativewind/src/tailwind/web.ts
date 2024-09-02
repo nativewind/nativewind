@@ -5,6 +5,7 @@ import { darkModeAtRule } from "./dark-mode";
 import { color } from "./color";
 import { verify } from "./verify";
 import { webPropModifierPlugin } from "./prop-modifier";
+import { safeArea } from "./safe-area";
 import { webSwitch } from "./switch";
 import { allowedColors } from "./common";
 
@@ -29,6 +30,7 @@ const preset: Config = {
     plugin(({ addVariant }) => addVariant("web", "&")),
     color,
     darkModeAtRule,
+    safeArea,
     verify,
     webPropModifierPlugin,
     webSwitch,

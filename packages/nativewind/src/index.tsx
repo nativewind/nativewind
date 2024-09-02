@@ -2,6 +2,7 @@ export { verifyInstallation } from "./doctor";
 
 export {
   createElement,
+  useSafeAreaEnv,
   useUnstableNativeVariable,
   vars,
   cssInterop,
