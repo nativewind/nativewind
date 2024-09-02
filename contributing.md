@@ -32,6 +32,29 @@ Be sure to follow the templates for new issues and pull requests, when applicabl
 
 This project uses npm, and should be run with Node.js on the latest available LTS version. Ensure you have them properly setup on your development environment before continuing.
 
+### Opening an issue
+
+When opening an issue, it's crucial to provide a reproduction of the problem to help us take action. We have created some templates to make this easier for you.
+
+#### Reproduction Templates
+
+- **StackBlitz template**: [NativeWind Test on StackBlitz](https://stackblitz.com/edit/nativewind-test?view=editor)
+- **Create Expo Stack template**: 
+  - `npx create-expo-stack@latest --nativewind`
+  - `npx create-expo-stack@latest --nativewind --expo-router`
+
+#### Steps to Follow
+
+1. **Test with Inline Styles**: Before reporting an issue, ensure that your flex layout behaves as expected using inline styles (passing `StyleSheet` styles to the `style` prop). This helps to confirm that the issue is specific to NativeWind.
+
+2. **Provide a Reproduction**: If you can get your styles working with inline styles but not with NativeWind, use one of the provided templates to create a reproduction of the issue:
+   - **StackBlitz**: This is the preferred method as it allows us to respond more quickly.
+   - **Create Expo Stack**: Use the provided commands to set up a reproducible example.
+
+3. **Submit the Issue**: Include the link to your reproduction in the issue description. If no reproduction is provided for an issue that can be reproduced, we are likely not to look into the issue.
+
+By following these steps, you help us understand and resolve issues more efficiently.
+
 ### Forking and cloning
 
 For external contributors, the best way to make changes to the project is to fork the repository and clone it locally:
