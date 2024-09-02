@@ -2,7 +2,7 @@ import { renderCurrentTest } from "../test";
 
 describe("Transforms - Scale", () => {
   test("scale-0", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -19,7 +19,7 @@ describe("Transforms - Scale", () => {
     });
   });
   test("scale-x-0", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -36,7 +36,7 @@ describe("Transforms - Scale", () => {
     });
   });
   test("scale-y-0", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -53,7 +53,7 @@ describe("Transforms - Scale", () => {
     });
   });
   test("scale-50", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -70,7 +70,7 @@ describe("Transforms - Scale", () => {
     });
   });
   test("scale-x-50", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -88,7 +88,7 @@ describe("Transforms - Scale", () => {
   });
 
   test("scale-y-50", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -108,7 +108,7 @@ describe("Transforms - Scale", () => {
 
 describe("Transforms - Rotate", () => {
   test("rotate-0", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -125,7 +125,7 @@ describe("Transforms - Rotate", () => {
     });
   });
   test("rotate-180", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -142,7 +142,7 @@ describe("Transforms - Rotate", () => {
     });
   });
   test("rotate-[30deg]", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -162,7 +162,7 @@ describe("Transforms - Rotate", () => {
 
 describe("Transforms - Translate", () => {
   test("translate-x-0", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -179,7 +179,7 @@ describe("Transforms - Translate", () => {
     });
   });
   test("translate-y-0", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -196,7 +196,7 @@ describe("Transforms - Translate", () => {
     });
   });
   test("translate-x-px", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -213,7 +213,7 @@ describe("Transforms - Translate", () => {
     });
   });
   test("translate-y-px", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -230,7 +230,7 @@ describe("Transforms - Translate", () => {
     });
   });
   test("translate-x-1", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -247,7 +247,7 @@ describe("Transforms - Translate", () => {
     });
   });
   test("translate-y-1", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -269,7 +269,6 @@ describe("Transforms - Translate (%)", () => {
   test("translate-x-1/2", async () => {
     expect(
       await renderCurrentTest({
-        layers: { base: true },
         className: "w-2 translate-x-1/2",
       }),
     ).toStrictEqual({
@@ -292,7 +291,6 @@ describe("Transforms - Translate (%)", () => {
   test("translate-y-1/2", async () => {
     expect(
       await renderCurrentTest({
-        layers: { base: true },
         className: "h-2 translate-y-1/2",
       }),
     ).toStrictEqual({
@@ -315,7 +313,6 @@ describe("Transforms - Translate (%)", () => {
   test("translate-x-full", async () => {
     expect(
       await renderCurrentTest({
-        layers: { base: true },
         className: "w-2 translate-x-full",
       }),
     ).toStrictEqual({
@@ -338,7 +335,6 @@ describe("Transforms - Translate (%)", () => {
   test("translate-y-full", async () => {
     expect(
       await renderCurrentTest({
-        layers: { base: true },
         className: "h-2 translate-y-full",
       }),
     ).toStrictEqual({
@@ -362,7 +358,7 @@ describe("Transforms - Translate (%)", () => {
 
 describe("Transforms - Skew", () => {
   test("skew-x-0", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -379,7 +375,7 @@ describe("Transforms - Skew", () => {
     });
   });
   test("skew-y-0", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -396,7 +392,7 @@ describe("Transforms - Skew", () => {
     });
   });
   test("skew-x-1", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -413,7 +409,7 @@ describe("Transforms - Skew", () => {
     });
   });
   test("skew-y-1", async () => {
-    expect(await renderCurrentTest({ layers: { base: true } })).toStrictEqual({
+    expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
           transform: [
@@ -435,7 +431,6 @@ describe("Transforms - Mixed", () => {
   test("rotate-90 skew-y-1 translate-x-1", async () => {
     expect(
       await renderCurrentTest({
-        layers: { base: true },
         className: "rotate-90 skew-y-1 translate-x-1",
       }),
     ).toStrictEqual({
