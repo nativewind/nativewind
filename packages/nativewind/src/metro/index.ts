@@ -7,6 +7,7 @@ import {
 
 import { cssToReactNativeRuntimeOptions } from "./common";
 import { tailwindCli, tailwindConfig } from "./tailwind";
+import { setupTypeScript } from "./typescript";
 
 interface WithNativeWindOptions extends WithCssInteropOptions {
   input: string;
@@ -16,6 +17,7 @@ interface WithNativeWindOptions extends WithCssInteropOptions {
   cliCommand?: string;
   browserslist?: string | null;
   browserslistEnv?: string | null;
+  typescriptEnvPath?: string;
 }
 
 export function withNativeWind(
@@ -26,6 +28,7 @@ export function withNativeWind(
     configPath: tailwindConfigPath = "tailwind.config",
     browserslist = "last 1 version",
     browserslistEnv = "native",
+    typescriptEnvPath = "nativewind-env.d.ts",
   }: WithNativeWindOptions = {} as WithNativeWindOptions,
 ): MetroConfig {
   if (input) input = path.resolve(input);
@@ -33,6 +36,8 @@ export function withNativeWind(
   const { important } = tailwindConfig(path.resolve(tailwindConfigPath));
 
   const cli = tailwindCli();
+
+  setupTypeScript(typescriptEnvPath);
 
   return withCssInterop(config, {
     ...cssToReactNativeRuntimeOptions,
