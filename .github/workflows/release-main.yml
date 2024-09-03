@@ -46,7 +46,7 @@ jobs:
 
       - name: Create snapshot release
         run: |
-          npx changeset version --snapshot 
+          npx changeset version --snapshot $(git rev-parse --short HEAD)
           npx changeset publish --tag snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
