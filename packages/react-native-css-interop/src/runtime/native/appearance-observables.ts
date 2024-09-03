@@ -57,6 +57,7 @@ export function cssVariableObservable(
   });
 
   return {
+    name,
     get(effect?: Effect) {
       return colorScheme.get(effect) === "light"
         ? light.get(effect)

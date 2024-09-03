@@ -103,11 +103,7 @@ export function getVariable(
   if (!store) return;
 
   let obs = store instanceof Map ? store.get(name) : store[name];
-  if (!obs) {
-    obs = cssVariableObservable(undefined);
-    store instanceof Map ? store.set(name, obs) : (store[name] = obs);
-  }
-  return obs.get(effect);
+  return obs?.get(effect);
 }
 
 export const getUniversalVariable = (name: string, effect: Effect) => {
@@ -153,7 +149,10 @@ export function injectData(data: StyleSheetRegisterCompiledOptions) {
       if (value) {
         value.set(entry[1]);
       } else {
-        rootVariables.set(entry[0], cssVariableObservable(entry[1]));
+        rootVariables.set(
+          entry[0],
+          cssVariableObservable(entry[1], { name: entry[0] }),
+        );
       }
     }
   }
