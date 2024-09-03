@@ -37,7 +37,6 @@ test("tw-colors", async () => {
           ),
         ],
       },
-      logOutput: true,
     },
   );
 
