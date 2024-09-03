@@ -50,6 +50,7 @@ const sidebars = {
       collapsed: false,
       items: [
         "core-concepts/tailwindcss",
+        "core-concepts/quirks",
         "core-concepts/states",
         "core-concepts/responsive-design",
         "core-concepts/dark-mode",
