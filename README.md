@@ -6,7 +6,7 @@
   </a>
 </p>
 
-[![Github branch check state](https://img.shields.io/github/checks-status/marklawlor/nativewind/next)](https://github.com/nativewind/nativewind/tree/next)
+[![Github branch check state](https://img.shields.io/github/checks-status/marklawlor/nativewind)](https://github.com/nativewind/nativewind)
 [![npm version](https://img.shields.io/npm/v/nativewind)](https://www.npmjs.com/package/nativewind)
 [![npm downloads](https://img.shields.io/npm/dw/nativewind)](https://www.npmjs.com/package/nativewind)
 [![Github](https://img.shields.io/github/license/marklawlor/nativewind)](https://github.com/nativewind/nativewind)
@@ -26,25 +26,13 @@ NativeWind processes your styles during your application's build step and uses a
 
 ## Installation
 
-<<<<<<< HEAD
-
-=======
-
-> > > > > > > 19a289e7 (update README to reflect changes in v4)
-> > > > > > > If you have an existing project, [use these guides](https://www.nativewind.dev/v4/getting-started/react-native) to configure NativeWind for your respective stack.
+If you have an existing project, [use these guides](https://www.nativewind.dev/v4/getting-started/react-native) to configure NativeWind for your respective stack.
 
 Alternatively, you can create a new pre-configured project via our Quickstart options, below.
 
 ## Quickstart
 
-<<<<<<< HEAD
-
 You can get started with any of the following options:
-
-=======
-You can get started with any of the following options:
-
-> > > > > > > 19a289e7 (update README to reflect changes in v4)
 
 - [Create Expo Stack](https://rn.new): `npx create-expo-stack@latest --nativewind`
 - ~~[Create Expo App](https://expo.new): `npx create-expo-app -e with-nativewind`~~ (being fixed to work with v4)
@@ -59,10 +47,7 @@ You can get started with any of the following options:
 - Respects all tailwind.config.js settings, including **themes, custom values,** and **plugins**
 - Support for
   - custom CSS properties, aka **CSS Variables**
-    <<<<<<< HEAD
-  - # **dark mode, arbitrary classes,** and **media queries**
   - **dark mode, arbitrary classes,** and **media queries**
-    > > > > > > > 19a289e7 (update README to reflect changes in v4)
   - **animations** and **transitions**
   - **container queries**
     - `container-type` and style-based container queries are not supported
@@ -76,56 +61,6 @@ You can get started with any of the following options:
 - **Children styles** - create simple layouts based upon parent class
 - Fast and consistent style application via hot reload
   - includes changes made to `tailwind.config.js`
-    <<<<<<< HEAD
-
-[More details here](https://www.nativewind.dev/v4/announcement#breaking-changes-from-v2)
-
-## Distribution tags guide
-
-- Release: `main` branch (currently v2.0.11)
-  - You should use this version
-- Experimental: `next` branch (currently v4.1)
-  - You probably shouldn't use this version
-  - Undergoing testing to move to a release version
-- Bleeding Edge: `-alpha` suffixed branches (no current alpha)
-  - You should not use this version
-  - Used internally for moving towards a `next` version
-
-## Contribution
-
-[See this guide](https://github.com/nativewind/nativewind/blob/main/contributing.md)
-
-# FAQ
-
-## Is NativeWind moving to Expo?
-
-No. Expo is always exploring ways to handle styles better but NativeWind, as a project, will not be moving into the Expo organization.
-
-## What happened to v3?
-
-Similar to Valve, we don't like the number 3. Nah, we had a V3 but it was a bad idea and needed to be reworked so we dropped it and moved on to v4.
-
-## What if I'm looking for a component library that uses NativeWind?
-
-There are a number of different component libraries available that use NativeWind to achieve different results. You should pick the one that best suits your needs.
-
-### [NativeWindUI](https://nativewindui.com)
-
-This multi-platform library focuses on achieving native feel for each individual platform using the familiar interface of Tailwind CSS.
-
-### [React Native Reusables](https://rnr-docs.vercel.app)
-
-This open source library offers universal [shadcn/ui](https://ui.shadcn.com) via React Native. Use this as a foundation to develop your own high-quality component library.
-
-### [GluestackUI v2](https://gluestack.io)
-
-From the folks that brought you NativeBase, this library offers customizable cross-platform components designed to look & behave cleanly on every platform.
-
-## What are the breaking changes from v2 to v4?
-
-# All breaking changes are [outlined here](https://www.nativewind.dev/v4/announcement#breaking-changes-from-v2).
-
-> > > > > > > 19a289e7 (update README to reflect changes in v4)
 
 [More details here](https://www.nativewind.dev/v4/announcement#breaking-changes-from-v2)
 
