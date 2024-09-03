@@ -31,6 +31,26 @@ export function renderComponent(
   let component = baseComponent;
   const shouldWarn = state.canUpgradeWarn;
 
+  if (props?.testID?.startsWith("debugClassName")) {
+    console.log(
+      `Debugging component.testID '${props?.testID}'\n\n${JSON.stringify(
+        {
+          originalProps: state.originalProps,
+          props: state.animated
+            ? {
+                ...props,
+                ...possiblyAnimatedProps,
+              }
+            : { ...props, ...possiblyAnimatedProps },
+          variables,
+          containers,
+        },
+        getDebugReplacer(),
+        2,
+      )}`,
+    );
+  }
+
   // TODO: We can probably remove this in favor of using `new Pressability()`
   if (state.pressable !== UpgradeState.NONE) {
     if (process.env.NODE_ENV !== "production") {
@@ -253,3 +273,27 @@ function stringify(object: any) {
 //       return "unknown";
 //   }
 // }
+
+function getDebugReplacer() {
+  const seen = new WeakSet<object>();
+  return (_: string, value: unknown) => {
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) {
+        return "[Circular]";
+      }
+      seen.add(value);
+
+      if ("_isReanimatedSharedValue" in value && "value" in value) {
+        return `${value.value} (animated value)`;
+      }
+
+      if ("get" in value && typeof value.get === "function") {
+        return value.get();
+      }
+    } else if (typeof value === "function") {
+      return value.name ? `[Function ${value.name}]` : "[Function]";
+    }
+
+    return value;
+  };
+}
