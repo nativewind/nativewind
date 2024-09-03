@@ -43,6 +43,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create snapshot release
+        if: steps.changesets.outputs.published == 'false'
         run: |
           npx changeset version --snapshot $(git rev-parse --short HEAD)
           npx changeset publish --tag snapshot --no-git-tag
