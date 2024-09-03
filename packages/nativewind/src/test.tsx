@@ -15,9 +15,11 @@ import {
 import { cssToReactNativeRuntimeOptions } from "./metro/common";
 
 export {
+  act,
   createMockComponent,
   screen,
   fireEvent,
+  within,
 } from "react-native-css-interop/test";
 
 export * from "./index";
