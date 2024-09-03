@@ -112,17 +112,18 @@ export function withCssInterop(
 
           await fsPromises.mkdir(prodOutputDir, { recursive: true });
 
-          const output = path.join(
-            prodOutputDir,
-            `${platform}.${platform === "web" ? "css" : "js"}`,
-          );
-
-          await fsPromises.writeFile(
-            output,
-            getNativeJS(
-              cssToReactNativeRuntime(options.processPROD(platform), options),
-            ),
-          );
+          if (platform === "web") {
+            const output = path.join(prodOutputDir, `web.css`);
+            await fsPromises.writeFile(output, options.processPROD(platform));
+          } else {
+            const output = path.join(prodOutputDir, `${platform}.js`);
+            await fsPromises.writeFile(
+              output,
+              getNativeJS(
+                cssToReactNativeRuntime(options.processPROD(platform), options),
+              ),
+            );
+          }
         }
 
         return (
