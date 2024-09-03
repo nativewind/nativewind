@@ -6,7 +6,6 @@
   </a>
 </p>
 
-[![Github branch check state](https://img.shields.io/github/checks-status/marklawlor/nativewind)](https://github.com/nativewind/nativewind)
 [![npm version](https://img.shields.io/npm/v/nativewind)](https://www.npmjs.com/package/nativewind)
 [![npm downloads](https://img.shields.io/npm/dw/nativewind)](https://www.npmjs.com/package/nativewind)
 [![Github](https://img.shields.io/github/license/marklawlor/nativewind)](https://github.com/nativewind/nativewind)
