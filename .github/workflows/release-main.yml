@@ -1,4 +1,4 @@
-name: Main
+name: Release
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
           cache: "npm"
 
       - name: Install Dependencies
@@ -33,12 +33,20 @@ jobs:
       - name: Copy readme
         run: cp README.md packages/nativewind/
 
-      - name: Create Release Pull Request or Publish to npm
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          publish: npx changeset publish
-          createGithubReleases: true
+      # - name: Create Release Pull Request or Publish to npm
+      #   id: changesets
+      #   uses: changesets/action@v1
+      #   with:
+      #     publish: npx changeset publish
+      #     createGithubReleases: false
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create snapshot release
+        run: |
+          npx changeset version --snapshot 
+          npx changeset publish --tag snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
