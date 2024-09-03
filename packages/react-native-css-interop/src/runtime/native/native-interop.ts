@@ -16,6 +16,7 @@ import {
   StyleRuleSet,
   ExtractedAnimations,
   ExtractedTransition,
+  ContainerRecord,
 } from "../../types";
 import { containerContext } from "./globals";
 import { UpgradeState, renderComponent } from "./render-component";
@@ -161,19 +162,12 @@ export function interop(
    * This is a memoized value, as variables and containers are used for Context.Providers
    */
   const memoOutput = useMemo(() => {
-    let variables =
-      // RootVariables are a map, inheritedVariables are an object
-      inheritedVariables instanceof Map
-        ? Object.fromEntries(inheritedVariables)
-        : { ...inheritedVariables };
-
-    let containers = { ...inheritedContainers };
+    let variables = undefined;
+    let containers: ContainerRecord = {};
 
     const possiblyAnimatedProps: Record<string, any> = {};
     const handlers: Record<string, any> = {};
 
-    let hasVariables = false;
-    let hasContainer = false;
     let hasNullContainer = false;
 
     /**
@@ -183,13 +177,11 @@ export function interop(
       Object.assign(possiblyAnimatedProps, state.props);
 
       if (state.variables) {
-        hasVariables = true;
+        variables ||= {};
         Object.assign(variables, state.variables);
       }
 
       if (state.containerNames !== undefined) {
-        hasContainer = true;
-
         if (state.containerNames === false) {
           hasNullContainer = true;
         } else if (!hasNullContainer) {
@@ -257,32 +249,35 @@ export function interop(
       };
     }
 
-    /**
-     * Determine the next variables and containers. If something has upgraded, then we always need a value
-     */
-    let nextVariables: Record<string, any> | undefined;
-    if (hasVariables) {
-      nextVariables = variables;
-    } else if (sharedState.variables !== UpgradeState.NONE) {
-      nextVariables = inheritedVariables;
-    }
-
-    let nextContainers: Record<string, any> | undefined;
-    if (hasNullContainer) {
-      nextContainers = inheritedContainers;
-    } else if (hasContainer) {
-      nextContainers = containers;
-    } else if (sharedState.containers !== UpgradeState.NONE) {
-      nextContainers = inheritedContainers;
-    }
-
     return {
       possiblyAnimatedProps,
       handlers,
-      variables: nextVariables,
-      containers: nextContainers,
+      variables,
+      containers:
+        sharedState.containers && !hasNullContainer ? containers : undefined,
     };
   }, states);
+
+  const variables = useMemo(() => {
+    return Object.assign(
+      {},
+      inheritedVariables instanceof Map
+        ? Object.fromEntries(inheritedVariables.entries())
+        : undefined,
+      memoOutput.variables,
+    );
+  }, [inheritedVariables, memoOutput.variables]);
+
+  const containers = useMemo(() => {
+    if (!memoOutput.containers) {
+      return inheritedContainers;
+    }
+
+    return {
+      ...inheritedContainers,
+      ...memoOutput.containers,
+    };
+  }, [inheritedContainers, memoOutput.containers]);
 
   // Cleanup the effects when the component is unmounted
   useEffect(() => {
@@ -304,8 +299,8 @@ export function interop(
     sharedState,
     { ...props, ...memoOutput.handlers, ref },
     memoOutput.possiblyAnimatedProps,
-    memoOutput.variables,
-    memoOutput.containers,
+    variables,
+    containers,
   );
 }
 

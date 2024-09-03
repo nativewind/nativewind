@@ -47,7 +47,9 @@ describe("debugging", () => {
       "color": "rgba(239, 68, 68, 1)",
       "padding": 10
     }
-  }
+  },
+  "variables": {},
+  "containers": {}
 }`);
   });
 
@@ -83,7 +85,9 @@ describe("debugging", () => {
       "color": "rgba(239, 68, 68, 1) (animated value)",
       "padding": 10
     }
-  }
+  },
+  "variables": {},
+  "containers": {}
 }`);
   });
 
@@ -119,7 +123,8 @@ describe("debugging", () => {
   },
   "variables": {
     "--test": "50%"
-  }
+  },
+  "containers": {}
 }`);
   });
 
@@ -161,6 +166,7 @@ describe("debugging", () => {
       "color": "rgba(239, 68, 68, 1)"
     }
   },
+  "variables": {},
   "containers": {
     "test": {
       "originalProps": "[Circular]",
