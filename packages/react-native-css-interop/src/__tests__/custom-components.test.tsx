@@ -1,4 +1,5 @@
-import { TextInput } from "react-native";
+import { FunctionComponent } from "react";
+import { TextInput, View } from "react-native";
 import { screen, cssInterop, registerCSS, render } from "test";
 
 const testID = "react-native-css-interop";
@@ -43,6 +44,44 @@ it("can create custom components", () => {
     textAlign: "center",
     style: {
       color: "rgba(255, 0, 0, 1)",
+    },
+  });
+});
+
+it("can target deeply nested props", () => {
+  registerCSS(`
+    .a {
+      color: red;
+      background-color: blue;
+    }
+  `);
+
+  const MyComp: FunctionComponent<{
+    testID?: string;
+    deeply?: { nested: { target: any; backgroundColor: string } };
+  }> = jest.fn((props) => <View {...props} />);
+
+  const MyStyledComp = cssInterop(MyComp, {
+    className: {
+      target: "deeply.nested.target",
+      nativeStyleToProp: {
+        backgroundColor: "deeply.nested.backgroundColor",
+      },
+    },
+  });
+
+  render(<MyStyledComp testID={testID} className="a" />);
+
+  expect(screen.getByTestId(testID).props).toStrictEqual({
+    testID,
+    children: undefined,
+    deeply: {
+      nested: {
+        backgroundColor: "rgba(0, 0, 255, 1)",
+        target: {
+          color: "rgba(255, 0, 0, 1)",
+        },
+      },
     },
   });
 });

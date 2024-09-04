@@ -1,4 +1,10 @@
-import { ComponentProps, ComponentType, ReactElement, forwardRef } from "react";
+import {
+  ComponentProps,
+  ComponentRef,
+  ForwardedRef,
+  ReactElement,
+  forwardRef,
+} from "react";
 import {
   render as tlRender,
   RenderOptions as TLRenderOptions,
@@ -15,7 +21,6 @@ import {
   EnableCssInteropOptions,
   ReactComponent,
   Style,
-  CssInteropGeneratedProps,
 } from "../../types";
 import { isReduceMotionEnabled } from "../../runtime/native/appearance-observables";
 import { resetData } from "../../runtime/native/styles";
@@ -87,53 +92,39 @@ export function getWarnings() {
  * Creates a mocked component that renders with the defaultCSSInterop WITHOUT needing
  * set the jsxImportSource.
  */
-export const createMockComponent = <
-  const T extends ReactComponent<any>,
-  const M extends EnableCssInteropOptions<any> = {
-    className: "style";
-  },
->(
-  Component: T,
-  mapping: M = {
-    className: "style",
-  } as unknown as M,
-) => {
+export function createMockComponent<
+  const C extends ReactComponent<any>,
+  const M extends EnableCssInteropOptions<C>,
+>(Component: C, mapping: M & EnableCssInteropOptions<C>) {
   cssInterop(Component, mapping);
 
-  const mock = jest.fn(({ ...props }, ref) => {
-    return createInteropElement(Component, { ...props, ref });
-  });
+  const mock = jest.fn(
+    ({ ...props }: ComponentProps<C>, ref: ForwardedRef<ComponentRef<C>>) => {
+      return createInteropElement(Component, { ...props, ref });
+    },
+  );
 
-  return Object.assign(forwardRef(mock as any), {
+  return Object.assign(forwardRef(mock), {
     mock,
-  }) as unknown as ComponentType<
-    ComponentProps<T> & CssInteropGeneratedProps<M>
-  > & { mock: typeof mock };
-};
+  });
+}
 
-export const createRemappedComponent = <
-  const T extends ReactComponent<any>,
-  const M extends EnableCssInteropOptions<any> = {
-    className: "style";
-  },
->(
-  Component: T,
-  mapping: M = {
-    className: "style",
-  } as unknown as M,
-) => {
+export function createRemappedComponent<
+  const C extends ReactComponent<any>,
+  const M extends EnableCssInteropOptions<C>,
+>(Component: C, mapping: M & EnableCssInteropOptions<C>) {
   remapProps(Component, mapping);
 
-  const mock = jest.fn(({ ...props }, ref) => {
-    return createInteropElement(Component, { ...props, ref });
-  });
+  const mock = jest.fn(
+    ({ ...props }: ComponentProps<C>, ref: ForwardedRef<ComponentRef<C>>) => {
+      return createInteropElement(Component, { ...props, ref });
+    },
+  );
 
-  return Object.assign(forwardRef(mock as any), {
+  return Object.assign(forwardRef(mock), {
     mock,
-  }) as unknown as ComponentType<
-    ComponentProps<T> & CssInteropGeneratedProps<M>
-  > & { mock: typeof mock };
-};
+  });
+}
 
 export const resetComponents = () => {
   interopComponents.clear();
