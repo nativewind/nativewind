@@ -147,6 +147,7 @@ test("inheritance will cascade", () => {
   registerCSS(`
     :root { --my-var: red; }
     .my-class { color: var(--my-var); --another-var: green; }
+    .inner-class { color: var(--my-var); }
     .another-class { color: var(--another-var); }
   `);
 
@@ -154,18 +155,25 @@ test("inheritance will cascade", () => {
     one: "one",
     two: "two",
     three: "three",
+    four: "four",
+    five: "five",
   };
 
   render(
     <View testID={testIDs.one} className="my-class">
-      <View testID={testIDs.two} className="my-class" />
-      <View testID={testIDs.three} className="another-class" />
+      <View testID={testIDs.two} className="my-class">
+        <View testID={testIDs.three} className="inner-class" />
+        <View testID={testIDs.four} className="my-class" />
+      </View>
+      <View testID={testIDs.five} className="another-class" />
     </View>,
   );
 
   expect(screen.getByTestId(testIDs.one)).toHaveStyle({ color: "red" });
   expect(screen.getByTestId(testIDs.two)).toHaveStyle({ color: "red" });
-  expect(screen.getByTestId(testIDs.three)).toHaveStyle({ color: "green" });
+  expect(screen.getByTestId(testIDs.three)).toHaveStyle({ color: "red" });
+  expect(screen.getByTestId(testIDs.four)).toHaveStyle({ color: "red" });
+  expect(screen.getByTestId(testIDs.five)).toHaveStyle({ color: "green" });
 });
 
 test("useUnsafeVariable", () => {
