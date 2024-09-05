@@ -20,6 +20,8 @@ export {
   screen,
   fireEvent,
   within,
+  native,
+  INTERNAL_SET,
 } from "react-native-css-interop/test";
 
 export * from "./index";
