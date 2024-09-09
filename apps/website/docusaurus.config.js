@@ -94,6 +94,11 @@ const config = {
         },
         items: [
           {
+            href: "https://discord.gg/ypNakAFQ65",
+            label: "Discord",
+            position: "right",
+          },
+          {
             href: "https://github.com/marklawlor/nativewind",
             label: "GitHub",
             position: "right",
@@ -110,6 +115,11 @@ const config = {
                 label: "GitHub",
                 href: "https://github.com/marklawlor/nativewind",
               },
+              {
+                label: "Discord",
+                href: "https://discord.gg/ypNakAFQ65",
+              },
+
             ],
           },
         ],
