@@ -1,7 +1,13 @@
 /** @jsxImportSource test */
 import { View } from "react-native";
 
-import { render, screen, registerCSS, setupAllComponents } from "test";
+import {
+  render,
+  screen,
+  registerCSS,
+  setupAllComponents,
+  fireEvent,
+} from "test";
 
 const testID = "react-native-css-interop";
 setupAllComponents();
@@ -63,7 +69,7 @@ test("numeric transition", () => {
   });
 });
 
-test("color transition", () => {
+test("transition - rerender", () => {
   registerCSS(`
     .transition {
       transition: color 1s linear;
@@ -78,13 +84,11 @@ test("color transition", () => {
     }
 `);
 
-  const { rerender, getByTestId } = render(
-    <View testID={testID} className="transition first" />,
-  );
+  render(<View testID={testID} className="transition first" />);
 
-  const component = getByTestId(testID);
+  const component = screen.getByTestId(testID);
 
-  // Should have a static width, no matter the time
+  // Should have the initial color
   expect(component).toHaveAnimatedStyle({
     color: "rgba(255, 0, 0, 1)",
   });
@@ -93,7 +97,7 @@ test("color transition", () => {
     color: "rgba(255, 0, 0, 1)",
   });
 
-  rerender(<View testID={testID} className="transition second" />);
+  screen.rerender(<View testID={testID} className="transition second" />);
 
   // Directly after rerender, should still have the old width
   expect(component).toHaveAnimatedStyle({
@@ -113,6 +117,60 @@ test("color transition", () => {
   });
 
   // Width should not change after the transition is done
+  jest.advanceTimersByTime(500);
+  expect(component).toHaveAnimatedStyle({
+    color: "rgba(0, 0, 255, 1)",
+  });
+});
+
+test("transition - interaction", () => {
+  registerCSS(`
+    .transition {
+      transition: color 1s linear;
+    }
+
+    .first {
+      color: red;
+    }
+
+    .first:active {
+      color: blue;
+    }
+`);
+
+  render(<View testID={testID} className="transition first" />);
+
+  const component = screen.getByTestId(testID);
+
+  // Should have the initial color
+  expect(component).toHaveAnimatedStyle({
+    color: "rgba(255, 0, 0, 1)",
+  });
+  jest.advanceTimersByTime(1000);
+  expect(component).toHaveAnimatedStyle({
+    color: "rgba(255, 0, 0, 1)",
+  });
+
+  fireEvent(component, "pressIn");
+
+  // Directly after rerender, should still have the old color
+  expect(component).toHaveAnimatedStyle({
+    color: "rgba(255, 0, 0, 1)",
+  });
+
+  // Color should only change after we advance time
+  jest.advanceTimersByTime(500);
+  expect(component).toHaveAnimatedStyle({
+    color: "rgba(186, 0, 186, 1)",
+  });
+
+  // At the end of the transition
+  jest.advanceTimersByTime(501);
+  expect(component).toHaveAnimatedStyle({
+    color: "rgba(0, 0, 255, 1)",
+  });
+
+  // Color should not change after the transition is done
   jest.advanceTimersByTime(500);
   expect(component).toHaveAnimatedStyle({
     color: "rgba(0, 0, 255, 1)",
