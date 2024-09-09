@@ -67,6 +67,33 @@ test("group - active", async () => {
   expect(child).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
 });
 
+test("group - active (animated)", async () => {
+  registerCSS(
+    `.group\\/item:active .my-class {
+      color: red;
+      transition: color 1s;
+    }`,
+    {
+      grouping,
+    },
+  );
+
+  render(
+    <View testID={parentID} className="group/item">
+      <View testID={childID} className="my-class" />
+    </View>,
+  );
+
+  const parent = screen.getByTestId(parentID);
+  const child = screen.getByTestId(childID);
+
+  expect(child).toHaveStyle(undefined);
+
+  fireEvent(parent, "pressIn");
+
+  expect(child).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+});
+
 test("invalid group", async () => {
   registerCSS(
     `.invalid .my-class {
