@@ -9,7 +9,7 @@
       "destination": "https://github.com/nativewind/nativewind/blob/main/contributing.md#opening-an-issue"
     },
     {
-      "source": "/repo",
+      "source": "/repro",
       "destination": "https://stackblitz.com/edit/nativewind-test?file=README.md&view=editor"
     }
   ]
