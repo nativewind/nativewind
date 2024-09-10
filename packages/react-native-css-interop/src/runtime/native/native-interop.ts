@@ -904,17 +904,29 @@ function applyRules(
       if (declaration.length === 2) {
         const paths =
           declaration[0] === "style"
-            ? [...target, ...declaration.slice(1)]
-            : [...target.slice(0, -1), ...declaration[1]];
+            ? target
+            : [...target.slice(0, -1), ...declaration[0]];
 
         assignToTarget(props, declaration[1], paths);
       } else {
-        // The styles say they are "style", but they should go to the first target
-        // If they don't say "style" then they have a @rn-move rule that has already moved them
-        const paths =
+        const isNativeStyleToProp = state.config.nativeStyleToProp?.some(
+          (value) => value[0] === declaration[0],
+        );
+
+        let paths: string[];
+
+        if (isNativeStyleToProp) {
+          paths = [...target, declaration[0]];
+        } else if (
+          declaration[1].length === 1 &&
           declaration[1][0] === "style"
-            ? [...target, ...declaration[1].slice(1)]
-            : [...target.slice(0, -1), ...declaration[1]];
+        ) {
+          // The styles say they are "style", but they should go to the first target
+          // If they don't say "style" then they have a @rn-move rule that has already moved them
+          paths = [...target, ...declaration[1]];
+        } else {
+          paths = [...target.slice(0, -1), ...declaration[1]];
+        }
 
         // em / rnw / rnh units use other declarations, so we need to delay them
         if (typeof declaration[2] === "object" && declaration[2].delay) {
