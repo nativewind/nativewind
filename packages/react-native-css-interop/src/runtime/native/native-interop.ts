@@ -905,7 +905,9 @@ function applyRules(
         const paths =
           declaration[0] === "style"
             ? target
-            : [...target.slice(0, -1), ...declaration[0]];
+            : Array.isArray(declaration[0])
+              ? [...target.slice(0, -1), ...declaration[0]]
+              : [...target.slice(0, -1), declaration[0]];
 
         assignToTarget(props, declaration[1], paths);
       } else {
