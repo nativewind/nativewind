@@ -47,6 +47,7 @@ import {
   getStyle,
 } from "./styles";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
+import { assignToTarget, getTargetValue } from "./utils";
 
 export function interop(
   component: ReactComponent<any>,
@@ -365,7 +366,7 @@ function getDeclarations(
     containerNames: undefined,
     variables: undefined,
     // Reset the inline styles
-    inline: refs.props?.[config.target],
+    inline: getTargetValue(refs.props, config),
     // Keep the same effect, but reset the guards
     declarationTracking: {
       effect: previousState.declarationTracking.effect,
@@ -381,7 +382,7 @@ function getDeclarations(
   state.declarationTracking.guards.push(
     (refs) =>
       !Object.is(refs.props?.[config.source], state.className) ||
-      !Object.is(refs.props?.[config.target], state.inline),
+      !Object.is(getTargetValue(refs.props, config), state.inline),
   );
 
   const normalRules: ProcessedStyleRules[] = [];
@@ -401,11 +402,11 @@ function getDeclarations(
     }
   }
 
-  if (config.source !== config.target && refs.props?.[config.target]) {
+  if (config.inlineProp && refs.props?.[config.inlineProp]) {
     collectInlineRules(
       state,
       refs,
-      refs.props[config.target],
+      refs.props[config.inlineProp],
       state.declarationTracking.effect,
       normalRules,
       importantRules,
@@ -651,7 +652,9 @@ function processAnimations(
             iterationCount.type === "infinite" ? -1 : iterationCount.value,
           );
 
-          setDeep(props, pathTokens, sharedValue);
+          assignToTarget(props, sharedValue, pathTokens, {
+            allowTransformMerging: true,
+          });
         }
       }
     } else {
@@ -659,10 +662,15 @@ function processAnimations(
         const keyframes = getAnimation(name, state.styleTracking.effect);
         if (!keyframes) continue;
 
-        props[state.config.target] ??= {};
-
         for (const [animationKey, { pathTokens }] of keyframes.frames) {
-          setDeep(props, pathTokens, state.sharedValues.get(animationKey));
+          assignToTarget(
+            props,
+            state.sharedValues.get(animationKey),
+            pathTokens,
+            {
+              allowTransformMerging: true,
+            },
+          );
           seenAnimatedProps.add(animationKey);
         }
       }
@@ -773,7 +781,9 @@ function processTransition(
 
       seenAnimatedProps.add(property);
       props.style ??= {};
-      setDeep(props.style, [property], sharedValue);
+      assignToTarget(props.style, sharedValue, [property], {
+        allowTransformMerging: true,
+      });
     }
   }
 }
@@ -800,7 +810,9 @@ function retainSharedValues(
     props.style?.[entry[0]] ??
       state.styleLookup[entry[0]] ??
       defaultValues[entry[0]];
-    setDeep(props.style, [entry[0]], entry[1]);
+    assignToTarget(props.style, entry[1], [entry[0]], {
+      allowTransformMerging: true,
+    });
   }
 }
 
@@ -844,17 +856,21 @@ function handleUpgrades(sharedState: SharedState, ruleSet: StyleRuleSet) {
 function cleanup(props: Record<string, any>, config: InteropComponentConfig) {
   if (!config.nativeStyleToProp) return;
 
-  for (let move of Object.entries(config.nativeStyleToProp)) {
+  for (let move of config.nativeStyleToProp) {
     const source = move[0];
-    const sourceValue = props[config.target]?.[source];
-    if (sourceValue === undefined) continue;
-    const targetProp = move[1] === true ? move[0] : move[1];
-    props[targetProp] = sourceValue;
-    delete props[config.target][source];
+
+    const target = getTargetValue(props, config);
+
+    if (!target || !(source in target)) continue;
+
+    assignToTarget(props, target[source], move[1], {
+      allowTransformMerging: true,
+    });
+    delete target[source];
   }
 
-  if (config.removeTarget) {
-    delete props[config.target];
+  if (config.propToRemove) {
+    delete props[config.propToRemove];
   }
 }
 
@@ -886,18 +902,30 @@ function applyRules(
   for (const declaration of declarations) {
     if (Array.isArray(declaration)) {
       if (declaration.length === 2) {
-        const prop = declaration[0] === "style" ? target : declaration[0];
-        if (typeof declaration[1] === "object") {
-          props[prop] ??= {};
-          Object.assign(props[prop], declaration[1]);
-        } else {
-          props[prop] = declaration[1];
-        }
-      } else {
-        const paths = [...declaration[1]];
+        const paths =
+          declaration[0] === "style"
+            ? target
+            : [...target.slice(0, -1), ...declaration[0]];
 
-        if (target !== "style" && paths[0] === "style") {
-          paths[0] = target;
+        assignToTarget(props, declaration[1], paths);
+      } else {
+        const isNativeStyleToProp = state.config.nativeStyleToProp?.some(
+          (value) => value[0] === declaration[0],
+        );
+
+        let paths: string[];
+
+        if (isNativeStyleToProp) {
+          paths = [...target, declaration[0]];
+        } else if (
+          declaration[1].length === 1 &&
+          declaration[1][0] === "style"
+        ) {
+          // The styles say they are "style", but they should go to the first target
+          // If they don't say "style" then they have a @rn-move rule that has already moved them
+          paths = [...target, ...declaration[1]];
+        } else {
+          paths = [...target.slice(0, -1), ...declaration[1]];
         }
 
         // em / rnw / rnh units use other declarations, so we need to delay them
@@ -912,9 +940,11 @@ function applyRules(
               refs,
               state.styleTracking,
               declaration[2],
-              props[target],
+              getTargetValue(props, state.config),
             );
-            setDeep(props, paths, value);
+            assignToTarget(props, value, paths, {
+              allowTransformMerging: true,
+            });
             lookup[declaration[0]] = value;
           });
         } else {
@@ -923,19 +953,19 @@ function applyRules(
             refs,
             state.styleTracking,
             declaration[2],
-            props[target],
+            getTargetValue(props, state.config),
           );
-          setDeep(props, paths, value);
+          assignToTarget(props, value, paths, {
+            allowTransformMerging: true,
+          });
           lookup[declaration[0]] = value;
         }
       }
     } else {
-      if (typeof props[target] === "object") {
-        Object.assign(props[target], declaration);
-      } else {
-        // Make sure we clone this, as it may be a frozen style object
-        props[target] = { ...declaration };
-      }
+      // Make sure we clone this, as it may be a frozen style object
+      assignToTarget(props, { ...declaration }, state.config, {
+        objectMergeStyle: "assign",
+      });
     }
   }
 }
@@ -969,24 +999,6 @@ function specificityCompare(
     return 0; /* Appearance Order */
   }
 }
-
-const transformKeys = new Set([
-  "transform",
-  "translateX",
-  "translateY",
-  "scale",
-  "scaleX",
-  "scaleY",
-  "rotate",
-  "rotateX",
-  "rotateY",
-  "rotateZ",
-  "skewX",
-  "skewY",
-  "perspective",
-  "matrix",
-  "transformOrigin",
-]);
 
 function collectRules(
   state: ReducerState,
@@ -1081,32 +1093,6 @@ const defaultTransition: Required<ExtractedTransition> = {
   delay: [{ type: "seconds", value: 0 }],
   timingFunction: [{ type: "linear" }],
 };
-
-function setDeep(target: Record<string, any>, paths: string[], value: any) {
-  const prop = paths[paths.length - 1];
-  for (let i = 0; i < paths.length - 1; i++) {
-    const token = paths[i];
-    target[token] ??= {};
-    target = target[token];
-  }
-  if (transformKeys.has(prop)) {
-    if (target.transform) {
-      const existing = target.transform.find(
-        (t: any) => Object.keys(t)[0] === prop,
-      );
-      if (existing) {
-        existing[prop] = value;
-      } else {
-        target.transform.push({ [prop]: value });
-      }
-    } else {
-      target.transform ??= [];
-      target.transform.push({ [prop]: value });
-    }
-  } else {
-    target[prop] = value;
-  }
-}
 
 /**
  * Perform a DeepEqual comparison that cares about order

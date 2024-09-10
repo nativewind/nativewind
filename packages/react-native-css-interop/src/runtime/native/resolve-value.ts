@@ -9,6 +9,7 @@ import { ReducerState, ReducerTracking, Refs } from "./types";
 import { getUniversalVariable, getVariable } from "./styles";
 import { systemColorScheme } from "./appearance-observables";
 import { rem, vh, vw } from "./unit-observables";
+import { getTargetValue } from "./utils";
 
 /**
  * Get the final value of a value descriptor
@@ -442,7 +443,7 @@ export function resolveTransitionValue(state: ReducerState, property: string) {
     defaultValue,
     value:
       state.styleLookup[property] ??
-      state.props?.[state.config.target]?.[property],
+      getTargetValue(state.props, state.config)?.[property],
   };
 }
 

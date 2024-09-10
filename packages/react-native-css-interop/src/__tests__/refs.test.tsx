@@ -10,8 +10,9 @@ import { ViewProps } from "react-native";
 import { render, createMockComponent, registerCSS } from "test";
 
 const testID = "react-native-css-interop";
+const mapping = { className: "style" } as const;
 
-const FunctionComponent = createMockComponent<any>((props: ViewProps) => null);
+const FunctionComponent = createMockComponent((_: ViewProps) => null, mapping);
 
 const ForwardRef = createMockComponent(
   forwardRef((props: ViewProps, ref: any) => {
@@ -21,10 +22,11 @@ const ForwardRef = createMockComponent(
 
     return null;
   }),
+  mapping,
 );
 
 const ClassComponent = createMockComponent(
-  class MyComponent extends PureComponent<any> {
+  class MyComponent extends PureComponent<ViewProps> {
     getProps = () => {
       return this.props;
     };
@@ -32,12 +34,14 @@ const ClassComponent = createMockComponent(
       return null;
     }
   },
+  mapping,
 );
 
 const ChildComponent = createMockComponent(
   forwardRef((props: ViewProps, ref: any) => {
     return <ClassComponent ref={ref} {...props} />;
   }),
+  mapping,
 );
 
 test("FunctionComponent", () => {
@@ -48,7 +52,9 @@ test("FunctionComponent", () => {
   const mockError = jest.fn();
   console.error = mockError;
 
-  render(<FunctionComponent ref={ref} testID={testID} className="my-class" />);
+  render(
+    <FunctionComponent ref={ref as any} testID={testID} className="my-class" />,
+  );
 
   expect(mockError.mock.lastCall?.[0]).toMatch(
     /Warning: Function components cannot be given refs\. Attempts to access this ref will fail\. Did you mean to use React\.forwardRef()?/,

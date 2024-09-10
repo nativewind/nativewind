@@ -10,6 +10,7 @@ import { interop } from "./native-interop";
 import { getComponentType } from "./unwrap-components";
 import { VariableContext, getVariable, opaqueStyles } from "./styles";
 import { colorScheme } from "./appearance-observables";
+import { assignToTarget } from "./utils";
 
 export { StyleSheet } from "./stylesheet";
 export { colorScheme } from "./appearance-observables";
@@ -75,17 +76,9 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
 
       delete props[config.source];
 
-      let target = props[config.target];
-
-      if (Array.isArray(target)) {
-        target.push(placeholder);
-      } else if (target) {
-        target = [target, placeholder];
-      } else {
-        target = placeholder;
-      }
-
-      props[config.target] = target;
+      assignToTarget(props, placeholder, config, {
+        objectMergeStyle: "toArray",
+      });
     }
 
     props.ref = ref;

@@ -15,7 +15,6 @@ import type {
   ComponentType,
   ForwardRefExoticComponent,
   FunctionComponent,
-  JSXElementConstructor,
 } from "react";
 import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
 import type { Effect } from "./runtime/observable";
@@ -35,10 +34,11 @@ export type ReactComponent<P = any> =
   | ForwardRefExoticComponent<P>;
 
 export type InteropComponentConfig = {
-  target: string;
+  target: string[];
+  inlineProp?: string;
   source: string;
-  removeTarget?: true | undefined;
-  nativeStyleToProp?: NativeStyleToProp<any>;
+  propToRemove?: string;
+  nativeStyleToProp?: Array<[string, string[]]>;
 };
 
 export type CssToReactNativeRuntimeOptions = {
@@ -63,51 +63,81 @@ export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
   rem?: StyleSheetRegisterOptions["rem"];
 }
 
-export type EnableCssInteropOptions<
-  T extends keyof JSX.IntrinsicElements | JSXElementConstructor<any>,
-> = Record<string, CSSInteropClassNamePropConfig<ComponentProps<T>>>;
-
 export type CssInterop = <
-  const T extends ReactComponent<any>,
-  const M extends EnableCssInteropOptions<any>,
+  const C extends ReactComponent<any>,
+  const M extends EnableCssInteropOptions<C>,
 >(
-  component: T,
-  mapping: EnableCssInteropOptions<T> & M,
-) => ComponentType<ComponentProps<T> & CssInteropGeneratedProps<M>>;
-
-export type CSSInteropClassNamePropConfig<P> =
-  | undefined
-  | boolean
-  | (keyof P & string)
-  | {
-      target: (keyof P & string) | boolean;
-      nativeStyleToProp?: NativeStyleToProp<P>;
-    };
-
-export type CssInteropGeneratedProps<T extends EnableCssInteropOptions<any>> = {
-  [K in keyof T as K extends string
-    ? T[K] extends undefined | false
-      ? never
-      : T[K] extends true | string
-        ? K
-        : T[K] extends
-              | {
-                  target: string | true;
-                }
-              | {
-                  target: false;
-                  nativeStyleToProp: Record<string, true>;
-                }
+  component: C,
+  mapping: M & EnableCssInteropOptions<C>,
+) => ComponentType<
+  ComponentProps<C> & {
+    [K in keyof M as K extends string
+      ? M[K] extends undefined | false
+        ? never
+        : M[K] extends true | FlattenComponentProps<C>
           ? K
-          : never
-    : never]?: string;
-};
+          : M[K] extends
+                | {
+                    target: FlattenComponentProps<C> | true;
+                  }
+                | {
+                    target: false;
+                    nativeStyleToProp: Record<string, unknown>;
+                  }
+            ? K
+            : never
+      : never]?: string;
+  }
+>;
 
-export type NativeStyleToProp<P> = {
-  [K in (keyof Style | "fill" | "stroke") & string]?: K extends keyof P
-    ? (keyof P & string) | true
-    : keyof P & string;
-};
+export type EnableCssInteropOptions<C extends ReactComponent<any>> = Record<
+  string,
+  | boolean
+  | FlattenComponentProps<C>
+  | {
+      target: false;
+      nativeStyleToProp: {
+        [K in
+          | (keyof Style & string)
+          | "fill"
+          | "stroke"]?: K extends FlattenComponentProps<C>
+          ? FlattenComponentProps<C> | true
+          : FlattenComponentProps<C>;
+      };
+    }
+  | {
+      target: FlattenComponentProps<C> | true;
+      nativeStyleToProp?: {
+        [K in
+          | (keyof Style & string)
+          | "fill"
+          | "stroke"]?: K extends FlattenComponentProps<C>
+          ? FlattenComponentProps<C> | true
+          : FlattenComponentProps<C>;
+      };
+    }
+>;
+
+type FlattenComponentProps<C extends ReactComponent<any>> = FlattenObjectKeys<
+  ComponentProps<C>
+>;
+
+type FlattenObjectKeys<
+  T extends Record<string, unknown>,
+  Depth extends number[] = [],
+  MaxDepth extends number = 10,
+  Key = keyof T,
+> = Depth["length"] extends MaxDepth
+  ? never
+  : Key extends string
+    ? unknown extends T[Key] // If its unknown or any then allow for freeform string
+      ? Key | `${Key}.${string}`
+      : NonNullable<T[Key]> extends Record<string, unknown>
+        ?
+            | Key
+            | `${Key}.${FlattenObjectKeys<NonNullable<T[Key]>, [...Depth, 0]>}`
+        : Key
+    : never;
 
 export type JSXFunction = (
   type: React.ComponentType,
@@ -116,7 +146,7 @@ export type JSXFunction = (
   isStaticChildren?: boolean,
   __source?: unknown,
   __self?: unknown,
-) => React.ElementType;
+) => React.ReactNode;
 
 type OmitFirstTwo<T extends any[]> = T extends [any, any, ...infer R]
   ? R
@@ -207,7 +237,7 @@ export type PropAccumulator = {
   props: Record<string, any>;
   transformLookup: Record<string, string>;
   state: PropState;
-  target: string;
+  target: string[];
   resetContext: boolean;
   requiresLayout: boolean;
   delayedDeclarations: Extract<StyleDeclaration, Array<any>>[];
