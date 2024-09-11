@@ -56,9 +56,9 @@ export type Refs = {
 };
 
 export type SharedState = {
+  initialRender: boolean;
   originalProps: Record<string, any> | null;
   props: Record<string, any> | null;
-  guardsEnabled: boolean;
   animated: number;
   variables: number;
   containers: number;
