@@ -1,5 +1,6 @@
 /** @jsxImportSource test */
 import { View } from "react-native";
+import { getAnimatedStyle } from "react-native-reanimated";
 
 import {
   fireEvent,
@@ -13,6 +14,8 @@ const grouping = ["^group(/.*)?"];
 const parentID = "parent";
 const childID = "child";
 setupAllComponents();
+
+jest.useFakeTimers();
 
 test("group", async () => {
   registerCSS(
@@ -69,7 +72,8 @@ test("group - active", async () => {
 
 test("group - active (animated)", async () => {
   registerCSS(
-    `.group\\/item:active .my-class {
+    `
+    .group\\/item:active .my-class {
       color: red;
       transition: color 1s;
     }`,
@@ -82,16 +86,35 @@ test("group - active (animated)", async () => {
     <View testID={parentID} className="group/item">
       <View testID={childID} className="my-class" />
     </View>,
+    {
+      logOutput: true,
+    },
   );
 
   const parent = screen.getByTestId(parentID);
   const child = screen.getByTestId(childID);
 
-  expect(child).toHaveStyle(undefined);
+  expect(getAnimatedStyle(child)).toStrictEqual({});
 
   fireEvent(parent, "pressIn");
 
-  expect(child).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  jest.advanceTimersByTime(0);
+
+  expect(getAnimatedStyle(child)).toStrictEqual({
+    color: "black",
+  });
+
+  jest.advanceTimersByTime(500);
+
+  expect(getAnimatedStyle(child)).toStrictEqual({
+    color: "rgba(151, 0, 0, 1)",
+  });
+
+  jest.advanceTimersByTime(500);
+
+  expect(getAnimatedStyle(child)).toStrictEqual({
+    color: "rgba(255, 0, 0, 1)",
+  });
 });
 
 test("invalid group", async () => {
