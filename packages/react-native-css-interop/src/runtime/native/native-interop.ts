@@ -6,7 +6,7 @@ import {
   useReducer,
   useState,
 } from "react";
-import { LayoutChangeEvent, View } from "react-native";
+import { LayoutChangeEvent, Platform, View } from "react-native";
 import {
   ReactComponent,
   InteropComponentConfig,
@@ -48,6 +48,7 @@ import {
 } from "./styles";
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { assignToTarget, getTargetValue } from "./utils";
+import { GestureHandlerEvent } from "react-native-reanimated/lib/typescript/reanimated2/hook";
 
 export function interop(
   component: ReactComponent<any>,
@@ -167,7 +168,8 @@ export function interop(
     let containers: ContainerRecord = {};
 
     const possiblyAnimatedProps: Record<string, any> = {};
-    const handlers: Record<string, any> = {};
+    const handlers: Record<string, (event: GestureHandlerEvent<any>) => void> =
+      {};
 
     let hasNullContainer = false;
 
@@ -233,9 +235,35 @@ export function interop(
       if (component === View) {
         sharedState.pressable ||= UpgradeState.SHOULD_UPGRADE;
       }
-      handlers.onPress = (event: unknown) => {
+      let tvTimeout: NodeJS.Timeout;
+      handlers.onPress = (event) => {
         sharedState.originalProps?.onPress?.(event);
+
+        /**
+         * tvOS does not receive pressIn/pressOut
+         * so we need to fake it via onPress or
+         * handle in onLongPress
+         */
+        if (Platform.isTV) {
+          sharedState.active!.set(true);
+          clearTimeout(tvTimeout);
+          tvTimeout = setTimeout(() => {
+            sharedState.active!.set(false);
+          }, 50);
+        }
       };
+
+      /**
+       * tvOS does not receive pressIn/pressOut
+       * so we need to fake it via onPress or
+       * handle in onLongPress
+       */
+      if (Platform.isTV) {
+        handlers.onLongPress = (event) => {
+          sharedState.originalProps?.onLongPress?.(event);
+          sharedState.active!.set(event.eventKeyAction === 0);
+        };
+      }
     }
 
     if (sharedState.layout || sharedState.containers) {
