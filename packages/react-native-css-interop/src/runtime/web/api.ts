@@ -1,7 +1,9 @@
 "use client";
 import { Component, createElement, forwardRef } from "react";
-import { CssInterop, StyleProp } from "../../types";
+import { CssInterop } from "../../types";
 import { getNormalizeConfig } from "../config";
+import { assignToTarget } from "../native/utils";
+
 export { StyleSheet } from "./stylesheet";
 export { colorScheme } from "./color-scheme";
 export { rem } from "./rem";
@@ -27,29 +29,24 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
 
     props = { ...props, ref };
     for (const config of configs) {
-      let newStyles: StyleProp = [];
       const source = props[config.source];
-      const target: StyleProp = props[config.target];
 
       // Ensure we only add non-empty strings
       if (typeof source === "string" && source) {
-        newStyles.push({
-          $$css: true,
-          [source]: source,
-        } as StyleProp);
+        assignToTarget(
+          props,
+          {
+            $$css: true,
+            [source]: source,
+          },
+          config,
+          {
+            objectMergeStyle: "toArray",
+          },
+        );
       }
 
       delete props[config.source];
-
-      if (Array.isArray(target)) {
-        newStyles.push(...target);
-      } else if (target) {
-        newStyles.push(target);
-      }
-
-      if (newStyles.length > 0) {
-        props[config.target] = newStyles;
-      }
     }
 
     if (

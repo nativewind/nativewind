@@ -1,28 +1,22 @@
+/** @jsxImportSource test */
 import { View } from "react-native";
-import { render, screen } from "@testing-library/react-native";
 
-import {
-  createMockComponent,
-  registerCSS,
-  resetComponents,
-  resetStyles,
-} from "../testing-library";
+import { render, screen, registerCSS, resetComponents, cssInterop } from "test";
 
 const testID = "react-native-css-interop";
 
 beforeEach(() => {
-  resetStyles();
   resetComponents();
 });
 
 test("mapping", () => {
-  const A = createMockComponent(View, { className: "differentStyle" });
+  cssInterop(View as any, { className: "differentStyle" });
 
   registerCSS(
     `.bg-black { background-color: black } .text-white { color: white }`,
   );
 
-  render(<A testID={testID} className="bg-black text-white" />);
+  render(<View testID={testID} className="bg-black text-white" />);
 
   const component = screen.getByTestId(testID);
 
@@ -36,13 +30,13 @@ test("mapping", () => {
 });
 
 test("multiple mapping", () => {
-  const A = createMockComponent(View, { a: "styleA", b: "styleB" });
+  cssInterop(View as any, { a: "styleA", b: "styleB" });
 
   registerCSS(
     `.bg-black { background-color: black } .text-white { color: white }`,
   );
 
-  render(<A testID={testID} a="bg-black" b="text-white" />);
+  render(<View testID={testID} {...{ a: "bg-black", b: "text-white" }} />);
 
   const component = screen.getByTestId(testID);
 

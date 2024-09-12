@@ -1,81 +1,41 @@
-import { resetStyles } from "react-native-css-interop/testing-library";
-import { testCases, style } from "../test-utils";
-
-afterEach(() => resetStyles());
+import { renderCurrentTest } from "../test";
 
 describe("Accessibility - Screen Readers", () => {
-  testCases(
-    [
-      "sr-only",
-      {
-        ...style({
-          borderWidth: 0,
-          height: 1,
-          margin: -1,
-          overflow: "hidden",
-          padding: 0,
-          position: "absolute",
-          width: 1,
-        }),
-        warning: () =>
-          new Map([
-            [
-              "sr-only",
-              [
-                {
-                  property: "clip",
-                  type: "IncompatibleNativeProperty",
-                },
-                {
-                  property: "white-space",
-                  type: "IncompatibleNativeProperty",
-                },
-              ],
-            ],
-          ]),
+  test("sr-only", async () => {
+    const { props, invalid } = await renderCurrentTest();
+    expect(props).toStrictEqual({
+      style: {
+        borderWidth: 0,
+        height: 1,
+        margin: -1,
+        overflow: "hidden",
+        padding: 0,
+        position: "absolute",
+        width: 1,
       },
-    ],
-    [
-      "not-sr-only",
-      {
-        ...style({
+    });
+    expect(invalid).toStrictEqual({
+      properties: ["clip", "white-space"],
+    });
+  });
+
+  test("not-sr-only", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: {
           margin: 0,
           overflow: "visible",
           padding: 0,
-        }),
-
-        warning: () =>
-          new Map([
-            [
-              "not-sr-only",
-              [
-                {
-                  property: "position",
-                  type: "IncompatibleNativeValue",
-                  value: "static",
-                },
-                {
-                  property: "width",
-                  type: "IncompatibleNativeValue",
-                  value: "auto",
-                },
-                {
-                  property: "height",
-                  type: "IncompatibleNativeValue",
-                  value: "auto",
-                },
-                {
-                  property: "clip",
-                  type: "IncompatibleNativeProperty",
-                },
-                {
-                  property: "white-space",
-                  type: "IncompatibleNativeProperty",
-                },
-              ],
-            ],
-          ]),
+        },
       },
-    ],
-  );
+      invalid: {
+        properties: ["clip", "white-space"],
+        style: {
+          position: "static",
+          width: "auto",
+          height: "auto",
+        },
+      },
+    });
+  });
 });

@@ -1,22 +1,31 @@
-import { render } from "@testing-library/react-native";
+/** @jsxImportSource test */
 import { View } from "react-native";
 
-import {
-  createMockComponent,
-  registerCSS,
-  resetStyles,
-} from "../testing-library";
+import { render, registerCSS, setupAllComponents } from "test";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
-
-beforeEach(() => resetStyles());
+setupAllComponents();
 
 test("translateX percentage", () => {
-  registerCSS(`.my-class { width: 120px; transform: translateX(10%); }`);
+  registerCSS(`.my-class { transform: translateX(10%); }`);
+  const component = render(
+    <View testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({
+    transform: [{ translateX: "10%" }],
+  });
+});
+
+test("translateX percentage - with polyfill", () => {
+  registerCSS(`.my-class { width: 120px; transform: translateX(10%); }`, {
+    features: {
+      transformPercentagePolyfill: true,
+    },
+  });
 
   const component = render(
-    <A testID={testID} className="my-class" />,
+    <View testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({
@@ -26,10 +35,26 @@ test("translateX percentage", () => {
 });
 
 test("translateY percentage", () => {
-  registerCSS(`.my-class { height: 120px; transform: translateY(10%); }`);
+  registerCSS(`.my-class { transform: translateY(10%); }`);
 
   const component = render(
-    <A testID={testID} className="my-class" />,
+    <View testID={testID} className="my-class" />,
+  ).getByTestId(testID);
+
+  expect(component).toHaveStyle({
+    transform: [{ translateY: "10%" }],
+  });
+});
+
+test("translateY percentage - with polyfill", () => {
+  registerCSS(`.my-class { height: 120px; transform: translateY(10%); }`, {
+    features: {
+      transformPercentagePolyfill: true,
+    },
+  });
+
+  const component = render(
+    <View testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({
@@ -42,7 +67,7 @@ test("rotate-180", () => {
   registerCSS(`.my-class { transform: rotate(180deg); }`);
 
   const component = render(
-    <A testID={testID} className="my-class" />,
+    <View testID={testID} className="my-class" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({
@@ -63,14 +88,14 @@ test("rotate-45", () => {
   --tw-pan-x:  ;
   --tw-pan-y:  ;
 }
-  
-.rotate-45 { 
+
+.rotate-45 {
   --tw-rotate: 45deg;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
 }`);
 
   const component = render(
-    <A testID={testID} className="rotate-45" />,
+    <View testID={testID} className="rotate-45" />,
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({

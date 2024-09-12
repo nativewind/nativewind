@@ -43,6 +43,7 @@ import type {
 } from "lightningcss";
 
 import type { ExtractionWarning, RuntimeValueDescriptor } from "../types";
+import { FeatureFlagStatus } from "./feature-flags";
 
 type AddStyleProp = (
   property: string,
@@ -247,6 +248,7 @@ export interface ParseDeclarationOptions {
   addTransitionProp: AddTransitionProp;
   addWarning: AddWarning;
   requiresLayout: (name: string) => void;
+  features: FeatureFlagStatus;
 }
 
 export interface ParseDeclarationOptionsWithValueWarning
@@ -272,6 +274,16 @@ export function parseDeclaration(
   } = options;
 
   if ("vendorPrefix" in declaration && declaration.vendorPrefix.length) {
+    return;
+  }
+
+  if (
+    "value" in declaration &&
+    typeof declaration.value === "object" &&
+    "vendorPrefix" in declaration.value &&
+    Array.isArray(declaration.value.vendorPrefix) &&
+    declaration.value.vendorPrefix.length
+  ) {
     return;
   }
 
@@ -321,8 +333,12 @@ export function parseDeclaration(
       }
       return;
     } else {
+      let property =
+        unparsedPropertyMapping[declaration.value.propertyId.property] ||
+        declaration.value.propertyId.property;
+
       return addStyleProp(
-        declaration.value.propertyId.property,
+        property,
         parseUnparsed(declaration.value.value, parseOptions),
       );
     }
@@ -1950,6 +1966,7 @@ export function parseLength(
   } else {
     switch (length.type) {
       case "calc": {
+        // TODO: Add the calc polyfill
         return undefined;
       }
       case "number": {
@@ -2474,7 +2491,10 @@ function parseLengthOrCoercePercentageToRuntime(
   runtimeName: string,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
-  if (value.type === "percentage") {
+  if (
+    options.features.transformPercentagePolyfill &&
+    value.type === "percentage"
+  ) {
     options.requiresLayout(runtimeName);
     return {
       name: runtimeName,
@@ -2784,15 +2804,19 @@ function parseCalcFn(
 }
 
 function parseCalcArguments(
-  args: TokenOrValue[],
+  [...args]: TokenOrValue[],
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
   const parsed: RuntimeValueDescriptor[] = [];
 
   let mode: "number" | "percentage" | undefined;
 
-  for (const arg of args) {
+  for (const [currentIndex, arg] of args.entries()) {
     switch (arg.type) {
+      case "env": {
+        parsed.push(parseEnv(arg.value, options));
+        break;
+      }
       case "var":
       case "function":
       case "unresolved-color": {
@@ -2809,33 +2833,17 @@ function parseCalcArguments(
         }
         break;
       }
-      case "length":
+      case "length": {
         const value = parseLength(arg.value, options);
 
-        if (!mode) {
-          if (typeof value === "number") {
-            mode = "number";
-          } else if (typeof value === "string" && value.endsWith("%")) {
-            mode = "percentage";
-          }
+        if (value !== undefined) {
+          parsed.push(value);
         }
 
-        if (mode === "number" && typeof value === "number") {
-          parsed.push(value);
-          break;
-        } else if (
-          mode === "percentage" &&
-          typeof value === "string" &&
-          value.endsWith("%")
-        ) {
-          parsed.push(value);
-          break;
-        } else {
-          return;
-        }
+        break;
+      }
       case "color":
       case "url":
-      case "env":
       case "angle":
       case "time":
       case "resolution":
@@ -2858,11 +2866,39 @@ function parseCalcArguments(
             if (mode !== "percentage") return;
             parsed.push(`${arg.value.value * 100}%`);
             break;
-          case "number":
+          case "number": {
             if (!mode) mode = "number";
             if (mode !== "number") return;
             parsed.push(arg.value.value);
             break;
+          }
+          case "parenthesis-block": {
+            /**
+             * If we have a parenthesis block, we just treat it as a nested calc function
+             * Because there could be multiple parenthesis blocks, this is recursive
+             */
+            const closeParenthesisIndex = args.findLastIndex((value) => {
+              return (
+                value.type === "token" &&
+                value.value.type === "close-parenthesis"
+              );
+            });
+
+            if (closeParenthesisIndex === -1) {
+              return;
+            }
+
+            const innerCalcArgs = args
+              // Extract the inner calcArgs including the parenthesis. This mutates args
+              .splice(currentIndex, closeParenthesisIndex - currentIndex + 1)
+              // Then drop the surrounding parenthesis
+              .slice(1, -1);
+
+            parsed.push(parseCalcFn("calc", innerCalcArgs, options));
+
+            break;
+          }
+          case "close-parenthesis":
           case "string":
           case "function":
           case "ident":
@@ -2883,12 +2919,10 @@ function parseCalcArguments(
           case "substring-match":
           case "cdo":
           case "cdc":
-          case "parenthesis-block":
           case "square-bracket-block":
           case "curly-bracket-block":
           case "bad-url":
           case "bad-string":
-          case "close-parenthesis":
           case "close-square-bracket":
           case "close-curly-bracket":
         }
@@ -2897,3 +2931,12 @@ function parseCalcArguments(
 
   return parsed;
 }
+
+const unparsedPropertyMapping: Record<string, string> = {
+  "margin-inline-start": "margin-start",
+  "margin-inline-end": "margin-end",
+  "padding-inline-start": "padding-start",
+  "padding-inline-end": "padding-end",
+  "inset-inline-start": "inset-inline-start",
+  "inset-inline-end": "inset-inline-end",
+};

@@ -15,18 +15,12 @@ import type {
   ComponentType,
   ForwardRefExoticComponent,
   FunctionComponent,
-  JSXElementConstructor,
 } from "react";
-import type {
-  Appearance,
-  Dimensions,
-  ImageStyle,
-  TextStyle,
-  ViewStyle,
-} from "react-native";
-import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
-import type { Effect, Observable } from "./runtime/observable";
+import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
+import type { Effect } from "./runtime/observable";
 import type { SharedValue } from "react-native-reanimated";
+import type { SharedState } from "./runtime/native/types";
+import type { FeatureFlagStatus } from "./css-to-rn/feature-flags";
 
 export interface Effect2 {
   update: () => void;
@@ -40,9 +34,11 @@ export type ReactComponent<P = any> =
   | ForwardRefExoticComponent<P>;
 
 export type InteropComponentConfig = {
-  target: string;
+  target: string[];
+  inlineProp?: string;
   source: string;
-  nativeStyleToProp?: NativeStyleToProp<any>;
+  propToRemove?: string;
+  nativeStyleToProp?: Array<[string, string[]]>;
 };
 
 export type CssToReactNativeRuntimeOptions = {
@@ -51,6 +47,7 @@ export type CssToReactNativeRuntimeOptions = {
   ignorePropertyWarningRegex?: (string | RegExp)[];
   selectorPrefix?: string;
   stylesheetOrder?: number;
+  features?: FeatureFlagStatus;
 };
 
 export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
@@ -66,48 +63,81 @@ export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
   rem?: StyleSheetRegisterOptions["rem"];
 }
 
-export type EnableCssInteropOptions<
-  T extends keyof JSX.IntrinsicElements | JSXElementConstructor<any>,
-> = Record<string, CSSInteropClassNamePropConfig<ComponentProps<T>>>;
-
 export type CssInterop = <
-  const T extends ReactComponent<any>,
-  const M extends EnableCssInteropOptions<any>,
+  const C extends ReactComponent<any>,
+  const M extends EnableCssInteropOptions<C>,
 >(
-  component: T,
-  mapping: EnableCssInteropOptions<T> & M,
-) => ComponentType<ComponentProps<T> & CssInteropGeneratedProps<M>>;
+  component: C,
+  mapping: M & EnableCssInteropOptions<C>,
+) => ComponentType<
+  ComponentProps<C> & {
+    [K in keyof M as K extends string
+      ? M[K] extends undefined | false
+        ? never
+        : M[K] extends true | FlattenComponentProps<C>
+          ? K
+          : M[K] extends
+                | {
+                    target: FlattenComponentProps<C> | true;
+                  }
+                | {
+                    target: false;
+                    nativeStyleToProp: Record<string, unknown>;
+                  }
+            ? K
+            : never
+      : never]?: string;
+  }
+>;
 
-export type CSSInteropClassNamePropConfig<P> =
-  | undefined
+export type EnableCssInteropOptions<C extends ReactComponent<any>> = Record<
+  string,
   | boolean
-  | (keyof P & string)
+  | FlattenComponentProps<C>
   | {
-      target: (keyof P & string) | boolean;
-      nativeStyleToProp?: NativeStyleToProp<P>;
-    };
+      target: false;
+      nativeStyleToProp: {
+        [K in
+          | (keyof Style & string)
+          | "fill"
+          | "stroke"]?: K extends FlattenComponentProps<C>
+          ? FlattenComponentProps<C> | true
+          : FlattenComponentProps<C>;
+      };
+    }
+  | {
+      target: FlattenComponentProps<C> | true;
+      nativeStyleToProp?: {
+        [K in
+          | (keyof Style & string)
+          | "fill"
+          | "stroke"]?: K extends FlattenComponentProps<C>
+          ? FlattenComponentProps<C> | true
+          : FlattenComponentProps<C>;
+      };
+    }
+>;
 
-export type CssInteropGeneratedProps<T extends EnableCssInteropOptions<any>> = {
-  [K in keyof T as K extends string
-    ? T[K] extends undefined | false
-      ? never
-      : T[K] extends true | string
-      ? K
-      : T extends {
-          target: string | boolean;
-        }
-      ? T["target"] extends true | string
-        ? K
-        : never
-      : never
-    : never]?: string;
-};
+type FlattenComponentProps<C extends ReactComponent<any>> = FlattenObjectKeys<
+  ComponentProps<C>
+>;
 
-export type NativeStyleToProp<P> = {
-  [K in keyof Style & string]?: K extends keyof P
-    ? (keyof P & string) | true
-    : keyof P & string;
-};
+type FlattenObjectKeys<
+  T extends Record<string, unknown>,
+  Depth extends number[] = [],
+  MaxDepth extends number = 10,
+  Key = keyof T,
+> = Depth["length"] extends MaxDepth
+  ? never
+  : Key extends string
+    ? unknown extends T[Key] // If its unknown or any then allow for freeform string
+      ? Key | `${Key}.${string}`
+      : NonNullable<T[Key]> extends Record<string, unknown>
+        ?
+            | Key
+            | `${Key}.${FlattenObjectKeys<NonNullable<T[Key]>, [...Depth, 0]>}`
+        : Key
+    : never;
 
 export type JSXFunction = (
   type: React.ComponentType,
@@ -116,7 +146,7 @@ export type JSXFunction = (
   isStaticChildren?: boolean,
   __source?: unknown,
   __self?: unknown,
-) => React.ElementType;
+) => React.ReactNode;
 
 type OmitFirstTwo<T extends any[]> = T extends [any, any, ...infer R]
   ? R
@@ -147,7 +177,7 @@ export type StyleDeclaration =
     ]; // Set a delayed value
 
 export type StyleRuleSet = {
-  $$type: "StyleRuleSet";
+  $type: "StyleRuleSet";
   normal?: StyleRule[];
   important?: StyleRule[];
   warnings?: ExtractionWarning[];
@@ -155,6 +185,14 @@ export type StyleRuleSet = {
   variables?: boolean;
   container?: boolean;
   animation?: boolean;
+  active?: boolean;
+  hover?: boolean;
+  focus?: boolean;
+};
+
+export type RemappedClassName = {
+  $type: "RemappedClassName";
+  classNames: string[];
 };
 
 export type RuntimeStyleRule = StyleRule | object;
@@ -166,7 +204,7 @@ export type RuntimeStyleRuleSet = {
 };
 
 export type StyleRule = {
-  $$type: "StyleRule";
+  $type: "StyleRule";
   specificity: Specificity;
   media?: MediaQuery[];
   variables?: Array<[string, RuntimeValueDescriptor]>;
@@ -182,6 +220,10 @@ export type StyleRule = {
   warnings?: ExtractionWarning[];
 };
 
+export type ProcessedStyleRules =
+  | (StyleRule & Required<Pick<StyleRule, "declarations">>)
+  | Record<string, any>;
+
 export type PropState = Effect & {
   initialRender: boolean;
   resetContext: boolean;
@@ -195,7 +237,7 @@ export type PropAccumulator = {
   props: Record<string, any>;
   transformLookup: Record<string, string>;
   state: PropState;
-  target: string;
+  target: string[];
   resetContext: boolean;
   requiresLayout: boolean;
   delayedDeclarations: Extract<StyleDeclaration, Array<any>>[];
@@ -282,11 +324,19 @@ export type ExtractedTransition = {
 };
 
 type AnimationPropertyKey = string;
+export type AnimationEasingFunction =
+  | EasingFunction
+  | { type: "!PLACEHOLDER!" };
+
 export type ExtractedAnimation = {
   frames: [
     AnimationPropertyKey,
     { values: RuntimeValueFrame[]; pathTokens: PathTokens },
   ][];
+  /**
+   * The easing function for each frame
+   */
+  easingFunctions?: AnimationEasingFunction[];
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
 };
@@ -303,7 +353,7 @@ export type PseudoClassesQuery = {
 };
 
 export type StyleSheetRegisterCompiledOptions = {
-  $$compiled: true;
+  $compiled: true;
   rules?: [string, StyleRuleSet][];
   keyframes?: [string, ExtractedAnimation][];
   rootVariables?: VariableRecord;
@@ -326,6 +376,7 @@ export type ColorSchemeVariableValue = {
   dark?: RuntimeValueDescriptor;
 };
 export type VariableRecord = Record<string, ColorSchemeVariableValue>;
+export type ContainerRecord = Record<string, SharedState>;
 
 export type Style = ViewStyle & TextStyle & ImageStyle;
 export type StyleProp = Style | StyleProp[] | undefined;
@@ -363,16 +414,11 @@ export type DarkMode =
   | { type: "attribute"; value: string };
 
 export interface CssInteropStyleSheet {
-  [INTERNAL_RESET](options?: {
-    dimensions?: Dimensions;
-    appearance?: typeof Appearance;
-  }): void;
-  [INTERNAL_FLAGS]: Record<string, string>;
   unstable_hook_onClassName?(callback: (c: string) => void): void;
   register(options: StyleSheetRegisterOptions): void;
   registerCompiled(options: StyleSheetRegisterCompiledOptions): void;
   getFlag(name: string): string | undefined;
-  getGlobalStyle(name: string): Observable<StyleRuleSet> | undefined;
+  getGlobalStyle(name: string): StyleRuleSet | undefined;
 }
 
 type AttributeSelectorComponent = Extract<

@@ -1,90 +1,201 @@
-import { resetStyles } from "react-native-css-interop/testing-library";
-import { invalidProperty, testCases } from "../test-utils";
-
-afterEach(() => resetStyles());
+import { renderCurrentTest } from "../test";
 
 describe("Filters - Blur", () => {
-  testCases(["blur", invalidProperty("filter")]);
+  test("blur", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
 });
 
 describe("Filters - Brightness", () => {
-  testCases(["brightness-0", invalidProperty("filter")]);
+  test("brightness-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
 });
 
 describe("Filters - Contrast", () => {
-  testCases(["contrast-0", invalidProperty("filter")]);
-  testCases(["contrast-50", invalidProperty("filter")]);
-  testCases(["contrast-200", invalidProperty("filter")]);
+  test("contrast-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
+  test("contrast-50", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
+  test("contrast-200", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
 });
 
 describe("Filters - Drop Shadow", () => {
-  testCases(["drop-shadow", invalidProperty("filter")]);
+  test("drop-shadow", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: {
+        properties: ["filter"],
+      },
+    });
+  });
 });
 
 describe("Filters - Grayscale", () => {
-  testCases(
-    ["grayscale", invalidProperty("filter")],
-    ["grayscale-0", invalidProperty("filter")],
-  );
+  test("grayscale", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
+  test("grayscale-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
 });
 
 describe("Filters - Hue Rotate", () => {
-  testCases(
-    ["hue-rotate-0", invalidProperty("filter")],
-    ["hue-rotate-180", invalidProperty("filter")],
-  );
+  test("hue-rotate-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
+  test("hue-rotate-180", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
 });
 
 describe("Filters - Invert", () => {
-  testCases(
-    ["invert-0", invalidProperty("filter")],
-    ["invert", invalidProperty("filter")],
-  );
+  test("invert-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
+  test("invert", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
 });
 
 describe("Filters - Saturate", () => {
-  testCases(
-    ["saturate-0", invalidProperty("filter")],
-    ["saturate-100", invalidProperty("filter")],
-  );
+  test("saturate-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
+  test("saturate-100", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
 });
 
 describe("Filters - Sepia", () => {
-  testCases(["sepia", invalidProperty("filter")]);
+  test("sepia", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["filter"] },
+    });
+  });
 });
 
 describe("Filters - Backdrop Blur", () => {
-  testCases(["backdrop-blur-none", invalidProperty("backdrop-filter")]);
+  test("backdrop-blur-none", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["backdrop-filter"] },
+    });
+  });
 });
 
 describe("Filters - Backdrop Brightness", () => {
-  testCases(["backdrop-brightness-0", invalidProperty("backdrop-filter")]);
+  test("backdrop-brightness-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["backdrop-filter"] },
+    });
+  });
 });
 
 describe("Filters - Backdrop Contrast", () => {
-  testCases(["backdrop-contrast-0", invalidProperty("backdrop-filter")]);
+  test("backdrop-contrast-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["backdrop-filter"] },
+    });
+  });
 });
 
 describe("Filters - Backdrop Grayscale", () => {
-  testCases(["backdrop-grayscale-0", invalidProperty("backdrop-filter")]);
+  test("backdrop-grayscale-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["backdrop-filter"] },
+    });
+  });
 });
 
 describe("Filters - Backdrop Hue Rotate", () => {
-  testCases(["backdrop-hue-rotate-0", invalidProperty("backdrop-filter")]);
+  test("backdrop-hue-rotate-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["backdrop-filter"] },
+    });
+  });
 });
 
 describe("Filters - Backdrop Invert", () => {
-  testCases(["backdrop-invert-0", invalidProperty("backdrop-filter")]);
+  test("backdrop-invert-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["backdrop-filter"] },
+    });
+  });
 });
 
 describe("Filters - Backdrop Opacity", () => {
-  testCases(["backdrop-opacity-0", invalidProperty("backdrop-filter")]);
+  test("backdrop-opacity-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["backdrop-filter"] },
+    });
+  });
 });
 
 describe("Filters - Backdrop Saturate", () => {
-  testCases(["backdrop-saturate-0", invalidProperty("backdrop-filter")]);
+  test("backdrop-saturate-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["backdrop-filter"] },
+    });
+  });
 });
 
 describe("Filters - Backdrop Sepia", () => {
-  testCases(["backdrop-sepia-0", invalidProperty("backdrop-filter")]);
+  test("backdrop-sepia-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["backdrop-filter"] },
+    });
+  });
 });

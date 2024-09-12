@@ -2,6 +2,7 @@ import {
   KeyframesRule,
   Animation,
   Declaration,
+  EasingFunction,
   transform as lightningcss,
   DeclarationBlock,
   MediaQuery,
@@ -32,6 +33,9 @@ import { DEFAULT_CONTAINER_NAME } from "../shared";
 import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
 import { optimizeRules } from "./optimize-rules";
 
+import { versions } from "node:process";
+import { defaultFeatureFlags } from "./feature-flags";
+
 type CSSInteropAtRule = {
   type: "custom";
   value: {
@@ -53,6 +57,12 @@ export function cssToReactNativeRuntime(
   code: Buffer | string,
   options: CssToReactNativeRuntimeOptions = {},
 ): StyleSheetRegisterCompiledOptions {
+  const features = Object.assign({}, defaultFeatureFlags, options.features);
+
+  if (Number(versions.node.split(".")[0]) < 18) {
+    throw new Error("react-native-css-interop only supports NodeJS >18");
+  }
+
   // Parse the grouping options to create an array of regular expressions
   const grouping =
     options.grouping?.map((value) => {
@@ -69,6 +79,7 @@ export function cssToReactNativeRuntime(
     flags: {},
     appearanceOrder: 1,
     ...options,
+    features,
     grouping,
   };
 
@@ -98,7 +109,7 @@ export function cssToReactNativeRuntime(
   for (const [name, styles] of extractOptions.rules) {
     if (styles.length === 0) continue;
 
-    const styleRuleSet: StyleRuleSet = { $$type: "StyleRuleSet" };
+    const styleRuleSet: StyleRuleSet = { $type: "StyleRuleSet" };
 
     for (const { warnings, ...style } of styles) {
       if (style.specificity.I) {
@@ -118,6 +129,9 @@ export function cssToReactNativeRuntime(
       if (style.container) styleRuleSet.container = true;
       if (style.animations) styleRuleSet.animation = true;
       if (style.transition) styleRuleSet.animation = true;
+      if (style.pseudoClasses?.active) styleRuleSet.active = true;
+      if (style.pseudoClasses?.hover) styleRuleSet.hover = true;
+      if (style.pseudoClasses?.focus) styleRuleSet.focus = true;
     }
 
     rules.push([name, styleRuleSet]);
@@ -125,7 +139,7 @@ export function cssToReactNativeRuntime(
 
   // Convert the extracted style declarations and animations from maps to objects and return them
   return {
-    $$compiled: true,
+    $compiled: true,
     rules: optimizeRules(rules),
     keyframes: Array.from(extractOptions.keyframes.entries()),
     rootVariables: extractOptions.rootVariables,
@@ -405,7 +419,7 @@ function setStyleForSelectorList(
       if (groupClassName) {
         // Add the conditions to the declarations object
         addDeclaration(declarations, groupClassName, {
-          $$type: "StyleRule",
+          $type: "StyleRule",
           specificity,
           attrs,
           declarations: [],
@@ -455,16 +469,16 @@ function extractKeyFrames(
   extractOptions: ExtractRuleOptions,
 ) {
   const animation: ExtractedAnimation = { frames: [] };
-  const frames: {
-    [index: string]: { values: RuntimeValueFrame[]; pathTokens: PathTokens };
-  } = {};
-
-  let rawFrames: Array<{ selector: number; values: StyleDeclaration[] }> = [];
+  let rawFrames: Array<{
+    selector: number;
+    values: StyleDeclaration[];
+    easingFunction?: EasingFunction;
+  }> = [];
 
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
 
-    const { declarations: props } = declarationsToStyle(
+    const { declarations: props, animations } = declarationsToStyle(
       frame.declarations.declarations,
       {
         ...extractOptions,
@@ -496,27 +510,29 @@ function extractKeyFrames(
 
     if (values.length === 0) continue;
 
+    const easingFunction = animations?.timingFunction?.[0];
+
     for (const selector of frame.selectors) {
       const keyframe =
         selector.type === "percentage"
           ? selector.value * 100
           : selector.type === "from"
-          ? 0
-          : selector.type === "to"
-          ? 100
-          : undefined;
+            ? 0
+            : selector.type === "to"
+              ? 100
+              : undefined;
 
       if (keyframe === undefined) continue;
 
       switch (selector.type) {
         case "percentage":
-          rawFrames.push({ selector: selector.value, values });
+          rawFrames.push({ selector: selector.value, values, easingFunction });
           break;
         case "from":
-          rawFrames.push({ selector: 0, values });
+          rawFrames.push({ selector: 0, values, easingFunction });
           break;
         case "to":
-          rawFrames.push({ selector: 1, values });
+          rawFrames.push({ selector: 1, values, easingFunction });
           break;
         default:
           selector satisfies never;
@@ -527,11 +543,22 @@ function extractKeyFrames(
   // Need to sort afterwards, as the order of the frames is not guaranteed
   rawFrames = rawFrames.sort((a, b) => a.selector - b.selector);
 
+  // Convert the rawFrames into frames
+  const frames: {
+    [index: string]: { values: RuntimeValueFrame[]; pathTokens: PathTokens };
+  } = {};
+
+  const easingFunctions: EasingFunction[] = [];
+
   for (let i = 0; i < rawFrames.length; i++) {
     const rawFrame = rawFrames[i];
     const animationProgress = rawFrame.selector;
     const previousProgress = i === 0 ? 0 : rawFrames[i - 1].selector;
     const progress = animationProgress - previousProgress;
+
+    if (rawFrame.easingFunction) {
+      easingFunctions[i] = rawFrame.easingFunction;
+    }
 
     for (const frameValue of rawFrame.values) {
       // This will never happen, as this an a later optimization
@@ -557,6 +584,15 @@ function extractKeyFrames(
   }
 
   animation.frames = Object.entries(frames);
+
+  if (easingFunctions.length) {
+    // This is a holey array and may contain undefined values
+    animation.easingFunctions = Array.from<EasingFunction | undefined>(
+      easingFunctions,
+    ).map((value) => {
+      return value ?? { type: "!PLACEHOLDER!" };
+    });
+  }
 
   extractOptions.keyframes.set(keyframes.name.value, animation);
 }
@@ -616,7 +652,7 @@ function declarationsToStyle(
 ): StyleRule {
   const props: NonNullable<StyleRule["declarations"]> = [];
   const extractedStyle: StyleRule = {
-    $$type: "StyleRule",
+    $type: "StyleRule",
     specificity: { A: 0, B: 0, C: 0, ...specificity },
     declarations: props,
   };
@@ -875,6 +911,7 @@ function declarationsToStyle(
   }
 
   const parseDeclarationOptions: ParseDeclarationOptions = {
+    features: {},
     addStyleProp,
     addTransformProp,
     handleStyleShorthand,

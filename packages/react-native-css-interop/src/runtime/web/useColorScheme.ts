@@ -3,7 +3,7 @@ import { colorScheme } from "./color-scheme";
 import { Effect } from "../observable";
 export function useColorScheme() {
   const [effect, setEffect] = useState<Effect>(() => ({
-    rerun: () => setEffect((s) => ({ ...s })),
+    run: () => setEffect((s) => ({ ...s })),
     dependencies: new Set(),
   }));
 

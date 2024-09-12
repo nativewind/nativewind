@@ -1,8 +1,9 @@
-import { resetStyles } from "react-native-css-interop/testing-library";
-import { style, testCases } from "../test-utils";
-
-afterEach(() => resetStyles());
+import { renderCurrentTest } from "../test";
 
 describe("Preset - color-*", () => {
-  testCases(["color-black", style({ color: "rgba(0, 0, 0, 1)" })]);
+  test("color-black", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { color: "rgba(0, 0, 0, 1)" } },
+    });
+  });
 });

@@ -1,8 +1,7 @@
 module.exports = {
   preset: "jest-expo",
   roots: ["src"],
-  setupFiles: ["react-native-css-interop/testing-library/setup"],
-  setupFilesAfterEnv: [
-    "react-native-css-interop/testing-library/setupAfterEnv",
-  ],
+  setupFiles: ["react-native-css-interop/test/setup"],
+  setupFilesAfterEnv: ["react-native-css-interop/test/setupAfterEnv"],
+  modulePathIgnorePatterns: ["<rootDir>/src/test"],
 };
