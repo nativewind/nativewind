@@ -102,3 +102,36 @@ test("ActivityIndicator", () => {
     }),
   );
 });
+
+test(`ScrollView`, () => {
+  registerCSS(`
+    .bg-black { background-color: black } 
+    .gap-10 { gap: 10 }
+    .pt-20 {
+      padding-top: 5rem
+    }
+    `);
+
+  render(
+    <ScrollView
+      testID={testID}
+      className="bg-black"
+      contentContainerClassName="gap-10  pt-20"
+    />,
+  );
+
+  const component = screen.getByTestId(testID);
+
+  expect(component.props).toStrictEqual({
+    testID,
+    children: expect.any(Array),
+    contentContainerStyle: {
+      columnGap: 10,
+      rowGap: 10,
+      paddingTop: 70,
+    },
+    style: {
+      backgroundColor: "rgba(0, 0, 0, 1)",
+    },
+  });
+});

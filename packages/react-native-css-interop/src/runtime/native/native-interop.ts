@@ -954,13 +954,10 @@ function applyRules(
 
         if (isNativeStyleToProp) {
           paths = [...target, declaration[0]];
-        } else if (
-          declaration[1].length === 1 &&
-          declaration[1][0] === "style"
-        ) {
+        } else if (declaration[1][0] === "style") {
           // The styles say they are "style", but they should go to the first target
           // If they don't say "style" then they have a @rn-move rule that has already moved them
-          paths = [...target, ...declaration[1]];
+          paths = [...target, ...declaration[1].slice(1)];
         } else {
           paths = [...target.slice(0, -1), ...declaration[1]];
         }
