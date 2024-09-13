@@ -69,8 +69,9 @@ export function getStyle(name: string, effect?: Effect) {
   const styleWarnings = style?.warnings;
 
   if (styleWarnings) {
-    if (warnings.has(name)) return;
-    warnings.set(name, styleWarnings);
+    if (!warnings.has(name)) {
+      warnings.set(name, styleWarnings);
+    }
   }
 
   return style;
