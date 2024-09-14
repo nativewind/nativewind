@@ -148,9 +148,6 @@ export function withCssInterop(
        * than listening to fileSystem events.
        *
        * This is also the only place the Metro exposes the MetroServer to the config.
-       *
-       * NOTE: This function is deprecated and should be replaced with unstable_devMiddleware, but no community CLI
-       *       supports it at time of writing.
        */
       enhanceMiddleware: (middleware, metroServer) => {
         const server = connect();
