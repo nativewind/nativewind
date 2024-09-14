@@ -1,6 +1,5 @@
 /** @jsxImportSource test */
 import { View } from "react-native";
-import { getAnimatedStyle } from "react-native-reanimated";
 
 import {
   render,
@@ -10,10 +9,7 @@ import {
   fireEvent,
 } from "test";
 
-const grouping = ["^group(/.*)?"];
 const testID = "react-native-css-interop";
-const parentID = "parent";
-const childID = "child";
 setupAllComponents();
 
 jest.useFakeTimers();
@@ -178,60 +174,5 @@ test("transition - interaction", () => {
   jest.advanceTimersByTime(500);
   expect(component).toHaveAnimatedStyle({
     color: "rgba(0, 0, 255, 1)",
-  });
-});
-
-test("optional transitions", async () => {
-  registerCSS(
-    `
-    .group\\/item:active .my-class {
-      color: red;
-      transition: color 1s;
-    }`,
-    {
-      grouping,
-    },
-  );
-
-  render(
-    <View testID={parentID} className="group/item">
-      <View testID={childID} className="my-class" />
-    </View>,
-    {
-      logOutput: true,
-    },
-  );
-
-  const parent = screen.getByTestId(parentID);
-  const child = screen.getByTestId(childID);
-
-  expect(getAnimatedStyle(child)).toStrictEqual({});
-
-  fireEvent(parent, "pressIn");
-
-  jest.advanceTimersByTime(0);
-
-  expect(getAnimatedStyle(child)).toStrictEqual({
-    color: "black",
-  });
-
-  jest.advanceTimersByTime(500);
-
-  expect(getAnimatedStyle(child)).toStrictEqual({
-    color: "rgba(151, 0, 0, 1)",
-  });
-
-  jest.advanceTimersByTime(500);
-
-  expect(getAnimatedStyle(child)).toStrictEqual({
-    color: "rgba(255, 0, 0, 1)",
-  });
-
-  fireEvent(parent, "pressOut");
-
-  jest.advanceTimersByTime(0);
-
-  expect(getAnimatedStyle(child)).toStrictEqual({
-    color: "black",
   });
 });

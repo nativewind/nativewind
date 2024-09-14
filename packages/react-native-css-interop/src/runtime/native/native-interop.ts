@@ -72,9 +72,9 @@ export function interop(
    * manage their own setup/cleanup
    */
   const sharedState = useState<SharedState>({
-    initialRender: true,
     originalProps,
     props: {},
+    guardsEnabled: false,
     canUpgradeWarn: false,
     animated: UpgradeState.NONE,
     containers: UpgradeState.NONE,
@@ -141,7 +141,7 @@ export function interop(
 
     // After the first render, we enable the guards. A guard is a function that will return true if the inputs
     // for that config has changed and needs to be updated
-    if (!sharedState.initialRender) {
+    if (sharedState.guardsEnabled) {
       if (state.declarationTracking.guards.some((guard) => guard(refs))) {
         // If needed, update the declarations
         dispatch({
@@ -293,7 +293,7 @@ export function interop(
   // Update the shared state with the latest values
   // sharedState.props = memoOutput.props;
   sharedState.originalProps = originalProps;
-  sharedState.initialRender = false;
+  sharedState.guardsEnabled = true;
 
   return renderComponent(
     component,
@@ -373,9 +373,6 @@ function getDeclarations(
       guards: [],
       previous: refs.props?.[config.source],
     },
-    // If we previously had a transition, we need to keep it
-    // So we 'reset' to the defaultTransition
-    transition: previousState.transition ? { ...defaultTransition } : undefined,
   };
 
   if (action.type === "new-declarations") {
@@ -743,54 +740,51 @@ function processTransition(
    * If there is a 'none' transition we should skip this logic.
    * In the sharedValues cleanup step the animation will be cancelled as the properties were not seen.
    */
-  if (properties.length === 0 || properties.includes("none")) {
-    return;
-  }
+  if (!properties.includes("none")) {
+    for (let index = 0; index < properties.length; index++) {
+      const property = properties[index];
+      if (seenAnimatedProps.has(property)) continue;
+      let sharedValue = state.sharedValues.get(property);
+      let { value, defaultValue } = resolveTransitionValue(state, property);
 
-  for (let index = 0; index < properties.length; index++) {
-    const property = properties[index];
-    if (seenAnimatedProps.has(property)) continue;
-    let sharedValue = state.sharedValues.get(property);
-    let { value, defaultValue } = resolveTransitionValue(state, property);
+      if (value === undefined && !sharedValue) {
+        // We have never seen this value, and its undefined so do nothing
+        continue;
+      } else if (!sharedValue) {
+        // First time seeing this value. On the initial render don't transition,
+        // otherwise transition from the default value
+        const initialValue =
+          Number(refs.sharedState.animated) < UpgradeState.UPGRADED &&
+          value !== undefined
+            ? value
+            : defaultValue;
 
-    if (value === undefined && !sharedValue) {
-      // We have never seen this value, and its undefined so do nothing
-      continue;
-    } else if (refs.sharedState.initialRender) {
-      // On the initial render don't transition
-      const initialValue = value !== undefined ? value : defaultValue;
-      sharedValue = makeMutable(initialValue);
-      state.sharedValues.set(property, sharedValue);
-    } else {
-      if (!sharedValue) {
-        // First time seeing this value, but its not the initial render!
-        // We need to create the sharedValue
-        sharedValue = makeMutable(defaultValue);
+        sharedValue = makeMutable(initialValue);
         state.sharedValues.set(property, sharedValue);
+      } else {
+        // If the value is undefined or null, then it should be the default
+        value ??= defaultValue;
+
+        if (value !== sharedValue.value) {
+          const duration = timeToMS(durations[index % durations.length]);
+          const delay = timeToMS(delays[index % delays.length]);
+          const easing = easingFunctions[index % easingFunctions.length];
+          sharedValue.value = withDelay(
+            delay,
+            withTiming(value, {
+              duration,
+              easing: getEasing(easing, Easing),
+            }),
+          );
+        }
       }
 
-      // If the value is undefined or null, then it should be the default
-      value ??= defaultValue;
-
-      if (value !== sharedValue.value) {
-        const duration = timeToMS(durations[index % durations.length]);
-        const delay = timeToMS(delays[index % delays.length]);
-        const easing = easingFunctions[index % easingFunctions.length];
-        sharedValue.value = withDelay(
-          delay,
-          withTiming(value, {
-            duration,
-            easing: getEasing(easing, Easing),
-          }),
-        );
-      }
+      seenAnimatedProps.add(property);
+      props.style ??= {};
+      assignToTarget(props.style, sharedValue, [property], {
+        allowTransformMerging: true,
+      });
     }
-
-    seenAnimatedProps.add(property);
-    props.style ??= {};
-    assignToTarget(props.style, sharedValue, [property], {
-      allowTransformMerging: true,
-    });
   }
 }
 
@@ -813,7 +807,6 @@ function retainSharedValues(
       value = value(state.styleTracking.effect);
     }
     entry[1].value = value;
-    props.style ??= {};
     props.style?.[entry[0]] ??
       state.styleLookup[entry[0]] ??
       defaultValues[entry[0]];

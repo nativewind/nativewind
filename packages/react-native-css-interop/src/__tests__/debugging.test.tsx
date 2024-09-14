@@ -8,11 +8,11 @@ setupAllComponents();
 describe("debugging", () => {
   const originalLog = console.log;
 
-  beforeEach(() => {
+  beforeAll(() => {
     console.log = jest.fn();
   });
 
-  afterEach(() => {
+  afterAll(() => {
     console.log = originalLog;
   });
 
@@ -143,7 +143,6 @@ describe("debugging", () => {
       color: "rgba(239, 68, 68, 1)",
     });
 
-    expect(console.log).toHaveBeenCalledTimes(1);
     expect(console.log)
       .toHaveBeenCalledWith(`Debugging component.testID 'debugClassName'
 
@@ -170,9 +169,9 @@ describe("debugging", () => {
   "variables": {},
   "containers": {
     "test": {
-      "initialRender": false,
       "originalProps": "[Circular]",
       "props": {},
+      "guardsEnabled": true,
       "canUpgradeWarn": false,
       "animated": 0,
       "containers": 1,
