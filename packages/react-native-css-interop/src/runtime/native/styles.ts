@@ -9,7 +9,6 @@ import {
 import type {
   ExtractedAnimation,
   RemappedClassName,
-  RuntimeValue,
   StyleRuleSet,
   StyleSheetRegisterCompiledOptions,
 } from "../../types";
@@ -23,14 +22,8 @@ export type InjectedStyleContextValue = {
 };
 
 export type VariableContextValue =
-  | Map<
-      string,
-      ReturnType<typeof cssVariableObservable> | number | string | RuntimeValue
-    >
-  | Record<
-      string,
-      ReturnType<typeof cssVariableObservable> | number | string | RuntimeValue
-    >;
+  | Map<string, ReturnType<typeof cssVariableObservable>>
+  | Record<string, ReturnType<typeof cssVariableObservable>>;
 
 declare global {
   var __css_interop: {
@@ -104,13 +97,13 @@ export function getAnimation(name: string, effect: Effect) {
 }
 export function getVariable(
   name: string,
-  store?: VariableContextValue,
+  store?: Record<string, any> | Map<string, any>,
   effect?: Effect,
 ) {
   if (!store) return;
 
   let obs = store instanceof Map ? store.get(name) : store[name];
-  return obs && typeof obs === "object" && "get" in obs ? obs.get(effect) : obs;
+  return obs?.get(effect);
 }
 
 export const getUniversalVariable = (name: string, effect: Effect) => {

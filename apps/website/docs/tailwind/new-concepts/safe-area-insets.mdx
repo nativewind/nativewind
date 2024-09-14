@@ -10,29 +10,61 @@ Safe Area Insets are the area of the screen that is not covered by the notch, ho
 
 On native, the safe area measurements are provided by [`react-native-safe-area-context`](https://github.com/th3rdwave/react-native-safe-area-context). You will need to wrap your app with the `SafeAreaProvider` and use the `useSafeAreaEnv` hook to get the safe area insets.
 
+The `useSafeAreaEnv()` object should be added to the style prop of a View or any other `cssInterop` enabled component
+
+The safe area class will only work on the component that has the `useSafeAreaEnv` styles, and any components within its render tree.
+
 ```tsx
 import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { useSafeAreaEnv } from "nativewind";
 
 export function MyApp(props) {
   // Make sure you have the SafeAreaProvider at the root of your app
   return (
     <SafeAreaProvider>
-      <View className="p-safe" {...props} />
+      <SafeAreaEnv {...props} />
     </SafeAreaProvider>
   );
+}
+
+function SafeAreaEnv() {
+  // Add the safe area insets to the render tree
+  return <View {...props} style={[style, useSafeAreaEnv()]} />;
+}
+
+// Now you can use the safe area className
+export function MyComponent({ className, ...props }) {
+  return <View className={`p-safe ${className}`} {...props} />;
 }
 ```
 
 :::tip
 
-Expo Router adds the \<SafeAreaProvider /> to every route. This setup is not needed
+Expo Router adds the \<SafeAreaProvider /> to every route. You only need to add `useSafeAreaEnv()` to your root layout.
+
+```tsx
+import { View } from "react-native";
+import { Slot } from "expo-router";
+import { useSafeAreaEnv } from "nativewind";
+
+export default function MyLayout() {
+  return (
+    // Add the safe area insets to the render tree
+    <View {...props} style={[style, useSafeAreaEnv()]}>
+      <Slot />
+    </View>
+  );
+}
+```
 
 :::
 
 ## Usage (web)
 
 On web, your CSS StyleSheet will use the [CSS `env()` function](https://developer.mozilla.org/en-US/docs/Web/CSS/env) and no extra setup is needed.
+
+`useSafeAreaEnv()` returns `undefined` on web.
 
 The `h-screen-safe` and `min-h-screen-safe` utilities may not work as expected on Google Chrome. Add height: `-webkit-fill-available` on parent nodes:
 
@@ -157,9 +189,9 @@ The `h-screen-safe` and `min-h-screen-safe` utilities may not work as expected o
     [
       "*-safe-or-[n]",
       <div>
-        <code>*</code> can be substituted for any spacing utility.
+        <code>*</code> can be subsitued for any spacing utiltity.
         <br />
-        <code>[n]</code> can be substituted for any spacing value.
+        <code>[n]</code> can be subsitued for any spacing value.
         <code>{`
 // example using mt
 .mt-safe-or-4 = {
@@ -178,9 +210,9 @@ The `h-screen-safe` and `min-h-screen-safe` utilities may not work as expected o
     [
       "*-safe-offset-[n]",
       <div>
-        <code>*</code> can be substituted for any spacing utility.
+        <code>*</code> can be subsitued for any spacing utiltity.
         <br />
-        <code>[n]</code> can be substituted for any spacing value.
+        <code>[n]</code> can be subsitued for any spacing value.
         <code>{`
 // example using mt
 .mt-safe-offset-4 = {

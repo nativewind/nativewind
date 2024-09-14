@@ -1,6 +1,11 @@
 /** @jsxImportSource nativewind */
-import { ViewProps } from "react-native";
-import { renderCurrentTest, native, INTERNAL_SET } from "../test";
+import { ViewProps, View } from "react-native";
+import {
+  renderCurrentTest,
+  useSafeAreaEnv,
+  native,
+  INTERNAL_SET,
+} from "../test";
 
 import { SafeAreaProvider, Metrics } from "react-native-safe-area-context";
 
@@ -28,9 +33,14 @@ const cssOptions = {
 function Wrapper({ children }: ViewProps) {
   return (
     <SafeAreaProvider initialMetrics={initialMetrics}>
-      {children}
+      <SafeEnv>{children}</SafeEnv>
     </SafeAreaProvider>
   );
+}
+
+function SafeEnv({ children }: ViewProps) {
+  const env = useSafeAreaEnv();
+  return <View style={env}>{children}</View>;
 }
 
 test("m-safe", async () => {

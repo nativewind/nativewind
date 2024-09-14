@@ -137,11 +137,18 @@ export const useUnstableNativeVariable = (name: string) => {
   return value;
 };
 
-/**
- * @deprecated Please use <SafeAreaProvider /> directly
- */
 export const useSafeAreaEnv = () => {
-  console.warn(
-    "useSafeAreaEnv() is deprecated. Please use <SafeAreaProvider /> directly",
-  );
+  try {
+    const insets =
+      require("react-native-safe-area-context").useSafeAreaInsets() as import("react-native-safe-area-context").EdgeInsets;
+
+    return vars({
+      "--___css-interop___safe-area-inset-bottom": insets.bottom,
+      "--___css-interop___safe-area-inset-left": insets.left,
+      "--___css-interop___safe-area-inset-right": insets.right,
+      "--___css-interop___safe-area-inset-top": insets.top,
+    });
+  } catch {
+    console.error("react-native-safe-area-context is not installed");
+  }
 };
