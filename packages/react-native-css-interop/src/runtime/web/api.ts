@@ -1,15 +1,21 @@
-"use client";
-import { Component, createElement, forwardRef } from "react";
-import { CssInterop } from "../../types";
+import { Component, createElement, forwardRef, useState } from "react";
+import { CssInterop, JSXFunction } from "../../types";
 import { getNormalizeConfig } from "../config";
+import { Effect } from "../observable";
+import { colorScheme } from "./color-scheme";
 import { assignToTarget } from "../native/utils";
 
 export { StyleSheet } from "./stylesheet";
 export { colorScheme } from "./color-scheme";
 export { rem } from "./rem";
-import { interopComponents } from "./interopComponentsMap";
+
+export const interopComponents = new Map<
+  object | string,
+  Parameters<JSXFunction>[0]
+>();
+
 const ForwardRefSymbol = Symbol.for("react.forward_ref");
-export { useColorScheme } from "./useColorScheme";
+
 export const cssInterop: CssInterop = (baseComponent, mapping): any => {
   const configs = getNormalizeConfig(mapping);
 
@@ -75,6 +81,19 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
 
 // On web, these are the same
 export const remapProps = cssInterop;
+
+export function useColorScheme() {
+  const [effect, setEffect] = useState<Effect>(() => ({
+    run: () => setEffect((s) => ({ ...s })),
+    dependencies: new Set(),
+  }));
+
+  return {
+    colorScheme: colorScheme.get(effect),
+    setColorScheme: colorScheme.set,
+    toggleColorScheme: colorScheme.toggle,
+  };
+}
 
 export const useUnstableNativeVariable = (name: string) => {
   if (process.env.NODE_ENV !== "production") {
