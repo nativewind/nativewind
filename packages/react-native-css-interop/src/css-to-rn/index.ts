@@ -411,10 +411,12 @@ function setStyleForSelectorList(
         media,
       } = selector;
 
-      const specificity = {
-        ...extractedStyle.specificity,
-        ...selector.specificity,
-      };
+      const specificity = Object.fromEntries(
+        Object.entries({
+          ...extractedStyle.specificity,
+          ...selector.specificity,
+        }).filter(([, value]) => value !== 0),
+      );
 
       if (groupClassName) {
         // Add the conditions to the declarations object

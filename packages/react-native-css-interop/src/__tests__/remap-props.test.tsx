@@ -50,10 +50,7 @@ test("mapping", () => {
           ],
           pseudoClasses: undefined,
           specificity: {
-            A: 0,
             B: 1,
-            C: 0,
-            I: 0,
             O: 1,
             S: 1,
           },
@@ -76,10 +73,7 @@ test("mapping", () => {
           ],
           pseudoClasses: undefined,
           specificity: {
-            A: 0,
             B: 1,
-            C: 0,
-            I: 0,
             O: 2,
             S: 1,
           },
