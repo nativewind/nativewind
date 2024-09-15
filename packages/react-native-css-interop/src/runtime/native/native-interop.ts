@@ -1004,7 +1004,7 @@ function applyRules(
   }
 }
 
-const inlineSpecificity: Specificity = { inline: 1, I: 0 };
+const inlineSpecificity: Specificity = { inline: 1 };
 function specificityCompare(
   o1?: object | StyleRule | null,
   o2?: object | StyleRule | null,

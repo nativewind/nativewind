@@ -197,9 +197,6 @@ test("optional transitions", async () => {
     <View testID={parentID} className="group/item">
       <View testID={childID} className="my-class" />
     </View>,
-    {
-      logOutput: true,
-    },
   );
 
   const parent = screen.getByTestId(parentID);
