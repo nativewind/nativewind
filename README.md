@@ -63,14 +63,17 @@ You can get started with any of the following options:
 
 [More details here](https://www.nativewind.dev/v4/announcement#breaking-changes-from-v2)
 
-## Distribution tags guide
-
-- Release: `main` branch (currently v2.0.11)
+## npm distribution tags
+It's worth noting that we do not have Github branches that directly correlate to npm distribution tags. Instead, we deploy to specific npm tags either via automated Github actions (push to `main` -> publish to `next`) or manually (snapshots versions).
+- **Release:** `latest` (currently v2.0.11)
   - You should use this version
-- Experimental: `next` branch (currently v4.1)
+- **Canary:** `canary` (currently v4.0.36)
+  - You can use this version
+  - Potentially less stable than latest but likely more robust
+- **Experimental:** `next` tag (currently v4.1)
   - You probably shouldn't use this version
   - Undergoing testing to move to a release version
-- Bleeding Edge: `-alpha` suffixed branches (no current alpha)
+- **Bleeding Edge:** snapshot releases prefixed with `0.0.0-`
   - You should not use this version
   - Used internally for moving towards a `next` version
 
@@ -80,9 +83,18 @@ You can get started with any of the following options:
 
 # FAQ
 
+## Is it safe to use v4?
+It's reasonably safe to use the `canary` version save for a known issue with styles being inconsistently applied. This issue is resolved in the `next` version; however, using this dist tag may break your app as it is considered experimental. To see which versions correlate to these dist tags, please refer to [our npm distrbution tags](https://github.com/nativewind/nativewind?tab=readme-ov-file#npm-distribution-tags).
+
 ## Is NativeWind moving to Expo?
 
 No. Expo is always exploring ways to handle styles better but NativeWind, as a project, will not be moving into the Expo organization.
+
+## Can we disable the change that was done recently to auto-add nativewind types using a setting or something? I already have the settings using `compilerOptions.types`, so I would like to disable the file generation.
+
+Not at the moment. We've found this will cause a long term problem where people "forget" what their type config was doing. They then update their types and break the NativeWind ones. To combat this, we've copied the behavior from other major frameworks which is to handle their types seperately from user specified ones.
+
+In the future, we may add an option like `dangerouslyDisableTypeScriptGeneration` or something verbose to prevent people from using it. We are tired of solving TypeScript issues, particularly ones such as "my types were working and now they aren't."
 
 ## What happened to v3?
 
