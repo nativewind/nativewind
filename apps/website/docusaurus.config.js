@@ -13,7 +13,7 @@ const config = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-  organizationName: "marklawlor", // Usually your GitHub org/user name.
+  organizationName: "NativeWind", // Usually your GitHub org/user name.
   projectName: "NativeWind", // Usually your repo name.
 
   clientModules: [
@@ -38,15 +38,15 @@ const config = {
           remarkPlugins: [require("./src/remark-snackplayer")],
           routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),
-          lastVersion: "v2",
+          lastVersion: "current",
           versions: {
             current: {
               label: "v4",
-              path: "v4",
+              path: "",
             },
             v2: {
               label: "v2",
-              path: "",
+              path: "v2",
             },
           },
         },
@@ -83,7 +83,7 @@ const config = {
       },
       announcementBar: {
         content:
-          '<a href="/v4/overview">NativeWind v4.0 is coming soon. Click here to see the docs</a>',
+          'NativeWind v4.0 is now the default version. <a href="/v2">Click here to view v2 docs</a>',
         isCloseable: true,
       },
       navbar: {
