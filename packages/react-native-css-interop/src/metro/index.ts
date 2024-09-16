@@ -9,7 +9,6 @@ import type { FileSystem } from "metro-file-map";
 import { expoColorSchemeWarning } from "./expo";
 import { CssToReactNativeRuntimeOptions } from "../types";
 import { cssToReactNativeRuntime } from "../css-to-rn";
-import { getNativeJS, platformPath } from "./shared";
 
 /**
  * Injects the CSS into the React Native runtime.
@@ -48,7 +47,7 @@ export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
 };
 
 let haste: any;
-const virtualModules = new Map<string, Promise<Buffer>>();
+const virtualModules = new Map<string, Promise<string>>();
 
 export function withCssInterop(
   config: MetroConfig,
@@ -114,7 +113,10 @@ export function withCssInterop(
 
           if (platform === "web") {
             const output = path.join(prodOutputDir, `web.css`);
-            await fsPromises.writeFile(output, options.processPROD(platform));
+            await fsPromises.writeFile(
+              output,
+              options.processPROD(platform).toString("utf-8"),
+            );
           } else {
             const output = path.join(prodOutputDir, `${platform}.js`);
             await fsPromises.writeFile(
@@ -246,7 +248,7 @@ async function startCSSProcessor(
       filePath,
       Promise.resolve(
         platform === "web"
-          ? Buffer.from(css)
+          ? css
           : getNativeJS(cssToReactNativeRuntime(css, options), dev),
       ),
     );
@@ -268,7 +270,7 @@ async function startCSSProcessor(
     });
   }).then((css) => {
     return platform === "web"
-      ? Buffer.from(css)
+      ? css
       : getNativeJS(cssToReactNativeRuntime(css, options), dev);
   });
 
@@ -321,10 +323,116 @@ function ensureBundlerPatched(
   ) {
     const virtualModule = virtualModules.get(filePath);
     if (virtualModule) {
-      fileBuffer = await virtualModule;
+      fileBuffer = Buffer.from(await virtualModule);
     }
 
     return originalTransformFile(filePath, transformOptions, fileBuffer);
   };
   bundler.transformFile.__css_interop__patched = true;
+}
+
+/**
+ * Convert a data structure to JavaScript.
+ * The output should be similar to JSON, but without the extra characters.
+ */
+function stringify(data: unknown): string {
+  switch (typeof data) {
+    case "bigint":
+    case "symbol":
+    case "function":
+      throw new Error(`Cannot stringify ${typeof data}`);
+    case "string":
+      return `"${data}"`;
+    case "number":
+      // Reduce to 3 decimal places
+      return `${Math.round(data * 1000) / 1000}`;
+    case "boolean":
+      return `${data}`;
+    case "undefined":
+      // null is processed faster than undefined
+      // JSON.stringify also converts undefined to null
+      return "null";
+    case "object": {
+      if (data === null) {
+        return "null";
+      } else if (Array.isArray(data)) {
+        return `[${data
+          .map((value) => {
+            // These values can be omitted to create a holey array
+            // This is slightly slower to parse at runtime, but keeps the
+            // file size smaller
+            return value === null || value === undefined
+              ? ""
+              : stringify(value);
+          })
+          .join(",")}]`;
+      } else {
+        return `{${Object.entries(data)
+          .flatMap(([key, value]) => {
+            // If an object's property is undefined or null we can just skip it
+            if (value === null || value === undefined) {
+              return [];
+            }
+
+            // Make sure we quote strings that require quotes
+            if (key.match(/[\[\]\-\/]/)) {
+              key = `"${key}"`;
+            }
+
+            value = stringify(value);
+
+            return [`${key}:${value}`];
+          })
+          .join(",")}}`;
+      }
+    }
+  }
+}
+
+function getNativeJS(data = {}, dev = false): string {
+  let output = `
+ "use strict";
+ "__css-interop-transformed";
+Object.defineProperty(exports, "__esModule", { value: true });
+const __inject_1 = require("react-native-css-interop/dist/runtime/native/styles");
+(0, __inject_1.injectData)(${stringify(data)});
+`;
+
+  if (dev) {
+    output += `
+/**
+ * This is a hack for Expo Router. It's _layout files export 'unstable_settings' which break Fast Refresh
+ * Expo Router only supports Metro as a bundler
+ */
+if (typeof __METRO_GLOBAL_PREFIX__ !== "undefined" && global[__METRO_GLOBAL_PREFIX__ + "__ReactRefresh"]) {
+  const Refresh = global[__METRO_GLOBAL_PREFIX__ + "__ReactRefresh"]
+  const isLikelyComponentType = Refresh.isLikelyComponentType
+  const expoRouterExports = new WeakSet()
+  Object.assign(Refresh, {
+    isLikelyComponentType(value) {
+      if (typeof value === "object" && "unstable_settings" in value) {
+        expoRouterExports.add(value.unstable_settings)
+      }
+
+      if (typeof value === "object" && "ErrorBoundary" in value) {
+        expoRouterExports.add(value.ErrorBoundary)
+      }
+
+      // When ErrorBoundary is exported, the inverse dependency will also include the _ctx file. So we need to account for it as well
+      if (typeof value === "object" && "ctx" in value && value.ctx.name === "metroContext") {
+        expoRouterExports.add(value.ctx)
+      }
+
+      return expoRouterExports.has(value) || isLikelyComponentType(value)
+    }
+  })
+}
+`;
+  }
+
+  return output;
+}
+
+function platformPath(filePath: string, platform: string) {
+  return `${filePath}.${platform}.${platform === "web" ? "css" : "js"}`;
 }
