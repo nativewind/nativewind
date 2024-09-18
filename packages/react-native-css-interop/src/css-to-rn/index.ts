@@ -536,6 +536,8 @@ function extractKeyFrames(
         case "to":
           rawFrames.push({ selector: 1, values, easingFunction });
           break;
+        case "timeline-range-percentage":
+          break;
         default:
           selector satisfies never;
       }
