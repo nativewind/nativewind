@@ -17,25 +17,22 @@ import {
   ExtractedAnimations,
   ExtractedTransition,
   ContainerRecord,
+  StyleDeclarationOrInline,
+  StyleDeclaration,
 } from "../../types";
 import { containerContext } from "./globals";
 import { UpgradeState, renderComponent } from "./render-component";
 import { testRule } from "./conditions";
-import {
-  SharedState,
-  ReducerAction,
-  ReducerState,
-  Refs,
-  ProcessedStyleDeclaration,
-} from "./types";
+import { SharedState, ReducerAction, ReducerState, Refs } from "./types";
 import { Effect, cleanupEffect, observable } from "../observable";
 import {
   defaultValues,
+  getBaseValue,
   getEasing,
   getHeight,
+  getTarget,
   getWidth,
   resolveAnimation,
-  resolveTransitionValue,
   resolveValue,
   timeToMS,
 } from "./resolve-value";
@@ -46,8 +43,12 @@ import {
   getOpaqueStyles,
   getStyle,
 } from "./styles";
-import { DEFAULT_CONTAINER_NAME } from "../../shared";
-import { assignToTarget, getTargetValue } from "./utils";
+import {
+  assignToTarget,
+  DEFAULT_CONTAINER_NAME,
+  getTargetValue,
+  PLACEHOLDER_SYMBOL,
+} from "../../shared";
 
 export function interop(
   component: ReactComponent<any>,
@@ -322,7 +323,6 @@ function initReducer({
       config,
       className,
       props: {},
-      styleLookup: {},
       normal: [],
       important: [],
       currentRenderAnimation: {},
@@ -366,7 +366,7 @@ function getDeclarations(
     containerNames: undefined,
     variables: undefined,
     // Reset the inline styles
-    inline: getTargetValue(refs.props, config),
+    inline: getTarget(refs.props, config),
     // Keep the same effect, but reset the guards
     declarationTracking: {
       effect: previousState.declarationTracking.effect,
@@ -385,7 +385,7 @@ function getDeclarations(
   state.declarationTracking.guards.push(
     (refs) =>
       !Object.is(refs.props?.[config.source], state.className) ||
-      !Object.is(getTargetValue(refs.props, config), state.inline),
+      !Object.is(getTarget(refs.props, config), state.inline),
   );
 
   const normalRules: ProcessedStyleRules[] = [];
@@ -444,7 +444,6 @@ function applyStyles(state: ReducerState, refs: Refs) {
   state = {
     ...state,
     props: {},
-    styleLookup: {},
     styleTracking: { effect: state.styleTracking.effect, guards: [] },
   };
 
@@ -610,8 +609,8 @@ function processAnimations(
 
         for (const frame of animation.frames) {
           const animationKey = frame[0];
-          const valueFrames = frame[1].values;
-          const pathTokens = frame[1].pathTokens;
+          const valueFrames = frame[1];
+          const pathTokens = ["style", animationKey];
 
           if (seenAnimatedProps.has(animationKey)) continue;
           seenAnimatedProps.add(animationKey);
@@ -665,11 +664,11 @@ function processAnimations(
         const keyframes = getAnimation(name, state.styleTracking.effect);
         if (!keyframes) continue;
 
-        for (const [animationKey, { pathTokens }] of keyframes.frames) {
+        for (const [animationKey] of keyframes.frames) {
           assignToTarget(
             props,
             state.sharedValues.get(animationKey),
-            pathTokens,
+            ["style", animationKey],
             {
               allowTransformMerging: true,
             },
@@ -751,7 +750,7 @@ function processTransition(
     const property = properties[index];
     if (seenAnimatedProps.has(property)) continue;
     let sharedValue = state.sharedValues.get(property);
-    let { value, defaultValue } = resolveTransitionValue(state, property);
+    let { value, defaultValue } = getBaseValue(state, [property]);
 
     if (value === undefined && !sharedValue) {
       // We have never seen this value, and its undefined so do nothing
@@ -805,18 +804,13 @@ function retainSharedValues(
 
   for (const entry of state.sharedValues) {
     if (seenAnimatedProps.has(entry[0])) continue;
-    let value =
-      props.style?.[entry[0]] ??
-      state.styleLookup[entry[0]] ??
-      defaultValues[entry[0]];
+    let value = props.style?.[entry[0]] ?? defaultValues[entry[0]];
     if (typeof value === "function") {
       value = value(state.styleTracking.effect);
     }
     entry[1].value = value;
     props.style ??= {};
-    props.style?.[entry[0]] ??
-      state.styleLookup[entry[0]] ??
-      defaultValues[entry[0]];
+    props.style?.[entry[0]] ?? defaultValues[entry[0]];
     assignToTarget(props.style, entry[1], [entry[0]], {
       allowTransformMerging: true,
     });
@@ -866,7 +860,7 @@ function cleanup(props: Record<string, any>, config: InteropComponentConfig) {
   for (let move of config.nativeStyleToProp) {
     const source = move[0];
 
-    const target = getTargetValue(props, config);
+    const target = getTarget(props, config);
 
     if (!target || !(source in target)) continue;
 
@@ -899,72 +893,69 @@ function containersAreEqual(
 function applyRules(
   state: ReducerState,
   refs: Refs,
-  declarations: ProcessedStyleDeclaration[],
+  declarations: StyleDeclarationOrInline[],
   delayedValues: (() => void)[],
 ) {
-  const target = state.config.target;
   const props = state.props;
-  const lookup = state.styleLookup;
 
   for (const declaration of declarations) {
     if (Array.isArray(declaration)) {
-      if (declaration.length === 2) {
-        const paths =
-          declaration[0] === "style"
-            ? target
-            : Array.isArray(declaration[0])
-              ? [...target.slice(0, -1), ...declaration[0]]
-              : [...target.slice(0, -1), declaration[0]];
+      let [descriptor, pathTokens] = declaration;
 
-        assignToTarget(props, declaration[1], paths);
+      const assignToTargetPath =
+        pathTokens === undefined
+          ? state.config.target
+          : typeof pathTokens === "string"
+            ? [...state.config.target, pathTokens]
+            : pathTokens.length === 0
+              ? [...state.config.target.slice(0, -1)]
+              : [...state.config.target.slice(0, -1), ...pathTokens];
+
+      const castToArray =
+        assignToTargetPath[assignToTargetPath.length - 1] === "transform";
+
+      // Static styles are non-array objects
+      if (typeof descriptor === "object" && !Array.isArray(descriptor)) {
+        assignToTarget(props, descriptor, assignToTargetPath, {
+          allowTransformMerging: true,
+        });
       } else {
-        const isNativeStyleToProp = state.config.nativeStyleToProp?.some(
-          (value) => value[0] === declaration[0],
-        );
-
-        let paths: string[];
-
-        if (isNativeStyleToProp) {
-          paths = [...target, declaration[0]];
-        } else if (declaration[1][0] === "style") {
-          // The styles say they are "style", but they should go to the first target
-          // If they don't say "style" then they have a @rn-move rule that has already moved them
-          paths = [...target, ...declaration[1].slice(1)];
-        } else {
-          paths = [...target.slice(0, -1), ...declaration[1]];
-        }
-
-        // em / rnw / rnh units use other declarations, so we need to delay them
-        if (typeof declaration[2] === "object" && declaration[2].delay) {
-          const uniquePlaceHolder = {};
+        // Some styles (e.g em unit) rely on other styles so we delay calculating their values
+        if (isDelayedDeclaration(declaration)) {
+          const uniquePlaceHolder = { [PLACEHOLDER_SYMBOL]: true };
           // Set a placeholder value, then later if the value is still the placeholder, we can resolve it
-          lookup[declaration[0]] = uniquePlaceHolder;
+          assignToTarget(props, uniquePlaceHolder, assignToTargetPath, {
+            allowTransformMerging: true,
+          });
           delayedValues.push(() => {
-            if (lookup[declaration[0]] !== uniquePlaceHolder) return;
-            const value = resolveValue(
-              state,
-              refs,
-              state.styleTracking,
-              declaration[2],
-              getTargetValue(props, state.config),
-            );
-            assignToTarget(props, value, paths, {
-              allowTransformMerging: true,
-            });
-            lookup[declaration[0]] = value;
+            let currentValue = getTargetValue(props, assignToTargetPath);
+
+            if (currentValue === uniquePlaceHolder) {
+              const value = resolveValue(
+                state,
+                refs,
+                state.styleTracking,
+                descriptor,
+                getTarget(props, state.config),
+                castToArray,
+              );
+              assignToTarget(props, value, assignToTargetPath, {
+                allowTransformMerging: true,
+              });
+            }
           });
         } else {
           const value = resolveValue(
             state,
             refs,
             state.styleTracking,
-            declaration[2],
-            getTargetValue(props, state.config),
+            descriptor,
+            getTarget(props, state.config),
+            castToArray,
           );
-          assignToTarget(props, value, paths, {
+          assignToTarget(props, value, assignToTargetPath, {
             allowTransformMerging: true,
           });
-          lookup[declaration[0]] = value;
         }
       }
     } else {
@@ -1120,4 +1111,10 @@ function isDeepEqual(a: any, b: any): boolean {
   }
 
   return a === b;
+}
+
+function isDelayedDeclaration(
+  declaration: StyleDeclaration,
+): declaration is Extract<StyleDeclaration, [any, any, true]> {
+  return declaration[2] === true;
 }

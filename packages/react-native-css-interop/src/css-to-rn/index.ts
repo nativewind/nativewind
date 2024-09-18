@@ -26,11 +26,12 @@ import {
   MoveTokenRecord,
   StyleRuleSet,
   StyleDeclaration,
-  RuntimeValueFrame,
   PathTokens,
+  AnimationFrame,
+  RuntimeValueDescriptor,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
-import { DEFAULT_CONTAINER_NAME } from "../shared";
+import { DEFAULT_CONTAINER_NAME, isRuntimeDescriptor } from "../shared";
 import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
 import { optimizeRules } from "./optimize-rules";
 
@@ -96,7 +97,7 @@ export function cssToReactNativeRuntime(
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
   lightningcss({
     filename: "style.css", // This is ignored, but required
-    code: typeof code === "string" ? Buffer.from(code) : code,
+    code: typeof code === "string" ? new TextEncoder().encode(code) : code,
     visitor: {
       StyleSheetExit(sheet) {
         debug(`StyleSheetExit`);
@@ -386,27 +387,17 @@ function setStyleForSelectorList(
     if (!style.declarations) continue;
 
     if (
-      selector.type === "rootVariables" ||
-      selector.type === "universalVariables"
+      selector.type === "rootVariables" || // :root
+      selector.type === "universalVariables" // *
     ) {
-      const fontSizeDeclaration = style.declarations.findLast((declaration) => {
-        if (Array.isArray(declaration)) {
-          return (
-            declaration[0] === "fontSize" && typeof declaration[2] === "number"
-          );
-        } else {
-          return "fontSize" in declaration;
+      const fontSizeValue = style.declarations.findLast(([value, property]) => {
+        if (property === "fontSize" && typeof value === "number") {
+          return true;
         }
-      });
+      })?.[0];
 
-      if (fontSizeDeclaration) {
-        const rem = Array.isArray(fontSizeDeclaration)
-          ? fontSizeDeclaration[2]
-          : (fontSizeDeclaration as Record<"fontSize", number>).fontSize;
-
-        if (typeof rem === "number") {
-          options.rem = rem;
-        }
+      if (typeof fontSizeValue === "number") {
+        options.rem = fontSizeValue;
       }
 
       if (!style.variables) {
@@ -500,7 +491,7 @@ function extractKeyFrames(
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
 
-    const { declarations: props, animations } = declarationsToStyle(
+    const { declarations, animations } = declarationsToStyle(
       frame.declarations.declarations,
       {
         ...extractOptions,
@@ -520,15 +511,15 @@ function extractKeyFrames(
       {},
     );
 
-    if (!props) continue;
+    if (!declarations) continue;
 
     /**
      * We an only animation style props
+     * Non-style props have pathTokens instead of a single string
      */
-    const values = props.filter((prop) => {
-      const target = prop.length === 2 ? prop[0] : prop[1][0];
-      return target === "style";
-    });
+    const values = declarations.filter(
+      (declaration) => typeof declaration[1] === "string",
+    );
 
     if (values.length === 0) continue;
 
@@ -568,9 +559,7 @@ function extractKeyFrames(
   rawFrames = rawFrames.sort((a, b) => a.selector - b.selector);
 
   // Convert the rawFrames into frames
-  const frames: {
-    [index: string]: { values: RuntimeValueFrame[]; pathTokens: PathTokens };
-  } = {};
+  const frames: Record<string, AnimationFrame> = {};
 
   const easingFunctions: EasingFunction[] = [];
 
@@ -585,29 +574,35 @@ function extractKeyFrames(
     }
 
     for (const frameValue of rawFrame.values) {
-      // This will never happen, as this an a later optimization
-      if (frameValue.length === 2) continue;
+      const [value, propOrPathTokens] = Array.isArray(frameValue)
+        ? frameValue
+        : [frameValue];
 
-      const [key, pathTokens, value] = frameValue;
-
-      if (progress === 0) {
-        frames[key] = {
-          values: [{ value, progress }],
-          pathTokens,
-        };
-      } else {
-        // All props need a progress 0 frame
-        frames[key] ??= {
-          values: [{ value: "!INHERIT!", progress: 0 }],
-          pathTokens,
-        };
-
-        frames[key].values.push({ value, progress });
+      // We only accept animations on the `style` prop
+      if (Array.isArray(propOrPathTokens) || !propOrPathTokens) {
+        continue;
       }
+
+      const key = propOrPathTokens;
+
+      if (!isRuntimeDescriptor(value)) {
+        throw new Error("animation is an object?");
+      }
+
+      if (!frames[key]) {
+        frames[key] = [key, []];
+      }
+
+      // All props need a progress 0 frame
+      if (progress !== 0 && frames[key][1].length === 0) {
+        frames[key][1].push({ value: "!INHERIT!", progress: 0 });
+      }
+
+      frames[key][1].push({ value, progress });
     }
   }
 
-  animation.frames = Object.entries(frames);
+  animation.frames = Object.values(frames);
 
   if (easingFunctions.length) {
     // This is a holey array and may contain undefined values
@@ -674,7 +669,7 @@ function declarationsToStyle(
   specificity: Pick<Specificity, "I" | "S" | "O">,
   mapping: MoveTokenRecord,
 ): StyleRule {
-  const props: NonNullable<StyleRule["declarations"]> = [];
+  const props: StyleDeclaration[] = [];
   const extractedStyle: StyleRule = {
     $type: "StyleRule",
     specificity: { A: 0, B: 0, C: 0, ...specificity },
@@ -690,7 +685,11 @@ function declarationsToStyle(
    * The `append` option allows the same property to be added multiple times
    * E.g. `transform` accepts an array of transforms
    */
-  function addStyleProp(attribute: string, value: any, moveTokens?: string[]) {
+  function addStyleProp(
+    attribute: string,
+    value: RuntimeValueDescriptor,
+    moveTokens?: PathTokens,
+  ) {
     if (value === undefined) {
       return;
     }
@@ -700,13 +699,30 @@ function declarationsToStyle(
     }
 
     attribute = toRNProperty(attribute);
-    let pathTokens = mapping[attribute] ?? mapping["*"] ?? ["style", attribute];
 
-    if (moveTokens) {
-      pathTokens = [...pathTokens.slice(0, -1), ...moveTokens];
+    const attributeMapping: PathTokens | undefined =
+      mapping[attribute] ?? mapping["*"];
+
+    const shouldDelay = Array.isArray(value) && Boolean(value[3]);
+
+    const pathTokens =
+      !moveTokens && !attributeMapping
+        ? attribute
+        : [...(moveTokens || []), ...(attributeMapping || [])];
+
+    if (typeof pathTokens === "string") {
+      if (shouldDelay) {
+        props.push([value, pathTokens, true]);
+      } else {
+        props.push([value, pathTokens]);
+      }
+    } else {
+      if (shouldDelay) {
+        props.push([value, pathTokens, true]);
+      } else {
+        props.push([value, pathTokens]);
+      }
     }
-
-    props.push([attribute, pathTokens, value]);
   }
 
   function addTransformProp(property: string, value: any) {
@@ -715,7 +731,7 @@ function declarationsToStyle(
 
   function handleTransformShorthand(
     name: string,
-    options: Record<string, unknown>,
+    options: Record<string, RuntimeValueDescriptor>,
   ) {
     if (allEqual(...Object.values(options))) {
       return addStyleProp(name, Object.values(options)[0], ["transform", name]);
@@ -728,7 +744,7 @@ function declarationsToStyle(
 
   function handleStyleShorthand(
     name: string,
-    options: Record<string, unknown>,
+    options: Record<string, RuntimeValueDescriptor>,
   ) {
     if (allEqual(...Object.values(options))) {
       return addStyleProp(name, Object.values(options)[0]);

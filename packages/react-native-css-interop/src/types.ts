@@ -160,22 +160,20 @@ export type JSXFunctionRest = OmitFirstTwo<Parameters<JSXFunction>>;
 /**
  * Used by the compiler to detail how props should be set on the component
  */
+export type StyleAttribute = string;
 export type PathTokens = string[];
+export type Delayed = boolean;
 export type MoveTokenRecord = Record<string, PathTokens>;
 export type StyleDeclaration =
-  | [string, object] // [Prop, Styles]
-  | [string, string | number] // [Prop, value]
-  | [
-      AnimationPropertyKey,
-      PathTokens,
-      Exclude<RuntimeValueDescriptor, Array<any> | undefined>,
-    ] // Set a value
-  | [
-      AnimationPropertyKey,
-      PathTokens,
-      Exclude<RuntimeValueDescriptor, Array<any> | undefined>,
-      true,
-    ]; // Set a delayed value
+  | [Record<string, unknown>]
+  | [Record<string, unknown>, PathTokens]
+  | [RuntimeValueDescriptor, StyleAttribute]
+  | [RuntimeValueDescriptor, PathTokens]
+  | [RuntimeValueDescriptor, StyleAttribute | PathTokens, true];
+
+export type StyleDeclarationOrInline =
+  | StyleDeclaration
+  | Record<string, unknown>;
 
 export type StyleRuleSet = {
   $type: "StyleRuleSet";
@@ -236,7 +234,6 @@ export type PropState = Effect & {
 
 export type PropAccumulator = {
   props: Record<string, any>;
-  transformLookup: Record<string, string>;
   state: PropState;
   target: string[];
   resetContext: boolean;
@@ -253,17 +250,32 @@ export type PropAccumulator = {
   getVariable(name?: string): RuntimeValueDescriptor;
 };
 
+export type RuntimeStyle = RuntimeValueDescriptor | Record<string, unknown>;
+
 export type RuntimeValueDescriptor =
   | string
   | number
   | boolean
   | undefined
-  | RuntimeValueDescriptor[]
-  | {
-      name: string;
-      arguments: RuntimeValueDescriptor[];
-      delay?: boolean;
-    };
+  | RuntimeFunction
+  | RuntimeValueDescriptor[];
+
+export type RuntimeFunction =
+  | [
+      {},
+      string, // string
+    ]
+  | [
+      {},
+      string, // string
+      undefined | RuntimeValueDescriptor[], // arguments
+    ]
+  | [
+      {},
+      string, // string
+      undefined | RuntimeValueDescriptor[], // arguments
+      true, // Should process after styles have been calculated
+    ];
 
 export type RuntimeValue =
   | string
@@ -329,11 +341,10 @@ export type AnimationEasingFunction =
   | EasingFunction
   | { type: "!PLACEHOLDER!" };
 
+export type AnimationFrame = [AnimationPropertyKey, RuntimeValueFrame[]];
+
 export type ExtractedAnimation = {
-  frames: [
-    AnimationPropertyKey,
-    { values: RuntimeValueFrame[]; pathTokens: PathTokens },
-  ][];
+  frames: AnimationFrame[];
   /**
    * The easing function for each frame
    */

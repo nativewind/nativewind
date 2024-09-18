@@ -12,7 +12,7 @@ import type {
   StyleRuleSet,
   StyleSheetRegisterCompiledOptions,
 } from "../../types";
-import { INTERNAL_RESET } from "./unit-observables";
+import { INTERNAL_RESET, rem } from "./unit-observables";
 import { flags, warnings } from "./globals";
 
 export type InjectedStyleContextValue = {
@@ -174,5 +174,9 @@ export function injectData(data: StyleSheetRegisterCompiledOptions) {
     for (const [key, value] of Object.entries(data.flags)) {
       flags.set(key, value);
     }
+  }
+
+  if (data.rem) {
+    rem.set(data.rem);
   }
 }

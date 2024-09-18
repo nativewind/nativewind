@@ -42,7 +42,6 @@ test("mapping", () => {
           attrs: undefined,
           declarations: [
             [
-              "style",
               {
                 backgroundColor: "rgba(0, 0, 0, 1)",
               },
@@ -65,7 +64,6 @@ test("mapping", () => {
           attrs: undefined,
           declarations: [
             [
-              "style",
               {
                 color: "rgba(255, 255, 255, 1)",
               },

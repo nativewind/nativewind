@@ -45,7 +45,11 @@ import type {
   UnresolvedColor,
 } from "lightningcss";
 
-import type { ExtractionWarning, RuntimeValueDescriptor } from "../types";
+import type {
+  ExtractionWarning,
+  RuntimeValueDescriptor,
+  RuntimeFunction,
+} from "../types";
 import { FeatureFlagStatus } from "./feature-flags";
 
 const unparsedPropertyMapping: Record<string, string> = {
@@ -57,13 +61,13 @@ const unparsedPropertyMapping: Record<string, string> = {
 
 type AddStyleProp = (
   property: string,
-  value: unknown,
+  value?: RuntimeValueDescriptor,
   moveTokens?: string[],
 ) => void;
 
 type HandleStyleShorthand = (
   property: string,
-  options: Record<string, unknown>,
+  options: Record<string, RuntimeValueDescriptor>,
 ) => void;
 
 type AddAnimationDefaultProp = (property: string, value: unknown[]) => void;
@@ -323,35 +327,14 @@ export function parseDeclaration(
       },
     };
 
-    if (declaration.value.propertyId.property === "transform") {
-      for (const transform of declaration.value.value as any[]) {
-        if (transform.value.name === "translate") {
-          addTransformProp(
-            "translateX",
-            parseUnparsed(transform.value.arguments[0], parseOptions),
-          );
-          addTransformProp(
-            "translateY",
-            parseUnparsed(transform.value.arguments[2], parseOptions),
-          );
-        } else {
-          addTransformProp(
-            transform.value.name,
-            parseUnparsed(transform.value.arguments, parseOptions),
-          );
-        }
-      }
-      return;
-    } else {
-      let property =
-        unparsedPropertyMapping[declaration.value.propertyId.property] ||
-        declaration.value.propertyId.property;
+    let property =
+      unparsedPropertyMapping[declaration.value.propertyId.property] ||
+      declaration.value.propertyId.property;
 
-      return addStyleProp(
-        property,
-        parseUnparsed(declaration.value.value, parseOptions),
-      );
-    }
+    return addStyleProp(
+      property,
+      parseUnparsed(declaration.value.value, parseOptions),
+    );
   } else if (declaration.property === "custom") {
     let property = declaration.value.name;
     if (
@@ -1562,10 +1545,7 @@ export function parseDeclaration(
         parseTextAlign(declaration.value, parseOptions),
       );
     case "box-shadow": {
-      return addStyleProp(
-        declaration.property,
-        parseBoxShadow(declaration.value, parseOptions),
-      );
+      parseBoxShadow(declaration.value, parseOptions);
     }
     case "aspect-ratio": {
       return addStyleProp(
@@ -1627,16 +1607,13 @@ function isValid<T extends Declaration | PropertyId>(
 function reduceParseUnparsed(
   tokenOrValues: TokenOrValue[],
   options: ParseDeclarationOptionsWithValueWarning,
-  allowUnwrap = false,
-): RuntimeValueDescriptor | RuntimeValueDescriptor[] {
+): RuntimeValueDescriptor[] | undefined {
   const result = tokenOrValues
-    .flatMap((tokenOrValue) => parseUnparsed(tokenOrValue, options))
+    .map((tokenOrValue) => parseUnparsed(tokenOrValue, options))
     .filter((v) => v !== undefined);
 
   if (result.length === 0) {
     return undefined;
-  } else if (result.length === 1 && allowUnwrap) {
-    return result[0];
   } else {
     return result;
   }
@@ -1645,24 +1622,9 @@ function reduceParseUnparsed(
 function unparsedFunction(
   token: Extract<TokenOrValue, { type: "function" }>,
   options: ParseDeclarationOptionsWithValueWarning,
-): RuntimeValueDescriptor {
+): RuntimeFunction {
   const args = reduceParseUnparsed(token.value.arguments, options);
-  return {
-    name: token.value.name,
-    arguments: Array.isArray(args) ? args : [args],
-  };
-}
-
-function unparsedKnownShorthand(
-  mapping: Record<string, TokenOrValue>,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
-  return Object.entries(mapping).map(([name, tokenOrValue]) => {
-    return {
-      name,
-      arguments: [parseUnparsed(tokenOrValue, options)],
-    };
-  });
+  return [{}, token.value.name, args];
 }
 
 /**
@@ -1678,7 +1640,7 @@ function parseUnparsed(
     | undefined
     | null,
   options: ParseDeclarationOptionsWithValueWarning,
-): RuntimeValueDescriptor | RuntimeValueDescriptor[] {
+): RuntimeValueDescriptor {
   if (tokenOrValue === undefined || tokenOrValue === null) {
     return;
   }
@@ -1698,7 +1660,10 @@ function parseUnparsed(
   }
 
   if (Array.isArray(tokenOrValue)) {
-    return reduceParseUnparsed(tokenOrValue, options, true);
+    const args = reduceParseUnparsed(tokenOrValue, options);
+    if (!args) return;
+    if (args.length === 1) return args[0];
+    return args;
   }
 
   switch (tokenOrValue.type) {
@@ -1706,14 +1671,15 @@ function parseUnparsed(
       return parseUnresolvedColor(tokenOrValue.value, options);
     }
     case "var": {
-      return {
-        name: "var",
-        delay: true,
-        arguments: [
+      return [
+        {},
+        "var",
+        [
           tokenOrValue.value.name.ident,
           parseUnparsed(tokenOrValue.value.fallback, options),
         ],
-      };
+        true,
+      ];
     }
     case "function": {
       switch (tokenOrValue.value.name) {
@@ -1730,26 +1696,14 @@ function parseUnparsed(
           tokenOrValue.value.name = "hsla";
           return unparsedFunction(tokenOrValue, options);
         case "translate":
-          return unparsedKnownShorthand(
-            {
-              translateX: tokenOrValue.value.arguments[0],
-              translateY: tokenOrValue.value.arguments[2],
-            },
-            options,
-          );
-        case "scale":
-          return unparsedKnownShorthand(
-            {
-              scaleX: tokenOrValue.value.arguments[0],
-              scaleY: tokenOrValue.value.arguments[2],
-            },
-            options,
-          );
         case "rotate":
         case "skewX":
         case "skewY":
+        case "scale":
         case "scaleX":
         case "scaleY":
+        case "translateX":
+        case "translateY":
           return unparsedFunction(tokenOrValue, options);
         case "platformColor":
         case "getPixelSizeForLayoutSize":
@@ -1759,10 +1713,7 @@ function parseUnparsed(
         case "shadow":
           return unparsedFunction(tokenOrValue, options);
         case "hairlineWidth":
-          return {
-            name: tokenOrValue.value.name,
-            arguments: [],
-          };
+          return [{}, tokenOrValue.value.name, []];
         case "platformSelect":
         case "fontScaleSelect":
         case "pixelScaleSelect":
@@ -1877,7 +1828,7 @@ export function parseLength(
     | NumberOrPercentage
     | LengthValue,
   options: ParseDeclarationOptionsWithValueWarning,
-): number | string | RuntimeValueDescriptor | undefined {
+): RuntimeValueDescriptor {
   const { inlineRem = 14 } = options;
 
   if (typeof length === "number") {
@@ -1892,19 +1843,12 @@ export function parseLength(
         if (typeof inlineRem === "number") {
           return length.value * inlineRem;
         } else {
-          return {
-            name: "rem",
-            arguments: [length.value],
-          };
+          return [{}, "rem", [length.value]];
         }
       case "vw":
       case "vh":
       case "em":
-        return {
-          name: length.unit,
-          arguments: [length.value],
-          delay: true,
-        };
+        return [{}, length.unit, [length.value], true];
       case "in":
       case "cm":
       case "mm":
@@ -2405,16 +2349,12 @@ function parseFontFamily(fontFamily: FontFamily[]) {
 function parseLineHeight(
   lineHeight: LineHeight,
   options: ParseDeclarationOptionsWithValueWarning,
-) {
+): RuntimeValueDescriptor {
   switch (lineHeight.type) {
     case "normal":
       return undefined;
     case "number":
-      return {
-        name: "em",
-        arguments: [lineHeight.value],
-        delay: true,
-      };
+      return [{}, "em", [lineHeight.value], true];
     case "length": {
       const length = lineHeight.value;
 
@@ -2486,17 +2426,13 @@ function parseLengthOrCoercePercentageToRuntime(
   value: Length | DimensionPercentageFor_LengthValue | NumberOrPercentage,
   runtimeName: string,
   options: ParseDeclarationOptionsWithValueWarning,
-) {
+): RuntimeValueDescriptor {
   if (
     options.features.transformPercentagePolyfill &&
     value.type === "percentage"
   ) {
     options.requiresLayout(runtimeName);
-    return {
-      name: runtimeName,
-      arguments: [value.value],
-      delay: true,
-    };
+    return [{}, runtimeName, [value.value], true];
   } else {
     return parseLength(value, options);
   }
@@ -2520,7 +2456,7 @@ function parseRNRuntimeSpecificsFunction(
   options: ParseDeclarationOptionsWithValueWarning,
 ): RuntimeValueDescriptor {
   let key: string | undefined;
-  const runtimeArgs: Record<string, unknown> = {};
+  const runtimeArgs: Record<string, RuntimeValueDescriptor> = {};
 
   for (const token of args) {
     if (!key) {
@@ -2586,10 +2522,7 @@ function parseRNRuntimeSpecificsFunction(
     }
   }
 
-  return {
-    name,
-    arguments: [runtimeArgs],
-  } as RuntimeValueDescriptor; // Type this later
+  return [{}, name, Object.entries(runtimeArgs)];
 }
 
 function parseTextAlign(
@@ -2618,10 +2551,14 @@ function parseBoxShadow(
 
   options.addStyleProp("shadowColor", parseColor(boxShadow.color, options));
   options.addStyleProp("shadowRadius", parseLength(boxShadow.spread, options));
-  options.addStyleProp("shadowOffset", {
-    width: parseLength(boxShadow.xOffset, options),
-    height: parseLength(boxShadow.yOffset, options),
-  });
+  // options.addStyleProp(
+  //   ["shadowOffsetWidth"],
+  //   parseLength(boxShadow.xOffset, options, ["", ""),
+  // );
+  // options.addStyleProp(
+  //   ["shadowOffset", "height"],
+  //   parseLength(boxShadow.yOffset, options),
+  // );
 }
 
 function parseDisplay(
@@ -2700,11 +2637,7 @@ function parseDimension(
       return `${value}%`;
     case "rnh":
     case "rnw":
-      return {
-        name: unit,
-        arguments: [value / 100],
-        delay: true,
-      };
+      return [{}, unit, [value / 100], true];
     default: {
       return options.addValueWarning(`${value}${unit}`);
     }
@@ -2756,7 +2689,7 @@ const allowAuto = new Set(["pointer-events"]);
 function parseEnv(
   value: EnvironmentVariable,
   options: ParseDeclarationOptionsWithValueWarning,
-) {
+): RuntimeFunction | undefined {
   switch (value.name.type) {
     case "ua":
       switch (value.name.value) {
@@ -2764,14 +2697,15 @@ function parseEnv(
         case "safe-area-inset-right":
         case "safe-area-inset-bottom":
         case "safe-area-inset-left":
-          return {
-            name: "var",
-            delay: true,
-            arguments: [
+          return [
+            {},
+            "var",
+            [
               `--___css-interop___${value.name.value}`,
               parseUnparsed(value.fallback, options),
             ],
-          };
+            true,
+          ];
         case "viewport-segment-width":
         case "viewport-segment-height":
         case "viewport-segment-top":
@@ -2792,10 +2726,7 @@ function parseCalcFn(
 ): RuntimeValueDescriptor {
   const args = parseCalcArguments(tokens, options);
   if (args) {
-    return {
-      name,
-      arguments: args,
-    };
+    return [{}, name, args];
   }
 }
 
@@ -2822,11 +2753,7 @@ function parseCalcArguments(
           return undefined;
         }
 
-        if (Array.isArray(value)) {
-          parsed.push(...value);
-        } else {
-          parsed.push(value);
-        }
+        parsed.push(value);
         break;
       }
       case "length": {
@@ -2932,7 +2859,7 @@ export function parseTranslate(
   translate: Translate,
   prop: keyof Extract<Translate, object>,
   options: ParseDeclarationOptionsWithValueWarning,
-): number | string | RuntimeValueDescriptor | undefined {
+): RuntimeValueDescriptor {
   if (translate === "none") {
     return 0;
   }
@@ -2944,7 +2871,7 @@ export function parseScale(
   translate: Scale,
   prop: keyof Extract<Scale, object>,
   options: ParseDeclarationOptionsWithValueWarning,
-): number | string | RuntimeValueDescriptor | undefined {
+): RuntimeValueDescriptor {
   if (translate === "none") {
     return 0;
   }
@@ -2955,28 +2882,25 @@ export function parseScale(
 export function parseUnresolvedColor(
   color: UnresolvedColor,
   options: ParseDeclarationOptionsWithValueWarning,
-) {
+): RuntimeValueDescriptor {
   switch (color.type) {
     case "rgb":
-      return {
-        name: "rgba",
-        arguments: [
+      return [
+        {},
+        "rgba",
+        [
           round(color.r * 255),
           round(color.g * 255),
           round(color.b * 255),
           parseUnparsed(color.alpha, options),
         ],
-      };
+      ];
     case "hsl":
-      return {
-        name: color.type,
-        arguments: [
-          color.h,
-          color.s,
-          color.l,
-          parseUnparsed(color.alpha, options),
-        ],
-      };
+      return [
+        {},
+        color.type,
+        [color.h, color.s, color.l, parseUnparsed(color.alpha, options)],
+      ];
     case "light-dark":
       return undefined;
     default:

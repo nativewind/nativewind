@@ -1,15 +1,22 @@
 import type { AnimatableValue } from "react-native-reanimated";
 import type { EasingFunction, Time } from "lightningcss";
-import type { RuntimeValueDescriptor, RuntimeValueFrame } from "../../types";
+import type {
+  InteropComponentConfig,
+  RuntimeValueDescriptor,
+  RuntimeValueFrame,
+} from "../../types";
 
 import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
 import { Effect, observable } from "../observable";
-import { transformKeys } from "../../shared";
+import {
+  isDescriptorArray,
+  isDescriptorFunction,
+  transformKeys,
+} from "../../shared";
 import { ReducerState, ReducerTracking, Refs } from "./types";
 import { getUniversalVariable, getVariable } from "./styles";
 import { systemColorScheme } from "./appearance-observables";
 import { rem, vh, vw } from "./unit-observables";
-import { getTargetValue } from "./utils";
 
 /**
  * Get the final value of a value descriptor
@@ -24,277 +31,297 @@ export function resolveValue(
   state: ReducerState,
   refs: Refs,
   tracking: ReducerTracking,
-  descriptor: RuntimeValueDescriptor | string | number | boolean,
-  style?: Record<string, any>,
-): any {
-  switch (typeof descriptor) {
-    case "undefined":
-      return;
-    case "boolean":
-    case "number":
-    case "function":
-      return descriptor;
-    case "string":
-      return descriptor.endsWith("px") // Inline vars() might set a value with a px suffix
-        ? parseInt(descriptor.slice(0, -2), 10)
-        : descriptor;
-  }
+  descriptor: RuntimeValueDescriptor,
+  style: Record<string, any> | undefined,
+  castToArray = false,
+): RuntimeValueDescriptor {
+  try {
+    switch (typeof descriptor) {
+      case "undefined":
+        return;
+      case "boolean":
+      case "number":
+      case "function":
+        return descriptor;
+      case "string":
+        return descriptor.endsWith("px") // Inline vars() might set a value with a px suffix
+          ? parseInt(descriptor.slice(0, -2), 10)
+          : descriptor;
+    }
 
-  if (Array.isArray(descriptor)) {
-    return descriptor.flatMap((d) => {
-      const value = resolveValue(state, refs, tracking, d, style);
-      return value === undefined ? [] : value;
-    });
-  }
+    if (isDescriptorArray(descriptor)) {
+      descriptor = descriptor.flatMap((d) => {
+        const value = resolveValue(state, refs, tracking, d, style);
+        return value === undefined ? [] : value;
+      }) as RuntimeValueDescriptor[];
 
-  switch (descriptor.name) {
-    case "var": {
-      let value = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments[0],
-        style,
-      );
-      if (typeof value === "string")
-        value = getVar(state, refs, tracking, value, style);
-      if (value === undefined && descriptor.arguments[1]) {
-        value = resolveValue(
-          state,
-          refs,
-          tracking,
-          descriptor.arguments[1],
-          style,
-        );
-      }
-
-      return value;
-    }
-    case "calc": {
-      return calc(state, refs, tracking, descriptor.arguments, style)?.value;
-    }
-    case "max": {
-      let mode;
-      let values: number[] = [];
-
-      for (const arg of descriptor.arguments) {
-        const result = calc(state, refs, tracking, arg, style);
-        if (result) {
-          if (!mode) mode = result?.mode;
-          if (result.mode === mode) {
-            values.push(result.raw);
-          }
-        }
-      }
-
-      const max = Math.max(...values);
-      return mode === "percentage" ? `${max}%` : max;
-    }
-    case "min": {
-      let mode;
-      let values: number[] = [];
-
-      for (const arg of descriptor.arguments) {
-        const result = calc(state, refs, tracking, arg, style);
-        if (result) {
-          if (!mode) mode = result?.mode;
-          if (result.mode === mode) {
-            values.push(result.raw);
-          }
-        }
-      }
-
-      const min = Math.min(...values);
-      return mode === "percentage" ? `${min}%` : min;
-    }
-    case "clamp": {
-      const min = calc(state, refs, tracking, descriptor.arguments[0], style);
-      const val = calc(state, refs, tracking, descriptor.arguments[1], style);
-      const max = calc(state, refs, tracking, descriptor.arguments[2], style);
-
-      if (!min || !val || !max) return;
-      if (min.mode !== val.mode && max.mode !== val.mode) return;
-
-      const value = Math.max(min.raw, Math.min(val.raw, max.raw));
-      return val.mode === "percentage" ? `${value}%` : value;
-    }
-    case "vh": {
-      // 50vh = 50% of the viewport height
-      const value = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments[0],
-        style,
-      );
-      const vhValue = vh.get(tracking.effect) / 100;
-      if (typeof value === "number") return round(vhValue * value);
-    }
-    case "vw": {
-      const value = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments[0],
-        style,
-      );
-      const vwValue = vw.get(tracking.effect) / 100;
-      if (typeof value === "number") return round(vwValue * value);
-    }
-    case "em": {
-      const value = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments[0],
-        style,
-      );
-      const fontSize = style?.fontSize ?? rem.get(tracking.effect);
-      if (typeof value === "number") return round(fontSize * value);
-    }
-    case "rem": {
-      const value = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments[0],
-        style,
-      );
-      const remValue = rem.get(tracking.effect);
-      if (typeof value === "number") return round(remValue * value);
-    }
-    case "rnh": {
-      const value = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments[0],
-        style,
-      );
-      const height = style?.height ?? getHeight(state, refs, tracking);
-      if (typeof value === "number") return round(height * value);
-    }
-    case "rnw": {
-      const value = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments[0],
-        style,
-      );
-      const width = style?.width ?? getWidth(state, refs, tracking);
-      if (typeof value === "number") return round(width * value);
-    }
-    case "hwb":
-      const args = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments,
-        style,
-      ).flat(10);
-      return getColorArgs(args, { 3: "hwb" });
-    case "rgb":
-    case "rgba": {
-      const args = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments,
-        style,
-      ).flat(10);
-      return getColorArgs(args, { 3: "rgb", 4: "rgba" });
-    }
-    case "hsl":
-    case "hsla": {
-      const args = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments,
-        style,
-      ).flat(10);
-      return getColorArgs(args, { 3: "hsl", 4: "hsla" });
-    }
-    case "hairlineWidth": {
-      return StyleSheet.hairlineWidth;
-    }
-    case "platformColor": {
-      return PlatformColor(
-        ...(descriptor.arguments as any[]),
-      ) as unknown as string;
-    }
-    case "platformSelect": {
-      return resolve(
-        state,
-        refs,
-        tracking,
-        Platform.select(descriptor.arguments[0] as any),
-        style,
-      );
-    }
-    case "getPixelSizeForLayoutSize": {
-      const v = resolve(state, refs, tracking, descriptor.arguments[0], style);
-      if (typeof v === "number") return PixelRatio.getPixelSizeForLayoutSize(v);
-    }
-    case "fontScale": {
-      const value = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments[0],
-        style,
-      );
-      if (typeof value === "number") return PixelRatio.getFontScale() * value;
-    }
-    case "pixelScale": {
-      const value = resolve(
-        state,
-        refs,
-        tracking,
-        descriptor.arguments[0],
-        style,
-      );
-      if (typeof value === "number") return PixelRatio.get() * value;
-    }
-    case "pixelScaleSelect": {
-      const specifics = descriptor.arguments[0] as any;
-      return resolve(
-        state,
-        refs,
-        tracking,
-        specifics[PixelRatio.get()] ?? specifics["default"],
-        style,
-      );
-    }
-    case "fontScaleSelect": {
-      const specifics = descriptor.arguments[0] as any;
-      return resolve(
-        state,
-        refs,
-        tracking,
-        specifics[PixelRatio.getFontScale()] ?? specifics["default"],
-        style,
-      );
-    }
-    case "roundToNearestPixel": {
-      const v = resolve(state, refs, tracking, descriptor.arguments[0], style);
-      if (typeof v === "number") return PixelRatio.roundToNearestPixel(v);
-    }
-    default: {
-      if ("name" in descriptor && "arguments" in descriptor) {
-        const args = resolve(
-          state,
-          refs,
-          tracking,
-          descriptor.arguments,
-          style,
-        ).join(",");
-        return `${descriptor.name}(${args})`;
+      if (castToArray && !Array.isArray(descriptor)) {
+        return [descriptor];
       } else {
         return descriptor;
       }
     }
+
+    const [, name, descriptorArgs = []] = descriptor;
+
+    const cast = (value: RuntimeValueDescriptor) => {
+      if (value === undefined) return;
+      return castToArray && !Array.isArray(value) ? [value] : value;
+    };
+
+    switch (name) {
+      case "var": {
+        let value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        if (typeof value === "string")
+          value = getVar(state, refs, tracking, value, style);
+        if (value === undefined && descriptorArgs[1]) {
+          value = resolveValue(state, refs, tracking, descriptorArgs[1], style);
+        }
+
+        return cast(value);
+      }
+      case "calc": {
+        return cast(calc(state, refs, tracking, descriptorArgs, style)?.value);
+      }
+      case "max": {
+        let mode;
+        let values: number[] = [];
+
+        for (const arg of descriptorArgs) {
+          const result = calc(state, refs, tracking, [arg], style);
+          if (result) {
+            if (!mode) mode = result?.mode;
+            if (result.mode === mode) {
+              values.push(result.raw);
+            }
+          }
+        }
+
+        const max = Math.max(...values);
+        return cast(mode === "percentage" ? `${max}%` : max);
+      }
+      case "min": {
+        let mode;
+        let values: number[] = [];
+
+        for (const arg of descriptorArgs) {
+          const result = calc(state, refs, tracking, [arg], style);
+          if (result) {
+            if (!mode) mode = result?.mode;
+            if (result.mode === mode) {
+              values.push(result.raw);
+            }
+          }
+        }
+
+        const min = Math.min(...values);
+        return cast(mode === "percentage" ? `${min}%` : min);
+      }
+      case "clamp": {
+        const min = calc(state, refs, tracking, descriptorArgs[0], style);
+        const val = calc(state, refs, tracking, descriptorArgs[1], style);
+        const max = calc(state, refs, tracking, descriptorArgs[2], style);
+
+        if (!min || !val || !max) return;
+        if (min.mode !== val.mode && max.mode !== val.mode) return;
+
+        const value = Math.max(min.raw, Math.min(val.raw, max.raw));
+        return cast(val.mode === "percentage" ? `${value}%` : value);
+      }
+      case "vh": {
+        // 50vh = 50% of the viewport height
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const vhValue = vh.get(tracking.effect) / 100;
+        if (typeof value === "number") {
+          return cast(round(vhValue * value));
+        }
+      }
+      case "vw": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const vwValue = vw.get(tracking.effect) / 100;
+        if (typeof value === "number") {
+          return cast(round(vwValue * value));
+        }
+      }
+      case "em": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const fontSize = style?.fontSize ?? rem.get(tracking.effect);
+        if (typeof value === "number") {
+          return cast(round(fontSize * value));
+        }
+      }
+      case "rem": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const remValue = rem.get(tracking.effect);
+        if (typeof value === "number") {
+          return cast(round(remValue * value));
+        }
+      }
+      case "rnh": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const height = style?.height ?? getHeight(state, refs, tracking);
+        if (typeof value === "number") {
+          return cast(round(height * value));
+        }
+      }
+      case "rnw": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const width = style?.width ?? getWidth(state, refs, tracking);
+        if (typeof value === "number") {
+          return cast(round(width * value));
+        }
+      }
+      case "hwb":
+        const args = resolve(state, refs, tracking, descriptorArgs, style).flat(
+          10,
+        );
+        return cast(getColorArgs(args, { 3: "hwb" }));
+      case "rgb":
+      case "rgba": {
+        const args = resolve(state, refs, tracking, descriptorArgs, style).flat(
+          10,
+        );
+        return cast(getColorArgs(args, { 3: "rgb", 4: "rgba" }));
+      }
+      case "hsl":
+      case "hsla": {
+        const args = resolve(state, refs, tracking, descriptorArgs, style).flat(
+          10,
+        );
+        return cast(getColorArgs(args, { 3: "hsl", 4: "hsla" }));
+      }
+      case "hairlineWidth": {
+        return cast(StyleSheet.hairlineWidth);
+      }
+      case "platformColor": {
+        return cast(
+          PlatformColor(...(descriptorArgs as any[])) as unknown as string,
+        );
+      }
+      case "platformSelect": {
+        if (!isDescriptorArray(descriptorArgs)) return;
+        const value = resolve(
+          state,
+          refs,
+          tracking,
+          Platform.select(Object.fromEntries(descriptorArgs as any)),
+          style,
+        );
+        return cast(value);
+      }
+      case "getPixelSizeForLayoutSize": {
+        const v = resolve(state, refs, tracking, descriptorArgs[0], style);
+        if (typeof v === "number") {
+          return cast(PixelRatio.getPixelSizeForLayoutSize(v));
+        }
+      }
+      case "fontScale": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        if (typeof value === "number") {
+          return cast(PixelRatio.getFontScale() * value);
+        }
+      }
+      case "pixelScale": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        if (typeof value === "number") {
+          return cast(PixelRatio.get() * value);
+        }
+      }
+      case "pixelScaleSelect": {
+        const specifics = Object.fromEntries(
+          descriptorArgs as [string, RuntimeValueDescriptor][],
+        );
+        const value = resolve(
+          state,
+          refs,
+          tracking,
+          specifics[PixelRatio.get()] ?? specifics["default"],
+          style,
+        );
+
+        return cast(value);
+      }
+      case "fontScaleSelect": {
+        const specifics = Object.fromEntries(
+          descriptorArgs as [string, RuntimeValueDescriptor][],
+        );
+        const value = resolve(
+          state,
+          refs,
+          tracking,
+          specifics[PixelRatio.getFontScale()] ?? specifics["default"],
+          style,
+        );
+        return cast(value);
+      }
+      case "roundToNearestPixel": {
+        const v = resolve(state, refs, tracking, descriptorArgs[0], style);
+        if (typeof v === "number") {
+          return PixelRatio.roundToNearestPixel(v);
+        }
+      }
+      case "translateX":
+      case "translateY":
+      case "scale":
+      case "scaleX":
+      case "scaleY":
+      case "rotate":
+      case "rotateX":
+      case "rotateY":
+      case "rotateZ":
+      case "skewX":
+      case "skewY":
+      case "perspective":
+      case "matrix":
+      case "transformOrigin": {
+        const value = {
+          [name]: resolve(state, refs, tracking, descriptorArgs[0], style),
+        } as RuntimeValueDescriptor;
+        return cast(value);
+      }
+      case "translate":
+      case "scale": {
+        return [
+          {
+            [`${name}X`]: resolve(
+              state,
+              refs,
+              tracking,
+              descriptorArgs[0],
+              style,
+            ),
+          },
+          {
+            [`${name}Y`]: resolve(
+              state,
+              refs,
+              tracking,
+              descriptorArgs[1],
+              style,
+            ),
+          },
+        ] as unknown as RuntimeValueDescriptor;
+      }
+      default: {
+        if ("name" in descriptor && "arguments" in descriptor) {
+          const args = resolve(
+            state,
+            refs,
+            tracking,
+            descriptorArgs,
+            style,
+          ).join(",");
+          return cast(`${descriptor.name}(${args})`);
+        } else {
+          return cast(descriptor);
+        }
+      }
+    }
+  } catch (error) {
+    if (process.env.NODE_ENV !== "development") {
+      console.error(error);
+    }
+    return undefined;
   }
 }
 
@@ -302,30 +329,26 @@ function resolve(
   state: ReducerState,
   refs: Refs,
   tracking: ReducerTracking,
-  args: RuntimeValueDescriptor,
+  descriptor: RuntimeValueDescriptor | RuntimeValueDescriptor[],
   style?: Record<string, any>,
 ): any {
-  if (typeof args !== "object") {
-    return args;
+  if (typeof descriptor !== "object" || !Array.isArray(descriptor)) {
+    return descriptor;
   }
 
-  if (!Array.isArray(args)) {
-    return "arguments" in args
-      ? resolveValue(state, refs, tracking, args, style)
-      : args;
-  }
-
-  let resolved = [];
-
-  for (let value of args) {
-    value = resolve(state, refs, tracking, value, style);
-
-    if (value !== undefined) {
-      resolved.push(value);
+  if (isDescriptorArray(descriptor)) {
+    // Resolve the items, but skip anything that returns undefined
+    let resolved = [];
+    for (let value of descriptor) {
+      value = resolve(state, refs, tracking, value, style);
+      if (value !== undefined) {
+        resolved.push(value);
+      }
     }
+    return resolved;
   }
 
-  return resolved;
+  return resolveValue(state, refs, tracking, descriptor, style);
 }
 
 /**
@@ -422,7 +445,8 @@ function resolveAnimationValue(
   value: RuntimeValueDescriptor,
 ) {
   if (value === "!INHERIT!") {
-    value = state.styleLookup[property] ?? state.props?.style?.[property];
+    const { value: baseValue, defaultValue } = getBaseValue(state, [property]);
+    value = baseValue ?? defaultValue;
     if (value === undefined) {
       const defaultValueFn = defaultValues[property];
       return typeof defaultValueFn === "function"
@@ -433,21 +457,6 @@ function resolveAnimationValue(
   } else {
     return resolve(state, refs, state.styleTracking, value, state.props);
   }
-}
-
-export function resolveTransitionValue(state: ReducerState, property: string) {
-  const defaultValueFn = defaultValues[property];
-  const defaultValue =
-    typeof defaultValueFn === "function"
-      ? defaultValueFn(state.styleTracking.effect)
-      : defaultValueFn;
-
-  return {
-    defaultValue,
-    value:
-      state.styleLookup[property] ??
-      getTargetValue(state.props, state.config)?.[property],
-  };
 }
 
 export const timeToMS = (time: Time) => {
@@ -640,19 +649,20 @@ export function calc(
   state: ReducerState,
   refs: Refs,
   tracking: ReducerTracking,
-  expression: RuntimeValueDescriptor,
+  descriptor: RuntimeValueDescriptor | RuntimeValueDescriptor[],
   style?: Record<string, any>,
 ) {
+  let mode;
   const values: number[] = [];
   const ops: string[] = [];
 
-  let mode;
+  descriptor = Array.isArray(descriptor)
+    ? isDescriptorFunction(descriptor)
+      ? [descriptor]
+      : descriptor
+    : [descriptor];
 
-  if (!Array.isArray(expression)) {
-    expression = [expression];
-  }
-
-  for (let token of expression) {
+  for (let token of descriptor) {
     switch (typeof token) {
       case "undefined":
         // Fail on an undefined value
@@ -725,4 +735,66 @@ export function calc(
     raw: value,
     value: mode === "percentage" ? `${value}%` : value,
   };
+}
+
+export function getBaseValue(state: ReducerState, paths: string[]) {
+  paths = [...state.config.target, ...paths];
+  let prop: string = "";
+
+  let target: unknown = state.props;
+  for (let index = 0; index < paths.length && target; index++) {
+    if (!isRecord(target)) {
+      target = undefined;
+      continue;
+    }
+
+    prop = paths[index];
+
+    if (target[prop] === undefined) {
+      if (
+        transformKeys.has(prop) &&
+        isRecord(target) &&
+        "transform" in target
+      ) {
+        target = target.transform.find((t: any) => t[prop] !== undefined);
+
+        if (isRecord(target) && prop in target) {
+          target = target[prop];
+        } else {
+          target = undefined;
+        }
+      } else {
+        target = undefined;
+      }
+    } else {
+      target = target[prop];
+    }
+  }
+
+  const defaultValueFn = defaultValues[paths[paths.length - 1]];
+  const defaultValue =
+    typeof defaultValueFn === "function"
+      ? defaultValueFn(state.styleTracking.effect)
+      : defaultValueFn;
+
+  return {
+    value: target as any | undefined,
+    defaultValue,
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, any> {
+  return Boolean(typeof value === "object" && value);
+}
+
+export function getTarget(
+  target: Record<string, any> | undefined | null,
+  config: InteropComponentConfig,
+) {
+  for (let index = 0; index < config.target.length && target; index++) {
+    const prop = config.target[index];
+    target = target[prop];
+  }
+
+  return target || undefined;
 }
