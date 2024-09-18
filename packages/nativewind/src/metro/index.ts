@@ -18,6 +18,7 @@ interface WithNativeWindOptions extends WithCssInteropOptions {
   browserslist?: string | null;
   browserslistEnv?: string | null;
   typescriptEnvPath?: string;
+  disableTypeScriptGeneration?: boolean;
 }
 
 export function withNativeWind(
@@ -29,6 +30,7 @@ export function withNativeWind(
     browserslist = "last 1 version",
     browserslistEnv = "native",
     typescriptEnvPath = "nativewind-env.d.ts",
+    disableTypeScriptGeneration = false,
   }: WithNativeWindOptions = {} as WithNativeWindOptions,
 ): MetroConfig {
   if (input) input = path.resolve(input);
@@ -37,7 +39,9 @@ export function withNativeWind(
 
   const cli = tailwindCli();
 
-  setupTypeScript(typescriptEnvPath);
+  if (!disableTypeScriptGeneration) {
+    setupTypeScript(typescriptEnvPath);
+  }
 
   return withCssInterop(config, {
     ...cssToReactNativeRuntimeOptions,
