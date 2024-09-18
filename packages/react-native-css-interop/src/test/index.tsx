@@ -63,8 +63,8 @@ export interface RenderOptions extends TLRenderOptions {
   logOutput?: boolean;
 }
 
-export function render<T>(
-  component: ReactElement<T>,
+export function render(
+  component: ReactElement<any>,
   { css, cssOptions, ...options }: RenderOptions = {},
 ) {
   if (options.logOutput) {
@@ -83,6 +83,10 @@ export function render<T>(
     ...options,
   });
 }
+
+render.debug = (component: ReactElement<any>, options: RenderOptions = {}) => {
+  return render(component, { ...options, logOutput: true });
+};
 
 export function getWarnings() {
   return warnings;
