@@ -10,27 +10,27 @@ import {
   RenderOptions as TLRenderOptions,
 } from "@testing-library/react-native";
 
-import { createInteropElement } from "../../runtime";
-import { INTERNAL_SET } from "../../shared";
-import { cssInterop, remapProps, interopComponents } from "../../runtime/api";
-import { cssToReactNativeRuntime } from "../../css-to-rn";
-import { injectData } from "../../runtime/native/styles";
-import { vh, vw } from "../../runtime/native/unit-observables";
+import { createInteropElement } from "../runtime";
+import { INTERNAL_SET } from "../shared";
+import { cssInterop, remapProps, interopComponents } from "../runtime/api";
+import { cssToReactNativeRuntime } from "../css-to-rn";
+import { injectData } from "../runtime/native/styles";
+import { vh, vw } from "../runtime/native/unit-observables";
 import {
   CssToReactNativeRuntimeOptions,
   EnableCssInteropOptions,
   ReactComponent,
   Style,
-} from "../../types";
-import { isReduceMotionEnabled } from "../../runtime/native/appearance-observables";
-import { resetData } from "../../runtime/native/styles";
-import { warnings } from "../../runtime/native/globals";
+} from "../types";
+import { isReduceMotionEnabled } from "../runtime/native/appearance-observables";
+import { resetData } from "../runtime/native/styles";
+import { warnings } from "../runtime/native/globals";
 
-export * from "../../index";
-export * from "../../runtime/native/styles";
-export * from "../../types";
+export * from "../index";
+export * from "../runtime/native/styles";
+export * from "../types";
 export * from "@testing-library/react-native";
-export { INTERNAL_SET } from "../../shared";
+export { INTERNAL_SET } from "../shared";
 
 declare global {
   namespace jest {
@@ -142,5 +142,5 @@ export function registerCSS(
 }
 
 export function setupAllComponents() {
-  require("../../runtime/components");
+  require("../runtime/components");
 }
