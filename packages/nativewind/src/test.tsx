@@ -79,7 +79,9 @@ export async function renderCurrentTest({
   }
 }
 
-let isCompilerLoggingEnabled = false;
+renderCurrentTest.debug = (options: RenderCurrentTestOptions = {}) => {
+  return renderCurrentTest({ ...options, logOutput: true });
+};
 
 export async function render(
   component: React.ReactElement<any>,
@@ -93,8 +95,6 @@ export async function render(
   }).reduce((acc, [layer, enabled]) => {
     return enabled ? `${acc}@tailwind ${layer};` : acc;
   }, "");
-  logOutput ||= isCompilerLoggingEnabled;
-
   const content = getClassNames(component);
 
   if (logOutput) {
@@ -124,9 +124,12 @@ export async function render(
   });
 }
 
-export function enableCompilerLogging(enable: boolean) {
-  isCompilerLoggingEnabled = enable;
-}
+render.debug = (
+  component: React.ReactElement<any>,
+  options: RenderOptions = {},
+) => {
+  return render(component, { ...options, logOutput: true });
+};
 
 function getClassNames(
   component: React.ReactElement<any>,
