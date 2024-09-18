@@ -40,10 +40,20 @@ import type {
   SVGPaint,
   ColorOrAuto,
   EnvironmentVariable,
+  Translate,
+  Scale,
+  UnresolvedColor,
 } from "lightningcss";
 
 import type { ExtractionWarning, RuntimeValueDescriptor } from "../types";
 import { FeatureFlagStatus } from "./feature-flags";
+
+const unparsedPropertyMapping: Record<string, string> = {
+  "margin-inline-start": "margin-start",
+  "margin-inline-end": "margin-end",
+  "padding-inline-start": "padding-start",
+  "padding-inline-end": "padding-end",
+};
 
 type AddStyleProp = (
   property: string,
@@ -1474,12 +1484,12 @@ export function parseDeclaration(
     }
     case "translate":
       addStyleProp(
-        "transformX",
-        parseLength(declaration.value.x, parseOptions),
+        "translateX",
+        parseTranslate(declaration.value, "x", parseOptions),
       );
       addStyleProp(
-        "transformY",
-        parseLength(declaration.value.y, parseOptions),
+        "translateX",
+        parseTranslate(declaration.value, "y", parseOptions),
       );
       return;
     case "rotate":
@@ -1488,8 +1498,8 @@ export function parseDeclaration(
       addStyleProp("rotateZ", parseAngle(declaration.value.z, parseOptions));
       return;
     case "scale":
-      addStyleProp("scaleX", parseLength(declaration.value.x, parseOptions));
-      addStyleProp("scaleY", parseLength(declaration.value.y, parseOptions));
+      addStyleProp("scaleX", parseScale(declaration.value, "x", parseOptions));
+      addStyleProp("scaleY", parseScale(declaration.value, "y", parseOptions));
       return;
     case "text-transform":
       return addStyleProp(declaration.property, declaration.value.case);
@@ -1693,28 +1703,7 @@ function parseUnparsed(
 
   switch (tokenOrValue.type) {
     case "unresolved-color": {
-      const value = tokenOrValue.value;
-      if (value.type === "rgb") {
-        return {
-          name: "rgba",
-          arguments: [
-            round(value.r * 255),
-            round(value.g * 255),
-            round(value.b * 255),
-            parseUnparsed(tokenOrValue.value.alpha, options),
-          ],
-        };
-      } else {
-        return {
-          name: tokenOrValue.value.type,
-          arguments: [
-            value.h,
-            value.s,
-            value.l,
-            parseUnparsed(tokenOrValue.value.alpha, options),
-          ],
-        };
-      }
+      return parseUnresolvedColor(tokenOrValue.value, options);
     }
     case "var": {
       return {
@@ -1873,6 +1862,7 @@ function parseUnparsed(
     case "time":
     case "resolution":
     case "dashed-ident":
+    case "animation-name":
       return;
   }
 
@@ -2047,6 +2037,11 @@ function parseColor(
   color: CssColor,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
+  if (typeof color === "string") {
+    // TODO: Could web system colors be mapped to native?
+    return;
+  }
+
   switch (color.type) {
     case "rgb":
       return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.alpha})`;
@@ -2055,6 +2050,7 @@ function parseColor(
     case "currentcolor":
       options.addValueWarning(color.type);
       return;
+    case "light-dark":
     case "lab":
     case "lch":
     case "oklab":
@@ -2932,11 +2928,58 @@ function parseCalcArguments(
   return parsed;
 }
 
-const unparsedPropertyMapping: Record<string, string> = {
-  "margin-inline-start": "margin-start",
-  "margin-inline-end": "margin-end",
-  "padding-inline-start": "padding-start",
-  "padding-inline-end": "padding-end",
-  "inset-inline-start": "inset-inline-start",
-  "inset-inline-end": "inset-inline-end",
-};
+export function parseTranslate(
+  translate: Translate,
+  prop: keyof Extract<Translate, object>,
+  options: ParseDeclarationOptionsWithValueWarning,
+): number | string | RuntimeValueDescriptor | undefined {
+  if (translate === "none") {
+    return 0;
+  }
+
+  return parseLength(translate[prop], options);
+}
+
+export function parseScale(
+  translate: Scale,
+  prop: keyof Extract<Scale, object>,
+  options: ParseDeclarationOptionsWithValueWarning,
+): number | string | RuntimeValueDescriptor | undefined {
+  if (translate === "none") {
+    return 0;
+  }
+
+  return parseLength(translate[prop], options);
+}
+
+export function parseUnresolvedColor(
+  color: UnresolvedColor,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  switch (color.type) {
+    case "rgb":
+      return {
+        name: "rgba",
+        arguments: [
+          round(color.r * 255),
+          round(color.g * 255),
+          round(color.b * 255),
+          parseUnparsed(color.alpha, options),
+        ],
+      };
+    case "hsl":
+      return {
+        name: color.type,
+        arguments: [
+          color.h,
+          color.s,
+          color.l,
+          parseUnparsed(color.alpha, options),
+        ],
+      };
+    case "light-dark":
+      return undefined;
+    default:
+      color satisfies never;
+  }
+}

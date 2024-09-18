@@ -1120,6 +1120,7 @@ const defaultAnimation: Required<ExtractedAnimations> = {
   playState: ["running"],
   duration: [{ type: "seconds", value: 0 }],
   delay: [{ type: "seconds", value: 0 }],
+  timeline: [{ type: "none" }],
 };
 const defaultTransition: Required<ExtractedTransition> = {
   property: [],
