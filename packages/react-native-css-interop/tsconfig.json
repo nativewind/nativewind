@@ -10,10 +10,10 @@
     "sourceMap": true,
     "paths": {
       "test": [
-        "./src/utils/test"
+        "./src/test"
       ],
       "test/jsx-runtime": [
-        "./src/utils/test"
+        "./src/test"
       ]
     }
   },

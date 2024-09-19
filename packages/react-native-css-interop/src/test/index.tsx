@@ -145,6 +145,13 @@ export function registerCSS(
   injectData(compiled);
 }
 
+registerCSS.debug = (
+  css: string,
+  options: CssToReactNativeRuntimeOptions & { logOutput?: boolean } = {},
+) => {
+  registerCSS(css, { ...options, logOutput: true });
+};
+
 export function setupAllComponents() {
   require("../runtime/components");
 }
