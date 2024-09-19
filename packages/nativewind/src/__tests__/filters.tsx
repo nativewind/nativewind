@@ -3,8 +3,11 @@ import { renderCurrentTest } from "../test";
 describe("Filters - Blur", () => {
   test("blur", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ blur: 8 }],
+        },
+      },
     });
   });
 });
@@ -12,8 +15,11 @@ describe("Filters - Blur", () => {
 describe("Filters - Brightness", () => {
   test("brightness-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ brightness: 0 }],
+        },
+      },
     });
   });
 });
@@ -21,20 +27,29 @@ describe("Filters - Brightness", () => {
 describe("Filters - Contrast", () => {
   test("contrast-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ contrast: 0 }],
+        },
+      },
     });
   });
   test("contrast-50", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ contrast: 0.5 }],
+        },
+      },
     });
   });
   test("contrast-200", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ contrast: 2 }],
+        },
+      },
     });
   });
 });
@@ -42,9 +57,27 @@ describe("Filters - Contrast", () => {
 describe("Filters - Drop Shadow", () => {
   test("drop-shadow", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: {
-        properties: ["filter"],
+      props: {
+        style: {
+          filter: [
+            {
+              dropShadow: {
+                offsetX: 0,
+                offsetY: 1,
+                standardDeviation: 2,
+                color: "rgba(0, 0, 0, 0.10196078568696976)",
+              },
+            },
+            {
+              dropShadow: {
+                offsetX: 0,
+                offsetY: 1,
+                standardDeviation: 1,
+                color: "rgba(0, 0, 0, 0.05882352963089943)",
+              },
+            },
+          ],
+        },
       },
     });
   });
@@ -53,14 +86,20 @@ describe("Filters - Drop Shadow", () => {
 describe("Filters - Grayscale", () => {
   test("grayscale", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ grayscale: "100%" }],
+        },
+      },
     });
   });
   test("grayscale-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ grayscale: 0 }],
+        },
+      },
     });
   });
 });
@@ -68,14 +107,20 @@ describe("Filters - Grayscale", () => {
 describe("Filters - Hue Rotate", () => {
   test("hue-rotate-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ hueRotate: "0deg" }],
+        },
+      },
     });
   });
   test("hue-rotate-180", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ hueRotate: "180deg" }],
+        },
+      },
     });
   });
 });
@@ -83,14 +128,20 @@ describe("Filters - Hue Rotate", () => {
 describe("Filters - Invert", () => {
   test("invert-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ invert: 0 }],
+        },
+      },
     });
   });
   test("invert", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ invert: "100%" }],
+        },
+      },
     });
   });
 });
@@ -98,14 +149,20 @@ describe("Filters - Invert", () => {
 describe("Filters - Saturate", () => {
   test("saturate-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ saturate: 0 }],
+        },
+      },
     });
   });
   test("saturate-100", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ saturate: 1 }],
+        },
+      },
     });
   });
 });
@@ -113,8 +170,11 @@ describe("Filters - Saturate", () => {
 describe("Filters - Sepia", () => {
   test("sepia", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["filter"] },
+      props: {
+        style: {
+          filter: [{ sepia: "100%" }],
+        },
+      },
     });
   });
 });

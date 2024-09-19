@@ -95,6 +95,7 @@ export async function render(
   }).reduce((acc, [layer, enabled]) => {
     return enabled ? `${acc}@tailwind ${layer};` : acc;
   }, "");
+
   const content = getClassNames(component);
 
   if (logOutput) {

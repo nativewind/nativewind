@@ -281,6 +281,50 @@ export function resolveValue(
       const v = resolve(state, refs, tracking, descriptor.arguments[0], style);
       if (typeof v === "number") return PixelRatio.roundToNearestPixel(v);
     }
+    case "blur":
+    case "brightness":
+    case "contrast":
+    case "grayscale":
+    case "hueRotate":
+    case "invert":
+    case "saturate":
+    case "sepia":
+      return {
+        [descriptor.name]: resolve(
+          state,
+          refs,
+          tracking,
+          descriptor.arguments[0],
+          style,
+        ),
+      };
+    case "dropShadow":
+      return {
+        [descriptor.name]: {
+          offsetX: resolve(
+            state,
+            refs,
+            tracking,
+            descriptor.arguments[0],
+            style,
+          ),
+          offsetY: resolve(
+            state,
+            refs,
+            tracking,
+            descriptor.arguments[1],
+            style,
+          ),
+          standardDeviation: resolve(
+            state,
+            refs,
+            tracking,
+            descriptor.arguments[2],
+            style,
+          ),
+          color: resolve(state, refs, tracking, descriptor.arguments[3], style),
+        },
+      };
     default: {
       if ("name" in descriptor && "arguments" in descriptor) {
         const args = resolve(
