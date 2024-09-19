@@ -41,7 +41,10 @@ export function resolveValue(
   }
 
   if (Array.isArray(descriptor)) {
-    return descriptor.map((v) => resolveValue(state, refs, tracking, v, style));
+    return descriptor.flatMap((d) => {
+      const value = resolveValue(state, refs, tracking, d, style);
+      return value === undefined ? [] : value;
+    });
   }
 
   switch (descriptor.name) {
