@@ -1,3 +1,4 @@
+import { debug as debugFn } from "debug";
 import {
   KeyframesRule,
   Animation,
@@ -55,9 +56,14 @@ export type { CssToReactNativeRuntimeOptions };
  */
 export function cssToReactNativeRuntime(
   code: Buffer | string,
-  options: CssToReactNativeRuntimeOptions = {},
+  {
+    debug = debugFn("react-native-css-interop"),
+    ...options
+  }: CssToReactNativeRuntimeOptions = {},
 ): StyleSheetRegisterCompiledOptions {
   const features = Object.assign({}, defaultFeatureFlags, options.features);
+
+  debug(`Features ${JSON.stringify(features)}`);
 
   if (Number(versions.node.split(".")[0]) < 18) {
     throw new Error("react-native-css-interop only supports NodeJS >18");
@@ -68,6 +74,8 @@ export function cssToReactNativeRuntime(
     options.grouping?.map((value) => {
       return typeof value === "string" ? new RegExp(value) : value;
     }) ?? [];
+
+  debug(`Grouping ${grouping}`);
 
   // These will by mutated by `extractRule`
   const extractOptions: ExtractRuleOptions = {
@@ -83,16 +91,23 @@ export function cssToReactNativeRuntime(
     grouping,
   };
 
+  debug(`Start lightningcss`);
+
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
   lightningcss({
     filename: "style.css", // This is ignored, but required
     code: typeof code === "string" ? Buffer.from(code) : code,
     visitor: {
-      Rule(rule) {
-        // Extract the style declarations and animations from the current rule
-        extractRule(rule, extractOptions);
-        // We have processed this rule, so now delete it from the AST
-        return [];
+      StyleSheetExit(sheet) {
+        debug(`StyleSheetExit`);
+
+        for (const rule of sheet.rules) {
+          // Extract the style declarations and animations from the current rule
+          extractRule(rule, extractOptions);
+          // We have processed this rule, so now delete it from the AST
+        }
+
+        debug(`Extraction of ${sheet.rules.length} rules finished`);
       },
     },
     customAtRules: {
@@ -105,7 +120,8 @@ export function cssToReactNativeRuntime(
     },
   });
 
-  const rules: StyleSheetRegisterCompiledOptions["rules"] = [];
+  debug("Start optimizing rules");
+  let rules: StyleSheetRegisterCompiledOptions["rules"] = [];
   for (const [name, styles] of extractOptions.rules) {
     if (styles.length === 0) continue;
 
@@ -137,10 +153,14 @@ export function cssToReactNativeRuntime(
     rules.push([name, styleRuleSet]);
   }
 
+  rules = optimizeRules(rules);
+  debug("Finishing optimization");
+  debug(`Rule set count: ${rules?.length || 0}`);
+
   // Convert the extracted style declarations and animations from maps to objects and return them
   return {
     $compiled: true,
-    rules: optimizeRules(rules),
+    rules,
     keyframes: Array.from(extractOptions.keyframes.entries()),
     rootVariables: extractOptions.rootVariables,
     universalVariables: extractOptions.universalVariables,

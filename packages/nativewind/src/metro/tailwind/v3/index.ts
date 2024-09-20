@@ -1,8 +1,9 @@
 import { execSync, fork } from "child_process";
 import fs from "fs";
 import path from "path";
-import { type Config } from 'tailwindcss';
+import { type Config } from "tailwindcss";
 import { TailwindCliOptions } from "../types";
+import { Debugger } from "debug";
 
 /**
  * Tailwind CLI v3 is not very well suited for programmatic usage.
@@ -29,73 +30,84 @@ const getEnv = (options: TailwindCliOptions) => {
   };
 };
 
-export const tailwindCliV3 = {
-  processPROD(options: TailwindCliOptions) {
-    const cliLocation = require.resolve("tailwindcss/lib/cli.js");
+export const tailwindCliV3 = function (debug: Debugger) {
+  return {
+    processPROD(options: TailwindCliOptions) {
+      debug("Start production Tailwind CLI");
+      const cliLocation = require.resolve("tailwindcss/lib/cli.js");
 
-    const outputPath = path.join(
-      path.dirname(require.resolve("nativewind/package.json")),
-      ".cache/",
-    );
+      const outputPath = path.join(
+        path.dirname(require.resolve("nativewind/package.json")),
+        ".cache/",
+      );
 
-    fs.mkdirSync(outputPath, { recursive: true });
+      fs.mkdirSync(outputPath, { recursive: true });
 
-    const output = path.join(
-      outputPath,
-      `${path.basename(options.input)}.${options.platform}.css`,
-    );
+      const output = path.join(
+        outputPath,
+        `${path.basename(options.input)}.${options.platform}.css`,
+      );
 
-    execSync(`${cliLocation} --input ${options.input} --output ${output}`, {
-      env: getEnv(options),
-    });
+      execSync(`${cliLocation} --input ${options.input} --output ${output}`, {
+        env: getEnv(options),
+      });
 
-    return fs.readFileSync(output);
-  },
-  processDEV(
-    options: TailwindCliOptions & { onChange: (css: string) => void },
-  ) {
-    return new Promise<string>((resolve, reject) => {
-      try {
-        const child = fork(child_file, { stdio: "pipe", env: getEnv(options) });
+      const contents = fs.readFileSync(output);
+      debug("Finished production Tailwind CLI");
+      return contents;
+    },
+    processDEV(
+      options: TailwindCliOptions & { onChange: (css: string) => void },
+    ) {
+      debug("Start development Tailwind CLI");
+      return new Promise<string>((resolve, reject) => {
+        try {
+          const child = fork(child_file, {
+            stdio: "pipe",
+            env: getEnv(options),
+          });
 
-        let initialMessage = true;
-        let initialDoneIn = true;
+          let initialMessage = true;
+          let initialDoneIn = true;
 
-        child.stderr?.on("data", (data) => {
-          data = data.toString();
-          if (data.includes("Done in")) {
-            if (initialDoneIn) {
-              initialDoneIn = false;
+          child.stderr?.on("data", (data) => {
+            data = data.toString();
+            if (data.includes("Done in")) {
+              if (initialDoneIn) {
+                initialDoneIn = false;
+              }
+            } else if (data.includes("warn -")) {
+              console.warn(data);
             }
-          } else if (data.includes("warn -")) {
-            console.warn(data);
-          }
-        });
+          });
 
-        child.stdout?.on("data", (data) => {
-          data = data.toString();
-        });
+          child.stdout?.on("data", (data) => {
+            data = data.toString();
+          });
 
-        child.on("message", (message) => {
-          if (initialMessage) {
-            resolve(message.toString());
-            initialMessage = false;
-          } else {
-            options.onChange(message.toString());
-          }
-        });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  },
+          child.on("message", (message) => {
+            if (initialMessage) {
+              resolve(message.toString());
+              initialMessage = false;
+              debug("Finished initial development Tailwind CLI");
+            } else {
+              debug("Tailwind CLI detected new styles");
+              options.onChange(message.toString());
+            }
+          });
+        } catch (e) {
+          reject(e);
+        }
+      });
+    },
+  };
 };
 
 const flattenPresets = (configs: Partial<Config>[] = []): Partial<Config>[] => {
   if (!configs) return [];
-  return configs.flatMap(config => [
+  return configs.flatMap((config) => [
     config,
-    ...flattenPresets(config.presets)
+    ...flattenPresets(config.presets),
   ]);
 };
 

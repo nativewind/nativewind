@@ -42,6 +42,7 @@ export type InteropComponentConfig = {
 };
 
 export type CssToReactNativeRuntimeOptions = {
+  debug?: (str: string) => void;
   inlineRem?: number | false;
   grouping?: (string | RegExp)[];
   ignorePropertyWarningRegex?: (string | RegExp)[];

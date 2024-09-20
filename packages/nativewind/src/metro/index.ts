@@ -1,4 +1,5 @@
 import type { MetroConfig } from "metro-config";
+import { debug as debugFn } from "debug";
 import path from "path";
 import {
   withCssInterop,
@@ -21,6 +22,8 @@ interface WithNativeWindOptions extends WithCssInteropOptions {
   disableTypeScriptGeneration?: boolean;
 }
 
+const debug = debugFn("nativewind");
+
 export function withNativeWind(
   config: MetroConfig,
   {
@@ -35,11 +38,16 @@ export function withNativeWind(
 ): MetroConfig {
   if (input) input = path.resolve(input);
 
+  debug(`input: ${input}`);
+
   const { important } = tailwindConfig(path.resolve(tailwindConfigPath));
 
-  const cli = tailwindCli();
+  debug(`important: ${important}`);
+
+  const cli = tailwindCli(debug);
 
   if (!disableTypeScriptGeneration) {
+    debug(`checking TypeScript setup`);
     setupTypeScript(typescriptEnvPath);
   }
 
@@ -48,7 +56,9 @@ export function withNativeWind(
     inlineRem,
     selectorPrefix: typeof important === "string" ? important : undefined,
     input,
+    debug,
     processPROD: (platform) => {
+      debug(`processPROD: ${platform}`);
       return cli.processPROD({
         platform,
         input,
@@ -57,6 +67,7 @@ export function withNativeWind(
       });
     },
     processDEV: (platform, onChange) => {
+      debug(`processDEV: ${platform}`);
       return cli.processDEV({
         platform,
         input,
