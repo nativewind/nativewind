@@ -55,8 +55,9 @@
     "types.d.ts"
   ],
   "dependencies": {
-    "react-native-css-interop": "0.1.9",
-    "comment-json": "^4.2.5"
+    "comment-json": "^4.2.5",
+    "debug": "^4.3.7",
+    "react-native-css-interop": "0.1.9"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",

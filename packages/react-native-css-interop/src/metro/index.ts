@@ -2,6 +2,7 @@ import connect from "connect";
 import fsPromises from "fs/promises";
 import fs from "fs";
 import path from "path";
+import { debug as debugFn, Debugger } from "debug";
 import type { MetroConfig } from "metro-config";
 import type MetroServer from "metro/src/Server";
 import type { FileSystem } from "metro-file-map";
@@ -39,6 +40,7 @@ import { cssToReactNativeRuntime } from "../css-to-rn";
 export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
   input: string;
   platforms?: string[];
+  debug?: Debugger;
   processPROD: (platform: string) => string | Buffer;
   processDEV: (
     platform: string,
@@ -60,6 +62,10 @@ export function withCssInterop(
   const originalResolver = config.resolver?.resolveRequest;
   const originalMiddleware = config.server?.enhanceMiddleware;
 
+  const debug = options.debug || debugFn("react-native-css-interop");
+  options.debug = debug;
+  debug("withCssInterop: successfully called");
+
   /*
    * Ensure the production files exist before Metro starts
    * Metro (or who ever is controlling Metro) will need to get the config before
@@ -70,6 +76,9 @@ export function withCssInterop(
     path.dirname(require.resolve("react-native-css-interop/package.json")),
     ".cache",
   );
+
+  debug(`platforms: ${platforms}`);
+  debug(`prodOutputDir: ${prodOutputDir}`);
 
   fs.mkdirSync(prodOutputDir, { recursive: true });
 
@@ -107,6 +116,7 @@ export function withCssInterop(
          * (or maybe the file tree hasn't read the files yet? Or this breaks cache SHA1 hash?)
          */
         if (!transformOptions.dev) {
+          debug(`prodOutputDir: ${prodOutputDir}`);
           const platform = transformOptions.platform || "native";
 
           await fsPromises.mkdir(prodOutputDir, { recursive: true });
@@ -123,6 +133,7 @@ export function withCssInterop(
               output,
               getNativeJS(
                 cssToReactNativeRuntime(options.processPROD(platform), options),
+                options.debug,
               ),
             );
           }
@@ -155,6 +166,7 @@ export function withCssInterop(
        *       supports it at time of writing.
        */
       enhanceMiddleware: (middleware, metroServer) => {
+        debug(`enhanceMiddleware successfully called`);
         const server = connect();
         const bundler = metroServer.getBundler().getBundler();
 
@@ -196,13 +208,19 @@ export function withCssInterop(
           return resolved;
         }
 
+        debug(`resolveRequest: found input`);
+
         platform = platform || "native";
 
         const isDev = (context as any).dev;
 
+        debug(`resolveRequest.isDev ${isDev}`);
+
         if (isDev) {
           // Generate a fake name for our virtual module. Make it platform specific
           const platformFilePath = platformPath(resolved.filePath, platform);
+
+          debug(`platformFilePath: ${platformFilePath}`);
 
           startCSSProcessor(platformFilePath, platform, options, true);
 
@@ -218,7 +236,7 @@ export function withCssInterop(
         } else {
           return resolver(
             context,
-            path.join("react-native-css-interop", ".cache", platform),
+            path.join(prodOutputDir, platform),
             platform,
           ) as any;
         }
@@ -249,9 +267,16 @@ async function startCSSProcessor(
       Promise.resolve(
         platform === "web"
           ? css
-          : getNativeJS(cssToReactNativeRuntime(css, options), dev),
+          : getNativeJS(
+              cssToReactNativeRuntime(css, options),
+              options.debug,
+              dev,
+              Date.now(),
+            ),
       ),
     );
+
+    options.debug?.("Firing change event to Metro");
 
     // Tell Metro that the virtual module has changed
     // It will think this is a fileSystem event and update its virtual fileTree
@@ -271,7 +296,7 @@ async function startCSSProcessor(
   }).then((css) => {
     return platform === "web"
       ? css
-      : getNativeJS(cssToReactNativeRuntime(css, options), dev);
+      : getNativeJS(cssToReactNativeRuntime(css, options), options.debug, dev);
   });
 
   virtualModules.set(filePath, virtualStyles);
@@ -389,7 +414,14 @@ function stringify(data: unknown): string {
   }
 }
 
-function getNativeJS(data = {}, dev = false): string {
+function getNativeJS(
+  data = {},
+  debug?: Debugger,
+  dev = false,
+  fastRefreshUpdateStart = 0,
+): string {
+  debug?.("Start stringify");
+
   let output = `
  "use strict";
  "__css-interop-transformed";
@@ -397,6 +429,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const __inject_1 = require("react-native-css-interop/dist/runtime/native/styles");
 (0, __inject_1.injectData)(${stringify(data)});
 `;
+
+  debug?.("Finished stringify");
 
   if (dev) {
     output += `
@@ -428,6 +462,15 @@ if (typeof __METRO_GLOBAL_PREFIX__ !== "undefined" && global[__METRO_GLOBAL_PREF
   })
 }
 `;
+  }
+
+  if (debug?.enabled) {
+    if (fastRefreshUpdateStart) {
+      output = `console.log(\`Fast Refresh took: \${Date.now()-${fastRefreshUpdateStart}}ms\`);${output};`;
+    }
+    output = `const start=Date.now();${output};console.log(\`${debug.namespace} parse time: \${Date.now() - start}ms\`)`;
+
+    debug(`Output size: ${Buffer.byteLength(output, "utf8")} bytes`);
   }
 
   return output;
