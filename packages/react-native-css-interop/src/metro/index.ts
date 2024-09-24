@@ -83,13 +83,7 @@ export function withCssInterop(
   fs.mkdirSync(prodOutputDir, { recursive: true });
 
   for (const platform of platforms) {
-    fs.writeFileSync(
-      path.join(
-        prodOutputDir,
-        `${platform}.${platform === "web" ? "css" : "js"}`,
-      ),
-      "",
-    );
+    fs.writeFileSync(platformPath("styles.css", platform, prodOutputDir), "");
   }
 
   return {
@@ -121,19 +115,16 @@ export function withCssInterop(
          * (or maybe the file tree hasn't read the files yet? Or this breaks cache SHA1 hash?)
          */
         if (!transformOptions.dev) {
-          debug(`prodOutputDir: ${prodOutputDir}`);
           const platform = transformOptions.platform || "native";
 
-          await fsPromises.mkdir(prodOutputDir, { recursive: true });
-
           if (platform === "web") {
-            const output = path.join(prodOutputDir, `web.css`);
+            const output = platformPath("styles.css", platform, prodOutputDir);
             await fsPromises.writeFile(
               output,
               options.processPROD(platform).toString("utf-8"),
             );
           } else {
-            const output = path.join(prodOutputDir, `${platform}.js`);
+            const output = platformPath("styles.css", platform, prodOutputDir);
             await fsPromises.writeFile(
               output,
               getNativeJS(
@@ -217,34 +208,34 @@ export function withCssInterop(
 
         platform = platform || "native";
 
-        const isDev = (context as any).dev;
+        const isProduction = !(context as any).dev;
 
-        debug(`resolveRequest.isDev ${isDev}`);
+        debug(`resolveRequest.isProduction ${isProduction}`);
 
-        if (isDev) {
-          // Generate a fake name for our virtual module. Make it platform specific
-          const platformFilePath = platformPath(resolved.filePath, platform);
-
-          debug(`platformFilePath: ${platformFilePath}`);
-
-          startCSSProcessor(platformFilePath, platform, options, debug, true);
-
-          /*
-           * Return a final Resolution.
-           * We ideally we should call the resolver again with the new filepath,
-           * but we can't control what it does. E.g it might check that the file actually exists
-           */
-          return {
-            ...resolved,
-            filePath: platformFilePath,
-          };
-        } else {
+        if (isProduction) {
           return resolver(
             context,
-            path.join(prodOutputDir, platform),
+            platformPath("styles.css", platform, prodOutputDir),
             platform,
           ) as any;
         }
+
+        // Generate a fake name for our virtual module. Make it platform specific
+        const platformFilePath = platformPath(resolved.filePath, platform);
+
+        debug(`platformFilePath: ${platformFilePath}`);
+
+        startCSSProcessor(platformFilePath, platform, options, debug, true);
+
+        /*
+         * Return a final Resolution.
+         * We ideally we should call the resolver again with the new filepath,
+         * but we can't control what it does. E.g it might check that the file actually exists
+         */
+        return {
+          ...resolved,
+          filePath: platformFilePath,
+        };
       },
     },
   };
@@ -273,12 +264,7 @@ async function startCSSProcessor(
       Promise.resolve(
         platform === "web"
           ? css
-          : getNativeJS(
-              cssToReactNativeRuntime(css, options),
-              debug,
-              dev,
-              Date.now(),
-            ),
+          : getNativeJS(cssToReactNativeRuntime(css, options), debug),
       ),
     );
 
@@ -302,7 +288,7 @@ async function startCSSProcessor(
   }).then((css) => {
     return platform === "web"
       ? css
-      : getNativeJS(cssToReactNativeRuntime(css, options), debug, dev);
+      : getNativeJS(cssToReactNativeRuntime(css, options), debug);
   });
 
   virtualModules.set(filePath, virtualStyles);
@@ -420,45 +406,16 @@ function stringify(data: unknown): string {
   }
 }
 
-function getNativeJS(
-  data = {},
-  debug?: Debugger,
-  dev = false,
-  fastRefreshUpdateStart = 0,
-): string {
-  debug?.("Start stringify");
-
-  let output = `
-__d(function (global, require, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
-Object.defineProperty(exports, "__esModule", { value: true });
-// before
-var __inject_1 = require(_dependencyMap[0], "react-native-css-interop/dist/runtime/native/styles");
-(0, __inject_1.injectData)(${stringify(data)});
-// after
-})
-`;
-
-  if (debug?.enabled) {
-    debug?.("Finished stringify");
-    if (fastRefreshUpdateStart) {
-      output = output.replace(
-        "// before",
-        `console.log(\`Fast Refresh took: \${Date.now()-${fastRefreshUpdateStart}}ms\`);// before`,
-      );
-    }
-    output = output
-      .replace("// before", `const start=Date.now()`)
-      .replace(
-        "// after",
-        `console.log(\`${debug.namespace} parse time: \${Date.now() - start}ms\`)`,
-      );
-
-    debug(`Output size: ${Buffer.byteLength(output, "utf8")} bytes`);
-  }
-
+function getNativeJS(data = {}, debug: Debugger): string {
+  debug("Start stringify");
+  let output = `injectData)(${stringify(data)})`;
+  debug(`Output size: ${Buffer.byteLength(output, "utf8")} bytes`);
   return output;
 }
 
-function platformPath(filePath: string, platform: string) {
-  return `${filePath}.${platform}.${platform === "web" ? "css" : "js"}`;
+function platformPath(filePath: string, platform: string, prefix = "") {
+  return path.join(
+    prefix,
+    `${filePath}.${platform}.${platform === "web" ? "css" : "js"}`,
+  );
 }

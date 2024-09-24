@@ -19,7 +19,7 @@ export async function transform(
     ? require(config.originalTransformerPath).transform
     : worker.transform;
 
-  if (filename.match(/.css.ios.js$/)) {
+  if (filename.match(/\.css\..+?\.js$/)) {
     const debugEnabled = "debugEnabled" in config && config.debugEnabled;
 
     if (debugEnabled) {
@@ -37,12 +37,12 @@ export async function transform(
       projectRoot,
       filename,
       Buffer.from(
-        `require("react-native-css-interop/dist/runtime/native/styles")`,
+        `import { injectData } from "react-native-css-interop/dist/runtime/native/styles";
+        injectData({});
+        `,
       ),
       options,
     );
-
-    const code = data.toString("utf-8");
 
     if (debugEnabled) {
       console.timeEnd("Transforming style JS file");
@@ -52,10 +52,13 @@ export async function transform(
       dependencies: result.dependencies,
       output: [
         {
+          // data: result.output[0].data,
           data: {
-            code,
-            lineCount: code.split("\n").length,
-            functionMap: result.output[0].data.functionMap,
+            ...result.output[0].data,
+            code: result.output[0].data.code.replace(
+              "injectData)({})",
+              data.toString("utf-8"),
+            ),
           },
           type: result.output[0].type,
         },
