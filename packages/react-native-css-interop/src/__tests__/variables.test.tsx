@@ -143,7 +143,7 @@ test(":root variables", () => {
   expect(component).toHaveStyle({ color: "red" });
 });
 
-test("inheritance will cascade", () => {
+test("can apply and set new variables", () => {
   registerCSS(`
     :root { --my-var: red; }
     .my-class { color: var(--my-var); --another-var: green; }
@@ -166,6 +166,35 @@ test("inheritance will cascade", () => {
   expect(screen.getByTestId(testIDs.one)).toHaveStyle({ color: "red" });
   expect(screen.getByTestId(testIDs.two)).toHaveStyle({ color: "red" });
   expect(screen.getByTestId(testIDs.three)).toHaveStyle({ color: "green" });
+});
+
+test("variables will be collected", () => {
+  registerCSS(`
+    :root { --my-var: red; }
+    .green { --var-2: green; }
+    .blue { --var-3: blue; }
+    .color { color: var(--var-2); }
+    .background { background-color: var(--var-3); }
+  `);
+
+  const testIDs = {
+    one: "one",
+    two: "two",
+    three: "three",
+  };
+
+  render(
+    <View testID={testIDs.one} className="green">
+      <View testID={testIDs.two} className="blue">
+        <View testID={testIDs.three} className="color background" />
+      </View>
+    </View>,
+  );
+
+  expect(screen.getByTestId(testIDs.three)).toHaveStyle({
+    color: "green",
+    backgroundColor: "blue",
+  });
 });
 
 test("useUnsafeVariable", () => {
