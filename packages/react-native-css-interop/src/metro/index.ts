@@ -40,7 +40,7 @@ import { cssToReactNativeRuntime } from "../css-to-rn";
 export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
   input: string;
   platforms?: string[];
-  debug?: Debugger;
+  debugNamespace?: string;
   processPROD: (platform: string) => string | Buffer;
   processDEV: (
     platform: string,
@@ -62,7 +62,7 @@ export function withCssInterop(
   const originalResolver = config.resolver?.resolveRequest;
   const originalMiddleware = config.server?.enhanceMiddleware;
 
-  const debug = options.debug || debugFn("react-native-css-interop");
+  const debug = debugFn(options.debugNamespace || "react-native-css-interop");
   options.debug = debug;
   debug("withCssInterop: successfully called");
 
@@ -94,8 +94,13 @@ export function withCssInterop(
 
   return {
     ...config,
+    transformerPath: require.resolve("./transformer"),
     transformer: {
       ...config.transformer,
+      ...{
+        originalTransformerPath: config.transformerPath,
+        debugEnabled: debug.enabled,
+      },
       async getTransformOptions(
         entryPoints,
         transformOptions,
@@ -133,19 +138,19 @@ export function withCssInterop(
               output,
               getNativeJS(
                 cssToReactNativeRuntime(options.processPROD(platform), options),
-                options.debug,
+                debug,
               ),
             );
           }
         }
 
-        return (
-          config.transformer?.getTransformOptions?.(
+        return {
+          ...(config.transformer?.getTransformOptions?.(
             entryPoints,
             transformOptions,
             getDependenciesOf,
-          ) || {}
-        );
+          ) || {}),
+        } as any;
       },
     },
     server: {
@@ -222,7 +227,7 @@ export function withCssInterop(
 
           debug(`platformFilePath: ${platformFilePath}`);
 
-          startCSSProcessor(platformFilePath, platform, options, true);
+          startCSSProcessor(platformFilePath, platform, options, debug, true);
 
           /*
            * Return a final Resolution.
@@ -249,6 +254,7 @@ async function startCSSProcessor(
   filePath: string,
   platform: string,
   { input, processDEV, ...options }: WithCssInteropOptions,
+  debug: Debugger,
   dev: boolean,
 ) {
   // Ensure that we only start the processor once per file
@@ -269,7 +275,7 @@ async function startCSSProcessor(
           ? css
           : getNativeJS(
               cssToReactNativeRuntime(css, options),
-              options.debug,
+              debug,
               dev,
               Date.now(),
             ),
@@ -296,7 +302,7 @@ async function startCSSProcessor(
   }).then((css) => {
     return platform === "web"
       ? css
-      : getNativeJS(cssToReactNativeRuntime(css, options), options.debug, dev);
+      : getNativeJS(cssToReactNativeRuntime(css, options), debug, dev);
   });
 
   virtualModules.set(filePath, virtualStyles);
@@ -423,52 +429,29 @@ function getNativeJS(
   debug?.("Start stringify");
 
   let output = `
- "use strict";
- "__css-interop-transformed";
+__d(function (global, require, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
 Object.defineProperty(exports, "__esModule", { value: true });
-const __inject_1 = require("react-native-css-interop/dist/runtime/native/styles");
+// before
+var __inject_1 = require(_dependencyMap[0], "react-native-css-interop/dist/runtime/native/styles");
 (0, __inject_1.injectData)(${stringify(data)});
+// after
+})
 `;
-
-  debug?.("Finished stringify");
-
-  if (dev) {
-    output += `
-/**
- * This is a hack for Expo Router. It's _layout files export 'unstable_settings' which break Fast Refresh
- * Expo Router only supports Metro as a bundler
- */
-if (typeof __METRO_GLOBAL_PREFIX__ !== "undefined" && global[__METRO_GLOBAL_PREFIX__ + "__ReactRefresh"]) {
-  const Refresh = global[__METRO_GLOBAL_PREFIX__ + "__ReactRefresh"]
-  const isLikelyComponentType = Refresh.isLikelyComponentType
-  const expoRouterExports = new WeakSet()
-  Object.assign(Refresh, {
-    isLikelyComponentType(value) {
-      if (typeof value === "object" && "unstable_settings" in value) {
-        expoRouterExports.add(value.unstable_settings)
-      }
-
-      if (typeof value === "object" && "ErrorBoundary" in value) {
-        expoRouterExports.add(value.ErrorBoundary)
-      }
-
-      // When ErrorBoundary is exported, the inverse dependency will also include the _ctx file. So we need to account for it as well
-      if (typeof value === "object" && "ctx" in value && value.ctx.name === "metroContext") {
-        expoRouterExports.add(value.ctx)
-      }
-
-      return expoRouterExports.has(value) || isLikelyComponentType(value)
-    }
-  })
-}
-`;
-  }
 
   if (debug?.enabled) {
+    debug?.("Finished stringify");
     if (fastRefreshUpdateStart) {
-      output = `console.log(\`Fast Refresh took: \${Date.now()-${fastRefreshUpdateStart}}ms\`);${output};`;
+      output = output.replace(
+        "// before",
+        `console.log(\`Fast Refresh took: \${Date.now()-${fastRefreshUpdateStart}}ms\`);// before`,
+      );
     }
-    output = `const start=Date.now();${output};console.log(\`${debug.namespace} parse time: \${Date.now() - start}ms\`)`;
+    output = output
+      .replace("// before", `const start=Date.now()`)
+      .replace(
+        "// after",
+        `console.log(\`${debug.namespace} parse time: \${Date.now() - start}ms\`)`,
+      );
 
     debug(`Output size: ${Buffer.byteLength(output, "utf8")} bytes`);
   }

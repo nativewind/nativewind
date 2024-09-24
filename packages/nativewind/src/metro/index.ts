@@ -55,8 +55,8 @@ export function withNativeWind(
     ...cssToReactNativeRuntimeOptions,
     inlineRem,
     selectorPrefix: typeof important === "string" ? important : undefined,
+    debugNamespace: "nativewind",
     input,
-    debug,
     processPROD: (platform) => {
       debug(`processPROD: ${platform}`);
       return cli.processPROD({
