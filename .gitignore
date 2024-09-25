@@ -113,3 +113,6 @@ dist
 
 # Turbo
 .turbo
+
+examples/**/ios/
+examples/**/android/

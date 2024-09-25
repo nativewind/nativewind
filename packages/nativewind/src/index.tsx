@@ -13,3 +13,4 @@ export {
 } from "react-native-css-interop";
 
 export { useColorScheme } from "./stylesheet";
+export { createElement } from "react";

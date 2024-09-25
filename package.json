@@ -36,7 +36,8 @@
     "tailwindcss": "3.4.4"
   },
   "overrides": {
+    "@expo/metro-runtime": "3.2.3",
     "react-native": "0.75.2",
-    "@expo/metro-runtime": "3.2.3"
+    "react-native-reanimated": "3.10.1"
   }
 }
