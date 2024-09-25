@@ -34,6 +34,7 @@ export function withNativeWind(
     browserslistEnv = "native",
     typescriptEnvPath = "nativewind-env.d.ts",
     disableTypeScriptGeneration = false,
+    ...options
   }: WithNativeWindOptions = {} as WithNativeWindOptions,
 ): MetroConfig {
   if (input) input = path.resolve(input);
@@ -53,6 +54,7 @@ export function withNativeWind(
 
   return withCssInterop(config, {
     ...cssToReactNativeRuntimeOptions,
+    ...options,
     inlineRem,
     selectorPrefix: typeof important === "string" ? important : undefined,
     debugNamespace: "nativewind",
