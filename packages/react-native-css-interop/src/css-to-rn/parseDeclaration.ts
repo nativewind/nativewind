@@ -43,10 +43,14 @@ import type {
   Translate,
   Scale,
   UnresolvedColor,
+  FilterList,
+  Filter,
+  DropShadow,
 } from "lightningcss";
 
 import type { ExtractionWarning, RuntimeValueDescriptor } from "../types";
 import { FeatureFlagStatus } from "./feature-flags";
+import { toRNProperty } from "./normalize-selectors";
 
 const unparsedPropertyMapping: Record<string, string> = {
   "margin-inline-start": "margin-start",
@@ -157,6 +161,7 @@ const validProperties = [
   "container-type",
   "display",
   "fill",
+  "filter",
   "flex",
   "flex-basis",
   "flex-direction",
@@ -1606,12 +1611,19 @@ export function parseDeclaration(
         parseColorOrAuto(declaration.value, parseOptions),
       );
     }
+    case "filter": {
+      return addStyleProp(
+        declaration.property,
+        parseFilterList(declaration.value, parseOptions),
+      );
+    }
     default: {
       /**
        * This is used to know when lightningcss has added a new property and we need to add it to the
        * switch.
        *
        * If your build fails here, its because you have a newer version of lightningcss installed.
+       * Or you have added a new valid property
        */
       declaration satisfies never;
     }
@@ -1648,7 +1660,7 @@ function unparsedFunction(
 ): RuntimeValueDescriptor {
   const args = reduceParseUnparsed(token.value.arguments, options);
   return {
-    name: token.value.name,
+    name: toRNProperty(token.value.name),
     arguments: Array.isArray(args) ? args : [args],
   };
 }
@@ -1757,6 +1769,15 @@ function parseUnparsed(
         case "pixelScale":
         case "fontScale":
         case "shadow":
+        case "brightness":
+        case "blur":
+        case "contrast":
+        case "drop-shadow":
+        case "grayscale":
+        case "hue-rotate":
+        case "invert":
+        case "saturate":
+        case "sepia":
           return unparsedFunction(tokenOrValue, options);
         case "hairlineWidth":
           return {
@@ -2982,4 +3003,55 @@ export function parseUnresolvedColor(
     default:
       color satisfies never;
   }
+}
+
+function parseFilterList(
+  filterList: FilterList,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  switch (filterList.type) {
+    case "none":
+      return;
+    case "filters":
+      return filterList.value.map((filter) => parseFilter(filter, options));
+    default:
+      filterList satisfies never;
+  }
+}
+
+function parseFilter(
+  filter: Filter,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  switch (filter.type) {
+    case "brightness":
+    case "blur":
+    case "contrast":
+    case "grayscale":
+    case "invert":
+    case "opacity":
+    case "saturate":
+    case "sepia":
+      return { [filter.type]: parseLength(filter.value, options) };
+    case "hue-rotate":
+      return { [filter.type]: parseAngle(filter.value, options) };
+    case "drop-shadow":
+      return { [filter.type]: parseDropShadow(filter.value, options) };
+    case "url":
+      return options.addFunctionValueWarning(`${filter.type}(${filter.value})`);
+    default:
+      filter satisfies never;
+  }
+}
+
+function parseDropShadow(
+  dropShadow: DropShadow,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  return {
+    offsetX: parseLength(dropShadow.xOffset, options),
+    offsetY: parseLength(dropShadow.yOffset, options),
+    color: parseColor(dropShadow.color, options),
+    standardDeviation: parseLength(dropShadow.blur, options),
+  };
 }
