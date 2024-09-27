@@ -60,14 +60,14 @@ export const native: {
 export interface RenderOptions extends TLRenderOptions {
   css?: string;
   cssOptions?: CssToReactNativeRuntimeOptions;
-  logOutput?: boolean;
+  debugCompiled?: boolean;
 }
 
 export function render(
   component: ReactElement<any>,
-  { css, cssOptions, ...options }: RenderOptions = {},
+  { css, cssOptions, debugCompiled, ...options }: RenderOptions = {},
 ) {
-  if (options.logOutput) {
+  if (debugCompiled) {
     if (css) {
       console.log(`Generated css:\n\n${css}`);
     } else {
@@ -76,16 +76,14 @@ export function render(
   }
 
   if (css) {
-    registerCSS(css, { ...cssOptions, logOutput: options.logOutput });
+    registerCSS(css, { ...cssOptions, debugCompiled: debugCompiled });
   }
 
-  return tlRender(component, {
-    ...options,
-  });
+  return tlRender(component, options);
 }
 
 render.debug = (component: ReactElement<any>, options: RenderOptions = {}) => {
-  return render(component, { ...options, logOutput: true });
+  return render(component, { ...options, debugCompiled: true });
 };
 
 export function getWarnings() {
@@ -136,10 +134,13 @@ export const resetComponents = () => {
 
 export function registerCSS(
   css: string,
-  options: CssToReactNativeRuntimeOptions & { logOutput?: boolean } = {},
+  {
+    debugCompiled = process.env.NODE_OPTIONS?.includes("--inspect"),
+    ...options
+  }: CssToReactNativeRuntimeOptions & { debugCompiled?: boolean } = {},
 ) {
   const compiled = cssToReactNativeRuntime(css, options);
-  if (options.logOutput) {
+  if (debugCompiled) {
     console.log(`Compiled styles:\n\n${JSON.stringify({ compiled }, null, 2)}`);
   }
   injectData(compiled);
@@ -147,9 +148,16 @@ export function registerCSS(
 
 registerCSS.debug = (
   css: string,
-  options: CssToReactNativeRuntimeOptions & { logOutput?: boolean } = {},
+  options: CssToReactNativeRuntimeOptions = {},
 ) => {
-  registerCSS(css, { ...options, logOutput: true });
+  registerCSS(css, { ...options, debugCompiled: true });
+};
+
+registerCSS.noDebug = (
+  css: string,
+  options: CssToReactNativeRuntimeOptions = {},
+) => {
+  registerCSS(css, { ...options, debugCompiled: false });
 };
 
 export function setupAllComponents() {

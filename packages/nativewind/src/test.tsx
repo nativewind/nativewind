@@ -80,13 +80,23 @@ export async function renderCurrentTest({
 }
 
 renderCurrentTest.debug = (options: RenderCurrentTestOptions = {}) => {
-  return renderCurrentTest({ ...options, logOutput: true });
+  return renderCurrentTest({ ...options, debugCompiled: true });
 };
 
 export async function render(
   component: React.ReactElement<any>,
-  { config, css, layers = {}, logOutput, ...options }: RenderOptions = {},
+  {
+    config,
+    css,
+    layers = {},
+    debugCompiled = process.env.NODE_OPTIONS?.includes("--inspect"),
+    ...options
+  }: RenderOptions = {},
 ) {
+  // Compile the base CSS, e.g:
+  // @tailwind base
+  // @tailwind components
+  // @tailwind utilities
   css ??= Object.entries({
     base: true,
     components: true,
@@ -95,9 +105,10 @@ export async function render(
   }).reduce((acc, [layer, enabled]) => {
     return enabled ? `${acc}@tailwind ${layer};` : acc;
   }, "");
+
   const content = getClassNames(component);
 
-  if (logOutput) {
+  if (debugCompiled) {
     const classNames = content.map(({ raw }) => `  ${raw}`);
     console.log(`Detected classNames:\n${classNames.join("\n")}\n\n`);
 
@@ -106,6 +117,7 @@ export async function render(
     }
   }
 
+  // Process the TailwindCSS
   let { css: output } = await postcss([
     tailwind({
       theme: {},
@@ -120,7 +132,7 @@ export async function render(
     ...options,
     css: output,
     cssOptions: cssToReactNativeRuntimeOptions,
-    logOutput,
+    debugCompiled: debugCompiled,
   });
 }
 
@@ -128,7 +140,14 @@ render.debug = (
   component: React.ReactElement<any>,
   options: RenderOptions = {},
 ) => {
-  return render(component, { ...options, logOutput: true });
+  return render(component, { ...options, debugCompiled: true });
+};
+
+render.noDebug = (
+  component: React.ReactElement<any>,
+  options: RenderOptions = {},
+) => {
+  return render(component, { ...options, debugCompiled: false });
 };
 
 function getClassNames(
