@@ -10,7 +10,7 @@ import { interop } from "./native-interop";
 import { getComponentType } from "./unwrap-components";
 import { VariableContext, getVariable, opaqueStyles } from "./styles";
 import { colorScheme } from "./appearance-observables";
-import { assignToTarget } from "./utils";
+import { assignToTarget } from "../../shared";
 
 export { StyleSheet } from "./stylesheet";
 export { colorScheme } from "./appearance-observables";

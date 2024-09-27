@@ -2,12 +2,12 @@
 import { Component, createElement, forwardRef } from "react";
 import { CssInterop } from "../../types";
 import { getNormalizeConfig } from "../config";
-import { assignToTarget } from "../native/utils";
 
 export { StyleSheet } from "./stylesheet";
 export { colorScheme } from "./color-scheme";
 export { rem } from "./rem";
 import { interopComponents } from "./interopComponentsMap";
+import { assignToTarget } from "../../shared";
 const ForwardRefSymbol = Symbol.for("react.forward_ref");
 export { useColorScheme } from "./useColorScheme";
 export const cssInterop: CssInterop = (baseComponent, mapping): any => {

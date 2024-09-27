@@ -160,8 +160,8 @@ it("works with @rn-move and nativeStyleToProps", () => {
     testID,
     children: undefined,
     deeply: {
-      color: "rgba(255, 0, 0, 1)",
       nested: {
+        myColor: "rgba(255, 0, 0, 1)",
         target: {
           backgroundColor: "rgba(0, 0, 255, 1)",
           fontSize: 14,

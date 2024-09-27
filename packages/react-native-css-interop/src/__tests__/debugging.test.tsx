@@ -44,8 +44,8 @@ describe("debugging", () => {
     "testID": "debugClassName",
     "ref": null,
     "style": {
-      "color": "rgba(239, 68, 68, 1)",
-      "padding": 10
+      "padding": 10,
+      "color": "rgba(239, 68, 68, 1)"
     }
   },
   "variables": {},
@@ -82,8 +82,8 @@ describe("debugging", () => {
     "testID": "debugClassName",
     "ref": null,
     "style": {
-      "color": "rgba(239, 68, 68, 1) (animated value)",
-      "padding": 10
+      "padding": 10,
+      "color": "rgba(239, 68, 68, 1) (animated value)"
     }
   },
   "variables": {},

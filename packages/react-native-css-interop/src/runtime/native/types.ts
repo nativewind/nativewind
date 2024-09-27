@@ -1,10 +1,10 @@
 import type { SharedValue } from "react-native-reanimated";
 import type {
   InteropComponentConfig,
-  StyleDeclaration,
   ExtractedAnimations,
   ExtractedTransition,
   ContainerRecord,
+  StyleDeclaration,
 } from "../../types";
 import type { Effect, Observable } from "../observable";
 import type { VariableContextValue } from "./styles";
@@ -23,9 +23,9 @@ export type ReducerAction =
 export type ReducerState = {
   className?: string | undefined | null;
   config: InteropComponentConfig;
-  normal: ProcessedStyleDeclaration[];
-  inline?: ProcessedStyleDeclaration | ProcessedStyleDeclaration[];
-  important: ProcessedStyleDeclaration[];
+  normal: StyleDeclaration[];
+  inline?: Record<string, unknown> | Record<string, unknown>[];
+  important: StyleDeclaration[];
   props: Record<string, any>;
   variables?: Record<string, any>;
   containerNames?: false | string[];
@@ -35,7 +35,6 @@ export type ReducerState = {
   transition?: Required<ExtractedTransition>;
   sharedValues?: Map<string, SharedValue<any>>;
   animationNames?: Set<string>;
-  styleLookup: Record<string, any>;
   styleTracking: ReducerTracking;
   declarationTracking: ReducerTracking;
 };
@@ -45,8 +44,6 @@ export type ReducerTracking = {
   guards: RenderingGuard[];
   previous?: any;
 };
-
-export type ProcessedStyleDeclaration = StyleDeclaration | Record<string, any>;
 
 export type Refs = {
   sharedState: SharedState;

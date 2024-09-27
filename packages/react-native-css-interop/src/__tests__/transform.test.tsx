@@ -6,77 +6,78 @@ import { render, registerCSS, setupAllComponents } from "test";
 const testID = "react-native-css-interop";
 setupAllComponents();
 
-test("translateX percentage", () => {
-  registerCSS(`.my-class { transform: translateX(10%); }`);
-  const component = render(
-    <View testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+describe("parsed", () => {
+  test("translateX percentage", () => {
+    registerCSS(`.my-class { transform: translateX(10%); }`);
+    const component = render(
+      <View testID={testID} className="my-class" />,
+    ).getByTestId(testID);
 
-  expect(component).toHaveStyle({
-    transform: [{ translateX: "10%" }],
-  });
-});
-
-test("translateX percentage - with polyfill", () => {
-  registerCSS(`.my-class { width: 120px; transform: translateX(10%); }`, {
-    features: {
-      transformPercentagePolyfill: true,
-    },
+    expect(component).toHaveStyle({
+      transform: [{ translateX: "10%" }],
+    });
   });
 
-  const component = render(
-    <View testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  test("translateX percentage - with polyfill", () => {
+    registerCSS(`.my-class { width: 120px; transform: translateX(10%); }`, {
+      features: {
+        transformPercentagePolyfill: true,
+      },
+    });
 
-  expect(component).toHaveStyle({
-    width: 120,
-    transform: [{ translateX: 12 }],
-  });
-});
+    const component = render(
+      <View testID={testID} className="my-class" />,
+    ).getByTestId(testID);
 
-test("translateY percentage", () => {
-  registerCSS(`.my-class { transform: translateY(10%); }`);
-
-  const component = render(
-    <View testID={testID} className="my-class" />,
-  ).getByTestId(testID);
-
-  expect(component).toHaveStyle({
-    transform: [{ translateY: "10%" }],
-  });
-});
-
-test("translateY percentage - with polyfill", () => {
-  registerCSS(`.my-class { height: 120px; transform: translateY(10%); }`, {
-    features: {
-      transformPercentagePolyfill: true,
-    },
+    expect(component).toHaveStyle({
+      width: 120,
+      transform: [{ translateX: 12 }],
+    });
   });
 
-  const component = render(
-    <View testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  test("translateY percentage", () => {
+    registerCSS(`.my-class { transform: translateY(10%); }`);
 
-  expect(component).toHaveStyle({
-    height: 120,
-    transform: [{ translateY: 12 }],
+    const component = render(
+      <View testID={testID} className="my-class" />,
+    ).getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      transform: [{ translateY: "10%" }],
+    });
   });
-});
 
-test("rotate-180", () => {
-  registerCSS(`.my-class { transform: rotate(180deg); }`);
+  test("translateY percentage - with polyfill", () => {
+    registerCSS(`.my-class { height: 120px; transform: translateY(10%); }`, {
+      features: {
+        transformPercentagePolyfill: true,
+      },
+    });
 
-  const component = render(
-    <View testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+    const component = render(
+      <View testID={testID} className="my-class" />,
+    ).getByTestId(testID);
 
-  expect(component).toHaveStyle({
-    transform: [{ rotate: "180deg" }],
+    expect(component).toHaveStyle({
+      height: 120,
+      transform: [{ translateY: 12 }],
+    });
   });
-});
 
-test("rotate-45", () => {
-  registerCSS(`
+  test("rotate-180", () => {
+    registerCSS(`.my-class { transform: rotate(180deg); }`);
+
+    const component = render(
+      <View testID={testID} className="my-class" />,
+    ).getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      transform: [{ rotate: "180deg" }],
+    });
+  });
+
+  test("rotate-45", () => {
+    registerCSS(`
 * {
   --tw-translate-x: 0;
   --tw-translate-y: 0;
@@ -94,19 +95,35 @@ test("rotate-45", () => {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
 }`);
 
-  const component = render(
-    <View testID={testID} className="rotate-45" />,
-  ).getByTestId(testID);
+    const component = render(
+      <View testID={testID} className="rotate-45" />,
+    ).getByTestId(testID);
 
-  expect(component).toHaveStyle({
-    transform: [
-      { translateX: 0 },
-      { translateY: 0 },
-      { rotate: "45deg" },
-      { skewX: "0deg" },
-      { skewY: "0deg" },
-      { scaleX: 1 },
-      { scaleY: 1 },
-    ],
+    expect(component).toHaveStyle({
+      transform: [
+        { translateX: 0 },
+        { translateY: 0 },
+        { rotate: "45deg" },
+        { skewX: "0deg" },
+        { skewY: "0deg" },
+        { scaleX: 1 },
+        { scaleY: 1 },
+      ],
+    });
+  });
+});
+
+describe("unparsed", () => {
+  test("translateX percentage", () => {
+    registerCSS(
+      `.my-class { transform: var(--test); --test: translateX(20%) }`,
+    );
+    const component = render(
+      <View testID={testID} className="my-class" />,
+    ).getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      transform: [{ translateX: "20%" }],
+    });
   });
 });
