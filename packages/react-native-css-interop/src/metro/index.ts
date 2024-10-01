@@ -225,7 +225,7 @@ export function withCssInterop(
 
         debug(`platformFilePath: ${platformFilePath}`);
 
-        startCSSProcessor(platformFilePath, platform, options, debug, true);
+        startCSSProcessor(platformFilePath, platform, options, debug);
 
         /*
          * Return a final Resolution.
@@ -246,12 +246,18 @@ async function startCSSProcessor(
   platform: string,
   { input, processDEV, ...options }: WithCssInteropOptions,
   debug: Debugger,
-  dev: boolean,
 ) {
   // Ensure that we only start the processor once per file
   if (virtualModules.has(filePath)) {
     return;
   }
+
+  options.cache = {
+    keyframes: new Map(),
+    rules: new Map(),
+    rootVariables: {},
+    universalVariables: {},
+  };
 
   /*
    * The virtualStyles is a promise that will resolve with the initial value

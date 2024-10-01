@@ -22,9 +22,6 @@ export async function transform(
   if (filename.match(/\.css\..+?\.js$/)) {
     const debugEnabled = "debugEnabled" in config && config.debugEnabled;
 
-    if (debugEnabled) {
-      console.time("Transforming style JS file");
-    }
     /**
      * The style object can be quite large and running it though a transform can be quite costly
      * Since the style file only uses a single import, we can transform a fake file to get the
@@ -32,15 +29,17 @@ export async function transform(
      *
      * We just need to ensure that the code we generate matches the code Metro would generate
      */
+    let fakeFile = `import { injectData } from "react-native-css-interop/dist/runtime/native/styles";injectData({});`;
+
+    if (debugEnabled) {
+      console.time("Transforming style JS file");
+      fakeFile += `console.log(\`Style Fast Refresh: \${Date.now()-${Date.now()}}ms\`)`;
+    }
     const result = await transform(
       config,
       projectRoot,
       filename,
-      Buffer.from(
-        `import { injectData } from "react-native-css-interop/dist/runtime/native/styles";
-        injectData({});
-        `,
-      ),
+      Buffer.from(fakeFile),
       options,
     );
 

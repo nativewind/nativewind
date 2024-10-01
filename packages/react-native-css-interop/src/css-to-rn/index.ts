@@ -42,6 +42,7 @@ import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
 
 import { versions } from "node:process";
 import { defaultFeatureFlags } from "./feature-flags";
+import { isDeepEqual } from "../util/isDeepEqual";
 
 type CSSInteropAtRule = {
   type: "custom";
@@ -105,7 +106,7 @@ export function cssToReactNativeRuntime(
     code: typeof code === "string" ? new TextEncoder().encode(code) : code,
     visitor: {
       StyleSheetExit(sheet) {
-        debug(`StyleSheetExit`);
+        debug(`Found ${sheet.rules.length} rules to process`);
 
         for (const rule of sheet.rules) {
           // Extract the style declarations and animations from the current rule
@@ -113,7 +114,7 @@ export function cssToReactNativeRuntime(
           // We have processed this rule, so now delete it from the AST
         }
 
-        debug(`Extraction of ${sheet.rules.length} rules finished`);
+        debug(`Exiting lightningcss`);
       },
     },
     customAtRules: {
@@ -126,10 +127,18 @@ export function cssToReactNativeRuntime(
     },
   });
 
-  debug("Start optimizing rules");
+  debug(`Found ${extractOptions.rules.size} valid rules`);
+
   let rules: StyleSheetRegisterCompiledOptions["rules"] = {};
+  let ruleCount = 0;
   for (const [name, styles] of extractOptions.rules) {
     if (styles.length === 0) continue;
+
+    if (isDeepEqual(styles, options.cache?.rules.get(name))) {
+      continue;
+    }
+
+    options.cache?.rules.set(name, styles);
 
     const styleRuleSet: StyleRuleSet = { $type: "StyleRuleSet" };
 
@@ -157,23 +166,36 @@ export function cssToReactNativeRuntime(
     }
 
     rules[name] = styleRuleSet;
+    ruleCount++;
   }
 
-  debug("Finishing optimization");
-  debug(`Rule set count: ${rules?.length || 0}`);
+  debug(`Found ${ruleCount} new/changed rules`);
+  debug(
+    `Note: Specificity order matters and a new style will change the specificity of the rules below it, causing a larger than expected number of changed rules`,
+  );
 
   const rem = extractOptions.inlineRem || extractOptions.rem;
+  const keyframes = Array.from(extractOptions.keyframes);
+  const rootVariables = extractOptions.rootVariables;
+  const universalVariables = extractOptions.universalVariables;
+  const flags = extractOptions.flags;
 
-  // Convert the extracted style declarations and animations from maps to objects and return them
-  return {
+  const result: StyleSheetRegisterCompiledOptions = {
     $compiled: true,
-    rules,
-    keyframes: Array.from(extractOptions.keyframes.entries()),
-    rootVariables: extractOptions.rootVariables,
-    universalVariables: extractOptions.universalVariables,
-    flags: extractOptions.flags,
+    flags,
     rem,
   };
+
+  if (ruleCount) result.rules = rules;
+  if (keyframes.length) result.keyframes = keyframes;
+  if (rootVariables && Object.keys(rootVariables).length) {
+    result.rootVariables = rootVariables;
+  }
+  if (universalVariables && Object.keys(universalVariables).length) {
+    result.universalVariables = universalVariables;
+  }
+
+  return result;
 }
 
 /**

@@ -43,6 +43,12 @@ export type InteropComponentConfig = {
 
 export type CssToReactNativeRuntimeOptions = {
   debug?: (str: string) => void;
+  cache?: {
+    rules: Map<string, StyleRule[]>;
+    keyframes: Map<string, ExtractedAnimation>;
+    rootVariables: StyleSheetRegisterOptions["rootVariables"];
+    universalVariables: StyleSheetRegisterOptions["universalVariables"];
+  };
   inlineRem?: number | false;
   grouping?: (string | RegExp)[];
   ignorePropertyWarningRegex?: (string | RegExp)[];
