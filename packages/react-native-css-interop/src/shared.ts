@@ -2,6 +2,7 @@ import {
   InteropComponentConfig,
   RuntimeStyle,
   RuntimeValueDescriptor,
+  Specificity,
 } from "./types";
 
 export const INTERNAL_RESET: unique symbol = Symbol();
@@ -185,6 +186,19 @@ export function getTargetValue(
     return parent[prop];
   }
 }
+
+export const SpecificityIndex = {
+  Order: 0,
+  ClassName: 1,
+  Important: 2,
+  Inline: 3,
+  PseudoElements: 4,
+  // Id: 0, - We don't support ID yet
+  // StyleSheet: 0, - WE don't support multiple stylesheets
+};
+
+export const inlineSpecificity: Specificity = [];
+inlineSpecificity[SpecificityIndex.Inline] = 1;
 
 export const transformKeys = new Set([
   "translateX",

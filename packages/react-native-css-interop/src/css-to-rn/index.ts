@@ -29,9 +29,14 @@ import {
   PathTokens,
   AnimationFrame,
   RuntimeValueDescriptor,
+  SpecificityValue,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
-import { DEFAULT_CONTAINER_NAME, isRuntimeDescriptor } from "../shared";
+import {
+  DEFAULT_CONTAINER_NAME,
+  isRuntimeDescriptor,
+  SpecificityIndex,
+} from "../shared";
 import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
 import { optimizeRules } from "./optimize-rules";
 
@@ -129,7 +134,7 @@ export function cssToReactNativeRuntime(
     const styleRuleSet: StyleRuleSet = { $type: "StyleRuleSet" };
 
     for (const { warnings, ...style } of styles) {
-      if (style.specificity.I) {
+      if (style.s[SpecificityIndex.Important]) {
         styleRuleSet.important ??= [];
         styleRuleSet.important.push(style);
       } else {
@@ -422,18 +427,20 @@ function setStyleForSelectorList(
         media,
       } = selector;
 
-      const specificity = Object.fromEntries(
-        Object.entries({
-          ...extractedStyle.specificity,
-          ...selector.specificity,
-        }).filter(([, value]) => value !== 0),
-      );
+      const specificity: SpecificityValue[] = [];
+      for (let index = 0; index < 5; index++) {
+        const value =
+          (extractedStyle.s[index] ?? 0) + (selector.specificity[index] ?? 0);
+        if (value) {
+          specificity[index] = value;
+        }
+      }
 
       if (groupClassName) {
         // Add the conditions to the declarations object
         addDeclaration(declarations, groupClassName, {
           $type: "StyleRule",
-          specificity,
+          s: specificity,
           attrs,
           declarations: [],
           container: {
@@ -456,7 +463,7 @@ function setStyleForSelectorList(
 
       addDeclaration(declarations, className, {
         ...style,
-        specificity,
+        s: specificity,
         pseudoClasses,
         attrs,
       });
@@ -491,6 +498,11 @@ function extractKeyFrames(
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
 
+    const specificity: Specificity = [];
+    specificity[SpecificityIndex.Important] = 2; // Animations have higher specificity than important
+    specificity[SpecificityIndex.ClassName] = 1;
+    specificity[SpecificityIndex.Order] = extractOptions.appearanceOrder;
+
     const { declarations, animations } = declarationsToStyle(
       frame.declarations.declarations,
       {
@@ -503,11 +515,7 @@ function extractKeyFrames(
           }
         },
       },
-      {
-        I: 99, // Animations have higher specificity than important
-        S: 1,
-        O: extractOptions.appearanceOrder,
-      },
+      specificity,
       {},
     );
 
@@ -627,16 +635,15 @@ function getExtractedStyles(
 ): StyleRule[] {
   const extractedStyles = [];
 
+  const specificity: Specificity = [];
+  specificity[SpecificityIndex.Order] = options.appearanceOrder;
+
   if (declarationBlock.declarations && declarationBlock.declarations.length) {
     extractedStyles.push(
       declarationsToStyle(
         declarationBlock.declarations,
         options,
-        {
-          I: 0,
-          S: 1,
-          O: options.appearanceOrder,
-        },
+        specificity,
         mapping,
       ),
     );
@@ -646,15 +653,12 @@ function getExtractedStyles(
     declarationBlock.importantDeclarations &&
     declarationBlock.importantDeclarations.length
   ) {
+    specificity[SpecificityIndex.Important] = 1;
     extractedStyles.push(
       declarationsToStyle(
         declarationBlock.importantDeclarations,
         options,
-        {
-          I: 1,
-          S: 1,
-          O: options.appearanceOrder,
-        },
+        specificity,
         mapping,
       ),
     );
@@ -666,13 +670,13 @@ function getExtractedStyles(
 function declarationsToStyle(
   declarations: Declaration[],
   options: GetExtractedStyleOptions,
-  specificity: Pick<Specificity, "I" | "S" | "O">,
+  specificity: Specificity,
   mapping: MoveTokenRecord,
 ): StyleRule {
   const props: StyleDeclaration[] = [];
   const extractedStyle: StyleRule = {
     $type: "StyleRule",
-    specificity: { A: 0, B: 0, C: 0, ...specificity },
+    s: [...specificity],
     declarations: props,
   };
 

@@ -10,6 +10,7 @@ import {
   StyleRule,
   AttributeCondition,
 } from "../types";
+import { SpecificityIndex } from "../shared";
 
 export type NormalizeSelector =
   | {
@@ -25,7 +26,7 @@ export type NormalizeSelector =
       groupPseudoClasses?: Record<string, true>;
       groupAttrs?: AttributeCondition[];
       attrs?: AttributeCondition[];
-      specificity: Pick<Specificity, "A" | "B" | "C">;
+      specificity: Specificity;
     };
 
 /**
@@ -153,7 +154,7 @@ export function normalizeSelectors(
           ...defaults,
           type: "className",
           className: "",
-          specificity: {},
+          specificity: [],
         },
         cssSelector,
         options,
@@ -213,8 +214,8 @@ function reduceSelector(
         }
 
         // Turn attribute selectors into AttributeConditions
-        acc.specificity.B ??= 0;
-        acc.specificity.B++;
+        acc.specificity[SpecificityIndex.ClassName] =
+          (acc.specificity[SpecificityIndex.ClassName] ?? 0) + 1;
 
         let attrs: AttributeCondition[];
         if (inGroup) {
@@ -237,11 +238,11 @@ function reduceSelector(
         break;
       }
       case "type": {
-        acc.specificity.C ??= 0;
-        acc.specificity.C++;
         /*
          * We only support type selectors as part of the selector prefix
          * For example: `html .my-class`
+         *
+         * NOTE: We ignore specificity for this
          */
         if (component.name !== options.selectorPrefix) {
           return null;
@@ -259,8 +260,8 @@ function reduceSelector(
         break;
       }
       case "class": {
-        acc.specificity.B ??= 0;
-        acc.specificity.B++;
+        acc.specificity[SpecificityIndex.ClassName] =
+          (acc.specificity[SpecificityIndex.ClassName] ?? 0) + 1;
 
         // .class.otherClass is only valid if the previous class was a valid group, or the last token was a combinator
         switch (previousType) {
@@ -318,8 +319,8 @@ function reduceSelector(
         break;
       }
       case "pseudo-class": {
-        acc.specificity.B ??= 0;
-        acc.specificity.B++;
+        acc.specificity[SpecificityIndex.ClassName] =
+          (acc.specificity[SpecificityIndex.ClassName] ?? 0) + 1;
 
         let pseudoClasses: Record<string, true>;
         let attrs: AttributeCondition[];

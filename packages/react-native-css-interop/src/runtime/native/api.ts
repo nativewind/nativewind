@@ -10,7 +10,7 @@ import { interop } from "./native-interop";
 import { getComponentType } from "./unwrap-components";
 import { VariableContext, getVariable, opaqueStyles } from "./styles";
 import { colorScheme } from "./appearance-observables";
-import { assignToTarget } from "../../shared";
+import { assignToTarget, inlineSpecificity } from "../../shared";
 
 export { StyleSheet } from "./stylesheet";
 export { colorScheme } from "./appearance-observables";
@@ -104,13 +104,14 @@ export function useColorScheme() {
 
 export function vars(variables: Record<string, RuntimeValueDescriptor>) {
   const style: Record<string, any> = {};
+
   opaqueStyles.set(style, {
     $type: "StyleRuleSet",
     variables: true,
     normal: [
       {
         $type: "StyleRule",
-        specificity: { inline: 1 },
+        s: inlineSpecificity,
         variables: Object.entries(variables).map(([name, value]) => {
           return [name.startsWith("--") ? name : `--${name}`, value];
         }),

@@ -204,7 +204,7 @@ export type RuntimeStyleRuleSet = {
 
 export type StyleRule = {
   $type: "StyleRule";
-  specificity: Specificity;
+  s: Specificity;
   media?: MediaQuery[];
   variables?: Array<[string, RuntimeValueDescriptor]>;
   pseudoClasses?: PseudoClassesQuery;
@@ -284,22 +284,15 @@ export type RuntimeValue =
   | undefined
   | ((acc: PropAccumulator) => RuntimeValue);
 
-export type Specificity = {
-  /** IDs - https://drafts.csswg.org/selectors/#specificity-rules */
-  A?: number;
-  /** Classes, Attributes, Pseudo-Classes - https://drafts.csswg.org/selectors/#specificity-rules */
-  B?: number;
-  /** Elements, Pseudo-Elements - https://drafts.csswg.org/selectors/#specificity-rules */
-  C?: number;
-  /** Importance - https://developer.mozilla.org/en-US/docs/Web/CSS/Cascade#cascading_order */
-  I?: number;
-  /** StyleSheet Order */
-  S?: number;
-  /** Appearance Order */
-  O?: number;
-  /** Inline */
-  inline?: number;
-};
+export type SpecificityValue = number | undefined;
+
+/**
+ * https://drafts.csswg.org/selectors/#specificity-rules
+ *
+ * This array is sorted by most common values when parsing a StyleSheet
+ * @see SpecificityIndex for the order
+ */
+export type Specificity = SpecificityValue[];
 
 export type ExtractedContainer = {
   names?: string[] | false;

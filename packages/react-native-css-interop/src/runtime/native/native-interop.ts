@@ -11,7 +11,6 @@ import {
   ReactComponent,
   InteropComponentConfig,
   StyleRule,
-  Specificity,
   ProcessedStyleRules,
   StyleRuleSet,
   ExtractedAnimations,
@@ -47,7 +46,9 @@ import {
   assignToTarget,
   DEFAULT_CONTAINER_NAME,
   getTargetValue,
+  inlineSpecificity,
   PLACEHOLDER_SYMBOL,
+  SpecificityIndex,
 } from "../../shared";
 
 export function interop(
@@ -967,7 +968,6 @@ function applyRules(
   }
 }
 
-const inlineSpecificity: Specificity = { inline: 1 };
 function specificityCompare(
   o1?: object | StyleRule | null,
   o2?: object | StyleRule | null,
@@ -975,25 +975,43 @@ function specificityCompare(
   if (!o1) return -1;
   if (!o2) return 1;
 
-  const a = "specificity" in o1 ? o1.specificity : inlineSpecificity;
-  const b = "specificity" in o2 ? o2.specificity : inlineSpecificity;
+  const aSpec = "$type" in o1 ? o1.s : inlineSpecificity;
+  const bSpec = "$type" in o2 ? o2.s : inlineSpecificity;
 
-  if (a.I !== b.I) {
-    return (a.I || 0) - (b.I || 0); /* Important */
-  } else if (a.inline !== b.inline) {
-    return (a.inline || 0) - (b.inline || 0); /* Inline */
-  } else if (a.A !== b.A) {
-    return (a.A || 0) - (b.A || 0); /* Ids */
-  } else if (a.B !== b.B) {
-    return (a.B || 0) - (b.B || 0); /* Classes */
-  } else if (a.C !== b.C) {
-    return (a.C || 0) - (b.C || 0); /* Styles */
-  } else if (a.S !== b.S) {
-    return (a.S || 0) - (b.S || 0); /* StyleSheet Order */
-  } else if (a.O !== b.O) {
-    return (a.O || 0) - (b.O || 0); /* Appearance Order */
+  if (aSpec[SpecificityIndex.Important] !== bSpec[SpecificityIndex.Important]) {
+    return (
+      (aSpec[SpecificityIndex.Important] || 0) -
+      (bSpec[SpecificityIndex.Important] || 0)
+    );
+  } else if (
+    aSpec[SpecificityIndex.Inline] !== bSpec[SpecificityIndex.Inline]
+  ) {
+    return (
+      (aSpec[SpecificityIndex.Inline] || 0) -
+      (bSpec[SpecificityIndex.Inline] || 0)
+    );
+  } else if (
+    aSpec[SpecificityIndex.PseudoElements] !==
+    bSpec[SpecificityIndex.PseudoElements]
+  ) {
+    return (
+      (aSpec[SpecificityIndex.PseudoElements] || 0) -
+      (bSpec[SpecificityIndex.PseudoElements] || 0)
+    );
+  } else if (
+    aSpec[SpecificityIndex.ClassName] !== bSpec[SpecificityIndex.ClassName]
+  ) {
+    return (
+      (aSpec[SpecificityIndex.ClassName] || 0) -
+      (bSpec[SpecificityIndex.ClassName] || 0)
+    );
+  } else if (aSpec[SpecificityIndex.Order] !== bSpec[SpecificityIndex.Order]) {
+    return (
+      (aSpec[SpecificityIndex.Order] || 0) -
+      (bSpec[SpecificityIndex.Order] || 0)
+    );
   } else {
-    return 0; /* Appearance Order */
+    return 0;
   }
 }
 
