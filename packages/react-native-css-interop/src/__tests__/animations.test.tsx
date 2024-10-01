@@ -335,7 +335,7 @@ test("stop animating when the animation is removed", () => {
   // The animation should have reset
   // Reanimated is keeping the transform prop
   expect(getAnimatedStyle(component)).toStrictEqual({
-    backgroundColor: "rgba(255, 255, 255, 1)",
+    backgroundColor: "#ffffff",
     transform: [
       {
         rotate: "0deg",

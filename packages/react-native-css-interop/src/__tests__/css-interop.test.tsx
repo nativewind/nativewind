@@ -23,8 +23,8 @@ test("mapping", () => {
   expect(component.props).toEqual({
     testID,
     differentStyle: {
-      backgroundColor: "rgba(0, 0, 0, 1)",
-      color: "rgba(255, 255, 255, 1)",
+      backgroundColor: "#000000",
+      color: "#ffffff",
     },
   });
 });
@@ -43,10 +43,10 @@ test("multiple mapping", () => {
   expect(component.props).toEqual({
     testID,
     styleA: {
-      backgroundColor: "rgba(0, 0, 0, 1)",
+      backgroundColor: "#000000",
     },
     styleB: {
-      color: "rgba(255, 255, 255, 1)",
+      color: "#ffffff",
     },
   });
 });

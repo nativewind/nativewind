@@ -16,7 +16,7 @@ describe("hsl", () => {
     const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({
-      color: "rgba(239, 68, 68, 1)",
+      color: "#ef4444",
     });
   });
 
@@ -30,7 +30,7 @@ describe("hsl", () => {
     ).getByTestId(testID);
 
     expect(component).toHaveStyle({
-      color: "rgba(239, 68, 68, 1)",
+      color: "#ef4444",
     });
   });
 
@@ -69,7 +69,7 @@ describe("hsla", () => {
     const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({
-      color: "rgba(239, 68, 68, 0.6000000238418579)",
+      color: "#ef444499",
     });
   });
 
@@ -82,7 +82,7 @@ describe("hsla", () => {
     const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({
-      color: "rgba(239, 68, 68, 0.6000000238418579)",
+      color: "#ef444499",
     });
   });
 

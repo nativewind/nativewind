@@ -121,15 +121,15 @@ describe("Border - Border Width", () => {
 describe("Border - Border Color", () => {
   test("border-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderColor: "rgba(255, 255, 255, 1)" } },
+      props: { style: { borderColor: "#ffffff" } },
     });
   });
   test("border-x-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          borderLeftColor: "rgba(255, 255, 255, 1)",
-          borderRightColor: "rgba(255, 255, 255, 1)",
+          borderLeftColor: "#ffffff",
+          borderRightColor: "#ffffff",
         },
       },
     });
@@ -138,30 +138,30 @@ describe("Border - Border Color", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          borderTopColor: "rgba(255, 255, 255, 1)",
-          borderBottomColor: "rgba(255, 255, 255, 1)",
+          borderTopColor: "#ffffff",
+          borderBottomColor: "#ffffff",
         },
       },
     });
   });
   test("border-t-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderTopColor: "rgba(255, 255, 255, 1)" } },
+      props: { style: { borderTopColor: "#ffffff" } },
     });
   });
   test("border-b-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderBottomColor: "rgba(255, 255, 255, 1)" } },
+      props: { style: { borderBottomColor: "#ffffff" } },
     });
   });
   test("border-l-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderLeftColor: "rgba(255, 255, 255, 1)" } },
+      props: { style: { borderLeftColor: "#ffffff" } },
     });
   });
   test("border-r-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderRightColor: "rgba(255, 255, 255, 1)" } },
+      props: { style: { borderRightColor: "#ffffff" } },
     });
   });
   test("border-current", async () => {

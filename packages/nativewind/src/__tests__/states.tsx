@@ -16,7 +16,7 @@ test("hover", async () => {
   expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "hoverIn");
-  expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(component).toHaveStyle({ color: "#ffffff" });
 
   fireEvent(component, "hoverOut");
   expect(component).toHaveStyle(undefined);
@@ -30,7 +30,7 @@ test("focus", async () => {
   expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "focus");
-  expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(component).toHaveStyle({ color: "#ffffff" });
 
   fireEvent(component, "blur");
   expect(component).toHaveStyle(undefined);
@@ -44,7 +44,7 @@ test("active", async () => {
   expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "pressIn");
-  expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(component).toHaveStyle({ color: "#ffffff" });
 
   fireEvent(component, "pressOut");
   expect(component).toHaveStyle(undefined);
@@ -65,7 +65,7 @@ test("mixed", async () => {
   expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "focus");
-  expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(component).toHaveStyle({ color: "#ffffff" });
 });
 
 test("selection", async () => {
@@ -74,7 +74,7 @@ test("selection", async () => {
   const component = screen.getByTestId(testID);
   expect(component.props).toEqual({
     testID,
-    selectionColor: "rgba(0, 0, 0, 1)",
+    selectionColor: "#000000",
   });
 });
 
@@ -83,7 +83,7 @@ test("ltr:", async () => {
 
   const component = screen.getByTestId(testID);
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 0, 1)",
+    color: "#000000",
   });
 });
 
@@ -95,7 +95,7 @@ test("placeholder", async () => {
   const component = screen.getByTestId(testID);
   expect(component.props).toEqual({
     testID,
-    placeholderTextColor: "rgba(0, 0, 0, 1)",
+    placeholderTextColor: "#000000",
   });
 });
 
@@ -126,7 +126,7 @@ test("disabled", async () => {
           width: 51,
         },
         {
-          backgroundColor: "rgba(0, 0, 0, 1)",
+          backgroundColor: "#000000",
         },
       ],
     }),

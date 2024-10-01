@@ -16,7 +16,7 @@ test("type prefix", () => {
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -30,6 +30,6 @@ test("class prefix", () => {
   ).getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });

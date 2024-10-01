@@ -66,7 +66,7 @@ describe("Interactivity - Caret Color", () => {
   });
   test("caret-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { cursorColor: "rgba(255, 255, 255, 1)" },
+      props: { cursorColor: "#ffffff" },
     });
   });
 });

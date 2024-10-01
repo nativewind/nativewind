@@ -58,13 +58,13 @@ describe("Backgrounds - Background Color", () => {
 
   test("bg-transparent", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { backgroundColor: "rgba(0, 0, 0, 0)" } },
+      props: { style: { backgroundColor: "#00000000" } },
     });
   });
 
   test("bg-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { backgroundColor: "rgba(255, 255, 255, 1)" } },
+      props: { style: { backgroundColor: "#ffffff" } },
     });
   });
 });

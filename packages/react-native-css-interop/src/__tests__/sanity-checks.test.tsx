@@ -60,7 +60,7 @@ test("rerender empty className", () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  expect(component).toHaveStyle({ color: "#ff0000" });
 
   screen.rerender(<View testID={testID} className="" />);
 });
@@ -79,7 +79,7 @@ test("rerender missing className", () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  expect(component).toHaveStyle({ color: "#ff0000" });
 
   screen.rerender(<View testID={testID} />);
 
@@ -102,7 +102,7 @@ test("rerender null className", () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  expect(component).toHaveStyle({ color: "#ff0000" });
 
   screen.rerender(<View testID={testID} className={null as any} />);
 

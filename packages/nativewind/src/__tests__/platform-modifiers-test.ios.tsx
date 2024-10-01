@@ -15,7 +15,7 @@ test("platformModifiers: ios", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(component).toHaveStyle({ color: "#ffffff" });
 });
 
 test("platformModifiers: ios native", async () => {
@@ -28,5 +28,5 @@ test("platformModifiers: ios native", async () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(0, 0, 0, 1)" });
+  expect(component).toHaveStyle({ color: "#000000" });
 });

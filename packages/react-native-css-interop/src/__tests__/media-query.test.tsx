@@ -29,7 +29,7 @@ test("color scheme", () => {
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 
   act(() => {
@@ -37,7 +37,7 @@ test("color scheme", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -54,7 +54,7 @@ test("prefers-reduced-motion", () => {
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 
   act(() => {
@@ -62,7 +62,7 @@ test("prefers-reduced-motion", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -78,7 +78,7 @@ test("width (plain)", () => {
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 
   act(() => {
@@ -86,7 +86,7 @@ test("width (plain)", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -102,7 +102,7 @@ test("width (range)", () => {
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 
   act(() => {
@@ -110,7 +110,7 @@ test("width (range)", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -126,7 +126,7 @@ test("min-width", () => {
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 
   act(() => {
@@ -134,7 +134,7 @@ test("min-width", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 });
 
@@ -150,7 +150,7 @@ test("max-width", () => {
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 
   act(() => {
@@ -158,7 +158,7 @@ test("max-width", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -181,6 +181,6 @@ test("not all", () => {
   act(() => vw[INTERNAL_SET](300));
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });

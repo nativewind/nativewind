@@ -43,7 +43,7 @@ test("mapping", () => {
           d: [
             [
               {
-                backgroundColor: "rgba(0, 0, 0, 1)",
+                backgroundColor: "#000000",
               },
             ],
           ],
@@ -61,7 +61,7 @@ test("mapping", () => {
           d: [
             [
               {
-                color: "rgba(255, 255, 255, 1)",
+                color: "#ffffff",
               },
             ],
           ],

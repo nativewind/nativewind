@@ -45,7 +45,7 @@ test("container query width", () => {
   });
 
   expect(child).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 
   fireEvent(parent, "layout", {
@@ -58,7 +58,7 @@ test("container query width", () => {
   });
 
   expect(child).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 
   screen.rerender(
@@ -81,6 +81,6 @@ test("container query width", () => {
   });
 
   expect(child).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 });

@@ -18,7 +18,7 @@ test("darkMode: media", async () => {
 
   act(() => colorScheme.set("dark"));
 
-  expect(component).toHaveStyle({ color: "rgba(0, 0, 0, 1)" });
+  expect(component).toHaveStyle({ color: "#000000" });
 });
 
 test("darkMode: media variable switching", async () => {
@@ -66,7 +66,7 @@ test("darkMode: class", async () => {
 
   act(() => colorScheme.set("dark"));
 
-  expect(component).toHaveStyle({ color: "rgba(0, 0, 0, 1)" });
+  expect(component).toHaveStyle({ color: "#000000" });
 });
 
 test("darkMode: class - on custom prop", async () => {
@@ -84,7 +84,7 @@ test("darkMode: class - on custom prop", async () => {
   act(() => colorScheme.set("dark"));
 
   expect(component).toHaveStyle(undefined);
-  expect(component.props.fill).toEqual("rgba(0, 0, 0, 1)");
+  expect(component.props.fill).toEqual("#000000");
 });
 
 test("darkMode: class variable switching", async () => {
@@ -238,12 +238,12 @@ test("combines with other modifiers", async () => {
   );
 
   const component = screen.getByTestId(testID);
-  expect(component).toHaveStyle({ backgroundColor: "rgba(34, 197, 94, 1)" });
+  expect(component).toHaveStyle({ backgroundColor: "#22c55e" });
 
   fireEvent(component, "pressIn");
-  expect(component).toHaveStyle({ backgroundColor: "rgba(59, 130, 246, 1)" });
+  expect(component).toHaveStyle({ backgroundColor: "#3b82f6" });
 
   act(() => colorScheme.set("light"));
 
-  expect(component).toHaveStyle({ backgroundColor: "rgba(239, 68, 68, 1)" });
+  expect(component).toHaveStyle({ backgroundColor: "#ef4444" });
 });

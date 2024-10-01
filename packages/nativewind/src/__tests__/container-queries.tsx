@@ -28,7 +28,7 @@ test("Unnamed containers", async () => {
     },
   });
 
-  expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(child).toHaveStyle({ color: "#ffffff" });
 });
 
 test("Named containers", async () => {
@@ -53,5 +53,5 @@ test("Named containers", async () => {
     },
   });
 
-  expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(child).toHaveStyle({ color: "#ffffff" });
 });

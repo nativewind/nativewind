@@ -1987,8 +1987,24 @@ function parseColor(
   }
 
   switch (color.type) {
-    case "rgb":
-      return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.alpha})`;
+    case "rgb": {
+      // Hex is smaller than rgb, so we convert it
+      const hexValues: string[] = [
+        color.r.toString(16).padStart(2, "0"),
+        color.g.toString(16).padStart(2, "0"),
+        color.b.toString(16).padStart(2, "0"),
+      ];
+
+      if (color.alpha !== 1) {
+        hexValues.push(
+          Math.round(color.alpha * 255)
+            .toString(16)
+            .padStart(2, "0"),
+        );
+      }
+
+      return `#${hexValues.join("")}`;
+    }
     case "hsl":
       return `hsla(${color.h}, ${color.s}, ${color.l}, ${color.alpha})`;
     case "currentcolor":

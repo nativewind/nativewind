@@ -3,22 +3,22 @@ import { renderCurrentTest } from "../test";
 describe("{}/<props>:", () => {
   test("{}/test:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { test: "rgba(0, 0, 0, 1)" },
+      props: { test: "#000000" },
     });
   });
   test("{}/test.nested:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { test: { nested: "rgba(0, 0, 0, 1)" } },
+      props: { test: { nested: "#000000" } },
     });
   });
   test("{}/&test:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { test: "rgba(0, 0, 0, 1)" } },
+      props: { style: { test: "#000000" } },
     });
   });
   test("{}/&test.nested:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { test: { nested: "rgba(0, 0, 0, 1)" } } },
+      props: { style: { test: { nested: "#000000" } } },
     });
   });
 });
@@ -27,22 +27,22 @@ describe("{}/<props>:", () => {
 describe("{}-[prop]:", () => {
   test("{}-[test]:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { test: "rgba(0, 0, 0, 1)" },
+      props: { test: "#000000" },
     });
   });
   test("{}-[test.nested]:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { test: { nested: "rgba(0, 0, 0, 1)" } },
+      props: { test: { nested: "#000000" } },
     });
   });
   test("{}-[&test]:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { test: "rgba(0, 0, 0, 1)" } },
+      props: { style: { test: "#000000" } },
     });
   });
   test("{}-[&test.nested]:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { test: { nested: "rgba(0, 0, 0, 1)" } } },
+      props: { style: { test: { nested: "#000000" } } },
     });
   });
 });

@@ -33,7 +33,7 @@ test("group", async () => {
     </View>,
   );
 
-  expect(getByTestId(childID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  expect(getByTestId(childID)).toHaveStyle({ color: "#ff0000" });
 
   rerender(
     <View testID={parentID}>
@@ -67,7 +67,7 @@ test("group - active", async () => {
 
   fireEvent(parent, "pressIn");
 
-  expect(child).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  expect(child).toHaveStyle({ color: "#ff0000" });
 });
 
 test("group - active (animated)", async () => {
@@ -154,7 +154,7 @@ test("group selector", async () => {
     </View>,
   );
 
-  expect(getByTestId(childID)).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  expect(getByTestId(childID)).toHaveStyle({ color: "#ff0000" });
 
   rerender(
     <View>

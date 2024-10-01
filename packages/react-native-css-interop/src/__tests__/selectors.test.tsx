@@ -25,5 +25,5 @@ test(":is(.dark *)", () => {
 
   act(() => colorScheme.set("dark"));
 
-  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  expect(component).toHaveStyle({ color: "#ff0000" });
 });

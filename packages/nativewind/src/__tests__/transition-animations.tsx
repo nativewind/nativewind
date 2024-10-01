@@ -26,13 +26,13 @@ test("transition-colors", async () => {
 
   // Should have a static color, and should not animate
   expect(getAnimatedStyle(component)).toStrictEqual({
-    backgroundColor: "rgba(239, 68, 68, 1)",
-    borderColor: "rgba(0, 0, 0, 1)",
+    backgroundColor: "#ef4444",
+    borderColor: "#000000",
   });
   jest.advanceTimersByTime(300);
   expect(getAnimatedStyle(component)).toStrictEqual({
-    backgroundColor: "rgba(239, 68, 68, 1)",
-    borderColor: "rgba(0, 0, 0, 1)",
+    backgroundColor: "#ef4444",
+    borderColor: "#000000",
   });
 
   // Rerender with a new color, triggering the animation
@@ -45,8 +45,8 @@ test("transition-colors", async () => {
 
   // Directly after rerender, should still have the old color
   expect(getAnimatedStyle(component)).toStrictEqual({
-    backgroundColor: "rgba(239, 68, 68, 1)",
-    borderColor: "rgba(0, 0, 0, 1)",
+    backgroundColor: "#ef4444",
+    borderColor: "#000000",
   });
 
   // Bg-Color should only change after we advance time

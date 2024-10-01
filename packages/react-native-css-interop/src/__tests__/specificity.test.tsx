@@ -33,7 +33,7 @@ test("specificity order", () => {
     <Text testID={testID} className="blue red" />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(0, 0, 255, 1)" });
+  expect(component).toHaveStyle({ color: "#0000ff" });
 });
 
 test("specificity modifiers", () => {
@@ -46,12 +46,12 @@ test("specificity modifiers", () => {
   ).getByTestId(testID);
 
   expect(component).toHaveStyle(
-    { color: "rgba(0, 0, 255, 1)" }, // .blue
+    { color: "#0000ff" }, // .blue
   );
 
   fireEvent(component, "hoverIn");
 
-  expect(component).toHaveStyle({ color: "rgba(0, 128, 0, 1)" }); // Green
+  expect(component).toHaveStyle({ color: "#008000" }); // Green
 });
 
 test("important - no wrapper", () => {
@@ -64,7 +64,7 @@ test("important - no wrapper", () => {
     <Text testID={testID} className="blue red" />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle({ color: "rgba(0, 0, 255, 1)" });
+  expect(component).toHaveStyle({ color: "#0000ff" });
 });
 
 test("important - inline", () => {
@@ -80,7 +80,7 @@ test("important - inline", () => {
     />,
   ).getByTestId(testID);
 
-  expect(component).toHaveStyle({ backgroundColor: "rgba(0, 0, 255, 1)" });
+  expect(component).toHaveStyle({ backgroundColor: "#0000ff" });
 });
 
 test("important - modifiers", () => {
@@ -95,13 +95,13 @@ test("important - modifiers", () => {
   ).getByTestId(testID);
 
   expect(component).toHaveStyle(
-    { color: "rgba(0, 0, 255, 1)" }, // Blue
+    { color: "#0000ff" }, // Blue
   );
 
   fireEvent(component, "hoverIn");
 
   expect(component).toHaveStyle(
-    { color: "rgba(0, 0, 255, 1)" }, // Blue
+    { color: "#0000ff" }, // Blue
   );
 });
 
@@ -162,7 +162,7 @@ test("remapped - inline important", () => {
   ).getByTestId(testID);
 
   // Red wins because it is important and overrides the inline style
-  expect(component).toHaveStyle({ color: "rgba(255, 0, 0, 1)" });
+  expect(component).toHaveStyle({ color: "#ff0000" });
 });
 
 test("remapped - inline important existing", () => {
@@ -185,5 +185,5 @@ test("remapped - inline important existing", () => {
   ).getByTestId(testID);
 
   // Blue wins, because 'red' and 'blue' are both important, but 'blue' has a higher 'order'
-  expect(component).toHaveStyle({ color: "rgba(0, 0, 255, 1)" });
+  expect(component).toHaveStyle({ color: "#0000ff" });
 });

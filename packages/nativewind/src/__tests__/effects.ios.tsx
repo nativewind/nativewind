@@ -5,7 +5,7 @@ describe("Effects - Box Shadow", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          shadowColor: "rgba(0, 0, 0, 0.3490196168422699)",
+          shadowColor: "#00000059",
           shadowOpacity: 1,
           shadowOffset: {
             height: 1,
@@ -20,7 +20,7 @@ describe("Effects - Box Shadow", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          shadowColor: "rgba(0, 0, 0, 0.3490196168422699)",
+          shadowColor: "#00000059",
           shadowOpacity: 1,
           shadowOffset: {
             height: 1,
@@ -35,7 +35,7 @@ describe("Effects - Box Shadow", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          shadowColor: "rgba(0, 0, 0, 0)",
+          shadowColor: "#00000000",
           shadowOpacity: 1,
           shadowOffset: {
             height: 0,

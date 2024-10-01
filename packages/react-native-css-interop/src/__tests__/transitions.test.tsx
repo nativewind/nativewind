@@ -94,18 +94,18 @@ test("transition - rerender", () => {
 
   // Should have the initial color
   expect(component).toHaveAnimatedStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
   jest.advanceTimersByTime(1000);
   expect(component).toHaveAnimatedStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 
   screen.rerender(<View testID={testID} className="transition second" />);
 
   // Directly after rerender, should still have the old width
   expect(component).toHaveAnimatedStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 
   // Width should only change after we advance time
@@ -148,18 +148,18 @@ test("transition - interaction", () => {
 
   // Should have the initial color
   expect(component).toHaveAnimatedStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
   jest.advanceTimersByTime(1000);
   expect(component).toHaveAnimatedStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 
   fireEvent(component, "pressIn");
 
   // Directly after rerender, should still have the old color
   expect(component).toHaveAnimatedStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 
   // Color should only change after we advance time

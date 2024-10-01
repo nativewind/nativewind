@@ -296,27 +296,27 @@ describe("Typography - Text Align", () => {
 describe("Typography - Text Color", () => {
   test("text-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { color: "rgba(0, 0, 0, 1)" } },
+      props: { style: { color: "#000000" } },
     });
   });
   test("text-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { color: "rgba(255, 255, 255, 1)" } },
+      props: { style: { color: "#ffffff" } },
     });
   });
   test("text-transparent", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { color: "rgba(0, 0, 0, 0)" } },
+      props: { style: { color: "#00000000" } },
     });
   });
   test("text-slate-50", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { color: "rgba(248, 250, 252, 1)" } },
+      props: { style: { color: "#f8fafc" } },
     });
   });
   test("text-white/50", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { color: "rgba(255, 255, 255, 0.501960813999176)" } },
+      props: { style: { color: "#ffffff80" } },
     });
   });
   test("text-current", async () => {
@@ -360,22 +360,22 @@ describe("Typography - Text Decoration", () => {
 describe("Typography - Text Decoration Color", () => {
   test("decoration-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { textDecorationColor: "rgba(0, 0, 0, 1)" } },
+      props: { style: { textDecorationColor: "#000000" } },
     });
   });
   test("decoration-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { textDecorationColor: "rgba(255, 255, 255, 1)" } },
+      props: { style: { textDecorationColor: "#ffffff" } },
     });
   });
   test("decoration-transparent", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { textDecorationColor: "rgba(0, 0, 0, 0)" } },
+      props: { style: { textDecorationColor: "#00000000" } },
     });
   });
   test("decoration-slate-50", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { textDecorationColor: "rgba(248, 250, 252, 1)" } },
+      props: { style: { textDecorationColor: "#f8fafc" } },
     });
   });
   test("decoration-current", async () => {

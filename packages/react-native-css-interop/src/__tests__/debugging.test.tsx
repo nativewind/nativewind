@@ -28,7 +28,7 @@ describe("debugging", () => {
     const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({
-      color: "rgba(239, 68, 68, 1)",
+      color: "#ef4444",
       padding: 10,
     });
 
@@ -45,7 +45,7 @@ describe("debugging", () => {
     "ref": null,
     "style": {
       "padding": 10,
-      "color": "rgba(239, 68, 68, 1)"
+      "color": "#ef4444"
     }
   },
   "variables": {},
@@ -66,7 +66,7 @@ describe("debugging", () => {
     const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({
-      color: "rgba(239, 68, 68, 1)",
+      color: "#ef4444",
       padding: 10,
     });
 
@@ -83,7 +83,7 @@ describe("debugging", () => {
     "ref": null,
     "style": {
       "padding": 10,
-      "color": "rgba(239, 68, 68, 1) (animated value)"
+      "color": "#ef4444 (animated value)"
     }
   },
   "variables": {},
@@ -140,7 +140,7 @@ describe("debugging", () => {
     const component = screen.getByTestId(testID);
 
     expect(component).toHaveStyle({
-      color: "rgba(239, 68, 68, 1)",
+      color: "#ef4444",
     });
 
     expect(console.log).toHaveBeenCalledTimes(1);
@@ -164,7 +164,7 @@ describe("debugging", () => {
     "onLayout": "[Function]",
     "ref": null,
     "style": {
-      "color": "rgba(239, 68, 68, 1)"
+      "color": "#ef4444"
     }
   },
   "variables": {},

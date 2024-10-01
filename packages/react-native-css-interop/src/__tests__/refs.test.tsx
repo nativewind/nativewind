@@ -70,7 +70,7 @@ test("ForwardRef", () => {
   render(<ForwardRef ref={ref} testID={testID} className="my-class" />);
 
   expect(ref.current?.getProps().style).toEqual({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -81,7 +81,7 @@ test("ClassComponent", () => {
   render(<ClassComponent ref={ref} testID={testID} className="my-class" />);
 
   expect(ref.current?.getProps().style).toEqual({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -92,6 +92,6 @@ test("ChildComponent", () => {
   render(<ChildComponent ref={ref} testID={testID} className="my-class" />);
 
   expect(ref.current?.getProps().style).toEqual({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });

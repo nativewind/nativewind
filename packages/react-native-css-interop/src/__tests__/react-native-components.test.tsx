@@ -69,9 +69,9 @@ test("TextInput", () => {
   expect(component.props).toEqual(
     expect.objectContaining({
       testID,
-      placeholderTextColor: "rgba(255, 255, 255, 1)",
+      placeholderTextColor: "#ffffff",
       style: {
-        color: "rgba(0, 0, 0, 1)",
+        color: "#000000",
       },
     }),
   );
@@ -95,9 +95,9 @@ test("ActivityIndicator", () => {
   expect(component.props).toEqual(
     expect.objectContaining({
       testID,
-      color: "rgba(255, 255, 255, 1)",
+      color: "#ffffff",
       style: {
-        backgroundColor: "rgba(0, 0, 0, 1)",
+        backgroundColor: "#000000",
       },
     }),
   );
@@ -131,7 +131,7 @@ test(`ScrollView`, () => {
       paddingTop: 70,
     },
     style: {
-      backgroundColor: "rgba(0, 0, 0, 1)",
+      backgroundColor: "#000000",
     },
   });
 });

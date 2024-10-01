@@ -40,10 +40,10 @@ it("can create custom components", () => {
   expect(comp.props).toStrictEqual({
     children: undefined,
     testID,
-    placeholderTextColor: "rgba(0, 0, 255, 1)",
+    placeholderTextColor: "#0000ff",
     textAlign: "center",
     style: {
-      color: "rgba(255, 0, 0, 1)",
+      color: "#ff0000",
     },
   });
 });
@@ -77,9 +77,9 @@ it("can target deeply nested props", () => {
     children: undefined,
     deeply: {
       nested: {
-        backgroundColor: "rgba(0, 0, 255, 1)",
+        backgroundColor: "#0000ff",
         target: {
-          color: "rgba(255, 0, 0, 1)",
+          color: "#ff0000",
         },
       },
     },
@@ -117,8 +117,8 @@ it("works with @rn-move", () => {
     children: undefined,
     deeply: {
       nested: {
-        backgroundColor: "rgba(0, 0, 255, 1)",
-        myColor: "rgba(255, 0, 0, 1)",
+        backgroundColor: "#0000ff",
+        myColor: "#ff0000",
         target: {
           fontSize: 14,
         },
@@ -161,9 +161,9 @@ it("works with @rn-move and nativeStyleToProps", () => {
     children: undefined,
     deeply: {
       nested: {
-        myColor: "rgba(255, 0, 0, 1)",
+        myColor: "#ff0000",
         target: {
-          backgroundColor: "rgba(0, 0, 255, 1)",
+          backgroundColor: "#0000ff",
           fontSize: 14,
         },
       },
