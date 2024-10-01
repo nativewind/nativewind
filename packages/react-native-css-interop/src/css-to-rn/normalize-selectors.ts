@@ -93,7 +93,7 @@ export function normalizeSelectors(
       }
     } else if (
       // Matches:  .dark * {}
-      isDarkDefaultVariableSelector(cssSelector, options)
+      isDarkUniversalSelector(cssSelector, options)
     ) {
       selectors.push({
         type: "universalVariables",
@@ -323,6 +323,23 @@ function reduceSelector(
 
         let pseudoClasses: Record<string, true>;
         let attrs: AttributeCondition[];
+        if (component.kind === "is") {
+          if (isDarkUniversalSelector(component.selectors[0], options)) {
+            acc.media ??= [];
+            acc.media.push({
+              mediaType: "all",
+              condition: {
+                type: "feature",
+                value: {
+                  type: "plain",
+                  name: "prefers-color-scheme",
+                  value: { type: "ident", value: "dark" },
+                },
+              },
+            });
+            break;
+          }
+        }
 
         switch (previousType) {
           case "pseudo-class":
@@ -475,7 +492,7 @@ function isRootDarkVariableSelector(
 }
 
 // Matches:  .dark * {}
-function isDarkDefaultVariableSelector(
+function isDarkUniversalSelector(
   [first, second, third]: Selector,
   options: ExtractRuleOptions,
 ) {

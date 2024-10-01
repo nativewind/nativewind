@@ -219,3 +219,31 @@ test("useColorScheme().toggleColorScheme() with darkMode: class", async () => {
   act(() => fireEvent.press(button));
   expect(text.props.children).toStrictEqual("dark");
 });
+
+test("combines with other modifiers", async () => {
+  act(() => colorScheme.set("dark"));
+
+  await render(
+    <View
+      testID={testID}
+      className="bg-green-500 active:bg-red-500 dark:active:bg-blue-500"
+    >
+      <Text>Press me</Text>
+    </View>,
+    {
+      config: {
+        darkMode: "class",
+      },
+    },
+  );
+
+  const component = screen.getByTestId(testID);
+  expect(component).toHaveStyle({ backgroundColor: "rgba(34, 197, 94, 1)" });
+
+  fireEvent(component, "pressIn");
+  expect(component).toHaveStyle({ backgroundColor: "rgba(59, 130, 246, 1)" });
+
+  act(() => colorScheme.set("light"));
+
+  expect(component).toHaveStyle({ backgroundColor: "rgba(239, 68, 68, 1)" });
+});
