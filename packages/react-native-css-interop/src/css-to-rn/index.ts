@@ -127,7 +127,7 @@ export function cssToReactNativeRuntime(
   });
 
   debug("Start optimizing rules");
-  let rules: StyleSheetRegisterCompiledOptions["rules"] = [];
+  let rules: StyleSheetRegisterCompiledOptions["rules"] = {};
   for (const [name, styles] of extractOptions.rules) {
     if (styles.length === 0) continue;
 
@@ -156,7 +156,7 @@ export function cssToReactNativeRuntime(
       if (style.pseudoClasses?.focus) styleRuleSet.focus = true;
     }
 
-    rules.push([name, styleRuleSet]);
+    rules[name] = styleRuleSet;
   }
 
   rules = optimizeRules(rules);

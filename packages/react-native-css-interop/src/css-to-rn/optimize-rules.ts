@@ -8,11 +8,17 @@ import {
 export function optimizeRules(
   rules: StyleSheetRegisterCompiledOptions["rules"],
 ): StyleSheetRegisterCompiledOptions["rules"] {
-  return rules?.map(([name, ruleSet]) => {
+  if (!rules) {
+    return {};
+  }
+
+  for (const name in rules) {
+    const ruleSet = rules[name];
+
     let isDynamic = ruleSet.important && ruleSet.important?.length > 0;
 
     if (isDynamic) {
-      return [name, ruleSet];
+      rules[name] = ruleSet;
     }
 
     if (ruleSet.normal) {
@@ -25,8 +31,10 @@ export function optimizeRules(
       }
     }
 
-    return [name, ruleSet];
-  });
+    rules[name] = ruleSet;
+  }
+
+  return rules;
 }
 
 /**

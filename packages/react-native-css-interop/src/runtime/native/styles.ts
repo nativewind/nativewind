@@ -46,6 +46,8 @@ const keyframes = global.__css_interop.keyframes;
 const rootVariables = global.__css_interop.rootVariables;
 const universalVariables = global.__css_interop.universalVariables;
 
+const seenStylesForHotReload = new Set<string>();
+
 export const opaqueStyles = new WeakMap<
   object,
   RemappedClassName | StyleRuleSet
@@ -55,6 +57,12 @@ export const VariableContext =
   createContext<VariableContextValue>(rootVariables);
 
 export function getStyle(name: string, effect?: Effect) {
+  if (!seenStylesForHotReload.has(name)) {
+    // This is the first time seeing the style, so we need to initiate it
+    seenStylesForHotReload.add(name);
+    initiateStyle(name);
+  }
+
   let obs = styles.get(name);
   if (!obs) styles.set(name, (obs = observable(undefined)));
   const style = obs.get(effect);
@@ -113,6 +121,7 @@ export const getUniversalVariable = (name: string, effect: Effect) => {
 
 export function resetData() {
   styles.clear();
+  seenStylesForHotReload.clear();
   keyframes.clear();
   warnings.clear();
   universalVariables.clear();
@@ -121,16 +130,15 @@ export function resetData() {
   isReduceMotionEnabled[INTERNAL_RESET]();
 }
 
+let latestInjectedData: StyleSheetRegisterCompiledOptions = {
+  $compiled: true,
+};
+
 export function injectData(data: StyleSheetRegisterCompiledOptions) {
-  if (data.rules) {
-    for (const entry of data.rules) {
-      const value = styles.get(entry[0]);
-      if (value) {
-        value.set(entry[1]);
-      } else {
-        styles.set(entry[0], observable(entry[1]));
-      }
-    }
+  latestInjectedData = data;
+
+  for (const style of seenStylesForHotReload) {
+    initiateStyle(style);
   }
 
   if (data.keyframes) {
@@ -178,5 +186,18 @@ export function injectData(data: StyleSheetRegisterCompiledOptions) {
 
   if (data.rem) {
     rem.set(data.rem);
+  }
+}
+
+function initiateStyle(name: string) {
+  const value = styles.get(name);
+  const style = latestInjectedData.rules?.[name];
+
+  if (!style) return;
+
+  if (value) {
+    value.set(style);
+  } else {
+    styles.set(name, observable(style));
   }
 }

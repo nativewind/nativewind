@@ -359,7 +359,7 @@ export type PseudoClassesQuery = {
 
 export type StyleSheetRegisterCompiledOptions = {
   $compiled: true;
-  rules?: [string, StyleRuleSet][];
+  rules?: Record<string, StyleRuleSet>;
   keyframes?: [string, ExtractedAnimation][];
   rootVariables?: VariableRecord;
   universalVariables?: VariableRecord;
