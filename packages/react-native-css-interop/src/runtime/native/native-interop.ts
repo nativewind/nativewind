@@ -420,12 +420,12 @@ function getDeclarations(
   state.normal = normalRules
     .filter(Boolean)
     .sort(specificityCompare)
-    .flatMap((rule) => ("$type" in rule ? rule.declarations : rule));
+    .flatMap((rule) => ("$type" in rule ? rule.d : rule));
 
   state.important = importantRules
     .filter(Boolean)
     .sort(specificityCompare)
-    .flatMap((rule) => ("$type" in rule ? rule.declarations : [rule]));
+    .flatMap((rule) => ("$type" in rule ? rule.d : [rule]));
 
   const areEqual =
     previousState.className === state.className &&
@@ -1050,7 +1050,7 @@ function collectRules(
           state.containerNames = rule.container.names;
         }
 
-        if (rule.declarations) {
+        if (rule.d) {
           collection.push(rule as ProcessedStyleRules);
         }
       } else {

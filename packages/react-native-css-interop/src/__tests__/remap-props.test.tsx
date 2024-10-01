@@ -40,7 +40,7 @@ test("mapping", () => {
         {
           $type: "StyleRule",
           attrs: undefined,
-          declarations: [
+          d: [
             [
               {
                 backgroundColor: "rgba(0, 0, 0, 1)",
@@ -58,7 +58,7 @@ test("mapping", () => {
         {
           $type: "StyleRule",
           attrs: undefined,
-          declarations: [
+          d: [
             [
               {
                 color: "rgba(255, 255, 255, 1)",

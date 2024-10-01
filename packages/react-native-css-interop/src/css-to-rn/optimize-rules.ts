@@ -18,10 +18,10 @@ export function optimizeRules(
     if (ruleSet.normal) {
       for (const rule of ruleSet.normal) {
         // Static styles only have $type & declarations
-        if (!("declarations" in rule) || Object.keys(rules).length > 2) {
+        if (!rule.d || Object.keys(rules).length > 2) {
           continue;
         }
-        rule.declarations = mergeDeclarations(rule.declarations);
+        rule.d = mergeDeclarations(rule.d);
       }
     }
 
@@ -34,7 +34,7 @@ export function optimizeRules(
  * There maybe multiple static object if there are different target props
  * Static declarations only have 2 tokens in the path, so transform/shadows are not counted
  */
-function mergeDeclarations(declarations: StyleRule["declarations"]) {
+function mergeDeclarations(declarations: StyleRule["d"]) {
   if (!declarations) {
     return;
   }

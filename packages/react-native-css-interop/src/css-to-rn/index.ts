@@ -389,13 +389,13 @@ function setStyleForSelectorList(
     options,
   )) {
     const style: StyleRule = { ...extractedStyle };
-    if (!style.declarations) continue;
+    if (!style.d) continue;
 
     if (
       selector.type === "rootVariables" || // :root
       selector.type === "universalVariables" // *
     ) {
-      const fontSizeValue = style.declarations.findLast(([value, property]) => {
+      const fontSizeValue = style.d.findLast(([value, property]) => {
         if (property === "fontSize" && typeof value === "number") {
           return true;
         }
@@ -442,7 +442,7 @@ function setStyleForSelectorList(
           $type: "StyleRule",
           s: specificity,
           attrs,
-          declarations: [],
+          d: [],
           container: {
             names: [groupClassName],
           },
@@ -503,7 +503,7 @@ function extractKeyFrames(
     specificity[SpecificityIndex.ClassName] = 1;
     specificity[SpecificityIndex.Order] = extractOptions.appearanceOrder;
 
-    const { declarations, animations } = declarationsToStyle(
+    const { d: declarations, animations } = declarationsToStyle(
       frame.declarations.declarations,
       {
         ...extractOptions,
@@ -677,7 +677,7 @@ function declarationsToStyle(
   const extractedStyle: StyleRule = {
     $type: "StyleRule",
     s: [...specificity],
-    declarations: props,
+    d: props,
   };
 
   /*

@@ -205,6 +205,7 @@ export type RuntimeStyleRuleSet = {
 export type StyleRule = {
   $type: "StyleRule";
   s: Specificity;
+  d?: StyleDeclaration[];
   media?: MediaQuery[];
   variables?: Array<[string, RuntimeValueDescriptor]>;
   pseudoClasses?: PseudoClassesQuery;
@@ -214,13 +215,12 @@ export type StyleRule = {
   transition?: ExtractedTransition;
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
-  declarations?: StyleDeclaration[];
   attrs?: AttributeCondition[];
   warnings?: ExtractionWarning[];
 };
 
 export type ProcessedStyleRules =
-  | (StyleRule & Required<Pick<StyleRule, "declarations">>)
+  | (StyleRule & Required<Pick<StyleRule, "d">>)
   | Record<string, any>;
 
 export type PropState = Effect & {
