@@ -128,6 +128,7 @@ export function resetData() {
   rootVariables.clear();
   colorScheme[INTERNAL_RESET](Appearance);
   isReduceMotionEnabled[INTERNAL_RESET]();
+  rem.set(14);
 }
 
 let latestInjectedData: StyleSheetRegisterCompiledOptions = {

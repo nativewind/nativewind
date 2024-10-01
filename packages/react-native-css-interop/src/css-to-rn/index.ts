@@ -36,9 +36,9 @@ import {
   DEFAULT_CONTAINER_NAME,
   isRuntimeDescriptor,
   SpecificityIndex,
+  transformKeys,
 } from "../shared";
 import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
-import { optimizeRules } from "./optimize-rules";
 
 import { versions } from "node:process";
 import { defaultFeatureFlags } from "./feature-flags";
@@ -159,9 +159,10 @@ export function cssToReactNativeRuntime(
     rules[name] = styleRuleSet;
   }
 
-  rules = optimizeRules(rules);
   debug("Finishing optimization");
   debug(`Rule set count: ${rules?.length || 0}`);
+
+  const rem = extractOptions.inlineRem || extractOptions.rem;
 
   // Convert the extracted style declarations and animations from maps to objects and return them
   return {
@@ -171,7 +172,7 @@ export function cssToReactNativeRuntime(
     rootVariables: extractOptions.rootVariables,
     universalVariables: extractOptions.universalVariables,
     flags: extractOptions.flags,
-    rem: extractOptions.rem,
+    rem,
   };
 }
 
@@ -395,14 +396,21 @@ function setStyleForSelectorList(
       selector.type === "rootVariables" || // :root
       selector.type === "universalVariables" // *
     ) {
-      const fontSizeValue = style.d.findLast(([value, property]) => {
-        if (property === "fontSize" && typeof value === "number") {
-          return true;
-        }
+      const fontSizeValue = style.d.findLast(([value]) => {
+        return typeof value === "object" && "fontSize" in value;
       })?.[0];
 
-      if (typeof fontSizeValue === "number") {
-        options.rem = fontSizeValue;
+      if (
+        typeof options.inlineRem !== "number" &&
+        fontSizeValue &&
+        typeof fontSizeValue === "object" &&
+        "fontSize" in fontSizeValue &&
+        typeof fontSizeValue["fontSize"] === "number"
+      ) {
+        options.rem = fontSizeValue["fontSize"];
+        if (options.inlineRem === undefined) {
+          options.inlineRem = options.rem;
+        }
       }
 
       if (!style.variables) {
@@ -461,12 +469,15 @@ function setStyleForSelectorList(
         style.media.push(...media);
       }
 
-      addDeclaration(declarations, className, {
+      const rule: StyleRule = {
         ...style,
         s: specificity,
-        pseudoClasses,
-        attrs,
-      });
+      };
+
+      if (pseudoClasses) rule.pseudoClasses = pseudoClasses;
+      if (attrs) rule.attrs = attrs;
+
+      addDeclaration(declarations, className, rule);
     }
   }
 }
@@ -526,7 +537,8 @@ function extractKeyFrames(
      * Non-style props have pathTokens instead of a single string
      */
     const values = declarations.filter(
-      (declaration) => typeof declaration[1] === "string",
+      (declaration) =>
+        declaration.length === 1 || typeof declaration[1] === "string",
     );
 
     if (values.length === 0) continue;
@@ -582,31 +594,44 @@ function extractKeyFrames(
     }
 
     for (const frameValue of rawFrame.values) {
-      const [value, propOrPathTokens] = Array.isArray(frameValue)
-        ? frameValue
-        : [frameValue];
+      const [value, propOrPathTokens] = frameValue;
 
-      // We only accept animations on the `style` prop
-      if (Array.isArray(propOrPathTokens) || !propOrPathTokens) {
+      // We only accept animations on the `style` prop, which are either undefined or a string
+      if (Array.isArray(propOrPathTokens)) {
         continue;
       }
 
-      const key = propOrPathTokens;
+      if (propOrPathTokens) {
+        const key = propOrPathTokens;
 
-      if (!isRuntimeDescriptor(value)) {
-        throw new Error("animation is an object?");
+        if (!isRuntimeDescriptor(value)) {
+          throw new Error("animation is an object?");
+        }
+
+        if (!frames[key]) {
+          frames[key] = [key, []];
+        }
+
+        // All props need a progress 0 frame
+        if (progress !== 0 && frames[key][1].length === 0) {
+          frames[key][1].push({ value: "!INHERIT!", progress: 0 });
+        }
+
+        frames[key][1].push({ value, progress });
+      } else if (value && typeof value === "object" && !Array.isArray(value)) {
+        for (const key in value) {
+          if (!frames[key]) {
+            frames[key] = [key, []];
+          }
+
+          // All props need a progress 0 frame
+          if (progress !== 0 && frames[key][1].length === 0) {
+            frames[key][1].push({ value: "!INHERIT!", progress: 0 });
+          }
+
+          frames[key][1].push({ value: value[key], progress });
+        }
       }
-
-      if (!frames[key]) {
-        frames[key] = [key, []];
-      }
-
-      // All props need a progress 0 frame
-      if (progress !== 0 && frames[key][1].length === 0) {
-        frames[key][1].push({ value: "!INHERIT!", progress: 0 });
-      }
-
-      frames[key][1].push({ value, progress });
     }
   }
 
@@ -673,11 +698,14 @@ function declarationsToStyle(
   specificity: Specificity,
   mapping: MoveTokenRecord,
 ): StyleRule {
-  const props: StyleDeclaration[] = [];
+  const styleDecls: StyleDeclaration[] = [];
+  let staticStyleDecl: Extract<StyleDeclaration, { length: 1 }>[0] | undefined =
+    undefined;
+
   const extractedStyle: StyleRule = {
     $type: "StyleRule",
     s: [...specificity],
-    d: props,
+    d: styleDecls,
   };
 
   /*
@@ -714,17 +742,29 @@ function declarationsToStyle(
         ? attribute
         : [...(moveTokens || []), ...(attributeMapping || [])];
 
-    if (typeof pathTokens === "string") {
-      if (shouldDelay) {
-        props.push([value, pathTokens, true]);
+    if (
+      typeof pathTokens === "string" &&
+      !transformKeys.has(pathTokens) &&
+      !shouldDelay &&
+      typeof value !== "object"
+    ) {
+      if (staticStyleDecl) {
+        Object.assign(staticStyleDecl, { [pathTokens]: value });
       } else {
-        props.push([value, pathTokens]);
+        staticStyleDecl = { [pathTokens]: value };
+        styleDecls.push([staticStyleDecl]);
+      }
+    } else if (typeof pathTokens === "string") {
+      if (shouldDelay) {
+        styleDecls.push([value, pathTokens, true]);
+      } else {
+        styleDecls.push([value, pathTokens]);
       }
     } else {
       if (shouldDelay) {
-        props.push([value, pathTokens, true]);
+        styleDecls.push([value, pathTokens, true]);
       } else {
-        props.push([value, pathTokens]);
+        styleDecls.push([value, pathTokens]);
       }
     }
   }

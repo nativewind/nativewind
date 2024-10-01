@@ -165,8 +165,8 @@ export type PathTokens = string[];
 export type Delayed = boolean;
 export type MoveTokenRecord = Record<string, PathTokens>;
 export type StyleDeclaration =
-  | [Record<string, unknown>]
-  | [Record<string, unknown>, PathTokens]
+  | [Record<string, string | number | boolean>]
+  | [Record<string, string | number | boolean>, PathTokens]
   | [RuntimeValueDescriptor, StyleAttribute]
   | [RuntimeValueDescriptor, PathTokens]
   | [RuntimeValueDescriptor, StyleAttribute | PathTokens, true];

@@ -20,6 +20,17 @@ test("heading", () => {
 
 describe("can override the rem value", () => {
   test("using :root", () => {
+    registerCSS(`:root { font-size: 10px } .my-class { font-size: 3rem; }`);
+
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      fontSize: 30,
+    });
+  });
+
+  test("using :root (inlineRem)", () => {
     registerCSS(`:root { font-size: 10px } .my-class { font-size: 3rem; }`, {
       inlineRem: false,
     });
