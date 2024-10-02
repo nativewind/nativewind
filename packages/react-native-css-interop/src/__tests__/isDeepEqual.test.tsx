@@ -4,7 +4,7 @@ test("a", () => {
   const a = [
     {
       $type: "StyleRule",
-      s: [14216, 2],
+      s: [14215, 2],
       d: [[[{}, "var", ["--theme-fg", null], true], "color", true]],
       pseudoClasses: {
         active: true,
