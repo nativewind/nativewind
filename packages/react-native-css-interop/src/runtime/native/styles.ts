@@ -199,10 +199,10 @@ function initiateStyle(name: string) {
 
   // Add the symbols that were removed during the Metro->Device transfer
   style[StyleRuleSetSymbol] = true;
-  style.normal?.forEach((style) => {
+  style.n?.forEach((style) => {
     style[StyleRuleSymbol] = true;
   });
-  style.important?.forEach((style) => {
+  style.i?.forEach((style) => {
     style[StyleRuleSymbol] = true;
   });
 

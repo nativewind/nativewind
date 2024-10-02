@@ -113,7 +113,7 @@ export function vars(variables: Record<string, RuntimeValueDescriptor>) {
   opaqueStyles.set(style, {
     [StyleRuleSetSymbol]: true,
     variables: true,
-    normal: [
+    n: [
       {
         [StyleRuleSymbol]: true,
         s: inlineSpecificity,

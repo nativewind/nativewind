@@ -37,7 +37,7 @@ test("mapping", () => {
   expect(getOpaqueStyles(component.props.differentStyle)).toStrictEqual([
     {
       [StyleRuleSetSymbol]: true,
-      normal: [
+      n: [
         {
           [StyleRuleSymbol]: true,
           d: [
@@ -53,7 +53,7 @@ test("mapping", () => {
     },
     {
       [StyleRuleSetSymbol]: true,
-      normal: [
+      n: [
         {
           [StyleRuleSymbol]: true,
           d: [

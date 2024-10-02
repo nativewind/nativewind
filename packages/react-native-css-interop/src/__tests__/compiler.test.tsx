@@ -21,7 +21,7 @@ test("will merge static styles", () => {
       test: {
         [StyleRuleSetSymbol]: true,
         variables: true,
-        normal: [
+        n: [
           {
             [StyleRuleSymbol]: true,
             s: [1, 1],

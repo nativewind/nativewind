@@ -403,8 +403,8 @@ function getDeclarations(
       }
 
       handleUpgrades(refs.sharedState, ruleSet);
-      collectRules(state, refs, ruleSet, normalRules, "normal");
-      collectRules(state, refs, ruleSet, importantRules, "important");
+      collectRules(state, refs, ruleSet, normalRules, "n");
+      collectRules(state, refs, ruleSet, importantRules, "i");
     }
   }
 
@@ -1022,7 +1022,7 @@ function collectRules(
   refs: Refs,
   ruleSet: StyleRuleSet,
   collection: ProcessedStyleRules[],
-  key: "normal" | "important",
+  key: "n" | "i",
 ) {
   const rules = ruleSet[key];
 
@@ -1089,8 +1089,8 @@ function collectInlineRules(
       if (StyleRuleSetSymbol in style) {
         const ruleSet = style as StyleRuleSet;
         handleUpgrades(refs.sharedState, ruleSet);
-        collectRules(state, refs, ruleSet, normal, "normal");
-        collectRules(state, refs, ruleSet, important, "important");
+        collectRules(state, refs, ruleSet, normal, "n");
+        collectRules(state, refs, ruleSet, important, "i");
       } else {
         normal.push(style);
       }

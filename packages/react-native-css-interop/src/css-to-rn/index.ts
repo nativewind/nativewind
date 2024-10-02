@@ -146,11 +146,11 @@ export function cssToReactNativeRuntime(
 
     for (const { warnings, ...style } of styles) {
       if (style.s[SpecificityIndex.Important]) {
-        styleRuleSet.important ??= [];
-        styleRuleSet.important.push(style);
+        styleRuleSet.i ??= [];
+        styleRuleSet.i.push(style);
       } else {
-        styleRuleSet.normal ??= [];
-        styleRuleSet.normal.push(style);
+        styleRuleSet.n ??= [];
+        styleRuleSet.n.push(style);
       }
 
       if (warnings) {

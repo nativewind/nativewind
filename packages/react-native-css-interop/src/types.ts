@@ -184,8 +184,8 @@ export type StyleDeclarationOrInline =
 
 export type StyleRuleSet = {
   [StyleRuleSetSymbol]: true;
-  normal?: StyleRule[];
-  important?: StyleRule[];
+  n?: StyleRule[];
+  i?: StyleRule[];
   warnings?: ExtractionWarning[];
   classNames?: string;
   variables?: boolean;
