@@ -6,18 +6,48 @@ import { observable } from "../observable";
 let appearance = Appearance;
 let appearanceListener: NativeEventSubscription | undefined;
 
-// This shouldn't change, as its loaded from the CSS
-const [darkMode, darkModeValue] = StyleSheet.getFlag("darkMode")?.split(
-  " ",
-) ?? ["media"];
+const darkModeFlag = StyleSheet.getFlag("darkMode");
 
+let darkMode: string | undefined;
+let darkModeValue: string | undefined;
 let initialColor: "light" | "dark" | undefined = undefined;
-if (darkMode === "class") {
-  initialColor = globalThis.window.document.documentElement.classList.contains(
-    darkModeValue,
-  )
-    ? "dark"
-    : "light";
+
+if (darkModeFlag) {
+  const flags = darkModeFlag.split(" ");
+  darkMode = flags[0];
+  darkModeValue = flags[1];
+
+  if (darkMode === "class") {
+    initialColor =
+      "window" in globalThis.window &&
+      globalThis.window.document.documentElement.classList.contains(
+        darkModeValue,
+      )
+        ? "dark"
+        : "light";
+  }
+} else if ("window" in globalThis) {
+  // In development, Expo might insert the StyleSheet AFTER this code runs.
+  // Instead we watch for the stylesheet being added
+  const headNode = globalThis.window.document.getElementsByTagName("head")[0];
+  new MutationObserver(function (_, observer) {
+    // We don't actually care what the mutation is, just wait until we have a darkMode setting
+    const darkModeFlag = StyleSheet.getFlag("darkMode");
+    if (!darkModeFlag) return;
+
+    // We have the flag, so we can remove the observer
+    observer.disconnect();
+    const flags = darkModeFlag.split(" ");
+    darkMode = flags[0];
+    darkModeValue = flags[1];
+    colorScheme.set(
+      globalThis.window.document.documentElement.classList.contains(
+        darkModeValue,
+      )
+        ? "dark"
+        : "system",
+    );
+  }).observe(headNode, { attributes: false, childList: true, subtree: false });
 }
 
 const systemColorScheme = observable<"light" | "dark">(
@@ -49,12 +79,16 @@ export const colorScheme = {
       colorSchemeObservable.set(value);
     }
 
-    if (value === "dark") {
-      globalThis.window?.document.documentElement.classList.add(darkModeValue);
-    } else {
-      globalThis.window?.document.documentElement.classList.remove(
-        darkModeValue,
-      );
+    if (darkModeValue) {
+      if (value === "dark") {
+        globalThis.window?.document.documentElement.classList.add(
+          darkModeValue,
+        );
+      } else {
+        globalThis.window?.document.documentElement.classList.remove(
+          darkModeValue,
+        );
+      }
     }
   },
   get: colorSchemeObservable.get,
