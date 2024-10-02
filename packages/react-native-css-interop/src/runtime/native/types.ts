@@ -24,8 +24,8 @@ export type ReducerState = {
   className?: string | undefined | null;
   config: InteropComponentConfig;
   normal: StyleDeclaration[];
-  inline?: Record<string, unknown> | Record<string, unknown>[];
   important: StyleDeclaration[];
+  inline?: Record<string, unknown> | Record<string, unknown>[];
   props: Record<string, any>;
   variables?: Record<string, any>;
   containerNames?: false | string[];

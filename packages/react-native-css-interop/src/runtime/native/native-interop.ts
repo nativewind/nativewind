@@ -50,6 +50,7 @@ import {
   PLACEHOLDER_SYMBOL,
   SpecificityIndex,
   StyleRuleSetSymbol,
+  StyleRuleSymbol,
 } from "../../shared";
 
 export function interop(
@@ -421,12 +422,12 @@ function getDeclarations(
   state.normal = normalRules
     .filter(Boolean)
     .sort(specificityCompare)
-    .flatMap((rule) => ("$type" in rule ? rule.d : rule));
+    .flatMap((rule) => (StyleRuleSymbol in rule ? rule.d : rule));
 
   state.important = importantRules
     .filter(Boolean)
     .sort(specificityCompare)
-    .flatMap((rule) => ("$type" in rule ? rule.d : [rule]));
+    .flatMap((rule) => (StyleRuleSymbol in rule ? rule.d : rule));
 
   const areEqual =
     previousState.className === state.className &&
@@ -976,8 +977,8 @@ function specificityCompare(
   if (!o1) return -1;
   if (!o2) return 1;
 
-  const aSpec = "$type" in o1 ? o1.s : inlineSpecificity;
-  const bSpec = "$type" in o2 ? o2.s : inlineSpecificity;
+  const aSpec = StyleRuleSymbol in o1 ? o1.s : inlineSpecificity;
+  const bSpec = StyleRuleSymbol in o2 ? o2.s : inlineSpecificity;
 
   if (aSpec[SpecificityIndex.Important] !== bSpec[SpecificityIndex.Important]) {
     return (
@@ -1030,7 +1031,7 @@ function collectRules(
   for (const rule of rules) {
     // Check if the rule should be applied and also mutate the guards to add checks for next render
     if (testRule(rule, refs, state.declarationTracking)) {
-      if ("$type" in rule) {
+      if (StyleRuleSymbol in rule) {
         if (rule.animations) {
           Object.assign(state.currentRenderAnimation, rule.animations);
         }

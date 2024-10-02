@@ -10,7 +10,7 @@ import {
   remapProps,
   getOpaqueStyles,
 } from "test";
-import { StyleRuleSetSymbol } from "../shared";
+import { StyleRuleSetSymbol, StyleRuleSymbol } from "../shared";
 
 const testID = "react-native-css-interop";
 
@@ -39,7 +39,7 @@ test("mapping", () => {
       [StyleRuleSetSymbol]: true,
       normal: [
         {
-          $type: "StyleRule",
+          [StyleRuleSymbol]: true,
           d: [
             [
               {
@@ -55,7 +55,7 @@ test("mapping", () => {
       [StyleRuleSetSymbol]: true,
       normal: [
         {
-          $type: "StyleRule",
+          [StyleRuleSymbol]: true,
           d: [
             [
               {

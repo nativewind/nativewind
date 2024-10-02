@@ -9,6 +9,7 @@ export const INTERNAL_RESET: unique symbol = Symbol();
 export const INTERNAL_SET: unique symbol = Symbol();
 export const INTERNAL_FLAGS: unique symbol = Symbol();
 export const StyleRuleSetSymbol: unique symbol = Symbol();
+export const StyleRuleSymbol: unique symbol = Symbol();
 
 export const PLACEHOLDER_SYMBOL: unique symbol = Symbol();
 

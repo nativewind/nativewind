@@ -14,6 +14,7 @@ import {
   assignToTarget,
   inlineSpecificity,
   StyleRuleSetSymbol,
+  StyleRuleSymbol,
 } from "../../shared";
 
 export { StyleSheet } from "./stylesheet";
@@ -114,7 +115,7 @@ export function vars(variables: Record<string, RuntimeValueDescriptor>) {
     variables: true,
     normal: [
       {
-        $type: "StyleRule",
+        [StyleRuleSymbol]: true,
         s: inlineSpecificity,
         variables: Object.entries(variables).map(([name, value]) => {
           return [name.startsWith("--") ? name : `--${name}`, value];

@@ -14,7 +14,7 @@ import type {
 } from "../../types";
 import { INTERNAL_RESET, rem } from "./unit-observables";
 import { flags, warnings } from "./globals";
-import { StyleRuleSetSymbol } from "../../shared";
+import { StyleRuleSetSymbol, StyleRuleSymbol } from "../../shared";
 
 export type InjectedStyleContextValue = {
   styles: Record<string, Observable<StyleRuleSet>>;
@@ -197,7 +197,14 @@ function initiateStyle(name: string) {
 
   if (!style) return;
 
+  // Add the symbols that were removed during the Metro->Device transfer
   style[StyleRuleSetSymbol] = true;
+  style.normal?.forEach((style) => {
+    style[StyleRuleSymbol] = true;
+  });
+  style.important?.forEach((style) => {
+    style[StyleRuleSymbol] = true;
+  });
 
   if (value) {
     value.set(style);

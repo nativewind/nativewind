@@ -1,5 +1,5 @@
 import { cssToReactNativeRuntime } from "../css-to-rn";
-import { StyleRuleSetSymbol } from "../shared";
+import { StyleRuleSetSymbol, StyleRuleSymbol } from "../shared";
 
 test("will merge static styles", () => {
   const compiled = cssToReactNativeRuntime(`
@@ -20,7 +20,7 @@ test("will merge static styles", () => {
         [StyleRuleSetSymbol]: true,
         normal: [
           {
-            $type: "StyleRule",
+            [StyleRuleSymbol]: true,
             s: [1, 1],
             d: [
               [

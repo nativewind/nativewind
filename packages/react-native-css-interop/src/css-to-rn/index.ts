@@ -37,6 +37,7 @@ import {
   isRuntimeDescriptor,
   SpecificityIndex,
   StyleRuleSetSymbol,
+  StyleRuleSymbol,
   transformKeys,
 } from "../shared";
 import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
@@ -470,7 +471,7 @@ function setStyleForSelectorList(
       if (groupClassName) {
         // Add the conditions to the declarations object
         addDeclaration(declarations, groupClassName, {
-          $type: "StyleRule",
+          [StyleRuleSymbol]: true,
           s: specificity,
           attrs,
           d: [],
@@ -726,7 +727,7 @@ function declarationsToStyle(
     undefined;
 
   const extractedStyle: StyleRule = {
-    $type: "StyleRule",
+    [StyleRuleSymbol]: true,
     s: [...specificity],
     d: styleDecls,
   };
