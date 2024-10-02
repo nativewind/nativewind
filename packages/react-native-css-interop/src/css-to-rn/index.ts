@@ -36,6 +36,7 @@ import {
   DEFAULT_CONTAINER_NAME,
   isRuntimeDescriptor,
   SpecificityIndex,
+  StyleRuleSetSymbol,
   transformKeys,
 } from "../shared";
 import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
@@ -140,7 +141,7 @@ export function cssToReactNativeRuntime(
 
     options.cache?.rules.set(name, styles);
 
-    const styleRuleSet: StyleRuleSet = { $type: "StyleRuleSet" };
+    const styleRuleSet: StyleRuleSet = { [StyleRuleSetSymbol]: true };
 
     for (const { warnings, ...style } of styles) {
       if (style.s[SpecificityIndex.Important]) {

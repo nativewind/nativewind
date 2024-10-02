@@ -14,6 +14,7 @@ import type {
 } from "../../types";
 import { INTERNAL_RESET, rem } from "./unit-observables";
 import { flags, warnings } from "./globals";
+import { StyleRuleSetSymbol } from "../../shared";
 
 export type InjectedStyleContextValue = {
   styles: Record<string, Observable<StyleRuleSet>>;
@@ -88,11 +89,11 @@ export function getOpaqueStyles(
     return [style];
   }
 
-  if (opaqueStyle.$type === "RemappedClassName") {
+  if (opaqueStyle[StyleRuleSetSymbol] === "RemappedClassName") {
     return opaqueStyle.classNames.map((className) => {
       return getStyle(className, effect);
     });
-  } else if (opaqueStyle.$type === "StyleRuleSet") {
+  } else if (opaqueStyle) {
     return [opaqueStyle];
   }
 
@@ -195,6 +196,8 @@ function initiateStyle(name: string) {
   const style = latestInjectedData.rules?.[name];
 
   if (!style) return;
+
+  style[StyleRuleSetSymbol] = true;
 
   if (value) {
     value.set(style);

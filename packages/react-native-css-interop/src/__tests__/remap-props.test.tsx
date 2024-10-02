@@ -10,6 +10,7 @@ import {
   remapProps,
   getOpaqueStyles,
 } from "test";
+import { StyleRuleSetSymbol } from "../shared";
 
 const testID = "react-native-css-interop";
 
@@ -33,13 +34,12 @@ test("mapping", () => {
     differentStyle: {},
   });
 
-  expect(getOpaqueStyles(component.props.differentStyle)).toEqual([
+  expect(getOpaqueStyles(component.props.differentStyle)).toStrictEqual([
     {
-      $type: "StyleRuleSet",
+      [StyleRuleSetSymbol]: true,
       normal: [
         {
           $type: "StyleRule",
-          attrs: undefined,
           d: [
             [
               {
@@ -47,17 +47,15 @@ test("mapping", () => {
               },
             ],
           ],
-          pseudoClasses: undefined,
           s: [1, 1],
         },
       ],
     },
     {
-      $type: "StyleRuleSet",
+      [StyleRuleSetSymbol]: true,
       normal: [
         {
           $type: "StyleRule",
-          attrs: undefined,
           d: [
             [
               {
@@ -65,7 +63,6 @@ test("mapping", () => {
               },
             ],
           ],
-          pseudoClasses: undefined,
           s: [2, 1],
         },
       ],

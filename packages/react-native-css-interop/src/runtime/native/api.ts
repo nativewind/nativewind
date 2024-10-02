@@ -10,7 +10,11 @@ import { interop } from "./native-interop";
 import { getComponentType } from "./unwrap-components";
 import { VariableContext, getVariable, opaqueStyles } from "./styles";
 import { colorScheme } from "./appearance-observables";
-import { assignToTarget, inlineSpecificity } from "../../shared";
+import {
+  assignToTarget,
+  inlineSpecificity,
+  StyleRuleSetSymbol,
+} from "../../shared";
 
 export { StyleSheet } from "./stylesheet";
 export { colorScheme } from "./appearance-observables";
@@ -70,7 +74,7 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
 
       const placeholder = {};
       opaqueStyles.set(placeholder, {
-        $type: "RemappedClassName",
+        [StyleRuleSetSymbol]: "RemappedClassName",
         classNames: source.split(/\s+/),
       });
 
@@ -106,7 +110,7 @@ export function vars(variables: Record<string, RuntimeValueDescriptor>) {
   const style: Record<string, any> = {};
 
   opaqueStyles.set(style, {
-    $type: "StyleRuleSet",
+    [StyleRuleSetSymbol]: true,
     variables: true,
     normal: [
       {

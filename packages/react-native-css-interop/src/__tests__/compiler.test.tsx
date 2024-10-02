@@ -1,4 +1,5 @@
 import { cssToReactNativeRuntime } from "../css-to-rn";
+import { StyleRuleSetSymbol } from "../shared";
 
 test("will merge static styles", () => {
   const compiled = cssToReactNativeRuntime(`
@@ -13,12 +14,10 @@ test("will merge static styles", () => {
   expect(compiled).toStrictEqual({
     $compiled: true,
     flags: {},
-    keyframes: [],
     rem: undefined,
-    rootVariables: {},
     rules: {
       test: {
-        $type: "StyleRuleSet",
+        [StyleRuleSetSymbol]: true,
         normal: [
           {
             $type: "StyleRule",
@@ -36,6 +35,5 @@ test("will merge static styles", () => {
         ],
       },
     },
-    universalVariables: {},
   });
 });

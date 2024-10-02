@@ -49,6 +49,7 @@ import {
   inlineSpecificity,
   PLACEHOLDER_SYMBOL,
   SpecificityIndex,
+  StyleRuleSetSymbol,
 } from "../../shared";
 
 export function interop(
@@ -1080,12 +1081,16 @@ function collectInlineRules(
     const styles = getOpaqueStyles(target, effect);
 
     for (const style of styles) {
-      if (typeof style === "object" && "$type" in style) {
+      if (!style) {
+        continue;
+      }
+
+      if (StyleRuleSetSymbol in style) {
         const ruleSet = style as StyleRuleSet;
         handleUpgrades(refs.sharedState, ruleSet);
         collectRules(state, refs, ruleSet, normal, "normal");
         collectRules(state, refs, ruleSet, important, "important");
-      } else if (style) {
+      } else {
         normal.push(style);
       }
     }

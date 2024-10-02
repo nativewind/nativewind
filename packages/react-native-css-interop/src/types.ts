@@ -21,6 +21,7 @@ import type { Effect } from "./runtime/observable";
 import type { SharedValue } from "react-native-reanimated";
 import type { SharedState } from "./runtime/native/types";
 import type { FeatureFlagStatus } from "./css-to-rn/feature-flags";
+import { StyleRuleSetSymbol } from "./shared";
 
 export interface Effect2 {
   update: () => void;
@@ -182,7 +183,7 @@ export type StyleDeclarationOrInline =
   | Record<string, unknown>;
 
 export type StyleRuleSet = {
-  $type: "StyleRuleSet";
+  [StyleRuleSetSymbol]: true;
   normal?: StyleRule[];
   important?: StyleRule[];
   warnings?: ExtractionWarning[];
@@ -196,7 +197,7 @@ export type StyleRuleSet = {
 };
 
 export type RemappedClassName = {
-  $type: "RemappedClassName";
+  [StyleRuleSetSymbol]: "RemappedClassName";
   classNames: string[];
 };
 
