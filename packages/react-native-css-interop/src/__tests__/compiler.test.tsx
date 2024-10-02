@@ -8,6 +8,8 @@ test("will merge static styles", () => {
       color: red; 
       border-color: blue; 
       background-color: red;
+      --test: 1;
+      border-color: var(--test)
     }
   `);
 
@@ -18,6 +20,7 @@ test("will merge static styles", () => {
     rules: {
       test: {
         [StyleRuleSetSymbol]: true,
+        variables: true,
         normal: [
           {
             [StyleRuleSymbol]: true,
@@ -30,7 +33,9 @@ test("will merge static styles", () => {
                 },
               ],
               ["#ff0000", ["test"]],
+              [[{}, "var", ["--test"], true], "borderColor", true],
             ],
+            variables: [["--test", 1]],
           },
         ],
       },

@@ -1671,15 +1671,13 @@ function parseUnparsed(
       return parseUnresolvedColor(tokenOrValue.value, options);
     }
     case "var": {
-      return [
-        {},
-        "var",
-        [
-          tokenOrValue.value.name.ident,
-          parseUnparsed(tokenOrValue.value.fallback, options),
-        ],
-        true,
-      ];
+      const args: RuntimeValueDescriptor[] = [tokenOrValue.value.name.ident];
+      const fallback = parseUnparsed(tokenOrValue.value.fallback, options);
+      if (fallback !== undefined) {
+        args.push(fallback);
+      }
+
+      return [{}, "var", args, true];
     }
     case "function": {
       switch (tokenOrValue.value.name) {
