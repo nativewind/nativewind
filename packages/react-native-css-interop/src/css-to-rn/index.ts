@@ -780,13 +780,13 @@ function declarationsToStyle(
       }
     } else if (typeof pathTokens === "string") {
       if (shouldDelay) {
-        styleDecls.push([value, pathTokens, true]);
+        styleDecls.push([value, pathTokens, 1]);
       } else {
         styleDecls.push([value, pathTokens]);
       }
     } else {
       if (shouldDelay) {
-        styleDecls.push([value, pathTokens, true]);
+        styleDecls.push([value, pathTokens, 1]);
       } else {
         styleDecls.push([value, pathTokens]);
       }

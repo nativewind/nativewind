@@ -33,7 +33,7 @@ test("will merge static styles", () => {
                 },
               ],
               ["#ff0000", ["test"]],
-              [[{}, "var", ["--test"], true], "borderColor", true],
+              [[{}, "var", ["--test"], 1], "borderColor", 1],
             ],
             variables: [["--test", 1]],
           },

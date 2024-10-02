@@ -176,7 +176,7 @@ export type StyleDeclaration =
   | [Record<string, string | number | boolean>, PathTokens]
   | [RuntimeValueDescriptor, StyleAttribute]
   | [RuntimeValueDescriptor, PathTokens]
-  | [RuntimeValueDescriptor, StyleAttribute | PathTokens, true];
+  | [RuntimeValueDescriptor, StyleAttribute | PathTokens, 1];
 
 export type StyleDeclarationOrInline =
   | StyleDeclaration
@@ -281,7 +281,7 @@ export type RuntimeFunction =
       {},
       string, // string
       undefined | RuntimeValueDescriptor[], // arguments
-      true, // Should process after styles have been calculated
+      1, // Should process after styles have been calculated
     ];
 
 export type RuntimeValue =

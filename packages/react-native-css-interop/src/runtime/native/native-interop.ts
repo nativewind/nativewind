@@ -1140,5 +1140,5 @@ function isDeepEqual(a: any, b: any): boolean {
 function isDelayedDeclaration(
   declaration: StyleDeclaration,
 ): declaration is Extract<StyleDeclaration, [any, any, true]> {
-  return declaration[2] === true;
+  return declaration[2] === 1;
 }

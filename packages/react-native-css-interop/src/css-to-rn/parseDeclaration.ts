@@ -1677,7 +1677,7 @@ function parseUnparsed(
         args.push(fallback);
       }
 
-      return [{}, "var", args, true];
+      return [{}, "var", args, 1];
     }
     case "function": {
       switch (tokenOrValue.value.name) {
@@ -1846,7 +1846,7 @@ export function parseLength(
       case "vw":
       case "vh":
       case "em":
-        return [{}, length.unit, [length.value], true];
+        return [{}, length.unit, [length.value], 1];
       case "in":
       case "cm":
       case "mm":
@@ -2368,7 +2368,7 @@ function parseLineHeight(
     case "normal":
       return undefined;
     case "number":
-      return [{}, "em", [lineHeight.value], true];
+      return [{}, "em", [lineHeight.value], 1];
     case "length": {
       const length = lineHeight.value;
 
@@ -2446,7 +2446,7 @@ function parseLengthOrCoercePercentageToRuntime(
     value.type === "percentage"
   ) {
     options.requiresLayout(runtimeName);
-    return [{}, runtimeName, [value.value], true];
+    return [{}, runtimeName, [value.value], 1];
   } else {
     return parseLength(value, options);
   }
@@ -2651,7 +2651,7 @@ function parseDimension(
       return `${value}%`;
     case "rnh":
     case "rnw":
-      return [{}, unit, [value / 100], true];
+      return [{}, unit, [value / 100], 1];
     default: {
       return options.addValueWarning(`${value}${unit}`);
     }
@@ -2718,7 +2718,7 @@ function parseEnv(
               `--___css-interop___${value.name.value}`,
               parseUnparsed(value.fallback, options),
             ],
-            true,
+            1,
           ];
         case "viewport-segment-width":
         case "viewport-segment-height":
