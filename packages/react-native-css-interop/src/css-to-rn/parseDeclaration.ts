@@ -207,6 +207,7 @@ const validProperties = [
   "min-height",
   "min-inline-size",
   "min-width",
+  "mix-blend-mode",
   "opacity",
   "overflow",
   "padding",
@@ -336,39 +337,7 @@ export function parseDeclaration(
       parseUnparsed(declaration.value.value, parseOptions),
     );
   } else if (declaration.property === "custom") {
-    let property = declaration.value.name;
-    if (
-      validPropertiesLoose.has(property) ||
-      property.startsWith("--") ||
-      property.startsWith("-rn-")
-    ) {
-      return addStyleProp(
-        property,
-        parseUnparsed(declaration.value.value, {
-          ...options,
-          allowAuto: allowAuto.has(property),
-          addValueWarning(value: any) {
-            return addWarning({
-              type: "IncompatibleNativeValue",
-              property,
-              value,
-            });
-          },
-          addFunctionValueWarning(value: any) {
-            return addWarning({
-              type: "IncompatibleNativeFunctionValue",
-              property,
-              value,
-            });
-          },
-        }),
-      );
-    } else {
-      return addWarning({
-        type: "IncompatibleNativeProperty",
-        property: declaration.value.name,
-      });
-    }
+    return parseCustom(declaration, options);
   }
 
   const parseOptions = {
@@ -2919,5 +2888,101 @@ export function parseUnresolvedColor(
       return undefined;
     default:
       color satisfies never;
+  }
+}
+
+function parseCustom(
+  declaration: Extract<Declaration, { property: "custom" }>,
+  options: ParseDeclarationOptions,
+) {
+  const { addStyleProp, addWarning } = options;
+
+  let property = declaration.value.name;
+
+  if (
+    !(
+      validPropertiesLoose.has(property) ||
+      property.startsWith("--") ||
+      property.startsWith("-rn-")
+    )
+  ) {
+    return addWarning({
+      type: "IncompatibleNativeProperty",
+      property: declaration.value.name,
+    });
+  }
+
+  const value = parseUnparsed(declaration.value.value, {
+    ...options,
+    allowAuto: allowAuto.has(property),
+    addValueWarning(value: any) {
+      return addWarning({
+        type: "IncompatibleNativeValue",
+        property,
+        value,
+      });
+    },
+    addFunctionValueWarning(value: any) {
+      return addWarning({
+        type: "IncompatibleNativeFunctionValue",
+        property,
+        value,
+      });
+    },
+  });
+
+  switch (property) {
+    case "mix-blend-mode":
+      return parseMixBlendMode(value, options);
+    default:
+      return addStyleProp(property, value);
+  }
+}
+
+/**
+ * LightningCSS parses mix-blend-mode as custom
+ */
+function parseMixBlendMode(
+  value: RuntimeValueDescriptor,
+  options: ParseDeclarationOptions,
+) {
+  if (!options.features.mixBlendModeEnabled) {
+    return options.addWarning({
+      type: "IncompatibleNativeProperty",
+      property: "mix-blend-mode",
+    });
+  }
+
+  const property = "mix-blend-mode";
+  if (
+    typeof value === "string" &&
+    [
+      "normal",
+      "multiply",
+      "screen",
+      "overlay",
+      "darken",
+      "lighten",
+      "color-dodge",
+      "color-burn",
+      "hard-light",
+      "soft-light",
+      "difference",
+      "exclusion",
+      "hue",
+      "saturation",
+      "color",
+      "luminosity",
+    ].includes(value)
+  ) {
+    return options.addStyleProp(property, value);
+  } else if (typeof value === "object") {
+    return options.addStyleProp(property, value);
+  } else {
+    return options.addWarning({
+      type: "IncompatibleNativeValue",
+      property,
+      value,
+    });
   }
 }
