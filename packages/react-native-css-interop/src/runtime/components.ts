@@ -69,3 +69,10 @@ remapProps(VirtualizedList, {
   contentContainerClassName: "contentContainerStyle",
   indicatorClassName: "indicatorStyle",
 });
+
+try {
+  const SafeAreaView = require("react-native-safe-area-context").SafeAreaView;
+  cssInterop(SafeAreaView, {
+    className: "style",
+  });
+} catch {}
