@@ -25,6 +25,31 @@ import { cssToReactNativeRuntime } from "../css-to-rn";
  *  that injects the global styles. In development we swap to a virtual module and in production we
  *  swap to a .js file generated in the node_modules
  *
+ * ------------------
+ * Notes about CLIs
+ * ------------------
+ *
+ * Depending on the scenario, enhanceMiddleware may not be called so Metro will not be patched
+ * enhanceMiddleware is used to patch Metro for our fast-refresh, so we only need it on
+ * Metro instances that will be performing the fast refresh. e.g.
+ *
+ * @expo/cli is run locally and will watch for file updates. It will call enhanceMiddleware
+ * eas is used to build clients that can be used to connect to a @expo/cli server.
+ *
+ * In this instance, even if eas is doing a debug build, we build it like a production app.
+ *
+ * The @react-native-community/cli is similar. When running locally for a device,
+ * it starts 2 instances of Metro. One to build and one to perform fast refreshes.
+ *
+ * So the App:
+ * - starts with the production styles
+ * - connects to the fast-refresh server
+ * - will receive updates
+ *
+ * Expo
+ * - @expo/cli enhanceMiddleware
+ * - eas does not use
+ *
  * Metro notes:
  *  - Expo uses a custom Metro server than the community CLI
  *  - @expo/cli and eas use slightly different Metro servers
@@ -37,6 +62,7 @@ import { cssToReactNativeRuntime } from "../css-to-rn";
  *
  * For these reasons we need to take multiple approaches with redundancies to ensure everything goes smoothly
  */
+
 export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
   input: string;
   platforms?: string[];
@@ -49,6 +75,7 @@ export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
 };
 
 let haste: any;
+let isWatching = false;
 const virtualModules = new Map<string, Promise<string>>();
 
 export function withCssInterop(
@@ -58,13 +85,15 @@ export function withCssInterop(
     ...options
   }: WithCssInteropOptions,
 ): MetroConfig {
-  expoColorSchemeWarning();
-  const originalResolver = config.resolver?.resolveRequest;
-  const originalMiddleware = config.server?.enhanceMiddleware;
-
   const debug = debugFn(options.debugNamespace || "react-native-css-interop");
   options.debug = debug;
-  debug("withCssInterop: successfully called");
+  debug("withCssInterop");
+
+  expoColorSchemeWarning();
+
+  const originalResolver = config.resolver?.resolveRequest;
+  const originalGetTransformOptions = config.transformer?.getTransformOptions;
+  const originalMiddleware = config.server?.enhanceMiddleware;
 
   /*
    * Ensure the production files exist before Metro starts
@@ -100,69 +129,53 @@ export function withCssInterop(
         transformOptions,
         getDependenciesOf,
       ) {
-        /*
-         * PRODUCTION ONLY!
-         *
-         * In production there might not be a dev server, so we don't actually know what is being processed
-         * The best option is hook into the transform options which are called before the transform workers
-         * are spawned.
-         *
-         * In production, we replace our placeholder files with the production ones
-         * There is most likely some race condition here, but since this is the only async function before
-         * files get processed, we can delay there server until everything is ready.
-         *
-         * Surprisingly, even in production, Metro registers the file update event and will update its file tree
-         * (or maybe the file tree hasn't read the files yet? Or this breaks cache SHA1 hash?)
-         */
-        if (!transformOptions.dev) {
-          const platform = transformOptions.platform || "native";
+        // We need to write the styles to the file system if we're either building for production, or
+        // we're building a standalone client and the watcher isn't enabled
+        const writeStylesToFS = !transformOptions.dev || !isWatching;
 
-          if (platform === "web") {
-            const output = platformPath("styles.css", platform, prodOutputDir);
-            await fsPromises.writeFile(
-              output,
-              options.processPROD(platform).toString("utf-8"),
-            );
-          } else {
-            const output = platformPath("styles.css", platform, prodOutputDir);
-            await fsPromises.writeFile(
-              output,
-              getNativeJS(
-                cssToReactNativeRuntime(options.processPROD(platform), options),
-                debug,
-              ),
-            );
-          }
+        debug(`getTransformOptions.dev ${transformOptions.dev}`);
+        debug(`getTransformOptions.watching ${isWatching}`);
+        debug(`getTransformOptions.writeStylesToFS ${writeStylesToFS}`);
+
+        // We can skip writing to the filesystem if this instance patched Metro
+        if (writeStylesToFS) {
+          const platform = transformOptions.platform || "native";
+          const outputPath = platformPath(
+            "styles.css",
+            platform,
+            prodOutputDir,
+          );
+
+          debug(`getTransformOptions.platform ${platform}`);
+          debug(`getTransformOptions.output ${outputPath}`);
+
+          const output =
+            platform === "web"
+              ? options.processPROD(platform).toString("utf-8")
+              : getNativeJS(
+                  cssToReactNativeRuntime(
+                    options.processPROD(platform),
+                    options,
+                  ),
+                  debug,
+                );
+
+          await fsPromises.writeFile(outputPath, output);
         }
 
-        return {
-          ...(config.transformer?.getTransformOptions?.(
+        return (
+          originalGetTransformOptions?.(
             entryPoints,
             transformOptions,
             getDependenciesOf,
-          ) || {}),
-        } as any;
+          ) || {}
+        );
       },
     },
     server: {
       ...config.server,
-      /*
-       * DEVELOPMENT ONLY
-       *
-       * A better version than using getTransformOptions is to hook directly into the development server
-       * All development clients (including websites) need to request the JS bundle. We can delay this as
-       * we generate the virtual module
-       *
-       * Patching the MetroServer.fileSystem for virtual module support is a bit tricky, but its much more reliable
-       * than listening to fileSystem events.
-       *
-       * This is also the only place the Metro exposes the MetroServer to the config.
-       *
-       * NOTE: This function is deprecated and should be replaced with unstable_devMiddleware, but no community CLI
-       *       supports it at time of writing.
-       */
       enhanceMiddleware: (middleware, metroServer) => {
-        debug(`enhanceMiddleware successfully called`);
+        debug(`enhanceMiddleware.setup`);
         const server = connect();
         const bundler = metroServer.getBundler().getBundler();
 
@@ -173,6 +186,10 @@ export function withCssInterop(
             ensureFileSystemPatched(graph._fileSystem);
             ensureBundlerPatched(bundler);
           });
+
+        // This instance of Metro has been setup with the dev server watching
+        // for changes
+        isWatching = true;
 
         server.use(async (_, __, next) => {
           // Wait until the bundler patching has completed
@@ -188,13 +205,6 @@ export function withCssInterop(
     resolver: {
       ...config.resolver,
       sourceExts: [...(config?.resolver?.sourceExts || []), "css"],
-      /*
-       * PRODUCTION & DEVELOPMENT
-       *
-       * resolveRequest is where we switch the import of the CSS file for something different
-       * In development this should be the virtual module
-       * In production this is the generated file
-       */
       resolveRequest: (context, moduleName, platform) => {
         const resolver = originalResolver ?? context.resolveRequest;
         const resolved = resolver(context, moduleName, platform);
@@ -204,34 +214,23 @@ export function withCssInterop(
           return resolved;
         }
 
-        debug(`resolveRequest: found input`);
-
         platform = platform || "native";
+        // Generate a fake name for our virtual module. Make it platform specific
+        const platformFilePath = platformPath(
+          "styles.css",
+          platform,
+          prodOutputDir,
+        );
 
-        const isProduction = !(context as any).dev;
+        debug(`resolveRequest.input ${resolved.filePath}`);
+        debug(`resolveRequest.isWatching ${isWatching}`);
+        debug(`resolveRequest.platform ${platform}`);
+        debug(`resolveRequest.platformFilePath: ${platformFilePath}`);
 
-        debug(`resolveRequest.isProduction ${isProduction}`);
-
-        if (isProduction) {
-          return resolver(
-            context,
-            platformPath("styles.css", platform, prodOutputDir),
-            platform,
-          ) as any;
+        if (isWatching) {
+          startCSSProcessor(platformFilePath, platform, options, debug);
         }
 
-        // Generate a fake name for our virtual module. Make it platform specific
-        const platformFilePath = platformPath(resolved.filePath, platform);
-
-        debug(`platformFilePath: ${platformFilePath}`);
-
-        startCSSProcessor(platformFilePath, platform, options, debug);
-
-        /*
-         * Return a final Resolution.
-         * We ideally we should call the resolver again with the new filepath,
-         * but we can't control what it does. E.g it might check that the file actually exists
-         */
         return {
           ...resolved,
           filePath: platformFilePath,
@@ -247,57 +246,59 @@ async function startCSSProcessor(
   { input, processDEV, ...options }: WithCssInteropOptions,
   debug: Debugger,
 ) {
+  debug(`virtualModules.size ${virtualModules.size}`);
+
   // Ensure that we only start the processor once per file
   if (virtualModules.has(filePath)) {
     return;
   }
 
-  options.cache = {
-    keyframes: new Map(),
-    rules: new Map(),
-    rootVariables: {},
-    universalVariables: {},
+  options = {
+    cache: {
+      keyframes: new Map(),
+      rules: new Map(),
+      rootVariables: {},
+      universalVariables: {},
+    },
+    ...options,
   };
 
-  /*
-   * The virtualStyles is a promise that will resolve with the initial value
-   * If the `processDEV` needs to change the styles (e.g hot-reload) then it will use the callback function
-   */
-  const virtualStyles = processDEV(platform, (css: string) => {
-    // Change the cached version with the new updated version
-    virtualModules.set(
-      filePath,
-      Promise.resolve(
-        platform === "web"
-          ? css
-          : getNativeJS(cssToReactNativeRuntime(css, options), debug),
-      ),
-    );
+  virtualModules.set(
+    filePath,
+    processDEV(platform, (css: string) => {
+      debug(`virtualStyles.update ${platform}`);
+      // Override the virtual module with the new update
+      virtualModules.set(
+        filePath,
+        Promise.resolve(
+          platform === "web"
+            ? css
+            : getNativeJS(cssToReactNativeRuntime(css, options), debug),
+        ),
+      );
 
-    options.debug?.("Firing change event to Metro");
-
-    // Tell Metro that the virtual module has changed
-    // It will think this is a fileSystem event and update its virtual fileTree
-    haste.emit("change", {
-      eventsQueue: [
-        {
-          filePath,
-          metadata: {
-            modifiedTime: Date.now(),
-            size: 1, // Can be anything
-            type: "virtual", // Can be anything
+      // Tell Metro that the virtual module has changed
+      debug(`virtualStyles.emit ${platform}`);
+      haste.emit("change", {
+        eventsQueue: [
+          {
+            filePath,
+            metadata: {
+              modifiedTime: Date.now(),
+              size: 1, // Can be anything
+              type: "virtual", // Can be anything
+            },
+            type: "change",
           },
-          type: "change",
-        },
-      ],
-    });
-  }).then((css) => {
-    return platform === "web"
-      ? css
-      : getNativeJS(cssToReactNativeRuntime(css, options), debug);
-  });
-
-  virtualModules.set(filePath, virtualStyles);
+        ],
+      });
+    }).then((css) => {
+      debug(`virtualStyles.initial ${platform}`);
+      return platform === "web"
+        ? css
+        : getNativeJS(cssToReactNativeRuntime(css, options), debug);
+    }),
+  );
 }
 
 /**
