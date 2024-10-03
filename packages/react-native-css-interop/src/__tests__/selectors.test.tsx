@@ -27,3 +27,43 @@ test(":is(.dark *)", () => {
 
   expect(component).toHaveStyle({ color: "#ff0000" });
 });
+
+test(':root[class="dark"]', () => {
+  registerCSS(`@cssInterop set darkMode class dark;
+:root[class="dark"] {
+  --my-var: red;
+}
+.my-class { 
+  color: var(--my-var); 
+}`);
+
+  render(<View testID={testID} className="my-class" />);
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: undefined });
+
+  act(() => colorScheme.set("dark"));
+
+  expect(component).toHaveStyle({ color: "red" });
+});
+
+test(':root[class~="dark"]', () => {
+  registerCSS(`@cssInterop set darkMode class dark;
+:root[class~="dark"] {
+  --my-var: red;
+}
+.my-class { 
+  color: var(--my-var); 
+}`);
+
+  render(<View testID={testID} className="my-class" />);
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: undefined });
+
+  act(() => colorScheme.set("dark"));
+
+  expect(component).toHaveStyle({ color: "red" });
+});

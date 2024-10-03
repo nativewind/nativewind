@@ -67,7 +67,7 @@ export function normalizeSelectors(
         });
       }
     } else if (
-      // Matches: .dark:root {}
+      // Matches: .dark:root {} || :root[class~="dark"]
       isRootDarkVariableSelector(cssSelector, options)
     ) {
       selectors.push({
@@ -483,12 +483,22 @@ function isRootDarkVariableSelector(
   options: ExtractRuleOptions,
 ) {
   return (
-    options.darkMode?.type === "class" &&
-    first.type === "class" &&
-    first.name === options.darkMode.value &&
+    first &&
     second &&
-    second.type === "pseudo-class" &&
-    second.kind === "root"
+    options.darkMode?.type === "class" &&
+    // .dark:root {}
+    ((first.type === "class" &&
+      first.name === options.darkMode.value &&
+      second.type === "pseudo-class" &&
+      second.kind === "root") ||
+      // :root[class~=dark] {}
+      (first.type === "pseudo-class" &&
+        first.kind === "root" &&
+        second.type === "attribute" &&
+        second.name === "class" &&
+        second.operation &&
+        second.operation.value === options.darkMode.value &&
+        ["includes", "equal"].includes(second.operation.operator)))
   );
 }
 
