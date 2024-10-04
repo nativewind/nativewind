@@ -710,7 +710,6 @@ function resetAnimation(state: ReducerState) {
       let sharedValue = state.sharedValues.get(propertyName);
       if (sharedValue) {
         cancelAnimation(sharedValue);
-        state.sharedValues.delete(propertyName);
       }
     }
   }

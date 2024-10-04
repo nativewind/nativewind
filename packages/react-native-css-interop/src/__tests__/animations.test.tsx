@@ -297,6 +297,44 @@ test("per-frame timing function", () => {
   });
 });
 
+test("work with active styles", () => {
+  registerCSS(`
+    .my-class:active {
+      animation-duration: 3s;
+      animation-name: spin;
+      animation-timing-function: linear;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+`);
+
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({});
+
+  fireEvent(component, "onPressIn");
+
+  // Half way though the animation
+  jest.advanceTimersByTime(1500);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "180deg" }],
+  });
+
+  fireEvent(component, "onPressOut");
+
+  jest.advanceTimersToNextTimer();
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "0deg" }],
+  });
+});
+
 test("stop animating when the animation is removed", () => {
   registerCSS(`
     .my-class {
