@@ -40,7 +40,6 @@ cssInterop(StatusBar, {
 cssInterop(ScrollView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
-  indicatorClassName: "indicatorStyle",
 });
 cssInterop(TextInput, {
   className: { target: "style", nativeStyleToProp: { textAlign: true } },
