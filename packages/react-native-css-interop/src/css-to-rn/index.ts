@@ -44,7 +44,7 @@ import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
 
 import { versions } from "node:process";
 import { defaultFeatureFlags } from "./feature-flags";
-import { isDeepEqual } from "../util/isDeepEqual";
+// import { isDeepEqual } from "../util/isDeepEqual";
 
 type CSSInteropAtRule = {
   type: "custom";
@@ -136,9 +136,10 @@ export function cssToReactNativeRuntime(
   for (const [name, styles] of extractOptions.rules) {
     if (styles.length === 0) continue;
 
-    if (isDeepEqual(styles, options.cache?.rules.get(name))) {
-      continue;
-    }
+    // TODO: We cannot diff styles until style updates are processed in a separate file
+    // if (isDeepEqual(styles, options.cache?.rules.get(name))) {
+    //   continue;
+    // }
 
     options.cache?.rules.set(name, styles);
 
