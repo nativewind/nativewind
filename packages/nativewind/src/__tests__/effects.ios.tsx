@@ -64,86 +64,173 @@ describe("Effects - Opacity", () => {
 });
 
 describe("Effects - Mix Blend Mode", () => {
-  test("mix-blend-normal", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-multiply", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-screen", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-overlay", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-darken", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-lighten", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-color-dodge", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-color-burn", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-hard-light", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-soft-light", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-difference", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-exclusion", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-hue", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-saturation", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-color", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
-  test("mix-blend-luminosity", async () =>
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      invalid: { properties: ["mix-blend-mode"] },
-    }));
+  const options = {
+    cssOptions: {
+      features: {
+        mixBlendModeEnabled: true,
+      },
+    },
+  };
+
+  test("mix-blend-normal", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "normal",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-multiply", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "multiply",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-screen", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "screen",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-overlay", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "overlay",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-darken", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "darken",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-lighten", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "lighten",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-color-dodge", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "color-dodge",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-color-burn", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "color-burn",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-hard-light", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "hard-light",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-soft-light", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "soft-light",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-difference", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "difference",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-exclusion", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "exclusion",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-hue", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "hue",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-saturation", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "saturation",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-color", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "color",
+        },
+      },
+    });
+  });
+
+  test("mix-blend-luminosity", async () => {
+    expect(await renderCurrentTest(options)).toStrictEqual({
+      props: {
+        style: {
+          mixBlendMode: "luminosity",
+        },
+      },
+    });
+  });
 });
 
 describe("Effects - Background Blend Mode", () => {

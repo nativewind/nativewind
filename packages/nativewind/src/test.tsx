@@ -131,7 +131,7 @@ export async function render(
   return interopRender(component, {
     ...options,
     css: output,
-    cssOptions: cssToReactNativeRuntimeOptions,
+    cssOptions: { ...cssToReactNativeRuntimeOptions, ...options.cssOptions },
     debugCompiled: debugCompiled,
   });
 }
