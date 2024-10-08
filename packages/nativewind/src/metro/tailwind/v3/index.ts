@@ -1,4 +1,5 @@
 import { execSync, fork } from "child_process";
+import { execPath } from "node:process";
 import fs from "fs";
 import path from "path";
 import { type Config } from "tailwindcss";
@@ -48,7 +49,10 @@ export const tailwindCliV3 = function (debug: Debugger) {
         `${path.basename(options.input)}.${options.platform}.css`,
       );
 
-      execSync(`${cliLocation} --input ${options.input} --output ${output}`, {
+      const cliCommand = `${execPath} ${cliLocation} --input ${options.input} --output ${output}`;
+      debug(`PROD execSync: ${cliCommand}`);
+
+      execSync(cliCommand, {
         env: getEnv(options),
       });
 
