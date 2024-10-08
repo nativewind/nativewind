@@ -136,7 +136,6 @@ export function cssToReactNativeRuntime(
   for (const [name, styles] of extractOptions.rules) {
     if (styles.length === 0) continue;
 
-    // TODO: We cannot diff styles until style updates are processed in a separate file
     // if (isDeepEqual(styles, options.cache?.rules.get(name))) {
     //   continue;
     // }
@@ -172,10 +171,10 @@ export function cssToReactNativeRuntime(
     ruleCount++;
   }
 
-  debug(`Found ${ruleCount} new/changed rules`);
-  debug(
-    `Note: Specificity order matters and a new style will change the specificity of the rules below it, causing a larger than expected number of changed rules`,
-  );
+  // debug(`Found ${ruleCount} new/changed rules`);
+  // debug(
+  //   `Note: Specificity order matters and a new style will change the specificity of the rules below it, causing a larger than expected number of changed rules`,
+  // );
 
   const rem = extractOptions.inlineRem || extractOptions.rem;
   const keyframes = Array.from(extractOptions.keyframes);

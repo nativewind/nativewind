@@ -1,6 +1,5 @@
 import connect from "connect";
-import fsPromises from "fs/promises";
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { debug as debugFn, Debugger } from "debug";
 import type { MetroConfig } from "metro-config";
@@ -65,29 +64,32 @@ import { cssToReactNativeRuntime } from "../css-to-rn";
 
 export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
   input: string;
-  platforms?: string[];
   debugNamespace?: string;
-  processPROD: (platform: string) => string | Buffer;
-  processDEV: (
-    platform: string,
-    next: (update: string) => void,
-  ) => Promise<string>;
+  /** Force load styles from the filesystem, used to test production style loading. Disables Fast Refresh of styles. */
+  forceWriteFileSystem?: boolean;
+  getCSSForPlatform: GetCSSForPlatform;
 };
 
+export type GetCSSForPlatform = (
+  platform: string,
+  onChange?: GetCSSForPlatformOnChange,
+) => Promise<string | Buffer>;
+
+export type GetCSSForPlatformOnChange = (platform: string) => void;
+
 let haste: any;
-let isWatching = false;
-const virtualModules = new Map<string, Promise<string>>();
+let writeStyles = true;
+const virtualModules = new Map<string, Promise<string | Buffer>>();
+const outputDirectory = path.resolve(__dirname, "../../.cache");
 
 export function withCssInterop(
   config: MetroConfig,
-  {
-    platforms = ["ios", "android", "web", "native"],
-    ...options
-  }: WithCssInteropOptions,
+  { ...options }: WithCssInteropOptions,
 ): MetroConfig {
   const debug = debugFn(options.debugNamespace || "react-native-css-interop");
   options.debug = debug;
   debug("withCssInterop");
+  debug(`outputDirectory ${outputDirectory}`);
 
   expoColorSchemeWarning();
 
@@ -101,28 +103,17 @@ export function withCssInterop(
    * its started, so we can generate these placeholder files to ensure that the
    * production files make it into the virtual file tree
    */
-  const prodOutputDir = path.join(
-    path.dirname(require.resolve("react-native-css-interop/package.json")),
-    ".cache",
-  );
-
-  debug(`platforms: ${platforms}`);
-  debug(`prodOutputDir: ${prodOutputDir}`);
-
-  fs.mkdirSync(prodOutputDir, { recursive: true });
-
-  for (const platform of platforms) {
-    fs.writeFileSync(platformPath("styles.css", platform, prodOutputDir), "");
-  }
-
   return {
     ...config,
     transformerPath: require.resolve("./transformer"),
     transformer: {
       ...config.transformer,
       ...{
-        originalTransformerPath: config.transformerPath,
-        debugEnabled: debug.enabled,
+        cssInterop_transformerPath: config.transformerPath,
+        cssInterop_outputDirectory: path.relative(
+          process.cwd(),
+          outputDirectory,
+        ),
       },
       async getTransformOptions(
         entryPoints,
@@ -131,36 +122,26 @@ export function withCssInterop(
       ) {
         // We need to write the styles to the file system if we're either building for production, or
         // we're building a standalone client and the watcher isn't enabled
-        const writeStylesToFS = !transformOptions.dev || !isWatching;
-
         debug(`getTransformOptions.dev ${transformOptions.dev}`);
-        debug(`getTransformOptions.watching ${isWatching}`);
-        debug(`getTransformOptions.writeStylesToFS ${writeStylesToFS}`);
+        debug(`getTransformOptions.watching ${writeStyles}`);
+        debug(`getTransformOptions.writeStyles ${writeStyles}`);
 
         // We can skip writing to the filesystem if this instance patched Metro
-        if (writeStylesToFS) {
+        if (writeStyles) {
           const platform = transformOptions.platform || "native";
-          const outputPath = platformPath(
-            "styles.css",
-            platform,
-            prodOutputDir,
-          );
+          const filePath = platformPath(platform);
 
-          debug(`getTransformOptions.platform ${platform}`);
-          debug(`getTransformOptions.output ${outputPath}`);
+          debug(`getTransformOptions.output ${filePath}`);
+
+          const css = await options.getCSSForPlatform(platform);
 
           const output =
             platform === "web"
-              ? options.processPROD(platform).toString("utf-8")
-              : getNativeJS(
-                  cssToReactNativeRuntime(
-                    options.processPROD(platform),
-                    options,
-                  ),
-                  debug,
-                );
+              ? css.toString("utf-8")
+              : getNativeJS(cssToReactNativeRuntime(css, options), debug);
 
-          await fsPromises.writeFile(outputPath, output);
+          await fs.mkdir(outputDirectory, { recursive: true });
+          await fs.writeFile(filePath, output);
         }
 
         return (
@@ -179,23 +160,26 @@ export function withCssInterop(
         const server = connect();
         const bundler = metroServer.getBundler().getBundler();
 
-        const initPromise = bundler
-          .getDependencyGraph()
-          .then(async (graph: any) => {
-            haste = graph._haste;
-            ensureFileSystemPatched(graph._fileSystem);
-            ensureBundlerPatched(bundler);
+        if (options.forceWriteFileSystem) {
+          debug(`forceWriteFileSystem true`);
+        } else {
+          const initPromise = bundler
+            .getDependencyGraph()
+            .then(async (graph: any) => {
+              haste = graph._haste;
+              ensureFileSystemPatched(graph._fileSystem);
+              ensureBundlerPatched(bundler);
+            });
+
+          // If we patch Metro, we don't need to write the styles
+          writeStyles = false;
+
+          server.use(async (_, __, next) => {
+            // Wait until the bundler patching has completed
+            await initPromise;
+            next();
           });
-
-        // This instance of Metro has been setup with the dev server watching
-        // for changes
-        isWatching = true;
-
-        server.use(async (_, __, next) => {
-          // Wait until the bundler patching has completed
-          await initPromise;
-          next();
-        });
+        }
 
         return originalMiddleware
           ? server.use(originalMiddleware(middleware, metroServer))
@@ -216,24 +200,18 @@ export function withCssInterop(
 
         platform = platform || "native";
         // Generate a fake name for our virtual module. Make it platform specific
-        const platformFilePath = platformPath(
-          "styles.css",
-          platform,
-          prodOutputDir,
-        );
+        const filePath = platformPath(platform);
 
         debug(`resolveRequest.input ${resolved.filePath}`);
-        debug(`resolveRequest.isWatching ${isWatching}`);
-        debug(`resolveRequest.platform ${platform}`);
-        debug(`resolveRequest.platformFilePath: ${platformFilePath}`);
+        debug(`resolveRequest.resolvedTo: ${filePath}`);
 
-        if (isWatching) {
-          startCSSProcessor(platformFilePath, platform, options, debug);
+        if (!writeStyles) {
+          startCSSProcessor(filePath, platform, options, debug);
         }
 
         return {
           ...resolved,
-          filePath: platformFilePath,
+          filePath,
         };
       },
     },
@@ -243,9 +221,10 @@ export function withCssInterop(
 async function startCSSProcessor(
   filePath: string,
   platform: string,
-  { input, processDEV, ...options }: WithCssInteropOptions,
+  { input, getCSSForPlatform, ...options }: WithCssInteropOptions,
   debug: Debugger,
 ) {
+  debug(`virtualModules ${filePath}`);
   debug(`virtualModules.size ${virtualModules.size}`);
 
   // Ensure that we only start the processor once per file
@@ -265,7 +244,7 @@ async function startCSSProcessor(
 
   virtualModules.set(
     filePath,
-    processDEV(platform, (css: string) => {
+    getCSSForPlatform(platform, (css: string) => {
       debug(`virtualStyles.update ${platform}`);
       // Override the virtual module with the new update
       virtualModules.set(
@@ -277,7 +256,6 @@ async function startCSSProcessor(
         ),
       );
 
-      // Tell Metro that the virtual module has changed
       debug(`virtualStyles.emit ${platform}`);
       haste.emit("change", {
         eventsQueue: [
@@ -338,7 +316,7 @@ function ensureBundlerPatched(
     return;
   }
 
-  const originalTransformFile = bundler.transformFile.bind(bundler);
+  const transformFile = bundler.transformFile.bind(bundler);
 
   bundler.transformFile = async function (
     filePath,
@@ -346,11 +324,11 @@ function ensureBundlerPatched(
     fileBuffer,
   ) {
     const virtualModule = virtualModules.get(filePath);
+
     if (virtualModule) {
       fileBuffer = Buffer.from(await virtualModule);
     }
-
-    return originalTransformFile(filePath, transformOptions, fileBuffer);
+    return transformFile(filePath, transformOptions, fileBuffer);
   };
   bundler.transformFile.__css_interop__patched = true;
 }
@@ -415,14 +393,11 @@ function stringify(data: unknown): string {
 
 function getNativeJS(data = {}, debug: Debugger): string {
   debug("Start stringify");
-  let output = `injectData)(${stringify(data)})`;
+  const output = `(${stringify(data)})`;
   debug(`Output size: ${Buffer.byteLength(output, "utf8")} bytes`);
   return output;
 }
 
-function platformPath(filePath: string, platform: string, prefix = "") {
-  return path.join(
-    prefix,
-    `${filePath}.${platform}.${platform === "web" ? "css" : "js"}`,
-  );
+function platformPath(platform = "native") {
+  return `${outputDirectory}/${platform}.${platform === "web" ? "css" : "js"}`;
 }
