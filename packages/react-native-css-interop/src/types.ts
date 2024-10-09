@@ -340,9 +340,7 @@ export interface ExtractedTransition {
 }
 
 type AnimationPropertyKey = string;
-export type AnimationEasingFunction =
-  | EasingFunction
-  | { type: "!PLACEHOLDER!" };
+export type AnimationStep = number | [number, EasingFunction];
 
 export type AnimationFrame = [AnimationPropertyKey, RuntimeValueFrame[]];
 
@@ -351,7 +349,7 @@ export interface ExtractedAnimation {
   /**
    * The easing function for each frame
    */
-  easingFunctions?: AnimationEasingFunction[];
+  steps: AnimationStep[];
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
 }

@@ -39,19 +39,19 @@ test("basic animation", () => {
 
   const component = screen.getByTestId(testID);
 
-  expect(component).toHaveAnimatedStyle({
+  expect(getAnimatedStyle(component)).toStrictEqual({
     marginLeft: "100%",
   });
 
   jest.advanceTimersByTime(1500);
 
-  expect(getAnimatedStyle(component)).toEqual({
+  expect(getAnimatedStyle(component)).toStrictEqual({
     marginLeft: "50%",
   });
 
   jest.advanceTimersByTime(1500);
 
-  expect(component).toHaveAnimatedStyle({
+  expect(getAnimatedStyle(component)).toStrictEqual({
     marginLeft: "0%",
   });
 });
@@ -174,7 +174,7 @@ test("timing functions per frame", () => {
 
   expect(component).toHaveAnimatedStyle({
     transform: [
-      { translateY: "-20.981126534630565%" },
+      { translateY: "-17.116079685686515%" },
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
@@ -212,7 +212,7 @@ test("timing functions per frame", () => {
 
   expect(component).toHaveAnimatedStyle({
     transform: [
-      { translateY: "-20.944655241363616%" },
+      { translateY: "-4.018873465369433%" },
       { perspective: 1 },
       { translateX: 0 },
       { rotate: "0deg" },
@@ -227,7 +227,7 @@ test("timing functions per frame", () => {
     ],
   });
 
-  jest.advanceTimersByTime(251);
+  jest.advanceTimersByTime(250);
 
   expect(component).toHaveAnimatedStyle({
     transform: [
@@ -290,12 +290,12 @@ test("per-frame timing function", () => {
   jest.advanceTimersByTime(250);
 
   expect(getAnimatedStyle(component)).toStrictEqual({
-    transform: [{ rotate: "330.801517737818deg" }],
+    transform: [{ rotate: "270deg" }],
   });
 
-  jest.advanceTimersByTime(251);
+  jest.advanceTimersByTime(250);
   expect(getAnimatedStyle(component)).toStrictEqual({
-    transform: [{ rotate: "360deg" }],
+    transform: [{ rotate: "0deg" }],
   });
 });
 
@@ -334,6 +334,50 @@ test("work with active styles", () => {
 
   expect(getAnimatedStyle(component)).toStrictEqual({
     transform: [{ rotate: "0deg" }],
+  });
+});
+
+test("inherits values", () => {
+  registerCSS(`
+    .my-class {
+      transform: rotate(180deg);
+    }
+
+    .my-class:active {
+      animation-duration: 3s;
+      animation-name: spin;
+      animation-timing-function: linear;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+`);
+
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "180deg" }],
+  });
+
+  fireEvent(component, "onPressIn");
+
+  // Half way though the animation
+  jest.advanceTimersByTime(1500);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "270deg" }],
+  });
+
+  fireEvent(component, "onPressOut");
+
+  jest.advanceTimersToNextTimer();
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "180deg" }],
   });
 });
 

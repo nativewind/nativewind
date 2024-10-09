@@ -4,8 +4,13 @@ import { ComponentType, createElement } from "react";
 import { Pressable } from "react-native";
 
 import { containerContext } from "./globals";
+import { defaultValues } from "./resolvers/defaults";
 import { VariableContext } from "./styles";
-import { SharedState } from "./types";
+import {
+  AnimationInputOutput,
+  SharedState,
+  TransitionSharedValue,
+} from "./types";
 
 const animatedCache = new Map<
   ComponentType<any> | string,
@@ -25,8 +30,9 @@ export const UpgradeState = {
 export function renderComponent(
   baseComponent: ComponentType<any>,
   state: SharedState,
-  props: Record<string, any>,
-  possiblyAnimatedProps: Record<string, any>,
+  { ...props }: Record<string, any>,
+  animationInputOutputs?: AnimationInputOutput[],
+  transitionSharedValues?: TransitionSharedValue[],
   variables?: Record<string, any>,
   containers?: Record<string, any>,
 ) {
@@ -38,12 +44,7 @@ export function renderComponent(
       `Debugging component.testID '${props?.testID}'\n\n${JSON.stringify(
         {
           originalProps: state.originalProps,
-          props: state.animated
-            ? {
-                ...props,
-                ...possiblyAnimatedProps,
-              }
-            : { ...props, ...possiblyAnimatedProps },
+          props,
           variables,
           containers,
         },
@@ -80,35 +81,106 @@ export function renderComponent(
       state.animated = UpgradeState.UPGRADED;
       component = createAnimatedComponent(component);
 
-      const { useAnimatedStyle } =
+      const { useAnimatedStyle, interpolateColor, interpolate } =
         require("react-native-reanimated") as typeof import("react-native-reanimated");
 
+      const originalStyle = { ...props.style };
       props.style = useAnimatedStyle(() => {
-        function flattenAnimatedProps(style: any): any {
-          // Primitive or null
-          if (typeof style !== "object" || !style) return style;
-          // Shared value
-          if ("_isReanimatedSharedValue" in style && "value" in style) {
-            return style.value;
+        const style: Record<string, any> = { ...originalStyle };
+
+        const seenProperties = new Set<string>();
+
+        function setValue(property: string, value: any) {
+          switch (property) {
+            case "matrix":
+              return;
+            case "translateX":
+            case "translateY":
+            case "scale":
+            case "scaleX":
+            case "scaleY":
+            case "rotate":
+            case "rotateX":
+            case "rotateY":
+            case "rotateZ":
+            case "skewX":
+            case "skewY":
+            case "perspective":
+            case "transformOrigin": {
+              style.transform ??= [];
+              const match = style.transform.find(
+                (obj: any) => obj[property] !== undefined,
+              );
+              if (match && value !== undefined) {
+                match[property] = value;
+              } else if (!match) {
+                style.transform.push({
+                  [property]: value ?? defaultValues[property],
+                });
+              }
+              break;
+            }
+            default:
+              style[property] = value;
           }
-          if (Array.isArray(style)) return style.map(flattenAnimatedProps);
-          return Object.fromEntries(
-            Object.entries(style).map(([key, value]: any) => {
-              return [key, flattenAnimatedProps(value)];
-            }),
-          );
         }
 
-        try {
-          return flattenAnimatedProps(possiblyAnimatedProps.style) || {};
-        } catch (error: any) {
-          console.log(`css-interop error: ${error.message}`);
-          return {};
+        if (animationInputOutputs) {
+          for (const entry of animationInputOutputs) {
+            const progress = entry[0].value;
+            const values = entry[1];
+
+            for (const propertyConfig of values) {
+              const property = propertyConfig[0];
+              const inputOutput = propertyConfig[1];
+
+              seenProperties.add(property);
+
+              let value: any = undefined;
+              if (inputOutput) {
+                const firstValue = inputOutput[1][0];
+
+                if (typeof firstValue === "number") {
+                  value = interpolate(progress, inputOutput[0], inputOutput[1]);
+                } else if (typeof firstValue === "string") {
+                  const numericValue = parseFloat(firstValue);
+
+                  if (isNaN(numericValue)) {
+                    // TODO: Check this is a valid color
+                    value = interpolateColor(
+                      progress,
+                      inputOutput[0],
+                      inputOutput[1],
+                    );
+                  } else {
+                    const suffix = firstValue.replace(`${numericValue}`, "");
+                    const output = inputOutput[1].map((value) =>
+                      parseFloat(value),
+                    );
+                    value = `${interpolate(progress, inputOutput[0], output)}${suffix}`;
+                  }
+                }
+              }
+
+              setValue(property, value);
+            }
+          }
         }
-      }, [possiblyAnimatedProps.style]);
+
+        if (transitionSharedValues) {
+          for (const entry of transitionSharedValues) {
+            // Don't override animations
+            if (seenProperties.has(entry[0])) {
+              continue;
+            }
+
+            setValue(entry[0], entry[1].value);
+          }
+        }
+
+        return style;
+      }, [animationInputOutputs, transitionSharedValues]);
     }
-  } else {
-    props = { ...props, ...possiblyAnimatedProps };
   }
 
   if (state.variables !== UpgradeState.NONE) {

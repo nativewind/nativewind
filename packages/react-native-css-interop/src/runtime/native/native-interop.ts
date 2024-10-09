@@ -23,6 +23,7 @@ import {
   StyleRuleSymbol,
 } from "../../shared";
 import {
+  AnimationStep,
   ContainerRecord,
   ExtractedAnimations,
   ExtractedTransition,
@@ -39,23 +40,28 @@ import { testRule } from "./conditions";
 import { containerContext } from "./globals";
 import { renderComponent, UpgradeState } from "./render-component";
 import {
-  defaultValues,
   getBaseValue,
   getEasing,
-  getHeight,
   getTarget,
-  getWidth,
   resolveAnimation,
   resolveValue,
   timeToMS,
 } from "./resolve-value";
+import { defaultValues } from "./resolvers/defaults";
 import {
   getAnimation,
   getOpaqueStyles,
   getStyle,
   VariableContext,
 } from "./styles";
-import { ReducerAction, ReducerState, Refs, SharedState } from "./types";
+import {
+  AnimationInputOutput,
+  ReducerAction,
+  ReducerState,
+  Refs,
+  SharedState,
+  TransitionSharedValue,
+} from "./types";
 
 export function interop(
   component: ReactComponent<any>,
@@ -174,21 +180,31 @@ export function interop(
   const memoOutput = useMemo(() => {
     let variables = undefined;
     const containers: ContainerRecord = {};
+    const props: Record<string, unknown> = {};
 
-    const possiblyAnimatedProps: Record<string, any> = {};
     const handlers: Record<string, any> = {};
 
     let hasNullContainer = false;
+    let transition: TransitionSharedValue[] | undefined = undefined;
+    let animation: AnimationInputOutput[] | undefined = undefined;
 
     /**
      * Loop over all the states and collect the props, variables and containers
      */
     for (const state of states) {
-      Object.assign(possiblyAnimatedProps, state.props);
+      Object.assign(props, state.props);
 
       if (state.variables) {
         variables ||= {};
         Object.assign(variables, state.variables);
+      }
+
+      if (state.animationInputOutputs) {
+        animation = Array.from(state.animationInputOutputs.values());
+      }
+
+      if (state.sharedValues) {
+        transition = Array.from(state.sharedValues.entries());
       }
 
       if (state.containerNames !== undefined) {
@@ -260,9 +276,11 @@ export function interop(
     }
 
     return {
-      possiblyAnimatedProps,
+      animation,
+      transition,
       handlers,
       variables,
+      props,
       containers:
         sharedState.containers && !hasNullContainer ? containers : undefined,
     };
@@ -307,8 +325,9 @@ export function interop(
   return renderComponent(
     component,
     sharedState,
-    { ...props, ...memoOutput.handlers, ref },
-    memoOutput.possiblyAnimatedProps,
+    { ...props, ...memoOutput.props, ...memoOutput.handlers, ref },
+    memoOutput.animation,
+    memoOutput.transition,
     variables,
     containers,
   );
@@ -530,7 +549,7 @@ function applyStyles(state: ReducerState, refs: Refs) {
 function processAnimations(
   state: ReducerState,
   refs: Refs,
-  seenAnimatedProps: Set<string>,
+  animatedProps: Set<string>,
 ) {
   // TODO - check for animation: "none"
   if (state.currentRenderAnimation?.name?.length) {
@@ -538,14 +557,13 @@ function processAnimations(
     state.animationNames ??= new Set();
 
     state.props ??= {};
-    const props = state.props;
 
     const {
       name: animationNames,
       duration: durations = defaultAnimation.duration,
       delay: delays = defaultAnimation.delay,
       timingFunction: baseEasingFuncs = defaultAnimation.timingFunction,
-      iterationCount: iterations = defaultAnimation.iterationCount,
+      iterationCount: iterationList = defaultAnimation.iterationCount,
     } = state.currentRenderAnimation;
 
     const {
@@ -558,7 +576,7 @@ function processAnimations(
 
     const waitingLayout = state.isWaitingLayout;
 
-    const { makeMutable, withRepeat, withSequence } =
+    const { makeMutable, Easing, withTiming, cancelAnimation } =
       require("react-native-reanimated") as typeof import("react-native-reanimated");
 
     let shouldResetAnimations =
@@ -567,7 +585,7 @@ function processAnimations(
       isDeepEqual(prevDurations, durations) ||
       isDeepEqual(prevDelays, delays) ||
       isDeepEqual(prevBaseEasingFuncs, baseEasingFuncs) ||
-      isDeepEqual(prevIterations, iterations);
+      isDeepEqual(prevIterations, iterationList);
 
     const names: string[] = [];
 
@@ -604,84 +622,164 @@ function processAnimations(
           continue;
         }
 
-        const baseEasingFunc = baseEasingFuncs[index % baseEasingFuncs.length];
+        state.animationInputOutputs ??= new Map();
+        let animationInputOutput = state.animationInputOutputs.get(name);
+        if (!animationInputOutput) {
+          animationInputOutput = [
+            makeMutable(0),
+            new Map<string, [any[], number[]]>(),
+          ] as const;
+          state.animationInputOutputs.set(name, animationInputOutput);
+        } else {
+          // Reset this animation
+          cancelAnimation(animationInputOutput[0]);
+          animationInputOutput[0].value = 0;
+          animationInputOutput[1].clear();
+        }
 
-        const easingFuncs =
-          animation.easingFunctions?.map((value) => {
-            return value.type === "!PLACEHOLDER!" ? baseEasingFunc : value;
-          }) || baseEasingFunc;
+        const progressMutable = animationInputOutput[0];
+        const inputsOutputs = animationInputOutput[1];
 
-        const totalDuration = timeToMS(durations[index % name.length]);
+        let start = 0;
         const delay = timeToMS(delays[index % delays.length]);
-        const iterationCount = iterations[index % iterations.length];
+        const duration = timeToMS(durations[index % name.length]);
+        const baseEasingFunction = baseEasingFuncs[index % name.length];
+        const maxIterations = iterationList[index % iterationList.length];
+        let iterations =
+          // Non-positive values represent an infinite loop
+          maxIterations.type === "infinite" ? -1 : maxIterations.value;
+
+        /**
+         * When delay < 0, the animation immediately starts and jumps ahead by the delayed amount
+         */
+        if (delay < 0) {
+          const absDelay = Math.abs(delay);
+          const iterationsPerformed = Math.floor(absDelay / duration);
+          iterations -= iterationsPerformed;
+
+          start =
+            iterations > 1
+              ? // If we are still repeating, work out the new starting progress
+                (absDelay % duration) / duration
+              : // Else we have finished
+                1;
+        }
 
         for (const frame of animation.frames) {
-          const animationKey = frame[0];
+          const property = frame[0];
           const valueFrames = frame[1];
-          const pathTokens = ["style", animationKey];
 
-          if (seenAnimatedProps.has(animationKey)) continue;
-          seenAnimatedProps.add(animationKey);
+          // Animations shouldn't override other animations
+          if (animatedProps.has(property)) continue;
+          animatedProps.add(property);
 
-          const [initialValue, ...sequence] = resolveAnimation(
-            state,
-            refs,
-            valueFrames,
-            animationKey,
-            delay,
-            totalDuration,
-            easingFuncs,
+          inputsOutputs.set(
+            property,
+            resolveAnimation(state, refs, valueFrames, property),
           );
 
-          if (animation.requiresLayoutWidth || animation.requiresLayoutHeight) {
-            const needWidth =
-              animation.requiresLayoutWidth &&
-              props.style?.width === undefined &&
-              getWidth(state, refs, state.styleTracking) === 0;
+          // if (animation.requiresLayoutWidth || animation.requiresLayoutHeight) {
+          //   const needWidth =
+          //     animation.requiresLayoutWidth &&
+          //     props.style?.width === undefined &&
+          //     getWidth(state, refs, state.styleTracking) === 0;
 
-            const needHeight =
-              animation.requiresLayoutHeight &&
-              props.style?.height === undefined &&
-              getHeight(state, refs, state.styleTracking) === 0;
+          //   const needHeight =
+          //     animation.requiresLayoutHeight &&
+          //     props.style?.height === undefined &&
+          //     getHeight(state, refs, state.styleTracking) === 0;
 
-            if (needWidth || needHeight) {
-              state.isWaitingLayout = true;
-            }
-          }
-
-          let sharedValue = state.sharedValues.get(animationKey);
-          if (!sharedValue) {
-            sharedValue = makeMutable(initialValue);
-            state.sharedValues.set(animationKey, sharedValue);
-          } else {
-            sharedValue.value = initialValue;
-          }
-
-          sharedValue.value = withRepeat(
-            withSequence(...sequence),
-            iterationCount.type === "infinite" ? -1 : iterationCount.value,
-          );
-
-          assignToTarget(props, sharedValue, pathTokens, {
-            allowTransformMerging: true,
-          });
+          //   if (needWidth || needHeight) {
+          //     state.isWaitingLayout = true;
+          //   }
+          // }
         }
+
+        // Update the progress to go from start to stop, repeating as needed
+        progressMutable.value = start;
+
+        function getTiming(
+          steps: AnimationStep[],
+          index: number,
+          progress: number,
+          totalDuration: number,
+          iterations: number,
+          repeat = false,
+          forwards = true,
+          easing = baseEasingFunction,
+        ) {
+          const step = steps[index];
+          const target = typeof step === "number" ? step : step[0];
+          const duration = totalDuration * target - progress;
+
+          if (typeof step !== "number" && target === 0) {
+            easing = step[1];
+          }
+
+          return withTiming(
+            target,
+            { duration, easing: getEasing(easing, Easing) },
+            (finished) => {
+              if (!finished) return;
+
+              if (typeof step !== "number") {
+                easing = step[1];
+              }
+
+              const nextIndex = forwards ? index + 1 : index - 1;
+
+              if (nextIndex > -1 && nextIndex < steps.length) {
+                progress += forwards ? duration : -duration;
+
+                progressMutable.value = getTiming(
+                  steps,
+                  nextIndex,
+                  progress,
+                  totalDuration,
+                  iterations,
+                  repeat,
+                  forwards,
+                  easing,
+                );
+              } else if (iterations > 1) {
+                if (repeat) forwards = !forwards;
+
+                const startingIndex = forwards ? 0 : steps.length - 1;
+
+                const staringProgress = forwards ? 0 : 1;
+
+                progressMutable.value = getTiming(
+                  steps,
+                  startingIndex,
+                  staringProgress,
+                  totalDuration,
+                  iterations - 1,
+                  repeat,
+                  forwards,
+                  easing,
+                );
+              }
+            },
+          );
+        }
+
+        progressMutable.value = getTiming(
+          animation.steps,
+          0,
+          0,
+          duration,
+          maxIterations.type === "infinite" ? Infinity : maxIterations.value,
+          false,
+          true,
+        );
       }
     } else {
+      // If we don't need to reset the animation, just record we saw all the values
       for (const name of names) {
         const keyframes = getAnimation(name, state.styleTracking.effect);
         if (!keyframes) continue;
-
-        for (const [animationKey] of keyframes.frames) {
-          assignToTarget(
-            props,
-            state.sharedValues.get(animationKey),
-            ["style", animationKey],
-            {
-              allowTransformMerging: true,
-            },
-          );
-          seenAnimatedProps.add(animationKey);
+        for (const [property] of keyframes.frames) {
+          animatedProps.add(property);
         }
       }
     }
@@ -694,34 +792,21 @@ function resetAnimation(state: ReducerState) {
   if (!state.animationNames) return;
 
   for (const name of state.animationNames) {
-    const animation = getAnimation(name, state.styleTracking.effect);
+    const animation = state.animationInputOutputs?.get(name);
 
-    if (!animation) {
-      continue;
-    }
-
-    state.sharedValues ??= new Map();
+    if (!animation) continue;
 
     const { cancelAnimation } =
       require("react-native-reanimated") as typeof import("react-native-reanimated");
 
-    for (const [propertyName] of animation.frames) {
-      let defaultValue =
-        defaultValues[propertyName as keyof typeof defaultValues];
-
-      if (typeof defaultValue === "function") {
-        defaultValue = defaultValue(state.styleTracking.effect);
-      }
-
-      const sharedValue = state.sharedValues.get(propertyName);
-      if (sharedValue) {
-        cancelAnimation(sharedValue);
-      }
+    cancelAnimation(animation[0]);
+    for (const key of animation[1].keys()) {
+      animation[1].set(key, undefined);
     }
   }
 }
 
-function processTransition(
+export function processTransition(
   state: ReducerState,
   refs: Refs,
   seenAnimatedProps: Set<string>,
@@ -730,7 +815,6 @@ function processTransition(
   state.sharedValues ??= new Map();
 
   state.props ??= {};
-  const props = state.props;
 
   const {
     property: properties,
@@ -757,47 +841,37 @@ function processTransition(
   for (let index = 0; index < properties.length; index++) {
     const property = properties[index];
     if (seenAnimatedProps.has(property)) continue;
-    let sharedValue = state.sharedValues.get(property);
+    seenAnimatedProps.add(property);
+
     let { value, defaultValue } = getBaseValue(state, [property]);
+    let transition = state.sharedValues?.get(property);
 
-    if (value === undefined && !sharedValue) {
-      // We have never seen this value, and its undefined so do nothing
+    // Skip values that are not set
+    if (value === undefined && !transition) {
       continue;
-    } else if (refs.sharedState.initialRender) {
-      // On the initial render don't transition
-      const initialValue = value !== undefined ? value : defaultValue;
-      sharedValue = makeMutable(initialValue);
-      state.sharedValues.set(property, sharedValue);
-    } else {
-      if (!sharedValue) {
-        // First time seeing this value, but its not the initial render!
-        // We need to create the sharedValue
-        sharedValue = makeMutable(defaultValue);
-        state.sharedValues.set(property, sharedValue);
-      }
-
-      // If the value is undefined or null, then it should be the default
-      value ??= defaultValue;
-
-      if (value !== sharedValue.value) {
-        const duration = timeToMS(durations[index % durations.length]);
-        const delay = timeToMS(delays[index % delays.length]);
-        const easing = easingFunctions[index % easingFunctions.length];
-        sharedValue.value = withDelay(
-          delay,
-          withTiming(value, {
-            duration,
-            easing: getEasing(easing, Easing),
-          }),
-        );
-      }
     }
 
-    seenAnimatedProps.add(property);
-    props.style ??= {};
-    assignToTarget(props.style, sharedValue, [property], {
-      allowTransformMerging: true,
-    });
+    state.sharedValues ??= new Map();
+    value ??= defaultValue;
+    transition ??= refs.sharedState.initialRender
+      ? makeMutable(value)
+      : makeMutable(defaultValue);
+    state.sharedValues.set(property, transition);
+
+    if (value === transition.value) {
+      continue;
+    }
+
+    const duration = timeToMS(durations[index % durations.length]);
+    const delay = timeToMS(delays[index % delays.length]);
+    const easing = easingFunctions[index % easingFunctions.length];
+    transition.value = withDelay(
+      delay,
+      withTiming(value, {
+        duration,
+        easing: getEasing(easing, Easing),
+      }),
+    );
   }
 }
 

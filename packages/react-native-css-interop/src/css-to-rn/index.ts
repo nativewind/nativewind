@@ -562,7 +562,7 @@ function extractKeyFrames(
   keyframes: KeyframesRule<Declaration>,
   extractOptions: ExtractRuleOptions,
 ) {
-  const animation: ExtractedAnimation = { frames: [] };
+  const animation: ExtractedAnimation = { frames: [], steps: [] };
   let rawFrames: {
     selector: number;
     values: StyleDeclaration[];
@@ -643,15 +643,20 @@ function extractKeyFrames(
 
   // Convert the rawFrames into frames
   const frames: Record<string, AnimationFrame> = {};
-
-  const easingFunctions: EasingFunction[] = [];
+  let easing: EasingFunction | undefined;
 
   for (let i = 0; i < rawFrames.length; i++) {
     const rawFrame = rawFrames[i];
     const progress = rawFrame.selector;
 
+    if (easing) {
+      animation.steps[i] = [progress, easing];
+    } else {
+      animation.steps[i] = progress;
+    }
+
     if (rawFrame.easingFunction) {
-      easingFunctions[i] = rawFrame.easingFunction;
+      easing = rawFrame.easingFunction;
     }
 
     for (const frameValue of rawFrame.values) {
@@ -707,15 +712,6 @@ function extractKeyFrames(
 
     return value;
   });
-
-  if (easingFunctions.length) {
-    // This is a holey array and may contain undefined values
-    animation.easingFunctions = Array.from<EasingFunction | undefined>(
-      easingFunctions,
-    ).map((value) => {
-      return value ?? { type: "!PLACEHOLDER!" };
-    });
-  }
 
   extractOptions.keyframes.set(keyframes.name.value, animation);
 }

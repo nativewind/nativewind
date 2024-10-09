@@ -38,11 +38,19 @@ export interface ReducerState {
   previousAnimation?: ExtractedAnimations;
   isWaitingLayout?: boolean;
   transition?: Required<ExtractedTransition>;
+  animationInputOutputs?: Map<string, AnimationInputOutput>;
   sharedValues?: Map<string, SharedValue<any>>;
   animationNames?: Set<string>;
   styleTracking: ReducerTracking;
   declarationTracking: ReducerTracking;
 }
+
+export type AnimationInputOutput = [
+  SharedValue<number>,
+  Map<string, [number[], any[]] | undefined>,
+];
+
+export type TransitionSharedValue = [string, SharedValue<any>];
 
 export interface ReducerTracking {
   effect: Effect;
