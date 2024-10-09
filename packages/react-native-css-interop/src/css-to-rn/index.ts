@@ -12,6 +12,7 @@ import {
   Rule,
   ContainerType,
   ContainerRule,
+  TokenOrValue,
 } from "lightningcss";
 
 import {
@@ -98,15 +99,39 @@ export function cssToReactNativeRuntime(
     ...options,
     features,
     grouping,
+    varUsageCount: new Map(),
   };
 
   debug(`Start lightningcss`);
+
+  const onVarUsage = (token: TokenOrValue) => {
+    if (token.type === "function") {
+      token.value.arguments.forEach((token) => onVarUsage(token));
+    } else if (token.type === "var") {
+      const variable = token.value;
+      const varName = variable.name.ident;
+      extractOptions.varUsageCount.set(
+        varName,
+        (extractOptions.varUsageCount.get(varName) || 0) + 1,
+      );
+
+      if (variable.fallback) {
+        const fallbackValues = variable.fallback;
+        fallbackValues.forEach((varObj) => onVarUsage(varObj));
+      }
+    }
+  };
 
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
   lightningcss({
     filename: "style.css", // This is ignored, but required
     code: typeof code === "string" ? new TextEncoder().encode(code) : code,
     visitor: {
+      Declaration(decl) {
+        // Track variable usage, we remove any unused variables
+        if (decl.property !== "unparsed" && decl.property !== "custom") return;
+        decl.value.value.forEach((varObj) => onVarUsage(varObj));
+      },
       StyleSheetExit(sheet) {
         debug(`Found ${sheet.rules.length} rules to process`);
 
@@ -752,6 +777,10 @@ function declarationsToStyle(
     }
 
     if (attribute.startsWith("--")) {
+      if (!options.varUsageCount.has(attribute)) {
+        return;
+      }
+
       return addVariable(attribute, value);
     }
 

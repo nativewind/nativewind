@@ -200,6 +200,7 @@ test("variables will be collected", () => {
 test("useUnsafeVariable", () => {
   registerCSS(`
     :root { --my-var: red; }
+    .test { color: var(--my-var); }
   `);
 
   let myVar;
