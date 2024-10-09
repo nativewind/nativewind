@@ -377,7 +377,7 @@ function stringify(data: unknown): string {
             }
 
             // Make sure we quote strings that require quotes
-            if (key.match(/[\[\]\-\/]/)) {
+            if (key.match(/[^a-zA-Z]/)) {
               key = `"${key}"`;
             }
 
