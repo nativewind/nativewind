@@ -701,7 +701,8 @@ function resetAnimation(state: ReducerState) {
       require("react-native-reanimated") as typeof import("react-native-reanimated");
 
     for (const [propertyName] of animation.frames) {
-      let defaultValue = defaultValues[propertyName];
+      let defaultValue =
+        defaultValues[propertyName as keyof typeof defaultValues];
 
       if (typeof defaultValue === "function") {
         defaultValue = defaultValue(state.styleTracking.effect);
@@ -806,13 +807,16 @@ function retainSharedValues(
 
   for (const entry of state.sharedValues) {
     if (seenAnimatedProps.has(entry[0])) continue;
-    let value = props.style?.[entry[0]] ?? defaultValues[entry[0]];
+    let value =
+      props.style?.[entry[0]] ??
+      defaultValues[entry[0] as keyof typeof defaultValues];
     if (typeof value === "function") {
       value = value(state.styleTracking.effect);
     }
     entry[1].value = value;
     props.style ??= {};
-    props.style?.[entry[0]] ?? defaultValues[entry[0]];
+    props.style?.[entry[0]] ??
+      defaultValues[entry[0] as keyof typeof defaultValues];
     assignToTarget(props.style, entry[1], [entry[0]], {
       allowTransformMerging: true,
     });

@@ -51,6 +51,8 @@ import type {
   RuntimeFunction,
 } from "../types";
 import { FeatureFlagStatus } from "./feature-flags";
+import { isDescriptorArray } from "../shared";
+import { toRNProperty } from "./normalize-selectors";
 
 const unparsedPropertyMapping: Record<string, string> = {
   "margin-inline-start": "margin-start",
@@ -330,6 +332,14 @@ export function parseDeclaration(
     let property =
       unparsedPropertyMapping[declaration.value.propertyId.property] ||
       declaration.value.propertyId.property;
+
+    if (unparsedRuntimeFn.has(property)) {
+      let args = parseUnparsed(declaration.value.value, parseOptions);
+      if (!isDescriptorArray(args)) {
+        args = [args];
+      }
+      return addStyleProp(property, [{}, `@${toRNProperty(property)}`, args]);
+    }
 
     return addStyleProp(
       property,
@@ -2921,3 +2931,5 @@ export function parseUnresolvedColor(
       color satisfies never;
   }
 }
+
+const unparsedRuntimeFn = new Set(["text-shadow"]);

@@ -13,10 +13,11 @@ import {
   isDescriptorFunction,
   transformKeys,
 } from "../../shared";
-import { ReducerState, ReducerTracking, Refs } from "./types";
+import { ReducerState, ReducerTracking, Refs, ShorthandResult } from "./types";
 import { getUniversalVariable, getVariable } from "./styles";
 import { systemColorScheme } from "./appearance-observables";
 import { rem, vh, vw } from "./unit-observables";
+import { textShadow } from "./resolvers/text-shadow";
 
 /**
  * Get the final value of a value descriptor
@@ -34,7 +35,7 @@ export function resolveValue(
   descriptor: RuntimeValueDescriptor,
   style: Record<string, any> | undefined,
   castToArray = false,
-): RuntimeValueDescriptor {
+): RuntimeValueDescriptor | ShorthandResult {
   try {
     switch (typeof descriptor) {
       case "undefined":
@@ -70,6 +71,16 @@ export function resolveValue(
     };
 
     switch (name) {
+      case "@textShadow": {
+        return textShadow(
+          resolve,
+          state,
+          refs,
+          tracking,
+          descriptorArgs,
+          style,
+        );
+      }
       case "var": {
         let value = resolve(state, refs, tracking, descriptorArgs[0], style);
         if (typeof value === "string")
@@ -448,7 +459,8 @@ function resolveAnimationValue(
     const { value: baseValue, defaultValue } = getBaseValue(state, [property]);
     value = baseValue ?? defaultValue;
     if (value === undefined) {
-      const defaultValueFn = defaultValues[property];
+      const defaultValueFn =
+        defaultValues[property as keyof typeof defaultValues];
       return typeof defaultValueFn === "function"
         ? defaultValueFn(state.styleTracking.effect)
         : defaultValueFn;
@@ -557,10 +569,7 @@ export function getHeight(
   return getLayout(state, refs, tracking)[1];
 }
 
-export const defaultValues: Record<
-  string,
-  AnimatableValue | ((effect: Effect) => AnimatableValue)
-> = {
+export const defaultValues = {
   backgroundColor: "transparent",
   borderBottomColor: "transparent",
   borderBottomLeftRadius: 0,
@@ -576,7 +585,7 @@ export const defaultValues: Record<
   borderTopWidth: 0,
   borderWidth: 0,
   bottom: 0,
-  color: (effect) => {
+  color: (effect: Effect) => {
     return systemColorScheme.get(effect) === "dark" ? "white" : "black";
   },
   flex: 1,
@@ -614,6 +623,7 @@ export const defaultValues: Record<
   scaleY: 1,
   skewX: "0deg",
   skewY: "0deg",
+  textShadowRadius: 0,
   top: 0,
   translateX: 0,
   translateY: 0,
@@ -771,7 +781,8 @@ export function getBaseValue(state: ReducerState, paths: string[]) {
     }
   }
 
-  const defaultValueFn = defaultValues[paths[paths.length - 1]];
+  const defaultValueFn =
+    defaultValues[paths[paths.length - 1] as keyof typeof defaultValues];
   const defaultValue =
     typeof defaultValueFn === "function"
       ? defaultValueFn(state.styleTracking.effect)
