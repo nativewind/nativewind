@@ -1,7 +1,4 @@
-import { execSync, fork } from "child_process";
-import { execPath } from "node:process";
-import fs from "fs";
-import path from "path";
+import { fork } from "child_process";
 import { type Config } from "tailwindcss";
 import { TailwindCliOptions } from "../types";
 import { Debugger } from "debug";
@@ -26,6 +23,7 @@ const getEnv = (options: TailwindCliOptions) => {
     ...process.env,
     NATIVEWIND_INPUT: options.input,
     NATIVEWIND_OS: options.platform,
+    NATIVEWIND_WATCH: options.onChange ? "true" : "false",
     BROWSERSLIST: options.browserslist ?? undefined,
     BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
   };
@@ -33,36 +31,7 @@ const getEnv = (options: TailwindCliOptions) => {
 
 export const tailwindCliV3 = function (debug: Debugger) {
   return {
-    processPROD(options: TailwindCliOptions) {
-      debug("Start production Tailwind CLI");
-      const cliLocation = require.resolve("tailwindcss/lib/cli.js");
-
-      const outputPath = path.join(
-        path.dirname(require.resolve("nativewind/package.json")),
-        ".cache/",
-      );
-
-      fs.mkdirSync(outputPath, { recursive: true });
-
-      const output = path.join(
-        outputPath,
-        `${path.basename(options.input)}.${options.platform}.css`,
-      );
-
-      const cliCommand = `${execPath} ${cliLocation} --input ${options.input} --output ${output}`;
-      debug(`PROD execSync: ${cliCommand}`);
-
-      execSync(cliCommand, {
-        env: getEnv(options),
-      });
-
-      const contents = fs.readFileSync(output);
-      debug("Finished production Tailwind CLI");
-      return contents;
-    },
-    processDEV(
-      options: TailwindCliOptions & { onChange: (css: string) => void },
-    ) {
+    getCSSForPlatform(options: TailwindCliOptions) {
       debug("Start development Tailwind CLI");
       return new Promise<string>((resolve, reject) => {
         try {
@@ -94,7 +63,7 @@ export const tailwindCliV3 = function (debug: Debugger) {
               resolve(message.toString());
               initialMessage = false;
               debug("Finished initial development Tailwind CLI");
-            } else {
+            } else if (options.onChange) {
               debug("Tailwind CLI detected new styles");
               options.onChange(message.toString());
             }

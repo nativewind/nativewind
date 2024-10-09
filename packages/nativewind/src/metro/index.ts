@@ -59,18 +59,9 @@ export function withNativeWind(
     selectorPrefix: typeof important === "string" ? important : undefined,
     debugNamespace: "nativewind",
     input,
-    processPROD: (platform) => {
-      debug(`processPROD: ${platform}`);
-      return cli.processPROD({
-        platform,
-        input,
-        browserslist,
-        browserslistEnv,
-      });
-    },
-    processDEV: (platform, onChange) => {
-      debug(`processDEV: ${platform}`);
-      return cli.processDEV({
+    getCSSForPlatform: (platform, onChange) => {
+      debug(`getCSSForPlatform: ${platform}`);
+      return cli.getCSSForPlatform({
         platform,
         input,
         browserslist,

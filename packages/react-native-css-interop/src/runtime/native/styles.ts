@@ -139,12 +139,12 @@ export function resetData() {
   rem.set(14);
 }
 
-let latestInjectedData: StyleSheetRegisterCompiledOptions = {
-  $compiled: true,
-};
+let rules: NonNullable<StyleSheetRegisterCompiledOptions["rules"]> = {};
 
 export function injectData(data: StyleSheetRegisterCompiledOptions) {
-  latestInjectedData = data;
+  if (data.rules) {
+    Object.assign(rules, data.rules);
+  }
 
   for (const style of seenStylesForHotReload) {
     initiateStyle(style);
@@ -200,7 +200,7 @@ export function injectData(data: StyleSheetRegisterCompiledOptions) {
 
 function initiateStyle(name: string) {
   const value = styles.get(name);
-  const style = latestInjectedData.rules?.[name];
+  const style = rules[name];
 
   if (!style) return;
 

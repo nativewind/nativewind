@@ -48,10 +48,14 @@
   };
 
   const { build } = require("tailwindcss/lib/cli/build");
-
-  await build({
+  const args: Record<string, string | boolean | undefined> = {
     "--input": process.env.NATIVEWIND_INPUT,
     "--output": fakeOutput,
-    "--watch": true,
-  });
+  };
+
+  if (process.env.NATIVEWIND_WATCH === "true") {
+    args["--watch"] = true;
+  }
+
+  await build(args);
 })();
