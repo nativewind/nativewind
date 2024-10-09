@@ -634,9 +634,7 @@ function extractKeyFrames(
 
   for (let i = 0; i < rawFrames.length; i++) {
     const rawFrame = rawFrames[i];
-    const animationProgress = rawFrame.selector;
-    const previousProgress = i === 0 ? 0 : rawFrames[i - 1].selector;
-    const progress = animationProgress - previousProgress;
+    const progress = rawFrame.selector;
 
     if (rawFrame.easingFunction) {
       easingFunctions[i] = rawFrame.easingFunction;
@@ -661,21 +659,11 @@ function extractKeyFrames(
           frames[key] = [key, []];
         }
 
-        // All props need a progress 0 frame
-        if (progress !== 0 && frames[key][1].length === 0) {
-          frames[key][1].push({ value: "!INHERIT!", progress: 0 });
-        }
-
         frames[key][1].push({ value, progress });
       } else if (value && typeof value === "object" && !Array.isArray(value)) {
         for (const key in value) {
           if (!frames[key]) {
             frames[key] = [key, []];
-          }
-
-          // All props need a progress 0 frame
-          if (progress !== 0 && frames[key][1].length === 0) {
-            frames[key][1].push({ value: "!INHERIT!", progress: 0 });
           }
 
           frames[key][1].push({ value: value[key], progress });
@@ -684,7 +672,27 @@ function extractKeyFrames(
     }
   }
 
-  animation.frames = Object.values(frames);
+  /**
+   * Ensure all animations have a 0%/100% frame.
+   *
+   * As per mdn:
+   * If a keyframe rule doesn't specify the start or end states of the animation (that is, 0%/from and 100%/to),
+   * browsers will use the element's existing styles for the start/end states.
+   * This can be used to animate an element from its initial state and back.
+   */
+  animation.frames = Object.values(frames).map((value) => {
+    const valueFrames = value[1];
+
+    if (valueFrames[0].progress !== 0) {
+      valueFrames.unshift({ value: "!INHERIT!", progress: 0 });
+    }
+
+    if (valueFrames[valueFrames.length - 1].progress !== 0) {
+      valueFrames.push({ value: "!INHERIT!", progress: 1 });
+    }
+
+    return value;
+  });
 
   if (easingFunctions.length) {
     // This is a holey array and may contain undefined values
