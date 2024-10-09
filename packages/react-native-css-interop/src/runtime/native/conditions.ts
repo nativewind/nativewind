@@ -6,7 +6,7 @@ import type {
   MediaQuery,
   QueryFeatureFor_MediaFeatureId,
 } from "lightningcss";
-import { I18nManager, Platform } from "react-native";
+import { I18nManager, PixelRatio, Platform } from "react-native";
 
 import {
   AttributeCondition,
@@ -262,6 +262,8 @@ function testPlainFeature(
   }
 
   switch (feature.name) {
+    case "resolution":
+      return value === PixelRatio.get();
     case "display-mode":
       return value === "native" || Platform.OS === value;
     case "prefers-color-scheme":
@@ -299,27 +301,46 @@ function getMediaFeatureValue(
   value: MediaFeatureValue,
   tracking?: ReducerTracking,
 ) {
-  if (value.type === "number") {
-    return value.value;
-  } else if (value.type === "length") {
-    if (value.value.type === "value") {
-      const length = value.value.value;
-      switch (length.unit) {
-        case "px":
-          return length.value;
-        case "rem":
-          return length.value * rem.get(tracking?.effect);
-        default:
-          return null;
+  switch (value.type) {
+    case "number":
+      return value.value;
+    case "length":
+      if (value.value.type === "value") {
+        const length = value.value.value;
+        switch (length.unit) {
+          case "px":
+            return length.value;
+          case "rem":
+            return length.value * rem.get(tracking?.effect);
+          default:
+            return null;
+        }
+      } else {
+        return null;
       }
-    } else {
+    case "ident":
+      return value.value;
+    case "resolution":
+      // React Native ~160 dp per inch
+      switch (value.value.type) {
+        case "dpi":
+          return value.value.value / 160;
+        case "dpcm":
+          // There are 1in = ~2.54cm
+          return value.value.value / (160 * 2.54);
+        case "dppx":
+          return value.value.value;
+        default:
+          value.value satisfies never;
+      }
+    case "boolean":
+    case "integer":
+    case "ratio":
+    case "env":
       return null;
-    }
-  } else if (value.type === "ident") {
-    return value.value;
+    default:
+      value satisfies never;
   }
-
-  return null;
 }
 
 function testRange(
@@ -338,6 +359,8 @@ function testRange(
       return testComparison(feature.operator, ref.height, value, tracking);
     case "width":
       return testComparison(feature.operator, ref.width, value, tracking);
+    case "resolution":
+      return testComparison(feature.operator, PixelRatio.get(), value);
     default:
       return false;
   }

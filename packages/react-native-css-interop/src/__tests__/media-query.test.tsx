@@ -184,3 +184,86 @@ test("not all", () => {
     color: "#ff0000",
   });
 });
+
+describe("resolution", () => {
+  // PixelRatio.get() === 2
+  test("dppx", () => {
+    registerCSS(`
+@media (resolution: 2dppx) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      color: "#ff0000",
+    });
+  });
+
+  test("dpi", () => {
+    registerCSS(`
+@media (resolution: 320dpi) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      color: "#ff0000",
+    });
+  });
+});
+
+describe("min-resolution", () => {
+  // PixelRatio.get() === 2
+  test("dppx", () => {
+    registerCSS(`
+@media (min-resolution: 1dppx) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      color: "#ff0000",
+    });
+  });
+
+  test("dpi", () => {
+    registerCSS(`
+@media (min-resolution: 160dpi) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      color: "#ff0000",
+    });
+  });
+});
+
+describe("max-resolution", () => {
+  // PixelRatio.get() === 2
+  test("dppx", () => {
+    registerCSS(`
+@media (max-resolution: 1dppx) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle(undefined);
+  });
+
+  test("dpi", () => {
+    registerCSS(`
+@media (max-resolution: 160dpi) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle(undefined);
+  });
+});
