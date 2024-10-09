@@ -2,6 +2,7 @@
 import { render, screen } from "../test";
 import { View } from "react-native";
 import { getAnimatedStyle } from "react-native-reanimated";
+import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 
 const testID = "test-id";
 
@@ -135,6 +136,35 @@ test("animate-spin", async () => {
   jest.advanceTimersByTime(250);
   expect(getAnimatedStyle(component)).toStrictEqual({
     transform: [{ rotate: "90deg" }],
+  });
+});
+
+test("animate-pulse", async () => {
+  await render(<View testID={testID} className="animate-pulse" />);
+
+  let component = screen.getByTestId(testID);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    opacity: 1,
+  });
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    opacity: 0.7500000093132256,
+  });
+
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    opacity: 0.5,
+  });
+
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    opacity: 0.7491666591949523,
+  });
+
+  jest.advanceTimersByTime(501);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    opacity: 1,
   });
 });
 

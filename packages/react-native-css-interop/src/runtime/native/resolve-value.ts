@@ -417,6 +417,8 @@ export function resolveAnimation(
   const { withDelay, withTiming, Easing } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
+  let progress = 0;
+
   const initialValue = resolveAnimationValue(
     state,
     refs,
@@ -431,10 +433,12 @@ export function resolveAnimation(
         ? easingFuncs[index]
         : easingFuncs;
 
+      const framesProgress = frame.progress - progress;
+
       let value = withTiming(
         resolveAnimationValue(state, refs, property, frame.value),
         {
-          duration: totalDuration * frame.progress,
+          duration: totalDuration * framesProgress,
           easing: getEasing(easingFunction, Easing),
         },
       );
@@ -443,6 +447,8 @@ export function resolveAnimation(
       if (index === 1) {
         value = withDelay(delay, value);
       }
+
+      progress += framesProgress;
 
       return value;
     }),
