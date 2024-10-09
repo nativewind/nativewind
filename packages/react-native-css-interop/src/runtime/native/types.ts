@@ -5,9 +5,12 @@ import type {
   ExtractedTransition,
   ContainerRecord,
   StyleDeclaration,
+  RuntimeValueDescriptor,
 } from "../../types";
 import type { Effect, Observable } from "../observable";
 import type { VariableContextValue } from "./styles";
+import { PLACEHOLDER_SYMBOL } from "../../shared";
+import { ShorthandSymbol } from "./resolvers/shared";
 
 export type Callback = () => void;
 export type GetInteraction = (
@@ -68,3 +71,28 @@ export type SharedState = {
 };
 
 export type RenderingGuard = (refs: Refs) => boolean;
+
+export type ShorthandResolveFn = (
+  resolve: (
+    state: ReducerState,
+    refs: Refs,
+    tracking: ReducerTracking,
+    descriptor: RuntimeValueDescriptor | RuntimeValueDescriptor[],
+    style?: Record<string, any>,
+  ) => any,
+  state: ReducerState,
+  refs: Refs,
+  tracking: ReducerTracking,
+  descriptor: RuntimeValueDescriptor | RuntimeValueDescriptor[],
+  style?: Record<string, any>,
+) => ShorthandResult | undefined;
+
+export type ShorthandResultArray = Array<
+  readonly [string | readonly string[], any]
+>;
+
+export type ShorthandResult = ShorthandResultArray & {
+  [ShorthandSymbol]: boolean;
+};
+
+export type Placeholder = { [PLACEHOLDER_SYMBOL]: boolean };

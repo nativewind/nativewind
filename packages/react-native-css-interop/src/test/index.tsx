@@ -160,6 +160,8 @@ registerCSS.noDebug = (
   registerCSS(css, { ...options, debugCompiled: false });
 };
 
+export const testID = "react-native-css-interop";
+
 export function setupAllComponents() {
   require("../runtime/components");
 }

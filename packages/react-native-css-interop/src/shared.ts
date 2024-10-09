@@ -1,9 +1,12 @@
+import type { SharedValue } from "react-native-reanimated";
+import type { Placeholder, ShorthandResult } from "./runtime/native/types";
 import {
   InteropComponentConfig,
   RuntimeStyle,
   RuntimeValueDescriptor,
   Specificity,
 } from "./types";
+import { ShorthandSymbol } from "./runtime/native/resolvers/shared";
 
 export const INTERNAL_RESET: unique symbol = Symbol();
 export const INTERNAL_SET: unique symbol = Symbol();
@@ -61,20 +64,47 @@ type ObjectMergeStyles = "assign" | "toArray";
 
 export function assignToTarget(
   parent: Record<string, any>,
-  value: any,
+  value:
+    | Record<string, unknown>
+    | RuntimeValueDescriptor
+    | SharedValue<any>
+    | ShorthandResult
+    | Placeholder,
   config: InteropComponentConfig | string[],
-  {
-    arrayMergeStyle = "push",
-    objectMergeStyle = "assign",
-    allowTransformMerging = false,
-    reverseTransformPush = false,
-  }: {
+  options: {
     arrayMergeStyle?: ArrayMergeStyles;
     objectMergeStyle?: ObjectMergeStyles;
     allowTransformMerging?: boolean;
     reverseTransformPush?: boolean;
   } = {},
 ) {
+  /**
+   * Handle shorthands first
+   */
+  if (typeof value === "object" && ShorthandSymbol in value) {
+    return value.map((shorthandConfig) => {
+      let pathTokens = Array.from(
+        Array.isArray(config) ? config : config.target,
+      );
+
+      const shortHandProp = shorthandConfig[0];
+      if (typeof shortHandProp === "string") {
+        pathTokens.splice(-1, 1, shortHandProp);
+      } else {
+        pathTokens.splice(-1, 1, ...shortHandProp);
+      }
+
+      assignToTarget(parent, shorthandConfig[1], pathTokens, options);
+    });
+  }
+
+  const {
+    arrayMergeStyle = "push",
+    objectMergeStyle = "assign",
+    allowTransformMerging = false,
+    reverseTransformPush = false,
+  } = options;
+
   let prop: string | number;
 
   let props = Array.isArray(config) ? config : config.target;
