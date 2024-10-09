@@ -51,7 +51,6 @@ remapProps(FlatList, {
   ListHeaderComponentClassName: "ListHeaderComponentStyle",
   columnWrapperClassName: "columnWrapperStyle",
   contentContainerClassName: "contentContainerStyle",
-  indicatorClassName: "indicatorStyle",
 });
 remapProps(ImageBackground, {
   className: "style",
@@ -66,7 +65,6 @@ remapProps(VirtualizedList, {
   ListFooterComponentClassName: "ListFooterComponentStyle",
   ListHeaderComponentClassName: "ListHeaderComponentStyle",
   contentContainerClassName: "contentContainerStyle",
-  indicatorClassName: "indicatorStyle",
 });
 
 try {
