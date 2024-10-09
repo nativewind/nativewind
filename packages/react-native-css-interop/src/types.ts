@@ -69,6 +69,7 @@ export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
   selectorPrefix?: string;
   appearanceOrder: number;
   rem?: StyleSheetRegisterOptions["rem"];
+  varUsageCount: Map<string, number>;
 }
 
 export type CssInterop = <
