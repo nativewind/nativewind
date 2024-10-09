@@ -687,7 +687,7 @@ function extractKeyFrames(
       valueFrames.unshift({ value: "!INHERIT!", progress: 0 });
     }
 
-    if (valueFrames[valueFrames.length - 1].progress !== 0) {
+    if (valueFrames[valueFrames.length - 1].progress !== 1) {
       valueFrames.push({ value: "!INHERIT!", progress: 1 });
     }
 
