@@ -123,6 +123,8 @@ export function assignToTarget(
 
     if (typeof parent[prop] !== "object") {
       parent[prop] = {};
+    } else if (Object.isFrozen(parent[prop])) {
+      parent[prop] = Object.assign({}, parent[prop]);
     }
 
     parent = parent[prop];
