@@ -10,7 +10,11 @@ import {
   remapProps,
   getOpaqueStyles,
 } from "test";
-import { StyleRuleSetSymbol, StyleRuleSymbol } from "../shared";
+import {
+  PLACEHOLDER_SYMBOL,
+  StyleRuleSetSymbol,
+  StyleRuleSymbol,
+} from "../shared";
 
 const testID = "react-native-css-interop";
 
@@ -31,7 +35,9 @@ test("mapping", () => {
 
   expect(component.props).toEqual({
     testID,
-    differentStyle: {},
+    differentStyle: {
+      [PLACEHOLDER_SYMBOL]: true,
+    },
   });
 
   expect(getOpaqueStyles(component.props.differentStyle)).toStrictEqual([

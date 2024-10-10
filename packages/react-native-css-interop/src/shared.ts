@@ -176,7 +176,13 @@ export function assignToTarget(
           parent[prop] = [target, value];
         }
       }
-    } else if (typeof value === "object" && !(PLACEHOLDER_SYMBOL in value)) {
+    } else if (
+      value &&
+      typeof value === "object" &&
+      !("_isReanimatedSharedValue" in value) &&
+      !(PLACEHOLDER_SYMBOL in value) &&
+      !Array.isArray(value)
+    ) {
       parent[prop] = Object.assign({}, value);
     } else {
       parent[prop] = value;

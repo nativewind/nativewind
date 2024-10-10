@@ -13,6 +13,7 @@ import { colorScheme } from "./appearance-observables";
 import {
   assignToTarget,
   inlineSpecificity,
+  PLACEHOLDER_SYMBOL,
   StyleRuleSetSymbol,
   StyleRuleSymbol,
 } from "../../shared";
@@ -73,7 +74,9 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
       // If the source is not a string or is empty, skip this config
       if (typeof source !== "string" || !source) continue;
 
-      const placeholder = {};
+      const placeholder = {
+        [PLACEHOLDER_SYMBOL]: true,
+      };
       opaqueStyles.set(placeholder, {
         [StyleRuleSetSymbol]: "RemappedClassName",
         classNames: source.split(/\s+/),
