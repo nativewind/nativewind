@@ -28,9 +28,15 @@ export function maybeHijackSafeAreaProvider(type: ComponentType<any>) {
 
 function shimFactory(type: ComponentType<any>) {
   function SafeAreaEnv({ children }: PropsWithChildren<{}>) {
-    const parentVars = useContext(VariableContext);
     const insets =
       require("react-native-safe-area-context").useSafeAreaInsets();
+
+    const parentVarContext = useContext(VariableContext);
+
+    const parentVars =
+      parentVarContext instanceof Map
+        ? Object.fromEntries(parentVarContext.entries())
+        : parentVarContext;
 
     const value = useMemo<VariableContextValue>(
       () => ({
@@ -40,7 +46,7 @@ function shimFactory(type: ComponentType<any>) {
         "--___css-interop___safe-area-inset-right": insets.right,
         "--___css-interop___safe-area-inset-top": insets.top,
       }),
-      [parentVars, insets],
+      [parentVarContext, insets],
     );
 
     return createElement(VariableContext.Provider, { value }, children);
