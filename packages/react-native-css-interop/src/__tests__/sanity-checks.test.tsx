@@ -108,3 +108,19 @@ test("rerender null className", () => {
 
   expect(component.props.style).not.toBeDefined();
 });
+
+test("styles don't mutate other styles", () => {
+  registerCSS(
+    `.text-red-500 { color: red; } .dynamic { background-color: var(--test); --test: blue }`,
+  );
+
+  render(<View testID={testID} className="text-red-500 dynamic" />);
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "#ff0000", backgroundColor: "blue" });
+
+  screen.rerender(<View testID={testID} className="text-red-500" />);
+
+  expect(component).toHaveStyle({ color: "#ff0000" });
+});

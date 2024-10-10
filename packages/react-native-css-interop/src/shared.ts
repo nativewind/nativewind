@@ -176,6 +176,8 @@ export function assignToTarget(
           parent[prop] = [target, value];
         }
       }
+    } else if (typeof value === "object" && !(PLACEHOLDER_SYMBOL in value)) {
+      parent[prop] = Object.assign({}, value);
     } else {
       parent[prop] = value;
     }
