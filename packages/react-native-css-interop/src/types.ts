@@ -43,7 +43,6 @@ export type InteropComponentConfig = {
 };
 
 export type CssToReactNativeRuntimeOptions = {
-  debug?: (str: string) => void;
   cache?: {
     rules: Map<string, StyleRule[]>;
     keyframes: Map<string, ExtractedAnimation>;

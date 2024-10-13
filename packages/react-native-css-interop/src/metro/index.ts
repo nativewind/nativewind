@@ -28,46 +28,31 @@ import { cssToReactNativeRuntime } from "../css-to-rn";
  * Notes about CLIs
  * ------------------
  *
- * Depending on the scenario, enhanceMiddleware may not be called so Metro will not be patched
- * enhanceMiddleware is used to patch Metro for our fast-refresh, so we only need it on
- * Metro instances that will be performing the fast refresh. e.g.
+ * Metro has two run modes, normal (with a server) and headless. In headless mode the `enhancedMiddleware` is not called.
+ * THIS DOES NOT MEAN THAT FAST-REFRESH IS NOT ENABLED! It just means you are making a build that CAN connect to an instance
+ * of Metro that is running a server. E.g `eas` may do a development build that you download and connect to your local server
  *
- * @expo/cli is run locally and will watch for file updates. It will call enhanceMiddleware
- * eas is used to build clients that can be used to connect to a @expo/cli server.
+ * You can also do production builds WITH Fast Refresh `npx expo run:android --variant production` will start a production
+ * like build, but still enable the dev server for fast refresh, it just don't use it.
  *
- * In this instance, even if eas is doing a debug build, we build it like a production app.
+ * The virtual module setup requires the development server, so when its turned off we need to write styles to disk
  *
- * The @react-native-community/cli is similar. When running locally for a device,
- * it starts 2 instances of Metro. One to build and one to perform fast refreshes.
+ * Therefore there are two flags
+ * - isDev: Is this a development or production build
+ * - writeStyles: Is this a headless build where we need to write styles to disk
  *
- * So the App:
- * - starts with the production styles
- * - connects to the fast-refresh server
- * - will receive updates
- *
- * Expo
- * - @expo/cli enhanceMiddleware
- * - eas does not use
- *
- * Metro notes:
- *  - Expo uses a custom Metro server than the community CLI
- *  - @expo/cli and eas use slightly different Metro servers
- *    - eas skips the customMiddleware and the dev server is never started
- *    - expo export also skip the customMiddleware, but the dev server is started
- *  - Metro uses a virtual file system.
- *    - Metro can be configured to only react to ADD events in development
- *    - This means all files need to be present on the file system BEFORE Metro generates the file tree
- *  - Metro is undocumented. Good luck
- *
- * For these reasons we need to take multiple approaches with redundancies to ensure everything goes smoothly
+ * All combinations over these flags at used in various scenarios
  */
 
 export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
   input: string;
-  debugNamespace?: string;
   /** Force load styles from the filesystem, used to test production style loading. Disables Fast Refresh of styles. */
   forceWriteFileSystem?: boolean;
   getCSSForPlatform: GetCSSForPlatform;
+  parent?: {
+    name: string;
+    debug: string;
+  };
 };
 
 export type GetCSSForPlatform = (
@@ -84,10 +69,28 @@ const outputDirectory = path.resolve(__dirname, "../../.cache");
 
 export function withCssInterop(
   config: MetroConfig,
-  { ...options }: WithCssInteropOptions,
+  options: WithCssInteropOptions,
+): MetroConfig;
+export function withCssInterop(
+  config: () => Promise<MetroConfig>,
+  options: WithCssInteropOptions,
+): () => Promise<MetroConfig>;
+export function withCssInterop(
+  config: MetroConfig | (() => Promise<MetroConfig>),
+  { parent, ...options }: WithCssInteropOptions,
+) {
+  return typeof config === "function"
+    ? async function WithCSSInterop() {
+        return getConfig(await config(), options);
+      }
+    : getConfig(config, options);
+}
+
+function getConfig(
+  config: MetroConfig,
+  options: WithCssInteropOptions,
 ): MetroConfig {
-  const debug = debugFn(options.debugNamespace || "react-native-css-interop");
-  options.debug = debug;
+  const debug = debugFn(options.parent?.name || "react-native-css-interop");
   debug("withCssInterop");
   debug(`outputDirectory ${outputDirectory}`);
 
@@ -97,12 +100,9 @@ export function withCssInterop(
   const originalGetTransformOptions = config.transformer?.getTransformOptions;
   const originalMiddleware = config.server?.enhanceMiddleware;
 
-  /*
-   * Ensure the production files exist before Metro starts
-   * Metro (or who ever is controlling Metro) will need to get the config before
-   * its started, so we can generate these placeholder files to ensure that the
-   * production files make it into the virtual file tree
-   */
+  // Used by the resolverPoisonPill
+  const poisonPillPath = "./interop-poison.pill";
+
   return {
     ...config,
     transformerPath: require.resolve("./transformer"),
@@ -138,7 +138,10 @@ export function withCssInterop(
           const output =
             platform === "web"
               ? css.toString("utf-8")
-              : getNativeJS(cssToReactNativeRuntime(css, options), debug);
+              : getNativeJS(
+                  cssToReactNativeRuntime(css, options, debug),
+                  debug,
+                );
 
           await fs.mkdir(outputDirectory, { recursive: true });
           await fs.writeFile(filePath, output);
@@ -190,6 +193,10 @@ export function withCssInterop(
       ...config.resolver,
       sourceExts: [...(config?.resolver?.sourceExts || []), "css"],
       resolveRequest: (context, moduleName, platform) => {
+        if (moduleName === poisonPillPath) {
+          return { type: "empty" };
+        }
+
         const resolver = originalResolver ?? context.resolveRequest;
         const resolved = resolver(context, moduleName, platform);
 
@@ -200,13 +207,19 @@ export function withCssInterop(
 
         platform = platform || "native";
         // Generate a fake name for our virtual module. Make it platform specific
+
         const filePath = platformPath(platform);
 
         debug(`resolveRequest.input ${resolved.filePath}`);
         debug(`resolveRequest.resolvedTo: ${filePath}`);
-
         if (!writeStyles) {
-          startCSSProcessor(filePath, platform, options, debug);
+          startCSSProcessor(
+            filePath,
+            platform,
+            (context as any).isDev === true,
+            options,
+            debug,
+          );
         }
 
         return {
@@ -221,16 +234,18 @@ export function withCssInterop(
 async function startCSSProcessor(
   filePath: string,
   platform: string,
+  isDev: boolean,
   { input, getCSSForPlatform, ...options }: WithCssInteropOptions,
   debug: Debugger,
 ) {
-  debug(`virtualModules ${filePath}`);
-  debug(`virtualModules.size ${virtualModules.size}`);
-
   // Ensure that we only start the processor once per file
   if (virtualModules.has(filePath)) {
     return;
   }
+
+  debug(`virtualModules ${filePath}`);
+  debug(`virtualModules.isDev ${isDev}`);
+  debug(`virtualModules.size ${virtualModules.size}`);
 
   options = {
     cache: {
@@ -242,41 +257,52 @@ async function startCSSProcessor(
     ...options,
   };
 
-  virtualModules.set(
-    filePath,
-    getCSSForPlatform(platform, (css: string) => {
-      debug(`virtualStyles.update ${platform}`);
-      // Override the virtual module with the new update
-      virtualModules.set(
-        filePath,
-        Promise.resolve(
-          platform === "web"
-            ? css
-            : getNativeJS(cssToReactNativeRuntime(css, options), debug),
-        ),
-      );
+  if (!isDev) {
+    debug(`virtualModules.fastRefresh disabled`);
+    virtualModules.set(
+      filePath,
+      getCSSForPlatform(platform).then((css) => {
+        return getNativeJS(cssToReactNativeRuntime(css, options), debug);
+      }),
+    );
+  } else {
+    debug(`virtualModules.fastRefresh enabled`);
+    virtualModules.set(
+      filePath,
+      getCSSForPlatform(platform, (css: string) => {
+        debug(`virtualStyles.update ${platform}`);
+        // Override the virtual module with the new update
+        virtualModules.set(
+          filePath,
+          Promise.resolve(
+            platform === "web"
+              ? css
+              : getNativeJS(cssToReactNativeRuntime(css, options), debug),
+          ),
+        );
 
-      debug(`virtualStyles.emit ${platform}`);
-      haste.emit("change", {
-        eventsQueue: [
-          {
-            filePath,
-            metadata: {
-              modifiedTime: Date.now(),
-              size: 1, // Can be anything
-              type: "virtual", // Can be anything
+        debug(`virtualStyles.emit ${platform}`);
+        haste.emit("change", {
+          eventsQueue: [
+            {
+              filePath,
+              metadata: {
+                modifiedTime: Date.now(),
+                size: 1, // Can be anything
+                type: "virtual", // Can be anything
+              },
+              type: "change",
             },
-            type: "change",
-          },
-        ],
-      });
-    }).then((css) => {
-      debug(`virtualStyles.initial ${platform}`);
-      return platform === "web"
-        ? css
-        : getNativeJS(cssToReactNativeRuntime(css, options), debug);
-    }),
-  );
+          ],
+        });
+      }).then((css) => {
+        debug(`virtualStyles.initial ${platform}`);
+        return platform === "web"
+          ? css
+          : getNativeJS(cssToReactNativeRuntime(css, options), debug);
+      }),
+    );
+  }
 }
 
 /**
@@ -331,6 +357,17 @@ function ensureBundlerPatched(
     return transformFile(filePath, transformOptions, fileBuffer);
   };
   bundler.transformFile.__css_interop__patched = true;
+}
+
+function getNativeJS(data = {}, debug: Debugger): string {
+  debug("Start stringify");
+  const output = `(${stringify(data)})`;
+  debug(`Output size: ${Buffer.byteLength(output, "utf8")} bytes`);
+  return output;
+}
+
+function platformPath(platform = "native") {
+  return `${outputDirectory}/${platform}.${platform === "web" ? "css" : "js"}`;
 }
 
 /**
@@ -389,15 +426,4 @@ function stringify(data: unknown): string {
       }
     }
   }
-}
-
-function getNativeJS(data = {}, debug: Debugger): string {
-  debug("Start stringify");
-  const output = `(${stringify(data)})`;
-  debug(`Output size: ${Buffer.byteLength(output, "utf8")} bytes`);
-  return output;
-}
-
-function platformPath(platform = "native") {
-  return `${outputDirectory}/${platform}.${platform === "web" ? "css" : "js"}`;
 }

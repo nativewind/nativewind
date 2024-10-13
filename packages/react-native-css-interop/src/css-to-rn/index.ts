@@ -66,10 +66,8 @@ export type { CssToReactNativeRuntimeOptions };
  */
 export function cssToReactNativeRuntime(
   code: Buffer | string,
-  {
-    debug = debugFn("react-native-css-interop"),
-    ...options
-  }: CssToReactNativeRuntimeOptions = {},
+  options: CssToReactNativeRuntimeOptions = {},
+  debug = debugFn("react-native-css-interop"),
 ): StyleSheetRegisterCompiledOptions {
   const features = Object.assign({}, defaultFeatureFlags, options.features);
 

@@ -57,8 +57,11 @@ export function withNativeWind(
     ...options,
     inlineRem,
     selectorPrefix: typeof important === "string" ? important : undefined,
-    debugNamespace: "nativewind",
     input,
+    parent: {
+      name: "nativewind",
+      debug: "nativewind",
+    },
     getCSSForPlatform: (platform, onChange) => {
       debug(`getCSSForPlatform: ${platform}`);
       return cli.getCSSForPlatform({
