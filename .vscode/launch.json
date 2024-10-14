@@ -1,17 +1,16 @@
 {
-  "version": "0.2.0",
   "configurations": [
     {
-      "type": "react-native-ide",
+      "type": "radon-ide",
       "request": "launch",
-      "name": "React Native IDE panel",
+      "name": "Radon IDE panel",
       "appRoot": "examples/expo-router",
-      "ios": {
-        "configuration": "Debug"
+      "env": {
+        "DEBUG": "nativewind",
+        "DEBUG_HIDE_DATE": "true"
       },
-      "android": {
-        "buildType": "debug"
-      }
+      "ios": {},
+      "android": {}
     }
   ]
 }

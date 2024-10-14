@@ -66,6 +66,7 @@ let haste: any;
 let writeStyles = true;
 const virtualModules = new Map<string, Promise<string | Buffer>>();
 const outputDirectory = path.resolve(__dirname, "../../.cache");
+const isRadonIDE = "REACT_NATIVE_IDE_LIB_PATH" in process.env;
 
 export function withCssInterop(
   config: MetroConfig,
@@ -77,7 +78,7 @@ export function withCssInterop(
 ): () => Promise<MetroConfig>;
 export function withCssInterop(
   config: MetroConfig | (() => Promise<MetroConfig>),
-  { parent, ...options }: WithCssInteropOptions,
+  options: WithCssInteropOptions,
 ) {
   return typeof config === "function"
     ? async function WithCSSInterop() {
@@ -93,6 +94,7 @@ function getConfig(
   const debug = debugFn(options.parent?.name || "react-native-css-interop");
   debug("withCssInterop");
   debug(`outputDirectory ${outputDirectory}`);
+  debug(`isRadonIDE: ${isRadonIDE}`);
 
   expoColorSchemeWarning();
 
@@ -133,7 +135,22 @@ function getConfig(
 
           debug(`getTransformOptions.output ${filePath}`);
 
-          const css = await options.getCSSForPlatform(platform);
+          // Virtual modules don't work for RadonIDE, so we need to write to the filesystem on changes
+          const watchFn = isRadonIDE
+            ? async (css: string) => {
+                const output =
+                  platform === "web"
+                    ? css.toString()
+                    : getNativeJS(
+                        cssToReactNativeRuntime(css, options, debug),
+                        debug,
+                      );
+
+                await fs.writeFile(filePath, output);
+              }
+            : undefined;
+
+          const css = await options.getCSSForPlatform(platform, watchFn);
 
           const output =
             platform === "web"
@@ -145,14 +162,16 @@ function getConfig(
 
           await fs.mkdir(outputDirectory, { recursive: true });
           await fs.writeFile(filePath, output);
+          await fs.writeFile(filePath.replace(/\.js$/, ".map"), "");
         }
 
-        return (
-          originalGetTransformOptions?.(
+        return Object.assign(
+          {},
+          await originalGetTransformOptions?.(
             entryPoints,
             transformOptions,
             getDependenciesOf,
-          ) || {}
+          ),
         );
       },
     },
@@ -175,7 +194,10 @@ function getConfig(
             });
 
           // If we patch Metro, we don't need to write the styles
-          writeStyles = false;
+          // The exception to this is Radon IDE, which will launch the dev server and then kill it
+          if (!isRadonIDE) {
+            writeStyles = false;
+          }
 
           server.use(async (_, __, next) => {
             // Wait until the bundler patching has completed
