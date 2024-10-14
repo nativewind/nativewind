@@ -22,10 +22,8 @@ const colorSchemeObservable = observable<"light" | "dark" | undefined>(
 export const colorScheme = {
   set(value: "light" | "dark" | "system") {
     if (value === "system") {
-      colorSchemeObservable.set(undefined);
       appearance.setColorScheme(null);
     } else {
-      colorSchemeObservable.set(value);
       appearance.setColorScheme(value);
     }
   },
@@ -33,7 +31,7 @@ export const colorScheme = {
   toggle() {
     let current = colorSchemeObservable.get();
     if (current === undefined) current = appearance.getColorScheme() ?? "light";
-    colorSchemeObservable.set(current === "light" ? "dark" : "light");
+    appearance.setColorScheme(current === "light" ? "dark" : "light");
   },
   [INTERNAL_RESET]: (appearance: typeof Appearance) => {
     colorSchemeObservable.set(undefined);

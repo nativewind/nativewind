@@ -103,6 +103,8 @@ export function useColorScheme() {
     dependencies: new Set(),
   }));
 
+  cleanupEffect(effect);
+
   return {
     colorScheme: colorScheme.get(effect),
     setColorScheme: colorScheme.set,
