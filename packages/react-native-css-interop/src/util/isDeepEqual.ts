@@ -10,13 +10,11 @@ export function isDeepEqual(a: unknown, b: unknown): boolean {
 
   // We don't actually support nulls, this is to make TypeScript happy
   if (!a || !b) {
-    debugger;
     return a === b;
   }
 
   // Shortcut for arrays
   if (aArray && bArray && a.length !== b.length) {
-    debugger;
     return false;
   }
 
@@ -28,7 +26,6 @@ export function isDeepEqual(a: unknown, b: unknown): boolean {
         (b as Record<string, unknown>)[key],
       )
     ) {
-      debugger;
       return false;
     }
   }
@@ -36,7 +33,6 @@ export function isDeepEqual(a: unknown, b: unknown): boolean {
   // Compare b to a
   for (const key in b) {
     if (!(key in a)) {
-      debugger;
       return false;
     }
   }

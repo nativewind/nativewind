@@ -16,7 +16,6 @@ export const systemColorScheme = observable<"light" | "dark">(
 );
 const colorSchemeObservable = observable<"light" | "dark" | undefined>(
   undefined,
-  { fallback: systemColorScheme },
 );
 
 export const colorScheme = {
@@ -26,12 +25,19 @@ export const colorScheme = {
     } else {
       appearance.setColorScheme(value);
     }
+
+    // Appearance.addChangeListener is not fired in a test environment
+    if (process.env.NODE_ENV === "test") {
+      colorSchemeObservable.set(value === "system" ? "light" : value);
+    }
   },
-  get: colorSchemeObservable.get,
+  get(effect?: Effect) {
+    return colorSchemeObservable.get(effect) ?? systemColorScheme.get(effect);
+  },
   toggle() {
     let current = colorSchemeObservable.get();
     if (current === undefined) current = appearance.getColorScheme() ?? "light";
-    appearance.setColorScheme(current === "light" ? "dark" : "light");
+    colorScheme.set(current === "light" ? "dark" : "light");
   },
   [INTERNAL_RESET]: (appearance: typeof Appearance) => {
     colorSchemeObservable.set(undefined);
@@ -96,7 +102,8 @@ function resetAppearanceListeners(
 
   appStateListener = appState.addEventListener("change", (type) => {
     if (type === "active") {
-      systemColorScheme.set(appearance.getColorScheme() ?? "light");
+      const colorScheme = appearance.getColorScheme() ?? "light";
+      systemColorScheme.set(colorScheme);
     }
   });
 }
