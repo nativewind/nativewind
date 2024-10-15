@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // cSpell:ignore borderless
 import { AtRule } from "postcss";
 import { Config } from "tailwindcss";

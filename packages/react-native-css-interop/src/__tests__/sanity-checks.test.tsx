@@ -88,6 +88,7 @@ test("rerender missing className", () => {
 
 test("null className", () => {
   const component = render(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     <View testID={testID} className={null as any} />,
   ).getByTestId(testID);
 
@@ -104,6 +105,7 @@ test("rerender null className", () => {
 
   expect(component).toHaveStyle({ color: "#ff0000" });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   screen.rerender(<View testID={testID} className={null as any} />);
 
   expect(component.props.style).not.toBeDefined();

@@ -19,7 +19,8 @@ export async function transform(
   options: JsTransformOptions,
 ): Promise<TransformResponse> {
   const transform = config.cssInterop_transformerPath
-    ? require(config.cssInterop_transformerPath).transform
+    ? // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require(config.cssInterop_transformerPath).transform
     : worker.transform;
 
   /**
@@ -46,7 +47,7 @@ export async function transform(
     options,
   );
 
-  const output = result.output[0] as any;
+  const output = result.output[0];
   const code = output.data.code.replace("({})", data.toString("utf-8"));
 
   return {

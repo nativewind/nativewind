@@ -1,7 +1,11 @@
-import { EnableCssInteropOptions, InteropComponentConfig } from "../types";
+import {
+  EnableCssInteropOptions,
+  InteropComponentConfig,
+  ReactComponent,
+} from "../types";
 
-export function getNormalizeConfig(
-  mapping: EnableCssInteropOptions<any>,
+export function getNormalizeConfig<T extends ReactComponent>(
+  mapping: EnableCssInteropOptions<T>,
 ): InteropComponentConfig[] {
   const configs: InteropComponentConfig[] = [];
 

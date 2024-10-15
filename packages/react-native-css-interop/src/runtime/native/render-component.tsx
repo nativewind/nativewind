@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentType, createElement } from "react";
 import { Pressable } from "react-native";
 
@@ -192,6 +194,7 @@ export function renderComponent(
 
 function createAnimatedComponent(Component: ComponentType<any>): any {
   if (animatedCache.has(Component)) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return animatedCache.get(Component)!;
   } else if (Component.displayName?.startsWith("AnimatedComponent")) {
     return Component;

@@ -35,7 +35,7 @@ test("numeric transition", () => {
 
   render(<View testID={testID} className="transition first" />);
 
-  let component = screen.getByTestId(testID);
+  const component = screen.getByTestId(testID);
 
   // Should have a static width, and should not animate
   expect(component).toHaveAnimatedStyle({

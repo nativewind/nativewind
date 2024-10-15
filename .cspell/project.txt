@@ -7,5 +7,6 @@ marklawlor
 moti
 nativewind
 nextjs
+picocolors
 snackplayer
 solito

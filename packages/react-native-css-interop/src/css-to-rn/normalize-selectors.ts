@@ -40,7 +40,7 @@ export function normalizeSelectors(
   selectors: NormalizeSelector[] = [],
   defaults: Partial<NormalizeSelector> = {},
 ) {
-  for (let cssSelector of selectorList) {
+  for (const cssSelector of selectorList) {
     // Ignore `:is()`, and just process its selectors
     if (isIsPseudoClass(cssSelector)) {
       normalizeSelectors(

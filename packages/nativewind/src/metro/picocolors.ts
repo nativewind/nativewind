@@ -1,3 +1,4 @@
+/** spell-checker: disable */
 // ISC License
 
 // Copyright (c) 2021 Alexey Raspopov, Kostiantyn Denysov, Anton Verinov

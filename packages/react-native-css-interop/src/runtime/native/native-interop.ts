@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-dynamic-delete */
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ReactNode,
   useContext,
@@ -108,12 +112,13 @@ export function interop(
   function reducer(state: ReducerState, action: ReducerAction) {
     switch (action.type) {
       case "rerender-declarations":
-      case "new-declarations":
+      case "new-declarations": {
         const nextState = getDeclarations(state, refs, action);
         // If the declarations have changed, then we need to update the styles
         return Object.is(nextState, state)
           ? state
           : applyStyles(nextState, refs);
+      }
       case "styles":
         return applyStyles(state, refs);
     }
@@ -168,7 +173,7 @@ export function interop(
    */
   const memoOutput = useMemo(() => {
     let variables = undefined;
-    let containers: ContainerRecord = {};
+    const containers: ContainerRecord = {};
 
     const possiblyAnimatedProps: Record<string, any> = {};
     const handlers: Record<string, any> = {};
@@ -455,7 +460,7 @@ function applyStyles(state: ReducerState, refs: Refs) {
   const seenAnimatedProps = new Set<string>();
 
   /**
-   * Render order TLDR:
+   * Render order:
    *
    * 1. Normal styles
    * 2. Inline styles
@@ -564,7 +569,7 @@ function processAnimations(
       isDeepEqual(prevBaseEasingFuncs, baseEasingFuncs) ||
       isDeepEqual(prevIterations, iterations);
 
-    let names: string[] = [];
+    const names: string[] = [];
 
     for (const name of animationNames) {
       if (name.type === "none") {
@@ -708,7 +713,7 @@ function resetAnimation(state: ReducerState) {
         defaultValue = defaultValue(state.styleTracking.effect);
       }
 
-      let sharedValue = state.sharedValues.get(propertyName);
+      const sharedValue = state.sharedValues.get(propertyName);
       if (sharedValue) {
         cancelAnimation(sharedValue);
       }
@@ -815,8 +820,6 @@ function retainSharedValues(
     }
     entry[1].value = value;
     props.style ??= {};
-    props.style?.[entry[0]] ??
-      defaultValues[entry[0] as keyof typeof defaultValues];
     assignToTarget(props.style, entry[1], [entry[0]], {
       allowTransformMerging: true,
     });
@@ -863,7 +866,7 @@ function handleUpgrades(sharedState: SharedState, ruleSet: StyleRuleSet) {
 function cleanup(props: Record<string, any>, config: InteropComponentConfig) {
   if (!config.nativeStyleToProp) return;
 
-  for (let move of config.nativeStyleToProp) {
+  for (const move of config.nativeStyleToProp) {
     const source = move[0];
 
     const target = getTarget(props, config);
@@ -906,7 +909,7 @@ function applyRules(
 
   for (const declaration of declarations) {
     if (Array.isArray(declaration)) {
-      let [descriptor, pathTokens] = declaration;
+      const [descriptor, pathTokens] = declaration;
 
       const assignToTargetPath =
         pathTokens === undefined
@@ -934,7 +937,7 @@ function applyRules(
             allowTransformMerging: true,
           });
           delayedValues.push(() => {
-            let currentValue = getTargetValue(props, assignToTargetPath);
+            const currentValue = getTargetValue(props, assignToTargetPath);
 
             if (currentValue === uniquePlaceHolder) {
               const value = resolveValue(

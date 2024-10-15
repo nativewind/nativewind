@@ -15,8 +15,8 @@ test("Unnamed containers", async () => {
     </View>,
   );
 
-  let parent = screen.getByTestId(parentID);
-  let child = screen.getByTestId(childID);
+  const parent = screen.getByTestId(parentID);
+  const child = screen.getByTestId(childID);
 
   expect(child).toHaveStyle(undefined);
 
@@ -40,8 +40,8 @@ test("Named containers", async () => {
     </View>,
   );
 
-  let parent = screen.getByTestId(parentID);
-  let child = screen.getByTestId(childID);
+  const parent = screen.getByTestId(parentID);
+  const child = screen.getByTestId(childID);
 
   expect(child).toHaveStyle(undefined);
 

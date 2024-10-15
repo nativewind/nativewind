@@ -1,4 +1,5 @@
 const ForwardRefSymbol = Symbol.for("react.forward_ref");
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getComponentType(component: any) {
   switch (typeof component) {
     case "function":

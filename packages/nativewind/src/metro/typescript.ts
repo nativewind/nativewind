@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { existsSync, readFileSync, writeFileSync } from "fs";
 
 import { CommentArray, parse, stringify } from "comment-json";
@@ -65,5 +66,7 @@ export function setupTypeScript(envPath: string) {
         `${cyan(bold("NativeWind"))} made the following changes to your project to support TypeScript:\n  - ${output.join("\n  - ")}`,
       );
     }
-  } catch {}
+  } catch {
+    /* empty */
+  }
 }

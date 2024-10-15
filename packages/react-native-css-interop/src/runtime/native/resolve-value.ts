@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
 
 import type { EasingFunction, Time } from "lightningcss";
@@ -97,7 +99,7 @@ export function resolveValue(
       }
       case "max": {
         let mode;
-        let values: number[] = [];
+        const values: number[] = [];
 
         for (const arg of descriptorArgs) {
           const result = calc(state, refs, tracking, [arg], style);
@@ -114,7 +116,7 @@ export function resolveValue(
       }
       case "min": {
         let mode;
-        let values: number[] = [];
+        const values: number[] = [];
 
         for (const arg of descriptorArgs) {
           const result = calc(state, refs, tracking, [arg], style);
@@ -147,6 +149,7 @@ export function resolveValue(
         if (typeof value === "number") {
           return cast(round(vhValue * value));
         }
+        return;
       }
       case "vw": {
         const value = resolve(state, refs, tracking, descriptorArgs[0], style);
@@ -154,6 +157,7 @@ export function resolveValue(
         if (typeof value === "number") {
           return cast(round(vwValue * value));
         }
+        return;
       }
       case "em": {
         const value = resolve(state, refs, tracking, descriptorArgs[0], style);
@@ -161,6 +165,7 @@ export function resolveValue(
         if (typeof value === "number") {
           return cast(round(fontSize * value));
         }
+        return;
       }
       case "rem": {
         const value = resolve(state, refs, tracking, descriptorArgs[0], style);
@@ -168,6 +173,7 @@ export function resolveValue(
         if (typeof value === "number") {
           return cast(round(remValue * value));
         }
+        return;
       }
       case "rnh": {
         const value = resolve(state, refs, tracking, descriptorArgs[0], style);
@@ -175,6 +181,7 @@ export function resolveValue(
         if (typeof value === "number") {
           return cast(round(height * value));
         }
+        return;
       }
       case "rnw": {
         const value = resolve(state, refs, tracking, descriptorArgs[0], style);
@@ -182,12 +189,14 @@ export function resolveValue(
         if (typeof value === "number") {
           return cast(round(width * value));
         }
+        return;
       }
-      case "hwb":
+      case "hwb": {
         const args = resolve(state, refs, tracking, descriptorArgs, style).flat(
           10,
         );
         return cast(getColorArgs(args, { 3: "hwb" }));
+      }
       case "rgb":
       case "rgba": {
         const args = resolve(state, refs, tracking, descriptorArgs, style).flat(
@@ -207,7 +216,7 @@ export function resolveValue(
       }
       case "platformColor": {
         return cast(
-          PlatformColor(...(descriptorArgs as any[])) as unknown as string,
+          PlatformColor(...(descriptorArgs as string[])) as unknown as string,
         );
       }
       case "platformSelect": {
@@ -226,18 +235,21 @@ export function resolveValue(
         if (typeof v === "number") {
           return cast(PixelRatio.getPixelSizeForLayoutSize(v));
         }
+        return;
       }
       case "fontScale": {
         const value = resolve(state, refs, tracking, descriptorArgs[0], style);
         if (typeof value === "number") {
           return cast(PixelRatio.getFontScale() * value);
         }
+        return;
       }
       case "pixelScale": {
         const value = resolve(state, refs, tracking, descriptorArgs[0], style);
         if (typeof value === "number") {
           return cast(PixelRatio.get() * value);
         }
+        return;
       }
       case "pixelScaleSelect": {
         const specifics = Object.fromEntries(
@@ -271,10 +283,10 @@ export function resolveValue(
         if (typeof v === "number") {
           return PixelRatio.roundToNearestPixel(v);
         }
+        return;
       }
       case "translateX":
       case "translateY":
-      case "scale":
       case "scaleX":
       case "scaleY":
       case "rotate":
@@ -342,7 +354,7 @@ function resolve(
   refs: Refs,
   tracking: ReducerTracking,
   descriptor: RuntimeValueDescriptor | RuntimeValueDescriptor[],
-  style?: Record<string, any>,
+  style?: Record<string, unknown>,
 ): any {
   if (typeof descriptor !== "object" || !Array.isArray(descriptor)) {
     return descriptor;
@@ -350,7 +362,7 @@ function resolve(
 
   if (isDescriptorArray(descriptor)) {
     // Resolve the items, but skip anything that returns undefined
-    let resolved = [];
+    const resolved = [];
     for (let value of descriptor) {
       value = resolve(state, refs, tracking, value, style);
       if (value !== undefined) {
@@ -378,7 +390,7 @@ function getVar(
   refs: Refs,
   tracking: ReducerTracking,
   name: string,
-  style?: Record<string, any>,
+  style?: Record<string, unknown>,
 ) {
   if (!name) return;
   let value: any = undefined;
@@ -549,9 +561,7 @@ function getColorArgs(args: any[], config: Record<number, string>) {
   // Otherwise, we need to split the args and remove any empty strings
   // e.g ["255 0 0", 1] => ["255", "0", "0", 1]
   args = args.flatMap((arg) => {
-    return typeof arg === "string"
-      ? arg.split(/[,\s\/]/g).filter(Boolean)
-      : arg;
+    return typeof arg === "string" ? arg.split(/[,\s/]/g).filter(Boolean) : arg;
   });
   // Now do we match a function?
   if (config[args.length]) return `${config[args.length]}(${args.join(", ")})`;
@@ -679,7 +689,7 @@ export function calc(
       : descriptor
     : [descriptor];
 
-  for (let token of descriptor) {
+  for (const token of descriptor) {
     switch (typeof token) {
       case "undefined":
         // Fail on an undefined value
@@ -718,6 +728,7 @@ export function calc(
         } else if (token === ")") {
           // Resolve all values within the brackets
           while (ops.length && ops[ops.length - 1] !== "(") {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             applyCalcOperator(ops.pop()!, values.pop()!, values.pop()!, values);
           }
           ops.pop();
@@ -731,6 +742,7 @@ export function calc(
             ops.length &&
             calcPrecedence[ops[ops.length - 1]] >= calcPrecedence[token]
           ) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             applyCalcOperator(ops.pop()!, values.pop()!, values.pop()!, values);
           }
           ops.push(token);
@@ -740,6 +752,7 @@ export function calc(
   }
 
   while (ops.length) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     applyCalcOperator(ops.pop()!, values.pop()!, values.pop()!, values);
   }
 
@@ -756,7 +769,7 @@ export function calc(
 
 export function getBaseValue(state: ReducerState, paths: string[]) {
   paths = [...state.config.target, ...paths];
-  let prop: string = "";
+  let prop = "";
 
   let target: unknown = state.props;
   for (let index = 0; index < paths.length && target; index++) {

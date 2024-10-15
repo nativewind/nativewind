@@ -1,5 +1,6 @@
+/* eslint-disable no-useless-escape */
 /** @jsxImportSource test */
-import { StyleSheet as RNStyleSheet, View } from "react-native";
+import { ColorValue, StyleSheet as RNStyleSheet, View } from "react-native";
 
 import { registerCSS, render, screen, setupAllComponents } from "test";
 
@@ -117,6 +118,6 @@ test("mixed", () => {
   expect(component).toHaveStyle({
     color: {
       semantic: ["systemRed"],
-    } as any,
+    } as unknown as ColorValue,
   });
 });

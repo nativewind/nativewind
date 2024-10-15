@@ -59,7 +59,7 @@ it("can target deeply nested props", () => {
 
   const MyComp: FunctionComponent<{
     testID?: string;
-    deeply?: { nested: { target: any; backgroundColor: string } };
+    deeply?: { nested: { target: unknown; backgroundColor: string } };
   }> = jest.fn((props) => <View {...props} />);
 
   const MyStyledComp = cssInterop(MyComp, {
@@ -99,7 +99,7 @@ it("works with @rn-move", () => {
 
   const MyComp: FunctionComponent<{
     testID?: string;
-    deeply?: { nested: { target: any; backgroundColor: string } };
+    deeply?: { nested: { target: unknown; backgroundColor: string } };
   }> = jest.fn((props) => <View {...props} />);
 
   const MyStyledComp = cssInterop(MyComp, {
@@ -141,7 +141,7 @@ it("works with @rn-move and nativeStyleToProps", () => {
   const MyComp: FunctionComponent<{
     testID?: string;
     deeply?: {
-      nested: { target: any; backgroundColor: string };
+      nested: { target: unknown; backgroundColor: string };
       color?: string;
     };
   }> = jest.fn((props) => <View {...props} />);

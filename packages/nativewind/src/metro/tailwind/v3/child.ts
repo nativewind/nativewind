@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * This is a hack around Tailwind CSS v3, please read tailwind/v3/index.ts for more information.
  */
@@ -5,7 +6,7 @@
   const fs = require("fs");
 
   const fakeOutput = "FAKE_OUTPUT";
-  let currentContents = "";
+  const currentContents = "";
 
   const originalReadFile = fs.promises.readFile;
   fs.promises.readFile = async (path: string, encoding: string) => {
@@ -16,7 +17,7 @@
   };
 
   const originalMkdir = fs.promises.mkdir.bind(fs.promises.mkdir);
-  fs.promises.mkdir = async (path: string, ...args: any) => {
+  fs.promises.mkdir = async (path: string, ...args: unknown[]) => {
     if (path === fakeOutput) {
       return;
     }
@@ -24,11 +25,7 @@
   };
 
   let previousData = "";
-  fs.promises.writeFile = async (
-    path: string,
-    data: string | Buffer,
-    ...args: any
-  ) => {
+  fs.promises.writeFile = async (path: string, data: string | Buffer) => {
     if (path !== fakeOutput) {
       throw new Error(`Tailwind CLI attempted to write file ${path}`);
     }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SharedValue } from "react-native-reanimated";
 
 import { PLACEHOLDER_SYMBOL } from "../../shared";
@@ -24,7 +25,7 @@ export type ReducerAction =
   | { type: "rerender-declarations" }
   | { type: "styles" };
 
-export type ReducerState = {
+export interface ReducerState {
   className?: string | undefined | null;
   config: InteropComponentConfig;
   normal: StyleDeclaration[];
@@ -41,22 +42,22 @@ export type ReducerState = {
   animationNames?: Set<string>;
   styleTracking: ReducerTracking;
   declarationTracking: ReducerTracking;
-};
+}
 
-export type ReducerTracking = {
+export interface ReducerTracking {
   effect: Effect;
   guards: RenderingGuard[];
   previous?: any;
-};
+}
 
-export type Refs = {
+export interface Refs {
   sharedState: SharedState;
   variables: VariableContextValue;
   containers: ContainerRecord;
   props: Record<string, any> | null;
-};
+}
 
-export type SharedState = {
+export interface SharedState {
   initialRender: boolean;
   originalProps: Record<string, any> | null;
   props: Record<string, any> | null;
@@ -69,7 +70,7 @@ export type SharedState = {
   hover?: Observable<boolean>;
   active?: Observable<boolean>;
   focus?: Observable<boolean>;
-};
+}
 
 export type RenderingGuard = (refs: Refs) => boolean;
 
@@ -88,12 +89,15 @@ export type ShorthandResolveFn = (
   style?: Record<string, any>,
 ) => ShorthandResult | undefined;
 
-export type ShorthandResultArray = Array<
-  readonly [string | readonly string[], any]
->;
+export type ShorthandResultArray = (readonly [
+  string | readonly string[],
+  any,
+])[];
 
 export type ShorthandResult = ShorthandResultArray & {
   [ShorthandSymbol]: boolean;
 };
 
-export type Placeholder = { [PLACEHOLDER_SYMBOL]: boolean };
+export interface Placeholder {
+  [PLACEHOLDER_SYMBOL]: boolean;
+}

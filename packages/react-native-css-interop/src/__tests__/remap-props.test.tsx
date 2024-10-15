@@ -24,6 +24,7 @@ beforeEach(() => {
 });
 
 test("mapping", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   remapProps(View as any, { className: "differentStyle" });
 
   registerCSS(
@@ -79,7 +80,7 @@ test("mapping", () => {
 
 test("works with ref", () => {
   remapProps(FlatList, {});
-  let listRef: RefObject<FlatList<any>> = { current: null };
+  let listRef: RefObject<FlatList<unknown>> = { current: null };
   const items = Array.from(Array(100).keys());
 
   const Component = () => {

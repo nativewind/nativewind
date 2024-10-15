@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /** @jsxImportSource nativewind */
 
 /**
@@ -61,7 +62,7 @@ test("tw-colors", async () => {
 
 test("text-shadow", async () => {
   const textShadowPlugin = plugin(
-    function ({ addBase, matchUtilities, matchComponents, theme }: any) {
+    function ({ addBase, matchUtilities, matchComponents, theme }) {
       addBase({
         ":root": {
           "--ts-text-shadow-color": "rgba(0, 0,0,0.50)",
@@ -73,13 +74,13 @@ test("text-shadow", async () => {
 
       matchUtilities(
         {
-          [`text-shadow-x`]: (value: Record<string, string>) => ({
+          "text-shadow-x": (value) => ({
             "--ts-text-shadow-x": value,
           }),
-          [`text-shadow-y`]: (value: Record<string, string>) => ({
+          [`text-shadow-y`]: (value) => ({
             "--ts-text-shadow-y": value,
           }),
-          [`text-shadow-blur`]: (value: Record<string, string>) => ({
+          [`text-shadow-blur`]: (value) => ({
             "--ts-text-shadow-blur": value,
           }),
         },
@@ -92,7 +93,7 @@ test("text-shadow", async () => {
 
       matchUtilities(
         {
-          [`text-shadow`]: (value: Record<string, string>) => ({
+          "text-shadow": (value) => ({
             "--ts-text-shadow-color": value,
           }),
         },
@@ -104,7 +105,7 @@ test("text-shadow", async () => {
 
       matchComponents(
         {
-          [`text-shadow`]: (value: number) => ({
+          "text-shadow": (value) => ({
             textShadow:
               value === 1
                 ? `var(--ts-text-shadow-x) var(--ts-text-shadow-y) var(--ts-text-shadow-blur) var(--ts-text-shadow-color)`

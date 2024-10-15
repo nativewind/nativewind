@@ -85,7 +85,7 @@ renderCurrentTest.debug = (options: RenderCurrentTestOptions = {}) => {
 };
 
 export async function render(
-  component: React.ReactElement<any>,
+  component: React.ReactElement,
   {
     config,
     css,
@@ -119,10 +119,11 @@ export async function render(
   }
 
   // Process the TailwindCSS
-  let { css: output } = await postcss([
+  const { css: output } = await postcss([
     tailwind({
       theme: {},
       ...config,
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       presets: [require("./tailwind")],
       plugins: [tailwindcssContainerQueries, ...(config?.plugins || [])],
       content,
@@ -137,31 +138,31 @@ export async function render(
   });
 }
 
-render.debug = (
-  component: React.ReactElement<any>,
+render.debug = function RenderDebug(
+  component: React.ReactElement,
   options: RenderOptions = {},
-) => {
+) {
   return render(component, { ...options, debugCompiled: true });
 };
 
-render.noDebug = (
-  component: React.ReactElement<any>,
+render.noDebug = function NoDebug(
+  component: React.ReactElement,
   options: RenderOptions = {},
-) => {
+) {
   return render(component, { ...options, debugCompiled: false });
 };
 
 function getClassNames(
-  component: React.ReactElement<any>,
-): Array<{ raw: string; extension?: string }> {
-  const classNames: Array<{ raw: string; extension?: string }> = [];
+  component: React.ReactElement,
+): { raw: string; extension?: string }[] {
+  const classNames: { raw: string; extension?: string }[] = [];
 
-  if (component.props?.className) {
+  if (typeof component.props?.className === "string") {
     classNames.push({ raw: component.props.className });
   }
 
   if (component.props?.children) {
-    const children: React.ReactElement<any>[] = Array.isArray(
+    const children: React.ReactElement[] = Array.isArray(
       component.props.children,
     )
       ? component.props.children
@@ -174,7 +175,7 @@ function getClassNames(
 }
 
 function getInvalid() {
-  const style: Record<string, any> = {};
+  const style: Record<string, unknown> = {};
   const properties: string[] = [];
 
   let hasStyles = false;

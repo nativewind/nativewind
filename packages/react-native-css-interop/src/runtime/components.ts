@@ -68,8 +68,11 @@ remapProps(VirtualizedList, {
 });
 
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const SafeAreaView = require("react-native-safe-area-context").SafeAreaView;
   cssInterop(SafeAreaView, {
     className: "style",
   });
-} catch {}
+} catch {
+  // SafeAreaView is not available
+}

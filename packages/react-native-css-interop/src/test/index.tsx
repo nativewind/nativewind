@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ComponentProps,
   ComponentRef,
@@ -33,6 +34,7 @@ export * from "@testing-library/react-native";
 export { INTERNAL_SET } from "../shared";
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface Matchers<R> {
       toHaveStyle(style?: Style | Style[]): R;
@@ -163,5 +165,6 @@ registerCSS.noDebug = (
 export const testID = "react-native-css-interop";
 
 export function setupAllComponents() {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require("../runtime/components");
 }

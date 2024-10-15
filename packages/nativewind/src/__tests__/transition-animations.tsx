@@ -2,7 +2,6 @@
 import { View } from "react-native";
 
 import { getAnimatedStyle } from "react-native-reanimated";
-import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 
 import { render, screen } from "../test";
 
@@ -25,7 +24,7 @@ test("transition-colors", async () => {
     },
   );
 
-  let component = screen.getByTestId(testID);
+  const component = screen.getByTestId(testID);
 
   // Should have a static color, and should not animate
   expect(getAnimatedStyle(component)).toStrictEqual({
@@ -87,7 +86,7 @@ test("transition-opacity", async () => {
     },
   );
 
-  let component = screen.getByTestId(testID);
+  const component = screen.getByTestId(testID);
 
   expect(getAnimatedStyle(component)).toStrictEqual({ opacity: 0 });
   jest.advanceTimersByTime(300);
@@ -120,7 +119,7 @@ test("transition-opacity", async () => {
 test("animate-spin", async () => {
   await render(<View testID={testID} className="animate-spin" />);
 
-  let component = screen.getByTestId(testID);
+  const component = screen.getByTestId(testID);
 
   expect(getAnimatedStyle(component)).toStrictEqual({
     transform: [{ rotate: "0deg" }],
@@ -144,7 +143,7 @@ test("animate-spin", async () => {
 test("animate-pulse", async () => {
   await render(<View testID={testID} className="animate-pulse" />);
 
-  let component = screen.getByTestId(testID);
+  const component = screen.getByTestId(testID);
 
   expect(getAnimatedStyle(component)).toStrictEqual({
     opacity: 1,
@@ -177,7 +176,7 @@ test("changing animations", async () => {
     },
   });
 
-  let component = screen.getByTestId(testID);
+  const component = screen.getByTestId(testID);
 
   expect(getAnimatedStyle(component)).toStrictEqual({
     transform: [{ rotate: "0deg" }],

@@ -48,13 +48,13 @@ import { parseDeclaration, ParseDeclarationOptions } from "./parseDeclaration";
 
 // import { isDeepEqual } from "../util/isDeepEqual";
 
-type CSSInteropAtRule = {
+interface CSSInteropAtRule {
   type: "custom";
   value: {
     name: string;
-    prelude: { value: { components: Array<{ value: string }> } };
+    prelude: { value: { components: { value: string }[] } };
   };
-};
+}
 
 export type { CssToReactNativeRuntimeOptions };
 
@@ -155,7 +155,7 @@ export function cssToReactNativeRuntime(
 
   debug(`Found ${extractOptions.rules.size} valid rules`);
 
-  let rules: StyleSheetRegisterCompiledOptions["rules"] = {};
+  const rules: StyleSheetRegisterCompiledOptions["rules"] = {};
   let ruleCount = 0;
   for (const [name, styles] of extractOptions.rules) {
     if (styles.length === 0) continue;
@@ -283,19 +283,34 @@ function extractRule(
  * @rn-move is a custom at-rule that allows you to move a style property to a different prop/location
  * Its a placeholder concept until we improve the LightningCSS parsing
  */
-function getRnMoveMapping<D, M>(rules?: any[]): MoveTokenRecord {
+function getRnMoveMapping(
+  rules?: (
+    | Rule<Declaration, MediaQuery>
+    | {
+        type: "custom";
+        value: {
+          name: string;
+          prelude: {
+            value: {
+              components: { value: string }[];
+            };
+          };
+        };
+      }
+  )[],
+): MoveTokenRecord {
   if (!rules) return {};
   const mapping: MoveTokenRecord = {};
 
   for (const rule of rules) {
-    if (rule.type !== "custom" && rule.value.name !== "rn-move") continue;
+    if (rule.type !== "custom" || rule.value?.name !== "rn-move") continue;
 
     /**
      * - is a special character that indicates that the style should be hoisted
      * Otherwise, keep it on the 'style' prop
      */
-    let [first, tokens] = rule.value.prelude.value.components.map(
-      (c: any) => c.value,
+    const [first, tokens] = rule.value.prelude.value.components.map(
+      (c) => c.value,
     );
 
     if (tokens) {
@@ -469,7 +484,7 @@ function setStyleForSelectorList(
       const record = (options[type] ??= {});
       for (const [name, value] of style.variables) {
         record[name] ??= {};
-        record[name][subtype] = value as any;
+        record[name][subtype] = value;
       }
       continue;
     } else if (selector.type === "className") {
@@ -548,11 +563,11 @@ function extractKeyFrames(
   extractOptions: ExtractRuleOptions,
 ) {
   const animation: ExtractedAnimation = { frames: [] };
-  let rawFrames: Array<{
+  let rawFrames: {
     selector: number;
     values: StyleDeclaration[];
     easingFunction?: EasingFunction;
-  }> = [];
+  }[] = [];
 
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
@@ -829,7 +844,7 @@ function declarationsToStyle(
     }
   }
 
-  function addTransformProp(property: string, value: any) {
+  function addTransformProp(property: string, value: RuntimeValueDescriptor) {
     return addStyleProp(property, value);
   }
 
@@ -859,7 +874,7 @@ function declarationsToStyle(
     }
   }
 
-  function addVariable(property: string, value: any) {
+  function addVariable(property: string, value: RuntimeValueDescriptor) {
     extractedStyle.variables ??= [];
     extractedStyle.variables.push([property, value]);
   }
@@ -1002,11 +1017,12 @@ function declarationsToStyle(
     }
   }
 
-  function addAnimationProp(property: string, value: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function addAnimationProp(property: string, value: any[]) {
     if (property === "animation") {
-      const groupedProperties: Record<string, any[]> = {};
+      const groupedProperties: Record<string, unknown[]> = {};
 
-      for (const animation of value as Animation[]) {
+      for (const animation of value) {
         for (const [key, value] of Object.entries(animation)) {
           groupedProperties[key] ??= [];
           groupedProperties[key].push(value);
@@ -1019,7 +1035,8 @@ function declarationsToStyle(
           .replace("animation-", "")
           .replace(/-./g, (x) => x[1].toUpperCase()) as keyof Animation;
 
-        extractedStyle.animations[key] ??= value;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        extractedStyle.animations[key] ??= value as any[];
       }
     } else {
       const key = property
@@ -1027,7 +1044,8 @@ function declarationsToStyle(
         .replace(/-./g, (x) => x[1].toUpperCase()) as keyof Animation;
 
       extractedStyle.animations ??= {};
-      extractedStyle.animations[key] = value;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      extractedStyle.animations[key] ??= value as any[];
     }
   }
 

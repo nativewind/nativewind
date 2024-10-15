@@ -1,4 +1,5 @@
 /** @jsxImportSource test */
+/** spell-checker: words slidein */
 import { View } from "react-native";
 
 import { getAnimatedStyle } from "react-native-reanimated";

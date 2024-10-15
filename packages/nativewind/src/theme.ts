@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const isNative = Boolean(process.env.NATIVEWIND_OS);
 
 export const {

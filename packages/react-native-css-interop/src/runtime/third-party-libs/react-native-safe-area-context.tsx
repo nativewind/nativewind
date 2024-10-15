@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ComponentType,
   createElement,
@@ -28,7 +30,7 @@ export function maybeHijackSafeAreaProvider(type: ComponentType<any>) {
 }
 
 function shimFactory(type: ComponentType<any>) {
-  function SafeAreaEnv({ children }: PropsWithChildren<{}>) {
+  function SafeAreaEnv({ children }: PropsWithChildren<any>) {
     const insets =
       require("react-native-safe-area-context").useSafeAreaInsets();
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createElement, forwardRef, useContext, useState } from "react";
 
 import {
@@ -83,6 +84,7 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
         classNames: source.split(/\s+/),
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete props[config.source];
 
       assignToTarget(props, placeholder, config, {

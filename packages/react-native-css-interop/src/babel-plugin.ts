@@ -18,7 +18,7 @@ const importModule = "react-native-css-interop";
 const importAs = "ReactNativeCSSInterop";
 
 const allowedFileRegex =
-  /^(?!.*[\/\\](react|react-native|react-native-web|react-native-css-interop)[\/\\]).*$/;
+  /^(?!.*[/\\](react|react-native|react-native-web|react-native-css-interop)[/\\]).*$/;
 
 export default function () {
   return {

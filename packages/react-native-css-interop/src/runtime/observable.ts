@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Observer pattern implementation
  *
@@ -6,29 +7,29 @@
  * is changed, it will rerun all subscribed Effects.
  */
 
-export type Observable<T> = {
+export interface Observable<T> {
   // Used for debugging only
   name?: string;
   // Get the current value of the observable. If you provide an Effect, it will be subscribed to the observable.
   get(effect?: Effect): T;
   // Set the value and rerun all subscribed Effects
   set(newValue: T): void;
-};
+}
 
 export type ReadableObservable<T> = Pick<Observable<T>, "get" | "name">;
 
 /**
  * An Effect is a function that will be rerun when its dependencies change.
  */
-export type Effect = {
+export interface Effect {
   run: () => void;
   dependencies: Set<() => void>;
-};
+}
 
-export type ObservableOptions<T> = {
+export interface ObservableOptions<T> {
   fallback?: Observable<T>;
   name?: string;
-};
+}
 
 export function observable<T>(
   value: T,
@@ -44,7 +45,11 @@ export function observable<T>(
         effects.add(effect);
         effect.dependencies.add(() => effects.delete(effect));
       }
-      return value ?? fallback?.get(effect)!;
+      if (fallback) {
+        return value ?? fallback.get(effect);
+      } else {
+        return value;
+      }
     },
 
     set(newValue: any) {

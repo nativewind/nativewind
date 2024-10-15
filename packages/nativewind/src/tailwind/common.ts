@@ -10,6 +10,7 @@ const denyColors = new Set([
  * So we need to filter out the colors that are not allowed.
  * The warning is shown on property access, so we need to filter using this method
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const allowedColors = ({ colors }: any) => {
   const _colors: Record<string, unknown> = {};
   for (const color of Object.keys(colors)) {

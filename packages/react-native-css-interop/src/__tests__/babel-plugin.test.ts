@@ -2,7 +2,9 @@ import { pluginTester } from "babel-plugin-tester";
 
 import plugin from "../babel-plugin";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).describe = describe;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).it = it;
 
 pluginTester({

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 export function expoColorSchemeWarning() {
   if (!isExpo()) {
     return;

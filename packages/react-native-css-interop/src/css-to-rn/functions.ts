@@ -7,7 +7,7 @@ export function hairlineWidth() {
 export function platformSelect(
   specifics: Partial<Record<PlatformOSType | "default", unknown>>,
 ) {
-  let output: string[] = [];
+  const output: string[] = [];
   for (const [key, value] of Object.entries(specifics)) {
     output.push(`${key}/${value}`);
   }
@@ -17,7 +17,7 @@ export function platformSelect(
 export function pixelScaleSelect(
   specifics: Partial<Record<number | "default", unknown>>,
 ) {
-  let output: string[] = [];
+  const output: string[] = [];
   for (const [key, value] of Object.entries(specifics)) {
     output.push(`${key}/${value}`);
   }
@@ -27,7 +27,7 @@ export function pixelScaleSelect(
 export function fontScaleSelect(
   specifics: Partial<Record<number | "default", unknown>>,
 ) {
-  let output: string[] = [];
+  const output: string[] = [];
   for (const [key, value] of Object.entries(specifics)) {
     output.push(`${key}/${value}`);
   }

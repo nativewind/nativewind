@@ -6,7 +6,7 @@ const computedStyles: Pick<CSSStyleDeclaration, "getPropertyValue"> =
     : { getPropertyValue: () => "asdf" };
 
 export function verifyJSX() {
-  // @ts-expect-error
+  // @ts-expect-error -- Ignored as this is invalid JSX
   return <react-native-css-interop-jsx-pragma-check /> === true;
 }
 

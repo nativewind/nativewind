@@ -11,11 +11,13 @@ const commonStyleSheet: CssInteropStyleSheet = {
   getFlag(name) {
     return documentStyle?.getPropertyValue(`--css-interop-${name}`);
   },
-  unstable_hook_onClassName() {},
-  register(_options) {
+  unstable_hook_onClassName() {
+    return;
+  },
+  register() {
     throw new Error("Stylesheet.register is not available on web");
   },
-  registerCompiled(_options) {
+  registerCompiled() {
     throw new Error("Stylesheet.registerCompiled is not available on web");
   },
   getGlobalStyle() {

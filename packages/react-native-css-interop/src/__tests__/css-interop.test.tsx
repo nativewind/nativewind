@@ -10,6 +10,7 @@ beforeEach(() => {
 });
 
 test("mapping", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cssInterop(View as any, { className: "differentStyle" });
 
   registerCSS(
@@ -30,6 +31,7 @@ test("mapping", () => {
 });
 
 test("multiple mapping", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cssInterop(View as any, { a: "styleA", b: "styleB" });
 
   registerCSS(

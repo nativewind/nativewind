@@ -1,6 +1,6 @@
 import createUtilityPlugin from "tailwindcss/lib/util/createUtilityPlugin";
 
-let cssTransformValue = [
+const cssTransformValue = [
   "translate(var(--tw-translate-x), var(--tw-translate-y))",
   "rotate(var(--tw-rotate))",
   "skewX(var(--tw-skew-x))",

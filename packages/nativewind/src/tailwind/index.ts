@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 module.exports = Object.assign(
   () =>
     process.env.NATIVEWIND_OS === undefined ||

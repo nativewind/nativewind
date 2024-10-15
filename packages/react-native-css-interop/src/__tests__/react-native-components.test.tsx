@@ -19,6 +19,7 @@ const testID = "react-native-css-interop";
 setupAllComponents();
 
 test("Component types", () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   [
     <Modal className="bg-black" presentationClassName="bg-black" />,
     <Pressable className="bg-black" />,

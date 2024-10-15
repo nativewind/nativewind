@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* spell-checker: words dppx dpcm */
 import { I18nManager, PixelRatio, Platform } from "react-native";
 
 import type {
@@ -292,9 +294,13 @@ function testPlainFeature(
             ref.width,
             tracking,
           );
+        default: {
+          return false;
+        }
       }
-    default:
+    default: {
       return false;
+    }
   }
 }
 
@@ -334,6 +340,7 @@ function getMediaFeatureValue(
         default:
           value.value satisfies never;
       }
+      return false;
     case "boolean":
     case "integer":
     case "ratio":

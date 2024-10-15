@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // cSpell:ignore rcap,vmin,svmin,lvmin,dvmin,cqmin,vmax,svmax,lvmax,dvmax,cqmax,currentcolor,oklab,oklch,prophoto
 
 import type {
@@ -72,7 +73,7 @@ type HandleStyleShorthand = (
   options: Record<string, RuntimeValueDescriptor>,
 ) => void;
 
-type AddAnimationDefaultProp = (property: string, value: unknown[]) => void;
+type AddAnimationDefaultProp = (property: string, value: any[]) => void;
 type AddContainerProp = (
   declaration: Extract<
     Declaration,
@@ -329,7 +330,7 @@ export function parseDeclaration(
       },
     };
 
-    let property =
+    const property =
       unparsedPropertyMapping[declaration.value.propertyId.property] ||
       declaration.value.propertyId.property;
 
@@ -346,7 +347,7 @@ export function parseDeclaration(
       parseUnparsed(declaration.value.value, parseOptions),
     );
   } else if (declaration.property === "custom") {
-    let property = declaration.value.name;
+    const property = declaration.value.name;
     if (
       validPropertiesLoose.has(property) ||
       property.startsWith("--") ||
@@ -487,7 +488,7 @@ export function parseDeclaration(
         declaration.property,
         parseOverflow(declaration.value.x, parseOptions),
       );
-    case "position":
+    case "position": {
       const value: any = (declaration as any).value.type;
       if (value === "absolute" || value === "relative") {
         return addStyleProp(declaration.property, value);
@@ -495,6 +496,7 @@ export function parseDeclaration(
         parseOptions.addValueWarning(value);
       }
       return;
+    }
     case "top":
       return addStyleProp(
         declaration.property,
@@ -1555,7 +1557,7 @@ export function parseDeclaration(
         parseTextAlign(declaration.value, parseOptions),
       );
     case "box-shadow": {
-      parseBoxShadow(declaration.value, parseOptions);
+      return parseBoxShadow(declaration.value, parseOptions);
     }
     case "aspect-ratio": {
       return addStyleProp(
@@ -2193,6 +2195,7 @@ function parseAlignSelf(
     case "normal":
     case "auto":
       value = "auto";
+      break;
     case "stretch":
       value = alignSelf.type;
       break;
@@ -2507,9 +2510,8 @@ function parseRNRuntimeSpecificsFunction(
             if (key) {
               runtimeArgs[key] = parseUnparsed(token, options);
               key = undefined;
-            } else {
-              return;
             }
+            continue;
           }
           case "delim":
           case "comma":

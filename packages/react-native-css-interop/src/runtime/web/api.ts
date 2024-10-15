@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Component, createElement, forwardRef } from "react";
@@ -49,6 +50,7 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
         );
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete props[config.source];
     }
 
@@ -79,7 +81,7 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
 // On web, these are the same
 export const remapProps = cssInterop;
 
-export const useUnstableNativeVariable = (name: string) => {
+export const useUnstableNativeVariable = (_name: string) => {
   if (process.env.NODE_ENV !== "production") {
     console.log("useUnstableNativeVariable is not supported on web.");
   }
@@ -101,6 +103,6 @@ export function vars<T extends Record<`--${string}`, string | number>>(
   return $variables;
 }
 
-export function useSafeAreaEnv(): {} | undefined {
+export function useSafeAreaEnv(): object | undefined {
   return undefined;
 }

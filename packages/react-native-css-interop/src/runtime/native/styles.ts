@@ -18,11 +18,11 @@ import {
 import { flags, warnings } from "./globals";
 import { INTERNAL_RESET, rem } from "./unit-observables";
 
-export type InjectedStyleContextValue = {
+export interface InjectedStyleContextValue {
   styles: Record<string, Observable<StyleRuleSet>>;
   animations: Record<string, ExtractedAnimation>;
   universalVariables: VariableContextValue;
-};
+}
 
 export type VariableContextValue =
   | Map<
@@ -35,6 +35,7 @@ export type VariableContextValue =
     >;
 
 declare global {
+  // eslint-disable-next-line no-var -- Required by TypeScript
   var __css_interop: {
     styles: Map<string, Observable<StyleRuleSet | undefined>>;
     keyframes: Map<string, Observable<ExtractedAnimation | undefined>>;
@@ -88,9 +89,9 @@ export function getStyle(name: string, effect?: Effect) {
 }
 
 export function getOpaqueStyles(
-  style: Record<string, any>,
+  style: Record<string, unknown>,
   effect?: Effect,
-): (StyleRuleSet | Record<string, any> | void)[] {
+): (StyleRuleSet | Record<string, unknown> | undefined)[] {
   const opaqueStyle = opaqueStyles.get(style);
 
   if (!opaqueStyle) {
@@ -120,7 +121,7 @@ export function getVariable(
 ) {
   if (!store) return;
 
-  let obs = store instanceof Map ? store.get(name) : store[name];
+  const obs = store instanceof Map ? store.get(name) : store[name];
   return obs && typeof obs === "object" && "get" in obs ? obs.get(effect) : obs;
 }
 
@@ -140,7 +141,7 @@ export function resetData() {
   rem.set(14);
 }
 
-let rules: NonNullable<StyleSheetRegisterCompiledOptions["rules"]> = {};
+const rules: NonNullable<StyleSheetRegisterCompiledOptions["rules"]> = {};
 
 export function injectData(data: StyleSheetRegisterCompiledOptions) {
   if (data.rules) {

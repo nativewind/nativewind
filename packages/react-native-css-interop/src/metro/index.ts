@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import type { EventEmitter } from "stream";
 
 import connect from "connect";
 import { debug as debugFn, Debugger } from "debug";
@@ -63,7 +64,7 @@ export type GetCSSForPlatform = (
 
 export type GetCSSForPlatformOnChange = (platform: string) => void;
 
-let haste: any;
+let haste: EventEmitter | undefined;
 let writeStyles = true;
 const virtualModules = new Map<string, Promise<string | Buffer>>();
 const outputDirectory = path.resolve(__dirname, "../../.cache");
@@ -188,6 +189,7 @@ function getConfig(
         } else {
           const initPromise = bundler
             .getDependencyGraph()
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .then(async (graph: any) => {
               haste = graph._haste;
               ensureFileSystemPatched(graph._fileSystem);
@@ -301,7 +303,7 @@ async function startCSSProcessor(
         );
 
         debug(`virtualStyles.emit ${platform}`);
-        haste.emit("change", {
+        haste?.emit("change", {
           eventsQueue: [
             {
               filePath,

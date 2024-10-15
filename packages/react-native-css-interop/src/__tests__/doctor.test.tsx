@@ -16,6 +16,6 @@ test("verifyJSX", () => {
   // We cannot test this within the JSX file, as Jest doesn't apply the importSource
   // transform for all files
 
-  // @ts-expect-error
+  // @ts-expect-error -- This is a special use case
   expect(<react-native-css-interop-jsx-pragma-check /> === true).toBeTruthy();
 });

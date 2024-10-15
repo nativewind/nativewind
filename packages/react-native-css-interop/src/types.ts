@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   ClassicComponentClass,
   ComponentClass,
@@ -36,15 +37,15 @@ export type ReactComponent<P = any> =
   | FunctionComponent<P>
   | ForwardRefExoticComponent<P>;
 
-export type InteropComponentConfig = {
+export interface InteropComponentConfig {
   target: string[];
   inlineProp?: string;
   source: string;
   propToRemove?: string;
-  nativeStyleToProp?: Array<[string, string[]]>;
-};
+  nativeStyleToProp?: [string, string[]][];
+}
 
-export type CssToReactNativeRuntimeOptions = {
+export interface CssToReactNativeRuntimeOptions {
   cache?: {
     rules: Map<string, StyleRule[]>;
     keyframes: Map<string, ExtractedAnimation>;
@@ -57,7 +58,7 @@ export type CssToReactNativeRuntimeOptions = {
   selectorPrefix?: string;
   stylesheetOrder?: number;
   features?: FeatureFlagStatus;
-};
+}
 
 export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
   rules: Map<string, StyleRule[]>;
@@ -184,7 +185,7 @@ export type StyleDeclarationOrInline =
   | StyleDeclaration
   | Record<string, unknown>;
 
-export type StyleRuleSet = {
+export interface StyleRuleSet {
   [StyleRuleSetSymbol]: true;
   n?: StyleRule[];
   i?: StyleRule[];
@@ -196,27 +197,27 @@ export type StyleRuleSet = {
   active?: boolean;
   hover?: boolean;
   focus?: boolean;
-};
+}
 
-export type RemappedClassName = {
+export interface RemappedClassName {
   [StyleRuleSetSymbol]: "RemappedClassName";
   classNames: string[];
-};
+}
 
 export type RuntimeStyleRule = StyleRule | object;
 
-export type RuntimeStyleRuleSet = {
+export interface RuntimeStyleRuleSet {
   normal: RuntimeStyleRule[];
   inline: RuntimeStyleRule[];
   important: RuntimeStyleRule[];
-};
+}
 
-export type StyleRule = {
+export interface StyleRule {
   [StyleRuleSymbol]: true;
   s: Specificity;
   d?: StyleDeclaration[];
   media?: MediaQuery[];
-  variables?: Array<[string, RuntimeValueDescriptor]>;
+  variables?: [string, RuntimeValueDescriptor][];
   pseudoClasses?: PseudoClassesQuery;
   animations?: ExtractedAnimations;
   container?: Partial<ExtractedContainer>;
@@ -226,7 +227,7 @@ export type StyleRule = {
   requiresLayoutHeight?: boolean;
   attrs?: AttributeCondition[];
   warnings?: ExtractionWarning[];
-};
+}
 
 export type ProcessedStyleRules =
   | (StyleRule & Required<Pick<StyleRule, "d">>)
@@ -241,13 +242,13 @@ export type PropState = Effect & {
   animationWaitingOnLayout: boolean;
 };
 
-export type PropAccumulator = {
+export interface PropAccumulator {
   props: Record<string, any>;
   state: PropState;
   target: string[];
   resetContext: boolean;
   requiresLayout: boolean;
-  delayedDeclarations: Extract<StyleDeclaration, Array<any>>[];
+  delayedDeclarations: Extract<StyleDeclaration, any[]>[];
   variables: Map<string, RuntimeValueDescriptor>;
   isAnimated: boolean;
   animation?: Required<ExtractedAnimations>;
@@ -257,7 +258,7 @@ export type PropAccumulator = {
   getHeight(): number;
   getFontSize(): number;
   getVariable(name?: string): RuntimeValueDescriptor;
-};
+}
 
 export type RuntimeStyle = RuntimeValueDescriptor | Record<string, unknown>;
 
@@ -271,16 +272,16 @@ export type RuntimeValueDescriptor =
 
 export type RuntimeFunction =
   | [
-      {},
+      Record<never, never>,
       string, // string
     ]
   | [
-      {},
+      Record<never, never>,
       string, // string
       undefined | RuntimeValueDescriptor[], // arguments
     ]
   | [
-      {},
+      Record<never, never>,
       string, // string
       undefined | RuntimeValueDescriptor[], // arguments
       1, // Should process after styles have been calculated
@@ -303,23 +304,23 @@ export type SpecificityValue = number | undefined;
  */
 export type Specificity = SpecificityValue[];
 
-export type ExtractedContainer = {
+export interface ExtractedContainer {
   names?: string[] | false;
   type?: ContainerType;
-};
+}
 
-export type ExtractedContainerQuery = {
+export interface ExtractedContainerQuery {
   name?: string | null;
   condition?: ContainerCondition<Declaration>;
   pseudoClasses?: PseudoClassesQuery;
   attrs?: AttributeCondition[];
-};
+}
 
 export type ExtractedAnimations = {
   [K in keyof Animation]?: Animation[K][];
 };
 
-export type ExtractedTransition = {
+export interface ExtractedTransition {
   /**
    * The delay before the transition starts.
    */
@@ -336,7 +337,7 @@ export type ExtractedTransition = {
    * The easing function for the transition.
    */
   timingFunction?: EasingFunction[];
-};
+}
 
 type AnimationPropertyKey = string;
 export type AnimationEasingFunction =
@@ -345,7 +346,7 @@ export type AnimationEasingFunction =
 
 export type AnimationFrame = [AnimationPropertyKey, RuntimeValueFrame[]];
 
-export type ExtractedAnimation = {
+export interface ExtractedAnimation {
   frames: AnimationFrame[];
   /**
    * The easing function for each frame
@@ -353,20 +354,20 @@ export type ExtractedAnimation = {
   easingFunctions?: AnimationEasingFunction[];
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
-};
+}
 
-export type RuntimeValueFrame = {
+export interface RuntimeValueFrame {
   progress: number;
   value: RuntimeValueDescriptor;
-};
+}
 
-export type PseudoClassesQuery = {
+export interface PseudoClassesQuery {
   hover?: boolean;
   active?: boolean;
   focus?: boolean;
-};
+}
 
-export type StyleSheetRegisterCompiledOptions = {
+export interface StyleSheetRegisterCompiledOptions {
   $compiled: true;
   rules?: Record<string, StyleRuleSet>;
   keyframes?: [string, ExtractedAnimation][];
@@ -374,21 +375,21 @@ export type StyleSheetRegisterCompiledOptions = {
   universalVariables?: VariableRecord;
   rem?: number;
   flags?: Record<string, unknown>;
-};
+}
 
-export type StyleSheetRegisterOptions = {
+export interface StyleSheetRegisterOptions {
   declarations?: Record<string, any | any[]>;
   keyframes?: Record<string, ExtractedAnimation>;
   rootVariables?: VariableRecord;
   universalVariables?: VariableRecord;
   rem?: number;
   flags?: Record<string, unknown>;
-};
+}
 
-export type ColorSchemeVariableValue = {
+export interface ColorSchemeVariableValue {
   light?: RuntimeValueDescriptor;
   dark?: RuntimeValueDescriptor;
-};
+}
 export type VariableRecord = Record<string, ColorSchemeVariableValue>;
 export type ContainerRecord = Record<string, SharedState>;
 
@@ -405,22 +406,22 @@ export type ExtractionWarning =
   | ExtractionWarningValue
   | ExtractionWarningFunctionValue;
 
-export type ExtractionWarningProperty = {
+export interface ExtractionWarningProperty {
   type: "IncompatibleNativeProperty";
   property: string;
-};
+}
 
-export type ExtractionWarningValue = {
+export interface ExtractionWarningValue {
   type: "IncompatibleNativeValue";
   property: string;
   value: any;
-};
+}
 
-export type ExtractionWarningFunctionValue = {
+export interface ExtractionWarningFunctionValue {
   type: "IncompatibleNativeFunctionValue";
   property: string;
   value: any;
-};
+}
 
 export type DarkMode =
   | { type: "media" }

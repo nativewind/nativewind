@@ -1,3 +1,4 @@
+/** spell-checker: disable */
 /*
 Modified from: https://github.com/mvllow/tailwindcss-safe-area
 Original License:

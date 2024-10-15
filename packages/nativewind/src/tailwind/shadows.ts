@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
 import { parseBoxShadowValue } from "tailwindcss/lib/util/parseBoxShadowValue";
 import toColorValue from "tailwindcss/lib/util/toColorValue";
@@ -9,7 +10,7 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
   const boxShadowEntries = Object.entries(theme("boxShadow") ?? {});
 
   function getElevation(value: any) {
-    let elevationKey: any = boxShadowEntries.find(
+    const elevationKey: any = boxShadowEntries.find(
       (entry) => entry[1] === value,
     )?.[0];
 
@@ -51,9 +52,9 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
       shadow: (value) => {
         const elevation = getElevation(value);
 
-        let transformValue = transformThemeValue("boxShadow");
+        const transformValue = transformThemeValue("boxShadow");
         value = transformValue(value);
-        let ast = parseBoxShadowValue(value);
+        const ast = parseBoxShadowValue(value);
 
         const firstValid = ast.find((shadow: any) => shadow.valid);
 

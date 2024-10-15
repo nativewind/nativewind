@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SharedValue } from "react-native-reanimated";
 
 import { ShorthandSymbol } from "./runtime/native/resolvers/shared";
@@ -30,7 +31,7 @@ export const STYLE_SCOPES = {
 
 export function isDescriptorFunction(
   value: RuntimeValueDescriptor | RuntimeValueDescriptor[],
-): value is Extract<RuntimeValueDescriptor, [{}, ...any[]]> {
+): value is Extract<RuntimeValueDescriptor, [Record<never, never>, ...any[]]> {
   return (
     Array.isArray(value) &&
     typeof value[0] === "object" &&
@@ -84,7 +85,7 @@ export function assignToTarget(
    */
   if (typeof value === "object" && ShorthandSymbol in value) {
     return value.map((shorthandConfig) => {
-      let pathTokens = Array.from(
+      const pathTokens = Array.from(
         Array.isArray(config) ? config : config.target,
       );
 
@@ -108,7 +109,7 @@ export function assignToTarget(
 
   let prop: string | number;
 
-  let props = Array.isArray(config) ? config : config.target;
+  const props = Array.isArray(config) ? config : config.target;
 
   if (props.length === 0) {
     Object.assign(parent, value);

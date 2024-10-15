@@ -56,9 +56,9 @@ export const tailwindCliV3 = function (debug: Debugger) {
             }
           });
 
-          child.stdout?.on("data", (data) => {
-            data = data.toString();
-          });
+          // child.stdout?.on("data", (data) => {
+          //   data = data.toString();
+          // });
 
           child.on("message", (message) => {
             if (initialMessage) {
@@ -87,6 +87,7 @@ const flattenPresets = (configs: Partial<Config>[] = []): Partial<Config>[] => {
 };
 
 export function tailwindConfigV3(path: string) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const config: Config = require("tailwindcss/loadConfig")(path);
 
   const hasPreset = flattenPresets(config.presets).some((preset) => {
