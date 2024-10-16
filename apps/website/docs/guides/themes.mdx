@@ -32,7 +32,7 @@ export default App() {
   return (
     <View>
       <Text className="text-primary">Access as a theme value</Text>
-      <Text className="text-[--color-primary]">Or the variable directly</Text>
+      <Text className="text-[rgb(var(--color-primary))]">Or the variable directly</Text>
 
       {/* Variables can be changed inline */}
       <View style={userTheme}>
