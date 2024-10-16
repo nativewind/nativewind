@@ -352,7 +352,6 @@ const preset: Config = {
   ],
   corePlugins: {
     preflight: false,
-    backgroundOpacity: false,
     borderOpacity: false,
     boxShadow: false,
     caretColor: false,
