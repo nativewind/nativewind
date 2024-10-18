@@ -34,6 +34,9 @@ export const colorScheme = {
   get(effect?: Effect) {
     return colorSchemeObservable.get(effect) ?? systemColorScheme.get(effect);
   },
+  getSystem(effect?: Effect) {
+    return colorSchemeObservable.get(effect) ?? systemColorScheme.get(effect);
+  },
   toggle() {
     let current = colorSchemeObservable.get();
     if (current === undefined) current = appearance.getColorScheme() ?? "light";
