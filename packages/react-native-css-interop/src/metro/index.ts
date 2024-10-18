@@ -235,13 +235,9 @@ function getConfig(
         debug(`resolveRequest.input ${resolved.filePath}`);
         debug(`resolveRequest.resolvedTo: ${filePath}`);
         if (!writeStyles) {
-          startCSSProcessor(
-            filePath,
-            platform,
-            (context as any).isDev === true,
-            options,
-            debug,
-          );
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const development = (context as any).isDev || (context as any).dev;
+          startCSSProcessor(filePath, platform, development, options, debug);
         }
 
         return {
