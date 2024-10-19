@@ -1,24 +1,15 @@
-const { defaults: tsjPreset } = require("ts-jest/presets");
-
-/** @type {import('ts-jest').JestConfigWithTsJest} */
+/** @type {import('jest').Config} */
 module.exports = {
-  ...tsjPreset,
-  preset: "react-native",
-  transform: {
-    "^.+\\.jsx$": "babel-jest",
-    "^.+\\.tsx?$": [
-      "ts-jest",
-      {
-        tsconfig: "tsconfig.spec.json",
-      },
-    ],
+  preset: "jest-expo",
+  roots: ["src"],
+  setupFiles: ["react-native-css-interop/test/setup"],
+  setupFilesAfterEnv: ["react-native-css-interop/test/setupAfterEnv"],
+  modulePathIgnorePatterns: ["<rootDir>/src/test"],
+  moduleNameMapper: {
+    "^react-native-css-interop$": "<rootDir>/../react-native-css-interop/src",
+    "^react-native-css-interop/jsx-runtime$":
+      "<rootDir>/../react-native-css-interop/src/runtime/jsx-runtime",
+    "^react-native-css-interop/test$":
+      "<rootDir>/../react-native-css-interop/src/test",
   },
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
-  testPathIgnorePatterns: [
-    "/node_modules/",
-    "/__tests__/babel/",
-    "/__tests__/tailwindcss/runner/",
-    "/__tests__/style-sheet/tests",
-    "/__tests__/types.d.ts",
-  ],
 };

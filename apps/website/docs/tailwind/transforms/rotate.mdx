@@ -10,3 +10,11 @@ import Usage from "../_usage.mdx";
 ## Compatibility
 
 <Compatibility supported={["rotate-{n}", "rotate-[n]"]} />
+
+:::tip
+
+Always include the `deg` unit when using arbitrary styles or setting `rotate` values in your theme. e.g. `rotate-[90deg]`.
+
+React Native only supports `deg` as a unit for rotation.
+
+:::

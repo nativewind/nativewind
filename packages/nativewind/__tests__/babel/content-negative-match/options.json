@@ -1,6 +1,0 @@
-{
-  "tailwindConfigPath": "./content-negative-match/tailwind.config.js",
-  "tailwindConfig": {
-    "content": ["./do-not-match-anything"]
-  }
-}

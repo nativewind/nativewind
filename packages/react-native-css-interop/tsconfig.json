@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "outDir": "dist",
+    "noEmit": false,
+    "sourceMap": true,
+    "paths": {
+      "test": [
+        "./src/test"
+      ],
+      "test/jsx-runtime": [
+        "./src/test"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "types.d.ts"
+  ]
+}

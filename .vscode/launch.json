@@ -1,0 +1,16 @@
+{
+  "configurations": [
+    {
+      "type": "radon-ide",
+      "request": "launch",
+      "name": "Radon IDE panel",
+      "appRoot": "examples/expo-router",
+      "env": {
+        "DEBUG": "nativewind",
+        "DEBUG_HIDE_DATE": "true"
+      },
+      "ios": {},
+      "android": {}
+    }
+  ]
+}

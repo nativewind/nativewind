@@ -2,8 +2,7 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
+const { vsLight, vsDark } = require("prism-react-renderer").themes;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -39,6 +38,17 @@ const config = {
           remarkPlugins: [require("./src/remark-snackplayer")],
           routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),
+          lastVersion: "v2",
+          versions: {
+            current: {
+              label: "v4",
+              path: "v4",
+            },
+            v2: {
+              label: "v2",
+              path: "",
+            },
+          },
         },
         blog: false,
         theme: {
@@ -57,6 +67,12 @@ const config = {
         indexName: "nativewind",
         contextualSearch: true,
       },
+      prism: {
+        defaultLanguage: "tsx",
+        theme: vsLight,
+        darkTheme: vsDark,
+        additionalLanguages: ["css", "diff"],
+      },
       docs: {
         sidebar: {
           autoCollapseCategories: false,
@@ -65,6 +81,11 @@ const config = {
       colorMode: {
         respectPrefersColorScheme: true,
       },
+      announcementBar: {
+        content:
+          '<a href="/v4/overview">NativeWind v4.0 is coming soon. Click here to see the docs</a>',
+        isCloseable: true,
+      },
       navbar: {
         title: "NativeWind",
         logo: {
@@ -72,6 +93,11 @@ const config = {
           src: "img/logo.svg",
         },
         items: [
+          {
+            href: "https://discord.gg/ypNakAFQ65",
+            label: "Discord",
+            position: "right",
+          },
           {
             href: "https://github.com/marklawlor/nativewind",
             label: "GitHub",
@@ -89,14 +115,15 @@ const config = {
                 label: "GitHub",
                 href: "https://github.com/marklawlor/nativewind",
               },
+              {
+                label: "Discord",
+                href: "https://discord.gg/ypNakAFQ65",
+              },
+
             ],
           },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Mark Lawlor. Built with Docusaurus.`,
-      },
-      prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
       },
     }),
 };

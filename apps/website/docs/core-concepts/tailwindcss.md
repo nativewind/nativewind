@@ -14,4 +14,4 @@ This documentation only documents whats is universally compatible, but you can a
 
 NativeWind works in a similar manner to CSS, it can accept all classes but will only apply the styles that it support. For example, if you use `grid`, this will work on web but not on native.
 
-Please read the [quirks](./quirks) guide for more information.
+Please read the [differences guide](./differences) for more information on some minor differences between NativeWind and Tailwind CSS.

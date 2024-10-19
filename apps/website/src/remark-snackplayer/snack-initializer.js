@@ -22,18 +22,15 @@ export default (() => {
   };
 
   const initSnackPlayers = () => {
-    // console.log('initSnackPlayers');
     updateSnacksTheme();
     window.ExpoSnack && window.ExpoSnack.initialize();
   };
 
   const setupTabPanelsMutationObservers = () => {
     const tabPanels = document.querySelectorAll("[role=tabpanel]");
-    // console.log('setupTabPanelsMutationObservers', {tabPanels});
     tabPanels.forEach((tabPanel) => {
       new MutationObserver((mutations, observer) => {
         initSnackPlayers();
-        // console.log('tabPanel MutationObserver triggered', {tabPanels});
       }).observe(tabPanel, { childList: true });
     });
   };

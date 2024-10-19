@@ -1,6 +1,0 @@
-{
-  "mode": "transformOnly",
-  "tailwindConfig": {
-    "content": ["./transform-only/code.{js,ts,jsx,tsx}"]
-  }
-}
