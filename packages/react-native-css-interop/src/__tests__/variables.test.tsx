@@ -1,13 +1,14 @@
 /** @jsxImportSource test */
 import { memo, useEffect } from "react";
 import { View, ViewProps } from "react-native";
+
 import {
+  cssInterop,
+  registerCSS,
   render,
   screen,
-  registerCSS,
-  useUnstableNativeVariable,
   setupAllComponents,
-  cssInterop,
+  useUnstableNativeVariable,
 } from "test";
 
 const testID = "react-native-css-interop";

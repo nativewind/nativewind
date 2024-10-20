@@ -1,4 +1,4 @@
-import { verifyJSX, verifyData, verifyFlag } from "react-native-css-interop";
+import { verifyData, verifyFlag, verifyJSX } from "react-native-css-interop";
 
 export function verifyInstallation() {
   if (process.env.NODE_ENV !== "development") {

@@ -1,7 +1,7 @@
-import plugin from "tailwindcss/plugin";
 import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
-import withAlphaVariable from "tailwindcss/lib/util/withAlphaVariable";
 import toColorValue from "tailwindcss/lib/util/toColorValue";
+import withAlphaVariable from "tailwindcss/lib/util/withAlphaVariable";
+import plugin from "tailwindcss/plugin";
 
 export const nativeSwitch = plugin(function ({ matchUtilities, theme }) {
   matchUtilities(

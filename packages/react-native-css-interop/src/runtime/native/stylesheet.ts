@@ -1,6 +1,6 @@
-import { getStyle, injectData } from "./styles";
 import { CssInteropStyleSheet } from "../../types";
 import { flags } from "./globals";
+import { getStyle, injectData } from "./styles";
 
 export const StyleSheet: CssInteropStyleSheet = {
   getGlobalStyle(name: string) {

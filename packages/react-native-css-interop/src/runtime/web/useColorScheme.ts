@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { colorScheme } from "./color-scheme";
+
 import { Effect } from "../observable";
+import { colorScheme } from "./color-scheme";
+
 export function useColorScheme() {
   const [effect, setEffect] = useState<Effect>(() => ({
     run: () => setEffect((s) => ({ ...s })),

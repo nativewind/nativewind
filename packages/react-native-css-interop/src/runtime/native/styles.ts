@@ -1,11 +1,7 @@
-import { Appearance } from "react-native";
 import { createContext } from "react";
-import { Effect, Observable, observable } from "../observable";
-import {
-  colorScheme,
-  cssVariableObservable,
-  isReduceMotionEnabled,
-} from "./appearance-observables";
+import { Appearance } from "react-native";
+
+import { StyleRuleSetSymbol, StyleRuleSymbol } from "../../shared";
 import type {
   ExtractedAnimation,
   RemappedClassName,
@@ -13,9 +9,14 @@ import type {
   StyleRuleSet,
   StyleSheetRegisterCompiledOptions,
 } from "../../types";
-import { INTERNAL_RESET, rem } from "./unit-observables";
+import { Effect, Observable, observable } from "../observable";
+import {
+  colorScheme,
+  cssVariableObservable,
+  isReduceMotionEnabled,
+} from "./appearance-observables";
 import { flags, warnings } from "./globals";
-import { StyleRuleSetSymbol, StyleRuleSymbol } from "../../shared";
+import { INTERNAL_RESET, rem } from "./unit-observables";
 
 export type InjectedStyleContextValue = {
   styles: Record<string, Observable<StyleRuleSet>>;

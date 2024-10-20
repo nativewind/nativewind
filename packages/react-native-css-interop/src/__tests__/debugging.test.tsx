@@ -1,7 +1,7 @@
 /** @jsxImportSource test */
 import { View } from "react-native";
 
-import { render, screen, registerCSS, setupAllComponents } from "test";
+import { registerCSS, render, screen, setupAllComponents } from "test";
 
 setupAllComponents();
 

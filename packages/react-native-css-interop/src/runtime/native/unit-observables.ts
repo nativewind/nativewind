@@ -1,6 +1,7 @@
 import { Dimensions } from "react-native";
+
 import { INTERNAL_RESET, INTERNAL_SET } from "../../shared";
-import { observable, Effect, ReadableObservable } from "../observable";
+import { Effect, observable, ReadableObservable } from "../observable";
 
 /**
  * rem unit value

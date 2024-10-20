@@ -1,23 +1,24 @@
-import type { AnimatableValue } from "react-native-reanimated";
-import type { EasingFunction, Time } from "lightningcss";
-import type {
-  InteropComponentConfig,
-  RuntimeValueDescriptor,
-  RuntimeValueFrame,
-} from "../../types";
-
 import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
-import { Effect, observable } from "../observable";
+
+import type { EasingFunction, Time } from "lightningcss";
+import type { AnimatableValue } from "react-native-reanimated";
+
 import {
   isDescriptorArray,
   isDescriptorFunction,
   transformKeys,
 } from "../../shared";
-import { ReducerState, ReducerTracking, Refs, ShorthandResult } from "./types";
-import { getUniversalVariable, getVariable } from "./styles";
+import type {
+  InteropComponentConfig,
+  RuntimeValueDescriptor,
+  RuntimeValueFrame,
+} from "../../types";
+import { Effect, observable } from "../observable";
 import { systemColorScheme } from "./appearance-observables";
-import { rem, vh, vw } from "./unit-observables";
 import { textShadow } from "./resolvers/text-shadow";
+import { getUniversalVariable, getVariable } from "./styles";
+import { ReducerState, ReducerTracking, Refs, ShorthandResult } from "./types";
+import { rem, vh, vw } from "./unit-observables";
 
 /**
  * Get the final value of a value descriptor

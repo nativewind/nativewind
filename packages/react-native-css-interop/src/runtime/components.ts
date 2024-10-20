@@ -3,21 +3,21 @@
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   ImageBackground,
   KeyboardAvoidingView,
   Pressable,
+  SafeAreaView,
   ScrollView,
   StatusBar,
   Switch,
   Text,
   TextInput,
-  SafeAreaView,
+  TouchableHighlight,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
   VirtualizedList,
-  Image,
-  TouchableHighlight,
-  TouchableWithoutFeedback,
 } from "react-native";
 
 import { cssInterop, remapProps } from "./api";

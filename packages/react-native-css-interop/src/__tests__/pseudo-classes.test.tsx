@@ -3,9 +3,9 @@ import { TextInput } from "react-native";
 
 import {
   fireEvent,
-  screen,
-  render,
   registerCSS,
+  render,
+  screen,
   setupAllComponents,
 } from "test";
 

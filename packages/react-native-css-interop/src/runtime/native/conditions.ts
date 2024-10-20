@@ -1,3 +1,5 @@
+import { I18nManager, PixelRatio, Platform } from "react-native";
+
 import type {
   ContainerCondition,
   Declaration,
@@ -6,19 +8,18 @@ import type {
   MediaQuery,
   QueryFeatureFor_MediaFeatureId,
 } from "lightningcss";
-import { I18nManager, PixelRatio, Platform } from "react-native";
 
+import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import {
   AttributeCondition,
   ExtractedContainerQuery,
   PseudoClassesQuery,
   StyleRule,
 } from "../../types";
-import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import { Effect, ReadableObservable } from "../observable";
-import { ReducerTracking, Refs, SharedState } from "./types";
 import { colorScheme, isReduceMotionEnabled } from "./appearance-observables";
-import { vw, vh, rem } from "./unit-observables";
+import { ReducerTracking, Refs, SharedState } from "./types";
+import { rem, vh, vw } from "./unit-observables";
 
 interface ConditionReference {
   width: number | ReadableObservable<number>;

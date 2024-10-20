@@ -1,6 +1,7 @@
 /** @jsxImportSource test */
 import { Text } from "react-native";
-import { render, registerCSS, setupAllComponents, screen, testID } from "test";
+
+import { registerCSS, render, screen, setupAllComponents, testID } from "test";
 
 setupAllComponents();
 

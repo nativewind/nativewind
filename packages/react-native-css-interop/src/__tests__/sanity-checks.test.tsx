@@ -1,12 +1,12 @@
 /** @jsxImportSource test */
-import { View } from "react-native";
 import { useEffect } from "react";
+import { View } from "react-native";
 
 import {
-  screen,
   fireEvent,
-  render,
   registerCSS,
+  render,
+  screen,
   setupAllComponents,
 } from "test";
 

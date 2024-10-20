@@ -1,22 +1,21 @@
+import { addNamespace } from "@babel/helper-module-imports";
+import { Binding, NodePath } from "@babel/traverse";
 import {
   Identifier,
-  MemberExpression,
-  Program,
+  identifier,
   isCallExpression,
   isIdentifier,
   isImportDeclaration,
   isMemberExpression,
   isStringLiteral,
+  MemberExpression,
   memberExpression,
-  identifier
+  Program,
 } from "@babel/types";
-import { Binding, NodePath } from "@babel/traverse";
-import { addNamespace } from "@babel/helper-module-imports";
 
 const importFunction = "createInteropElement";
 const importModule = "react-native-css-interop";
 const importAs = "ReactNativeCSSInterop";
-
 
 const allowedFileRegex =
   /^(?!.*[\/\\](react|react-native|react-native-web|react-native-css-interop)[\/\\]).*$/;
@@ -30,15 +29,17 @@ export default function () {
           let newExpression: null | MemberExpression = null;
           const insertImportStatement = () => {
             if (newExpression === null) {
-              const importAsIdentifier = addNamespace(path, importModule, { nameHint: importAs })
+              const importAsIdentifier = addNamespace(path, importModule, {
+                nameHint: importAs,
+              });
               newExpression = memberExpression(
                 importAsIdentifier,
-                identifier(importFunction)
+                identifier(importFunction),
               );
             }
-            return newExpression
-          }
-          path.traverse(visitor, {...state, insertImportStatement});
+            return newExpression;
+          };
+          path.traverse(visitor, { ...state, insertImportStatement });
         }
       },
     },
@@ -46,10 +47,11 @@ export default function () {
 }
 
 const visitor = {
-  MemberExpression(path: NodePath<MemberExpression>, state: {insertImportStatement: () => MemberExpression, filename: string}) {
-    if (
-      isIdentifier(path.node.property, { name: "createElement" })
-    ) {
+  MemberExpression(
+    path: NodePath<MemberExpression>,
+    state: { insertImportStatement: () => MemberExpression; filename: string },
+  ) {
+    if (isIdentifier(path.node.property, { name: "createElement" })) {
       let shouldReplace = false;
 
       if (
@@ -71,22 +73,25 @@ const visitor = {
 
       if (!shouldReplace) return;
 
-      const newExpression = state.insertImportStatement()
+      const newExpression = state.insertImportStatement();
 
       path.replaceWith(newExpression);
     }
   },
-  Identifier(path: NodePath<Identifier>, state: {insertImportStatement: () => MemberExpression, filename: string}) {
+  Identifier(
+    path: NodePath<Identifier>,
+    state: { insertImportStatement: () => MemberExpression; filename: string },
+  ) {
     if (
       path.node.name === "createElement" &&
       path.parentPath.isCallExpression() &&
       isImportedFromReact(path.scope.getBinding("createElement"))
     ) {
-      const newExpression = state.insertImportStatement()
+      const newExpression = state.insertImportStatement();
       path.replaceWith(newExpression);
     }
   },
-}
+};
 
 function isImportedFromReact(binding?: Binding): boolean {
   const path = binding?.path;

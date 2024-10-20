@@ -7,23 +7,33 @@ import {
   useState,
 } from "react";
 import { LayoutChangeEvent, View } from "react-native";
+
 import {
-  ReactComponent,
-  InteropComponentConfig,
-  StyleRule,
-  ProcessedStyleRules,
-  StyleRuleSet,
+  assignToTarget,
+  DEFAULT_CONTAINER_NAME,
+  getTargetValue,
+  inlineSpecificity,
+  PLACEHOLDER_SYMBOL,
+  SpecificityIndex,
+  StyleRuleSetSymbol,
+  StyleRuleSymbol,
+} from "../../shared";
+import {
+  ContainerRecord,
   ExtractedAnimations,
   ExtractedTransition,
-  ContainerRecord,
-  StyleDeclarationOrInline,
+  InteropComponentConfig,
+  ProcessedStyleRules,
+  ReactComponent,
   StyleDeclaration,
+  StyleDeclarationOrInline,
+  StyleRule,
+  StyleRuleSet,
 } from "../../types";
-import { containerContext } from "./globals";
-import { UpgradeState, renderComponent } from "./render-component";
+import { cleanupEffect, Effect, observable } from "../observable";
 import { testRule } from "./conditions";
-import { SharedState, ReducerAction, ReducerState, Refs } from "./types";
-import { Effect, cleanupEffect, observable } from "../observable";
+import { containerContext } from "./globals";
+import { renderComponent, UpgradeState } from "./render-component";
 import {
   defaultValues,
   getBaseValue,
@@ -35,23 +45,13 @@ import {
   resolveValue,
   timeToMS,
 } from "./resolve-value";
-
 import {
-  VariableContext,
   getAnimation,
   getOpaqueStyles,
   getStyle,
+  VariableContext,
 } from "./styles";
-import {
-  assignToTarget,
-  DEFAULT_CONTAINER_NAME,
-  getTargetValue,
-  inlineSpecificity,
-  PLACEHOLDER_SYMBOL,
-  SpecificityIndex,
-  StyleRuleSetSymbol,
-  StyleRuleSymbol,
-} from "../../shared";
+import { ReducerAction, ReducerState, Refs, SharedState } from "./types";
 
 export function interop(
   component: ReactComponent<any>,

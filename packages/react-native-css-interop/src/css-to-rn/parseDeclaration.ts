@@ -7,10 +7,13 @@ import type {
   Angle,
   BorderSideWidth,
   BorderStyle,
+  BoxShadow,
+  ColorOrAuto,
   CssColor,
   Declaration,
   DimensionPercentageFor_LengthValue,
   Display,
+  EnvironmentVariable,
   FontFamily,
   FontSize,
   FontStyle,
@@ -27,31 +30,28 @@ import type {
   NumberOrPercentage,
   OverflowKeyword,
   PropertyId,
+  Scale,
   Size,
+  SVGPaint,
   TextAlign,
   TextDecorationLine,
   TextDecorationStyle,
   TextShadow,
-  TokenOrValue,
-  VerticalAlign,
   Token,
-  BoxShadow,
-  UserSelect,
-  SVGPaint,
-  ColorOrAuto,
-  EnvironmentVariable,
+  TokenOrValue,
   Translate,
-  Scale,
   UnresolvedColor,
+  UserSelect,
+  VerticalAlign,
 } from "lightningcss";
 
+import { isDescriptorArray } from "../shared";
 import type {
   ExtractionWarning,
-  RuntimeValueDescriptor,
   RuntimeFunction,
+  RuntimeValueDescriptor,
 } from "../types";
 import { FeatureFlagStatus } from "./feature-flags";
-import { isDescriptorArray } from "../shared";
 import { toRNProperty } from "./normalize-selectors";
 
 const unparsedPropertyMapping: Record<string, string> = {

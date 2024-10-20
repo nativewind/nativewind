@@ -1,12 +1,13 @@
 import {
+  AccessibilityInfo,
   Appearance,
   AppState,
   NativeEventSubscription,
-  AccessibilityInfo,
 } from "react-native";
+
 import { INTERNAL_RESET } from "../../shared";
 import { ColorSchemeVariableValue, RuntimeValueDescriptor } from "../../types";
-import { observable, ObservableOptions, Effect } from "../observable";
+import { Effect, observable, ObservableOptions } from "../observable";
 
 /**
  * Color scheme

@@ -1,13 +1,13 @@
 /** @jsxImportSource test */
 import {
-  PureComponent,
   createRef,
   forwardRef,
+  PureComponent,
   useImperativeHandle,
 } from "react";
 import { ViewProps } from "react-native";
 
-import { render, createMockComponent, registerCSS } from "test";
+import { createMockComponent, registerCSS, render } from "test";
 
 const testID = "react-native-css-interop";
 const mapping = { className: "style" } as const;

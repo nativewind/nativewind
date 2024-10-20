@@ -1,9 +1,9 @@
 /** @jsxImportSource nativewind */
 import { View } from "react-native";
 
-import { render } from "../test";
-
 import { verifyFlag } from "react-native-css-interop";
+
+import { render } from "../test";
 
 test("verifyInstallation", async () => {
   // Render will inject data

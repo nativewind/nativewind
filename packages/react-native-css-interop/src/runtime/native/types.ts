@@ -1,16 +1,17 @@
 import type { SharedValue } from "react-native-reanimated";
+
+import { PLACEHOLDER_SYMBOL } from "../../shared";
 import type {
-  InteropComponentConfig,
+  ContainerRecord,
   ExtractedAnimations,
   ExtractedTransition,
-  ContainerRecord,
-  StyleDeclaration,
+  InteropComponentConfig,
   RuntimeValueDescriptor,
+  StyleDeclaration,
 } from "../../types";
 import type { Effect, Observable } from "../observable";
-import type { VariableContextValue } from "./styles";
-import { PLACEHOLDER_SYMBOL } from "../../shared";
 import { ShorthandSymbol } from "./resolvers/shared";
+import type { VariableContextValue } from "./styles";
 
 export type Callback = () => void;
 export type GetInteraction = (

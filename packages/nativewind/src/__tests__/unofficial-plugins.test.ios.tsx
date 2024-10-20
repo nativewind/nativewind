@@ -7,9 +7,11 @@
  */
 
 import { Text, View } from "react-native";
-import { render, screen } from "../test";
-import plugin from "tailwindcss/plugin";
+
 import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
+import plugin from "tailwindcss/plugin";
+
+import { render, screen } from "../test";
 
 const testID = "nativewind";
 

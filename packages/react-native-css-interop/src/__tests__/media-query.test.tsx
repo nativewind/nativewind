@@ -3,12 +3,12 @@ import { View } from "react-native";
 
 import {
   act,
-  screen,
-  render,
-  registerCSS,
-  INTERNAL_SET,
   colorScheme,
+  INTERNAL_SET,
   native,
+  registerCSS,
+  render,
+  screen,
   setupAllComponents,
 } from "test";
 

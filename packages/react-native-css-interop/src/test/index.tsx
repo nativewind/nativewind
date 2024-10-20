@@ -2,29 +2,29 @@ import {
   ComponentProps,
   ComponentRef,
   ForwardedRef,
-  ReactElement,
   forwardRef,
+  ReactElement,
 } from "react";
+
 import {
   render as tlRender,
   RenderOptions as TLRenderOptions,
 } from "@testing-library/react-native";
 
-import { createInteropElement } from "../runtime";
-import { INTERNAL_SET } from "../shared";
-import { cssInterop, remapProps, interopComponents } from "../runtime/api";
 import { cssToReactNativeRuntime } from "../css-to-rn";
-import { injectData } from "../runtime/native/styles";
+import { createInteropElement } from "../runtime";
+import { cssInterop, interopComponents, remapProps } from "../runtime/api";
+import { isReduceMotionEnabled } from "../runtime/native/appearance-observables";
+import { warnings } from "../runtime/native/globals";
+import { injectData, resetData } from "../runtime/native/styles";
 import { vh, vw } from "../runtime/native/unit-observables";
+import { INTERNAL_SET } from "../shared";
 import {
   CssToReactNativeRuntimeOptions,
   EnableCssInteropOptions,
   ReactComponent,
   Style,
 } from "../types";
-import { isReduceMotionEnabled } from "../runtime/native/appearance-observables";
-import { resetData } from "../runtime/native/styles";
-import { warnings } from "../runtime/native/globals";
 
 export * from "../index";
 export * from "../runtime/native/styles";

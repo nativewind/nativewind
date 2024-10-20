@@ -1,9 +1,8 @@
 /** @jsxImportSource nativewind */
-import { View, Platform } from "react-native";
+import { Platform, View } from "react-native";
+
 import tailwindcssContainerQueries from "@tailwindcss/container-queries";
 import postcss from "postcss";
-import tailwind, { Config } from "tailwindcss";
-
 import {
   getWarnings,
   render as interopRender,
@@ -12,6 +11,8 @@ import {
   screen,
   setupAllComponents,
 } from "react-native-css-interop/test";
+import tailwind, { Config } from "tailwindcss";
+
 import { cssToReactNativeRuntimeOptions } from "./metro/common";
 
 export {

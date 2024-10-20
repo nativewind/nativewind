@@ -1,7 +1,8 @@
-import { AppState, Appearance, NativeEventSubscription } from "react-native";
-import { StyleSheet } from "./stylesheet";
+import { Appearance, AppState, NativeEventSubscription } from "react-native";
+
 import { INTERNAL_RESET } from "../../shared";
 import { observable } from "../observable";
+import { StyleSheet } from "./stylesheet";
 
 let appearance = Appearance;
 let appearanceListener: NativeEventSubscription | undefined;

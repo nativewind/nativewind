@@ -4,13 +4,14 @@ import type {
   SelectorComponent,
   SelectorList,
 } from "lightningcss";
-import {
-  Specificity,
-  ExtractRuleOptions,
-  StyleRule,
-  AttributeCondition,
-} from "../types";
+
 import { SpecificityIndex } from "../shared";
+import {
+  AttributeCondition,
+  ExtractRuleOptions,
+  Specificity,
+  StyleRule,
+} from "../types";
 
 export type NormalizeSelector =
   | {
