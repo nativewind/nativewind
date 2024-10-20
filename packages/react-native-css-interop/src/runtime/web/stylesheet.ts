@@ -1,4 +1,5 @@
 import { StyleSheet as RNStyleSheet } from "react-native";
+
 import { CssInteropStyleSheet } from "../../types";
 
 const documentStyle: CSSStyleDeclaration | undefined =

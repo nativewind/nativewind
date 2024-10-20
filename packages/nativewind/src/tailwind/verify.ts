@@ -1,4 +1,5 @@
 import plugin from "tailwindcss/plugin";
+
 import { isWeb } from "./common";
 
 export const verify = plugin(function ({ addBase }) {

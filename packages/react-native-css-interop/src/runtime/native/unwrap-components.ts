@@ -6,8 +6,8 @@ export function getComponentType(component: any) {
       return "$$typeof" in component && component.$$typeof === ForwardRefSymbol
         ? "forwardRef"
         : component.prototype?.isReactComponent
-        ? "class"
-        : typeof component;
+          ? "class"
+          : typeof component;
     default:
       return "unknown";
   }

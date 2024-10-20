@@ -2,13 +2,13 @@
 import { View } from "react-native";
 
 import {
-  registerCSS,
-  screen,
   act,
-  render,
-  native,
   INTERNAL_SET,
+  native,
+  registerCSS,
   rem,
+  render,
+  screen,
   setupAllComponents,
 } from "test";
 

@@ -1,13 +1,15 @@
 /** @jsxImportSource nativewind */
 import {
-  PlatformColor,
   PixelRatio,
+  Platform,
+  PlatformColor,
   StyleSheet,
   View,
-  Platform,
 } from "react-native";
-import { render } from "../test";
+
 import { screen } from "@testing-library/react-native";
+
+import { render } from "../test";
 import {
   fontScaleSelect,
   getPixelSizeForLayoutSize,

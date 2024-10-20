@@ -1,7 +1,7 @@
 /** @jsxImportSource test */
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { View, ViewProps } from "react-native";
 
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { registerCSS, render, setupAllComponents, useSafeAreaEnv } from "test";
 
 const testID = "react-native-css-interop";

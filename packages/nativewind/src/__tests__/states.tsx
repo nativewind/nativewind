@@ -1,10 +1,7 @@
 /** @jsxImportSource nativewind */
-import {
-  TextInput as TextInput,
-  Switch as Switch,
-  View as View,
-} from "react-native";
-import { render, fireEvent, screen } from "../test";
+import { Switch, TextInput, View } from "react-native";
+
+import { fireEvent, render, screen } from "../test";
 
 const testID = "component";
 

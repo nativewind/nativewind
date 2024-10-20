@@ -1,11 +1,12 @@
 /** @jsxImportSource test */
 import { View } from "react-native";
+
 import { getAnimatedStyle } from "react-native-reanimated";
 import {
   fireEvent,
-  screen,
-  render,
   registerCSS,
+  render,
+  screen,
   setupAllComponents,
 } from "test";
 

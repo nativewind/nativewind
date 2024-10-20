@@ -1,8 +1,9 @@
 /** @jsxImportSource nativewind */
 import { ViewProps } from "react-native";
-import { renderCurrentTest, native, INTERNAL_SET } from "../test";
 
-import { SafeAreaProvider, Metrics } from "react-native-safe-area-context";
+import { Metrics, SafeAreaProvider } from "react-native-safe-area-context";
+
+import { INTERNAL_SET, native, renderCurrentTest } from "../test";
 
 const { vh } = native;
 

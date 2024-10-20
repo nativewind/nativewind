@@ -1,13 +1,13 @@
 /** @jsxImportSource test */
 import { View } from "react-native";
-import { getAnimatedStyle } from "react-native-reanimated";
 
+import { getAnimatedStyle } from "react-native-reanimated";
 import {
+  fireEvent,
+  registerCSS,
   render,
   screen,
-  registerCSS,
   setupAllComponents,
-  fireEvent,
 } from "test";
 
 const grouping = ["^group(/.*)?"];

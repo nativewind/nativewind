@@ -3,9 +3,9 @@ import { View } from "react-native";
 
 import {
   fireEvent,
+  registerCSS,
   render,
   screen,
-  registerCSS,
   setupAllComponents,
 } from "test";
 

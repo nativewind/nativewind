@@ -2,8 +2,8 @@ import { ComponentType, createElement } from "react";
 import { Pressable } from "react-native";
 
 import { containerContext } from "./globals";
-import { SharedState } from "./types";
 import { VariableContext } from "./styles";
+import { SharedState } from "./types";
 
 const animatedCache = new Map<
   ComponentType<any> | string,

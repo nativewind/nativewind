@@ -1,7 +1,9 @@
 /** @jsxImportSource nativewind */
 import { View } from "react-native";
-import { render } from "../test";
+
 import { fireEvent, screen } from "@testing-library/react-native";
+
+import { render } from "../test";
 
 const parentID = "parent";
 const childID = "child";

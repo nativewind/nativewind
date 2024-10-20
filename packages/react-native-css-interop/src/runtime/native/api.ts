@@ -1,15 +1,5 @@
 import { createElement, forwardRef, useContext, useState } from "react";
-import type {
-  CssInterop,
-  JSXFunction,
-  RuntimeValueDescriptor,
-} from "../../types";
-import { getNormalizeConfig } from "../config";
-import { Effect, cleanupEffect } from "../observable";
-import { interop } from "./native-interop";
-import { getComponentType } from "./unwrap-components";
-import { VariableContext, getVariable, opaqueStyles } from "./styles";
-import { colorScheme } from "./appearance-observables";
+
 import {
   assignToTarget,
   inlineSpecificity,
@@ -17,6 +7,17 @@ import {
   StyleRuleSetSymbol,
   StyleRuleSymbol,
 } from "../../shared";
+import type {
+  CssInterop,
+  JSXFunction,
+  RuntimeValueDescriptor,
+} from "../../types";
+import { getNormalizeConfig } from "../config";
+import { cleanupEffect, Effect } from "../observable";
+import { colorScheme } from "./appearance-observables";
+import { interop } from "./native-interop";
+import { getVariable, opaqueStyles, VariableContext } from "./styles";
+import { getComponentType } from "./unwrap-components";
 
 export { StyleSheet } from "./stylesheet";
 export { colorScheme } from "./appearance-observables";

@@ -1,8 +1,8 @@
-import plugin from "tailwindcss/plugin";
-import transformThemeValue from "tailwindcss/lib/util/transformThemeValue";
 import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
-import toColorValue from "tailwindcss/lib/util/toColorValue";
 import { parseBoxShadowValue } from "tailwindcss/lib/util/parseBoxShadowValue";
+import toColorValue from "tailwindcss/lib/util/toColorValue";
+import transformThemeValue from "tailwindcss/lib/util/transformThemeValue";
+import plugin from "tailwindcss/plugin";
 
 export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
   const { addDefaults } = rest as any;

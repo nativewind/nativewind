@@ -1,18 +1,19 @@
 /** @jsxImportSource test */
 import {
-  View,
-  Text,
-  Pressable,
+  ActivityIndicator,
   ImageBackground,
   KeyboardAvoidingView,
   Modal,
+  Pressable,
   ScrollView,
   StatusBar,
-  VirtualizedList,
-  ActivityIndicator,
+  Text,
   TextInput,
+  View,
+  VirtualizedList,
 } from "react-native";
-import { screen, registerCSS, render, setupAllComponents } from "test";
+
+import { registerCSS, render, screen, setupAllComponents } from "test";
 
 const testID = "react-native-css-interop";
 setupAllComponents();

@@ -1,15 +1,16 @@
 /** @jsxImportSource test */
+import { RefObject, useRef } from "react";
 import { FlatList, View } from "react-native";
 
-import { RefObject, useRef } from "react";
 import {
-  render,
-  screen,
-  registerCSS,
-  resetComponents,
-  remapProps,
   getOpaqueStyles,
+  registerCSS,
+  remapProps,
+  render,
+  resetComponents,
+  screen,
 } from "test";
+
 import {
   PLACEHOLDER_SYMBOL,
   StyleRuleSetSymbol,

@@ -1,6 +1,7 @@
-import type { MetroConfig } from "metro-config";
-import { debug as debugFn } from "debug";
 import path from "path";
+
+import { debug as debugFn } from "debug";
+import type { MetroConfig } from "metro-config";
 import {
   withCssInterop,
   WithCssInteropOptions,

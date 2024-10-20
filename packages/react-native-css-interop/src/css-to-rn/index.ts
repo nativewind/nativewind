@@ -1,38 +1,22 @@
+import { versions } from "node:process";
+
 import { debug as debugFn } from "debug";
 import {
-  KeyframesRule,
   Animation,
+  ContainerRule,
+  ContainerType,
   Declaration,
-  EasingFunction,
-  transform as lightningcss,
   DeclarationBlock,
+  EasingFunction,
+  KeyframesRule,
+  transform as lightningcss,
   MediaQuery,
   MediaRule,
-  SelectorList,
   Rule,
-  ContainerType,
-  ContainerRule,
+  SelectorList,
   TokenOrValue,
 } from "lightningcss";
 
-import {
-  AnimatableCSSProperty,
-  ExtractedAnimation,
-  ExtractionWarning,
-  ExtractRuleOptions,
-  CssToReactNativeRuntimeOptions,
-  StyleSheetRegisterCompiledOptions,
-  StyleRule,
-  Specificity,
-  MoveTokenRecord,
-  StyleRuleSet,
-  StyleDeclaration,
-  PathTokens,
-  AnimationFrame,
-  RuntimeValueDescriptor,
-  SpecificityValue,
-} from "../types";
-import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import {
   DEFAULT_CONTAINER_NAME,
   isRuntimeDescriptor,
@@ -41,10 +25,27 @@ import {
   StyleRuleSymbol,
   transformKeys,
 } from "../shared";
-import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
-
-import { versions } from "node:process";
+import {
+  AnimatableCSSProperty,
+  AnimationFrame,
+  CssToReactNativeRuntimeOptions,
+  ExtractedAnimation,
+  ExtractionWarning,
+  ExtractRuleOptions,
+  MoveTokenRecord,
+  PathTokens,
+  RuntimeValueDescriptor,
+  Specificity,
+  SpecificityValue,
+  StyleDeclaration,
+  StyleRule,
+  StyleRuleSet,
+  StyleSheetRegisterCompiledOptions,
+} from "../types";
 import { defaultFeatureFlags } from "./feature-flags";
+import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
+import { parseDeclaration, ParseDeclarationOptions } from "./parseDeclaration";
+
 // import { isDeepEqual } from "../util/isDeepEqual";
 
 type CSSInteropAtRule = {

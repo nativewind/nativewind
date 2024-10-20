@@ -1,6 +1,7 @@
-import tailwindPackage from "tailwindcss/package.json";
-import { tailwindCliV3, tailwindConfigV3 } from "./v3";
 import { Debugger } from "debug";
+import tailwindPackage from "tailwindcss/package.json";
+
+import { tailwindCliV3, tailwindConfigV3 } from "./v3";
 
 const isV3 = tailwindPackage.version.split(".")[0].includes("3");
 

@@ -7,6 +7,7 @@ import {
   type PropsWithChildren,
 } from "react";
 import { Platform } from "react-native";
+
 import { VariableContext, VariableContextValue } from "../native/styles";
 
 type SafeAreaLibraryTypes = typeof import("react-native-safe-area-context");

@@ -1,4 +1,6 @@
 import type { SharedValue } from "react-native-reanimated";
+
+import { ShorthandSymbol } from "./runtime/native/resolvers/shared";
 import type { Placeholder, ShorthandResult } from "./runtime/native/types";
 import {
   InteropComponentConfig,
@@ -6,7 +8,6 @@ import {
   RuntimeValueDescriptor,
   Specificity,
 } from "./types";
-import { ShorthandSymbol } from "./runtime/native/resolvers/shared";
 
 export const INTERNAL_RESET: unique symbol = Symbol();
 export const INTERNAL_SET: unique symbol = Symbol();

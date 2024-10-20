@@ -2,10 +2,10 @@
 import { Text, ViewProps } from "react-native";
 
 import {
-  fireEvent,
-  render,
   createRemappedComponent,
+  fireEvent,
   registerCSS,
+  render,
   setupAllComponents,
 } from "test";
 

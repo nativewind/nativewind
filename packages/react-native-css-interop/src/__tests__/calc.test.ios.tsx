@@ -1,7 +1,7 @@
 /** @jsxImportSource test */
 import { View } from "react-native";
 
-import { vars, render, registerCSS, setupAllComponents } from "test";
+import { registerCSS, render, setupAllComponents, vars } from "test";
 
 const testID = "react-native-css-interop";
 setupAllComponents();

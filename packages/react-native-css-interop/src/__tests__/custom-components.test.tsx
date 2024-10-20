@@ -1,6 +1,7 @@
 import { FunctionComponent } from "react";
 import { TextInput, View } from "react-native";
-import { screen, cssInterop, registerCSS, render } from "test";
+
+import { cssInterop, registerCSS, render, screen } from "test";
 
 const testID = "react-native-css-interop";
 

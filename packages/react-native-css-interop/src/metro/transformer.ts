@@ -1,9 +1,10 @@
+import path from "path";
+
 import worker, {
   JsTransformerConfig,
   JsTransformOptions,
   TransformResponse,
 } from "metro-transform-worker";
-import path from "path";
 
 interface TransformerConfig extends JsTransformerConfig {
   cssInterop_transformerPath?: string;

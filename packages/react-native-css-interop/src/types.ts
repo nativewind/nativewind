@@ -1,14 +1,4 @@
 import type {
-  MediaQuery,
-  Animation,
-  ContainerType,
-  Time,
-  EasingFunction,
-  ContainerCondition,
-  Declaration,
-  SelectorComponent,
-} from "lightningcss";
-import type {
   ClassicComponentClass,
   ComponentClass,
   ComponentProps,
@@ -17,10 +7,22 @@ import type {
   FunctionComponent,
 } from "react";
 import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
-import type { Effect } from "./runtime/observable";
+
+import type {
+  Animation,
+  ContainerCondition,
+  ContainerType,
+  Declaration,
+  EasingFunction,
+  MediaQuery,
+  SelectorComponent,
+  Time,
+} from "lightningcss";
 import type { SharedValue } from "react-native-reanimated";
-import type { SharedState } from "./runtime/native/types";
+
 import type { FeatureFlagStatus } from "./css-to-rn/feature-flags";
+import type { SharedState } from "./runtime/native/types";
+import type { Effect } from "./runtime/observable";
 import { StyleRuleSetSymbol, StyleRuleSymbol } from "./shared";
 
 export interface Effect2 {

@@ -2,12 +2,12 @@
 import { View } from "react-native";
 
 import {
-  render,
-  registerCSS,
-  setupAllComponents,
-  screen,
-  colorScheme,
   act,
+  colorScheme,
+  registerCSS,
+  render,
+  screen,
+  setupAllComponents,
 } from "test";
 
 const testID = "react-native-css-interop";

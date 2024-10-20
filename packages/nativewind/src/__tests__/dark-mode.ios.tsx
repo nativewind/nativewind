@@ -1,7 +1,9 @@
 /** @jsxImportSource nativewind */
-import { View, Text, Button } from "react-native";
-import { colorScheme, render, useColorScheme } from "../test";
+import { Button, Text, View } from "react-native";
+
 import { act, fireEvent, screen } from "@testing-library/react-native";
+
+import { colorScheme, render, useColorScheme } from "../test";
 
 const testID = "react-native-css-interop";
 

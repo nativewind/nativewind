@@ -1,7 +1,9 @@
 import { fork } from "child_process";
-import { type Config } from "tailwindcss";
-import { TailwindCliOptions } from "../types";
+
 import { Debugger } from "debug";
+import { type Config } from "tailwindcss";
+
+import { TailwindCliOptions } from "../types";
 
 /**
  * Tailwind CLI v3 is not very well suited for programmatic usage.

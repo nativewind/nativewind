@@ -1,14 +1,15 @@
-import connect from "connect";
 import fs from "fs/promises";
 import path from "path";
+
+import connect from "connect";
 import { debug as debugFn, Debugger } from "debug";
 import type { MetroConfig } from "metro-config";
-import type MetroServer from "metro/src/Server";
 import type { FileSystem } from "metro-file-map";
+import type MetroServer from "metro/src/Server";
 
-import { expoColorSchemeWarning } from "./expo";
-import { CssToReactNativeRuntimeOptions } from "../types";
 import { cssToReactNativeRuntime } from "../css-to-rn";
+import { CssToReactNativeRuntimeOptions } from "../types";
+import { expoColorSchemeWarning } from "./expo";
 
 /**
  * Injects the CSS into the React Native runtime.
