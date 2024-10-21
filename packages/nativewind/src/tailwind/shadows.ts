@@ -33,7 +33,7 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
     "--tw-shadow-colored": "0 0 #0000",
   });
 
-  if (process.env.NATIVEWIND_NATIVE === "android") {
+  if (process.env.NATIVEWIND_OS === "android") {
     matchUtilities(
       {
         elevation: (value) => {
@@ -74,7 +74,7 @@ export const shadows = plugin(({ matchUtilities, theme, ...rest }) => {
           "-rn-shadow-opacity": 1,
         } as any;
 
-        if (process.env.NATIVEWIND_NATIVE === "android") {
+        if (process.env.NATIVEWIND_OS === "android") {
           shadow["-rn-elevation"] = elevation;
         }
 

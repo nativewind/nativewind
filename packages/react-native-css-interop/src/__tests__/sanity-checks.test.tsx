@@ -1,17 +1,17 @@
-import { fireEvent, render } from "@testing-library/react-native";
+/** @jsxImportSource test */
 import { View } from "react-native";
-
-import {
-  createMockComponent,
-  registerCSS,
-  resetStyles,
-} from "../testing-library";
 import { useEffect } from "react";
 
-const testID = "react-native-css-interop";
-const A = createMockComponent(View);
+import {
+  screen,
+  fireEvent,
+  render,
+  registerCSS,
+  setupAllComponents,
+} from "test";
 
-beforeEach(() => resetStyles());
+const testID = "react-native-css-interop";
+setupAllComponents();
 
 test("dynamic variables should not unmount children", () => {
   /**
@@ -24,15 +24,15 @@ test("dynamic variables should not unmount children", () => {
   const onUnMount = jest.fn();
   const onMount = jest.fn(() => onUnMount);
 
-  const Child = (props: { assertMount: () => () => void }) => {
+  const Child = (props: { assertMount: () => () => void; testID?: string }) => {
     useEffect(props.assertMount, []);
     return null;
   };
 
   const component = render(
-    <A testID={testID} className="my-class">
-      <Child assertMount={onMount} />
-    </A>,
+    <View testID={testID} className="my-class">
+      <Child testID="child" assertMount={onMount} />
+    </View>,
   ).getByTestId(testID);
 
   expect(onUnMount).not.toHaveBeenCalled();
@@ -45,7 +45,7 @@ test("dynamic variables should not unmount children", () => {
 });
 
 test("empty className", () => {
-  const component = render(<A testID={testID} className="" />).getByTestId(
+  const component = render(<View testID={testID} className="" />).getByTestId(
     testID,
   );
 
@@ -53,9 +53,74 @@ test("empty className", () => {
   expect(component).toHaveStyle(undefined);
 });
 
+test("rerender empty className", () => {
+  registerCSS(`.bg-red-500 { color: red; }`);
+
+  render(<View testID={testID} className="bg-red-500" />);
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "#ff0000" });
+
+  screen.rerender(<View testID={testID} className="" />);
+});
+
 test("missing className", () => {
-  const component = render(<A testID={testID} />).getByTestId(testID);
+  const component = render(<View testID={testID} />).getByTestId(testID);
 
   expect(component.props.className).not.toBeDefined();
   expect(component.props.style).not.toBeDefined();
+});
+
+test("rerender missing className", () => {
+  registerCSS(`.bg-red-500 { color: red; }`);
+
+  render(<View testID={testID} className="bg-red-500" />);
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "#ff0000" });
+
+  screen.rerender(<View testID={testID} />);
+
+  expect(component.props.style).not.toBeDefined();
+});
+
+test("null className", () => {
+  const component = render(
+    <View testID={testID} className={null as any} />,
+  ).getByTestId(testID);
+
+  expect(component.props.className).not.toBeDefined();
+  expect(component.props.style).not.toBeDefined();
+});
+
+test("rerender null className", () => {
+  registerCSS(`.bg-red-500 { color: red; }`);
+
+  render(<View testID={testID} className="bg-red-500" />);
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "#ff0000" });
+
+  screen.rerender(<View testID={testID} className={null as any} />);
+
+  expect(component.props.style).not.toBeDefined();
+});
+
+test("styles don't mutate other styles", () => {
+  registerCSS(
+    `.text-red-500 { color: red; } .dynamic { background-color: var(--test); --test: blue }`,
+  );
+
+  render(<View testID={testID} className="text-red-500 dynamic" />);
+
+  const component = screen.getByTestId(testID);
+
+  expect(component).toHaveStyle({ color: "#ff0000", backgroundColor: "blue" });
+
+  screen.rerender(<View testID={testID} className="text-red-500" />);
+
+  expect(component).toHaveStyle({ color: "#ff0000" });
 });

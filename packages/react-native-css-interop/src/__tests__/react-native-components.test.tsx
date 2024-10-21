@@ -1,3 +1,4 @@
+/** @jsxImportSource test */
 import {
   View,
   Text,
@@ -11,12 +12,10 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
-import { screen } from "@testing-library/react-native";
-import { registerCSS, resetStyles, render } from "../testing-library";
+import { screen, registerCSS, render, setupAllComponents } from "test";
 
 const testID = "react-native-css-interop";
-
-beforeEach(() => resetStyles());
+setupAllComponents();
 
 test("Component types", () => {
   [
@@ -54,7 +53,7 @@ test("Component types", () => {
 
 test("TextInput", () => {
   registerCSS(
-    `.text-black { color: black } 
+    `.text-black { color: black }
      .placeholder\\:text-white {
        @rn-move color placeholderTextColor;
        color: #fff
@@ -70,9 +69,9 @@ test("TextInput", () => {
   expect(component.props).toEqual(
     expect.objectContaining({
       testID,
-      placeholderTextColor: "rgba(255, 255, 255, 1)",
+      placeholderTextColor: "#ffffff",
       style: {
-        color: "rgba(0, 0, 0, 1)",
+        color: "#000000",
       },
     }),
   );
@@ -96,12 +95,43 @@ test("ActivityIndicator", () => {
   expect(component.props).toEqual(
     expect.objectContaining({
       testID,
-      color: "rgba(255, 255, 255, 1)",
+      color: "#ffffff",
       style: {
-        // ActivityIndicator does not accept styles. It overrides them with its own size styles
-        height: 20,
-        width: 20,
+        backgroundColor: "#000000",
       },
     }),
   );
+});
+
+test(`ScrollView`, () => {
+  registerCSS(`
+    .bg-black { background-color: black } 
+    .gap-10 { gap: 10 }
+    .pt-20 {
+      padding-top: 5rem
+    }
+    `);
+
+  render(
+    <ScrollView
+      testID={testID}
+      className="bg-black"
+      contentContainerClassName="gap-10  pt-20"
+    />,
+  );
+
+  const component = screen.getByTestId(testID);
+
+  expect(component.props).toStrictEqual({
+    testID,
+    children: expect.any(Array),
+    contentContainerStyle: {
+      columnGap: 10,
+      rowGap: 10,
+      paddingTop: 70,
+    },
+    style: {
+      backgroundColor: "#000000",
+    },
+  });
 });

@@ -1,22 +1,21 @@
-import { act, render } from "@testing-library/react-native";
-
-import {
-  colorScheme,
-  isReduceMotionEnabled,
-  vw,
-} from "../runtime/native/globals";
-import {
-  createMockComponent,
-  registerCSS,
-  resetStyles,
-} from "../testing-library";
-import { INTERNAL_SET } from "../shared";
+/** @jsxImportSource test */
 import { View } from "react-native";
 
-const testID = "react-native-css-interop";
-const A = createMockComponent(View);
+import {
+  act,
+  screen,
+  render,
+  registerCSS,
+  INTERNAL_SET,
+  colorScheme,
+  native,
+  setupAllComponents,
+} from "test";
 
-beforeEach(() => resetStyles());
+const { isReduceMotionEnabled, vw } = native;
+
+const testID = "react-native-css-interop";
+setupAllComponents();
 
 test("color scheme", () => {
   registerCSS(`
@@ -26,12 +25,11 @@ test("color scheme", () => {
   .my-class { color: red; }
 }`);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 
   act(() => {
@@ -39,7 +37,7 @@ test("color scheme", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -52,12 +50,11 @@ test("prefers-reduced-motion", () => {
     }
   `);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 
   act(() => {
@@ -65,7 +62,7 @@ test("prefers-reduced-motion", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -77,12 +74,11 @@ test("width (plain)", () => {
   .my-class { color: red; }
 }`);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 
   act(() => {
@@ -90,7 +86,7 @@ test("width (plain)", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -102,12 +98,11 @@ test("width (range)", () => {
   .my-class { color: red; }
 }`);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 
   act(() => {
@@ -115,7 +110,7 @@ test("width (range)", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -127,12 +122,11 @@ test("min-width", () => {
   .my-class { color: red; }
 }`);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 
   act(() => {
@@ -140,7 +134,7 @@ test("min-width", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 });
 
@@ -152,12 +146,11 @@ test("max-width", () => {
   .my-class { color: red; }
 }`);
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 
   act(() => {
@@ -165,7 +158,7 @@ test("max-width", () => {
   });
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 });
 
@@ -173,15 +166,14 @@ test("not all", () => {
   // This reads not (all and min-width: 640px)
   // It is the same as max-width: 639px
   registerCSS(`
-@media not all and (min-width: 640px) { 
+@media not all and (min-width: 640px) {
   .my-class { color: red; }
 }`);
   // Make larger than 640
   act(() => vw[INTERNAL_SET](1000));
 
-  const component = render(
-    <A testID={testID} className="my-class" />,
-  ).getByTestId(testID);
+  render(<View testID={testID} className="my-class" />);
+  const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle(undefined);
 
@@ -189,6 +181,89 @@ test("not all", () => {
   act(() => vw[INTERNAL_SET](300));
 
   expect(component).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
+  });
+});
+
+describe("resolution", () => {
+  // PixelRatio.get() === 2
+  test("dppx", () => {
+    registerCSS(`
+@media (resolution: 2dppx) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      color: "#ff0000",
+    });
+  });
+
+  test("dpi", () => {
+    registerCSS(`
+@media (resolution: 320dpi) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      color: "#ff0000",
+    });
+  });
+});
+
+describe("min-resolution", () => {
+  // PixelRatio.get() === 2
+  test("dppx", () => {
+    registerCSS(`
+@media (min-resolution: 1dppx) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      color: "#ff0000",
+    });
+  });
+
+  test("dpi", () => {
+    registerCSS(`
+@media (min-resolution: 160dpi) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle({
+      color: "#ff0000",
+    });
+  });
+});
+
+describe("max-resolution", () => {
+  // PixelRatio.get() === 2
+  test("dppx", () => {
+    registerCSS(`
+@media (max-resolution: 1dppx) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle(undefined);
+  });
+
+  test("dpi", () => {
+    registerCSS(`
+@media (max-resolution: 160dpi) {
+  .my-class { color: red; }
+}`);
+    render(<View testID={testID} className="my-class" />);
+    const component = screen.getByTestId(testID);
+
+    expect(component).toHaveStyle(undefined);
   });
 });

@@ -15,18 +15,13 @@ import type {
   ComponentType,
   ForwardRefExoticComponent,
   FunctionComponent,
-  JSXElementConstructor,
 } from "react";
-import type {
-  Appearance,
-  Dimensions,
-  ImageStyle,
-  TextStyle,
-  ViewStyle,
-} from "react-native";
-import type { INTERNAL_FLAGS, INTERNAL_RESET } from "./shared";
-import type { Effect, Observable } from "./runtime/observable";
+import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
+import type { Effect } from "./runtime/observable";
 import type { SharedValue } from "react-native-reanimated";
+import type { SharedState } from "./runtime/native/types";
+import type { FeatureFlagStatus } from "./css-to-rn/feature-flags";
+import { StyleRuleSetSymbol, StyleRuleSymbol } from "./shared";
 
 export interface Effect2 {
   update: () => void;
@@ -40,17 +35,26 @@ export type ReactComponent<P = any> =
   | ForwardRefExoticComponent<P>;
 
 export type InteropComponentConfig = {
-  target: string;
+  target: string[];
+  inlineProp?: string;
   source: string;
-  nativeStyleToProp?: NativeStyleToProp<any>;
+  propToRemove?: string;
+  nativeStyleToProp?: Array<[string, string[]]>;
 };
 
 export type CssToReactNativeRuntimeOptions = {
+  cache?: {
+    rules: Map<string, StyleRule[]>;
+    keyframes: Map<string, ExtractedAnimation>;
+    rootVariables: StyleSheetRegisterOptions["rootVariables"];
+    universalVariables: StyleSheetRegisterOptions["universalVariables"];
+  };
   inlineRem?: number | false;
   grouping?: (string | RegExp)[];
   ignorePropertyWarningRegex?: (string | RegExp)[];
   selectorPrefix?: string;
   stylesheetOrder?: number;
+  features?: FeatureFlagStatus;
 };
 
 export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
@@ -64,50 +68,84 @@ export interface ExtractRuleOptions extends CssToReactNativeRuntimeOptions {
   selectorPrefix?: string;
   appearanceOrder: number;
   rem?: StyleSheetRegisterOptions["rem"];
+  varUsageCount: Map<string, number>;
 }
 
-export type EnableCssInteropOptions<
-  T extends keyof JSX.IntrinsicElements | JSXElementConstructor<any>,
-> = Record<string, CSSInteropClassNamePropConfig<ComponentProps<T>>>;
-
 export type CssInterop = <
-  const T extends ReactComponent<any>,
-  const M extends EnableCssInteropOptions<any>,
+  const C extends ReactComponent<any>,
+  const M extends EnableCssInteropOptions<C>,
 >(
-  component: T,
-  mapping: EnableCssInteropOptions<T> & M,
-) => ComponentType<ComponentProps<T> & CssInteropGeneratedProps<M>>;
+  component: C,
+  mapping: M & EnableCssInteropOptions<C>,
+) => ComponentType<
+  ComponentProps<C> & {
+    [K in keyof M as K extends string
+      ? M[K] extends undefined | false
+        ? never
+        : M[K] extends true | FlattenComponentProps<C>
+          ? K
+          : M[K] extends
+                | {
+                    target: FlattenComponentProps<C> | true;
+                  }
+                | {
+                    target: false;
+                    nativeStyleToProp: Record<string, unknown>;
+                  }
+            ? K
+            : never
+      : never]?: string;
+  }
+>;
 
-export type CSSInteropClassNamePropConfig<P> =
-  | undefined
+export type EnableCssInteropOptions<C extends ReactComponent<any>> = Record<
+  string,
   | boolean
-  | (keyof P & string)
+  | FlattenComponentProps<C>
   | {
-      target: (keyof P & string) | boolean;
-      nativeStyleToProp?: NativeStyleToProp<P>;
-    };
+      target: false;
+      nativeStyleToProp: {
+        [K in
+          | (keyof Style & string)
+          | "fill"
+          | "stroke"]?: K extends FlattenComponentProps<C>
+          ? FlattenComponentProps<C> | true
+          : FlattenComponentProps<C>;
+      };
+    }
+  | {
+      target: FlattenComponentProps<C> | true;
+      nativeStyleToProp?: {
+        [K in
+          | (keyof Style & string)
+          | "fill"
+          | "stroke"]?: K extends FlattenComponentProps<C>
+          ? FlattenComponentProps<C> | true
+          : FlattenComponentProps<C>;
+      };
+    }
+>;
 
-export type CssInteropGeneratedProps<T extends EnableCssInteropOptions<any>> = {
-  [K in keyof T as K extends string
-    ? T[K] extends undefined | false
-      ? never
-      : T[K] extends true | string
-      ? K
-      : T extends {
-          target: string | boolean;
-        }
-      ? T["target"] extends true | string
-        ? K
-        : never
-      : never
-    : never]?: string;
-};
+type FlattenComponentProps<C extends ReactComponent<any>> = FlattenObjectKeys<
+  ComponentProps<C>
+>;
 
-export type NativeStyleToProp<P> = {
-  [K in keyof Style & string]?: K extends keyof P
-    ? (keyof P & string) | true
-    : keyof P & string;
-};
+type FlattenObjectKeys<
+  T extends Record<string, unknown>,
+  Depth extends number[] = [],
+  MaxDepth extends number = 10,
+  Key = keyof T,
+> = Depth["length"] extends MaxDepth
+  ? never
+  : Key extends string
+    ? unknown extends T[Key] // If its unknown or any then allow for freeform string
+      ? Key | `${Key}.${string}`
+      : NonNullable<T[Key]> extends Record<string, unknown>
+        ?
+            | Key
+            | `${Key}.${FlattenObjectKeys<NonNullable<T[Key]>, [...Depth, 0]>}`
+        : Key
+    : never;
 
 export type JSXFunction = (
   type: React.ComponentType,
@@ -116,7 +154,7 @@ export type JSXFunction = (
   isStaticChildren?: boolean,
   __source?: unknown,
   __self?: unknown,
-) => React.ElementType;
+) => React.ReactNode;
 
 type OmitFirstTwo<T extends any[]> = T extends [any, any, ...infer R]
   ? R
@@ -129,32 +167,38 @@ export type JSXFunctionRest = OmitFirstTwo<Parameters<JSXFunction>>;
 /**
  * Used by the compiler to detail how props should be set on the component
  */
+export type StyleAttribute = string;
 export type PathTokens = string[];
+export type Delayed = boolean;
 export type MoveTokenRecord = Record<string, PathTokens>;
 export type StyleDeclaration =
-  | [string, object] // [Prop, Styles]
-  | [string, string | number] // [Prop, value]
-  | [
-      AnimationPropertyKey,
-      PathTokens,
-      Exclude<RuntimeValueDescriptor, Array<any> | undefined>,
-    ] // Set a value
-  | [
-      AnimationPropertyKey,
-      PathTokens,
-      Exclude<RuntimeValueDescriptor, Array<any> | undefined>,
-      true,
-    ]; // Set a delayed value
+  | [Record<string, string | number | boolean>]
+  | [Record<string, string | number | boolean>, PathTokens]
+  | [RuntimeValueDescriptor, StyleAttribute]
+  | [RuntimeValueDescriptor, PathTokens]
+  | [RuntimeValueDescriptor, StyleAttribute | PathTokens, 1];
+
+export type StyleDeclarationOrInline =
+  | StyleDeclaration
+  | Record<string, unknown>;
 
 export type StyleRuleSet = {
-  $$type: "StyleRuleSet";
-  normal?: StyleRule[];
-  important?: StyleRule[];
+  [StyleRuleSetSymbol]: true;
+  n?: StyleRule[];
+  i?: StyleRule[];
   warnings?: ExtractionWarning[];
   classNames?: string;
   variables?: boolean;
   container?: boolean;
   animation?: boolean;
+  active?: boolean;
+  hover?: boolean;
+  focus?: boolean;
+};
+
+export type RemappedClassName = {
+  [StyleRuleSetSymbol]: "RemappedClassName";
+  classNames: string[];
 };
 
 export type RuntimeStyleRule = StyleRule | object;
@@ -166,8 +210,9 @@ export type RuntimeStyleRuleSet = {
 };
 
 export type StyleRule = {
-  $$type: "StyleRule";
-  specificity: Specificity;
+  [StyleRuleSymbol]: true;
+  s: Specificity;
+  d?: StyleDeclaration[];
   media?: MediaQuery[];
   variables?: Array<[string, RuntimeValueDescriptor]>;
   pseudoClasses?: PseudoClassesQuery;
@@ -177,10 +222,13 @@ export type StyleRule = {
   transition?: ExtractedTransition;
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
-  declarations?: StyleDeclaration[];
   attrs?: AttributeCondition[];
   warnings?: ExtractionWarning[];
 };
+
+export type ProcessedStyleRules =
+  | (StyleRule & Required<Pick<StyleRule, "d">>)
+  | Record<string, any>;
 
 export type PropState = Effect & {
   initialRender: boolean;
@@ -193,9 +241,8 @@ export type PropState = Effect & {
 
 export type PropAccumulator = {
   props: Record<string, any>;
-  transformLookup: Record<string, string>;
   state: PropState;
-  target: string;
+  target: string[];
   resetContext: boolean;
   requiresLayout: boolean;
   delayedDeclarations: Extract<StyleDeclaration, Array<any>>[];
@@ -210,17 +257,32 @@ export type PropAccumulator = {
   getVariable(name?: string): RuntimeValueDescriptor;
 };
 
+export type RuntimeStyle = RuntimeValueDescriptor | Record<string, unknown>;
+
 export type RuntimeValueDescriptor =
   | string
   | number
   | boolean
   | undefined
-  | RuntimeValueDescriptor[]
-  | {
-      name: string;
-      arguments: RuntimeValueDescriptor[];
-      delay?: boolean;
-    };
+  | RuntimeFunction
+  | RuntimeValueDescriptor[];
+
+export type RuntimeFunction =
+  | [
+      {},
+      string, // string
+    ]
+  | [
+      {},
+      string, // string
+      undefined | RuntimeValueDescriptor[], // arguments
+    ]
+  | [
+      {},
+      string, // string
+      undefined | RuntimeValueDescriptor[], // arguments
+      1, // Should process after styles have been calculated
+    ];
 
 export type RuntimeValue =
   | string
@@ -229,22 +291,15 @@ export type RuntimeValue =
   | undefined
   | ((acc: PropAccumulator) => RuntimeValue);
 
-export type Specificity = {
-  /** IDs - https://drafts.csswg.org/selectors/#specificity-rules */
-  A?: number;
-  /** Classes, Attributes, Pseudo-Classes - https://drafts.csswg.org/selectors/#specificity-rules */
-  B?: number;
-  /** Elements, Pseudo-Elements - https://drafts.csswg.org/selectors/#specificity-rules */
-  C?: number;
-  /** Importance - https://developer.mozilla.org/en-US/docs/Web/CSS/Cascade#cascading_order */
-  I?: number;
-  /** StyleSheet Order */
-  S?: number;
-  /** Appearance Order */
-  O?: number;
-  /** Inline */
-  inline?: number;
-};
+export type SpecificityValue = number | undefined;
+
+/**
+ * https://drafts.csswg.org/selectors/#specificity-rules
+ *
+ * This array is sorted by most common values when parsing a StyleSheet
+ * @see SpecificityIndex for the order
+ */
+export type Specificity = SpecificityValue[];
 
 export type ExtractedContainer = {
   names?: string[] | false;
@@ -282,11 +337,18 @@ export type ExtractedTransition = {
 };
 
 type AnimationPropertyKey = string;
+export type AnimationEasingFunction =
+  | EasingFunction
+  | { type: "!PLACEHOLDER!" };
+
+export type AnimationFrame = [AnimationPropertyKey, RuntimeValueFrame[]];
+
 export type ExtractedAnimation = {
-  frames: [
-    AnimationPropertyKey,
-    { values: RuntimeValueFrame[]; pathTokens: PathTokens },
-  ][];
+  frames: AnimationFrame[];
+  /**
+   * The easing function for each frame
+   */
+  easingFunctions?: AnimationEasingFunction[];
   requiresLayoutWidth?: boolean;
   requiresLayoutHeight?: boolean;
 };
@@ -303,8 +365,8 @@ export type PseudoClassesQuery = {
 };
 
 export type StyleSheetRegisterCompiledOptions = {
-  $$compiled: true;
-  rules?: [string, StyleRuleSet][];
+  $compiled: true;
+  rules?: Record<string, StyleRuleSet>;
   keyframes?: [string, ExtractedAnimation][];
   rootVariables?: VariableRecord;
   universalVariables?: VariableRecord;
@@ -326,6 +388,7 @@ export type ColorSchemeVariableValue = {
   dark?: RuntimeValueDescriptor;
 };
 export type VariableRecord = Record<string, ColorSchemeVariableValue>;
+export type ContainerRecord = Record<string, SharedState>;
 
 export type Style = ViewStyle & TextStyle & ImageStyle;
 export type StyleProp = Style | StyleProp[] | undefined;
@@ -363,16 +426,11 @@ export type DarkMode =
   | { type: "attribute"; value: string };
 
 export interface CssInteropStyleSheet {
-  [INTERNAL_RESET](options?: {
-    dimensions?: Dimensions;
-    appearance?: typeof Appearance;
-  }): void;
-  [INTERNAL_FLAGS]: Record<string, string>;
   unstable_hook_onClassName?(callback: (c: string) => void): void;
   register(options: StyleSheetRegisterOptions): void;
   registerCompiled(options: StyleSheetRegisterCompiledOptions): void;
   getFlag(name: string): string | undefined;
-  getGlobalStyle(name: string): Observable<StyleRuleSet> | undefined;
+  getGlobalStyle(name: string): StyleRuleSet | undefined;
 }
 
 type AttributeSelectorComponent = Extract<

@@ -1,5 +1,6 @@
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
 
 # Troubleshooting
 
@@ -17,7 +18,7 @@ module.exports = function (api) {
 };
 ```
 
-If you are still recieving this error after including the preset, you most likely have another preset or plugin overriding the `jsxImportSource`. If so, explictly set the options of `@babel/plugin-transform-react-jsx` within your `plugins` array.
+If you are still receiving this error after including the preset, you most likely have another preset or plugin overriding the `jsxImportSource`. If so, explicitly set the options of `@babel/plugin-transform-react-jsx` within your `plugins` array.
 
 ```diff title=babel.config.js
 module.exports = function (api) {

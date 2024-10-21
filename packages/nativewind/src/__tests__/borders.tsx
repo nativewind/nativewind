@@ -1,259 +1,355 @@
-import { resetStyles } from "react-native-css-interop/testing-library";
-import { invalidValue, style, testCases } from "../test-utils";
-
-afterEach(() => resetStyles());
+import { renderCurrentTest } from "../test";
 
 describe("Border - Border Radius", () => {
-  testCases(
-    [
-      "rounded",
-      style({
-        borderRadius: 3.5,
-      }),
-    ],
-    [
-      "rounded-t",
-      style({
-        borderTopLeftRadius: 3.5,
-        borderTopRightRadius: 3.5,
-      }),
-    ],
-    [
-      "rounded-b",
-      style({
-        borderBottomLeftRadius: 3.5,
-        borderBottomRightRadius: 3.5,
-      }),
-    ],
-    [
-      "rounded-full",
-      style({
-        borderRadius: 9999,
-      }),
-    ],
-  );
+  test("rounded", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderRadius: 3.5 } },
+    });
+  });
+  test("rounded-t", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderTopLeftRadius: 3.5, borderTopRightRadius: 3.5 } },
+    });
+  });
+  test("rounded-b", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: { borderBottomLeftRadius: 3.5, borderBottomRightRadius: 3.5 },
+      },
+    });
+  });
+  test("rounded-full", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderRadius: 9999 } },
+    });
+  });
 });
 
 describe("Border - Border Width", () => {
-  testCases(
-    ["border-0", style({ borderWidth: 0 })],
-    ["border-x-0", style({ borderRightWidth: 0, borderLeftWidth: 0 })],
-    ["border-y-0", style({ borderTopWidth: 0, borderBottomWidth: 0 })],
-    ["border-s-0", style({ borderLeftWidth: 0 })],
-    ["border-e-0", style({ borderRightWidth: 0 })],
-    ["border-t-0", style({ borderTopWidth: 0 })],
-    ["border-r-0", style({ borderRightWidth: 0 })],
-    ["border-b-0", style({ borderBottomWidth: 0 })],
-    ["border-l-0", style({ borderLeftWidth: 0 })],
-    ["border-2", style({ borderWidth: 2 })],
-    ["border-x-2", style({ borderRightWidth: 2, borderLeftWidth: 2 })],
-    ["border-y-2", style({ borderTopWidth: 2, borderBottomWidth: 2 })],
-    ["border-s-2", style({ borderLeftWidth: 2 })],
-    ["border-e-2", style({ borderRightWidth: 2 })],
-    ["border-t-2", style({ borderTopWidth: 2 })],
-    ["border-r-2", style({ borderRightWidth: 2 })],
-    ["border-b-2", style({ borderBottomWidth: 2 })],
-    ["border-l-2", style({ borderLeftWidth: 2 })],
-  );
+  test("border-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderWidth: 0 } },
+    });
+  });
+  test("border-x-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderRightWidth: 0, borderLeftWidth: 0 } },
+    });
+  });
+  test("border-y-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderTopWidth: 0, borderBottomWidth: 0 } },
+    });
+  });
+  test("border-s-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderLeftWidth: 0 } },
+    });
+  });
+  test("border-e-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderRightWidth: 0 } },
+    });
+  });
+  test("border-t-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderTopWidth: 0 } },
+    });
+  });
+  test("border-r-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderRightWidth: 0 } },
+    });
+  });
+  test("border-b-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderBottomWidth: 0 } },
+    });
+  });
+  test("border-l-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderLeftWidth: 0 } },
+    });
+  });
+  test("border-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderWidth: 2 } },
+    });
+  });
+  test("border-x-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderRightWidth: 2, borderLeftWidth: 2 } },
+    });
+  });
+  test("border-y-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderTopWidth: 2, borderBottomWidth: 2 } },
+    });
+  });
+  test("border-s-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderLeftWidth: 2 } },
+    });
+  });
+  test("border-e-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderRightWidth: 2 } },
+    });
+  });
+  test("border-t-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderTopWidth: 2 } },
+    });
+  });
+  test("border-r-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderRightWidth: 2 } },
+    });
+  });
+  test("border-b-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderBottomWidth: 2 } },
+    });
+  });
+  test("border-l-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderLeftWidth: 2 } },
+    });
+  });
 });
 
 describe("Border - Border Color", () => {
-  testCases(
-    ["border-white", style({ borderColor: "rgba(255, 255, 255, 1)" })],
-    [
-      "border-x-white",
-      style({
-        borderLeftColor: "rgba(255, 255, 255, 1)",
-        borderRightColor: "rgba(255, 255, 255, 1)",
-      }),
-    ],
-    [
-      "border-y-white",
-      style({
-        borderTopColor: "rgba(255, 255, 255, 1)",
-        borderBottomColor: "rgba(255, 255, 255, 1)",
-      }),
-    ],
-    ["border-t-white", style({ borderTopColor: "rgba(255, 255, 255, 1)" })],
-    ["border-b-white", style({ borderBottomColor: "rgba(255, 255, 255, 1)" })],
-    ["border-l-white", style({ borderLeftColor: "rgba(255, 255, 255, 1)" })],
-    ["border-r-white", style({ borderRightColor: "rgba(255, 255, 255, 1)" })],
-    [
-      "border-current",
-      {
-        warning: () =>
-          new Map([
-            [
-              "border-current",
-              [
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-top-color",
-                  value: "currentcolor",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-bottom-color",
-                  value: "currentcolor",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-left-color",
-                  value: "currentcolor",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-right-color",
-                  value: "currentcolor",
-                },
-              ],
-            ],
-          ]),
+  test("border-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderColor: "#ffffff" } },
+    });
+  });
+  test("border-x-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: {
+          borderLeftColor: "#ffffff",
+          borderRightColor: "#ffffff",
+        },
       },
-    ],
-    ["border-inherit", invalidValue("border-color", "inherit")],
-    [
-      "border-x-inherit",
-      {
-        warning: () =>
-          new Map([
-            [
-              "border-x-inherit",
-              [
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-left-color",
-                  value: "inherit",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-right-color",
-                  value: "inherit",
-                },
-              ],
-            ],
-          ]),
+    });
+  });
+  test("border-y-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: {
+          borderTopColor: "#ffffff",
+          borderBottomColor: "#ffffff",
+        },
       },
-    ],
-    [
-      "border-y-current",
-      {
-        warning: () =>
-          new Map([
-            [
-              "border-y-current",
-              [
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-top-color",
-                  value: "currentcolor",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-bottom-color",
-                  value: "currentcolor",
-                },
-              ],
-            ],
-          ]),
+    });
+  });
+  test("border-t-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderTopColor: "#ffffff" } },
+    });
+  });
+  test("border-b-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderBottomColor: "#ffffff" } },
+    });
+  });
+  test("border-l-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderLeftColor: "#ffffff" } },
+    });
+  });
+  test("border-r-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderRightColor: "#ffffff" } },
+    });
+  });
+  test("border-current", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: {
+        style: {
+          "border-top-color": "currentcolor",
+          "border-bottom-color": "currentcolor",
+          "border-left-color": "currentcolor",
+          "border-right-color": "currentcolor",
+        },
       },
-    ],
-    [
-      "border-y-inherit",
-      {
-        warning: () =>
-          new Map([
-            [
-              "border-y-inherit",
-              [
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-top-color",
-                  value: "inherit",
-                },
-                {
-                  type: "IncompatibleNativeValue",
-                  property: "border-bottom-color",
-                  value: "inherit",
-                },
-              ],
-            ],
-          ]),
+    });
+  });
+  test("border-inherit", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-color": "inherit" } },
+    });
+  });
+
+  test("border-x-inherit", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: {
+        style: {
+          "border-left-color": "inherit",
+          "border-right-color": "inherit",
+        },
       },
-    ],
-    ["border-t-current", invalidValue("border-top-color", "currentcolor")],
-    ["border-t-inherit", invalidValue("border-top-color", "inherit")],
-    ["border-b-current", invalidValue("border-bottom-color", "currentcolor")],
-    ["border-b-inherit", invalidValue("border-bottom-color", "inherit")],
-    ["border-l-current", invalidValue("border-left-color", "currentcolor")],
-    ["border-l-inherit", invalidValue("border-left-color", "inherit")],
-    ["border-r-current", invalidValue("border-right-color", "currentcolor")],
-    ["border-r-inherit", invalidValue("border-right-color", "inherit")],
-  );
+    });
+  });
+  test("border-y-current", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: {
+        style: {
+          "border-top-color": "currentcolor",
+          "border-bottom-color": "currentcolor",
+        },
+      },
+    });
+  });
+  test("border-y-inherit", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: {
+        style: {
+          "border-top-color": "inherit",
+          "border-bottom-color": "inherit",
+        },
+      },
+    });
+  });
+  test("border-t-current", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-top-color": "currentcolor" } },
+    });
+  });
+
+  test("border-t-inherit", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-top-color": "inherit" } },
+    });
+  });
+
+  test("border-b-current", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-bottom-color": "currentcolor" } },
+    });
+  });
+
+  test("border-b-inherit", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-bottom-color": "inherit" } },
+    });
+  });
+
+  test("border-l-current", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-left-color": "currentcolor" } },
+    });
+  });
+
+  test("border-l-inherit", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-left-color": "inherit" } },
+    });
+  });
+
+  test("border-r-current", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-right-color": "currentcolor" } },
+    });
+  });
+
+  test("border-r-inherit", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-right-color": "inherit" } },
+    });
+  });
 });
 
 describe("Borders - Border Style", () => {
-  testCases(
-    ["border-solid", style({ borderStyle: "solid" })],
-    ["border-dashed", style({ borderStyle: "dashed" })],
-    ["border-dotted", style({ borderStyle: "dotted" })],
-    ["border-none", invalidValue("border-style", "none")],
-    ["border-double", invalidValue("border-style", "double")],
-    ["border-hidden", invalidValue("border-style", "hidden")],
-  );
+  test("border-solid", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderStyle: "solid" } },
+    });
+  });
+  test("border-dashed", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderStyle: "dashed" } },
+    });
+  });
+  test("border-dotted", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderStyle: "dotted" } },
+    });
+  });
+  test("border-none", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-style": "none" } },
+    });
+  });
+  test("border-double", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-style": "double" } },
+    });
+  });
+  test("border-hidden", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "border-style": "hidden" } },
+    });
+  });
 });
 
 describe.skip("Borders - Divide Width", () => {
   // TODO
-  testCases();
 });
 
 describe.skip("Borders - Divide Color", () => {
   // TODO
-  testCases();
 });
 
 describe.skip("Borders - Divide Style", () => {
   // TODO
-  testCases();
 });
 
 describe.skip("Borders - Outline Width", () => {
   // TODO
-  testCases();
 });
 
 describe.skip("Borders - Outline Color", () => {
   // TODO
-  testCases();
 });
 
 describe.skip("Borders - Outline Style", () => {
   // TODO
-  testCases();
 });
 
 describe.skip("Borders - Outline Offset", () => {
   // TODO
-  testCases();
 });
 
 describe.skip("Borders - Ring Width", () => {
   // TODO
-  testCases();
 });
 
 describe.skip("Borders - Ring Color", () => {
   // TODO
-  testCases();
 });
 
 describe.skip("Borders - Ring Offset Width", () => {
   // TODO
-  testCases();
 });
 
 describe.skip("Borders - Ring Offset Color", () => {
   // TODO
-  testCases();
 });

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ActivityIndicator,
   FlatList,
@@ -38,7 +40,6 @@ cssInterop(StatusBar, {
 cssInterop(ScrollView, {
   className: "style",
   contentContainerClassName: "contentContainerStyle",
-  indicatorClassName: "indicatorStyle",
 });
 cssInterop(TextInput, {
   className: { target: "style", nativeStyleToProp: { textAlign: true } },
@@ -50,7 +51,6 @@ remapProps(FlatList, {
   ListHeaderComponentClassName: "ListHeaderComponentStyle",
   columnWrapperClassName: "columnWrapperStyle",
   contentContainerClassName: "contentContainerStyle",
-  indicatorClassName: "indicatorStyle",
 });
 remapProps(ImageBackground, {
   className: "style",
@@ -65,5 +65,11 @@ remapProps(VirtualizedList, {
   ListFooterComponentClassName: "ListFooterComponentStyle",
   ListHeaderComponentClassName: "ListHeaderComponentStyle",
   contentContainerClassName: "contentContainerStyle",
-  indicatorClassName: "indicatorStyle",
 });
+
+try {
+  const SafeAreaView = require("react-native-safe-area-context").SafeAreaView;
+  cssInterop(SafeAreaView, {
+    className: "style",
+  });
+} catch {}

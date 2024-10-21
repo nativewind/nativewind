@@ -1,47 +1,79 @@
+/** @jsxImportSource test */
 import { FlatList, View } from "react-native";
-import { render, screen } from "@testing-library/react-native";
 
+import { RefObject, useRef } from "react";
 import {
+  render,
+  screen,
   registerCSS,
   resetComponents,
-  resetStyles,
-  createRemappedComponent,
-  revealStyles,
-} from "../testing-library";
-import { RefObject, useRef } from "react";
-import { remapProps } from "../runtime/api";
-import { globalStyles } from "../runtime/native/style-store";
+  remapProps,
+  getOpaqueStyles,
+} from "test";
+import {
+  PLACEHOLDER_SYMBOL,
+  StyleRuleSetSymbol,
+  StyleRuleSymbol,
+} from "../shared";
 
 const testID = "react-native-css-interop";
 
 beforeEach(() => {
-  resetStyles();
   resetComponents();
 });
 
 test("mapping", () => {
-  const A = createRemappedComponent(View, { className: "differentStyle" });
+  remapProps(View as any, { className: "differentStyle" });
 
   registerCSS(
     `.bg-black { background-color: black } .text-white { color: white }`,
   );
 
-  render(<A testID={testID} className="bg-black text-white" />);
+  render(<View testID={testID} className="bg-black text-white" />);
 
   const component = screen.getByTestId(testID);
 
   expect(component.props).toEqual({
     testID,
-    differentStyle: [{}, {}],
+    differentStyle: {
+      [PLACEHOLDER_SYMBOL]: true,
+    },
   });
 
-  expect(revealStyles(component.props)).toEqual({
-    testID,
-    differentStyle: [
-      globalStyles.get("bg-black")?.get(),
-      globalStyles.get("text-white")?.get(),
-    ],
-  });
+  expect(getOpaqueStyles(component.props.differentStyle)).toStrictEqual([
+    {
+      [StyleRuleSetSymbol]: true,
+      n: [
+        {
+          [StyleRuleSymbol]: true,
+          d: [
+            [
+              {
+                backgroundColor: "#000000",
+              },
+            ],
+          ],
+          s: [1, 1],
+        },
+      ],
+    },
+    {
+      [StyleRuleSetSymbol]: true,
+      n: [
+        {
+          [StyleRuleSymbol]: true,
+          d: [
+            [
+              {
+                color: "#ffffff",
+              },
+            ],
+          ],
+          s: [2, 1],
+        },
+      ],
+    },
+  ]);
 });
 
 test("works with ref", () => {

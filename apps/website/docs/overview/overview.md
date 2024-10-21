@@ -84,7 +84,6 @@ remapProps(FlatList, {
   ListHeaderComponentClassName: "ListHeaderComponentStyle",
   columnWrapperClassName: "columnWrapperStyle",
   contentContainerClassName: "contentContainerStyle",
-  indicatorClassName: "indicatorStyle",
 });
 
 <FlatList

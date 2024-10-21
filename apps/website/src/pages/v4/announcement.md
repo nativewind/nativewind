@@ -414,7 +414,6 @@ remapProps(FlatList, {
   ListHeaderComponentStyle: "ListHeaderComponentClassName",
   columnWrapperStyle: "columnWrapperClassName",
   contentContainerStyle: "contentContainerClassName",
-  indicatorStyle: "indicatorClassName",
 });
 
 // Now you can use FlatList with the added props

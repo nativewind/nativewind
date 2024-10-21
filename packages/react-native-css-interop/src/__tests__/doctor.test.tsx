@@ -1,14 +1,21 @@
-import { verifyReceivedData } from "../doctor";
-import { verifyHasStyles } from "../doctor.native";
-import { registerCSS, resetStyles } from "../testing-library";
+/** @jsxImportSource test */
+import { registerCSS, verifyData } from "test";
 
-beforeEach(() => resetStyles());
+test("verifyData", () => {
+  expect(verifyData()).toBe(false);
 
-test("verifyReceivedData", () => {
-  registerCSS(`.my-class { 
-    color: hsl(0, 84.2%, 60.2%); 
+  registerCSS(`
+  .my-class {
+    color: hsl(0, 84.2%, 60.2%);
   }`);
 
-  expect(verifyReceivedData()).toBe(true);
-  expect(verifyHasStyles()).toBe(true);
+  expect(verifyData()).toBe(true);
+});
+
+test("verifyJSX", () => {
+  // We cannot test this within the JSX file, as Jest doesn't apply the importSource
+  // transform for all files
+
+  // @ts-expect-error
+  expect(<react-native-css-interop-jsx-pragma-check /> === true).toBeTruthy();
 });

@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/react-native/tsconfig.json",
   "compilerOptions": {
+    "target": "esnext",
     "declaration": true,
     "noUnusedLocals": true,
     "removeComments": true,
