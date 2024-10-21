@@ -64,7 +64,7 @@ export type GetCSSForPlatform = (
 export type GetCSSForPlatformOnChange = (platform: string) => void;
 
 let haste: any;
-let writeStyles = true;
+let virtualModulesPossible: undefined | Promise<void> = undefined;
 const virtualModules = new Map<string, Promise<string | Buffer>>();
 const outputDirectory = path.resolve(__dirname, "../../.cache");
 const isRadonIDE = "REACT_NATIVE_IDE_LIB_PATH" in process.env;
@@ -126,11 +126,16 @@ function getConfig(
         // We need to write the styles to the file system if we're either building for production, or
         // we're building a standalone client and the watcher isn't enabled
         debug(`getTransformOptions.dev ${transformOptions.dev}`);
-        debug(`getTransformOptions.watching ${writeStyles}`);
-        debug(`getTransformOptions.writeStyles ${writeStyles}`);
+        debug(`getTransformOptions.platform ${transformOptions.platform}`);
+        debug(
+          `getTransformOptions.virtualModulesPossible ${Boolean(virtualModulesPossible)}`,
+        );
+
+        // const isWebProduction =
+        //   transformOptions.dev === false && transformOptions.platform === "web";
 
         // We can skip writing to the filesystem if this instance patched Metro
-        if (writeStyles) {
+        if (!virtualModulesPossible) {
           const platform = transformOptions.platform || "native";
           const filePath = platformPath(platform);
 
@@ -163,7 +168,22 @@ function getConfig(
 
           await fs.mkdir(outputDirectory, { recursive: true });
           await fs.writeFile(filePath, output);
-          await fs.writeFile(filePath.replace(/\.js$/, ".map"), "");
+          if (platform !== "web") {
+            await fs.writeFile(filePath.replace(/\.js$/, ".map"), "");
+          }
+
+          debug(`getTransformOptions.finished`);
+        } else {
+          await virtualModulesPossible;
+          const platform = transformOptions.platform || "native";
+          const filePath = platformPath(platform);
+          await startCSSProcessor(
+            filePath,
+            platform,
+            transformOptions.dev,
+            options,
+            debug,
+          );
         }
 
         return Object.assign(
@@ -186,25 +206,21 @@ function getConfig(
         if (options.forceWriteFileSystem) {
           debug(`forceWriteFileSystem true`);
         } else {
-          const initPromise = bundler
-            .getDependencyGraph()
-            .then(async (graph: any) => {
-              haste = graph._haste;
-              ensureFileSystemPatched(graph._fileSystem);
-              ensureBundlerPatched(bundler);
-            });
-
-          // If we patch Metro, we don't need to write the styles
-          // The exception to this is Radon IDE, which will launch the dev server and then kill it
           if (!isRadonIDE) {
-            writeStyles = false;
-          }
+            virtualModulesPossible = bundler
+              .getDependencyGraph()
+              .then(async (graph: any) => {
+                haste = graph._haste;
+                ensureFileSystemPatched(graph._fileSystem);
+                ensureBundlerPatched(bundler);
+              });
 
-          server.use(async (_, __, next) => {
-            // Wait until the bundler patching has completed
-            await initPromise;
-            next();
-          });
+            server.use(async (_, __, next) => {
+              // Wait until the bundler patching has completed
+              await virtualModulesPossible;
+              next();
+            });
+          }
         }
 
         return originalMiddleware
@@ -229,15 +245,20 @@ function getConfig(
         }
 
         platform = platform || "native";
-        // Generate a fake name for our virtual module. Make it platform specific
 
+        // Generate a fake name for our virtual module. Make it platform specific
         const filePath = platformPath(platform);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const development = (context as any).isDev || (context as any).dev;
+        const isWebProduction = !development && platform === "web";
 
         debug(`resolveRequest.input ${resolved.filePath}`);
         debug(`resolveRequest.resolvedTo: ${filePath}`);
-        if (!writeStyles) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const development = (context as any).isDev || (context as any).dev;
+        debug(`resolveRequest.development: ${development}`);
+        debug(`resolveRequest.platform: ${platform}`);
+
+        if (virtualModulesPossible && !isWebProduction) {
           startCSSProcessor(filePath, platform, development, options, debug);
         }
 
@@ -281,7 +302,9 @@ async function startCSSProcessor(
     virtualModules.set(
       filePath,
       getCSSForPlatform(platform).then((css) => {
-        return getNativeJS(cssToReactNativeRuntime(css, options), debug);
+        return platform === "web"
+          ? css
+          : getNativeJS(cssToReactNativeRuntime(css, options), debug);
       }),
     );
   } else {

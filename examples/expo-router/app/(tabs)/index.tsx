@@ -1,5 +1,6 @@
-import { vars } from "nativewind";
 import { Text, View } from "react-native";
+
+import { vars } from "nativewind";
 
 const theme = vars({
   "--theme-fg": "green",
@@ -11,7 +12,7 @@ const App = () => {
       <Text className="text-[--theme-fg]">Variables!!!</Text>
       <Text
         suppressHighlighting
-        className="active:scale-150 active:text-[--theme-fg] transition"
+        className="active:scale-150 text-red-500 active:text-[--theme-fg] transition"
       >
         Transitions
       </Text>
