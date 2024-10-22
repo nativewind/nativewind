@@ -13,7 +13,7 @@ const config = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-  organizationName: "marklawlor", // Usually your GitHub org/user name.
+  organizationName: "nativewind", // Usually your GitHub org/user name.
   projectName: "NativeWind", // Usually your repo name.
 
   clientModules: [
@@ -34,19 +34,19 @@ const config = {
       ({
         docs: {
           breadcrumbs: false,
-          editUrl: `https://github.com/marklawlor/nativewind/edit/main/apps/website/`,
+          editUrl: `https://github.com/nativewind/nativewind/edit/main/apps/website/`,
           remarkPlugins: [require("./src/remark-snackplayer")],
           routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),
-          lastVersion: "v2",
+          lastVersion: "current",
           versions: {
             current: {
               label: "v4",
-              path: "v4",
+              path: "/",
             },
             v2: {
               label: "v2",
-              path: "",
+              path: "v2",
             },
           },
         },
@@ -83,7 +83,7 @@ const config = {
       },
       announcementBar: {
         content:
-          '<a href="/v4/overview">NativeWind v4.0 is coming soon. Click here to see the docs</a>',
+          '<a href="/v2">Looking for the NativeWind v2 docs? Click here</a>',
         isCloseable: true,
       },
       navbar: {
@@ -94,14 +94,19 @@ const config = {
         },
         items: [
           {
-            href: "https://discord.gg/ypNakAFQ65",
+            href: "https://nativewind.dev/discord",
             label: "Discord",
             position: "right",
           },
           {
-            href: "https://github.com/marklawlor/nativewind",
+            href: "https://github.com/nativewind/nativewind",
             label: "GitHub",
             position: "right",
+          },
+          {
+            type: "docsVersionDropdown",
+            position: "left",
+            dropdownActiveClassDisabled: true,
           },
         ],
       },
@@ -113,13 +118,12 @@ const config = {
             items: [
               {
                 label: "GitHub",
-                href: "https://github.com/marklawlor/nativewind",
+                href: "https://github.com/nativewind/nativewind",
               },
               {
                 label: "Discord",
-                href: "https://discord.gg/ypNakAFQ65",
+                href: "https://nativewind.dev/discord",
               },
-
             ],
           },
         ],
