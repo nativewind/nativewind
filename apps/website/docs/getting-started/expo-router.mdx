@@ -1,5 +1,6 @@
-import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import Tabs from "@theme/Tabs";
+
 import Install from "./_install.mdx";
 import Tailwind from "./_tailwind.mdx";
 
@@ -18,6 +19,19 @@ import Tailwind from "./_tailwind.mdx";
 ### 3. Add the Babel preset
 
 <Tabs>
+  <TabItem value="SDK 50+">
+    ```js title="babel.config.js"
+    module.exports = function (api) {
+      api.cache(true);
+      return {
+        presets: [
+          ["babel-preset-expo", { jsxImportSource: "nativewind" }],
+          "nativewind/babel",
+        ],
+      };
+    };
+    ```
+  </TabItem>
   <TabItem value="SDK 49">
     ```js title="babel.config.js"
     module.exports = function (api) {
@@ -36,21 +50,7 @@ import Tailwind from "./_tailwind.mdx";
     };
     ```
   </TabItem>
-  <TabItem value="SDK 50+">
-    ```js title="babel.config.js"
-    module.exports = function (api) {
-      api.cache(true);
-      return {
-        presets: [
-          ["babel-preset-expo", { jsxImportSource: "nativewind" }],
-          "nativewind/babel",
-        ],
-      };
-    };
-    ```
-  </TabItem>
 </Tabs>
-
 
 ### 4. Modify your metro.config.js
 
@@ -61,11 +61,11 @@ If your project does not have a `metro.config.js` run `npx expo customize metro.
 
 ```js title="metro.config.js"
 const { getDefaultConfig } = require("expo/metro-config");
-const { withNativeWind } = require('nativewind/metro');
+const { withNativeWind } = require("nativewind/metro");
 
-const config = getDefaultConfig(__dirname, { isCSSEnabled: true })
+const config = getDefaultConfig(__dirname, { isCSSEnabled: true });
 
-module.exports = withNativeWind(config, { input: './global.css' })
+module.exports = withNativeWind(config, { input: "./global.css" });
 ```
 
 </TabItem>
@@ -73,11 +73,11 @@ module.exports = withNativeWind(config, { input: './global.css' })
 
 ```js title="metro.config.js"
 const { getDefaultConfig } = require("expo/metro-config");
-const { withNativeWind } = require('nativewind/metro');
+const { withNativeWind } = require("nativewind/metro");
 
-const config = getDefaultConfig(__dirname)
+const config = getDefaultConfig(__dirname);
 
-module.exports = withNativeWind(config, { input: './global.css' })
+module.exports = withNativeWind(config, { input: "./global.css" });
 ```
 
 </TabItem>
@@ -87,13 +87,12 @@ module.exports = withNativeWind(config, { input: './global.css' })
 ### 5. Import your CSS file
 
 ```js title="app/_layout.js"
-import {Slot} from "expo-router";
+import { Slot } from "expo-router";
 
 // Import your global CSS file
-import "../global.css"
+import "../global.css";
 
-export default Slot
-
+export default Slot;
 ```
 
 ### 6. TypeScript (optional)

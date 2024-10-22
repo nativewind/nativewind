@@ -1,5 +1,6 @@
-import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import Tabs from "@theme/Tabs";
+
 import Install from "./_install.mdx";
 import Tailwind from "./_tailwind.mdx";
 
@@ -26,6 +27,20 @@ NativeWind works with both Expo and framework-less React Native projects but Exp
 ### 3. Add the Babel preset
 
 <Tabs groupId="framework">
+  <TabItem value="Expo SDK 50+">
+    ```js title="babel.config.js"
+    module.exports = function (api) {
+      api.cache(true);
+      return {
+        presets: [
+          ["babel-preset-expo", { jsxImportSource: "nativewind" }],
+          "nativewind/babel",
+        ],
+      };
+    };
+    ```
+  </TabItem>
+
   <TabItem value="Expo SDK 49">
     ```js title="babel.config.js"
     module.exports = function (api) {
@@ -40,19 +55,6 @@ NativeWind works with both Expo and framework-less React Native projects but Exp
           "expo-router/babel",
           "react-native-reanimated/plugin",
         ]
-      };
-    };
-    ```
-  </TabItem>
-  <TabItem value="Expo SDK 50+">
-    ```js title="babel.config.js"
-    module.exports = function (api) {
-      api.cache(true);
-      return {
-        presets: [
-          ["babel-preset-expo", { jsxImportSource: "nativewind" }],
-          "nativewind/babel",
-        ],
       };
     };
     ```
@@ -83,6 +85,7 @@ module.exports = {
 
     module.exports = withNativeWind(config, { input: './global.css' })
     ```
+
   </TabItem>
   <TabItem value="Expo SDK 50+">
 
@@ -97,18 +100,17 @@ module.exports = {
 
   </TabItem >
 
-
   <TabItem value="frameworkless" label="Framework-less">
 
 ```js title="metro.config.js"
-const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
-const { withNativeWind } = require('nativewind/metro')
+const { getDefaultConfig, mergeConfig } = require("@react-native/metro-config");
+const { withNativeWind } = require("nativewind/metro");
 
 const config = mergeConfig(getDefaultConfig(__dirname), {
   /* your config */
 });
 
-module.exports = withNativeWind(config, { input: './global.css'})
+module.exports = withNativeWind(config, { input: "./global.css" });
 ```
 
   </TabItem>
@@ -127,6 +129,7 @@ export default App() {
 ### 6. Modify your `app.json` (Expo only)
 
 Switch the bundler to use the [Metro bundler](https://docs.expo.dev/guides/customizing-metro/#web-support)
+
 ```js
 {
   "expo": {
