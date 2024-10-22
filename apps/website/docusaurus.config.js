@@ -42,7 +42,7 @@ const config = {
           versions: {
             current: {
               label: "v4",
-              path: "/"
+              path: "/",
             },
             v2: {
               label: "v2",
@@ -103,6 +103,11 @@ const config = {
             label: "GitHub",
             position: "right",
           },
+          {
+            type: "docsVersionDropdown",
+            position: "left",
+            dropdownActiveClassDisabled: true,
+          },
         ],
       },
       footer: {
@@ -119,7 +124,6 @@ const config = {
                 label: "Discord",
                 href: "https://nativewind.dev/discord",
               },
-
             ],
           },
         ],
