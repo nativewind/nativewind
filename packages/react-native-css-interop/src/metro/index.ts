@@ -26,23 +26,32 @@ import { expoColorSchemeWarning } from "./expo";
  *  swap to a .js file generated in the node_modules
  *
  * ------------------
- * Notes about CLIs
+ * Notes
  * ------------------
  *
- * Metro has two run modes, normal (with a server) and headless. In headless mode the `enhancedMiddleware` is not called.
- * THIS DOES NOT MEAN THAT FAST-REFRESH IS NOT ENABLED! It just means you are making a build that CAN connect to an instance
- * of Metro that is running a server. E.g `eas` may do a development build that you download and connect to your local server
+ * - The virtual module setup requires the development server, so when its turned off we need to write styles to disk
+ * - Metro has two run modes, normal (with a server) and headless. In headless mode the `enhancedMiddleware` is not called.
+ *   THIS DOES NOT MEAN THAT FAST-REFRESH IS NOT ENABLED! It just means you are making a build that CAN connect to an instance
+ *   of Metro that is running a server. E.g `eas` may do a development build that you download and connect to your local server
+ * - You can also do production builds WITH Fast Refresh `npx expo run:android --variant production` will start a production
+ *   like build, but still enable the dev server for fast refresh.
+ * - RadonIDE doesn't use the virtual module setup, it writes the style changes to disk
+ * - expo-updates starts its own Metro server with weird timing issues that we cannot resolve. This is why we always write to disk in production.
  *
- * You can also do production builds WITH Fast Refresh `npx expo run:android --variant production` will start a production
- * like build, but still enable the dev server for fast refresh, it just don't use it.
+ * ------------------
+ * Different build types
+ * ------------------
+ * Each of these commands will trigger a different build type.
  *
- * The virtual module setup requires the development server, so when its turned off we need to write styles to disk
- *
- * Therefore there are two flags
- * - isDev: Is this a development or production build
- * - writeStyles: Is this a headless build where we need to write styles to disk
- *
- * All combinations over these flags at used in various scenarios
+ *  - `expo start`
+ *  - `expo run <platform> --variant production|development`
+ *  - `expo export`
+ *  - `eas build (without expo-updates)`
+ *  - `eas build (with expo-updates)`
+ *  - `react-native run`
+ *  - `react-native build`
+ *  - `npx expo prebuild & building in xcode (development)`
+ *  - `npx expo prebuild & building in xcode (production)`
  */
 
 export type WithCssInteropOptions = CssToReactNativeRuntimeOptions & {
@@ -123,25 +132,36 @@ function getConfig(
         transformOptions,
         getDependenciesOf,
       ) {
-        // We need to write the styles to the file system if we're either building for production, or
-        // we're building a standalone client and the watcher isn't enabled
         debug(`getTransformOptions.dev ${transformOptions.dev}`);
         debug(`getTransformOptions.platform ${transformOptions.platform}`);
         debug(
           `getTransformOptions.virtualModulesPossible ${Boolean(virtualModulesPossible)}`,
         );
 
-        // const isWebProduction =
-        //   transformOptions.dev === false && transformOptions.platform === "web";
+        const platform = transformOptions.platform || "native";
+        const filePath = platformPath(platform);
 
-        // We can skip writing to the filesystem if this instance patched Metro
-        if (!virtualModulesPossible) {
-          const platform = transformOptions.platform || "native";
-          const filePath = platformPath(platform);
+        if (virtualModulesPossible) {
+          await virtualModulesPossible;
+          await startCSSProcessor(
+            filePath,
+            platform,
+            transformOptions.dev,
+            options,
+            debug,
+          );
+        }
 
+        // We need to write to the file system if virtual modules are not possible and/or we are building for production
+        const writeToFileSystem =
+          !virtualModulesPossible || !transformOptions.dev;
+
+        debug(`getTransformOptions.writeToFileSystem ${writeToFileSystem}`);
+
+        if (writeToFileSystem) {
           debug(`getTransformOptions.output ${filePath}`);
 
-          // Virtual modules don't work for RadonIDE, so we need to write to the filesystem on changes
+          // Radon IDE needs to watch the file system for changes, so we need to write the file
           const watchFn = isRadonIDE
             ? async (css: string) => {
                 const output =
@@ -173,17 +193,6 @@ function getConfig(
           }
 
           debug(`getTransformOptions.finished`);
-        } else {
-          await virtualModulesPossible;
-          const platform = transformOptions.platform || "native";
-          const filePath = platformPath(platform);
-          await startCSSProcessor(
-            filePath,
-            platform,
-            transformOptions.dev,
-            options,
-            debug,
-          );
         }
 
         return Object.assign(
