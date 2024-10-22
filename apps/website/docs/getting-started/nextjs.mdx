@@ -1,11 +1,17 @@
-import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import Tabs from "@theme/Tabs";
 
 # Next.js
 
 NativeWind can be used in a Next.js project that is already configured to use Expo or framework-less React Native Web.
 
 Setting up a new Next.js project to use React Native Web is out of scope for these instructions.
+
+:::info
+
+NativeWind will only work with the `/pages` router or on `"use client"` routes. RSC support is in progress.
+
+:::
 
 ## 1. Setup Tailwind CSS
 
@@ -41,6 +47,7 @@ NativeWind requires the `jsxImportSource` to be set to `nativewind`. The option 
       }
     }
     ```
+
   </TabItem>
   <TabItem value="babel" label="Babel">
 
@@ -59,6 +66,7 @@ module.exports = {
 };
 
 ```
+
   </TabItem>
 </Tabs>
 
