@@ -1,4 +1,5 @@
-import fs from "fs/promises";
+import fs from "fs";
+import fsPromise from "fs/promises";
 import path from "path";
 
 import connect from "connect";
@@ -115,6 +116,13 @@ function getConfig(
   // Used by the resolverPoisonPill
   const poisonPillPath = "./interop-poison.pill";
 
+  fs.mkdirSync(outputDirectory, { recursive: true });
+  fs.writeFileSync(platformPath("ios"), "");
+  fs.writeFileSync(platformPath("android"), "");
+  fs.writeFileSync(platformPath("native"), "");
+  fs.writeFileSync(platformPath("macos"), "");
+  fs.writeFileSync(platformPath("windows"), "");
+
   return {
     ...config,
     transformerPath: require.resolve("./transformer"),
@@ -172,7 +180,7 @@ function getConfig(
                         debug,
                       );
 
-                await fs.writeFile(filePath, output);
+                await fsPromise.writeFile(filePath, output);
               }
             : undefined;
 
@@ -186,10 +194,10 @@ function getConfig(
                   debug,
                 );
 
-          await fs.mkdir(outputDirectory, { recursive: true });
-          await fs.writeFile(filePath, output);
+          await fsPromise.mkdir(outputDirectory, { recursive: true });
+          await fsPromise.writeFile(filePath, output);
           if (platform !== "web") {
-            await fs.writeFile(filePath.replace(/\.js$/, ".map"), "");
+            await fsPromise.writeFile(filePath.replace(/\.js$/, ".map"), "");
           }
 
           debug(`getTransformOptions.finished`);
