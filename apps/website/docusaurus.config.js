@@ -7,7 +7,7 @@ const { vsLight, vsDark } = require("prism-react-renderer").themes;
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "NativeWind",
-  tagline: "",
+  tagline: "Tailwind for React Native",
   url: "https://nativewind.dev/",
   baseUrl: "/",
   onBrokenLinks: "throw",
