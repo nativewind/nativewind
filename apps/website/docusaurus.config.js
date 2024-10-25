@@ -135,6 +135,7 @@ const config = {
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Mark Lawlor. Built with Docusaurus.`,
       },
+      image: 'img/og-image.png',
     }),
 };
 
