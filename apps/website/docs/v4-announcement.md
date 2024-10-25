@@ -164,7 +164,7 @@ Additionally, the style compiler has be rewritten using [lightningcss](https://l
 
 ### `rem` Support
 
-NativeWind v4 includes scaling support for the `rem` unit. By default NativeWind will inline the `rem` value, replacing `rem` with `px` at build time. This greatly improves performance, but can be disabled if you need to dynamically change the `rem` value at runtime. [More information](https://www.nativewind.dev/v4/tailwind/typography/font-size)
+NativeWind v4 includes scaling support for the `rem` unit. By default NativeWind will inline the `rem` value, replacing `rem` with `px` at build time. This greatly improves performance, but can be disabled if you need to dynamically change the `rem` value at runtime. [More information](https://www.nativewind.dev/tailwind/typography/font-size)
 
 ```jsx title=metro.config.js
 export default withNativeWind(config, {
@@ -291,7 +291,7 @@ const App = () => {
 
 ### CSS Specificity
 
-NativeWind has change its specificity algorithm. You can read more about it here: https://www.nativewind.dev/v4/core-concepts/style-specificity
+NativeWind has change its specificity algorithm. You can read more about it here: https://www.nativewind.dev/core-concepts/style-specificity
 
 ### Base Scaling Modifications
 
@@ -422,7 +422,7 @@ remapProps(FlatList, {
 
 `remapProps` is a lightweight wrapper which doesn't generate any styles. Instead it converts Tailwind CSS strings to `OpaqueStyleTokens` (readonly empty objects). These tokens should be treat just any other other style object, and once passed to a component tagged with `remapProps`, they will be converted into styles.
 
-(See the documentation for more information)[https://www.nativewind.dev/v4/api/remap-props]
+(See the documentation for more information)[https://www.nativewind.dev/api/remap-props]
 
 **`cssInterop(component, mapping)`**
 
@@ -434,7 +434,7 @@ Before using `cssInterop` you should could consider if `remapProps` would be mor
 - Moving a style property to an prop
   - Note: If this is not a 3rd party component, you should consider simply using the style prop as this will not work on web.
 
-(See the documentation for more information)[https://www.nativewind.dev/v4/api/css-interop]
+(See the documentation for more information)[https://www.nativewind.dev/api/css-interop]
 
 ### `vars()`
 

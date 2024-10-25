@@ -66,6 +66,12 @@ const config = {
         apiKey: "e179290d52cea5f4751ae76dd1f40b4f",
         indexName: "nativewind",
         contextualSearch: true,
+        transformItems: (/** @type {{ url: string; }[]} */ items) => {
+          return items.map((/** @type {{ url: string; }} */ item) => ({
+            ...item,
+            url: item.url.replace('/v4/', '/'),
+          }));
+        },
       },
       prism: {
         defaultLanguage: "tsx",

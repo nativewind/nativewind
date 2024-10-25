@@ -23,7 +23,12 @@ const sidebars = {
       type: "category",
       label: "Overview",
       collapsed: false,
-      items: ["overview/overview", "guides/goals"],
+      items: [
+        "overview/overview",
+        "guides/goals",
+        "v4-announcement",
+        "v4-1-announcement"
+      ],
     },
     {
       type: "category",

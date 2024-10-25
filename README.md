@@ -25,7 +25,7 @@ NativeWind processes your styles during your application's build step and uses a
 
 ## Installation
 
-If you have an existing project, [use these guides](https://www.nativewind.dev/v4/getting-started/react-native) to configure NativeWind for your respective stack.
+If you have an existing project, [use these guides](https://www.nativewind.dev/getting-started/react-native) to configure NativeWind for your respective stack.
 
 Alternatively, you can create a new pre-configured project via our Quickstart options, below.
 
@@ -61,7 +61,7 @@ You can get started with any of the following options:
 - Fast and consistent style application via hot reload
   - includes changes made to `tailwind.config.js`
 
-[More details here](https://www.nativewind.dev/v4/announcement#breaking-changes-from-v2)
+[More details here](https://www.nativewind.dev/v4-announcement#breaking-changes-from-v2)
 
 ## npm distribution tags
 It's worth noting that we do not have Github branches that directly correlate to npm distribution tags. Instead, we deploy to specific npm tags either via automated Github actions (push to `main` -> publish to `next`) or manually (snapshots versions).
@@ -118,7 +118,7 @@ From the folks that brought you NativeBase, this library offers customizable cro
 
 ## What are the breaking changes from v2 to v4?
 
-All breaking changes are [outlined here](https://www.nativewind.dev/v4/announcement#breaking-changes-from-v2).
+All breaking changes are [outlined here](https://www.nativewind.dev/v4-announcement#breaking-changes-from-v2).
 
 ## Documentation
 
