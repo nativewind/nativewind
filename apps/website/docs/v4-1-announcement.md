@@ -1,3 +1,9 @@
+---
+title: NativeWind 4.1 Announcement
+description: Discover the new features and improvements in NativeWind 4.1, including faster refresh times, enhanced animations, and more.
+image: /img/og-image.png
+---
+
 # NativeWind 4.1
 
 Version 4 of NativeWind, particularly NativeWind 4.1, is officially ready for production. With the release of 4.1, we've expanded upon the major updates from v4.0, focusing on performance improvements, enhanced features, and better developer experience. Give it a shot:
