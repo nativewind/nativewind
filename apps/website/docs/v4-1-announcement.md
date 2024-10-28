@@ -19,7 +19,7 @@ This document highlights the changes and improvements introduced in NativeWind 4
 
 - **Consistent Fast Refresh:** Style changes are now consistent across all build types.
 - **Drastically Fast(er) Refresh:** Reduced output size and improved Fast Refresh performance.
-- **Enhanced Animations and Transitions:** More robust and consistent animation and transition support.
+- **Enhanced Animations and Transitions (Experimental):** More robust and consistent animation and transition support.
 - **tvOS Support:** Styling capabilities for `react-native-tvos` projects.
 - **Media Query Support:** New support for `dpi`/`dpcm`/`dppx` media queries.
 - **Automatically Configured TypeScript Types:** Improved TypeScript integration.
