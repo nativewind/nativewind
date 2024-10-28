@@ -1,3 +1,8 @@
+---
+id: v4-announcement
+title: v4 Announcement
+---
+
 # NativeWind v4
 
 Dear NativeWind Community,

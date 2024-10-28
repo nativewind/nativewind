@@ -1,7 +1,7 @@
 ---
-title: NativeWind 4.1 Announcement
+id: v4-1-announcement
+title: v4.1 Announcement
 description: Discover the new features and improvements in NativeWind 4.1, including faster refresh times, enhanced animations, and more.
-image: /img/og-image.png
 ---
 
 # NativeWind 4.1
