@@ -1,7 +1,25 @@
 ---
-id: v4-1-announcement
 title: v4.1 Announcement
 description: Discover the new features and improvements in NativeWind 4.1, including faster refresh times, enhanced animations, and more.
+slug: announcement-nativewind-v4-1
+authors:
+  - name: Dan Stepanov
+    title: NativeWind maintainer
+    url: https://github.com/danstepanov
+    image_url: https://github.com/danstepanov.png
+    socials:
+      x: danstepanov
+      github: danstepanov
+  - name: Mark Lawlor
+    title: NativeWind author
+    url: https://github.com/marklawlor
+    image_url: https://github.com/marklawlor.png
+    socials:
+      x: mark__lawlor
+      github: marklawlor
+tags: [announcement, nativewind, v4]
+image: https://www.nativewind.dev/img/og-image.png
+hide_table_of_contents: false
 ---
 
 # NativeWind 4.1
@@ -13,7 +31,7 @@ npm install nativewind@latest
 
 ## What's New Since v4.0
 
-This document highlights the changes and improvements introduced in NativeWind 4.1, compared to v4.0. If you're upgrading from v2 or earlier and want to see the major changes introduced in v4.0, please refer to our [v4 announcement page](./v4-announcement.md).
+This document highlights the changes and improvements introduced in NativeWind 4.1, compared to v4.0. If you're upgrading from v2 or earlier and want to see the major changes introduced in v4.0, please refer to our [v4 announcement page](./blog/announcement-nativewind-v4).
 
 ## What's New in NativeWind 4.1
 

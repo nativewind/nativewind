@@ -50,7 +50,10 @@ const config = {
             },
           },
         },
-        blog: false,
+        blog: {
+          showReadingTime: true,
+          editUrl: `https://github.com/nativewind/nativewind/edit/main/apps/website/`,
+        },
         theme: {
           customCss: require.resolve("./src/css/custom.scss"),
         },
@@ -114,6 +117,7 @@ const config = {
             position: "left",
             dropdownActiveClassDisabled: true,
           },
+          {to: 'blog', label: 'Blog', position: 'left'},
         ],
       },
       footer: {

@@ -1,6 +1,18 @@
 ---
-id: v4-announcement
 title: v4 Announcement
+description: Discover the new features and improvements in NativeWind 4
+slug: announcement-nativewind-v4
+authors:
+  - name: Mark Lawlor
+    title: NativeWind author
+    url: https://github.com/marklawlor
+    image_url: https://github.com/marklawlor.png
+    socials:
+      x: mark__lawlor
+      github: marklawlor
+tags: [announcement, nativewind, v4]
+image: https://www.nativewind.dev/img/og-image.png
+hide_table_of_contents: false
 ---
 
 # NativeWind v4

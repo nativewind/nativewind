@@ -26,8 +26,6 @@ const sidebars = {
       items: [
         "overview/overview",
         "guides/goals",
-        "v4-announcement",
-        "v4-1-announcement"
       ],
     },
     {
