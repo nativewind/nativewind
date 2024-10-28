@@ -57,18 +57,6 @@ import Tailwind from "./_tailwind.mdx";
 If your project does not have a `metro.config.js` run `npx expo customize metro.config.js`
 
 <Tabs>
-<TabItem value="SDK 49">
-
-```js title="metro.config.js"
-const { getDefaultConfig } = require("expo/metro-config");
-const { withNativeWind } = require("nativewind/metro");
-
-const config = getDefaultConfig(__dirname, { isCSSEnabled: true });
-
-module.exports = withNativeWind(config, { input: "./global.css" });
-```
-
-</TabItem>
 <TabItem value="SDK 50+">
 
 ```js title="metro.config.js"
@@ -76,6 +64,18 @@ const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
 
 const config = getDefaultConfig(__dirname);
+
+module.exports = withNativeWind(config, { input: "./global.css" });
+```
+
+</TabItem>
+<TabItem value="SDK 49">
+
+```js title="metro.config.js"
+const { getDefaultConfig } = require("expo/metro-config");
+const { withNativeWind } = require("nativewind/metro");
+
+const config = getDefaultConfig(__dirname, { isCSSEnabled: true });
 
 module.exports = withNativeWind(config, { input: "./global.css" });
 ```
