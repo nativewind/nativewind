@@ -63,13 +63,13 @@ const config = {
     ({
       algolia: {
         appId: "G6PSHR6HYU",
-        apiKey: "e179290d52cea5f4751ae76dd1f40b4f",
+        apiKey: "bd85496379f08b8c03fc86acdc7210f7",
         indexName: "nativewind",
         contextualSearch: true,
         transformItems: (/** @type {{ url: string; }[]} */ items) => {
           return items.map((/** @type {{ url: string; }} */ item) => ({
             ...item,
-            url: item.url.replace('/v4/', '/'),
+            url: item.url.replace("/v4/", "/"),
           }));
         },
       },
@@ -135,7 +135,7 @@ const config = {
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Mark Lawlor. Built with Docusaurus.`,
       },
-      image: 'img/og-image.png',
+      image: "img/og-image.png",
     }),
 };
 
