@@ -34,6 +34,12 @@ function Wrapper({ children }: ViewProps) {
   );
 }
 
+test("works without the wrapper", async () => {
+  expect(await renderCurrentTest({ cssOptions })).toStrictEqual({
+    props: {},
+  });
+});
+
 test("m-safe", async () => {
   expect(
     await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
