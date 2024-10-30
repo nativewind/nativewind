@@ -426,7 +426,10 @@ function getNativeJS(data = {}, debug: Debugger): string {
 }
 
 function platformPath(platform = "native") {
-  return `${outputDirectory}/${platform}.${platform === "web" ? "css" : "js"}`;
+  return path.join(
+    outputDirectory,
+    `$platform}.${platform === "web" ? "css" : "js"}`,
+  );
 }
 
 /**
