@@ -31,7 +31,7 @@ npm install nativewind@latest
 
 ## What's New Since v4.0
 
-This document highlights the changes and improvements introduced in NativeWind 4.1, compared to v4.0. If you're upgrading from v2 or earlier and want to see the major changes introduced in v4.0, please refer to our [v4 announcement page](./blog/announcement-nativewind-v4).
+This document highlights the changes and improvements introduced in NativeWind 4.1, compared to v4.0. If you're upgrading from v2 or earlier and want to see the major changes introduced in v4.0, please refer to our [v4 announcement page](/blog/announcement-nativewind-v4).
 
 ## What's New in NativeWind 4.1
 
