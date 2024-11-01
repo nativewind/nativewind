@@ -17,16 +17,13 @@ const sidebars = {
     {
       type: "doc",
       id: "home",
-      className: "home"
+      className: "home",
     },
     {
       type: "category",
       label: "Overview",
       collapsed: false,
-      items: [
-        "overview/overview",
-        "guides/goals",
-      ],
+      items: ["overview/overview", "guides/goals"],
     },
     {
       type: "category",
@@ -73,7 +70,7 @@ const sidebars = {
         "core-concepts/units",
         "core-concepts/differences",
         "core-concepts/style-specificity",
-        // "tailwind/new-concepts/safe-area-insets",
+        "tailwind/new-concepts/safe-area-insets",
       ],
     },
     {
