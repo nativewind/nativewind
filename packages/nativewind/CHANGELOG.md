@@ -1,5 +1,13 @@
 # nativewind
 
+## 4.1.23
+
+### Patch Changes
+
+- 0bb61b4: Fix incorrect template string in platformPath
+- Updated dependencies [0bb61b4]
+  - react-native-css-interop@0.1.22
+
 ## 4.1.22
 
 ### Patch Changes

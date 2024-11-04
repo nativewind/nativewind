@@ -1,5 +1,12 @@
 # nativewind-expo-router
 
+## 1.0.61
+
+### Patch Changes
+
+- Updated dependencies [0bb61b4]
+  - nativewind@4.1.23
+
 ## 1.0.60
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # react-native-css-interop
 
+## 0.1.22
+
+### Patch Changes
+
+- 0bb61b4: Fix incorrect template string in platformPath
+
 ## 0.1.21
 
 ### Patch Changes
