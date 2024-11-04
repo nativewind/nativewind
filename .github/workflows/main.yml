@@ -35,6 +35,7 @@ jobs:
         run: cp README.md packages/nativewind/
 
       - name: Create Release Pull Request or Publish to npm
+        id: changesets
         uses: changesets/action@v1
         with:
           publish: npx changeset publish --tag next
