@@ -1,5 +1,5 @@
 {
-  "version": "4.0.36",
+  "version": "4.1.23",
   "name": "nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "main": "dist/index.js",
@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/marklawlor/nativewind.git"
+    "url": "git+https://github.com/marklawlor/nativewind.git"
   },
   "author": {
     "name": "Mark Lawlor",
@@ -35,7 +35,7 @@
     "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "lint": "eslint .",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm test",
     "postpublish": "./post-publish.sh",
     "build": "tsc -p tsconfig.build.json",
     "build:watch": "tsc -p tsconfig.build.json -w",
@@ -44,16 +44,20 @@
   "files": [
     "babel.js",
     "dist/",
+    "src/",
     "expo-snack.js",
     "jsx-dev-runtime/",
     "jsx-runtime/",
     "metro/",
     "preset/",
+    "test/",
     "theme/",
     "types.d.ts"
   ],
   "dependencies": {
-    "react-native-css-interop": "0.0.36"
+    "comment-json": "^4.2.5",
+    "debug": "^4.3.7",
+    "react-native-css-interop": "0.1.22"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
@@ -62,7 +66,9 @@
     "@types/micromatch": "^4.0.4",
     "jest": "^29.3.1",
     "jest-expo": "^50.0.1",
-    "tailwindcss": "3.4.1"
+    "prettier": "^3.3.1",
+    "tailwindcss": "3.4.4",
+    "tw-colors": "^3.3.1"
   },
   "peerDependencies": {
     "tailwindcss": ">3.3.0"

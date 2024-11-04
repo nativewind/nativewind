@@ -1,12 +1,19 @@
 import NPM from "../_npm.mdx";
 
-You will need to install `nativewind@^4.0.1` and it's peer dependencies `tailwindcss` and `react-native-reanimated`.
+You will need to install `nativewind` and it's peer dependencies `tailwindcss`, `react-native-reanimated` and `react-native-safe-area-context`
 
 <NPM
-  deps={["nativewind@^4.0.1", "react-native-reanimated", "tailwindcss"]}
+  deps={[
+    "nativewind",
+    "tailwindcss",
+    "react-native-reanimated",
+    "react-native-safe-area-context",
+  ]}
 />
 
-Run `pod-install` to install Reanimated pod:
+**Non-Expo projects**
+
+Run `pod-install` to finish installation of `react-native-reanimated`
 
 ```bash
 npx pod-install

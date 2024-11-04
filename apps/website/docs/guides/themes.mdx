@@ -11,12 +11,17 @@ module.exports = {
   theme: {
     colors: {
       // Create a custom color that uses a CSS custom value
-      primary: "rgb(var(--color-primary) / <alpha-value>)",
+      primary: "rgb(var(--color-values) / <alpha-value>)",
     },
   },
   plugins: [
     // Set a default value on the `:root` element
-    ({ addBase }) => addBase({ ":root": { "--color-primary": "255 0 0" } }),
+    ({ addBase }) => addBase({ 
+        ":root": { 
+          "--color-values": "255 0 0",
+          "--color-rgb": "rgb(255 0 0)" 
+        } 
+    }),
   ],
 };
 ```
@@ -25,18 +30,20 @@ module.exports = {
 import { vars } from 'nativewind'
 
 const userTheme = vars({
-  '--color-primary': '255 0 0'
+  '--color-values': '0 255 0',
+  '--color-rgb': 'rbg(0 0 255)'
 });
 
 export default App() {
   return (
     <View>
       <Text className="text-primary">Access as a theme value</Text>
-      <Text className="text-[--color-primary]">Or the variable directly</Text>
+      <Text className="text-[--color-rgb]">Or the variable directly</Text>
 
       {/* Variables can be changed inline */}
       <View style={userTheme}>
-        <Text className="text-primary">I am now red!</Text>
+        <Text className="text-primary">I am now green!</Text>
+        <Text className="text-[--color-rgb]">I am now blue!</Text>
       </View>
     </View>
   )

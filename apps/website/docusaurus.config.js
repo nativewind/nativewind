@@ -7,13 +7,13 @@ const { vsLight, vsDark } = require("prism-react-renderer").themes;
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "NativeWind",
-  tagline: "",
+  tagline: "Tailwind for React Native",
   url: "https://nativewind.dev/",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-  organizationName: "marklawlor", // Usually your GitHub org/user name.
+  organizationName: "nativewind", // Usually your GitHub org/user name.
   projectName: "NativeWind", // Usually your repo name.
 
   clientModules: [
@@ -34,23 +34,26 @@ const config = {
       ({
         docs: {
           breadcrumbs: false,
-          editUrl: `https://github.com/marklawlor/nativewind/edit/main/apps/website/`,
+          editUrl: `https://github.com/nativewind/nativewind/edit/main/apps/website/`,
           remarkPlugins: [require("./src/remark-snackplayer")],
           routeBasePath: "/", // disable landing page
           sidebarPath: require.resolve("./sidebars.js"),
-          lastVersion: "v2",
+          lastVersion: "current",
           versions: {
             current: {
               label: "v4",
-              path: "v4",
+              path: "/",
             },
             v2: {
               label: "v2",
-              path: "",
+              path: "v2",
             },
           },
         },
-        blog: false,
+        blog: {
+          showReadingTime: true,
+          editUrl: `https://github.com/nativewind/nativewind/edit/main/apps/website/`,
+        },
         theme: {
           customCss: require.resolve("./src/css/custom.scss"),
         },
@@ -63,9 +66,15 @@ const config = {
     ({
       algolia: {
         appId: "G6PSHR6HYU",
-        apiKey: "e179290d52cea5f4751ae76dd1f40b4f",
+        apiKey: "bd85496379f08b8c03fc86acdc7210f7",
         indexName: "nativewind",
         contextualSearch: true,
+        transformItems: (/** @type {{ url: string; }[]} */ items) => {
+          return items.map((/** @type {{ url: string; }} */ item) => ({
+            ...item,
+            url: item.url.replace("/v4/", "/"),
+          }));
+        },
       },
       prism: {
         defaultLanguage: "tsx",
@@ -83,7 +92,7 @@ const config = {
       },
       announcementBar: {
         content:
-          '<a href="/v4/overview">NativeWind v4.0 is coming soon. Click here to see the docs</a>',
+          '<a href="/v2">Looking for the NativeWind v2 docs? Click here</a>',
         isCloseable: true,
       },
       navbar: {
@@ -94,10 +103,21 @@ const config = {
         },
         items: [
           {
-            href: "https://github.com/marklawlor/nativewind",
+            href: "https://nativewind.dev/discord",
+            label: "Discord",
+            position: "right",
+          },
+          {
+            href: "https://github.com/nativewind/nativewind",
             label: "GitHub",
             position: "right",
           },
+          {
+            type: "docsVersionDropdown",
+            position: "left",
+            dropdownActiveClassDisabled: true,
+          },
+          {to: 'blog', label: 'Blog', position: 'left'},
         ],
       },
       footer: {
@@ -108,13 +128,18 @@ const config = {
             items: [
               {
                 label: "GitHub",
-                href: "https://github.com/marklawlor/nativewind",
+                href: "https://github.com/nativewind/nativewind",
+              },
+              {
+                label: "Discord",
+                href: "https://nativewind.dev/discord",
               },
             ],
           },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Mark Lawlor. Built with Docusaurus.`,
       },
+      image: "img/og-image.png",
     }),
 };
 

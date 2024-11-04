@@ -1,17 +1,16 @@
 # Styling third-party components
 
-A third-party component is a component that is a dependancy of your application and not a core React Native component.  NativeWind works by passing the `className` prop to the core React Native components. Unfortunately, its not always obvious what third-party components implement this behaviour without checking their source code.
+A third-party component is a component that is a dependency of your application and not a core React Native component. NativeWind works by passing the `className` prop to the core React Native components. Unfortunately, its not always obvious what third-party components implement this behavior without checking their source code.
 
 This is an example of a 3rd party component that does not pass the `className` prop down:
 
 ```jsx
 // ❌ This component will not work with NativeWind
-// This component is 'picking' the props. 
+// This component is 'picking' the props.
 // Any props that are not explicitly defined will not be passed down
 function ThirdPartyComponent({ style }) {
   return <View style={style} />;
 }
-
 
 // ✅ This component will work with NativeWind
 function ThirdPartyComponent({ style, ...props }) {
@@ -29,7 +28,7 @@ function ThirdPartyComponent({ style }) {
 }
 
 // aria-label was added in 0.71, but this component will not work with it!
-<ThirdPartyComponent aria-label="My Label" />
+<ThirdPartyComponent aria-label="My Label" />;
 ```
 
 ## Handling components with multiple style props
@@ -39,7 +38,13 @@ Some components will pass the `className` prop down, but they may also have mult
 ```tsx
 // This component has two 'style' props
 function ThirdPartyComponent({ style, contentContainerStyle, ...props }) {
-  return <FlatList style={style} contentContainerStyle={contentContainerStyle} {...props} />;
+  return (
+    <FlatList
+      style={style}
+      contentContainerStyle={contentContainerStyle}
+      {...props}
+    />
+  );
 }
 
 // Call this once at the entry point of your app
@@ -49,19 +54,18 @@ remapProps(ThirdPartyComponent, {
 });
 
 // Now you can use the component with NativeWind
-<ThirdPartyComponent className="p-5" contentContainerClassName="p-2" />
+<ThirdPartyComponent className="p-5" contentContainerClassName="p-2" />;
 ```
 
 :::tip
 
-NativeWind's style objects are more complex than the objected created `StyleSheet.create`. To not break third-party components, `remapProps` will pass a special object to the targed prop. To the third-party component this will appear as an empty object.
+NativeWind's style objects are more complex than the objected created `StyleSheet.create`. To not break third-party components, `remapProps` will pass a special object to the target prop. To the third-party component this will appear as an empty object.
 
 :::
 
 ## Handling components with style attribute props
 
 Some components may require style attributes to be passed as props (for example, React Native's `<StatusBar />` component accepts a `backgroundColor` prop), or they may access the `style` prop directly.
-
 
 ```tsx
 /*
@@ -71,14 +75,14 @@ Some components may require style attributes to be passed as props (for example,
  */
 function ThirdPartyComponent({ borderColor, style, ...props }) {
   // The background color is based on the style prop
-  const backgroundColor = style.color === "white" ? 'black': 'white'
+  const backgroundColor = style.color === "white" ? "black" : "white";
   return (
-    <View 
-      style={{ 
-        ...style, 
-        borderColor, 
-        backgroundColor
-      }} 
+    <View
+      style={{
+        ...style,
+        borderColor,
+        backgroundColor,
+      }}
     />
   );
 }
@@ -94,7 +98,7 @@ Enabling the `cssInterop` for a component comes at a performance cost. NativeWin
 
 ## Handling multiple props with similar properties
 
-Sometimes a component will have multiple props that are similar. 
+Sometimes a component will have multiple props that are similar.
 
 ```tsx
 function ThirdPartyComponent({ labelColor, inputColor, ...props }) {
@@ -128,7 +132,7 @@ function Wrapper() {
   const inputStyle = cva('color-black')
 
   return (
-    <ThirdPartyComponent 
+    <ThirdPartyComponent
       labelColorClassName={labelStyle}
       inputColorClassName={inputStyle}
     />
@@ -140,16 +144,14 @@ Instead, you can use the dynamic mapping modifier to move props.
 
 ```tsx
 cssInterop(ThirdPartyComponent, {
-  className: 'style'
-})
+  className: "style",
+});
 
 function Wrapper() {
   // Need to create a new className for each prop
-  const style = cva("{}-[inputColor]:color-black {}-[labelColor]:color-black")
+  const style = cva("{}-[inputColor]:color-black {}-[labelColor]:color-black");
 
-  return (
-    <ThirdPartyComponent className={style} />
-  )
+  return <ThirdPartyComponent className={style} />;
 }
 ```
 

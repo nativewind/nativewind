@@ -1,98 +1,254 @@
-import { resetStyles } from "react-native-css-interop/testing-library";
-import { style, testCasesWithOptions } from "../test-utils";
+/** @jsxImportSource nativewind */
+import { View } from "react-native";
 
-afterEach(() => resetStyles());
+import { getAnimatedStyle } from "react-native-reanimated";
+import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 
-/** TODO Rewrite these tests to actually test the properties, not what they just compile to */
+import { render, screen } from "../test";
 
-describe.skip("Transitions & Animation - Transition Property", () => {
-  testCasesWithOptions(
+const testID = "test-id";
+
+// Default transition duration is 150ms
+
+jest.useFakeTimers();
+
+test("transition-colors", async () => {
+  await render(
+    <View
+      testID={testID}
+      className="transition-colors ease-linear bg-red-500 border-black"
+    />,
     {
-      animated: true,
+      config: {
+        safelist: ["bg-blue-500 border-slate-500"],
+      },
     },
-    // TODO: Add tests for all transition properties
-    // "transition-none",
-    // "transition-all",
-    // "transition",
-    // "transition-colors",
-    // "transition-opacity",
-    // "transition-shadow",
-    // "transition-transform",
-    [
-      "transition-colors",
-      style({
-        backgroundColor: "transparent",
-        borderColor: "transparent",
-        color: "transparent",
-      }),
-    ],
-    [
-      "transition-opacity",
-      style({
-        opacity: 1,
-      }),
-    ],
   );
+
+  let component = screen.getByTestId(testID);
+
+  // Should have a static color, and should not animate
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    backgroundColor: "#ef4444",
+    borderColor: "#000000",
+  });
+  jest.advanceTimersByTime(300);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    backgroundColor: "#ef4444",
+    borderColor: "#000000",
+  });
+
+  // Rerender with a new color, triggering the animation
+  screen.rerender(
+    <View
+      testID={testID}
+      className="transition-colors ease-linear bg-blue-500 border-slate-500"
+    />,
+  );
+
+  // Directly after rerender, should still have the old color
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    backgroundColor: "#ef4444",
+    borderColor: "#000000",
+  });
+
+  // Bg-Color should only change after we advance time
+  jest.advanceTimersByTime(76); // Transition half the time
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    backgroundColor: "rgba(178, 105, 184, 1)",
+    borderColor: "rgba(73, 85, 101, 1)",
+  });
+
+  // At the end of the transition
+  jest.advanceTimersByTime(1000);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    backgroundColor: "rgba(59, 130, 246, 1)",
+    borderColor: "rgba(100, 116, 139, 1)",
+  });
+
+  // Bg-Color should not change after the transition is done
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    backgroundColor: "rgba(59, 130, 246, 1)",
+    borderColor: "rgba(100, 116, 139, 1)",
+  });
 });
 
-describe.skip("Transitions & Animation - Transition Duration", () => {
-  testCasesWithOptions(
+test("transition-opacity", async () => {
+  await render(
+    <View
+      testID={testID}
+      className="transition-opacity ease-linear opacity-0"
+    />,
     {
-      animated: true,
+      config: {
+        safelist: ["opacity-100"],
+      },
     },
-    ["duration-75", {}],
   );
+
+  let component = screen.getByTestId(testID);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({ opacity: 0 });
+  jest.advanceTimersByTime(300);
+  expect(getAnimatedStyle(component)).toStrictEqual({ opacity: 0 });
+
+  // Rerender with a new color, triggering the animation
+  screen.rerender(
+    <View
+      testID={testID}
+      className="transition-opacity ease-linear opacity-100"
+    />,
+  );
+
+  // Directly after rerender, should still have the old color
+  expect(getAnimatedStyle(component)).toStrictEqual({ opacity: 0 });
+
+  // Bg-Color should only change after we advance time
+  jest.advanceTimersByTime(76); // Transition half the time
+  expect(getAnimatedStyle(component)).toStrictEqual({ opacity: 0.5 });
+
+  // At the end of the transition
+  jest.advanceTimersByTime(1000);
+  expect(getAnimatedStyle(component)).toStrictEqual({ opacity: 1 });
+
+  // Bg-Color should not change after the transition is done
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({ opacity: 1 });
 });
 
-describe.skip("Transitions & Animation - Transition Timing Function", () => {
-  testCasesWithOptions(
-    {
-      animated: true,
-    },
-    ["ease-linear", {}],
-    ["ease-in", {}],
-    ["ease-out", {}],
-    ["ease-in-out", {}],
-  );
+test("animate-spin", async () => {
+  await render(<View testID={testID} className="animate-spin" />);
+
+  let component = screen.getByTestId(testID);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "0deg" }],
+  });
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "180deg" }],
+  });
+
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "360deg" }],
+  });
+
+  jest.advanceTimersByTime(250);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "90deg" }],
+  });
 });
 
-describe.skip("Transitions & Animation - Transition Delay", () => {
-  testCasesWithOptions(
-    {
-      animated: true,
-    },
-    ["delay-0", {}],
-  );
+test("animate-pulse", async () => {
+  await render(<View testID={testID} className="animate-pulse" />);
+
+  let component = screen.getByTestId(testID);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    opacity: 1,
+  });
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    opacity: 0.7500000093132256,
+  });
+
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    opacity: 0.5,
+  });
+
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    opacity: 0.7491666591949523,
+  });
+
+  jest.advanceTimersByTime(501);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    opacity: 1,
+  });
 });
 
-describe.skip("Transitions & Animation - Animation", () => {
-  testCasesWithOptions(
-    {
-      animated: true,
+test("changing animations", async () => {
+  await render(<View testID={testID} className="animate-spin" />, {
+    config: {
+      safelist: ["animate-bounce"],
     },
-    [
-      // TODO:
-      // "animate-ping",
-      // "animate-pulse",
-      // "animate-bounce",
+  });
 
-      "animate-none",
-      {},
+  let component = screen.getByTestId(testID);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "0deg" }],
+  });
+  jest.advanceTimersByTime(500);
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "180deg" }],
+  });
+
+  screen.rerender(<View testID={testID} className="animate-bounce" />);
+
+  // It takes 1 tick for reanimated to realize that the SharedValues have changed
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [{ rotate: "0deg" }],
+  });
+
+  // Advance to the next tick
+  jest.advanceTimersToNextTimer();
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [
+      { translateY: "-25%" },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
     ],
-    [
-      "animate-spin",
-      style({
-        transform: [{ rotate: "0deg" }],
-      }),
+  });
+
+  jest.advanceTimersByTime(500);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [
+      { translateY: "0%" },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
     ],
-    // [
-    //   "animate-ping",
-    //   {
-    //     style: {
-    //       opacity: NaN,
-    //       transform: [{ scaleX: 1 }, { scaleY: 1 }],
-    //     },
-    //   },
-    // ],
-  );
+  });
+
+  jest.advanceTimersByTime(501);
+
+  expect(getAnimatedStyle(component)).toStrictEqual({
+    transform: [
+      { translateY: "-25%" },
+      { perspective: 1 },
+      { translateX: 0 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { scale: 1 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
+    ],
+  });
 });

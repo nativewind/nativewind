@@ -1,13 +1,15 @@
+/** @jsxImportSource nativewind */
 import {
-  PlatformColor,
   PixelRatio,
+  Platform,
+  PlatformColor,
   StyleSheet,
   View,
-  Platform,
 } from "react-native";
-import { createMockComponent, renderTailwind } from "../test-utils";
+
 import { screen } from "@testing-library/react-native";
-import { resetStyles } from "react-native-css-interop/testing-library";
+
+import { render } from "../test";
 import {
   fontScaleSelect,
   getPixelSizeForLayoutSize,
@@ -18,14 +20,11 @@ import {
   roundToNearestPixel,
 } from "../theme";
 
-const A = createMockComponent(View);
 const testA = "a";
 const testB = "b";
 
-beforeEach(() => resetStyles());
-
 test("hairlineWidth()", async () => {
-  await renderTailwind(<A testID={testA} className="border-custom" />, {
+  await render(<View testID={testA} className="border-custom" />, {
     config: {
       theme: {
         extend: {
@@ -43,10 +42,10 @@ test("hairlineWidth()", async () => {
 });
 
 test("platformSelect()", async () => {
-  await renderTailwind(
+  await render(
     <>
-      <A testID={testA} className="text-match" />
-      <A testID={testB} className="text-default" />
+      <View testID={testA} className="text-match" />
+      <View testID={testB} className="text-default" />
     </>,
     {
       config: {
@@ -75,10 +74,10 @@ test("platformSelect()", async () => {
 test("pixelScaleSelect()", async () => {
   const currentPixelRatio = PixelRatio.get();
 
-  await renderTailwind(
+  await render(
     <>
-      <A testID={testA} className="text-match" />
-      <A testID={testB} className="text-default" />
+      <View testID={testA} className="text-match" />
+      <View testID={testB} className="text-default" />
     </>,
     {
       config: {
@@ -107,10 +106,10 @@ test("pixelScaleSelect()", async () => {
 test("fontScaleSelect()", async () => {
   const fontScale = PixelRatio.getFontScale();
 
-  await renderTailwind(
+  await render(
     <>
-      <A testID={testA} className="text-match" />
-      <A testID={testB} className="text-default" />
+      <View testID={testA} className="text-match" />
+      <View testID={testB} className="text-default" />
     </>,
     {
       config: {
@@ -137,7 +136,7 @@ test("fontScaleSelect()", async () => {
 });
 
 test("roundToNearestPixel()", async () => {
-  await renderTailwind(<A testID={testA} className="border-custom" />, {
+  await render(<View testID={testA} className="border-custom" />, {
     config: {
       theme: {
         extend: {
@@ -155,7 +154,7 @@ test("roundToNearestPixel()", async () => {
 });
 
 test("getPixelSizeForLayoutSize()", async () => {
-  await renderTailwind(<A testID={testA} className="border-custom" />, {
+  await render(<View testID={testA} className="border-custom" />, {
     config: {
       theme: {
         extend: {
@@ -173,7 +172,7 @@ test("getPixelSizeForLayoutSize()", async () => {
 });
 
 test("platformColor()", async () => {
-  await renderTailwind(<A testID={testA} className="text-custom" />, {
+  await render(<View testID={testA} className="text-custom" />, {
     config: {
       theme: {
         extend: {
@@ -195,8 +194,8 @@ test("platformColor()", async () => {
 });
 
 test("nested functions", async () => {
-  await renderTailwind(
-    <A testID={testA} className="border-custom [--test:123px]" />,
+  await render(
+    <View testID={testA} className="border-custom [--test:123px]" />,
     {
       config: {
         theme: {
@@ -220,8 +219,8 @@ test("nested functions", async () => {
 });
 
 test("custom color w/ css variable", async () => {
-  await renderTailwind(
-    <A
+  await render(
+    <View
       testID={testA}
       className="text-primary-50 [--color-primary-50:240,253,250]"
     />,

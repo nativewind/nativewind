@@ -1,4 +1,4 @@
-const isNative = Boolean(process.env.NATIVEWIND_NATIVE);
+const isNative = Boolean(process.env.NATIVEWIND_OS);
 
 export const {
   hairlineWidth,
