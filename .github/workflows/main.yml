@@ -45,6 +45,7 @@ jobs:
       - name: Create snapshot release
         if: steps.changesets.outputs.published == 'false'
         run: |
+          git restore . # Undo changesets changes
           npx changeset version --snapshot $(git rev-parse --short HEAD)
           npx changeset publish --tag snapshot --no-git-tag
         env:
