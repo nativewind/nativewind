@@ -5,8 +5,7 @@ import type {
   SharedValueInterpolation,
 } from "../animations";
 import type { ContainerContextValue, VariableContextValue } from "../contexts";
-import { updateRenderTree } from "../rendering";
-import type { ConfigStates, Maybe, SideEffectTrigger } from "../types";
+import type { ConfigStates, SideEffectTrigger } from "../types";
 import type { ConfigReducerAction, ConfigReducerState } from "./config";
 import { configReducer } from "./config";
 
@@ -122,21 +121,7 @@ export function performConfigReducerActions(
   universalVariables: VariableContextValue,
   inheritedContainers: ContainerContextValue,
 ): ComponentReducerState {
-  let updatedStates: Maybe<ConfigStates>;
-  let nextVariables: Maybe<VariableContextValue>;
-  let nextContainers: Maybe<ContainerContextValue>;
-  let nextGroupedProps: Maybe<Record<string, Maybe<Record<string, unknown>>>>;
-  let nextHoverActions: Maybe<Record<string, Maybe<ConfigReducerAction[]>>>;
-  let nextActiveActions: Maybe<Record<string, Maybe<ConfigReducerAction[]>>>;
-  let nextFocusActions: Maybe<Record<string, Maybe<ConfigReducerAction[]>>>;
-  let nextSideEffects: Maybe<Record<string, Maybe<SideEffectTrigger[]>>>;
-  let nextAnimationIO: Maybe<Record<string, Maybe<SharedValueInterpolation[]>>>;
-  let nextTransitions: Maybe<
-    Record<
-      string,
-      Map<string | string[], ReanimatedMutable<any> | undefined> | undefined
-    >
-  >;
+  let configStatesToUpdate: ConfigStates | undefined;
 
   /**
    * This reducer's state is used as the props for multiple components/hooks.
@@ -158,127 +143,80 @@ export function performConfigReducerActions(
 
     /**
      * If the config state didn't change, we can skip updating the state.
-     *
-     * However, variables, containers, and side-effects are special cases where the order matters.
-     * If a prior config state set new values, we need to maintain the order by still applying the later ones
      */
     if (Object.is(configState, nextConfigState)) {
-      if (nextVariables) Object.assign(nextVariables, configState.variables);
-      if (nextContainers) Object.assign(nextContainers, configState.containers);
       continue;
     }
 
-    // Something caused the config state to change, find out what it was
-
-    // Update the state with the new config state
-    updatedStates ??= {};
-    updatedStates[nextConfigState.key] = nextConfigState;
-
-    // Did the props change?
-    if (!Object.is(configState.styles?.props, nextConfigState.styles?.props)) {
-      nextGroupedProps ??= {};
-      nextGroupedProps[nextConfigState.key] = nextConfigState.styles?.props;
-    }
-
-    // Did a variable change?
-    if (!Object.is(configState.variables, nextConfigState.variables)) {
-      nextVariables ??= {};
-      Object.assign(nextVariables, nextConfigState.variables);
-    }
-
-    // Did a container change?
-    if (!Object.is(configState.containers, nextConfigState.containers)) {
-      nextContainers ??= { ...inheritedContainers };
-      Object.assign(nextContainers, nextConfigState.containers);
-    }
-
-    // Did declaration side effects change?
-    if (
-      !Object.is(
-        configState.declarations?.sideEffects,
-        nextConfigState.declarations?.sideEffects,
-      )
-    ) {
-      nextSideEffects ??= {};
-      nextSideEffects[`$d:${nextConfigState.key}`] =
-        nextConfigState.declarations?.sideEffects;
-    }
-
-    // Did style side effects change?
-    if (
-      !Object.is(
-        configState.styles?.sideEffects,
-        nextConfigState.styles?.sideEffects,
-      )
-    ) {
-      nextSideEffects ??= {};
-      nextSideEffects[`$s:${nextConfigState.key}`] =
-        nextConfigState.styles?.sideEffects;
-    }
-
-    // Did animations change?
-    if (
-      !Object.is(
-        configState.styles?.animationIO,
-        nextConfigState.styles?.animationIO,
-      )
-    ) {
-      nextAnimationIO ??= {};
-      nextAnimationIO[nextConfigState.key] =
-        nextConfigState.styles?.animationIO;
-    }
-
-    // Did transitions change?
-    if (
-      !Object.is(
-        configState.styles?.transitions,
-        nextConfigState.styles?.transitions,
-      )
-    ) {
-      nextTransitions ??= {};
-      nextTransitions[nextConfigState.key] =
-        nextConfigState.styles?.transitions;
-    }
-
-    // Did hover actions change?
-    if (!Object.is(configState.hoverActions, nextConfigState.hoverActions)) {
-      nextHoverActions ??= {};
-      nextHoverActions[nextConfigState.key] = nextHoverActions.hoverActions;
-    }
-
-    // Did active actions change?
-    if (!Object.is(configState.activeActions, nextConfigState.activeActions)) {
-      nextActiveActions ??= {};
-      nextActiveActions[nextConfigState.key] = nextActiveActions.activeActions;
-    }
-
-    // Did focus actions change?
-    if (!Object.is(configState.focusActions, nextConfigState.focusActions)) {
-      nextFocusActions ??= {};
-      nextFocusActions[nextConfigState.key] = nextFocusActions.focusActions;
-    }
+    configStatesToUpdate ??= {};
+    configStatesToUpdate[key] = nextConfigState;
   }
 
-  // Did anything change?
-  if (!updatedStates) {
+  if (!configStatesToUpdate) {
     return state;
   }
 
-  const sideEffects = nextSideEffects
-    ? { ...nextSideEffects }
-    : state.sideEffects;
-
-  // Update the render tree, this will inject the context providers / animated types
-  return updateRenderTree(
-    state,
-    Object.assign({}, state.configStates, updatedStates),
-    nextVariables ?? state.variables,
-    nextContainers ?? state.containers,
-    nextHoverActions ?? state.hoverActions,
-    nextActiveActions ?? state.activeActions,
-    nextFocusActions ?? state.focusActions,
-    nextAnimationIO ?? state.animations,
-    nextTransitions ?? state.transitions,
-    sideEffects,
+  let variables: VariableContextValue | undefined;
+  let containers: ContainerContextValue | undefined;
+  let sideEffects: SideEffectTrigger[] | undefined;
+  const configStates = Object.assign(
+    {},
+    state.configStates,
+    configStatesToUpdate,
   );
+
+  for (const state of Object.values(configStates)) {
+    if (state.variables) {
+      variables ??= {};
+      Object.assign(variables, state.variables);
+    }
+
+    if (state.containers) {
+      containers ??= {};
+      Object.assign(containers, state.containers);
+    }
+
+    if (state.declarations?.sideEffects) {
+      sideEffects ??= [];
+      sideEffects.push(...state.declarations?.sideEffects);
+    }
+
+    if (state.styles?.sideEffects) {
+      sideEffects ??= [];
+      sideEffects.push(...state.styles?.sideEffects);
+    }
+  }
+
+  const next = {
+    ...state,
+    configStates,
+    variables,
+    containers,
+  };
+
+  next.variables = Object.assign({}, state.variables);
+
+  return next;
+  // // Did anything change?
+  // if (!updatedStates) {
+  //   return state;
+  // }
+
+  // const sideEffects = nextSideEffects
+  //   ? { ...nextSideEffects }
+  //   : state.sideEffects;
+
+  // // Update the render tree, this will inject the context providers / animated types
+  // return updateRenderTree(
+  //   state,
+  //   Object.assign({}, state.configStates, updatedStates),
+  //   nextVariables ?? state.variables,
+  //   nextContainers ?? state.containers,
+  //   nextHoverActions ?? state.hoverActions,
+  //   nextActiveActions ?? state.activeActions,
+  //   nextFocusActions ?? state.focusActions,
+  //   nextAnimationIO ?? state.animations,
+  //   nextTransitions ?? state.transitions,
+  //   sideEffects,
+  // );
 }
