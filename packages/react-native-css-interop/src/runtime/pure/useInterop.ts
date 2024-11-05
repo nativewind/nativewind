@@ -95,17 +95,6 @@ export function buildUseInterop(type: ComponentType, ...configs: Config[]) {
     );
 
     /**
-     * Animations and transitions are side effects.
-     */
-    useEffect(() => {
-      if (!state.sideEffects) return;
-      const sideEffects = Object.values(state.sideEffects).flat();
-      for (const sideEffect of sideEffects) {
-        sideEffect?.();
-      }
-    }, [state.sideEffects]);
-
-    /**
      * The declarations and styles need to be cleaned up when the component
      * unmounts, as they will hold references to observables.
      *

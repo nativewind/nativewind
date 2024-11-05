@@ -241,10 +241,11 @@ export const defaultValues: Record<string, any> = {
   scaleY: 1,
   skewX: "0deg",
   skewY: "0deg",
-  transformOrigin: "50%",
   textShadowRadius: 0,
   top: 0,
+  transformOrigin: "50%",
   translateX: 0,
   translateY: 0,
+  width: 0,
   zIndex: 0,
 };

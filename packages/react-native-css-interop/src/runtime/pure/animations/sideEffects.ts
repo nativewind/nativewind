@@ -213,9 +213,11 @@ export function getAnimationTiming(
 }
 
 export function getEasing(
-  timingFunction: EasingFunction,
+  timingFunction: EasingFunction | undefined,
   Easing: (typeof import("react-native-reanimated"))["Easing"],
 ) {
+  if (!timingFunction) return Easing.linear;
+
   switch (timingFunction.type) {
     case "ease":
       return Easing.ease;

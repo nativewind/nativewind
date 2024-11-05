@@ -3,6 +3,8 @@ import type { ContainerContextValue, VariableContextValue } from "./contexts";
 import type { ResolveOptions } from "./resolvers";
 import { resolveValue } from "./resolvers";
 import type { ConfigReducerState } from "./state/config";
+import { TransitionStyles } from "./transitions";
+import { getTransitionSideEffect } from "./transitions/sideEffects";
 import type {
   Callback,
   RenderGuard,
@@ -13,16 +15,19 @@ import type {
 import { Effect } from "./utils/observable";
 import { setValue } from "./utils/properties";
 
-export type Styles = Effect & {
-  epoch: number;
-  guards: RenderGuard[];
-  props?: Record<string, any>;
-  sideEffects?: SideEffectTrigger[];
-  animationIO?: SharedValueInterpolation[];
-};
+export type Styles = Effect &
+  TransitionStyles & {
+    epoch: number;
+    guards: RenderGuard[];
+    props?: Record<string, any>;
+    sideEffects?: SideEffectTrigger[];
+    animationIO?: SharedValueInterpolation[];
+  };
+
+export type StateWithStyles = ConfigReducerState & { styles: Styles };
 
 export function buildStyles(
-  state: ConfigReducerState,
+  previous: ConfigReducerState,
   incomingProps: Record<string, unknown>,
   inheritedVariables: VariableContextValue,
   universalVariables: VariableContextValue,
@@ -30,7 +35,7 @@ export function buildStyles(
   run: () => void,
 ) {
   const styles: Styles = {
-    epoch: state.styles ? state.styles.epoch : -1,
+    epoch: previous.styles ? previous.styles.epoch : -1,
     guards: [],
     run,
     dependencies: new Set(),
@@ -39,12 +44,13 @@ export function buildStyles(
     },
   };
 
-  const next: ConfigReducerState = {
-    ...state,
+  const next: StateWithStyles = {
+    ...previous,
     styles,
   };
 
   const delayedStyles: Callback[] = [];
+  const sideEffects: SideEffectTrigger[] = [];
 
   const resolveOptions: ResolveOptions = {
     getProp: (name: string) => {
@@ -79,24 +85,26 @@ export function buildStyles(
     },
   };
 
-  if (state.declarations?.normal) {
+  if (next.declarations?.normal) {
     styles.props = applyStyles(
-      styles.props,
-      state.declarations?.normal,
-      state,
+      next,
+      previous,
+      next.declarations?.normal,
       delayedStyles,
+      sideEffects,
       resolveOptions,
     );
   }
 
-  styles.animationIO = getAnimationIO(state, styles, resolveOptions);
+  styles.animationIO = getAnimationIO(next, styles, resolveOptions);
 
-  if (state.declarations?.important) {
+  if (next.declarations?.important) {
     styles.props = applyStyles(
-      styles.props,
-      state.declarations?.important,
-      state,
+      next,
+      previous,
+      next.declarations?.important,
       delayedStyles,
+      sideEffects,
       resolveOptions,
     );
   }
@@ -107,22 +115,36 @@ export function buildStyles(
     }
   }
 
+  if (sideEffects.length) {
+    styles.sideEffects = sideEffects;
+  }
+
   styles.epoch++;
   return next;
 }
 
 function applyStyles(
-  props: Record<string, any> | undefined,
+  next: StateWithStyles,
+  previous: ConfigReducerState,
   styleRules: StyleRule[],
-  state: ConfigReducerState,
   delayedStyles: Callback[],
-  resolveOptions: ResolveOptions,
+  sideEffects: SideEffectTrigger[],
+  options: ResolveOptions,
 ) {
+  let props = next.styles.props;
+
   for (const styleRule of styleRules) {
     if (styleRule.d) {
       for (const declaration of styleRule.d) {
         if (Array.isArray(declaration)) {
           let value: any = declaration[0];
+          const propPath = declaration[1];
+
+          const transitionFn = getTransitionSideEffect(
+            next,
+            previous,
+            propPath,
+          );
 
           if (Array.isArray(value)) {
             const shouldDelay = declaration[2];
@@ -141,20 +163,39 @@ function applyStyles(
               value = {};
               delayedStyles.push(() => {
                 const placeholder = value;
-                value = resolveValue(state, originalValue, resolveOptions);
-                setValue(props, declaration[1], value, state, placeholder);
+                value = resolveValue(next, originalValue, options);
+                if (transitionFn) {
+                  sideEffects.push(transitionFn(value));
+                } else {
+                  setValue(props, propPath, value, next, placeholder);
+                }
               });
             } else {
-              value = resolveValue(state, value, resolveOptions);
+              value = resolveValue(next, value, options);
             }
           }
 
           // This mutates and/or creates the props object
-          props = setValue(props, declaration[1], value, state);
+
+          if (transitionFn) {
+            sideEffects.push(transitionFn(value));
+          } else {
+            props = setValue(props, propPath, value, next);
+          }
         } else {
           props ??= {};
           props.style ??= {};
           Object.assign(props.style, declaration);
+
+          if (next.declarations?.transition?.p?.length) {
+            for (const key in declaration) {
+              const transitionFn = getTransitionSideEffect(next, previous, key);
+
+              if (transitionFn) {
+                sideEffects.push(transitionFn(declaration[key]));
+              }
+            }
+          }
         }
       }
     }

@@ -1,6 +1,9 @@
 import type { ComponentType, Dispatch, Reducer } from "react";
 
-import type { SharedValueInterpolation } from "../animations";
+import type {
+  ReanimatedMutable,
+  SharedValueInterpolation,
+} from "../animations";
 import type { ContainerContextValue, VariableContextValue } from "../contexts";
 import { updateRenderTree } from "../rendering";
 import type { ConfigStates, Maybe, SideEffectTrigger } from "../types";
@@ -31,10 +34,17 @@ export type ComponentReducerState = Readonly<{
   // The side effects for each config, grouped by config key
   // These are mostly used to control animations
   sideEffects?: Record<string, SideEffectTrigger[] | undefined>;
+
+  // A flattened version of animations / transitions
+  sharedValues?: ReanimatedMutable<any>[];
+
   // Animations
   animations?: Record<string, SharedValueInterpolation[] | undefined>;
   // Transitions
-  transitions?: any;
+  transitions?: Record<
+    string,
+    Map<string | string[], ReanimatedMutable<any> | undefined> | undefined
+  >;
 }>;
 
 export type ComponentReducerAction =
@@ -121,6 +131,12 @@ export function performConfigReducerActions(
   let nextFocusActions: Maybe<Record<string, Maybe<ConfigReducerAction[]>>>;
   let nextSideEffects: Maybe<Record<string, Maybe<SideEffectTrigger[]>>>;
   let nextAnimationIO: Maybe<Record<string, Maybe<SharedValueInterpolation[]>>>;
+  let nextTransitions: Maybe<
+    Record<
+      string,
+      Map<string | string[], ReanimatedMutable<any> | undefined> | undefined
+    >
+  >;
 
   /**
    * This reducer's state is used as the props for multiple components/hooks.
@@ -212,6 +228,18 @@ export function performConfigReducerActions(
         nextConfigState.styles?.animationIO;
     }
 
+    // Did transitions change?
+    if (
+      !Object.is(
+        configState.styles?.transitions,
+        nextConfigState.styles?.transitions,
+      )
+    ) {
+      nextTransitions ??= {};
+      nextTransitions[nextConfigState.key] =
+        nextConfigState.styles?.transitions;
+    }
+
     // Did hover actions change?
     if (!Object.is(configState.hoverActions, nextConfigState.hoverActions)) {
       nextHoverActions ??= {};
@@ -250,6 +278,7 @@ export function performConfigReducerActions(
     nextActiveActions ?? state.activeActions,
     nextFocusActions ?? state.focusActions,
     nextAnimationIO ?? state.animations,
+    nextTransitions ?? state.transitions,
     sideEffects,
   );
 }

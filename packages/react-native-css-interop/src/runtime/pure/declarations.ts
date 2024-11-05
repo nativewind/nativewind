@@ -1,27 +1,28 @@
 import {
   buildAnimationSideEffects,
   type AnimationAttributes,
-  type ReanimatedMutable,
 } from "./animations";
 import { styleFamily } from "./globals";
 import type { ConfigReducerState } from "./state/config";
+import { TransitionAttributes, TransitionDeclarations } from "./transitions";
 import type { RenderGuard, SideEffectTrigger, StyleRule } from "./types";
 import type { Effect } from "./utils/observable";
 
-export type Declarations = Effect & {
-  epoch: number;
-  defaultStyle?: Record<string, any>;
-  normal: StyleRule[];
-  important: StyleRule[];
-  guards: RenderGuard[];
-  animation: AnimationAttributes[];
-  sideEffects?: SideEffectTrigger[];
-  sharedValues?: Map<string, ReanimatedMutable<any>>;
-};
+export type Declarations = Effect &
+  TransitionDeclarations & {
+    epoch: number;
+    defaultStyle?: Record<string, any>;
+    normal: StyleRule[];
+    important: StyleRule[];
+    guards: RenderGuard[];
+    animation?: AnimationAttributes[];
+    sideEffects?: SideEffectTrigger[];
+  };
 
 type DeclarationUpdates = {
   rules?: boolean;
   animation?: boolean;
+  transition?: boolean;
 };
 
 export function buildDeclarations(
@@ -36,7 +37,6 @@ export function buildDeclarations(
     epoch: previous ? previous.epoch : 0,
     normal: [],
     important: [],
-    animation: [],
     guards: [{ type: "prop", name: state.config.source, value: source }],
     run,
     dependencies: new Set(),
@@ -46,6 +46,7 @@ export function buildDeclarations(
   };
 
   let updates: DeclarationUpdates = {};
+  const transitions: TransitionAttributes[] = [];
 
   for (const className of source.split(/\s+/)) {
     const styleRuleSet = next.get(styleFamily(className));
@@ -59,6 +60,7 @@ export function buildDeclarations(
       next,
       previous,
       next.normal,
+      transitions,
       previous?.normal,
     );
     updates = collectRules(
@@ -67,17 +69,22 @@ export function buildDeclarations(
       next,
       previous,
       next.important,
+      transitions,
       previous?.important,
     );
   }
 
-  if (updates.rules || updates.animation) {
+  if (updates.rules || updates.animation || transitions.length) {
     // If a rule or animation property changed, increment the epoch
     next.epoch++;
 
     // If the animation's changed, then we need to update the animation side effects
     if (updates.animation) {
       buildAnimationSideEffects(next, previous);
+    }
+
+    if (transitions.length) {
+      next.transition = Object.assign({}, ...transitions);
     }
   }
 
@@ -96,6 +103,7 @@ function collectRules(
   next: Declarations,
   previous: Declarations | undefined,
   collection: StyleRule[],
+  transitions: TransitionAttributes[],
   previousCollection?: StyleRule[],
 ) {
   if (!styleRules) {
@@ -104,19 +112,25 @@ function collectRules(
   }
 
   let collectionIndex = Math.max(0, collection.length - 1);
-  let aIndex = Math.max(0, next.animation.length - 1);
+  let aIndex = next.animation ? Math.max(0, next.animation.length - 1) : 0;
 
   for (const rule of styleRules) {
     if (!testRule(rule)) continue;
 
     if (rule.a) {
+      next.animation ??= [];
       next.animation.push(rule.a);
       /**
        * Changing any animation property will restart all animations
        * TODO: This is not entirely accurate, Chrome does not restart animations
        *       This is fine during this experimental stage, but we should fix this in the future
        */
-      updates.animation ||= !Object.is(previous?.animation[aIndex], rule.a);
+      updates.animation ||= !Object.is(previous?.animation?.[aIndex], rule.a);
+      aIndex++;
+    }
+
+    if (rule.t) {
+      transitions.push(rule.t);
       aIndex++;
     }
 

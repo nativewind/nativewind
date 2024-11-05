@@ -9,6 +9,7 @@ export function updateRenderTree(
   activeActions: ComponentReducerState["activeActions"],
   focusActions: ComponentReducerState["focusActions"],
   animations: ComponentReducerState["animations"],
+  transitions: ComponentReducerState["transitions"],
   sideEffects: ComponentReducerState["sideEffects"],
 ) {
   let props = {};
@@ -28,6 +29,7 @@ export function updateRenderTree(
     hoverActions,
     props,
     sideEffects,
+    transitions,
     variables,
   };
 }

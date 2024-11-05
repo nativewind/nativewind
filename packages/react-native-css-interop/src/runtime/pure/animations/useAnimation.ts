@@ -1,3 +1,5 @@
+import { useEffect, useMemo } from "react";
+
 import {
   interpolate,
   interpolateColor,
@@ -23,9 +25,23 @@ export function useAnimation(
   const groupedTransitions = state.transitions;
   const originalStyle = state.props?.style as Record<string, any> | undefined;
 
+  /**
+   * Animations and transitions are side effects.
+   */
+  useEffect(() => {
+    if (!state.sideEffects) return;
+    const sideEffects = Object.values(state.sideEffects).flat();
+    for (const sideEffect of sideEffects) {
+      sideEffect?.();
+    }
+  }, [state.sideEffects]);
+
+  const a = useMemo(() => {
+    return [[groupedTransitions?.["0"]?.get("width")]];
+  }, [groupedTransitions]);
+
   const animatedStyle = useAnimatedStyle(() => {
     const style: Record<string, any> = { ...originalStyle };
-    // const seenProperties = new Set<string>();
 
     /**
      * Duplicate of setValue() from src/utils/properties.ts.
@@ -63,21 +79,6 @@ export function useAnimation(
       }
     }
 
-    // if (groupedTransitions) {
-    //   for (const transition of Object.values(groupedTransitions).flat()) {
-    //     if (!transition) {
-    //       continue;
-    //     }
-    //     if (seenProperties.has(transition[0])) {
-    //       continue;
-    //     }
-
-    //     seenProperties.add(transition[0]);
-
-    //     style[transition[0]] = transition[1].value;
-    //   }
-    // }
-
     if (groupedAnimations) {
       for (const animationIO of Object.values(groupedAnimations).flat()) {
         if (!animationIO) {
@@ -107,8 +108,24 @@ export function useAnimation(
       }
     }
 
+    if (groupedTransitions) {
+      for (const transitions of Object.values(groupedTransitions).flat()) {
+        if (!transitions) {
+          continue;
+        }
+
+        for (const transition of transitions) {
+          if (!transition[1]) {
+            continue;
+          }
+
+          setValue(transition[0], transition[1].value);
+        }
+      }
+    }
+
     return style;
-  }, [groupedAnimations, groupedTransitions, originalStyle]);
+  }, [groupedAnimations, groupedTransitions, originalStyle, a]);
 
   return state.animations || state.transitions
     ? { ...state.props, style: animatedStyle }
