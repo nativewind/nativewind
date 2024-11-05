@@ -16,12 +16,13 @@ module.exports = {
   },
   plugins: [
     // Set a default value on the `:root` element
-    ({ addBase }) => addBase({ 
-        ":root": { 
+    ({ addBase }) =>
+      addBase({
+        ":root": {
           "--color-values": "255 0 0",
-          "--color-rgb": "rgb(255 0 0)" 
-        } 
-    }),
+          "--color-rgb": "rgb(255 0 0)",
+        },
+      }),
   ],
 };
 ```
@@ -81,7 +82,7 @@ const themes = {
 }
 
 function Theme(props) {
-  const colorScheme = useColorScheme()
+  const { colorScheme } = useColorScheme()
   return (
     <View style={themes[props.name][colorScheme]}>
       {props.children}
