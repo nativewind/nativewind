@@ -37,8 +37,8 @@
     "vercel": "^31.2.2"
   },
   "overrides": {
-    "@expo/metro-runtime": "3.2.3",
-    "react-native": "0.75.2",
-    "react-native-reanimated": "3.15.5"
+    "expo": "52.0.0-preview.23",
+    "react-native": "0.76.1",
+    "react-native-reanimated": "3.16.1"
   }
 }

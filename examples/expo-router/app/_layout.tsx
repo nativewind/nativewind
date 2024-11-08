@@ -1,9 +1,11 @@
 import "../global.css";
+
+import { memo, useEffect } from "react";
+import { StyleSheet, View } from "react-native";
+
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
-import { memo, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
 
 export {
   // Catch any errors thrown by the Layout component.

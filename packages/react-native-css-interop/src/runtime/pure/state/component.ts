@@ -9,6 +9,8 @@ import type { ConfigStates, SideEffectTrigger } from "../types";
 import type { ConfigReducerAction, ConfigReducerState } from "./config";
 import { configReducer } from "./config";
 
+export type AnimatableProps = {};
+
 export type ComponentReducerState = Readonly<{
   key: object;
   dispatch: Dispatch<ComponentReducerAction>;
