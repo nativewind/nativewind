@@ -5,7 +5,7 @@ import {
 import { styleFamily } from "./globals";
 import type { ConfigReducerState } from "./state/config";
 import { TransitionAttributes, TransitionDeclarations } from "./transitions";
-import type { RenderGuard, SideEffectTrigger, StyleRule } from "./types";
+import type { Props, RenderGuard, SideEffectTrigger, StyleRule } from "./types";
 import type { Effect } from "./utils/observable";
 
 export type Declarations = Effect &
@@ -26,11 +26,11 @@ type DeclarationUpdates = {
 
 export function buildDeclarations(
   state: ConfigReducerState,
-  props: Record<string, any>,
+  props: Props,
   run: () => void,
 ): Declarations {
   const previous = state.declarations;
-  const source = props[state.config.source] as string;
+  const source = props?.[state.config.source] as string | undefined;
 
   const next: Declarations = {
     epoch: previous?.epoch ?? 0,
@@ -41,6 +41,10 @@ export function buildDeclarations(
       return readable.get(next);
     },
   };
+
+  if (!source) {
+    return next;
+  }
 
   let updates: DeclarationUpdates | undefined;
 

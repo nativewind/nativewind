@@ -7,6 +7,7 @@ import { TransitionStyles } from "./transitions";
 import { getTransitionSideEffect } from "./transitions/sideEffects";
 import type {
   Callback,
+  Props,
   RenderGuard,
   SideEffectTrigger,
   StyleRule,
@@ -29,7 +30,7 @@ export type StateWithStyles = ConfigReducerState & { styles: Styles };
 
 export function buildStyles(
   previous: ConfigReducerState,
-  incomingProps: Record<string, unknown>,
+  incomingProps: Props,
   inheritedVariables: VariableContextValue,
   universalVariables: VariableContextValue,
   inheritedContainers: ContainerContextValue,
@@ -56,9 +57,9 @@ export function buildStyles(
       styles.guards?.push({
         type: "prop",
         name: name,
-        value: incomingProps[name],
+        value: incomingProps?.[name],
       });
-      return incomingProps[name] as StyleValueDescriptor;
+      return incomingProps?.[name] as StyleValueDescriptor;
     },
     getVariable: (name: string) => {
       let value: StyleValueDescriptor;

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { ComponentType, createElement, useEffect } from "react";
 
 import {
   interpolate,
@@ -6,20 +6,18 @@ import {
   useAnimatedStyle,
 } from "react-native-reanimated";
 
+import { Props } from "../types";
 import type { UseInteropState } from "../useInterop";
 
-/**
- * Wrapper around useAnimatedStyle that allows for animations and transitions.
- * Note: This only sets the style properties that are animated or transitioned,
- *       the SharedValue is controlled via the SideEffects useEffect() in useInterop()
- * @param originalStyle
- * @param animations
- * @param transitions
- * @returns
- */
-export function useAnimation(
+const animatedCache = new Map<
+  UseInteropState["type"],
+  UseInteropState["type"]
+>();
+
+export function createAnimatedElement(
   state: UseInteropState,
-  props?: Record<string, any>,
+  Component: ComponentType<any>,
+  props: Props,
 ) {
   const originalStyle = state.props?.style as Record<string, any> | undefined;
 
@@ -108,10 +106,43 @@ export function useAnimation(
     return style;
   }, [state.sharedValues, baseStyles, state.animations, state.transitions]);
 
-  if (state.animations || state.transitions) {
+  if (state.animations?.length || state.transitions?.length) {
     props ??= {};
     props.style = animatedStyle;
   }
 
-  return props;
+  return createElement(Component, props);
+}
+
+export function createAnimatedComponent(
+  Component: UseInteropState["type"],
+): any {
+  if (animatedCache.has(Component)) {
+    return animatedCache.get(Component)!;
+  } else if (Component.displayName?.startsWith("AnimatedComponent")) {
+    return Component;
+  }
+
+  if (
+    !(
+      typeof Component !== "function" ||
+      (Component.prototype && Component.prototype.isReactComponent)
+    )
+  ) {
+    throw new Error(
+      `Looks like you're passing an animation style to a function component \`${Component.name}\`. Please wrap your function component with \`React.forwardRef()\` or use a class component instead.`,
+    );
+  }
+
+  const { default: Animated } =
+    require("react-native-reanimated") as typeof import("react-native-reanimated");
+
+  const AnimatedComponent = Animated.createAnimatedComponent(
+    Component as React.ComponentClass,
+  );
+  AnimatedComponent.displayName = `Animated.${Component.displayName || Component.name || "Unknown"}`;
+
+  animatedCache.set(Component, AnimatedComponent);
+
+  return AnimatedComponent;
 }

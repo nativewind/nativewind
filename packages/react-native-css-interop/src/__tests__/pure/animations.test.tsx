@@ -1,5 +1,7 @@
+import { View } from "react-native";
+
 import { render, screen } from "@testing-library/react-native";
-import Animated, { getAnimatedStyle } from "react-native-reanimated";
+import { getAnimatedStyle } from "react-native-reanimated";
 
 import { buildUseInterop } from "../../runtime/pure";
 import { addKeyFrames, addStyle } from "../../runtime/pure/testUtils";
@@ -8,14 +10,13 @@ const testID = "react-native-css-interop";
 
 jest.useFakeTimers();
 
-const useInterop = buildUseInterop(Animated.View, {
+const useInterop = buildUseInterop(View, {
   source: "className",
   target: "style",
 });
 
 function MyAnimatedView(props: any) {
-  props = useInterop(props);
-  return <Animated.View testID={testID} {...props} />;
+  return useInterop({ testID, ...props });
 }
 
 test("basic animation", () => {

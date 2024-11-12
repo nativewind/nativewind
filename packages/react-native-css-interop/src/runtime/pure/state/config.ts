@@ -4,6 +4,7 @@ import { buildStyles, type Styles } from "../styles";
 import type {
   ConfigWithKey,
   InlineStyle,
+  Props,
   StyleValueDescriptor,
 } from "../types";
 import { UseInteropDispatch } from "../useInterop";
@@ -40,7 +41,7 @@ export function configReducer(
   state: ConfigReducerState,
   action: ConfigReducerAction,
   dispatch: UseInteropDispatch,
-  incomingProps: Record<string, unknown>,
+  incomingProps: Props,
   inheritedVariables: VariableContextValue,
   universalVariables: VariableContextValue,
   inheritedContainers: ContainerContextValue,
@@ -79,10 +80,10 @@ export function configReducer(
 function updateDefinitions(
   state: ConfigReducerState,
   dispatch: UseInteropDispatch,
-  props: Record<string, unknown>,
+  props: Props,
 ): ConfigReducerState {
-  const source = props[state.config.source] as string;
-  const target = props[state.config.target] as InlineStyle;
+  const source = props?.[state.config.source] as string | undefined;
+  const target = props?.[state.config.target] as InlineStyle | undefined;
 
   // Has this component ever seen styles?
   const initialized = state.declarations;
@@ -118,7 +119,7 @@ function updateDefinitions(
 function updateStyles(
   previous: ConfigReducerState,
   dispatch: UseInteropDispatch,
-  incomingProps: Record<string, unknown>,
+  incomingProps: Props,
   inheritedVariables: VariableContextValue,
   universalVariables: VariableContextValue,
   inheritedContainers: ContainerContextValue,
