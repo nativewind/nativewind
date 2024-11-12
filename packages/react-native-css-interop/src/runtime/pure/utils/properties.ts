@@ -129,6 +129,17 @@ function setFinalValue(
   }
 }
 
+export function setBaseValue(
+  target: Record<string, any>,
+  path: string | string[],
+) {
+  return setValue(
+    target,
+    path,
+    defaultValues[path as keyof typeof defaultValues],
+  );
+}
+
 export function assignStyleObjects(
   target: Record<string, any>,
   source: Record<string, any>,

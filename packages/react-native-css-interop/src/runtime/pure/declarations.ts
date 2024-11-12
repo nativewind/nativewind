@@ -11,18 +11,17 @@ import type { Effect } from "./utils/observable";
 export type Declarations = Effect &
   TransitionDeclarations & {
     epoch: number;
-    defaultStyle?: Record<string, any>;
-    normal: StyleRule[];
-    important: StyleRule[];
+    normal?: StyleRule[];
+    important?: StyleRule[];
     guards: RenderGuard[];
     animation?: AnimationAttributes[];
     sideEffects?: SideEffectTrigger[];
   };
 
 type DeclarationUpdates = {
-  rules?: boolean;
-  animation?: boolean;
-  transition?: boolean;
+  d?: boolean;
+  a?: boolean;
+  t?: TransitionAttributes[];
 };
 
 export function buildDeclarations(
@@ -34,9 +33,7 @@ export function buildDeclarations(
   const source = props[state.config.source] as string;
 
   const next: Declarations = {
-    epoch: previous ? previous.epoch : 0,
-    normal: [],
-    important: [],
+    epoch: previous?.epoch ?? 0,
     guards: [{ type: "prop", name: state.config.source, value: source }],
     run,
     dependencies: new Set(),
@@ -45,8 +42,7 @@ export function buildDeclarations(
     },
   };
 
-  let updates: DeclarationUpdates = {};
-  const transitions: TransitionAttributes[] = [];
+  let updates: DeclarationUpdates | undefined;
 
   for (const className of source.split(/\s+/)) {
     const styleRuleSet = next.get(styleFamily(className));
@@ -54,37 +50,28 @@ export function buildDeclarations(
       continue;
     }
 
+    updates = collectRules("normal", updates, styleRuleSet.n, next, previous);
     updates = collectRules(
-      updates,
-      styleRuleSet.n,
-      next,
-      previous,
-      next.normal,
-      transitions,
-      previous?.normal,
-    );
-    updates = collectRules(
+      "important",
       updates,
       styleRuleSet.i,
       next,
       previous,
-      next.important,
-      transitions,
-      previous?.important,
     );
   }
 
-  if (updates.rules || updates.animation || transitions.length) {
+  if (updates) {
     // If a rule or animation property changed, increment the epoch
     next.epoch++;
 
     // If the animation's changed, then we need to update the animation side effects
-    if (updates.animation) {
+    if (updates.a) {
       buildAnimationSideEffects(next, previous);
     }
 
-    if (transitions.length) {
-      next.transition = Object.assign({}, ...transitions);
+    if (updates.t?.length) {
+      // Flatten the transition attributes
+      next.transition = Object.assign({}, ...updates.t);
     }
   }
 
@@ -98,21 +85,22 @@ export function buildDeclarations(
  * @returns
  */
 function collectRules(
-  updates: DeclarationUpdates,
+  key: "normal" | "important",
+  updates: DeclarationUpdates | undefined,
   styleRules: StyleRule[] | undefined,
   next: Declarations,
   previous: Declarations | undefined,
-  collection: StyleRule[],
-  transitions: TransitionAttributes[],
-  previousCollection?: StyleRule[],
 ) {
   if (!styleRules) {
-    updates.rules ||= previousCollection !== undefined;
+    if (previous?.[key] !== undefined) {
+      updates ??= {};
+      updates.d = true;
+    }
     return updates;
   }
 
-  let collectionIndex = Math.max(0, collection.length - 1);
   let aIndex = next.animation ? Math.max(0, next.animation.length - 1) : 0;
+  let dIndex = next[key] ? Math.max(0, next[key].length - 1) : 0;
 
   for (const rule of styleRules) {
     if (!testRule(rule)) continue;
@@ -125,18 +113,25 @@ function collectRules(
        * TODO: This is not entirely accurate, Chrome does not restart animations
        *       This is fine during this experimental stage, but we should fix this in the future
        */
-      updates.animation ||= !Object.is(previous?.animation?.[aIndex], rule.a);
+      updates ??= {};
+      updates.a ||= !Object.is(previous?.animation?.[aIndex], rule.a);
       aIndex++;
     }
 
     if (rule.t) {
-      transitions.push(rule.t);
+      updates ??= {};
+      updates.t ||= [];
+      updates.t.push(rule.t);
       aIndex++;
     }
 
-    collection.push(rule);
-    updates.rules ||= Object.is(previousCollection?.[collectionIndex], rule);
-    collectionIndex++;
+    if (rule.d) {
+      next[key] ??= [];
+      next[key].push(rule);
+      updates ??= {};
+      updates.d ||= !Object.is(previous?.[key]?.[dIndex], rule);
+      dIndex++;
+    }
   }
 
   return updates;

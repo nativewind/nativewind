@@ -1,7 +1,8 @@
 import { Appearance, Dimensions } from "react-native";
 import type { ColorSchemeName, LayoutRectangle } from "react-native";
+
 import {
-  getAnimationDefaults,
+  writeAnimation,
   type Animation,
   type RawAnimation,
 } from "./animations";
@@ -27,26 +28,8 @@ export const variableFamily = family(() => {
 
 export const animationFamily = family(() => {
   return process.env.NODE_ENV === "production"
-    ? mutable(
-        undefined,
-        (rawAnimation: RawAnimation): Animation => {
-          return {
-            ...rawAnimation,
-            defaults: getAnimationDefaults(rawAnimation),
-          };
-        },
-        isDeepEqual,
-      )
-    : observable(
-        undefined,
-        (_, rawAnimation: RawAnimation): Animation => {
-          return {
-            ...rawAnimation,
-            defaults: getAnimationDefaults(rawAnimation),
-          };
-        },
-        isDeepEqual,
-      );
+    ? mutable(undefined, writeAnimation, isDeepEqual)
+    : observable(undefined, writeAnimation, isDeepEqual);
 });
 
 export const rem = observable(14);

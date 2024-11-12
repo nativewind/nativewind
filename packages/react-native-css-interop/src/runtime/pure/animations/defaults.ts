@@ -1,13 +1,16 @@
 import { defaultValues, setValue } from "../utils/properties";
-import type { RawAnimation } from "./types";
+import type { Animation, RawAnimation } from "./types";
 
-export function getAnimationDefaults(rawAnimation: RawAnimation) {
-  const style: Record<string, any> = {};
+export function writeAnimation(
+  _: unknown,
+  rawAnimation: RawAnimation,
+): Animation {
+  const baseStyles: Record<string, any> = {};
 
   for (const frame of rawAnimation.p) {
     const prop = frame[0];
-    setValue(style, prop, defaultValues[prop]);
+    setValue(baseStyles, prop, defaultValues[prop]);
   }
 
-  return style;
+  return { ...rawAnimation, baseStyles };
 }

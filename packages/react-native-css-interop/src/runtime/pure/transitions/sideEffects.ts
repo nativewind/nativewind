@@ -25,11 +25,14 @@ export function getTransitionSideEffect(
     return;
   }
 
-  let transitions = next.styles.transitions;
+  let transitions = previous.styles?.transitions;
   if (!transitions) {
     transitions = new Map();
-    next.styles.transitions = transitions;
+  } else {
+    transitions = new Map(transitions);
   }
+
+  next.styles.transitions = transitions;
 
   const {
     makeMutable,

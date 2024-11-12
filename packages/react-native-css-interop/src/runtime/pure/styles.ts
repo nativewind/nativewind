@@ -1,4 +1,4 @@
-import { getAnimationIO, type SharedValueInterpolation } from "./animations";
+import { applyAnimation, type SharedValueInterpolation } from "./animations";
 import type { ContainerContextValue, VariableContextValue } from "./contexts";
 import type { ResolveOptions } from "./resolvers";
 import { resolveValue } from "./resolvers";
@@ -13,12 +13,13 @@ import type {
   StyleValueDescriptor,
 } from "./types";
 import { Effect } from "./utils/observable";
-import { setValue } from "./utils/properties";
+import { defaultValues, setBaseValue, setValue } from "./utils/properties";
 
 export type Styles = Effect &
   TransitionStyles & {
     epoch: number;
     guards: RenderGuard[];
+    baseStyles?: Record<string, any>;
     props?: Record<string, any>;
     sideEffects?: SideEffectTrigger[];
     animationIO?: SharedValueInterpolation[];
@@ -34,7 +35,7 @@ export function buildStyles(
   inheritedContainers: ContainerContextValue,
   run: () => void,
 ) {
-  const styles: Styles = {
+  let styles: Styles = {
     epoch: previous.styles ? previous.styles.epoch : -1,
     guards: [],
     run,
@@ -44,13 +45,11 @@ export function buildStyles(
     },
   };
 
-  const next: StateWithStyles = {
-    ...previous,
-    styles,
-  };
+  if (previous.styles?.baseStyles) {
+    styles.baseStyles = { ...previous.styles.baseStyles };
+  }
 
   const delayedStyles: Callback[] = [];
-  const sideEffects: SideEffectTrigger[] = [];
 
   const resolveOptions: ResolveOptions = {
     getProp: (name: string) => {
@@ -85,18 +84,22 @@ export function buildStyles(
     },
   };
 
+  const next: StateWithStyles = {
+    ...previous,
+    styles,
+  };
+
   if (next.declarations?.normal) {
     styles.props = applyStyles(
       next,
       previous,
       next.declarations?.normal,
       delayedStyles,
-      sideEffects,
       resolveOptions,
     );
   }
 
-  styles.animationIO = getAnimationIO(next, styles, resolveOptions);
+  styles = applyAnimation(next, styles, resolveOptions);
 
   if (next.declarations?.important) {
     styles.props = applyStyles(
@@ -104,7 +107,6 @@ export function buildStyles(
       previous,
       next.declarations?.important,
       delayedStyles,
-      sideEffects,
       resolveOptions,
     );
   }
@@ -115,20 +117,18 @@ export function buildStyles(
     }
   }
 
-  if (sideEffects.length) {
-    styles.sideEffects = sideEffects;
-  }
-
   styles.epoch++;
   return next;
 }
 
+/**
+ * Mutates `next` to apply the styles from `styleRules`
+ */
 function applyStyles(
   next: StateWithStyles,
   previous: ConfigReducerState,
   styleRules: StyleRule[],
   delayedStyles: Callback[],
-  sideEffects: SideEffectTrigger[],
   options: ResolveOptions,
 ) {
   let props = next.styles.props;
@@ -165,7 +165,8 @@ function applyStyles(
                 const placeholder = value;
                 value = resolveValue(next, originalValue, options);
                 if (transitionFn) {
-                  sideEffects.push(transitionFn(value));
+                  next.styles.sideEffects ??= [];
+                  next.styles.sideEffects.push(transitionFn(value));
                 } else {
                   setValue(props, propPath, value, next, placeholder);
                 }
@@ -176,9 +177,12 @@ function applyStyles(
           }
 
           // This mutates and/or creates the props object
-
           if (transitionFn) {
-            sideEffects.push(transitionFn(value));
+            next.styles.sideEffects ??= [];
+            next.styles.sideEffects.push(transitionFn(value));
+
+            next.styles.baseStyles ??= {};
+            setBaseValue(next.styles.baseStyles, propPath);
           } else {
             props = setValue(props, propPath, value, next);
           }
@@ -192,7 +196,11 @@ function applyStyles(
               const transitionFn = getTransitionSideEffect(next, previous, key);
 
               if (transitionFn) {
-                sideEffects.push(transitionFn(declaration[key]));
+                next.styles.sideEffects ??= [];
+                next.styles.sideEffects.push(transitionFn(declaration[key]));
+
+                next.styles.baseStyles ??= {};
+                next.styles.baseStyles[key] = defaultValues[key];
               }
             }
           }

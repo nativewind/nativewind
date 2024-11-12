@@ -10,7 +10,7 @@ export type RawAnimation = {
 };
 
 export type Animation = RawAnimation & {
-  defaults: Record<string, any>;
+  baseStyles: Record<string, any>;
 };
 
 export type ReanimatedMutable<Value> = ReturnType<typeof makeMutable<Value>>;

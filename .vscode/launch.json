@@ -1,16 +1,36 @@
 {
   "configurations": [
     {
+      "name": "Attach",
+      "port": 9229,
+      "request": "attach",
+      "type": "node"
+    },
+    {
+      "cwd": "${workspaceFolder}",
+      "internalConsoleOptions": "neverOpen",
+      "name": "Debug File",
+      "program": "${file}",
+      "request": "launch",
+      "stopOnEntry": false,
+      "type": "bun",
+      "watchMode": false
+    },
+    {
+      "cwd": "${workspaceFolder}",
+      "internalConsoleOptions": "neverOpen",
+      "name": "Run File",
+      "noDebug": true,
+      "program": "${file}",
+      "request": "launch",
+      "type": "bun",
+      "watchMode": false
+    },
+    {
       "type": "radon-ide",
       "request": "launch",
       "name": "Radon IDE panel",
-      "appRoot": "examples/expo-router",
-      "env": {
-        "DEBUG": "nativewind",
-        "DEBUG_HIDE_DATE": "true"
-      },
-      "ios": {},
-      "android": {}
+      "appRoot": "examples/expo-router"
     }
   ]
 }

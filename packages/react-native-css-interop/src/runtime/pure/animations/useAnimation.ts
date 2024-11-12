@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
 import {
   interpolate,
@@ -6,7 +6,7 @@ import {
   useAnimatedStyle,
 } from "react-native-reanimated";
 
-import type { ComponentReducerState } from "../state/component";
+import type { UseInteropState } from "../useInterop";
 
 /**
  * Wrapper around useAnimatedStyle that allows for animations and transitions.
@@ -18,15 +18,13 @@ import type { ComponentReducerState } from "../state/component";
  * @returns
  */
 export function useAnimation(
-  state: ComponentReducerState,
+  state: UseInteropState,
   props?: Record<string, any>,
 ) {
-  const groupedAnimations = state.animations;
-  const groupedTransitions = state.transitions;
   const originalStyle = state.props?.style as Record<string, any> | undefined;
 
   /**
-   * Animations and transitions are side effects.
+   * Animations and transitions both generate side effects.
    */
   useEffect(() => {
     if (!state.sideEffects) return;
@@ -36,12 +34,14 @@ export function useAnimation(
     }
   }, [state.sideEffects]);
 
-  const a = useMemo(() => {
-    return [[groupedTransitions?.["0"]?.get("width")]];
-  }, [groupedTransitions]);
+  const baseStyles = state.baseStyles;
 
   const animatedStyle = useAnimatedStyle(() => {
-    const style: Record<string, any> = { ...originalStyle };
+    const style: Record<string, any> = Object.assign(
+      {},
+      originalStyle,
+      baseStyles,
+    );
 
     /**
      * Duplicate of setValue() from src/utils/properties.ts.
@@ -79,13 +79,9 @@ export function useAnimation(
       }
     }
 
-    if (groupedAnimations) {
-      for (const animationIO of Object.values(groupedAnimations).flat()) {
-        if (!animationIO) {
-          continue;
-        }
-
-        for (const propIO of animationIO[1]) {
+    if (state.animations) {
+      for (const animation of state.animations) {
+        for (const propIO of animation[1]) {
           const input = propIO[1];
           const output = propIO[2];
           const type = propIO[3];
@@ -93,11 +89,7 @@ export function useAnimation(
           const interpolateFn =
             type === "color" ? interpolateColor : interpolate;
 
-          let value = interpolateFn(
-            animationIO[0].value,
-            input,
-            output as any[],
-          );
+          let value = interpolateFn(animation[0].get(), input, output as any[]);
 
           if (type === "%") {
             value = `${value}%`;
@@ -108,26 +100,18 @@ export function useAnimation(
       }
     }
 
-    if (groupedTransitions) {
-      for (const transitions of Object.values(groupedTransitions).flat()) {
-        if (!transitions) {
-          continue;
-        }
-
-        for (const transition of transitions) {
-          if (!transition[1]) {
-            continue;
-          }
-
-          setValue(transition[0], transition[1].value);
-        }
+    if (state.transitions) {
+      for (const transition of state.transitions) {
+        setValue(transition[0], transition[1].get());
       }
     }
-
     return style;
-  }, [groupedAnimations, groupedTransitions, originalStyle, a]);
+  }, [state.sharedValues, baseStyles, state.animations, state.transitions]);
 
-  return state.animations || state.transitions
-    ? { ...state.props, style: animatedStyle }
-    : props;
+  if (state.animations || state.transitions) {
+    props ??= {};
+    props.style = animatedStyle;
+  }
+
+  return props;
 }

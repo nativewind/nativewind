@@ -1,4 +1,4 @@
-import type { EasingFunction, Time } from "lightningcss";
+import type { EasingFunction } from "lightningcss";
 
 import type { ReanimatedMutable } from "../animations";
 
@@ -7,8 +7,10 @@ export type TransitionDeclarations = {
   sharedValues?: Map<string, ReanimatedMutable<any>>;
 };
 
+export type Transition = [string | string[], ReanimatedMutable<any>];
+
 export type TransitionStyles = {
-  transitions?: Map<string | string[], ReanimatedMutable<any>>;
+  transitions?: Map<Transition[0], Transition[1]>;
 };
 
 export type TransitionAttributes = {

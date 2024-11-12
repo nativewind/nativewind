@@ -16,6 +16,10 @@ type Write<Value, Args extends unknown[]> = (
   set: Setter,
   ...args: Args
 ) => Value;
+type MutableWrite<Value, Args extends unknown[]> = (
+  _: void,
+  ...args: Args
+) => Value;
 type Equality<Value> = (left: Value, right: Value) => Boolean;
 type Getter = <Value, Args extends unknown[]>(
   observable: Observable<Value, Args>,
@@ -166,12 +170,12 @@ export function mutable<Value>(
 export function mutable<Value>(): Mutable<Value | undefined, never[]>;
 export function mutable<Value, Args extends unknown[]>(
   value: undefined,
-  write?: (...Args: Args) => Value,
+  write?: MutableWrite<Value, Args>,
   equality?: Equality<Value>,
 ): Mutable<Value | undefined, Args>;
 export function mutable<Value, Args extends unknown[]>(
   value?: Value,
-  write?: (...Args: Args) => Value,
+  write?: MutableWrite<Value, Args>,
   equality: Equality<Value> = Object.is,
 ): Mutable<Value, Args> {
   return {
@@ -181,7 +185,7 @@ export function mutable<Value, Args extends unknown[]>(
     set(...args) {
       const nextValue =
         typeof write === "function"
-          ? write(...(args as Args))
+          ? write(undefined, ...(args as Args))
           : (args[0] as Value);
 
       if (!equality(value as Value, nextValue)) {

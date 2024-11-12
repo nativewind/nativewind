@@ -1,5 +1,3 @@
-import type { Dispatch } from "react";
-
 import type { ContainerContextValue, VariableContextValue } from "../contexts";
 import { buildDeclarations, type Declarations } from "../declarations";
 import { buildStyles, type Styles } from "../styles";
@@ -8,8 +6,8 @@ import type {
   InlineStyle,
   StyleValueDescriptor,
 } from "../types";
+import { UseInteropDispatch } from "../useInterop";
 import { cleanupEffect } from "../utils/observable";
-import type { ComponentReducerAction } from "./component";
 
 export type ConfigReducerState = Readonly<{
   // The key of the config, used to group props, variables, containers, etc.
@@ -41,7 +39,7 @@ export type ConfigReducerAction = Readonly<
 export function configReducer(
   state: ConfigReducerState,
   action: ConfigReducerAction,
-  dispatch: Dispatch<ComponentReducerAction>,
+  dispatch: UseInteropDispatch,
   incomingProps: Record<string, unknown>,
   inheritedVariables: VariableContextValue,
   universalVariables: VariableContextValue,
@@ -80,7 +78,7 @@ export function configReducer(
 
 function updateDefinitions(
   state: ConfigReducerState,
-  dispatch: Dispatch<ComponentReducerAction>,
+  dispatch: UseInteropDispatch,
   props: Record<string, unknown>,
 ): ConfigReducerState {
   const source = props[state.config.source] as string;
@@ -96,10 +94,7 @@ function updateDefinitions(
 
   const previous = state.declarations;
   let next = buildDeclarations(state, props, () => {
-    dispatch({
-      type: "perform-config-reducer-actions",
-      actions: [{ action: { type: "update-definitions" }, key: state.key }],
-    });
+    dispatch([{ action: { type: "update-definitions" }, key: state.key }]);
   });
 
   /*
@@ -122,7 +117,7 @@ function updateDefinitions(
 
 function updateStyles(
   previous: ConfigReducerState,
-  dispatch: Dispatch<ComponentReducerAction>,
+  dispatch: UseInteropDispatch,
   incomingProps: Record<string, unknown>,
   inheritedVariables: VariableContextValue,
   universalVariables: VariableContextValue,
@@ -139,10 +134,7 @@ function updateStyles(
     universalVariables,
     inheritedContainers,
     () => {
-      dispatch({
-        type: "perform-config-reducer-actions",
-        actions: [{ action: { type: "update-styles" }, key: previous.key }],
-      });
+      dispatch([{ action: { type: "update-styles" }, key: previous.key }]);
     },
   );
 
