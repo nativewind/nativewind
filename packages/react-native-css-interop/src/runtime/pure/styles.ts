@@ -82,6 +82,7 @@ export function buildStyles(
       styles.guards?.push({ type: "container", name: name, value });
       return value;
     },
+    previousTransitions: new Set(previous.styles?.transitions?.keys()),
   };
 
   const next: StateWithStyles = {
@@ -114,6 +115,22 @@ export function buildStyles(
   if (delayedStyles.length) {
     for (const delayedStyle of delayedStyles) {
       delayedStyle();
+    }
+  }
+
+  /**
+   * If we had a transition style that was removed,
+   * we need to transition back to the default value
+   */
+  for (let transition of resolveOptions.previousTransitions) {
+    const transitionFn = getTransitionSideEffect(next, previous, transition);
+
+    if (transitionFn) {
+      if (typeof transition !== "string") {
+        transition = transition[transition.length - 1];
+      }
+      next.styles.sideEffects ??= [];
+      next.styles.sideEffects.push(transitionFn(defaultValues[transition]));
     }
   }
 
@@ -183,6 +200,8 @@ function applyStyles(
 
             next.styles.baseStyles ??= {};
             setBaseValue(next.styles.baseStyles, propPath);
+
+            options.previousTransitions.delete(propPath);
           } else {
             props = setValue(props, propPath, value, next);
           }
@@ -201,6 +220,7 @@ function applyStyles(
 
                 next.styles.baseStyles ??= {};
                 next.styles.baseStyles[key] = defaultValues[key];
+                options.previousTransitions.delete(key);
               }
             }
           }

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react-native";
 import Animated, { getAnimatedStyle } from "react-native-reanimated";
 
 import { buildUseInterop } from "../../runtime/pure";
-import { addKeyFrames, addStyle } from "../../runtime/pure/testUtils";
+import { addStyle } from "../../runtime/pure/testUtils";
 
 const testID = "react-native-css-interop";
 

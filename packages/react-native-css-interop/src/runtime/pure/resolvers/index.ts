@@ -11,6 +11,7 @@ export type ResolveOptions = {
   getVariable: (name: string) => StyleValueDescriptor;
   getContainer: (name: string) => ContainerContextRecord | undefined;
   castToArray?: boolean;
+  previousTransitions: Set<string | string[]>;
 };
 
 export const resolveValue: StyleValueResolver = (state, value, options) => {
