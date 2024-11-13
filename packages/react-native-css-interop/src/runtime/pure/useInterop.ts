@@ -1,10 +1,15 @@
-import { useContext, useDebugValue, useEffect, useReducer } from "react";
+import {
+  createElement,
+  useContext,
+  useDebugValue,
+  useEffect,
+  useReducer,
+} from "react";
 import type { ComponentType, Dispatch } from "react";
 
 import { SharedValue } from "react-native-reanimated";
 
-import { SharedValueInterpolation } from "./animations";
-import { createUseInteropElement } from "./components/typeUpgrades";
+import { animatedComponent, SharedValueInterpolation } from "./animations";
 import type { ContainerContextValue, VariableContextValue } from "./contexts";
 import {
   ContainerContext,
@@ -18,6 +23,7 @@ import {
 } from "./state/config";
 import { Transition } from "./transitions";
 import type { Config, Props, SideEffectTrigger } from "./types";
+import { useHandlers } from "./useHandlers";
 import { cleanupEffect } from "./utils/observable";
 
 export type UseInteropState = Readonly<{
@@ -50,106 +56,112 @@ type PerformConfigReducerAction = Readonly<{
   index: number;
 }>;
 
-export function buildUseInterop(type: ComponentType, ...configs: Config[]) {
-  const configStates: ConfigReducerState[] = [];
-  const initialActions: PerformConfigReducerAction[] = [];
+export function useInterop(
+  props: Props,
+  type: ComponentType<any>,
+  configStates: ConfigReducerState[],
+  initialActions: PerformConfigReducerAction[],
+) {
+  const inheritedVariables = useContext(VariableContext);
+  const universalVariables = useContext(UniversalVariableContext);
+  const inheritedContainers = useContext(ContainerContext);
+
+  let [state, dispatch] = useReducer(
+    /**
+     * Reducers can capture current values, so rebuild the reducer each time
+     * This is a performance de-optimization, but it's better than writing
+     * to refs or using side effects.
+     */
+    (state: UseInteropState, actions: PerformConfigReducerAction[]) => {
+      return performConfigReducerActions(
+        state,
+        actions,
+        props,
+        inheritedVariables,
+        universalVariables,
+        inheritedContainers,
+      );
+    },
+    undefined,
+    () => {
+      return performConfigReducerActions(
+        {
+          key: {},
+          type,
+          configStates,
+          dispatch: (actions) => dispatch(actions),
+          epoch: 0,
+        },
+        initialActions,
+        props,
+        inheritedVariables,
+        universalVariables,
+        inheritedContainers,
+      );
+    },
+  );
+
+  maybeRerenderComponent(
+    state,
+    dispatch,
+    props,
+    inheritedVariables,
+    inheritedContainers,
+  );
 
   /**
-   * Group the configs by index so we can easily reference them later.
-   * Build an array of actions to initialize the interopReducer.
+   * The declarations and styles need to be cleaned up when the component
+   * unmounts, as they will hold references to observables.
+   *
+   * Observables created by this component (e.g hover observables) will be
+   * automatically removed as they are weakly referenced, and each component
+   * that references them (should only be unmounting children) will remove their
+   * reference either on unmount or next rerender.
    */
-  configs.forEach((config, index) => {
-    const configState = {
-      index,
-      config: { index, ...config },
-    };
-    configStates[index] = configState;
-    initialActions.push({
-      action: { type: "update-definitions" },
-      index,
-    });
-  });
-
-  return function useInterop(props: Props) {
-    const inheritedVariables = useContext(VariableContext);
-    const universalVariables = useContext(UniversalVariableContext);
-    const inheritedContainers = useContext(ContainerContext);
-
-    let [state, dispatch] = useReducer(
-      /**
-       * Reducers can capture current values, so rebuild the reducer each time
-       * This is a performance de-optimization, but it's better than writing
-       * to refs or using side effects.
-       */
-      (state: UseInteropState, actions: PerformConfigReducerAction[]) => {
-        return performConfigReducerActions(
-          state,
-          actions,
-          props,
-          inheritedVariables,
-          universalVariables,
-          inheritedContainers,
-        );
-      },
-      undefined,
-      () => {
-        return performConfigReducerActions(
-          {
-            key: {},
-            type,
-            configStates,
-            dispatch: (actions) => dispatch(actions),
-            epoch: 0,
-          },
-          initialActions,
-          props,
-          inheritedVariables,
-          universalVariables,
-          inheritedContainers,
-        );
-      },
-    );
-
-    maybeRerenderComponent(
-      state,
-      dispatch,
-      props,
-      inheritedVariables,
-      inheritedContainers,
-    );
-
-    /**
-     * The declarations and styles need to be cleaned up when the component
-     * unmounts, as they will hold references to observables.
-     *
-     * Observables created by this component (e.g hover observables) will be
-     * automatically removed as they are weakly referenced, and each component
-     * that references them (should only be unmounting children) will remove their
-     * reference either on unmount or next rerender.
-     */
-    useEffect(() => {
-      return () => {
-        for (const key in state.configStates) {
-          const configState = state.configStates[key];
-          cleanupEffect(configState.declarations);
-          cleanupEffect(configState.styles);
-        }
-      };
-    }, []);
-
-    useDebugValue(state);
-
-    // Create the new props by merging the incoming props with the props from the state
-    // and then removing the source props
-    let nextProps: Props = { ...props, ...state.props };
-    for (const config of state.configStates) {
-      if (config.config.source !== config.config.target) {
-        delete nextProps[config.config.source];
+  useEffect(() => {
+    return () => {
+      for (const key in state.configStates) {
+        const configState = state.configStates[key];
+        cleanupEffect(configState.declarations);
+        cleanupEffect(configState.styles);
       }
-    }
+    };
+  }, []);
 
-    return createUseInteropElement(state, nextProps);
-  };
+  useDebugValue(state);
+
+  let nextType = state.type;
+  let nextProps: Props = { ...props, ...state.props };
+
+  for (const config of state.configStates) {
+    if (config.config.source !== config.config.target) {
+      delete nextProps[config.config.source];
+    }
+  }
+
+  nextProps = useHandlers(state, nextProps);
+
+  if (state.animations || state.transitions) {
+    nextProps.$$state = state;
+  }
+
+  if (state.variables) {
+    nextProps = {
+      value: state.variables,
+      children: createElement(nextType, nextProps),
+    };
+    nextType = VariableContext.Provider;
+  }
+
+  if (state.containers) {
+    nextProps = {
+      value: state.containers,
+      children: createElement(nextType, nextProps),
+    };
+    nextType = ContainerContext.Provider;
+  }
+
+  return createElement(nextType, nextProps);
 }
 
 function maybeRerenderComponent(
@@ -363,8 +375,14 @@ export function performConfigReducerActions(
     }
   }
 
+  const type =
+    animations || transitions
+      ? animatedComponent(previous.type)
+      : previous.type;
+
   const next: UseInteropState = {
     ...previous,
+    type,
     baseStyles,
     props,
     configStates,
@@ -377,4 +395,27 @@ export function performConfigReducerActions(
   };
 
   return next;
+}
+
+export function getUseInteropOptions(...configs: Config[]) {
+  const configStates: ConfigReducerState[] = [];
+  const initialActions: PerformConfigReducerAction[] = [];
+
+  /**
+   * Group the configs by index so we can easily reference them later.
+   * Build an array of actions to initialize the interopReducer.
+   */
+  configs.forEach((config, index) => {
+    const configState = {
+      index,
+      config: { index, ...config },
+    };
+    configStates[index] = configState;
+    initialActions.push({
+      action: { type: "update-definitions" },
+      index,
+    });
+  });
+
+  return { configStates, initialActions };
 }

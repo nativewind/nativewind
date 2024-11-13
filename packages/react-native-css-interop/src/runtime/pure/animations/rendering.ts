@@ -1,4 +1,4 @@
-import { ComponentType, createElement, useEffect } from "react";
+import { createElement, useEffect } from "react";
 
 import {
   interpolate,
@@ -9,16 +9,52 @@ import {
 import { Props } from "../types";
 import type { UseInteropState } from "../useInterop";
 
-const animatedCache = new Map<
+const animatedCache = new WeakMap<
   UseInteropState["type"],
   UseInteropState["type"]
 >();
 
-export function createAnimatedElement(
-  state: UseInteropState,
-  Component: ComponentType<any>,
-  props: Props,
-) {
+export function animatedComponent(Component: UseInteropState["type"]): any {
+  if (animatedCache.has(Component)) {
+    return animatedCache.get(Component)!;
+  }
+
+  if (
+    !(
+      typeof Component !== "function" ||
+      (Component.prototype && Component.prototype.isReactComponent)
+    )
+  ) {
+    throw new Error(
+      `Looks like you're passing an animation style to a function component \`${Component.name}\`. Please wrap your function component with \`React.forwardRef()\` or use a class component instead.`,
+    );
+  }
+
+  const { default: Animated } =
+    require("react-native-reanimated") as typeof import("react-native-reanimated");
+
+  const AnimatedComponent = Animated.createAnimatedComponent(
+    Component as React.ComponentClass,
+  );
+  AnimatedComponent.displayName = `Animated.${Component.displayName || Component.name || "Unknown"}`;
+
+  function InteropAnimatedComponent(
+    props: Props & { $$state: UseInteropState },
+  ) {
+    return createElement(AnimatedComponent, useInteropAnimatedStyle(props));
+  }
+
+  animatedCache.set(Component, InteropAnimatedComponent);
+  animatedCache.set(InteropAnimatedComponent, InteropAnimatedComponent);
+
+  return InteropAnimatedComponent;
+}
+
+export function useInteropAnimatedStyle({
+  $$state: state,
+  ...props
+}: Props & { $$state: UseInteropState }) {
+  const nextProps = { ...props };
   const originalStyle = state.props?.style as Record<string, any> | undefined;
 
   /**
@@ -60,7 +96,9 @@ export function createAnimatedElement(
 
         if (path === "transform" && i < paths.length - 1) {
           const nextPath = paths[i + 1];
-          target.transform ??= [];
+          if (target.transform) {
+            target.transform = [];
+          }
           let existing = target.transform.find(
             (obj: Record<string, unknown>) => obj[nextPath] !== undefined,
           );
@@ -72,7 +110,9 @@ export function createAnimatedElement(
           break;
         }
 
-        target[path] ??= {};
+        if (!target[path]) {
+          target[path] = {};
+        }
         target = target[path];
       }
     }
@@ -107,42 +147,8 @@ export function createAnimatedElement(
   }, [state.sharedValues, baseStyles, state.animations, state.transitions]);
 
   if (state.animations?.length || state.transitions?.length) {
-    props ??= {};
-    props.style = animatedStyle;
+    nextProps.style = animatedStyle;
   }
 
-  return createElement(Component, props);
-}
-
-export function createAnimatedComponent(
-  Component: UseInteropState["type"],
-): any {
-  if (animatedCache.has(Component)) {
-    return animatedCache.get(Component)!;
-  } else if (Component.displayName?.startsWith("AnimatedComponent")) {
-    return Component;
-  }
-
-  if (
-    !(
-      typeof Component !== "function" ||
-      (Component.prototype && Component.prototype.isReactComponent)
-    )
-  ) {
-    throw new Error(
-      `Looks like you're passing an animation style to a function component \`${Component.name}\`. Please wrap your function component with \`React.forwardRef()\` or use a class component instead.`,
-    );
-  }
-
-  const { default: Animated } =
-    require("react-native-reanimated") as typeof import("react-native-reanimated");
-
-  const AnimatedComponent = Animated.createAnimatedComponent(
-    Component as React.ComponentClass,
-  );
-  AnimatedComponent.displayName = `Animated.${Component.displayName || Component.name || "Unknown"}`;
-
-  animatedCache.set(Component, AnimatedComponent);
-
-  return AnimatedComponent;
+  return nextProps;
 }

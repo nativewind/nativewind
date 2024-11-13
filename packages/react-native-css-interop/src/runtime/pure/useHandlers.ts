@@ -18,7 +18,7 @@ const weakMap = new WeakMap<
   Record<InteractionType, (event: unknown) => void>
 >();
 
-export const handlerFamily = function (
+export function handlerFamily(
   type: InteractionType,
   mainHandler: (type: InteractionType, event: unknown) => void,
 ) {
@@ -38,9 +38,12 @@ export const handlerFamily = function (
   }
 
   return handlers[type];
-};
+}
 
-export function useInteraction(state: UseInteropState, props?: Props) {
+export function useHandlers(state: UseInteropState, props?: Props) {
+  // The React Compiler prevents you from modifying props directly
+  let newProps = Object.assign({}, props);
+
   /**
    * Create a handler for each interaction type, and as the key for sub-handlers
    */
@@ -80,23 +83,23 @@ export function useInteraction(state: UseInteropState, props?: Props) {
   );
 
   if (hoverFamily.has(state.key)) {
-    props ??= {};
-    props.onHoverIn = handlerFamily("onHoverIn", handler);
-    props.onHoverOut = handlerFamily("onHoverOut", handler);
+    if (!newProps) newProps = {};
+    newProps.onHoverIn = handlerFamily("onHoverIn", handler);
+    newProps.onHoverOut = handlerFamily("onHoverOut", handler);
   }
 
   if (activeFamily.has(state.key)) {
-    props ??= {};
-    props.onPress = handlerFamily("onPress", handler);
-    props.onPressIn = handlerFamily("onPressIn", handler);
-    props.onPressOut = handlerFamily("onPressOut", handler);
+    if (!newProps) newProps = {};
+    newProps.onPress = handlerFamily("onPress", handler);
+    newProps.onPressIn = handlerFamily("onPressIn", handler);
+    newProps.onPressOut = handlerFamily("onPressOut", handler);
   }
 
   if (focusFamily.has(state.key)) {
-    props ??= {};
-    props.onBlur = handlerFamily("onBlur", handler);
-    props.onFocus = handlerFamily("onFocus", handler);
+    if (!newProps) newProps = {};
+    newProps.onBlur = handlerFamily("onBlur", handler);
+    newProps.onFocus = handlerFamily("onFocus", handler);
   }
 
-  return props;
+  return newProps;
 }

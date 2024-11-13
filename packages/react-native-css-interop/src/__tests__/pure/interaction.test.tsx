@@ -2,7 +2,7 @@ import { View } from "react-native";
 
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 
-import { buildUseInterop } from "../../runtime/pure";
+import { getUseInteropOptions, useInterop } from "../../runtime/pure";
 import { addStyle } from "../../runtime/pure/testUtils";
 
 const testID = "react-native-css-interop";
@@ -10,16 +10,16 @@ const children = undefined;
 
 jest.useFakeTimers();
 
-const useInterop = buildUseInterop(View, {
+let renderCount = 0;
+
+const { configStates, initialActions } = getUseInteropOptions({
   source: "className",
   target: "style",
 });
 
-let renderCount = 0;
-
 function MyView(props: any) {
   renderCount++;
-  return useInterop({ testID, ...props });
+  return useInterop({ testID, ...props }, View, configStates, initialActions);
 }
 
 beforeEach(() => {
