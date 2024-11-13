@@ -2,7 +2,6 @@ import { animationFamily } from "../globals";
 import { resolveValue, type ResolveOptions } from "../resolvers";
 import type { ConfigReducerState } from "../state/config";
 import type { Styles } from "../styles";
-import { setBaseValue } from "../utils/properties";
 import type { AnimationInterpolation, SharedValueInterpolation } from "./types";
 
 export function applyAnimation(

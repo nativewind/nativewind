@@ -2,19 +2,19 @@ import type { ContainerContextValue, VariableContextValue } from "../contexts";
 import { buildDeclarations, type Declarations } from "../declarations";
 import { buildStyles, type Styles } from "../styles";
 import type {
-  ConfigWithKey,
+  ConfigWithIndex,
   InlineStyle,
   Props,
   StyleValueDescriptor,
 } from "../types";
-import { UseInteropDispatch } from "../useInterop";
+import type { UseInteropState } from "../useInterop";
 import { cleanupEffect } from "../utils/observable";
 
 export type ConfigReducerState = Readonly<{
   // The key of the config, used to group props, variables, containers, etc.
-  key: string;
+  index: number;
   // The config that this state is for
-  config: ConfigWithKey;
+  config: ConfigWithIndex;
   source?: string | null | undefined;
   target?: Record<string, unknown> | null | undefined;
 
@@ -40,7 +40,7 @@ export type ConfigReducerAction = Readonly<
 export function configReducer(
   state: ConfigReducerState,
   action: ConfigReducerAction,
-  dispatch: UseInteropDispatch,
+  componentState: UseInteropState,
   incomingProps: Props,
   inheritedVariables: VariableContextValue,
   universalVariables: VariableContextValue,
@@ -48,12 +48,12 @@ export function configReducer(
 ) {
   switch (action.type) {
     case "update-definitions": {
-      let nextState = updateDefinitions(state, dispatch, incomingProps);
+      let nextState = updateDefinitions(state, componentState, incomingProps);
       return Object.is(state, nextState)
         ? state
         : updateStyles(
             nextState,
-            dispatch,
+            componentState,
             incomingProps,
             inheritedVariables,
             universalVariables,
@@ -63,7 +63,7 @@ export function configReducer(
     case "update-styles": {
       return updateStyles(
         state,
-        dispatch,
+        componentState,
         incomingProps,
         inheritedVariables,
         universalVariables,
@@ -79,7 +79,7 @@ export function configReducer(
 
 function updateDefinitions(
   state: ConfigReducerState,
-  dispatch: UseInteropDispatch,
+  componentState: UseInteropState,
   props: Props,
 ): ConfigReducerState {
   const source = props?.[state.config.source] as string | undefined;
@@ -94,9 +94,7 @@ function updateDefinitions(
   }
 
   const previous = state.declarations;
-  let next = buildDeclarations(state, props, () => {
-    dispatch([{ action: { type: "update-definitions" }, key: state.key }]);
-  });
+  let next = buildDeclarations(state, componentState, props);
 
   /*
    * If they are the same epoch, then nothing changed.
@@ -118,7 +116,7 @@ function updateDefinitions(
 
 function updateStyles(
   previous: ConfigReducerState,
-  dispatch: UseInteropDispatch,
+  componentState: UseInteropState,
   incomingProps: Props,
   inheritedVariables: VariableContextValue,
   universalVariables: VariableContextValue,
@@ -135,7 +133,9 @@ function updateStyles(
     universalVariables,
     inheritedContainers,
     () => {
-      dispatch([{ action: { type: "update-styles" }, key: previous.key }]);
+      componentState.dispatch([
+        { action: { type: "update-styles" }, index: previous.index },
+      ]);
     },
   );
 

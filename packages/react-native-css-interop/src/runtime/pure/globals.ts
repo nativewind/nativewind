@@ -1,11 +1,7 @@
 import { Appearance, Dimensions } from "react-native";
 import type { ColorSchemeName, LayoutRectangle } from "react-native";
 
-import {
-  writeAnimation,
-  type Animation,
-  type RawAnimation,
-} from "./animations";
+import { writeAnimation } from "./animations";
 import type { StyleRuleSet, StyleValueDescriptor } from "./types";
 import { isDeepEqual } from "./utils/equality";
 import { family, mutable, observable, weakFamily } from "./utils/observable";

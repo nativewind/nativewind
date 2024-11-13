@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 
 import { activeFamily, focusFamily, hoverFamily } from "./globals";
+import { Props } from "./types";
 import { UseInteropState } from "./useInterop";
 
 type InteractionType =
@@ -12,44 +13,34 @@ type InteractionType =
   | "onFocus"
   | "onBlur";
 
-/**
- * Create a function that returns a handler for a specific interaction type.
- * This function will be memoized and reused for the lifetime of the component.
- */
-function buildHandlerFamily() {
-  const weakMap = new WeakMap<
-    Function,
-    Map<InteractionType, (event: unknown) => void>
-  >();
+const weakMap = new WeakMap<
+  Function,
+  Record<InteractionType, (event: unknown) => void>
+>();
 
-  return function (
-    type: InteractionType,
-    mainHandler: (type: InteractionType, event: unknown) => void,
-  ) {
-    let map = weakMap.get(mainHandler);
-
-    if (!map) {
-      map = new Map();
-      weakMap.set(mainHandler, map);
-    }
-
-    let handler = map.get(type);
-
-    if (!handler) {
-      handler = (event) => mainHandler(type, event);
-      map.set(type, handler);
-    }
-
-    return handler;
-  };
-}
-
-export const handlerFamily = buildHandlerFamily();
-
-export function useInteraction(
-  state: UseInteropState,
-  props?: Record<string, any>,
+export const handlerFamily = function (
+  type: InteractionType,
+  mainHandler: (type: InteractionType, event: unknown) => void,
 ) {
+  let handlers = weakMap.get(mainHandler);
+
+  if (!handlers) {
+    handlers = {
+      onBlur: (event) => mainHandler("onBlur", event),
+      onFocus: (event) => mainHandler("onFocus", event),
+      onHoverIn: (event) => mainHandler("onHoverIn", event),
+      onHoverOut: (event) => mainHandler("onHoverOut", event),
+      onPress: (event) => mainHandler("onPress", event),
+      onPressIn: (event) => mainHandler("onPressIn", event),
+      onPressOut: (event) => mainHandler("onPressOut", event),
+    };
+    weakMap.set(mainHandler, handlers);
+  }
+
+  return handlers[type];
+};
+
+export function useInteraction(state: UseInteropState, props?: Props) {
   /**
    * Create a handler for each interaction type, and as the key for sub-handlers
    */
@@ -62,7 +53,7 @@ export function useInteraction(
           break;
         case "onHoverOut":
           props?.onHover?.(event);
-          hoverFamily(state.key).set(true);
+          hoverFamily(state.key).set(false);
           break;
         case "onPress":
           props?.onPress?.(event);
@@ -85,13 +76,13 @@ export function useInteraction(
           break;
       }
     },
-    [state, props],
+    [state.key, props],
   );
 
   if (hoverFamily.has(state.key)) {
     props ??= {};
     props.onHoverIn = handlerFamily("onHoverIn", handler);
-    props.onHoverIn = handlerFamily("onHoverOut", handler);
+    props.onHoverOut = handlerFamily("onHoverOut", handler);
   }
 
   if (activeFamily.has(state.key)) {

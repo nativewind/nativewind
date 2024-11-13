@@ -1,7 +1,6 @@
 import type { AnimationAttributes, TransitionAttributes } from "../reanimated";
 import { ResolveOptions } from "../resolvers";
 import { ConfigReducerState } from "../state/config";
-import { TransitionAttributes } from "../transitions";
 import type {
   AttributeCondition,
   ContainerQuery,

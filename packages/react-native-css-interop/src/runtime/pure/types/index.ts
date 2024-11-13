@@ -12,8 +12,6 @@ export type ConfigWithIndex = Config & { index: number };
 
 export type Props = Record<string, any> | undefined | null;
 
-export type Props = Record<string, any> | undefined | null;
-
 export type Callback = () => void;
 
 // Side effects are things that cannot be performed during a render. They will be invoked during an useEffect

@@ -8,10 +8,17 @@ import {
 } from "../animations/rendering";
 import { ContainerContext } from "../contexts";
 import { Props } from "../types";
+import { useInteraction } from "../useInteraction";
 import { UseInteropState } from "../useInterop";
 
 export function createUseInteropElement(state: UseInteropState, props: Props) {
   let type = state.type;
+
+  const isInteractive =
+    state.hoverActions || state.activeActions || state.focusActions;
+
+  props = useInteraction(state, props);
+
   const isAnimated =
     state.animations || state.transitions || state.sharedValues;
 

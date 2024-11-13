@@ -2,10 +2,12 @@ import {
   buildAnimationSideEffects,
   type AnimationAttributes,
 } from "./animations";
+import { testRule } from "./conditions";
 import { styleFamily } from "./globals";
 import type { ConfigReducerState } from "./state/config";
 import { TransitionAttributes, TransitionDeclarations } from "./transitions";
 import type { Props, RenderGuard, SideEffectTrigger, StyleRule } from "./types";
+import { UseInteropState } from "./useInterop";
 import type { Effect } from "./utils/observable";
 
 export type Declarations = Effect &
@@ -26,8 +28,8 @@ type DeclarationUpdates = {
 
 export function buildDeclarations(
   state: ConfigReducerState,
+  componentState: UseInteropState,
   props: Props,
-  run: () => void,
 ): Declarations {
   const previous = state.declarations;
   const source = props?.[state.config.source] as string | undefined;
@@ -35,7 +37,11 @@ export function buildDeclarations(
   const next: Declarations = {
     epoch: previous?.epoch ?? 0,
     guards: [{ type: "prop", name: state.config.source, value: source }],
-    run,
+    run: () => {
+      componentState.dispatch([
+        { action: { type: "update-definitions" }, index: state.index },
+      ]);
+    },
     dependencies: new Set(),
     get(readable) {
       return readable.get(next);
@@ -54,9 +60,19 @@ export function buildDeclarations(
       continue;
     }
 
-    updates = collectRules("normal", updates, styleRuleSet.n, next, previous);
+    updates = collectRules(
+      "normal",
+      state,
+      componentState,
+      updates,
+      styleRuleSet.n,
+      next,
+      previous,
+    );
     updates = collectRules(
       "important",
+      state,
+      componentState,
       updates,
       styleRuleSet.i,
       next,
@@ -90,6 +106,8 @@ export function buildDeclarations(
  */
 function collectRules(
   key: "normal" | "important",
+  state: ConfigReducerState,
+  componentState: UseInteropState,
   updates: DeclarationUpdates | undefined,
   styleRules: StyleRule[] | undefined,
   next: Declarations,
@@ -107,7 +125,7 @@ function collectRules(
   let dIndex = next[key] ? Math.max(0, next[key].length - 1) : 0;
 
   for (const rule of styleRules) {
-    if (!testRule(rule)) continue;
+    if (!testRule(rule, componentState.key, next)) continue;
 
     if (rule.a) {
       next.animation ??= [];
@@ -139,8 +157,4 @@ function collectRules(
   }
 
   return updates;
-}
-
-function testRule(styleRule: StyleRule) {
-  return true;
 }
