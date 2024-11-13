@@ -1,9 +1,6 @@
 import type { ContainerContextRecord } from "../contexts";
-import type {
-  RuntimeFunction,
-  StyleValueDescriptor,
-  StyleValueResolver,
-} from "../types";
+import { ConfigReducerState } from "../state/config";
+import type { RuntimeFunction, StyleValueDescriptor } from "../types";
 import { resolveRuntimeFunction } from "./functions";
 
 export type ResolveOptions = {
@@ -13,6 +10,19 @@ export type ResolveOptions = {
   castToArray?: boolean;
   previousTransitions: Set<string | string[]>;
 };
+
+export type StyleValueResolver = (
+  state: ConfigReducerState,
+  value: unknown,
+  options: ResolveOptions,
+) => any;
+
+export type StyleValueSubResolver<T = unknown> = (
+  resolveValue: StyleValueResolver,
+  state: ConfigReducerState,
+  value: T,
+  options: ResolveOptions,
+) => any;
 
 export const resolveValue: StyleValueResolver = (state, value, options) => {
   switch (typeof value) {

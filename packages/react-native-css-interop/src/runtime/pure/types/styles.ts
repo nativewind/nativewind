@@ -1,6 +1,4 @@
 import type { AnimationAttributes, TransitionAttributes } from "../reanimated";
-import { ResolveOptions } from "../resolvers";
-import { ConfigReducerState } from "../state/config";
 import type {
   AttributeCondition,
   ContainerQuery,
@@ -93,16 +91,3 @@ export type InlineStyle =
   | undefined
   | null
   | (Record<string, unknown> | undefined | null)[];
-
-export type StyleValueResolver = (
-  state: ConfigReducerState,
-  value: unknown,
-  options: ResolveOptions,
-) => any;
-
-export type StyleValueSubResolver<T = unknown> = (
-  resolveValue: StyleValueResolver,
-  state: ConfigReducerState,
-  value: T,
-  options: ResolveOptions,
-) => any;
