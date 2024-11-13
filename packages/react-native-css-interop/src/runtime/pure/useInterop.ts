@@ -9,7 +9,6 @@ import type { ComponentType, Dispatch } from "react";
 
 import { SharedValue } from "react-native-reanimated";
 
-import { animatedComponent, SharedValueInterpolation } from "./animations";
 import type { ContainerContextValue, VariableContextValue } from "./contexts";
 import {
   ContainerContext,
@@ -17,11 +16,15 @@ import {
   VariableContext,
 } from "./contexts";
 import {
+  animatedComponent,
+  SharedValueInterpolation,
+  Transition,
+} from "./reanimated";
+import {
   configReducer,
   type ConfigReducerAction,
   type ConfigReducerState,
 } from "./state/config";
-import { Transition } from "./transitions";
 import type { Config, Props, SideEffectTrigger } from "./types";
 import { useHandlers } from "./useHandlers";
 import { cleanupEffect } from "./utils/observable";

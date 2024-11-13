@@ -27,8 +27,8 @@ test("basic animation", () => {
   addStyle("animation-slide-in", {
     s: [0],
     a: {
-      name: [{ type: "string", value: "slide-in" }],
-      duration: [{ type: "milliseconds", value: 1000 }],
+      n: ["slide-in"],
+      du: [1000],
     },
   });
 
@@ -69,16 +69,16 @@ test("updating animation", () => {
   addStyle("animation-slide-in", {
     s: [0],
     a: {
-      name: [{ type: "string", value: "slide-in" }],
-      duration: [{ type: "milliseconds", value: 1000 }],
+      n: ["slide-in"],
+      du: [1000],
     },
   });
 
   addStyle("animation-slide-down", {
     s: [0],
     a: {
-      name: [{ type: "string", value: "slide-down" }],
-      duration: [{ type: "milliseconds", value: 1000 }],
+      n: ["slide-down"],
+      du: [1000],
     },
   });
 

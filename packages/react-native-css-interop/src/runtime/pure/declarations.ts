@@ -1,11 +1,12 @@
-import {
-  buildAnimationSideEffects,
-  type AnimationAttributes,
-} from "./animations";
 import { testRule } from "./conditions";
 import { styleFamily } from "./globals";
+import {
+  AnimationAttributes,
+  buildAnimationSideEffects,
+  TransitionAttributes,
+  TransitionDeclarations,
+} from "./reanimated";
 import type { ConfigReducerState } from "./state/config";
-import { TransitionAttributes, TransitionDeclarations } from "./transitions";
 import type { Props, RenderGuard, SideEffectTrigger, StyleRule } from "./types";
 import { UseInteropState } from "./useInterop";
 import type { Effect } from "./utils/observable";

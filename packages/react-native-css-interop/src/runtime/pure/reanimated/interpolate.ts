@@ -12,22 +12,22 @@ export function applyAnimation(
   const sharedValues = state.declarations?.sharedValues;
   if (!sharedValues) return styles;
 
-  const animationNames = state.declarations?.animation?.findLast(
-    (value) => "name" in value,
-  )?.name;
+  const animationNames = state.declarations?.animation?.findLast((value) =>
+    Boolean(value.n),
+  )?.n;
 
   if (!animationNames) return styles;
 
   const sharedValueIO: SharedValueInterpolation[] = [];
 
   for (const name of animationNames) {
-    if (name.type === "none") {
+    if (name === "none") {
       continue;
     }
 
-    const sharedValue = sharedValues.get(name.value);
+    const sharedValue = sharedValues.get(name);
 
-    const animation = styles.get(animationFamily(name.value));
+    const animation = styles.get(animationFamily(name));
     if (!animation || !sharedValue) {
       continue;
     }

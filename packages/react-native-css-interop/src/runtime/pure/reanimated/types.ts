@@ -7,6 +7,8 @@ import type { makeMutable, SharedValue } from "react-native-reanimated";
 
 import type { StyleValueDescriptor } from "../types";
 
+/******************************** Animations ******************************** */
+
 export type RawAnimation = {
   p: AnimationInterpolation[];
   // The easing function for each frame
@@ -24,39 +26,39 @@ export type AnimationAttributes = {
   /**
    * The animation delay.
    */
-  de: number;
+  de?: number[];
   /**
    * The direction of the animation.
    */
-  di: AnimationDirection;
+  di?: AnimationDirection[];
   /**
    * The animation duration.
    */
-  du: number;
+  du?: number[];
   /**
    * The animation fill mode.
    */
-  f: AnimationFillMode;
+  f?: AnimationFillMode[];
   /**
    * The number of times the animation will run.
    */
-  i: number;
+  i?: number[];
   /**
    * The animation name.
    */
-  n: string;
+  n?: string[];
   /**
    * The current play state of the animation.
    */
-  p: AnimationPlayState;
+  p?: AnimationPlayState[];
   /**
    * The animation timeline.
    */
-  t: AnimationTimeline;
+  t?: never[];
   /**
    * The easing function for the animation.
    */
-  e: EasingFunction;
+  e?: EasingFunction[];
 };
 
 export type EasingFunction =

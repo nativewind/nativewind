@@ -1,12 +1,15 @@
-import type { EasingFunction, Time } from "lightningcss";
-
 import type { Declarations } from "../declarations";
 import { animationFamily } from "../globals";
+import type { ConfigReducerState } from "../state/config";
+import type { StateWithStyles } from "../styles";
 import type { SideEffectTrigger } from "../types";
+import { getValue } from "../utils/properties";
 import type {
   AnimationAttributes,
   AnimationEasing,
   AnimationMutable,
+  EasingFunction,
+  ReanimatedMutable,
 } from "./types";
 
 /**
@@ -20,11 +23,11 @@ export function buildAnimationSideEffects(
   if (!next.animation) return next;
 
   const {
-    name: names = defaultAnimation.name,
-    duration: durations = defaultAnimation.duration,
-    delay: delays = defaultAnimation.delay,
-    timingFunction: baseEasingFuncs = defaultAnimation.timingFunction,
-    iterationCount: iterationList = defaultAnimation.iterationCount,
+    n: names = defaultAnimation.n,
+    du: durations = defaultAnimation.du,
+    de: delays = defaultAnimation.du,
+    e: baseEasingFuncs = defaultAnimation.e,
+    i: iterationList = defaultAnimation.i,
   } = Object.assign({}, ...next.animation) as AnimationAttributes;
 
   if (!names.length) return next;
@@ -42,14 +45,13 @@ export function buildAnimationSideEffects(
     }
 
     for (let index = 0; index < names.length; index++) {
-      const animationName = names[index];
+      const name = names[index];
 
       // If any animation is set to none, we should cancel all animations
-      if (animationName.type === "none") {
+      if (name === "none") {
         continue;
       }
 
-      const name = animationName.value;
       let mutable = sharedValues.get(name);
       if (!mutable) {
         mutable = makeMutable(0) as AnimationMutable;
@@ -67,14 +69,11 @@ export function buildAnimationSideEffects(
        * values
        */
       let start = 0;
-      const delay = timeToMS(delays[index % delays.length]);
-      const duration = timeToMS(durations[index % durations.length]);
+      const delay = delays[index % delays.length];
+      const duration = durations[index % durations.length];
       const baseEasingFunction =
         baseEasingFuncs[index % baseEasingFuncs.length];
-      const maxIterations = iterationList[index % iterationList.length];
-      let iterations =
-        // Non-positive values represent an infinite loop
-        maxIterations.type === "infinite" ? -1 : maxIterations.value;
+      let iterations = iterationList[index % iterationList.length];
 
       /**
        * When delay < 0, the animation immediately starts and jumps ahead by the delayed amount
@@ -101,7 +100,7 @@ export function buildAnimationSideEffects(
           0,
           0,
           duration,
-          maxIterations.type === "infinite" ? Infinity : maxIterations.value,
+          iterations === -1 ? Infinity : iterations,
           false,
           true,
           animation.e,
@@ -153,7 +152,7 @@ export function getAnimationTiming(
   repeat = false,
   forwards = true,
   steps: AnimationEasing[] = [0, 1],
-  easing: EasingFunction = { type: "linear" },
+  easing: EasingFunction = "linear",
 ) {
   const { withTiming, Easing } = require("react-native-reanimated");
 
@@ -218,41 +217,124 @@ export function getEasing(
 ) {
   if (!timingFunction) return Easing.linear;
 
-  switch (timingFunction.type) {
-    case "ease":
-      return Easing.ease;
-    case "ease-in":
-      return Easing.in(Easing.quad);
-    case "ease-out":
-      return Easing.out(Easing.quad);
-    case "ease-in-out":
-      return Easing.inOut(Easing.quad);
-    case "linear":
-      return Easing.linear;
-    case "cubic-bezier":
-      return Easing.bezier(
-        timingFunction.x1,
-        timingFunction.y1,
-        timingFunction.x2,
-        timingFunction.y2,
-      );
-    default:
-      return Easing.linear;
+  if (typeof timingFunction === "string") {
+    switch (timingFunction) {
+      case "ease":
+        return Easing.ease;
+      case "ease-in":
+        return Easing.in(Easing.quad);
+      case "ease-out":
+        return Easing.out(Easing.quad);
+      case "ease-in-out":
+        return Easing.inOut(Easing.quad);
+      case "linear":
+        return Easing.linear;
+      default:
+        timingFunction satisfies never;
+    }
+  } else {
+    switch (timingFunction.type) {
+      case "cubic-bezier":
+        return Easing.bezier(
+          timingFunction.x1,
+          timingFunction.y1,
+          timingFunction.x2,
+          timingFunction.y2,
+        );
+      case "steps":
+        return Easing.linear;
+      default:
+        timingFunction satisfies never;
+    }
   }
 }
 
-const timeToMS = (time: Time) => {
-  return time.type === "milliseconds" ? time.value : time.value * 1000;
+const defaultAnimation: Required<AnimationAttributes> = {
+  n: ["none"],
+  di: ["normal"],
+  de: [0],
+  f: ["none"],
+  i: [1],
+  e: ["linear"],
+  p: ["running"],
+  du: [0],
+  t: [],
 };
 
-const defaultAnimation: Required<AnimationAttributes> = {
-  name: [],
-  direction: ["normal"],
-  fillMode: ["none"],
-  iterationCount: [{ type: "number", value: 1 }],
-  timingFunction: [{ type: "linear" }],
-  playState: ["running"],
-  duration: [{ type: "seconds", value: 0 }],
-  delay: [{ type: "seconds", value: 0 }],
-  timeline: [{ type: "none" }],
-};
+export function getTransitionSideEffect(
+  next: StateWithStyles,
+  previous: ConfigReducerState,
+  propPath: string | string[],
+): ((value: any) => () => void) | undefined {
+  let prop = Array.isArray(propPath) ? propPath[propPath.length - 1] : propPath;
+  if (prop.startsWith("^")) {
+    prop = prop.slice(1);
+  }
+
+  const transition = next.declarations?.transition;
+
+  if (!transition?.p) {
+    return;
+  }
+
+  const index = transition.p.indexOf(prop);
+
+  if (index === -1) {
+    return;
+  }
+
+  let transitions = previous.styles?.transitions;
+  if (!transitions) {
+    transitions = new Map();
+  } else {
+    transitions = new Map(transitions);
+  }
+
+  next.styles.transitions = transitions;
+
+  const {
+    makeMutable,
+    withTiming,
+    withDelay,
+    Easing,
+  } = require("react-native-reanimated");
+
+  let sharedValue = transitions.get(propPath);
+  if (!sharedValue) {
+    sharedValue = makeMutable() as ReanimatedMutable<any>;
+    transitions.set(propPath, sharedValue);
+  }
+
+  return (value: any) => {
+    return () => {
+      const previousValue = sharedValue.value;
+
+      // This is the first render, never transition
+      if (previousValue === undefined && previous === undefined) {
+        sharedValue.value = value;
+        return;
+      }
+
+      // This is not the first render, just the first time this prop is set
+      // So we need to transition from the default value
+      if (previousValue === undefined) {
+        sharedValue.value = getValue(
+          previous,
+          previous.styles?.props || {},
+          propPath,
+        );
+      }
+
+      sharedValue.value = withDelay(
+        transition.d?.[index % transition.d.length] ?? 0,
+        withTiming(value, {
+          duration: transition.l?.[index % transition.l.length] ?? 0,
+          easing: getEasing(
+            transition.t?.[index % transition.t.length],
+            Easing,
+          ),
+        }),
+      );
+    };
+  };
+}

@@ -1,10 +1,13 @@
-import { applyAnimation, type SharedValueInterpolation } from "./animations";
 import type { ContainerContextValue, VariableContextValue } from "./contexts";
+import {
+  applyAnimation,
+  getTransitionSideEffect,
+  SharedValueInterpolation,
+  TransitionStyles,
+} from "./reanimated";
 import type { ResolveOptions } from "./resolvers";
 import { resolveValue } from "./resolvers";
 import type { ConfigReducerState } from "./state/config";
-import { TransitionStyles } from "./transitions";
-import { getTransitionSideEffect } from "./transitions/sideEffects";
 import type {
   Callback,
   Props,
