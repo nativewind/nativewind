@@ -5,13 +5,10 @@ import type {
   SelectorList,
 } from "lightningcss";
 
+import { StyleRule } from "../runtime/pure";
+import { CompilerCollection } from "../runtime/pure/compiler/types";
 import { SpecificityIndex } from "../shared";
-import {
-  AttributeCondition,
-  ExtractRuleOptions,
-  Specificity,
-  StyleRule,
-} from "../types";
+import { AttributeCondition, Specificity } from "../types";
 
 export type NormalizeSelector =
   | {
@@ -36,7 +33,7 @@ export type NormalizeSelector =
 export function normalizeSelectors(
   extractedStyle: StyleRule,
   selectorList: SelectorList,
-  options: ExtractRuleOptions,
+  collection: CompilerCollection,
   selectors: NormalizeSelector[] = [],
   defaults: Partial<NormalizeSelector> = {},
 ) {
@@ -46,7 +43,7 @@ export function normalizeSelectors(
       normalizeSelectors(
         extractedStyle,
         cssSelector[0].selectors,
-        options,
+        collection,
         selectors,
       );
     } else if (
@@ -55,7 +52,7 @@ export function normalizeSelectors(
     ) {
       if (
         // Matches: @media(prefers-dark-mode) { :root {} }
-        isDarkModeMediaQuery(extractedStyle.media?.[0])
+        isDarkModeMediaQuery(extractedStyle.m?.[0])
       ) {
         selectors.push({
           type: "rootVariables",
@@ -69,7 +66,7 @@ export function normalizeSelectors(
       }
     } else if (
       // Matches: .dark:root {} || :root[class~="dark"]
-      isRootDarkVariableSelector(cssSelector, options)
+      isRootDarkVariableSelector(cssSelector, collection)
     ) {
       selectors.push({
         type: "rootVariables",
@@ -81,7 +78,7 @@ export function normalizeSelectors(
     ) {
       if (
         // Matches @media(prefers-dark-mode) { * {} }
-        isDarkModeMediaQuery(extractedStyle.media?.[0])
+        isDarkModeMediaQuery(extractedStyle.m?.[0])
       ) {
         selectors.push({
           type: "universalVariables",
@@ -95,7 +92,7 @@ export function normalizeSelectors(
       }
     } else if (
       // Matches:  .dark * {}
-      isDarkUniversalSelector(cssSelector, options)
+      isDarkUniversalSelector(cssSelector, collection)
     ) {
       selectors.push({
         type: "universalVariables",
@@ -103,14 +100,14 @@ export function normalizeSelectors(
       });
     } else if (
       // Matches:  .dark <selector> {}
-      isDarkClassLegacySelector(cssSelector, options)
+      isDarkClassLegacySelector(cssSelector, collection)
     ) {
       const [_, __, third, ...rest] = cssSelector;
 
       normalizeSelectors(
         extractedStyle,
         [[third, ...rest]],
-        options,
+        collection,
         selectors,
         {
           media: [
@@ -130,11 +127,11 @@ export function normalizeSelectors(
       );
     } else if (
       // Matches:  <selector>:is(.dark *) {}
-      isDarkClassSelector(cssSelector, options)
+      isDarkClassSelector(cssSelector, collection)
     ) {
       const [first] = cssSelector;
 
-      normalizeSelectors(extractedStyle, [[first]], options, selectors, {
+      normalizeSelectors(extractedStyle, [[first]], collection, selectors, {
         media: [
           {
             mediaType: "all",
@@ -158,7 +155,7 @@ export function normalizeSelectors(
           specificity: [],
         },
         cssSelector,
-        options,
+        collection,
       );
 
       if (selector === null || !selector.className) {
@@ -175,7 +172,7 @@ export function normalizeSelectors(
 function reduceSelector(
   acc: Extract<NormalizeSelector, { type: "className" }>,
   selectorComponents: Selector,
-  options: ExtractRuleOptions,
+  collection: CompilerCollection,
 ) {
   let previousType: SelectorComponent["type"] = "combinator";
   let inGroup = false;
@@ -245,7 +242,7 @@ function reduceSelector(
          *
          * NOTE: We ignore specificity for this
          */
-        if (component.name !== options.selectorPrefix) {
+        if (component.name !== collection.selectorPrefix) {
           return null;
         }
         break;
@@ -273,14 +270,14 @@ function reduceSelector(
               // .className .otherClassName
               // This will only occur if the first className is not a group
               return null;
-            } else if (component.name === options.selectorPrefix?.slice(1)) {
+            } else if (component.name === collection.selectorPrefix?.slice(1)) {
               // If the name matches the selectorPrefix, just ignore it!
               // E.g .dark .myClass
               break;
             } else {
               const groupingValid =
                 !acc.groupClassName &&
-                options.grouping.some((group) => {
+                collection.grouping.some((group) => {
                   return group.test(component.name);
                 });
 
@@ -326,7 +323,7 @@ function reduceSelector(
         let pseudoClasses: Record<string, true>;
         let attrs: AttributeCondition[];
         if (component.kind === "is") {
-          if (isDarkUniversalSelector(component.selectors[0], options)) {
+          if (isDarkUniversalSelector(component.selectors[0], collection)) {
             acc.media ??= [];
             acc.media.push({
               mediaType: "all",
@@ -422,9 +419,9 @@ function isDarkModeMediaQuery(query?: MediaQuery): boolean {
 // Matches:  <selector>:is(.dark *)
 function isDarkClassSelector(
   [first, second, third]: Selector,
-  options: ExtractRuleOptions,
+  collection: CompilerCollection,
 ) {
-  if (options.darkMode?.type !== "class" || !options.darkMode.value) {
+  if (collection.darkMode?.[0] !== "class" || !collection.darkMode[1]) {
     return false;
   }
 
@@ -438,7 +435,7 @@ function isDarkClassSelector(
     second.selectors.length === 1 &&
     second.selectors[0].length === 3 &&
     second.selectors[0][0].type === "class" &&
-    second.selectors[0][0].name === options.darkMode.value &&
+    second.selectors[0][0].name === collection.darkMode[1] &&
     second.selectors[0][1].type === "combinator" &&
     second.selectors[0][1].value === "descendant" &&
     second.selectors[0][2].type === "universal"
@@ -448,9 +445,9 @@ function isDarkClassSelector(
 // Matches:  .dark <selector> {}
 function isDarkClassLegacySelector(
   [first, second, third]: Selector,
-  options: ExtractRuleOptions,
+  collection: CompilerCollection,
 ) {
-  if (options.darkMode?.type !== "class" || !options.darkMode.value) {
+  if (collection.darkMode?.[0] !== "class" || !collection.darkMode[1]) {
     return false;
   }
 
@@ -459,7 +456,7 @@ function isDarkClassLegacySelector(
     second &&
     third &&
     first.type === "class" &&
-    first.name === options.darkMode?.value &&
+    first.name === collection.darkMode[1] &&
     second.type === "combinator" &&
     second.value === "descendant" &&
     third.type === "class"
@@ -481,15 +478,15 @@ function isDefaultVariableSelector([first, second]: Selector) {
 // Matches:  .dark:root  {}
 function isRootDarkVariableSelector(
   [first, second]: Selector,
-  options: ExtractRuleOptions,
+  collection: CompilerCollection,
 ) {
   return (
     first &&
     second &&
-    options.darkMode?.type === "class" &&
+    collection.darkMode?.[0] === "class" &&
     // .dark:root {}
     ((first.type === "class" &&
-      first.name === options.darkMode.value &&
+      first.name === collection.darkMode[1] &&
       second.type === "pseudo-class" &&
       second.kind === "root") ||
       // :root[class~=dark] {}
@@ -498,7 +495,7 @@ function isRootDarkVariableSelector(
         second.type === "attribute" &&
         second.name === "class" &&
         second.operation &&
-        second.operation.value === options.darkMode.value &&
+        second.operation.value === collection.darkMode[1] &&
         ["includes", "equal"].includes(second.operation.operator)))
   );
 }
@@ -506,15 +503,15 @@ function isRootDarkVariableSelector(
 // Matches:  .dark * {}
 function isDarkUniversalSelector(
   [first, second, third]: Selector,
-  options: ExtractRuleOptions,
+  collection: CompilerCollection,
 ) {
   return (
-    options.darkMode?.type === "class" &&
+    collection.darkMode?.[0] === "class" &&
     first &&
     second &&
     third &&
     first.type === "class" &&
-    first.name === options.darkMode.value &&
+    first.name === collection.darkMode[1] &&
     second.type === "combinator" &&
     second.value === "descendant" &&
     third.type === "universal"

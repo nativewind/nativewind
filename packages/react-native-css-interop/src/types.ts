@@ -172,7 +172,7 @@ export type JSXFunctionRest = OmitFirstTwo<Parameters<JSXFunction>>;
 export type StyleAttribute = string;
 export type PathTokens = string[];
 export type Delayed = boolean;
-export type MoveTokenRecord = Record<string, PathTokens>;
+export type MoveTokenRecord = Record<string, PathTokens | undefined>;
 export type StyleDeclaration =
   | [Record<string, string | number | boolean>]
   | [Record<string, string | number | boolean>, PathTokens]
@@ -260,6 +260,13 @@ export type PropAccumulator = {
 };
 
 export type RuntimeStyle = RuntimeValueDescriptor | Record<string, unknown>;
+
+export type SingleRuntimeValueDescriptor =
+  | string
+  | number
+  | boolean
+  | undefined
+  | RuntimeFunction;
 
 export type RuntimeValueDescriptor =
   | string

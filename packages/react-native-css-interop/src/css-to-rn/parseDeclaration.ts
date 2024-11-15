@@ -37,6 +37,7 @@ import type {
   TextDecorationLine,
   TextDecorationStyle,
   TextShadow,
+  Time,
   Token,
   TokenOrValue,
   Translate,
@@ -46,13 +47,11 @@ import type {
 } from "lightningcss";
 
 import { isDescriptorArray } from "../shared";
-import type {
-  ExtractionWarning,
-  RuntimeFunction,
-  RuntimeValueDescriptor,
-} from "../types";
+import type { RuntimeFunction, RuntimeValueDescriptor } from "../types";
+import { AddFn } from "./add";
 import { FeatureFlagStatus } from "./feature-flags";
 import { toRNProperty } from "./normalize-selectors";
+import { parseEasingFunction, parseIterationCount } from "./reanimated";
 
 const unparsedPropertyMapping: Record<string, string> = {
   "margin-inline-start": "margin-start",
@@ -60,39 +59,6 @@ const unparsedPropertyMapping: Record<string, string> = {
   "padding-inline-start": "padding-start",
   "padding-inline-end": "padding-end",
 };
-
-type AddStyleProp = (
-  property: string,
-  value?: RuntimeValueDescriptor,
-  moveTokens?: string[],
-) => void;
-
-type HandleStyleShorthand = (
-  property: string,
-  options: Record<string, RuntimeValueDescriptor>,
-) => void;
-
-type AddAnimationDefaultProp = (property: string, value: unknown[]) => void;
-type AddContainerProp = (
-  declaration: Extract<
-    Declaration,
-    { property: "container" | "container-name" | "container-type" }
-  >,
-) => void;
-type AddTransitionProp = (
-  declaration: Extract<
-    Declaration,
-    {
-      property:
-        | "transition-property"
-        | "transition-duration"
-        | "transition-delay"
-        | "transition-timing-function"
-        | "transition";
-    }
-  >,
-) => void;
-type AddWarning = (warning: ExtractionWarning) => undefined;
 
 const validProperties = [
   "align-content",
@@ -255,40 +221,35 @@ const validPropertiesLoose = new Set<string>(validProperties);
 
 export interface ParseDeclarationOptions {
   inlineRem?: number | false;
-  addStyleProp: AddStyleProp;
-  addTransformProp: AddStyleProp;
-  handleStyleShorthand: HandleStyleShorthand;
-  handleTransformShorthand: HandleStyleShorthand;
-  addAnimationProp: AddAnimationDefaultProp;
-  addContainerProp: AddContainerProp;
-  addTransitionProp: AddTransitionProp;
-  addWarning: AddWarning;
-  requiresLayout: (name: string) => void;
   features: FeatureFlagStatus;
-}
-
-export interface ParseDeclarationOptionsWithValueWarning
-  extends ParseDeclarationOptions {
-  addValueWarning: (value: any) => undefined;
-  addFunctionValueWarning: (value: any) => undefined;
   allowAuto?: boolean;
 }
+
+interface ParserOptions extends ParseDeclarationOptions {
+  add: AddFn;
+  addWarning: AddWarningShort;
+}
+
+declare function AddWarning(type: "property", property: string): undefined;
+declare function AddWarning(type: "function", name: string): undefined;
+declare function AddWarning(
+  type: "value",
+  property: string,
+  value: any,
+): undefined;
+export type AddWarningFn = typeof AddWarning;
+
+declare function AddWarningShort(type: "property", value: never): undefined;
+declare function AddWarningShort(type: "value", value: any): undefined;
+declare function AddWarningShort(type: "function", name: any): undefined;
+type AddWarningShort = typeof AddWarningShort;
 
 export function parseDeclaration(
   declaration: Declaration,
   options: ParseDeclarationOptions,
+  add: AddFn,
+  addWarning: AddWarningFn,
 ) {
-  const {
-    addStyleProp,
-    addTransformProp,
-    handleStyleShorthand,
-    handleTransformShorthand,
-    addAnimationProp,
-    addContainerProp,
-    addTransitionProp,
-    addWarning,
-  } = options;
-
   if ("vendorPrefix" in declaration && declaration.vendorPrefix.length) {
     return;
   }
@@ -304,234 +265,180 @@ export function parseDeclaration(
   }
 
   if (declaration.property === "unparsed") {
-    if (!isValid(declaration.value.propertyId)) {
-      return addWarning({
-        type: "IncompatibleNativeProperty",
-        property: declaration.value.propertyId.property,
-      });
-    }
-
-    const parseOptions = {
-      ...options,
-      addFunctionValueWarning(value: any) {
-        return addWarning({
-          type: "IncompatibleNativeFunctionValue",
-          property: declaration.value.propertyId.property,
-          value,
-        });
-      },
-      addValueWarning(value: any) {
-        return addWarning({
-          type: "IncompatibleNativeValue",
-          property: declaration.value.propertyId.property,
-          value,
-        });
-      },
-    };
-
-    let property =
-      unparsedPropertyMapping[declaration.value.propertyId.property] ||
-      declaration.value.propertyId.property;
-
-    if (unparsedRuntimeFn.has(property)) {
-      let args = parseUnparsed(declaration.value.value, parseOptions);
-      if (!isDescriptorArray(args)) {
-        args = [args];
-      }
-      return addStyleProp(property, [{}, `@${toRNProperty(property)}`, args]);
-    }
-
-    return addStyleProp(
-      property,
-      parseUnparsed(declaration.value.value, parseOptions),
-    );
+    return parseDeclarationUnparsed(declaration, options, add, addWarning);
   } else if (declaration.property === "custom") {
-    let property = declaration.value.name;
-    if (
-      validPropertiesLoose.has(property) ||
-      property.startsWith("--") ||
-      property.startsWith("-rn-")
-    ) {
-      return addStyleProp(
-        property,
-        parseUnparsed(declaration.value.value, {
-          ...options,
-          allowAuto: allowAuto.has(property),
-          addValueWarning(value: any) {
-            return addWarning({
-              type: "IncompatibleNativeValue",
-              property,
-              value,
-            });
-          },
-          addFunctionValueWarning(value: any) {
-            return addWarning({
-              type: "IncompatibleNativeFunctionValue",
-              property,
-              value,
-            });
-          },
-        }),
-      );
-    } else {
-      return addWarning({
-        type: "IncompatibleNativeProperty",
-        property: declaration.value.name,
-      });
-    }
+    return parseDeclarationCustom(declaration, options, add, addWarning);
   }
 
-  const parseOptions = {
-    ...options,
-    addValueWarning(value: any) {
-      return addWarning({
-        type: "IncompatibleNativeValue",
-        property: declaration.property,
-        value,
-      });
-    },
-    addFunctionValueWarning(value: any) {
-      return addWarning({
-        type: "IncompatibleNativeFunctionValue",
-        property: declaration.property,
-        value,
-      });
-    },
-  };
-
-  const addInvalidProperty = () => {
-    return addWarning({
-      type: "IncompatibleNativeProperty",
-      property: declaration.property,
-    });
-  };
-
   if (!isValid(declaration)) {
-    return addInvalidProperty();
+    return addWarning("property", declaration.property);
+  }
+
+  const parseOptions: ParserOptions = {
+    ...options,
+    add,
+    addWarning(value: any) {
+      return addWarning("value", declaration.property, value);
+    },
+  };
+
+  function handleStyleShorthand(
+    name: string,
+    options: Record<string, RuntimeValueDescriptor>,
+  ) {
+    if (allEqual(...Object.values(options))) {
+      return add("style", name, Object.values(options)[0]);
+    } else {
+      for (const [name, value] of Object.entries(options)) {
+        add("style", name, value);
+      }
+    }
   }
 
   switch (declaration.property) {
     case "background-color":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseColor(declaration.value, parseOptions),
       );
     case "opacity":
-      return addStyleProp(declaration.property, declaration.value);
+      return add("style", declaration.property, declaration.value);
     case "color":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseColor(declaration.value, parseOptions),
       );
     case "display":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseDisplay(declaration.value, parseOptions),
       );
     case "width":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "height":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "min-width":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "min-height":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "max-width":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "max-height":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "block-size":
-      return addStyleProp("width", parseSize(declaration.value, parseOptions));
+      return add("style", "width", parseSize(declaration.value, parseOptions));
     case "inline-size":
-      return addStyleProp("height", parseSize(declaration.value, parseOptions));
+      return add("style", "height", parseSize(declaration.value, parseOptions));
     case "min-block-size":
-      return addStyleProp(
+      return add(
+        "style",
         "min-width",
         parseSize(declaration.value, parseOptions),
       );
     case "min-inline-size":
-      return addStyleProp(
+      return add(
+        "style",
         "min-height",
         parseSize(declaration.value, parseOptions),
       );
     case "max-block-size":
-      return addStyleProp(
+      return add(
+        "style",
         "max-width",
         parseSize(declaration.value, parseOptions),
       );
     case "max-inline-size":
-      return addStyleProp(
+      return add(
+        "style",
         "max-height",
         parseSize(declaration.value, parseOptions),
       );
     case "overflow":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseOverflow(declaration.value.x, parseOptions),
       );
     case "position":
       const value: any = (declaration as any).value.type;
       if (value === "absolute" || value === "relative") {
-        return addStyleProp(declaration.property, value);
+        return add("style", declaration.property, value);
       } else {
-        parseOptions.addValueWarning(value);
+        parseOptions.addWarning("value", value);
       }
       return;
     case "top":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "bottom":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "left":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "right":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "inset-block-start":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "inset-block-end":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "inset-inline-start":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "inset-inline-end":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
@@ -561,191 +468,163 @@ export function parseDeclaration(
       handleStyleShorthand("inset", {
         top: parseLengthPercentageOrAuto(declaration.value.top, {
           ...parseOptions,
-          addValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeValue",
-              property: "top",
-              value,
-            });
-          },
-          addFunctionValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeFunctionValue",
-              property: "top",
-              value,
-            });
-          },
+          addWarning: buildAddWarning(addWarning, "top"),
         }),
         bottom: parseLengthPercentageOrAuto(declaration.value.bottom, {
           ...parseOptions,
-          addValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeValue",
-              property: "bottom",
-              value,
-            });
-          },
-          addFunctionValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeFunctionValue",
-              property: "bottom",
-              value,
-            });
-          },
+          addWarning: buildAddWarning(addWarning, "bottom"),
         }),
         left: parseLengthPercentageOrAuto(declaration.value.left, {
           ...parseOptions,
-          addValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeValue",
-              property: "left",
-              value,
-            });
-          },
-          addFunctionValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeFunctionValue",
-              property: "left",
-              value,
-            });
-          },
+          addWarning: buildAddWarning(addWarning, "left"),
         }),
         right: parseLengthPercentageOrAuto(declaration.value.right, {
           ...parseOptions,
-          addValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeValue",
-              property: "right",
-              value,
-            });
-          },
-          addFunctionValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeFunctionValue",
-              property: "right",
-              value,
-            });
-          },
+          addWarning: buildAddWarning(addWarning, "right"),
         }),
       });
       return;
     case "border-top-color":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseColor(declaration.value, parseOptions),
       );
     case "border-bottom-color":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseColor(declaration.value, parseOptions),
       );
     case "border-left-color":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseColor(declaration.value, parseOptions),
       );
     case "border-right-color":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseColor(declaration.value, parseOptions),
       );
     case "border-block-start-color":
-      return addStyleProp(
+      return add(
+        "style",
         "border-top-color",
         parseColor(declaration.value, parseOptions),
       );
     case "border-block-end-color":
-      return addStyleProp(
+      return add(
+        "style",
         "border-bottom-color",
         parseColor(declaration.value, parseOptions),
       );
     case "border-inline-start-color":
-      return addStyleProp(
+      return add(
+        "style",
         "border-left-color",
         parseColor(declaration.value, parseOptions),
       );
     case "border-inline-end-color":
-      return addStyleProp(
+      return add(
+        "style",
         "border-right-color",
         parseColor(declaration.value, parseOptions),
       );
     case "border-top-width":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-bottom-width":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-left-width":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-right-width":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-block-start-width":
-      return addStyleProp(
+      return add(
+        "style",
         "border-top-width",
         parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-block-end-width":
-      return addStyleProp(
+      return add(
+        "style",
         "border-bottom-width",
         parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-inline-start-width":
-      return addStyleProp(
+      return add(
+        "style",
         "border-left-width",
         parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-inline-end-width":
-      return addStyleProp(
+      return add(
+        "style",
         "border-right-width",
         parseBorderSideWidth(declaration.value, parseOptions),
       );
     case "border-top-left-radius":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLength(declaration.value[0], parseOptions),
       );
     case "border-top-right-radius":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLength(declaration.value[0], parseOptions),
       );
     case "border-bottom-left-radius":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLength(declaration.value[0], parseOptions),
       );
     case "border-bottom-right-radius":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLength(declaration.value[0], parseOptions),
       );
     case "border-start-start-radius":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLength(declaration.value[0], parseOptions),
       );
     case "border-start-end-radius":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLength(declaration.value[0], parseOptions),
       );
     case "border-end-start-radius":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLength(declaration.value[0], parseOptions),
       );
     case "border-end-end-radius":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLength(declaration.value[0], parseOptions),
       );
@@ -773,76 +652,25 @@ export function parseDeclaration(
       handleStyleShorthand("border-color", {
         "border-top-color": parseColor(declaration.value.top, {
           ...parseOptions,
-          addValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeValue",
-              property: "border-top-color",
-              value,
-            });
-          },
-          addFunctionValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeFunctionValue",
-              property: "border-top-color",
-              value,
-            });
-          },
+          addWarning: buildAddWarning(addWarning, "border-top-color"),
         }),
         "border-bottom-color": parseColor(declaration.value.bottom, {
           ...parseOptions,
-          addValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeValue",
-              property: "border-bottom-color",
-              value,
-            });
-          },
-          addFunctionValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeFunctionValue",
-              property: "border-bottom-color",
-              value,
-            });
-          },
+          addWarning: buildAddWarning(addWarning, "border-bottom-color"),
         }),
         "border-left-color": parseColor(declaration.value.left, {
           ...parseOptions,
-          addValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeValue",
-              property: "border-left-color",
-              value,
-            });
-          },
-          addFunctionValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeFunctionValue",
-              property: "border-left-color",
-              value,
-            });
-          },
+          addWarning: buildAddWarning(addWarning, "border-left-color"),
         }),
         "border-right-color": parseColor(declaration.value.right, {
           ...parseOptions,
-          addValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeValue",
-              property: "border-right-color",
-              value,
-            });
-          },
-          addFunctionValueWarning(value: any) {
-            addWarning({
-              type: "IncompatibleNativeFunctionValue",
-              property: "border-right-color",
-              value,
-            });
-          },
+          addWarning: buildAddWarning(addWarning, "border-right-color"),
         }),
       });
       return;
     case "border-style":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseBorderStyle(declaration.value, parseOptions),
       );
@@ -867,41 +695,49 @@ export function parseDeclaration(
       });
       return;
     case "border-block-color":
-      addStyleProp(
+      add(
+        "style",
         "border-top-color",
         parseColor(declaration.value.start, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-bottom-color",
         parseColor(declaration.value.end, parseOptions),
       );
       return;
     case "border-block-width":
-      addStyleProp(
+      add(
+        "style",
         "border-top-width",
         parseBorderSideWidth(declaration.value.start, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-bottom-width",
         parseBorderSideWidth(declaration.value.end, parseOptions),
       );
       return;
     case "border-inline-color":
-      addStyleProp(
+      add(
+        "style",
         "border-left-color",
         parseColor(declaration.value.start, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-right-color",
         parseColor(declaration.value.end, parseOptions),
       );
       return;
     case "border-inline-width":
-      addStyleProp(
+      add(
+        "style",
         "border-left-width",
         parseBorderSideWidth(declaration.value.start, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-right-width",
         parseBorderSideWidth(declaration.value.end, parseOptions),
       );
@@ -916,176 +752,208 @@ export function parseDeclaration(
       });
       return;
     case "border-top":
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-bottom":
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-left":
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-right":
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-block":
-      addStyleProp(
+      add(
+        "style",
         "border-top-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-bottom-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-top-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-bottom-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-block-start":
-      addStyleProp(
+      add(
+        "style",
         "border-top-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-top-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-block-end":
-      addStyleProp(
+      add(
+        "style",
         "border-bottom-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-bottom-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-inline":
-      addStyleProp(
+      add(
+        "style",
         "border-left-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-right-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-left-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-right-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-inline-start":
-      addStyleProp(
+      add(
+        "style",
         "border-left-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-left-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "border-inline-end":
-      addStyleProp(
+      add(
+        "style",
         "border-right-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "border-right-width",
         parseBorderSideWidth(declaration.value.width, parseOptions),
       );
       return;
     case "flex-direction":
-      return addStyleProp(declaration.property, declaration.value);
+      return add("style", declaration.property, declaration.value);
     case "flex-wrap":
-      return addStyleProp(declaration.property, declaration.value);
+      return add("style", declaration.property, declaration.value);
     case "flex-flow":
-      addStyleProp("flexWrap", declaration.value.wrap);
-      addStyleProp("flexDirection", declaration.value.direction);
+      add("style", "flexWrap", declaration.value.wrap);
+      add("style", "flexDirection", declaration.value.direction);
       break;
     case "flex-grow":
-      return addStyleProp(declaration.property, declaration.value);
+      return add("style", declaration.property, declaration.value);
     case "flex-shrink":
-      return addStyleProp(declaration.property, declaration.value);
+      return add("style", declaration.property, declaration.value);
     case "flex-basis":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "flex":
-      addStyleProp("flex-grow", declaration.value.grow);
-      addStyleProp("flex-shrink", declaration.value.shrink);
-      addStyleProp(
+      add("style", "flex-grow", declaration.value.grow);
+      add("style", "flex-shrink", declaration.value.shrink);
+      add(
+        "style",
         "flex-basis",
         parseLengthPercentageOrAuto(declaration.value.basis, parseOptions),
       );
       break;
     case "align-content":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseAlignContent(declaration.value, parseOptions),
       );
     case "justify-content":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseJustifyContent(declaration.value, parseOptions),
       );
     case "align-self":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseAlignSelf(declaration.value, parseOptions),
       );
     case "align-items":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseAlignItems(declaration.value, parseOptions),
       );
     case "row-gap":
-      return addStyleProp("row-gap", parseGap(declaration.value, parseOptions));
+      return add("style", "row-gap", parseGap(declaration.value, parseOptions));
     case "column-gap":
-      return addStyleProp(
+      return add(
+        "style",
         "column-gap",
         parseGap(declaration.value, parseOptions),
       );
     case "gap":
-      addStyleProp("row-gap", parseGap(declaration.value.row, parseOptions));
-      addStyleProp(
+      add("style", "row-gap", parseGap(declaration.value.row, parseOptions));
+      add(
+        "style",
         "column-gap",
         parseGap(declaration.value.column, parseOptions),
       );
@@ -1107,56 +975,64 @@ export function parseDeclaration(
       });
       return;
     case "margin-top":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions, {
           allowAuto: true,
         }),
       );
     case "margin-bottom":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions, {
           allowAuto: true,
         }),
       );
     case "margin-left":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions, {
           allowAuto: true,
         }),
       );
     case "margin-right":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions, {
           allowAuto: true,
         }),
       );
     case "margin-block-start":
-      return addStyleProp(
+      return add(
+        "style",
         "margin-start",
         parseLengthPercentageOrAuto(declaration.value, parseOptions, {
           allowAuto: true,
         }),
       );
     case "margin-block-end":
-      return addStyleProp(
+      return add(
+        "style",
         "margin-end",
         parseLengthPercentageOrAuto(declaration.value, parseOptions, {
           allowAuto: true,
         }),
       );
     case "margin-inline-start":
-      return addStyleProp(
+      return add(
+        "style",
         "margin-start",
         parseLengthPercentageOrAuto(declaration.value, parseOptions, {
           allowAuto: true,
         }),
       );
     case "margin-inline-end":
-      return addStyleProp(
+      return add(
+        "style",
         "margin-end",
         parseLengthPercentageOrAuto(declaration.value, parseOptions, {
           allowAuto: true,
@@ -1195,42 +1071,50 @@ export function parseDeclaration(
       });
       break;
     case "padding-top":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "padding-bottom":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "padding-left":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "padding-right":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSize(declaration.value, parseOptions),
       );
     case "padding-block-start":
-      return addStyleProp(
+      return add(
+        "style",
         "padding-start",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-block-end":
-      return addStyleProp(
+      return add(
+        "style",
         "padding-end",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-inline-start":
-      return addStyleProp(
+      return add(
+        "style",
         "padding-start",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
     case "padding-inline-end":
-      return addStyleProp(
+      return add(
+        "style",
         "padding-end",
         parseLengthPercentageOrAuto(declaration.value, parseOptions),
       );
@@ -1259,205 +1143,268 @@ export function parseDeclaration(
       });
       return;
     case "font-weight":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseFontWeight(declaration.value, parseOptions),
       );
     case "font-size":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseFontSize(declaration.value, parseOptions),
       );
     case "font-family":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseFontFamily(declaration.value),
       );
     case "font-style":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseFontStyle(declaration.value, parseOptions),
       );
     case "font-variant-caps":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseFontVariantCaps(declaration.value, parseOptions),
       );
     case "line-height":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseLineHeight(declaration.value, parseOptions),
       );
     case "font":
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-family",
         parseFontFamily(declaration.value.family),
       );
-      addStyleProp(
+      add(
+        "style",
         "line-height",
         parseLineHeight(declaration.value.lineHeight, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-size",
         parseFontSize(declaration.value.size, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-style",
         parseFontStyle(declaration.value.style, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-variant",
         parseFontVariantCaps(declaration.value.variantCaps, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         declaration.property + "-weight",
         parseFontWeight(declaration.value.weight, parseOptions),
       );
       return;
     case "vertical-align":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseVerticalAlign(declaration.value, parseOptions),
       );
     case "transition-property":
+      return add(
+        "transition",
+        declaration.property,
+        declaration.value.map((v) => v.property),
+      );
     case "transition-duration":
+      return add(
+        "transition",
+        declaration.property,
+        parseTimeArray(declaration.value),
+      );
     case "transition-delay":
+      return add(
+        "transition",
+        declaration.property,
+        parseTimeArray(declaration.value),
+      );
     case "transition-timing-function":
+      return add(
+        "transition",
+        declaration.property,
+        parseEasingFunction(declaration.value),
+      );
     case "transition":
-      return addTransitionProp(declaration);
+      // TODO
+      return;
+    // return add("transition", declaration);
     case "animation-duration":
+      return add(
+        "animation",
+        declaration.property,
+        parseTimeArray(declaration.value),
+      );
     case "animation-timing-function":
+      return add(
+        "animation",
+        declaration.property,
+        parseEasingFunction(declaration.value),
+      );
     case "animation-iteration-count":
+      return add(
+        "animation",
+        declaration.property,
+        parseIterationCount(declaration.value),
+      );
     case "animation-direction":
     case "animation-play-state":
     case "animation-delay":
     case "animation-fill-mode":
     case "animation-name":
     case "animation":
-      return addAnimationProp(declaration.property, declaration.value);
+      // TODO
+      return;
     case "transform": {
       if (declaration.value.length === 0) {
-        addTransformProp("perspective", 1);
-        addTransformProp("translateX", 0);
-        addTransformProp("translateY", 0);
-        addTransformProp("rotate", "0deg");
-        addTransformProp("rotateX", "0deg");
-        addTransformProp("rotateY", "0deg");
-        addTransformProp("rotateZ", "0deg");
-        addTransformProp("scale", 1);
-        addTransformProp("scaleX", 1);
-        addTransformProp("scaleY", 1);
-        addTransformProp("skewX", "0deg");
-        addTransformProp("skewY", "0deg");
+        add("style", "perspective", 1);
+        add("style", "translateX", 0);
+        add("style", "translateY", 0);
+        add("style", "rotate", "0deg");
+        add("style", "rotateX", "0deg");
+        add("style", "rotateY", "0deg");
+        add("style", "rotateZ", "0deg");
+        add("style", "scale", 1);
+        add("style", "scaleX", 1);
+        add("style", "scaleY", 1);
+        add("style", "skewX", "0deg");
+        add("style", "skewY", "0deg");
         break;
       }
 
       for (const transform of declaration.value) {
         switch (transform.type) {
           case "perspective":
-            addTransformProp(
+            add(
+              "transform",
               "perspective",
               parseLength(transform.value, parseOptions),
             );
             break;
           case "translate":
-            addTransformProp(
+            add(
+              "transform",
               "translateX",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value[0],
-                "rnw",
                 parseOptions,
               ),
             );
-            addTransformProp(
+            add(
+              "transform",
               "translateY",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value[1],
-                "rnh",
                 parseOptions,
               ),
             );
             break;
           case "translateX":
-            addTransformProp(
+            add(
+              "transform",
               "translateX",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value,
-                "rnw",
                 parseOptions,
               ),
             );
             break;
           case "translateY":
-            addTransformProp(
+            add(
+              "transform",
               "translateY",
               parseLengthOrCoercePercentageToRuntime(
                 transform.value,
-                "rnh",
                 parseOptions,
               ),
             );
             break;
           case "rotate":
-            addTransformProp(
+            add(
+              "transform",
               "rotate",
               parseAngle(transform.value, parseOptions),
             );
             break;
           case "rotateX":
-            addTransformProp(
+            add(
+              "transform",
               "rotateX",
               parseAngle(transform.value, parseOptions),
             );
             break;
           case "rotateY":
-            addTransformProp(
+            add(
+              "transform",
               "rotateY",
               parseAngle(transform.value, parseOptions),
             );
             break;
           case "rotateZ":
-            addTransformProp(
+            add(
+              "transform",
               "rotateZ",
               parseAngle(transform.value, parseOptions),
             );
             break;
           case "scale":
-            handleTransformShorthand("scale", {
-              scaleX: parseLength(transform.value[0], parseOptions),
-              scaleY: parseLength(transform.value[1], parseOptions),
-            });
+            // return;
+            // handleTransformShorthand("scale", {
+            //   scaleX: parseLength(transform.value[0], parseOptions),
+            //   scaleY: parseLength(transform.value[1], parseOptions),
+            // });
             break;
           case "scaleX":
-            addTransformProp(
+            add(
+              "transform",
               "scaleX",
               parseLength(transform.value, parseOptions),
             );
             break;
           case "scaleY":
-            addTransformProp(
+            add(
+              "transform",
               "scaleY",
               parseLength(transform.value, parseOptions),
             );
             break;
           case "skew":
-            addTransformProp(
+            add(
+              "transform",
               "skewX",
               parseAngle(transform.value[0], parseOptions),
             );
-            addTransformProp(
+            add(
+              "transform",
               "skewY",
               parseAngle(transform.value[1], parseOptions),
             );
             break;
           case "skewX":
-            addTransformProp(
+            add(
+              "transform",
               "skewX",
               parseAngle(transform.value, parseOptions),
             );
             break;
           case "skewY":
-            addTransformProp(
+            add(
+              "transform",
               "skewY",
               parseAngle(transform.value, parseOptions),
             );
@@ -1476,81 +1423,88 @@ export function parseDeclaration(
       return;
     }
     case "translate":
-      addStyleProp(
+      add(
+        "style",
         "translateX",
         parseTranslate(declaration.value, "x", parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "translateX",
         parseTranslate(declaration.value, "y", parseOptions),
       );
       return;
     case "rotate":
-      addStyleProp("rotateX", parseAngle(declaration.value.x, parseOptions));
-      addStyleProp("rotateY", parseAngle(declaration.value.y, parseOptions));
-      addStyleProp("rotateZ", parseAngle(declaration.value.z, parseOptions));
+      add("style", "rotateX", parseAngle(declaration.value.x, parseOptions));
+      add("style", "rotateY", parseAngle(declaration.value.y, parseOptions));
+      add("style", "rotateZ", parseAngle(declaration.value.z, parseOptions));
       return;
     case "scale":
-      addStyleProp("scaleX", parseScale(declaration.value, "x", parseOptions));
-      addStyleProp("scaleY", parseScale(declaration.value, "y", parseOptions));
+      add("style", "scaleX", parseScale(declaration.value, "x", parseOptions));
+      add("style", "scaleY", parseScale(declaration.value, "y", parseOptions));
       return;
     case "text-transform":
-      return addStyleProp(declaration.property, declaration.value.case);
+      return add("style", declaration.property, declaration.value.case);
     case "letter-spacing":
       if (declaration.value.type !== "normal") {
-        return addStyleProp(
+        return add(
+          "style",
           declaration.property,
           parseLength(declaration.value.value, parseOptions),
         );
       }
       return;
     case "text-decoration-line":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseTextDecorationLine(declaration.value, parseOptions),
       );
     case "text-decoration-color":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseColor(declaration.value, parseOptions),
       );
     case "text-decoration":
-      addStyleProp(
+      add(
+        "style",
         "text-decoration-color",
         parseColor(declaration.value.color, parseOptions),
       );
-      addStyleProp(
+      add(
+        "style",
         "text-decoration-line",
         parseTextDecorationLine(declaration.value.line, parseOptions),
       );
       return;
     case "text-shadow":
-      return parseTextShadow(declaration.value, addStyleProp, parseOptions);
+      return parseTextShadow(add, declaration.value, parseOptions);
     case "z-index":
       if (declaration.value.type === "integer") {
-        addStyleProp(
+        add(
+          "style",
           declaration.property,
           parseLength(declaration.value.value, parseOptions),
         );
       } else {
-        addWarning({
-          type: "IncompatibleNativeValue",
-          property: declaration.property,
-          value: declaration.value.type,
-        });
+        parseOptions.addWarning("value", declaration.value.type);
       }
       return;
     case "container-type":
     case "container-name":
     case "container":
-      return addContainerProp(declaration);
+      return;
+    // return addContainerProp(declaration);
     case "text-decoration-style":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseTextDecorationStyle(declaration.value, parseOptions),
       );
     case "text-align":
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseTextAlign(declaration.value, parseOptions),
       );
@@ -1558,31 +1512,36 @@ export function parseDeclaration(
       parseBoxShadow(declaration.value, parseOptions);
     }
     case "aspect-ratio": {
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseAspectRatio(declaration.value),
       );
     }
     case "user-select": {
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseUserSelect(declaration.value, parseOptions),
       );
     }
     case "fill": {
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSVGPaint(declaration.value, parseOptions),
       );
     }
     case "stroke": {
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseSVGPaint(declaration.value, parseOptions),
       );
     }
     case "stroke-width": {
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseDimensionPercentageFor_LengthValue(
           declaration.value,
@@ -1591,7 +1550,8 @@ export function parseDeclaration(
       );
     }
     case "caret-color": {
-      return addStyleProp(
+      return add(
+        "style",
         declaration.property,
         parseColorOrAuto(declaration.value, parseOptions),
       );
@@ -1608,6 +1568,93 @@ export function parseDeclaration(
   }
 }
 
+function buildAddWarning(
+  addWarning: AddWarningFn,
+  property: string,
+): AddWarningShort {
+  return function (type, value) {
+    if (type === "property") {
+      return addWarning(type, property);
+    } else if (type === "value") {
+      return addWarning(type, property, value);
+    }
+  };
+}
+
+function parseDeclarationUnparsed(
+  declaration: Extract<Declaration, { property: "unparsed" }>,
+  options: ParseDeclarationOptions,
+  add: AddFn,
+  addWarning: AddWarningFn,
+) {
+  let property = declaration.value.propertyId.property;
+
+  if (!isValid(declaration.value.propertyId)) {
+    return addWarning("property", property);
+  }
+
+  const parseOptions: ParserOptions = {
+    ...options,
+    add,
+    addWarning: buildAddWarning(addWarning, property),
+  };
+
+  if (unparsedPropertyMapping[declaration.value.propertyId.property]) {
+    property = unparsedPropertyMapping[declaration.value.propertyId.property];
+  }
+
+  if (unparsedRuntimeFn.has(property)) {
+    let args = parseUnparsed(declaration.value.value, parseOptions);
+    if (!isDescriptorArray(args)) {
+      args = [args];
+    }
+    return add("style", property, [{}, `@${toRNProperty(property)}`, args]);
+  }
+
+  return add(
+    "style",
+    property,
+    parseUnparsed(declaration.value.value, parseOptions),
+  );
+}
+
+function parseDeclarationCustom(
+  declaration: Extract<Declaration, { property: "custom" }>,
+  options: ParseDeclarationOptions,
+  add: AddFn,
+  addWarning: AddWarningFn,
+) {
+  const parseOptions: ParserOptions = {
+    ...options,
+    add,
+    addWarning(type, value) {
+      if (type === "property") {
+        return addWarning(type, property);
+      } else if (type === "value") {
+        return addWarning(type, property, value);
+      }
+    },
+  };
+
+  let property = declaration.value.name;
+  if (
+    validPropertiesLoose.has(property) ||
+    property.startsWith("--") ||
+    property.startsWith("-rn-")
+  ) {
+    return add(
+      "style",
+      property,
+      parseUnparsed(declaration.value.value, {
+        ...parseOptions,
+        allowAuto: allowAuto.has(property),
+      }),
+    );
+  } else {
+    return addWarning("property", declaration.value.name);
+  }
+}
+
 function isValid<T extends Declaration | PropertyId>(
   declaration: T,
 ): declaration is Extract<T, { property: (typeof validProperties)[number] }> {
@@ -1616,7 +1663,7 @@ function isValid<T extends Declaration | PropertyId>(
 
 function reduceParseUnparsed(
   tokenOrValues: TokenOrValue[],
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor[] | undefined {
   const result = tokenOrValues
     .map((tokenOrValue) => parseUnparsed(tokenOrValue, options))
@@ -1631,7 +1678,7 @@ function reduceParseUnparsed(
 
 function unparsedFunction(
   token: Extract<TokenOrValue, { type: "function" }>,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeFunction {
   const args = reduceParseUnparsed(token.value.arguments, options);
   return [{}, token.value.name, args];
@@ -1649,7 +1696,7 @@ function parseUnparsed(
     | number
     | undefined
     | null,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor {
   if (tokenOrValue === undefined || tokenOrValue === null) {
     return;
@@ -1740,7 +1787,7 @@ function parseUnparsed(
             options,
           );
         default: {
-          options.addFunctionValueWarning(tokenOrValue.value.name);
+          options.addWarning("function", tokenOrValue.value.name);
           return;
         }
       }
@@ -1757,11 +1804,11 @@ function parseUnparsed(
           const value = tokenOrValue.value.value;
           if (typeof value === "string") {
             if (!options.allowAuto && value === "auto") {
-              return options.addValueWarning(value);
+              return options.addWarning("value", value);
             }
 
             if (value === "inherit") {
-              return options.addValueWarning(value);
+              return options.addWarning("value", value);
             }
 
             if (value === "true") {
@@ -1776,7 +1823,7 @@ function parseUnparsed(
           }
         }
         case "function":
-          options.addValueWarning(tokenOrValue.value.value);
+          options.addWarning("value", tokenOrValue.value.value);
           return;
         case "percentage":
           return `${round(tokenOrValue.value.value * 100)}%`;
@@ -1835,7 +1882,7 @@ export function parseLength(
     | DimensionPercentageFor_LengthValue
     | NumberOrPercentage
     | LengthValue,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor {
   const { inlineRem = 14 } = options;
 
@@ -1901,7 +1948,7 @@ export function parseLength(
       case "lvmax":
       case "dvmax":
       case "cqmax":
-        options.addValueWarning(`${length.value}${length.unit}`);
+        options.addWarning("value", `${length.value}${length.unit}`);
         return undefined;
     }
     length.unit satisfies never;
@@ -1925,10 +1972,7 @@ export function parseLength(
   }
 }
 
-function parseAngle(
-  angle: Angle | number,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseAngle(angle: Angle | number, options: ParserOptions) {
   if (typeof angle === "number") {
     return `${angle}deg`;
   }
@@ -1938,14 +1982,14 @@ function parseAngle(
     case "rad":
       return `${angle.value}${angle.type}`;
     default:
-      options.addValueWarning(angle.value);
+      options.addWarning("value", angle.value);
       return undefined;
   }
 }
 
 function parseSize(
   size: Size | MaxSize,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
   { allowAuto = false } = {},
 ) {
   switch (size.type) {
@@ -1957,7 +2001,7 @@ function parseSize(
       if (allowAuto) {
         return size.type;
       } else {
-        options.addValueWarning(size.type);
+        options.addWarning("value", size.type);
         return undefined;
       }
     case "min-content":
@@ -1966,29 +2010,23 @@ function parseSize(
     case "fit-content-function":
     case "stretch":
     case "contain":
-      options.addValueWarning(size.type);
+      options.addWarning("value", size.type);
       return undefined;
   }
 
   size satisfies never;
 }
 
-function parseColorOrAuto(
-  color: ColorOrAuto,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseColorOrAuto(color: ColorOrAuto, options: ParserOptions) {
   if (color.type === "auto") {
-    options.addValueWarning(`Invalid color value ${color.type}`);
+    options.addWarning("value", `Invalid color value ${color.type}`);
     return;
   } else {
     return parseColor(color.value, options);
   }
 }
 
-function parseColor(
-  color: CssColor,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseColor(color: CssColor, options: ParserOptions) {
   if (typeof color === "string") {
     // TODO: Could web system colors be mapped to native?
     return;
@@ -2016,7 +2054,7 @@ function parseColor(
     case "hsl":
       return `hsla(${color.h}, ${color.s}, ${color.l}, ${color.alpha})`;
     case "currentcolor":
-      options.addValueWarning(color.type);
+      options.addWarning("value", color.type);
       return;
     case "light-dark":
     case "lab":
@@ -2032,7 +2070,7 @@ function parseColor(
     case "xyz-d50":
     case "xyz-d65":
     case "hwb":
-      options.addValueWarning(`Invalid color unit ${color.type}`);
+      options.addWarning("value", `Invalid color unit ${color.type}`);
       return undefined;
   }
 
@@ -2041,7 +2079,7 @@ function parseColor(
 
 function parseLengthPercentageOrAuto(
   lengthPercentageOrAuto: LengthPercentageOrAuto,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
   { allowAuto = false } = {},
 ) {
   switch (lengthPercentageOrAuto.type) {
@@ -2049,7 +2087,7 @@ function parseLengthPercentageOrAuto(
       if (allowAuto) {
         return lengthPercentageOrAuto.type;
       } else {
-        options.addValueWarning(lengthPercentageOrAuto.type);
+        options.addWarning("value", lengthPercentageOrAuto.type);
         return undefined;
       }
     case "length-percentage":
@@ -2060,7 +2098,7 @@ function parseLengthPercentageOrAuto(
 
 function parseJustifyContent(
   justifyContent: JustifyContent,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ) {
   const allowed = new Set([
     "flex-start",
@@ -2089,17 +2127,14 @@ function parseJustifyContent(
   }
 
   if (value && !allowed.has(value)) {
-    options.addValueWarning(value);
+    options.addWarning("value", value);
     return;
   }
 
   return value;
 }
 
-function parseAlignContent(
-  alignContent: AlignContent,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseAlignContent(alignContent: AlignContent, options: ParserOptions) {
   const allowed = new Set([
     "flex-start",
     "flex-end",
@@ -2126,17 +2161,14 @@ function parseAlignContent(
   }
 
   if (value && !allowed.has(value)) {
-    options.addValueWarning(value);
+    options.addWarning("value", value);
     return;
   }
 
   return value;
 }
 
-function parseAlignItems(
-  alignItems: AlignItems,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseAlignItems(alignItems: AlignItems, options: ParserOptions) {
   const allowed = new Set([
     "auto",
     "flex-start",
@@ -2167,17 +2199,14 @@ function parseAlignItems(
   }
 
   if (value && !allowed.has(value)) {
-    options.addValueWarning(value);
+    options.addWarning("value", value);
     return;
   }
 
   return value;
 }
 
-function parseAlignSelf(
-  alignSelf: AlignSelf,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseAlignSelf(alignSelf: AlignSelf, options: ParserOptions) {
   const allowed = new Set([
     "auto",
     "flex-start",
@@ -2208,17 +2237,14 @@ function parseAlignSelf(
   }
 
   if (value && !allowed.has(value)) {
-    options.addValueWarning(value);
+    options.addWarning("value", value);
     return;
   }
 
   return value;
 }
 
-function parseFontWeight(
-  fontWeight: FontWeight,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseFontWeight(fontWeight: FontWeight, options: ParserOptions) {
   switch (fontWeight.type) {
     case "absolute":
       if (fontWeight.value.type === "weight") {
@@ -2228,7 +2254,7 @@ function parseFontWeight(
       }
     case "bolder":
     case "lighter":
-      options.addValueWarning(fontWeight.type);
+      options.addWarning("value", fontWeight.type);
       return;
   }
 
@@ -2236,25 +2262,27 @@ function parseFontWeight(
 }
 
 function parseTextShadow(
+  add: AddFn,
   [textShadow]: TextShadow[],
-  addStyleProp: AddStyleProp,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ) {
-  addStyleProp("textShadowColor", parseColor(textShadow.color, options));
-  addStyleProp(
+  add("style", "textShadowColor", parseColor(textShadow.color, options));
+  add(
+    "style",
     "textShadowOffset.width",
     parseLength(textShadow.xOffset, options),
   );
-  addStyleProp(
+  add(
+    "style",
     "textShadowOffset.height",
     parseLength(textShadow.yOffset, options),
   );
-  addStyleProp("textShadowRadius", parseLength(textShadow.blur, options));
+  add("style", "textShadowRadius", parseLength(textShadow.blur, options));
 }
 
 function parseTextDecorationStyle(
   textDecorationStyle: TextDecorationStyle,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ) {
   const allowed = new Set(["solid", "double", "dotted", "dashed"]);
 
@@ -2262,19 +2290,19 @@ function parseTextDecorationStyle(
     return textDecorationStyle;
   }
 
-  options.addValueWarning(textDecorationStyle);
+  options.addWarning("value", textDecorationStyle);
   return undefined;
 }
 
 function parseTextDecorationLine(
   textDecorationLine: TextDecorationLine,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ) {
   if (!Array.isArray(textDecorationLine)) {
     if (textDecorationLine === "none") {
       return textDecorationLine;
     }
-    options.addValueWarning(textDecorationLine);
+    options.addWarning("value", textDecorationLine);
     return;
   }
 
@@ -2290,27 +2318,24 @@ function parseTextDecorationLine(
     return "line-through";
   }
 
-  options.addValueWarning(textDecorationLine.join(" "));
+  options.addWarning("value", textDecorationLine.join(" "));
   return undefined;
 }
 
-function parseOverflow(
-  overflow: OverflowKeyword,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseOverflow(overflow: OverflowKeyword, options: ParserOptions) {
   const allowed = new Set(["visible", "hidden"]);
 
   if (allowed.has(overflow)) {
     return overflow;
   }
 
-  options.addValueWarning(overflow);
+  options.addWarning("value", overflow);
   return undefined;
 }
 
 function parseBorderStyle(
   borderStyle: BorderStyle | LineStyle,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ) {
   const allowed = new Set(["solid", "dotted", "dashed"]);
 
@@ -2318,7 +2343,7 @@ function parseBorderStyle(
     if (allowed.has(borderStyle)) {
       return borderStyle;
     } else {
-      options.addValueWarning(borderStyle);
+      options.addWarning("value", borderStyle);
       return undefined;
     }
   } else if (
@@ -2330,26 +2355,26 @@ function parseBorderStyle(
     return borderStyle.top;
   }
 
-  options.addValueWarning(borderStyle.top);
+  options.addWarning("value", borderStyle.top);
 
   return undefined;
 }
 
 function parseBorderSideWidth(
   borderSideWidth: BorderSideWidth,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ) {
   if (borderSideWidth.type === "length") {
     return parseLength(borderSideWidth.value, options);
   }
 
-  options.addValueWarning(borderSideWidth.type);
+  options.addWarning("value", borderSideWidth.type);
   return undefined;
 }
 
 function parseVerticalAlign(
   verticalAlign: VerticalAlign,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ) {
   if (verticalAlign.type === "length") {
     return undefined;
@@ -2361,7 +2386,7 @@ function parseVerticalAlign(
     return verticalAlign.value;
   }
 
-  options.addValueWarning(verticalAlign.value);
+  options.addWarning("value", verticalAlign.value);
   return undefined;
 }
 
@@ -2372,7 +2397,7 @@ function parseFontFamily(fontFamily: FontFamily[]) {
 
 function parseLineHeight(
   lineHeight: LineHeight,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor {
   switch (lineHeight.type) {
     case "normal":
@@ -2387,7 +2412,7 @@ function parseLineHeight(
           return parseLength(length, options);
         case "percentage":
         case "calc":
-          options.addValueWarning(length.value);
+          options.addWarning("value", length.value);
           return undefined;
       }
       length satisfies never;
@@ -2396,31 +2421,25 @@ function parseLineHeight(
   lineHeight satisfies never;
 }
 
-function parseFontSize(
-  fontSize: FontSize,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseFontSize(fontSize: FontSize, options: ParserOptions) {
   switch (fontSize.type) {
     case "length":
       return parseLength(fontSize.value, options);
     case "absolute":
     case "relative":
-      options.addValueWarning(fontSize.value);
+      options.addWarning("value", fontSize.value);
       return undefined;
   }
   fontSize satisfies never;
 }
 
-function parseFontStyle(
-  fontStyle: FontStyle,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseFontStyle(fontStyle: FontStyle, options: ParserOptions) {
   switch (fontStyle.type) {
     case "normal":
     case "italic":
       return fontStyle.type;
     case "oblique":
-      options.addValueWarning(fontStyle.type);
+      options.addWarning("value", fontStyle.type);
       return undefined;
   }
 
@@ -2429,7 +2448,7 @@ function parseFontStyle(
 
 function parseFontVariantCaps(
   fontVariantCaps: FontVariantCaps,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ) {
   const allowed = new Set([
     "small-caps",
@@ -2442,32 +2461,20 @@ function parseFontVariantCaps(
     return fontVariantCaps;
   }
 
-  options.addValueWarning(fontVariantCaps);
+  options.addWarning("value", fontVariantCaps);
   return undefined;
 }
 
 function parseLengthOrCoercePercentageToRuntime(
   value: Length | DimensionPercentageFor_LengthValue | NumberOrPercentage,
-  runtimeName: string,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor {
-  if (
-    options.features.transformPercentagePolyfill &&
-    value.type === "percentage"
-  ) {
-    options.requiresLayout(runtimeName);
-    return [{}, runtimeName, [value.value], 1];
-  } else {
-    return parseLength(value, options);
-  }
+  return parseLength(value, options);
 }
 
-function parseGap(
-  value: GapValue,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseGap(value: GapValue, options: ParserOptions) {
   if (value.type === "normal") {
-    options.addValueWarning(value.type);
+    options.addWarning("value", value.type);
     return;
   }
 
@@ -2477,7 +2484,7 @@ function parseGap(
 function parseRNRuntimeSpecificsFunction(
   name: string,
   args: TokenOrValue[],
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor {
   let key: string | undefined;
   const runtimeArgs: Record<string, RuntimeValueDescriptor> = {};
@@ -2549,87 +2556,78 @@ function parseRNRuntimeSpecificsFunction(
   return [{}, name, Object.entries(runtimeArgs)];
 }
 
-function parseTextAlign(
-  textAlign: TextAlign,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseTextAlign(textAlign: TextAlign, options: ParserOptions) {
   const allowed = new Set(["auto", "left", "right", "center", "justify"]);
   if (allowed.has(textAlign)) {
     return textAlign;
   }
 
-  options.addValueWarning(textAlign);
+  options.addWarning("value", textAlign);
   return undefined;
 }
 
-function parseBoxShadow(
-  boxShadows: BoxShadow[],
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseBoxShadow(boxShadows: BoxShadow[], options: ParserOptions) {
   if (boxShadows.length > 1) {
-    options.addValueWarning("multiple box shadows");
+    options.addWarning("value", "multiple box shadows");
     return;
   }
 
   const boxShadow = boxShadows[0];
 
-  options.addStyleProp("shadowColor", parseColor(boxShadow.color, options));
-  options.addStyleProp("shadowRadius", parseLength(boxShadow.spread, options));
-  // options.addStyleProp(
+  options.add("style", "shadowColor", parseColor(boxShadow.color, options));
+  options.add("style", "shadowRadius", parseLength(boxShadow.spread, options));
+  // options.add("style",
   //   ["shadowOffsetWidth"],
   //   parseLength(boxShadow.xOffset, options, ["", ""),
   // );
-  // options.addStyleProp(
+  // options.add("style",
   //   ["shadowOffset", "height"],
   //   parseLength(boxShadow.yOffset, options),
   // );
 }
 
-function parseDisplay(
-  display: Display,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseDisplay(display: Display, options: ParserOptions) {
   if (display.type === "keyword") {
     if (display.value === "none") {
       return display.value;
     } else {
-      return options.addValueWarning(display.value);
+      return options.addWarning("value", display.value);
     }
   } else if (display.type === "pair") {
     if (display.outside === "block") {
       switch (display.inside.type) {
         case "flow":
           if (display.isListItem) {
-            return options.addValueWarning("list-item");
+            return options.addWarning("value", "list-item");
           } else {
-            return options.addValueWarning("block");
+            return options.addWarning("value", "block");
           }
         case "flow-root":
-          return options.addValueWarning("flow-root");
+          return options.addWarning("value", "flow-root");
         case "table":
-          return options.addValueWarning(display.inside.type);
+          return options.addWarning("value", display.inside.type);
         case "flex":
           return display.inside.type;
         case "box":
         case "grid":
         case "ruby":
-          return options.addValueWarning(display.inside.type);
+          return options.addWarning("value", display.inside.type);
       }
     } else {
       switch (display.inside.type) {
         case "flow":
-          return options.addValueWarning("inline");
+          return options.addWarning("value", "inline");
         case "flow-root":
-          return options.addValueWarning("inline-block");
+          return options.addWarning("value", "inline-block");
         case "table":
-          return options.addValueWarning("inline-table");
+          return options.addWarning("value", "inline-table");
         case "flex":
-          return options.addValueWarning("inline-flex");
+          return options.addWarning("value", "inline-flex");
         case "box":
         case "grid":
-          return options.addValueWarning("inline-grid");
+          return options.addWarning("value", "inline-grid");
         case "ruby":
-          return options.addValueWarning(display.inside.type);
+          return options.addWarning("value", display.inside.type);
       }
     }
   }
@@ -2652,7 +2650,7 @@ function parseAspectRatio(
 
 function parseDimension(
   { unit, value }: Extract<Token, { type: "dimension" }>,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor {
   switch (unit) {
     case "px":
@@ -2663,27 +2661,21 @@ function parseDimension(
     case "rnw":
       return [{}, unit, [value / 100], 1];
     default: {
-      return options.addValueWarning(`${value}${unit}`);
+      return options.addWarning("value", `${value}${unit}`);
     }
   }
 }
 
-function parseUserSelect(
-  value: UserSelect,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseUserSelect(value: UserSelect, options: ParserOptions) {
   const allowed = ["auto", "text", "none", "contain", "all"];
   if (allowed.includes(value)) {
     return value;
   } else {
-    return options.addValueWarning(value);
+    return options.addWarning("value", value);
   }
 }
 
-function parseSVGPaint(
-  value: SVGPaint,
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseSVGPaint(value: SVGPaint, options: ParserOptions) {
   if (value.type === "none") {
     return "transparent";
   } else if (value.type === "color") {
@@ -2697,7 +2689,7 @@ function round(number: number) {
 
 function parseDimensionPercentageFor_LengthValue(
   value: DimensionPercentageFor_LengthValue,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ) {
   if (value.type === "calc") {
     return undefined;
@@ -2712,7 +2704,7 @@ const allowAuto = new Set(["pointer-events"]);
 
 function parseEnv(
   value: EnvironmentVariable,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeFunction | undefined {
   switch (value.name.type) {
     case "ua":
@@ -2746,7 +2738,7 @@ function parseEnv(
 function parseCalcFn(
   name: string,
   tokens: TokenOrValue[],
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor {
   const args = parseCalcArguments(tokens, options);
   if (args) {
@@ -2754,10 +2746,7 @@ function parseCalcFn(
   }
 }
 
-function parseCalcArguments(
-  [...args]: TokenOrValue[],
-  options: ParseDeclarationOptionsWithValueWarning,
-) {
+function parseCalcArguments([...args]: TokenOrValue[], options: ParserOptions) {
   const parsed: RuntimeValueDescriptor[] = [];
 
   let mode: "number" | "percentage" | undefined;
@@ -2882,7 +2871,7 @@ function parseCalcArguments(
 export function parseTranslate(
   translate: Translate,
   prop: keyof Extract<Translate, object>,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor {
   if (translate === "none") {
     return 0;
@@ -2894,7 +2883,7 @@ export function parseTranslate(
 export function parseScale(
   translate: Scale,
   prop: keyof Extract<Scale, object>,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor {
   if (translate === "none") {
     return 0;
@@ -2905,7 +2894,7 @@ export function parseScale(
 
 export function parseUnresolvedColor(
   color: UnresolvedColor,
-  options: ParseDeclarationOptionsWithValueWarning,
+  options: ParserOptions,
 ): RuntimeValueDescriptor {
   switch (color.type) {
     case "rgb":
@@ -2930,6 +2919,43 @@ export function parseUnresolvedColor(
     default:
       color satisfies never;
   }
+}
+
+function allEqual(...params: unknown[]) {
+  return params.every((param, index, array) => {
+    return index === 0 ? true : equal(array[0], param);
+  });
+}
+function equal(a: unknown, b: unknown) {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (a === null || b === null) return false;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (!equal(a[i], b[i])) return false;
+    }
+    return true;
+  }
+  if (typeof a === "object" && typeof b === "object") {
+    if (Object.keys(a).length !== Object.keys(b).length) return false;
+    for (const key in a) {
+      if (
+        !equal(
+          (a as Record<string, unknown>)[key],
+          (b as Record<string, unknown>)[key],
+        )
+      )
+        return false;
+    }
+    return true;
+  }
+}
+
+function parseTimeArray(time: Time[]) {
+  return time.map((t) =>
+    t.type === "milliseconds" ? t.value : t.value * 1000,
+  );
 }
 
 const unparsedRuntimeFn = new Set(["text-shadow"]);

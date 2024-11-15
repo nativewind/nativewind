@@ -130,19 +130,19 @@ export type TransitionStyles = {
 
 export type TransitionAttributes = {
   /**
-   * The delay before the transition starts in milliseconds.
+   * Delay before the transition starts in milliseconds.
    */
   d?: number[];
   /**
-   * The duration of the transition in milliseconds.
+   * Duration of the transition in milliseconds.
    */
   l?: number[];
   /**
-   * The property to transition.
+   * Property to transition.
    */
   p?: string[];
   /**
-   * The easing function for the transition.
+   * Easing function for the transition.
    */
   t?: EasingFunction[];
 };

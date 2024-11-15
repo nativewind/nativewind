@@ -199,16 +199,13 @@ export function mutable<Value, Args extends unknown[]>(
  * An effect can be used to subscribe to an observable. When the observable
  * changes, the effect will run.
  */
-export class Effect {
-  constructor(public run: () => void) {}
-  public dependencies = new Set<Observable<any, any[]>>();
-
+export type Effect = {
+  dependencies: Set<Observable<any, any[]>>;
+  run(): void;
   get<Value, Args extends unknown[]>(
     readable: Observable<Value, Args> | Mutable<Value, Args>,
-  ) {
-    return readable.get(this);
-  }
-}
+  ): Value;
+};
 
 export function cleanupEffect(effect?: Effect) {
   if (!effect) return;

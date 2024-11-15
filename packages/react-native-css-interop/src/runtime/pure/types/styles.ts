@@ -1,3 +1,5 @@
+import { StyleRuleSetSymbol, StyleRuleSymbol } from "../../../shared";
+import { RuntimeValueDescriptor, Specificity } from "../../../types";
 import type { AnimationAttributes, TransitionAttributes } from "../reanimated";
 import type {
   AttributeCondition,
@@ -5,60 +7,60 @@ import type {
   MediaQuery,
   PseudoClassesQuery,
 } from "./conditions";
-import type { Container } from "./container";
 
 export interface StyleRuleSet {
-  // [StyleRuleSetSymbol]: true;
-  // Normal Rules
+  [StyleRuleSetSymbol]: true;
+  /** Normal Rules */
   n?: StyleRule[];
-  // Important Rules
+  /** Important Rules */
   i?: StyleRule[];
 }
 
 export interface StyleRule {
-  // Specificity
-  s: any;
-  // Declarations
+  [StyleRuleSymbol]: true;
+  /** Specificity */
+  s: Specificity;
+  /** Declarations */
   d?: StyleDeclaration[];
-  // Variables
-  v?: [string, RuntimeFunction][];
-  // Named Containers
-  c?: Partial<Container>;
+  /** Variables */
+  v?: [string, RuntimeValueDescriptor][];
+  /** Named Containers */
+  // c?: Container[];
 
   /**
    * Conditionals
    */
 
-  // MediaQuery
+  /** MediaQuery */
   m?: MediaQuery[];
-  // PseudoClassesQuery
+  /** PseudoClassesQuery */
   p?: PseudoClassesQuery;
-  // Container Query
+  /** Container Query */
   q?: ContainerQuery[];
-  // Attribute Conditions
+  /** Attribute Conditions */
   ac?: AttributeCondition[];
 
   /**
    * Animations and Transitions
    */
 
-  // Animations
+  /** Animations */
   a?: AnimationAttributes;
-  // Transitions
+  /** Transitions */
   t?: TransitionAttributes;
 }
 
 export type StyleAttribute = string;
 export type StyleDeclaration =
-  // This is a static style object
+  /** This is a static style object */
   | Record<string, unknown>
-  // A static style that that is assigned to a different prop
+  /** A static style that that is assigned to a different prop */
   | [Record<string, unknown>, StyleAttribute | StyleAttribute[]]
-  // A value that is deeply nested (e.g. `transform`)
+  /** A value that is deeply nested (e.g. `transform`) */
   | [string | number, StyleAttribute | StyleAttribute[]]
-  // A value that can only be computed at runtime
+  /** A value that can only be computed at runtime */
   | [RuntimeFunction, StyleAttribute | StyleAttribute[]]
-  // A value that can only be computed at runtime, and only after styles have been calculated
+  /** A value that can only be computed at runtime, and only after styles have been calculated */
   | [RuntimeFunction, StyleAttribute | StyleAttribute[], 1];
 
 export type StyleValueDescriptor =
