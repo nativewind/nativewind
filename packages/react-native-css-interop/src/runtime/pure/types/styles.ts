@@ -54,10 +54,8 @@ export type StyleAttribute = string;
 export type StyleDeclaration =
   /** This is a static style object */
   | Record<string, unknown>
-  /** A static style that that is assigned to a different prop */
-  | [Record<string, unknown>, StyleAttribute | StyleAttribute[]]
-  /** A value that is deeply nested (e.g. `transform`) */
-  | [string | number, StyleAttribute | StyleAttribute[]]
+  /** A style that needs to be set  */
+  | [RuntimeValueDescriptor, StyleAttribute | StyleAttribute[]]
   /** A value that can only be computed at runtime */
   | [RuntimeFunction, StyleAttribute | StyleAttribute[]]
   /** A value that can only be computed at runtime, and only after styles have been calculated */

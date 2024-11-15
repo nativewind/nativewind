@@ -167,27 +167,23 @@ export function cssToReactNativeRuntime(
     ruleSets.set(name, styleRuleSet);
   }
 
-  // const rem = collection.inlineRem || extractOptions.rem;
-  const flags = collection.flags;
+  const stylesheetOptions: StyleSheetOptions = {};
 
-  const stylesheetOptions: StyleSheetOptions = {
-    flags,
-    rem: 14,
-  };
+  if (Object.keys(collection.flags).length) {
+    stylesheetOptions.f = collection.flags;
+  }
 
   if (ruleSets.size) {
-    stylesheetOptions.rules = Array.from(ruleSets);
+    stylesheetOptions.s = Array.from(ruleSets);
   }
   if (collection.animations.size) {
-    stylesheetOptions.keyFrames = Array.from(collection.animations);
+    stylesheetOptions.a = Array.from(collection.animations);
   }
   if (Object.keys(collection.rootVariables).length) {
-    stylesheetOptions.rootVariables = Object.entries(collection.rootVariables);
+    stylesheetOptions.va = Object.entries(collection.rootVariables);
   }
   if (Object.keys(collection.universalVariables).length) {
-    stylesheetOptions.universalVariables = Object.entries(
-      collection.universalVariables,
-    );
+    stylesheetOptions.vu = Object.entries(collection.universalVariables);
   }
 
   return stylesheetOptions;
@@ -571,13 +567,10 @@ function declarationsToStyle(
     // TODO
   };
 
+  const addFn = buildAddFn(extractedStyle, collection, mapping);
+
   for (const declaration of declarations) {
-    parseDeclaration(
-      declaration,
-      parseDeclarationOptions,
-      buildAddFn(extractedStyle, collection),
-      addWarning,
-    );
+    parseDeclaration(declaration, parseDeclarationOptions, addFn, addWarning);
   }
 
   return extractedStyle;
