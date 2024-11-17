@@ -31,9 +31,11 @@ export interface CompilerCollection extends CompilerOptions {
   varUsageCount: Map<string, number>;
 }
 
-export interface StyleSheetOptions {
+export interface InjectStylesOptions {
   f?: FeatureFlagStatus;
+  /** rem */
   r?: number;
+  /** StyleRuleSets */
   s?: [string, StyleRuleSet][];
   a?: [string, RawAnimation][];
   va?: [string, RuntimeValueDescriptor[]][];

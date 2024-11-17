@@ -10,28 +10,19 @@ import type {
 import type { UseInteropState } from "../useInterop";
 import { cleanupEffect } from "../utils/observable";
 
-export type ConfigReducerState = Readonly<{
-  // The key of the config, used to group props, variables, containers, etc.
-  index: number;
-  // The config that this state is for
-  config: ConfigWithIndex;
-  source?: string | null | undefined;
-  target?: Record<string, unknown> | null | undefined;
-
-  declarations?: Declarations;
-  styles?: Styles;
-
-  // The variables produced by the config
-  variables?: Record<string, StyleValueDescriptor>;
-  // The containers produced by the config
-  containers?: Record<string, unknown>;
-  // The hover actions produced by the config
-  hoverActions?: ConfigReducerAction[];
-  // The active actions produced by the config
-  activeActions?: ConfigReducerAction[];
-  // The focus actions produced by the config
-  focusActions?: ConfigReducerAction[];
-}>;
+export type ConfigReducerState = ConfigWithIndex &
+  Readonly<{
+    // The key of the config, used to group props, variables, containers, etc.
+    index: number;
+    // The declarations that apply to this component
+    declarations?: Declarations;
+    // The styles from the declarations
+    styles?: Styles;
+    // The containers produced by the config
+    containers?: Record<string, unknown>;
+    // The containers produced by the config
+    variables?: Record<string, StyleValueDescriptor>;
+  }>;
 
 export type ConfigReducerAction = Readonly<
   { type: "update-styles" } | { type: "update-definitions" }
@@ -43,7 +34,6 @@ export function configReducer(
   componentState: UseInteropState,
   incomingProps: Props,
   inheritedVariables: VariableContextValue,
-  universalVariables: VariableContextValue,
   inheritedContainers: ContainerContextValue,
 ) {
   switch (action.type) {
@@ -56,7 +46,6 @@ export function configReducer(
             componentState,
             incomingProps,
             inheritedVariables,
-            universalVariables,
             inheritedContainers,
           );
     }
@@ -66,7 +55,6 @@ export function configReducer(
         componentState,
         incomingProps,
         inheritedVariables,
-        universalVariables,
         inheritedContainers,
       );
     }
@@ -82,8 +70,14 @@ function updateDefinitions(
   componentState: UseInteropState,
   props: Props,
 ): ConfigReducerState {
-  const source = props?.[state.config.source] as string | undefined;
-  const target = props?.[state.config.target] as InlineStyle | undefined;
+  const source = props?.[state.source] as string | undefined;
+
+  // TODO
+  if (state.target === false) {
+    return state;
+  }
+
+  const target = props?.[state.target] as InlineStyle | undefined;
 
   // Has this component ever seen styles?
   const initialized = state.declarations;
@@ -119,7 +113,6 @@ function updateStyles(
   componentState: UseInteropState,
   incomingProps: Props,
   inheritedVariables: VariableContextValue,
-  universalVariables: VariableContextValue,
   inheritedContainers: ContainerContextValue,
 ) {
   /**
@@ -130,7 +123,6 @@ function updateStyles(
     previous,
     incomingProps,
     inheritedVariables,
-    universalVariables,
     inheritedContainers,
     () => {
       componentState.dispatch([

@@ -16,8 +16,8 @@ import { createInteropElement } from "../runtime";
 import { cssInterop, interopComponents, remapProps } from "../runtime/api";
 import { isReduceMotionEnabled } from "../runtime/native/appearance-observables";
 import { warnings } from "../runtime/native/globals";
-import { injectData, resetData } from "../runtime/native/styles";
 import { vh, vw } from "../runtime/native/unit-observables";
+import { injectData, resetData } from "../runtime/pure/stylesheet";
 import { INTERNAL_SET } from "../shared";
 import {
   CssToReactNativeRuntimeOptions,
@@ -106,7 +106,7 @@ export function createMockComponent<
     },
   );
 
-  return Object.assign(forwardRef(mock), {
+  return Object.assign(forwardRef(mock as any), {
     mock,
   });
 }
@@ -123,7 +123,7 @@ export function createRemappedComponent<
     },
   );
 
-  return Object.assign(forwardRef(mock), {
+  return Object.assign(forwardRef(mock as any), {
     mock,
   });
 }
@@ -145,20 +145,6 @@ export function registerCSS(
   }
   injectData(compiled);
 }
-
-registerCSS.debug = (
-  css: string,
-  options: CssToReactNativeRuntimeOptions = {},
-) => {
-  registerCSS(css, { ...options, debugCompiled: true });
-};
-
-registerCSS.noDebug = (
-  css: string,
-  options: CssToReactNativeRuntimeOptions = {},
-) => {
-  registerCSS(css, { ...options, debugCompiled: false });
-};
 
 export const testID = "react-native-css-interop";
 

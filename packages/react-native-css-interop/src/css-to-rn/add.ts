@@ -134,10 +134,12 @@ function stripDelay(
     return [results, didDelay];
   }
 
-  const isDelayed = value[3] === 1;
+  const [newArgs, didArgsDelay] = stripDelay(value[2]);
+
+  const isDelayed = value[3] === 1 || didArgsDelay;
 
   if (isDelayed) {
-    return [[value[0], value[1], value[2]], true];
+    return [[value[0], value[1], newArgs as RuntimeValueDescriptor[]], true];
   }
 
   return [value, false];

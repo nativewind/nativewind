@@ -23,7 +23,7 @@ export interface StyleRule {
   /** Declarations */
   d?: StyleDeclaration[];
   /** Variables */
-  v?: [string, RuntimeValueDescriptor][];
+  v?: VariableDescriptor[];
   /** Named Containers */
   // c?: Container[];
 
@@ -68,6 +68,8 @@ export type StyleValueDescriptor =
   | undefined
   | RuntimeFunction
   | StyleValueDescriptor[];
+
+export type VariableDescriptor = [string, RuntimeValueDescriptor];
 
 export type RuntimeFunction =
   | [

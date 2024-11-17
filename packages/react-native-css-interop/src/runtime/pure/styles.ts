@@ -1,4 +1,5 @@
 import type { ContainerContextValue, VariableContextValue } from "./contexts";
+import { rootVariables, universalVariables } from "./globals";
 import {
   applyAnimation,
   getTransitionSideEffect,
@@ -16,7 +17,7 @@ import type {
   StyleRule,
   StyleValueDescriptor,
 } from "./types";
-import { Effect } from "./utils/observable";
+import { DraftableRecord, Effect } from "./utils/observable";
 import { defaultValues, setBaseValue, setValue } from "./utils/properties";
 
 export type Styles = Effect &
@@ -35,7 +36,6 @@ export function buildStyles(
   previous: ConfigReducerState,
   incomingProps: Props,
   inheritedVariables: VariableContextValue,
-  universalVariables: VariableContextValue,
   inheritedContainers: ContainerContextValue,
   run: () => void,
 ) {
@@ -55,7 +55,17 @@ export function buildStyles(
 
   const delayedStyles: Callback[] = [];
 
-  const resolveOptions: ResolveOptions = {
+  const variables = new DraftableRecord(previous.variables)
+    .assignAll(previous.declarations?.variables)
+    .commit();
+
+  const next: StateWithStyles = {
+    ...previous,
+    styles,
+    variables,
+  };
+
+  const options: ResolveOptions = {
     getProp: (name: string) => {
       styles.guards?.push({
         type: "prop",
@@ -65,19 +75,44 @@ export function buildStyles(
       return incomingProps?.[name] as StyleValueDescriptor;
     },
     getVariable: (name: string) => {
-      let value: StyleValueDescriptor;
+      let value = resolveValue(next, next.variables?.[name], options);
 
-      value ??=
-        universalVariables instanceof Map
-          ? universalVariables.get(name)
-          : universalVariables?.[name];
+      // If the value is already defined, we don't need to look it up
+      if (value !== undefined) {
+        return value;
+      }
 
-      value ??=
-        inheritedVariables instanceof Map
-          ? inheritedVariables.get(name)
-          : inheritedVariables?.[name];
+      // Is there a universal variable?
+      value = resolveValue(
+        next,
+        next.styles.get(universalVariables(name)),
+        options,
+      );
 
-      styles.guards?.push({ type: "variable", name: name, value });
+      // Check if the variable is inherited
+      if (value === undefined) {
+        for (const inherited of inheritedVariables) {
+          if (name in inherited) {
+            value = resolveValue(next, inherited[name], options);
+            if (value !== undefined) {
+              break;
+            }
+          }
+        }
+
+        /**
+         * Create a rerender guard incase the variable changes
+         */
+        styles.guards?.push({
+          type: "variable",
+          name: name,
+          value,
+        });
+      }
+
+      // This is a bit redundant as inheritedVariables probably is rootVariables,
+      // but this ensures a subscription is created for Fast Refresh
+      value ??= next.styles.get(rootVariables(name));
 
       return value;
     },
@@ -89,30 +124,25 @@ export function buildStyles(
     previousTransitions: new Set(previous.styles?.transitions?.keys()),
   };
 
-  const next: StateWithStyles = {
-    ...previous,
-    styles,
-  };
-
   if (next.declarations?.normal) {
-    styles.props = applyStyles(
+    applyStyles(
       next,
       previous,
       next.declarations?.normal,
       delayedStyles,
-      resolveOptions,
+      options,
     );
   }
 
-  styles = applyAnimation(next, styles, resolveOptions);
+  applyAnimation(next, styles, options);
 
   if (next.declarations?.important) {
-    styles.props = applyStyles(
+    applyStyles(
       next,
       previous,
       next.declarations?.important,
       delayedStyles,
-      resolveOptions,
+      options,
     );
   }
 
@@ -126,7 +156,7 @@ export function buildStyles(
    * If we had a transition style that was removed,
    * we need to transition back to the default value
    */
-  for (let transition of resolveOptions.previousTransitions) {
+  for (let transition of options.previousTransitions) {
     const transitionFn = getTransitionSideEffect(next, previous, transition);
 
     if (transitionFn) {
@@ -233,5 +263,5 @@ function applyStyles(
     }
   }
 
-  return props;
+  next.styles.props = props;
 }

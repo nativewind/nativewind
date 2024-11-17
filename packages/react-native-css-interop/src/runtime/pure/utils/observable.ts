@@ -1,6 +1,32 @@
+/********************************    Effect   *********************************/
+
+/**
+ * An effect can be used to subscribe to an observable.
+ * When the observable changes, the effect will run.
+ */
+export type Effect = {
+  dependencies: Set<Observable<any, any[]>>;
+  run(): void;
+  get<Value, Args extends unknown[]>(
+    readable: Observable<Value, Args> | Mutable<Value, Args>,
+  ): Value;
+};
+
+export function cleanupEffect(effect?: Effect) {
+  if (!effect) return;
+  for (const dep of effect.dependencies) {
+    dep.remove(effect);
+  }
+  effect.dependencies.clear();
+}
+
+/******************************    Observable   *******************************/
+
+/**
+ * An observable is a value that when read by an effect, will subscribe
+ * the effect to the observable.
+ */
 export type Observable<Value = unknown, Args extends unknown[] = never[]> = {
-  // Used for debugging only
-  name?: string;
   // Get the current value of the observable. If you provide an Effect, it will be subscribed to the observable.
   get(effect?: Effect): Value;
   // Set the value and rerun all subscribed Effects
@@ -135,14 +161,19 @@ export function observable<Value, Args extends unknown[]>(
               },
               ...(args as Args),
             )
-          : (args[1] as Value);
+          : (args[0] as Value);
 
       if (equality(value as Value, nextValue)) {
         return;
       }
 
-      value = nextValue;
+      // If the observable has not been initialized, we can just set the value
+      if (!init) {
+        read = nextValue;
+        return;
+      }
 
+      value = nextValue;
       for (const effect of effects) {
         batch.add(effect);
       }
@@ -152,15 +183,14 @@ export function observable<Value, Args extends unknown[]>(
   return obs;
 }
 
+/********************************    Mutable   ********************************/
+
 /**
- * A non-observable object that can be mutated.
- * In production, we don't need observability for everything,
- * so we can this to avoid the overhead of observability.
+ * An "observable" that does not observe anything.
+ *
+ * This is used in production for things that cannot change.
  */
-export type Mutable<Value, Args extends unknown[]> = {
-  get(): Value;
-  set(...value: Args): void;
-};
+export type Mutable<Value, Args extends unknown[]> = Observable<Value, Args>;
 
 export function mutable<Value>(
   read: undefined,
@@ -192,39 +222,31 @@ export function mutable<Value, Args extends unknown[]>(
         value = nextValue;
       }
     },
+    batch(_, ...args) {
+      return this.set(...args);
+    },
+    remove() {},
   };
 }
 
-/**
- * An effect can be used to subscribe to an observable. When the observable
- * changes, the effect will run.
- */
-export type Effect = {
-  dependencies: Set<Observable<any, any[]>>;
-  run(): void;
-  get<Value, Args extends unknown[]>(
-    readable: Observable<Value, Args> | Mutable<Value, Args>,
-  ): Value;
-};
+/********************************    Family    ********************************/
 
-export function cleanupEffect(effect?: Effect) {
-  if (!effect) return;
-  for (const dep of effect.dependencies) {
-    dep.remove(effect);
-  }
-  effect.dependencies.clear();
-}
+export type Family<Value, Args extends unknown[] = never[]> = ReturnType<
+  typeof family<Value, Args>
+>;
 
 /**
  * Utility around Map that creates a new value if it doesn't exist.
  */
-export function family<Value>(fn: (name: string) => Value) {
+export function family<Value, Args extends unknown[]>(
+  fn: (name: string, ...args: Args) => Value,
+) {
   const map = new Map<string, Value>();
   return Object.assign(
-    (name: string) => {
+    (name: string, ...args: Args) => {
       let result = map.get(name);
       if (!result) {
-        result = fn(name);
+        result = fn(name, ...args);
         map.set(name, result);
       }
       return result!;
@@ -259,4 +281,97 @@ export function weakFamily<Key extends WeakKey, Result>(
       },
     },
   );
+}
+
+/******************************    Immutable    *******************************/
+
+export class DraftableRecord<Value> {
+  private draft: Record<string, Value>;
+
+  constructor(
+    private record: Record<string, Value> = {},
+    private equality: Equality<Value> = Object.is,
+  ) {
+    this.draft = record;
+  }
+
+  set(key: string, value: Value) {
+    if (this.equality(this.record[key], value)) {
+      return;
+    }
+
+    if (this.draft === this.record) {
+      this.draft = { ...this.record };
+    }
+
+    this.draft[key] = value;
+  }
+
+  assign(entries?: [string, Value][]) {
+    if (!entries) return;
+
+    for (const entry of entries) {
+      this.set(entry[0], entry[1]);
+    }
+  }
+
+  assignAll(entries?: [string, Value][][]) {
+    if (!entries) return this;
+
+    for (const entry of entries) {
+      this.assign(entry);
+    }
+
+    return this;
+  }
+
+  commit() {
+    if (this.draft !== this.record) {
+      this.record = this.draft;
+    }
+    return this.record;
+  }
+}
+
+export class DraftableArray<Value> {
+  private draft: Value[] | undefined;
+  private draftIndex: number;
+
+  constructor(
+    private array?: Value[],
+    private equality: Equality<Value> = Object.is,
+  ) {
+    this.draft = array;
+    this.draftIndex = -1;
+  }
+
+  push(value: Value) {
+    this.draftIndex += 1;
+
+    if (this.array && this.equality(this.array[this.draftIndex], value)) {
+      return;
+    }
+
+    if (this.draft === this.array && Array.isArray(this.array)) {
+      this.draft = this.array.slice(0, this.draftIndex);
+    } else if (!this.draft) {
+      this.draft = [];
+    }
+
+    this.draft.push(value);
+  }
+
+  pushAll(values: Value[]) {
+    for (const value of values) {
+      this.push(value);
+    }
+  }
+
+  commit() {
+    if (this.draft !== this.array) {
+      this.array = this.draft;
+    }
+    this.draftIndex = -1;
+    return this.array;
+  }
 }

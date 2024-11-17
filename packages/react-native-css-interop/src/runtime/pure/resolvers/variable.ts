@@ -10,15 +10,15 @@ export const resolveVariable: StyleValueSubResolver<RuntimeFunction> = (
   const args = func[2];
   if (!args || !args[0]) return;
 
-  let name = resolveValue(state, args[0], options);
+  const name = resolveValue(state, args[0], options);
 
-  let value: unknown;
-
-  if (typeof name === "string") {
-    value = resolveValue(state, state.variables?.[name], options);
-    value ??= resolveValue(state, options.getVariable(name), options);
+  if (typeof name !== "string") {
+    return;
   }
 
+  let value = options.getVariable(name);
+
+  // If there is no value, check for a default value
   if (value === undefined && args[1]) {
     value = resolveValue(state, args[1], options);
   }

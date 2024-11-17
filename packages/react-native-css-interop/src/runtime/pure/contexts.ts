@@ -1,14 +1,12 @@
 import { createContext } from "react";
-import type { StyleValueDescriptor } from "./types";
+
+import { StyleValueDescriptor } from "./types";
 
 /**
  * Variables
  */
-export type VariableContextValue =
-  | Record<string, StyleValueDescriptor>
-  | Map<string, StyleValueDescriptor>;
-export const VariableContext = createContext<VariableContextValue>({});
-export const UniversalVariableContext = createContext<VariableContextValue>({});
+export type VariableContextValue = Record<string, StyleValueDescriptor>[];
+export const VariableContext = createContext<VariableContextValue>([]);
 
 /**
  * Containers

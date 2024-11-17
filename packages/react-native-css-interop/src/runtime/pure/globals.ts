@@ -16,12 +16,6 @@ export const styleFamily = family(() => {
     : observable<StyleRuleSet>(undefined, undefined, isDeepEqual);
 });
 
-export const variableFamily = family(() => {
-  return process.env.NODE_ENV === "production"
-    ? mutable<StyleValueDescriptor>(undefined, undefined, isDeepEqual)
-    : observable<StyleValueDescriptor>(undefined, undefined, isDeepEqual);
-});
-
 export const animationFamily = family(() => {
   return process.env.NODE_ENV === "production"
     ? mutable(undefined, writeAnimation, isDeepEqual)
@@ -29,6 +23,37 @@ export const animationFamily = family(() => {
 });
 
 export const rem = observable(14);
+
+/********************************* Variables **********************************/
+
+const buildGlobalVariableFamily = () => {
+  return family(() => {
+    const lightObs = observable<StyleValueDescriptor>();
+    const darkObs = observable<StyleValueDescriptor>();
+
+    return observable<
+      StyleValueDescriptor,
+      [light: StyleValueDescriptor, dark: StyleValueDescriptor]
+    >(
+      (get) => {
+        const colorScheme = get(appColorScheme);
+        return colorScheme === "dark" ? get(darkObs) : get(lightObs);
+      },
+      (set, light: StyleValueDescriptor, dark: StyleValueDescriptor) => {
+        set(lightObs, light);
+        set(darkObs, dark);
+        return light;
+      },
+      /**
+       * This observable is only used for setting the values of other observables.
+       * Ignore any write values
+       */
+      () => true,
+    );
+  });
+};
+export const rootVariables = buildGlobalVariableFamily();
+export const universalVariables = buildGlobalVariableFamily();
 
 /**
  * Interactivity

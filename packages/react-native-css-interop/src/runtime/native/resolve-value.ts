@@ -322,7 +322,7 @@ export function resolveValue(
             tracking,
             descriptorArgs,
             style,
-          ).join(",");
+          ).join(", ");
           return cast(`${descriptor.name}(${args})`);
         } else {
           return cast(descriptor);

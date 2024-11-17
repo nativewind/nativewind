@@ -1,4 +1,5 @@
-import type { RuntimeFunction, StyleValueSubResolver } from "../types";
+import type { StyleValueSubResolver } from ".";
+import type { RuntimeFunction } from "../types";
 import { resolveVariable } from "./variable";
 
 export const resolveRuntimeFunction: StyleValueSubResolver<RuntimeFunction> = (
@@ -24,7 +25,7 @@ export const resolveRuntimeFunction: StyleValueSubResolver<RuntimeFunction> = (
       if (args === undefined) {
         return;
       } else if (Array.isArray(args)) {
-        return `${name}(${args.join(",")})`;
+        return `${name}(${args.join(", ")})`;
       } else {
         return `${name}(${args})`;
       }

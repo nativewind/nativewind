@@ -1,20 +1,19 @@
 import {
   createElement,
+  ForwardedRef,
   useContext,
   useDebugValue,
   useEffect,
   useReducer,
+  type ComponentType,
+  type Dispatch,
 } from "react";
-import type { ComponentType, Dispatch } from "react";
 
 import { SharedValue } from "react-native-reanimated";
 
+import { EnableCssInteropOptions } from "../../types";
 import type { ContainerContextValue, VariableContextValue } from "./contexts";
-import {
-  ContainerContext,
-  UniversalVariableContext,
-  VariableContext,
-} from "./contexts";
+import { ContainerContext, VariableContext } from "./contexts";
 import {
   animatedComponent,
   SharedValueInterpolation,
@@ -27,7 +26,7 @@ import {
 } from "./state/config";
 import type { Config, Props, SideEffectTrigger } from "./types";
 import { useHandlers } from "./useHandlers";
-import { cleanupEffect } from "./utils/observable";
+import { cleanupEffect, DraftableArray } from "./utils/observable";
 
 export type UseInteropState = Readonly<{
   key: WeakKey;
@@ -60,16 +59,16 @@ type PerformConfigReducerAction = Readonly<{
 }>;
 
 export function useInterop(
-  props: Props,
   type: ComponentType<any>,
   configStates: ConfigReducerState[],
   initialActions: PerformConfigReducerAction[],
+  props: Props,
+  ref?: ForwardedRef<any>,
 ) {
   const inheritedVariables = useContext(VariableContext);
-  const universalVariables = useContext(UniversalVariableContext);
   const inheritedContainers = useContext(ContainerContext);
 
-  let [state, dispatch] = useReducer(
+  const reducerState = useReducer(
     /**
      * Reducers can capture current values, so rebuild the reducer each time
      * This is a performance de-optimization, but it's better than writing
@@ -81,7 +80,6 @@ export function useInterop(
         actions,
         props,
         inheritedVariables,
-        universalVariables,
         inheritedContainers,
       );
     },
@@ -98,11 +96,13 @@ export function useInterop(
         initialActions,
         props,
         inheritedVariables,
-        universalVariables,
         inheritedContainers,
       );
     },
   );
+
+  let state = reducerState[0];
+  let dispatch = reducerState[1];
 
   maybeRerenderComponent(
     state,
@@ -137,8 +137,8 @@ export function useInterop(
   let nextProps: Props = { ...props, ...state.props };
 
   for (const config of state.configStates) {
-    if (config.config.source !== config.config.target) {
-      delete nextProps[config.config.source];
+    if (config.source !== config.target) {
+      delete nextProps[config.source];
     }
   }
 
@@ -184,11 +184,11 @@ function maybeRerenderComponent(
           case "prop":
             return props?.[guard.name] !== guard.value;
           case "variable":
-            if (variables instanceof Map) {
-              return guard.value !== variables.get(guard.name);
-            } else {
-              return variables[guard.name] !== guard.value;
-            }
+            return variables.find((variable) => {
+              return (
+                guard.name in variable && variable[guard.name] !== guard.value
+              );
+            });
           case "container":
             return containers[guard.name] !== guard.value;
           default:
@@ -209,11 +209,11 @@ function maybeRerenderComponent(
           case "prop":
             return props?.[guard.name] !== guard.value;
           case "variable":
-            if (variables instanceof Map) {
-              return guard.value !== variables.get(guard.name);
-            } else {
-              return variables[guard.name] !== guard.value;
-            }
+            return variables.find((variable) => {
+              return (
+                guard.name in variable && variable[guard.name] !== guard.value
+              );
+            });
           case "container":
             return containers[guard.name] !== guard.value;
         }
@@ -266,7 +266,6 @@ export function initUseInterop(
     actions,
     incomingProps,
     inheritedVariables,
-    universalVariables,
     inheritedContainers,
   );
 }
@@ -276,7 +275,6 @@ export function performConfigReducerActions(
   actions: Readonly<PerformConfigReducerAction[]>,
   incomingProps: Props,
   inheritedVariables: VariableContextValue,
-  universalVariables: VariableContextValue,
   inheritedContainers: ContainerContextValue,
 ): UseInteropState {
   let configStatesToUpdate: [number, ConfigReducerState][] | undefined;
@@ -295,7 +293,6 @@ export function performConfigReducerActions(
       previous,
       incomingProps,
       inheritedVariables,
-      universalVariables,
       inheritedContainers,
     );
 
@@ -320,7 +317,6 @@ export function performConfigReducerActions(
     configStates[index] = configState;
   }
 
-  let variables: UseInteropState["variables"];
   let containers: UseInteropState["containers"];
   let sideEffects: UseInteropState["sideEffects"];
   let sharedValues: UseInteropState["sharedValues"];
@@ -329,10 +325,11 @@ export function performConfigReducerActions(
   let baseStyles: UseInteropState["baseStyles"];
   let props: UseInteropState["props"];
 
+  const variableDraft = new DraftableArray(previous.variables);
+
   for (const state of configStates) {
     if (state.variables) {
-      variables ??= {};
-      Object.assign(variables, state.variables);
+      variableDraft.push(state.variables);
     }
 
     if (state.containers) {
@@ -385,11 +382,11 @@ export function performConfigReducerActions(
 
   const next: UseInteropState = {
     ...previous,
+    variables: variableDraft.commit(),
     type,
     baseStyles,
     props,
     configStates,
-    variables,
     containers,
     animations,
     transitions,
@@ -400,25 +397,39 @@ export function performConfigReducerActions(
   return next;
 }
 
-export function getUseInteropOptions(...configs: Config[]) {
-  const configStates: ConfigReducerState[] = [];
+export function getUseInteropOptions(options: EnableCssInteropOptions<any>) {
+  const configs: ConfigReducerState[] = [];
   const initialActions: PerformConfigReducerAction[] = [];
 
-  /**
-   * Group the configs by index so we can easily reference them later.
-   * Build an array of actions to initialize the interopReducer.
-   */
-  configs.forEach((config, index) => {
-    const configState = {
+  Object.entries(options).forEach(([source, config], index) => {
+    let target = typeof config === "object" ? config.target : config;
+
+    if (target === true) {
+      target = source;
+    }
+
+    let nativeStyleToProp: Config["nativeStyleToProp"];
+
+    if (typeof config === "object" && config.nativeStyleToProp) {
+      nativeStyleToProp = Object.fromEntries(
+        Object.entries(config.nativeStyleToProp).map(([key, value]) => {
+          return [key, value === true ? [key] : value.split(".")];
+        }),
+      );
+    }
+
+    configs[index] = {
       index,
-      config: { index, ...config },
+      source,
+      target,
+      nativeStyleToProp,
     };
-    configStates[index] = configState;
+
     initialActions.push({
       action: { type: "update-definitions" },
       index,
     });
   });
 
-  return { configStates, initialActions };
+  return { configs, initialActions };
 }

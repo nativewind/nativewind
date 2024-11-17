@@ -16,7 +16,7 @@ import {
 import {
   CompilerCollection,
   CompilerOptions,
-  StyleSheetOptions,
+  InjectStylesOptions,
 } from "../runtime/pure/compiler/types";
 import {
   StyleDeclaration,
@@ -62,7 +62,7 @@ export function cssToReactNativeRuntime(
   code: Buffer | string,
   options: CompilerOptions = {},
   debug = debugFn("react-native-css-interop"),
-): StyleSheetOptions {
+): InjectStylesOptions {
   const features = Object.assign({}, defaultFeatureFlags, options.features);
 
   debug(`Features ${JSON.stringify(features)}`);
@@ -167,7 +167,7 @@ export function cssToReactNativeRuntime(
     ruleSets.set(name, styleRuleSet);
   }
 
-  const stylesheetOptions: StyleSheetOptions = {};
+  const stylesheetOptions: InjectStylesOptions = {};
 
   if (Object.keys(collection.flags).length) {
     stylesheetOptions.f = collection.flags;

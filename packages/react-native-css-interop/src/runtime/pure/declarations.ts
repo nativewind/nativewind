@@ -7,7 +7,13 @@ import {
   TransitionDeclarations,
 } from "./reanimated";
 import type { ConfigReducerState } from "./state/config";
-import type { Props, RenderGuard, SideEffectTrigger, StyleRule } from "./types";
+import type {
+  Props,
+  RenderGuard,
+  SideEffectTrigger,
+  StyleRule,
+  VariableDescriptor,
+} from "./types";
 import { UseInteropState } from "./useInterop";
 import type { Effect } from "./utils/observable";
 
@@ -16,6 +22,7 @@ export type Declarations = Effect &
     epoch: number;
     normal?: StyleRule[];
     important?: StyleRule[];
+    variables?: VariableDescriptor[][];
     guards: RenderGuard[];
     animation?: AnimationAttributes[];
     sideEffects?: SideEffectTrigger[];
@@ -25,6 +32,7 @@ type DeclarationUpdates = {
   d?: boolean;
   a?: boolean;
   t?: TransitionAttributes[];
+  v?: boolean;
 };
 
 export function buildDeclarations(
@@ -33,11 +41,11 @@ export function buildDeclarations(
   props: Props,
 ): Declarations {
   const previous = state.declarations;
-  const source = props?.[state.config.source] as string | undefined;
+  const source = props?.[state.source] as string | undefined;
 
   const next: Declarations = {
     epoch: previous?.epoch ?? 0,
-    guards: [{ type: "prop", name: state.config.source, value: source }],
+    guards: [{ type: "prop", name: state.source, value: source }],
     run: () => {
       componentState.dispatch([
         { action: { type: "update-definitions" }, index: state.index },
@@ -122,8 +130,9 @@ function collectRules(
     return updates;
   }
 
-  let aIndex = next.animation ? Math.max(0, next.animation.length - 1) : 0;
   let dIndex = next[key] ? Math.max(0, next[key].length - 1) : 0;
+  let aIndex = next.animation ? Math.max(0, next.animation.length - 1) : 0;
+  let vIndex = next.variables ? Math.max(0, next.variables.length - 1) : 0;
 
   for (const rule of styleRules) {
     if (!testRule(rule, componentState.key, next)) continue;
@@ -154,6 +163,14 @@ function collectRules(
       updates ??= {};
       updates.d ||= !Object.is(previous?.[key]?.[dIndex], rule);
       dIndex++;
+    }
+
+    if (rule.v) {
+      next.variables ??= [];
+      next.variables.push(rule.v);
+      updates ??= {};
+      updates.v ||= !Object.is(previous?.variables?.[vIndex], rule);
+      vIndex++;
     }
   }
 

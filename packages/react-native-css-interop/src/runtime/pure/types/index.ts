@@ -6,7 +6,11 @@ export type Maybe<T> = T | undefined;
 export type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 // The options passed to cssInterop
-export type Config = { target: string; source: string };
+export type Config = {
+  target: string | false;
+  source: string;
+  nativeStyleToProp?: Record<string, string | string[]>;
+};
 // cssInterop will add a key to the config
 export type ConfigWithIndex = Config & { index: number };
 
@@ -19,5 +23,5 @@ export type SideEffectTrigger = Callback;
 
 export type RenderGuard =
   | { type: "prop"; name: string; value: unknown }
-  | { type: "variable"; name: string; value: unknown }
+  | { type: "variable"; name: string; value: unknown; global?: boolean }
   | { type: "container"; name: string; value: unknown };

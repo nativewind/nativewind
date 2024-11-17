@@ -6,7 +6,10 @@ export function getValue(
   props: Record<string, any>,
   paths: string | string[],
 ) {
-  const target = state.config.target;
+  const target = state.target;
+
+  // TODO
+  if (!target) return undefined;
 
   if (typeof paths === "string") {
     return getFinalValue(state, props, paths);
@@ -38,7 +41,13 @@ function getFinalValue(
   path: string,
 ) {
   if (path.startsWith("^")) {
-    const target = state.config.target;
+    const target = state.target;
+
+    if (!target) {
+      // TODO
+      return undefined;
+    }
+
     path = path.slice(1);
     props = props?.[target];
   }
@@ -61,7 +70,7 @@ export function setValue(
   placeholder?: Record<string, any>,
 ) {
   let props = target;
-  const configTarget = state?.config.target;
+  const configTarget = state?.target;
 
   if (typeof paths === "string") {
     paths = [paths];
@@ -70,14 +79,18 @@ export function setValue(
   for (let i = 0; i < paths.length; i++) {
     let path = paths[i];
 
-    if (i === 0 && path.startsWith("^")) {
-      if (!configTarget) {
-        throw new Error("Cannot use ^ without a config target");
+    if (i === 0) {
+      if (path.startsWith("^")) {
+        path = path.slice(1);
+      } else {
+        if (!configTarget) {
+          return target;
+        }
+
+        props ??= {};
+        props[configTarget] ??= {};
+        props = props[configTarget];
       }
-      path = path.slice(1);
-      props ??= {};
-      props[configTarget] ??= {};
-      props = props[configTarget];
     }
 
     if (i === paths.length - 1) {

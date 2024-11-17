@@ -8,7 +8,7 @@ export function applyAnimation(
   state: ConfigReducerState,
   styles: Styles,
   options: ResolveOptions,
-): Styles {
+) {
   const sharedValues = state.declarations?.sharedValues;
   if (!sharedValues) return styles;
 
@@ -54,6 +54,4 @@ export function applyAnimation(
   }
 
   styles.animationIO = sharedValueIO;
-
-  return styles;
 }
