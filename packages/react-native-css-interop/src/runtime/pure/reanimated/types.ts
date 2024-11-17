@@ -9,13 +9,13 @@ import type { StyleValueDescriptor } from "../types";
 
 /******************************** Animations ******************************** */
 
-export type RawAnimation = {
-  p: AnimationInterpolation[];
-  // The easing function for each frame
-  e?: AnimationEasing[];
-};
+/** The animation interpolation and its optional timing */
+export type RawAnimation =
+  | [AnimationInterpolation[]]
+  | [AnimationInterpolation[], AnimationEasing[]];
 
-export type Animation = RawAnimation & {
+export type Animation = {
+  animation: RawAnimation;
   baseStyles: Record<string, any>;
 };
 
@@ -101,10 +101,12 @@ export type EasingFunction =
 type AnimationPropertyKey = string;
 export type AnimationInterpolation =
   | [AnimationPropertyKey, number[], StyleValueDescriptor[]]
+  | [AnimationPropertyKey, number[], StyleValueDescriptor[], number]
   | [
       AnimationPropertyKey,
       number[],
       StyleValueDescriptor[],
+      number,
       AnimationInterpolationType,
     ];
 export type AnimationEasing = number | [number, EasingFunction];
@@ -132,11 +134,11 @@ export type TransitionAttributes = {
   /**
    * Delay before the transition starts in milliseconds.
    */
-  d?: number[];
+  de?: number[];
   /**
    * Duration of the transition in milliseconds.
    */
-  l?: number[];
+  du?: number[];
   /**
    * Property to transition.
    */
@@ -144,5 +146,5 @@ export type TransitionAttributes = {
   /**
    * Easing function for the transition.
    */
-  t?: EasingFunction[];
+  e?: EasingFunction[];
 };

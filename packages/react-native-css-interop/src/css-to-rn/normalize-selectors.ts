@@ -5,10 +5,14 @@ import type {
   SelectorList,
 } from "lightningcss";
 
-import { StyleRule } from "../runtime/pure";
+import {
+  AttributeCondition,
+  PseudoClassesQuery,
+  StyleRule,
+} from "../runtime/pure";
 import { CompilerCollection } from "../runtime/pure/compiler/types";
 import { SpecificityIndex } from "../shared";
-import { AttributeCondition, Specificity } from "../types";
+import { Specificity } from "../types";
 
 export type NormalizeSelector =
   | {
@@ -20,8 +24,8 @@ export type NormalizeSelector =
       className: string;
       media?: MediaQuery[];
       groupClassName?: string;
-      pseudoClasses?: Record<string, true>;
-      groupPseudoClasses?: Record<string, true>;
+      pseudoClasses?: PseudoClassesQuery;
+      groupPseudoClasses?: PseudoClassesQuery;
       groupAttrs?: AttributeCondition[];
       attrs?: AttributeCondition[];
       specificity: Specificity;
@@ -320,7 +324,7 @@ function reduceSelector(
         acc.specificity[SpecificityIndex.ClassName] =
           (acc.specificity[SpecificityIndex.ClassName] ?? 0) + 1;
 
-        let pseudoClasses: Record<string, true>;
+        let pseudoClasses: PseudoClassesQuery;
         let attrs: AttributeCondition[];
         if (component.kind === "is") {
           if (isDarkUniversalSelector(component.selectors[0], collection)) {
@@ -365,10 +369,16 @@ function reduceSelector(
 
         switch (component.kind) {
           case "hover":
+            pseudoClasses ??= {};
+            pseudoClasses.h = 1;
+            break;
           case "active":
+            pseudoClasses ??= {};
+            pseudoClasses.a = 1;
+            break;
           case "focus":
             pseudoClasses ??= {};
-            pseudoClasses[component.kind] = true;
+            pseudoClasses.f = 1;
             break;
           case "disabled":
             attrs ??= [];

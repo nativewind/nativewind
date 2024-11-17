@@ -1,38 +1,34 @@
+/** @jsxImportSource test */
 import { View } from "react-native";
 
 import { render, screen } from "@testing-library/react-native";
 import { getAnimatedStyle } from "react-native-reanimated";
-
-import { getUseInteropOptions, useInterop } from "../../runtime/pure";
-import { addKeyFrames, addStyle } from "../../runtime/pure/testUtils";
+import { registerCSS, setupAllComponents } from "test";
 
 const testID = "react-native-css-interop";
+setupAllComponents();
 
 jest.useFakeTimers();
 
-const { configStates, initialActions } = getUseInteropOptions({
-  source: "className",
-  target: "style",
-});
-
-function MyAnimatedView(props: any) {
-  return useInterop({ testID, ...props }, View, configStates, initialActions);
-}
-
 test("basic animation", () => {
-  addKeyFrames("slide-in", {
-    p: [["marginLeft", [0, 1], [100, 0], "%"]],
-  });
+  registerCSS(`
+    .animation-slide-in {
+      animation-name: slide-in;
+      animation-duration: 1s;
+    }
 
-  addStyle("animation-slide-in", {
-    s: [0],
-    a: {
-      n: ["slide-in"],
-      du: [1000],
-    },
-  });
+    @keyframes slide-in {
+      from {
+        margin-left: 100%;
+      }
 
-  render(<MyAnimatedView className="animation-slide-in" />);
+      to {
+        margin-left: 0%;
+      }
+    }
+  `);
+
+  render(<View testID={testID} className="animation-slide-in" />);
 
   expect(screen.getByTestId(testID)).toHaveAnimatedStyle({
     marginLeft: "100%",
@@ -58,37 +54,45 @@ test("basic animation", () => {
 });
 
 test("updating animation", () => {
-  addKeyFrames("slide-in", {
-    p: [["marginLeft", [0, 1], [100, 0], "%"]],
-  });
+  registerCSS(`
+    .animation-slide-in {
+      animation-name: slide-in;
+      animation-duration: 1s;
+    }
 
-  addKeyFrames("slide-down", {
-    p: [["marginTop", [0, 1], [0, 50], "%"]],
-  });
+    .animation-slide-down {
+      animation-name: slide-down;
+      animation-duration: 1s;
+    }
 
-  addStyle("animation-slide-in", {
-    s: [0],
-    a: {
-      n: ["slide-in"],
-      du: [1000],
-    },
-  });
+    @keyframes slide-in {
+      from {
+        margin-left: 100%;
+      }
 
-  addStyle("animation-slide-down", {
-    s: [0],
-    a: {
-      n: ["slide-down"],
-      du: [1000],
-    },
-  });
+      to {
+        margin-left: 0%;
+      }
+    }
 
-  render(<MyAnimatedView className="animation-slide-in" />);
+    @keyframes slide-down {
+      from {
+        margin-top: 0%;
+      }
+
+      to {
+        margin-top: 50%;
+      }
+    }
+  `);
+
+  render(<View testID={testID} className="animation-slide-in" />);
 
   expect(screen.getByTestId(testID)).toHaveAnimatedStyle({
     marginLeft: "100%",
   });
 
-  screen.rerender(<MyAnimatedView className="animation-slide-down" />);
+  screen.rerender(<View testID={testID} className="animation-slide-down" />);
 
   expect(screen.getByTestId(testID)).toHaveAnimatedStyle({
     marginLeft: "100%",

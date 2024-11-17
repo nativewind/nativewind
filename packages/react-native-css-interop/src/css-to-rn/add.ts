@@ -1,3 +1,9 @@
+import {
+  AnimationDirection,
+  AnimationFillMode,
+  AnimationPlayState,
+} from "lightningcss";
+
 import { CompilerCollection } from "../runtime/pure/compiler/types";
 import { EasingFunction } from "../runtime/pure/reanimated";
 import { RuntimeFunction, StyleRule } from "../runtime/pure/types";
@@ -26,7 +32,14 @@ export function buildAddFn(
   ): void;
   function Add(
     type: "animation",
-    property: string,
+    property:
+      | "animation-delay"
+      | "animation-direction"
+      | "animation-duration"
+      | "animation-fill-mode"
+      | "animation-iteration-count"
+      | "animation-name"
+      | "animation-play-state",
     value: RuntimeValueDescriptor,
   ): void;
   function Add(
@@ -36,7 +49,10 @@ export function buildAddFn(
   ): void;
   function Add(
     type: "transition",
-    property: string,
+    property:
+      | "transition-delay"
+      | "transition-duration"
+      | "transition-property",
     value: RuntimeValueDescriptor,
   ): void;
   function Add(
@@ -49,10 +65,73 @@ export function buildAddFn(
     property: string,
     value: RuntimeValueDescriptor | EasingFunction[],
   ) {
+    if (value === undefined) {
+      return;
+    }
+
     switch (type) {
       case "transform":
-      case "animation":
+        return;
       case "transition":
+        switch (property) {
+          case "transition-timing-function":
+            rule.t ??= {};
+            rule.t.e ??= [];
+            rule.t.e.push(...(value as EasingFunction[]));
+            break;
+          case "transition-delay":
+            rule.t ??= {};
+            rule.t.de = value as number[];
+            break;
+          case "transition-duration":
+            rule.t ??= {};
+            rule.t.du = value as number[];
+            break;
+          case "transition-property":
+            rule.t ??= {};
+            rule.t.p = value as string[];
+            break;
+        }
+        return;
+      case "animation":
+        switch (property) {
+          case "animation-timing-function":
+            rule.a ??= {};
+            rule.a.e ??= [];
+            rule.a.e.push(...(value as EasingFunction[]));
+            break;
+          case "animation-delay":
+            rule.a ??= {};
+            rule.a.de = value as number[];
+            break;
+          case "animation-direction":
+            rule.a ??= {};
+            rule.a.di = value as AnimationDirection[];
+            break;
+          case "animation-duration":
+            rule.a ??= {};
+            rule.a.du = value as number[];
+            break;
+          case "animation-fill-mode":
+            rule.a ??= {};
+            rule.a.f = value as AnimationFillMode[];
+            break;
+          case "animation-iteration-count":
+            rule.a ??= {};
+            rule.a.i = value as number[];
+            break;
+          case "animation-name":
+            rule.a ??= {};
+            rule.a.n = value as string[];
+            break;
+          case "animation-play-state":
+            rule.a ??= {};
+            rule.a.p = value as AnimationPlayState[];
+            break;
+          case "animation-timeline":
+            return;
+        }
+
         return;
       case "style": {
         value = value as RuntimeValueDescriptor;

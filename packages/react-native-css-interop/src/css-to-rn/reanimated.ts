@@ -6,7 +6,15 @@ import {
 } from "lightningcss";
 
 import { CompilerCollection } from "../runtime/pure/compiler/types";
-import { EasingFunction } from "../runtime/pure/reanimated";
+import {
+  AnimationInterpolation,
+  AnimationInterpolationType,
+  EasingFunction,
+  RawAnimation,
+} from "../runtime/pure/reanimated";
+import { RuntimeValueDescriptor } from "../types";
+import { toRNProperty } from "./normalize-selectors";
+import { parseDeclaration } from "./parseDeclaration";
 
 export function parseIterationCount(
   value: AnimationIterationCount[],
@@ -42,127 +50,99 @@ export function parseEasingFunction(
 export function extractKeyFrames(
   keyframes: KeyframesRule<Declaration>,
   collection: CompilerCollection,
+  // getStyles: (declarations: Declaration[]) => StyleRule[],
 ) {
-  // const animation: RawAnimation = { p: [] };
-  // let rawFrames: Array<{
-  //   selector: number;
-  //   values: StyleDeclaration[];
-  //   easingFunction?: EasingFunction;
-  // }> = [];
-  // for (const frame of keyframes.keyframes) {
-  //   if (!frame.declarations.declarations) continue;
-  //   const specificity: Specificity = [];
-  //   specificity[SpecificityIndex.Important] = 2; // Animations have higher specificity than important
-  //   specificity[SpecificityIndex.ClassName] = 1;
-  //   specificity[SpecificityIndex.Order] = collection.appearanceOrder;
-  //   const { d: declarations, animations } = declarationsToStyle(
-  //     frame.declarations.declarations,
-  //     collection,
-  //     specificity,
-  //     {},
-  //   );
-  //   if (!declarations) continue;
-  //   /**
-  //    * We an only animation style props
-  //    * Non-style props have pathTokens instead of a single string
-  //    */
-  //   const values = declarations.filter(
-  //     (declaration) =>
-  //       declaration.length === 1 || typeof declaration[1] === "string",
-  //   );
-  //   if (values.length === 0) continue;
-  //   const easingFunction = animations?.timingFunction?.[0];
-  //   for (const selector of frame.selectors) {
-  //     const keyframe =
-  //       selector.type === "percentage"
-  //         ? selector.value * 100
-  //         : selector.type === "from"
-  //           ? 0
-  //           : selector.type === "to"
-  //             ? 100
-  //             : undefined;
-  //     if (keyframe === undefined) continue;
-  //     switch (selector.type) {
-  //       case "percentage":
-  //         rawFrames.push({ selector: selector.value, values, easingFunction });
-  //         break;
-  //       case "from":
-  //         rawFrames.push({ selector: 0, values, easingFunction });
-  //         break;
-  //       case "to":
-  //         rawFrames.push({ selector: 1, values, easingFunction });
-  //         break;
-  //       case "timeline-range-percentage":
-  //         break;
-  //       default:
-  //         selector satisfies never;
-  //     }
-  //   }
-  // }
-  // // Need to sort afterwards, as the order of the frames is not guaranteed
-  // rawFrames = rawFrames.sort((a, b) => a.selector - b.selector);
-  // // Convert the rawFrames into frames
-  // const frames: Record<string, AnimationFrame> = {};
-  // const easingFunctions: EasingFunction[] = [];
-  // for (let i = 0; i < rawFrames.length; i++) {
-  //   const rawFrame = rawFrames[i];
-  //   const progress = rawFrame.selector;
-  //   if (rawFrame.easingFunction) {
-  //     easingFunctions[i] = rawFrame.easingFunction;
-  //   }
-  //   for (const frameValue of rawFrame.values) {
-  //     const [value, propOrPathTokens] = frameValue;
-  //     // We only accept animations on the `style` prop, which are either undefined or a string
-  //     if (Array.isArray(propOrPathTokens)) {
-  //       continue;
-  //     }
-  //     if (propOrPathTokens) {
-  //       const key = propOrPathTokens;
-  //       if (!isRuntimeDescriptor(value)) {
-  //         throw new Error("animation is an object?");
-  //       }
-  //       if (!frames[key]) {
-  //         frames[key] = [key, []];
-  //       }
-  //       frames[key][1].push({ value, progress });
-  //     } else if (value && typeof value === "object" && !Array.isArray(value)) {
-  //       for (const key in value) {
-  //         if (!frames[key]) {
-  //           frames[key] = [key, []];
-  //         }
-  //         frames[key][1].push({ value: value[key], progress });
-  //       }
-  //     }
-  //   }
-  // }
-  // /**
-  //  * Ensure all animations have a 0%/100% frame.
-  //  *
-  //  * As per mdn:
-  //  * If a keyframe rule doesn't specify the start or end states of the animation (that is, 0%/from and 100%/to),
-  //  * browsers will use the element's existing styles for the start/end states.
-  //  * This can be used to animate an element from its initial state and back.
-  //  */
-  // animation.p = Object.values(frames).map((value) => {
-  //   const valueFrames = value[1];
-  //   if (valueFrames[0].progress !== 0) {
-  //     valueFrames.unshift({ value: "!INHERIT!", progress: 0 });
-  //   }
-  //   if (valueFrames[valueFrames.length - 1].progress !== 1) {
-  //     valueFrames.push({ value: "!INHERIT!", progress: 1 });
-  //   }
-  //   return value;
-  // });
-  // if (easingFunctions.length) {
-  //   // This is a holey array and may contain undefined values
-  //   animation.p = Array.from<EasingFunction | undefined>(
-  //     easingFunctions,
-  //   ).map((value) => {
-  //     if (!value) {
-  //       return "!PLACEHOLDER!"
-  //     }
-  //     return value ?? ;
-  //   });
-  // }
-  // collection.keyframes.set(keyframes.name.value, animation);
+  const propertyMap = new Map<string, AnimationInterpolation>();
+
+  for (const frame of keyframes.keyframes) {
+    if (!frame.declarations.declarations) continue;
+
+    const selectors = frame.selectors.map((selector) => {
+      switch (selector.type) {
+        case "percentage":
+          return selector.value;
+        case "from":
+          return 0;
+        case "to":
+          return 1;
+        case "timeline-range-percentage":
+          // TODO
+          return selector.value.percentage;
+      }
+    });
+
+    for (const declaration of frame.declarations.declarations) {
+      parseDeclaration(
+        declaration,
+        collection,
+        (type, property, value) => {
+          if (value === undefined) return;
+
+          switch (type) {
+            case "transition":
+              // These are ignores
+              return;
+            case "transform":
+            case "animation":
+              // TODO
+              return;
+            case "style": {
+              value = value as RuntimeValueDescriptor;
+
+              property = toRNProperty(property);
+
+              let interpolation = propertyMap.get(property);
+
+              if (!interpolation) {
+                interpolation = [property, [], []];
+                propertyMap.set(property, interpolation);
+              }
+
+              if (typeof value === "object") {
+                interpolation[3] = 1;
+              } else if (typeof value === "string") {
+                if (!interpolation[4]) {
+                  interpolation[3] ??= 0;
+                  interpolation[4] = value.replace(
+                    /[\d\.]*/g,
+                    "",
+                  ) as AnimationInterpolationType;
+                }
+
+                value = Number.parseFloat(value);
+              }
+
+              for (const selector of selectors) {
+                interpolation[1].push(selector);
+                interpolation[2].push(value);
+              }
+            }
+          }
+        },
+        () => {},
+      );
+    }
+  }
+
+  const sortedInterpolation = Array.from(
+    propertyMap.values(),
+    ([property, selectors, values, ...rest]): AnimationInterpolation => {
+      const indices = Array.from(selectors.keys());
+      indices.sort((a, b) => selectors[a] - selectors[b]);
+
+      return [
+        property,
+        indices.map((i) => selectors[i]),
+        indices.map((i) => values[i]),
+        ...rest,
+      ];
+    },
+  );
+
+  /**
+   * Sort the values by selector to be in ascending order
+   */
+  const animation: RawAnimation = [sortedInterpolation];
+
+  collection.animations.set(keyframes.name.value, animation);
 }

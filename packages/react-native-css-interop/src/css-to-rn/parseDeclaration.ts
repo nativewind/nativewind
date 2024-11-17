@@ -221,7 +221,7 @@ const validPropertiesLoose = new Set<string>(validProperties);
 
 export interface ParseDeclarationOptions {
   inlineRem?: number | false;
-  features: FeatureFlagStatus;
+  features?: FeatureFlagStatus;
   allowAuto?: boolean;
 }
 
@@ -1262,11 +1262,16 @@ export function parseDeclaration(
         declaration.property,
         parseIterationCount(declaration.value),
       );
+    case "animation-name":
+      return add(
+        "animation",
+        declaration.property,
+        declaration.value.map((v) => (v.type === "none" ? "none" : v.value)),
+      );
     case "animation-direction":
     case "animation-play-state":
     case "animation-delay":
     case "animation-fill-mode":
-    case "animation-name":
     case "animation":
       // TODO
       return;

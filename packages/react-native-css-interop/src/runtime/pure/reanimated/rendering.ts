@@ -122,7 +122,7 @@ export function useInteropAnimatedStyle({
         for (const propIO of animation[1]) {
           const input = propIO[1];
           const output = propIO[2];
-          const type = propIO[3];
+          const type = propIO[4];
 
           const interpolateFn =
             type === "color" ? interpolateColor : interpolate;

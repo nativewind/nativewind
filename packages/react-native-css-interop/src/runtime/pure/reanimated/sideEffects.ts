@@ -103,7 +103,7 @@ export function buildAnimationSideEffects(
           iterations === -1 ? Infinity : iterations,
           false,
           true,
-          animation.e,
+          animation.animation[1],
           baseEasingFunction,
         );
       });
@@ -326,11 +326,11 @@ export function getTransitionSideEffect(
       }
 
       sharedValue.value = withDelay(
-        transition.d?.[index % transition.d.length] ?? 0,
+        transition.de?.[index % transition.de.length] ?? 0,
         withTiming(value, {
-          duration: transition.l?.[index % transition.l.length] ?? 0,
+          duration: transition.du?.[index % transition.du.length] ?? 0,
           easing: getEasing(
-            transition.t?.[index % transition.t.length],
+            transition.e?.[index % transition.e.length],
             Easing,
           ),
         }),

@@ -20,11 +20,11 @@ export interface ContainerQuery {
 
 export interface PseudoClassesQuery {
   // Hover
-  h?: boolean;
+  h?: 1;
   // Active
-  a?: boolean;
+  a?: 1;
   // Focus
-  f?: boolean;
+  f?: 1;
 }
 
 export type AttributeCondition = PropCondition | DataAttributeCondition;

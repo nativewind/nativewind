@@ -1,46 +1,33 @@
+/** @jsxImportSource test */
 import { View } from "react-native";
 
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-
-import { getUseInteropOptions, useInterop } from "../../runtime/pure";
-import { addStyle } from "../../runtime/pure/testUtils";
+import { registerCSS, setupAllComponents } from "test";
 
 const testID = "react-native-css-interop";
 const children = undefined;
 
-jest.useFakeTimers();
+setupAllComponents();
 
-let renderCount = 0;
-
-const { configStates, initialActions } = getUseInteropOptions({
-  source: "className",
-  target: "style",
-});
-
-function MyView(props: any) {
-  renderCount++;
-  return useInterop({ testID, ...props }, View, configStates, initialActions);
-}
-
-beforeEach(() => {
-  renderCount = 0;
+const MyView = jest.fn((props) => {
+  console.log(props);
+  return <View {...props} />;
 });
 
 test("hover", () => {
-  addStyle("text-blue-500", {
-    s: [0],
-    d: [{ color: "blue" }],
-  });
+  registerCSS(`
+    .text-blue-500 {
+      color: blue;
+    }
 
-  addStyle("hover:text-red-500", {
-    s: [0],
-    d: [{ color: "red" }],
-    p: {
-      h: true,
-    },
-  });
+    .text-blue-500:hover {
+      color: red;
+    }
+  `);
 
-  render(<MyView className="text-blue-500 hover:text-red-500" />);
+  render(
+    <MyView testID={testID} className="text-blue-500 hover:text-red-500" />,
+  );
   const component = screen.getByTestId(testID);
 
   expect(component.props).toStrictEqual({
@@ -49,10 +36,9 @@ test("hover", () => {
     onHoverIn: expect.any(Function),
     onHoverOut: expect.any(Function),
     style: {
-      color: "blue",
+      color: "#0000ff",
     },
   });
-  expect(renderCount).toBe(1);
 
   act(() => fireEvent(component, "hoverIn"));
 
@@ -62,11 +48,9 @@ test("hover", () => {
     onHoverIn: expect.any(Function),
     onHoverOut: expect.any(Function),
     style: {
-      color: "red",
+      color: "#ff0000",
     },
   });
-  expect(renderCount).toBe(2);
-
   act(() => fireEvent(component, "hoverOut"));
 
   expect(component.props).toStrictEqual({
@@ -75,8 +59,8 @@ test("hover", () => {
     onHoverIn: expect.any(Function),
     onHoverOut: expect.any(Function),
     style: {
-      color: "blue",
+      color: "#0000ff",
     },
   });
-  expect(renderCount).toBe(3);
+  expect(MyView).toHaveBeenCalledTimes(1);
 });

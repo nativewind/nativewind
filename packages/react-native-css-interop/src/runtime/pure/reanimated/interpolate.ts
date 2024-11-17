@@ -36,7 +36,12 @@ export function applyAnimation(
     styles.baseStyles ??= {};
     Object.assign(styles.baseStyles, animation.baseStyles);
 
-    for (const interpolation of animation.p) {
+    for (const interpolation of animation.animation[0]) {
+      if (!interpolation[3]) {
+        animationInterpolation.push(interpolation);
+        continue;
+      }
+
       const values = [];
       for (const value of interpolation[2]) {
         values.push(resolveValue(state, value, options));
@@ -47,7 +52,8 @@ export function applyAnimation(
         interpolation[1],
         values,
         interpolation[3],
-      ] as const);
+        interpolation[4],
+      ]);
     }
 
     sharedValueIO.push([sharedValue, animationInterpolation]);

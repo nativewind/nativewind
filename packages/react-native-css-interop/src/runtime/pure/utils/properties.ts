@@ -82,11 +82,7 @@ export function setValue(
     if (i === 0) {
       if (path.startsWith("^")) {
         path = path.slice(1);
-      } else {
-        if (!configTarget) {
-          return target;
-        }
-
+      } else if (configTarget) {
         props ??= {};
         props[configTarget] ??= {};
         props = props[configTarget];

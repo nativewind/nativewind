@@ -18,11 +18,7 @@ import {
   CompilerOptions,
   InjectStylesOptions,
 } from "../runtime/pure/compiler/types";
-import {
-  StyleDeclaration,
-  StyleRule,
-  StyleRuleSet,
-} from "../runtime/pure/types";
+import { StyleRule, StyleRuleSet } from "../runtime/pure/types";
 import {
   SpecificityIndex,
   StyleRuleSetSymbol,
@@ -401,13 +397,13 @@ function setStyleForSelectorList(
     collection,
   )) {
     const style: StyleRule = { ...extractedStyle };
-    if (!style.d) continue;
+    if (!(style.d || style.a || style.v || style.t)) continue;
 
     if (
       selector.type === "rootVariables" || // :root
       selector.type === "universalVariables" // *
     ) {
-      const fontSizeValue = style.d.findLast((value) => {
+      const fontSizeValue = style.d?.findLast((value) => {
         return typeof value === "object" && "fontSize" in value;
       })?.[0];
 
@@ -551,11 +547,9 @@ function declarationsToStyle(
   specificity: Specificity,
   mapping: MoveTokenRecord,
 ): StyleRule {
-  const styleDecls: StyleDeclaration[] = [];
   const extractedStyle: StyleRule = {
     [StyleRuleSymbol]: true,
     s: [...specificity],
-    d: styleDecls,
   };
 
   const parseDeclarationOptions: ParseDeclarationOptions = {

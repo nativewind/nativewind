@@ -1,40 +1,29 @@
+/** @jsxImportSource test */
 import { View } from "react-native";
 
 import { render, screen } from "@testing-library/react-native";
 import { getAnimatedStyle } from "react-native-reanimated";
-
-import { getUseInteropOptions, useInterop } from "../../runtime/pure";
-import { addStyle } from "../../runtime/pure/testUtils";
+import { registerCSS, setupAllComponents } from "test";
 
 const testID = "react-native-css-interop";
 
 jest.useFakeTimers();
 
-const { configStates, initialActions } = getUseInteropOptions({
-  source: "className",
-  target: "style",
-});
-
-function MyAnimatedView(props: any) {
-  return useInterop({ testID, ...props }, View, configStates, initialActions);
-}
+setupAllComponents();
 
 test("basic transition", () => {
-  addStyle("transition-width", {
-    s: [0],
-    t: {
-      p: ["width"],
-      l: [1000],
-    },
-  });
+  registerCSS(`
+    .transition-width {
+      transition-property: width;
+      transition-duration: 1s;
+    }
 
-  addStyle("width-1", [
-    {
-      width: 100,
-    },
-  ]);
+    .width-1 {
+      width: 100;
+    }
+  `);
 
-  render(<MyAnimatedView className="transition-width" />);
+  render(<View testID={testID} className="transition-width" />);
 
   expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({});
 
@@ -42,7 +31,9 @@ test("basic transition", () => {
   jest.advanceTimersByTime(500);
   expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({});
 
-  screen.rerender(<MyAnimatedView className="transition-width width-1" />);
+  screen.rerender(
+    <View testID={testID} className="transition-width width-1" />,
+  );
 
   // Transitions start once the useEffect() runs
   jest.advanceTimersToNextTimer();
@@ -62,30 +53,27 @@ test("basic transition", () => {
 });
 
 test("updating transition", () => {
-  addStyle("transition-width", {
-    s: [0],
-    t: {
-      p: ["width"],
-      l: [1000],
-    },
-  });
+  registerCSS(`
+    .transition-width {
+      transition-property: width;
+      transition-duration: 1s;
+    }
 
-  addStyle("width-1", [
-    {
-      width: 100,
-    },
-  ]);
+    .width-1 {
+      width: 100;
+    }
 
-  addStyle("width-2", [
-    {
-      width: 200,
-    },
-  ]);
+    .width-2 {
+      width: 200;
+    }
+  `);
 
-  render(<MyAnimatedView className="transition-width" />);
+  render(<View testID={testID} className="transition-width" />);
   expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({});
 
-  screen.rerender(<MyAnimatedView className="transition-width width-1" />);
+  screen.rerender(
+    <View testID={testID} className="transition-width width-1" />,
+  );
   // Transitions start once the useEffect() runs
   jest.advanceTimersToNextTimer();
   expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({ width: 0 });
@@ -94,7 +82,9 @@ test("updating transition", () => {
   jest.advanceTimersByTime(1000);
   expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({ width: 100 });
 
-  screen.rerender(<MyAnimatedView className="transition-width width-2" />);
+  screen.rerender(
+    <View testID={testID} className="transition-width width-2" />,
+  );
   jest.advanceTimersToNextTimer();
   expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({ width: 100 });
 
@@ -103,32 +93,29 @@ test("updating transition", () => {
 });
 
 test("removing transition", () => {
-  addStyle("transition-width", {
-    s: [0],
-    t: {
-      p: ["width"],
-      l: [1000],
-    },
-  });
+  registerCSS(`
+    .transition-width {
+      transition-property: width;
+      transition-duration: 1s;
+    }
 
-  addStyle("width-1", [
-    {
-      width: 100,
-    },
-  ]);
+    .width-1 {
+      width: 100;
+    }
 
-  addStyle("width-2", [
-    {
-      width: 200,
-    },
-  ]);
+    .width-2 {
+      width: 200;
+    }
+  `);
 
-  render(<MyAnimatedView className="transition-width" />);
+  render(<View testID={testID} className="transition-width" />);
 
-  render(<MyAnimatedView className="transition-width" />);
+  render(<View testID={testID} className="transition-width" />);
   expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({});
 
-  screen.rerender(<MyAnimatedView className="transition-width width-1" />);
+  screen.rerender(
+    <View testID={testID} className="transition-width width-1" />,
+  );
   // Transitions start once the useEffect() runs
   jest.advanceTimersToNextTimer();
   expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({ width: 0 });
@@ -137,7 +124,7 @@ test("removing transition", () => {
   jest.advanceTimersByTime(1000);
   expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({ width: 100 });
 
-  screen.rerender(<MyAnimatedView className="transition-width" />);
+  screen.rerender(<View testID={testID} className="transition-width" />);
   jest.advanceTimersToNextTimer();
   expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({ width: 100 });
 
