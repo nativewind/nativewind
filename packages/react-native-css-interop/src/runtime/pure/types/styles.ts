@@ -45,7 +45,7 @@ export interface StyleRule {
    */
 
   /** Animations */
-  a?: AnimationAttributes;
+  a?: [AnimationAttributes] | [AnimationAttributes, RuntimeFunction];
   /** Transitions */
   t?: TransitionAttributes;
 }

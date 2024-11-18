@@ -1,17 +1,20 @@
 import type { StyleValueSubResolver } from ".";
 import type { RuntimeFunction } from "../types";
+import { animationShorthand } from "./animation";
 import { resolveVariable } from "./variable";
 
 export const resolveRuntimeFunction: StyleValueSubResolver<RuntimeFunction> = (
   resolveValue,
-  state,
   func,
   options,
 ) => {
   const name = func[1];
   switch (name) {
+    case "@animation": {
+      return animationShorthand(resolveValue, func, options);
+    }
     case "var": {
-      return resolveVariable(resolveValue, state, func, options);
+      return resolveVariable(resolveValue, func, options);
     }
     // case "vh": {
     //   // 50vh = 50% of the viewport height
@@ -20,7 +23,7 @@ export const resolveRuntimeFunction: StyleValueSubResolver<RuntimeFunction> = (
     //   return typeof value === "number" ? round(vhValue * value) : undefined;
     // }
     default: {
-      const args = resolveValue(state, func[2], options);
+      const args = resolveValue(func[2], options);
 
       if (args === undefined) {
         return;

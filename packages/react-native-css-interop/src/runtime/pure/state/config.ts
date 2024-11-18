@@ -38,7 +38,12 @@ export function configReducer(
 ) {
   switch (action.type) {
     case "update-definitions": {
-      let nextState = updateDefinitions(state, componentState, incomingProps);
+      let nextState = updateDefinitions(
+        state,
+        componentState,
+        incomingProps,
+        inheritedVariables,
+      );
       return Object.is(state, nextState)
         ? state
         : updateStyles(
@@ -69,6 +74,7 @@ function updateDefinitions(
   state: ConfigReducerState,
   componentState: UseInteropState,
   props: Props,
+  inheritedVariables: VariableContextValue,
 ): ConfigReducerState {
   const source = props?.[state.source] as string | undefined;
 
@@ -88,7 +94,12 @@ function updateDefinitions(
   }
 
   const previous = state.declarations;
-  let next = buildDeclarations(state, componentState, props);
+  let next = buildDeclarations(
+    state,
+    componentState,
+    props,
+    inheritedVariables,
+  );
 
   /*
    * If they are the same epoch, then nothing changed.

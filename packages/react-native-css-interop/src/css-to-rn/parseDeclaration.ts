@@ -53,7 +53,7 @@ import { FeatureFlagStatus } from "./feature-flags";
 import { toRNProperty } from "./normalize-selectors";
 import { parseEasingFunction, parseIterationCount } from "./reanimated";
 
-const unparsedPropertyMapping: Record<string, string> = {
+const propertyRename: Record<string, string> = {
   "margin-inline-start": "margin-start",
   "margin-inline-end": "margin-end",
   "padding-inline-start": "padding-start",
@@ -1226,13 +1226,13 @@ export function parseDeclaration(
       return add(
         "transition",
         declaration.property,
-        parseTimeArray(declaration.value),
+        declaration.value.map((t) => parseTime(t)),
       );
     case "transition-delay":
       return add(
         "transition",
         declaration.property,
-        parseTimeArray(declaration.value),
+        declaration.value.map((t) => parseTime(t)),
       );
     case "transition-timing-function":
       return add(
@@ -1245,36 +1245,15 @@ export function parseDeclaration(
       return;
     // return add("transition", declaration);
     case "animation-duration":
-      return add(
-        "animation",
-        declaration.property,
-        parseTimeArray(declaration.value),
-      );
     case "animation-timing-function":
-      return add(
-        "animation",
-        declaration.property,
-        parseEasingFunction(declaration.value),
-      );
     case "animation-iteration-count":
-      return add(
-        "animation",
-        declaration.property,
-        parseIterationCount(declaration.value),
-      );
     case "animation-name":
-      return add(
-        "animation",
-        declaration.property,
-        declaration.value.map((v) => (v.type === "none" ? "none" : v.value)),
-      );
+    case "animation-delay":
     case "animation-direction":
     case "animation-play-state":
-    case "animation-delay":
     case "animation-fill-mode":
     case "animation":
-      // TODO
-      return;
+      return addAnimationValue(declaration, parseOptions);
     case "transform": {
       if (declaration.value.length === 0) {
         add("style", "perspective", 1);
@@ -1604,16 +1583,36 @@ function parseDeclarationUnparsed(
     addWarning: buildAddWarning(addWarning, property),
   };
 
-  if (unparsedPropertyMapping[declaration.value.propertyId.property]) {
-    property = unparsedPropertyMapping[declaration.value.propertyId.property];
+  /**
+   * React Native doesn't support all the logical properties
+   */
+  if (propertyRename[declaration.value.propertyId.property]) {
+    property = propertyRename[declaration.value.propertyId.property];
   }
 
-  if (unparsedRuntimeFn.has(property)) {
+  /**
+   * Unparsed shorthand properties need to be parsed at runtime
+   */
+  if (runtimeShorthands.has(property)) {
     let args = parseUnparsed(declaration.value.value, parseOptions);
     if (!isDescriptorArray(args)) {
       args = [args];
     }
-    return add("style", property, [{}, `@${toRNProperty(property)}`, args]);
+
+    if (property === "animation") {
+      return add("animation", "unparsed-animation", [
+        {},
+        `@${toRNProperty(property)}`,
+        args,
+      ]);
+    } else {
+      return add("style", property, [
+        {},
+        `@${toRNProperty(property)}`,
+        args,
+        1,
+      ]);
+    }
   }
 
   return add(
@@ -1869,8 +1868,9 @@ function parseUnparsed(
       return parseColor(tokenOrValue.value, options);
     case "env":
       return parseEnv(tokenOrValue.value, options);
-    case "url":
     case "time":
+      return parseTime(tokenOrValue.value);
+    case "url":
     case "resolution":
     case "dashed-ident":
     case "animation-name":
@@ -2957,10 +2957,99 @@ function equal(a: unknown, b: unknown) {
   }
 }
 
-function parseTimeArray(time: Time[]) {
-  return time.map((t) =>
-    t.type === "milliseconds" ? t.value : t.value * 1000,
+function parseTime(time: Time) {
+  return time.type === "milliseconds" ? time.value : time.value * 1000;
+}
+
+function addAnimationValue(
+  declaration: Extract<
+    Declaration,
+    { property: `animation${string}` | "animation" }
+  >,
+  options: ParserOptions,
+) {
+  switch (declaration.property) {
+    case "animation": {
+      const grouped: Record<string, any[]> = {};
+
+      for (const animation of declaration.value) {
+        for (const [key, value] of Object.entries(animation)) {
+          grouped[key] ??= [];
+          grouped[key].push(value);
+        }
+      }
+
+      for (const [property, value] of Object.entries(grouped)) {
+        addAnimationValue(
+          {
+            property: `animation-${kebabCase(property)}`,
+            value,
+          } as any,
+          options,
+        );
+      }
+      break;
+    }
+    case "animation-delay": {
+      options.add(
+        "animation",
+        declaration.property,
+        declaration.value.map((t) => parseTime(t)),
+      );
+      break;
+    }
+    case "animation-direction": {
+      options.add("animation", declaration.property, declaration.value);
+      break;
+    }
+    case "animation-duration": {
+      options.add(
+        "animation",
+        declaration.property,
+        declaration.value.map((t) => parseTime(t)),
+      );
+      break;
+    }
+    case "animation-fill-mode": {
+      options.add("animation", declaration.property, declaration.value);
+      break;
+    }
+    case "animation-iteration-count": {
+      options.add(
+        "animation",
+        declaration.property,
+        parseIterationCount(declaration.value),
+      );
+      break;
+    }
+    case "animation-name": {
+      options.add(
+        "animation",
+        declaration.property,
+        declaration.value.map((v) => (v.type === "none" ? "none" : v.value)),
+      );
+      break;
+    }
+    case "animation-play-state": {
+      options.add("animation", declaration.property, declaration.value);
+      break;
+    }
+    case "animation-timing-function": {
+      options.add(
+        "animation",
+        declaration.property,
+        parseEasingFunction(declaration.value),
+      );
+      break;
+    }
+  }
+}
+
+function kebabCase(str: string) {
+  return str.replace(
+    /[A-Z]+(?![a-z])|[A-Z]/g,
+    ($, ofs) => (ofs ? "-" : "") + $.toLowerCase(),
   );
 }
 
-const unparsedRuntimeFn = new Set(["text-shadow"]);
+const runtimeShorthands = new Set(["animation", "text-shadow"]);

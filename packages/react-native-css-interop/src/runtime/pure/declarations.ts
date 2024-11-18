@@ -1,7 +1,7 @@
 import { testRule } from "./conditions";
+import { VariableContextValue } from "./contexts";
 import { styleFamily } from "./globals";
 import {
-  AnimationAttributes,
   buildAnimationSideEffects,
   TransitionAttributes,
   TransitionDeclarations,
@@ -24,7 +24,7 @@ export type Declarations = Effect &
     important?: StyleRule[];
     variables?: VariableDescriptor[][];
     guards: RenderGuard[];
-    animation?: AnimationAttributes[];
+    animation?: NonNullable<StyleRule["a"]>[];
     sideEffects?: SideEffectTrigger[];
   };
 
@@ -39,6 +39,7 @@ export function buildDeclarations(
   state: ConfigReducerState,
   componentState: UseInteropState,
   props: Props,
+  inheritedVariables: VariableContextValue,
 ): Declarations {
   const previous = state.declarations;
   const source = props?.[state.source] as string | undefined;
@@ -95,7 +96,7 @@ export function buildDeclarations(
 
     // If the animation's changed, then we need to update the animation side effects
     if (updates.a) {
-      buildAnimationSideEffects(next, previous);
+      buildAnimationSideEffects(next, previous, inheritedVariables);
     }
 
     if (updates.t?.length) {

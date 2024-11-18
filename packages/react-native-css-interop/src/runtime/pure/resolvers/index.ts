@@ -1,30 +1,27 @@
 import type { ContainerContextRecord } from "../contexts";
-import { ConfigReducerState } from "../state/config";
 import type { RuntimeFunction, StyleValueDescriptor } from "../types";
 import { resolveRuntimeFunction } from "./functions";
 
 export type ResolveOptions = {
-  getProp: (name: string) => StyleValueDescriptor;
+  getProp?: (name: string) => StyleValueDescriptor;
   getVariable: (name: string) => StyleValueDescriptor;
-  getContainer: (name: string) => ContainerContextRecord | undefined;
+  getContainer?: (name: string) => ContainerContextRecord | undefined;
   castToArray?: boolean;
-  previousTransitions: Set<string | string[]>;
+  previousTransitions?: Set<string | string[]>;
 };
 
 export type StyleValueResolver = (
-  state: ConfigReducerState,
   value: unknown,
   options: ResolveOptions,
 ) => any;
 
 export type StyleValueSubResolver<T = unknown> = (
   resolveValue: StyleValueResolver,
-  state: ConfigReducerState,
   value: T,
   options: ResolveOptions,
 ) => any;
 
-export const resolveValue: StyleValueResolver = (state, value, options) => {
+export const resolveValue: StyleValueResolver = (value, options) => {
   switch (typeof value) {
     case "bigint":
     case "symbol":
@@ -39,7 +36,7 @@ export const resolveValue: StyleValueResolver = (state, value, options) => {
         ? parseInt(value.slice(0, -2), 10)
         : value;
     case "function":
-      return resolveValue(state, value(), options);
+      return resolveValue(value(), options);
     case "object": {
       if (!Array.isArray(value)) {
         return value;
@@ -47,7 +44,7 @@ export const resolveValue: StyleValueResolver = (state, value, options) => {
 
       if (isDescriptorArray(value)) {
         value = value.flatMap((d) => {
-          const value = resolveValue(state, d, options);
+          const value = resolveValue(d, options);
           return value === undefined ? [] : value;
         }) as StyleValueDescriptor[];
 
@@ -60,7 +57,6 @@ export const resolveValue: StyleValueResolver = (state, value, options) => {
 
       value = resolveRuntimeFunction(
         resolveValue,
-        state,
         value as RuntimeFunction,
         options,
       );

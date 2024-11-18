@@ -2,6 +2,7 @@ import {
   AnimationDirection,
   AnimationFillMode,
   AnimationPlayState,
+  Animation as CSSAnimation,
 } from "lightningcss";
 
 import { CompilerCollection } from "../runtime/pure/compiler/types";
@@ -33,13 +34,15 @@ export function buildAddFn(
   function Add(
     type: "animation",
     property:
+      | "unparsed-animation"
       | "animation-delay"
       | "animation-direction"
       | "animation-duration"
       | "animation-fill-mode"
       | "animation-iteration-count"
       | "animation-name"
-      | "animation-play-state",
+      | "animation-play-state"
+      | keyof CSSAnimation,
     value: RuntimeValueDescriptor,
   ): void;
   function Add(
@@ -94,39 +97,42 @@ export function buildAddFn(
         }
         return;
       case "animation":
+        let attributes = rule.a?.[0];
+
+        if (!attributes) {
+          attributes = {};
+          rule.a = [attributes];
+        }
+
+        if (property === "unparsed-animation") {
+          rule.a![1] = value as RuntimeFunction;
+          return;
+        }
+
         switch (property) {
           case "animation-timing-function":
-            rule.a ??= {};
-            rule.a.e ??= [];
-            rule.a.e.push(...(value as EasingFunction[]));
+            attributes.e = value as EasingFunction[];
             break;
           case "animation-delay":
-            rule.a ??= {};
-            rule.a.de = value as number[];
+            attributes.de = value as number[];
             break;
           case "animation-direction":
-            rule.a ??= {};
-            rule.a.di = value as AnimationDirection[];
+            attributes.di = value as AnimationDirection[];
             break;
           case "animation-duration":
-            rule.a ??= {};
-            rule.a.du = value as number[];
+            attributes.du = value as number[];
             break;
           case "animation-fill-mode":
-            rule.a ??= {};
-            rule.a.f = value as AnimationFillMode[];
+            attributes.f = value as AnimationFillMode[];
             break;
           case "animation-iteration-count":
-            rule.a ??= {};
-            rule.a.i = value as number[];
+            attributes.i = value as number[];
             break;
           case "animation-name":
-            rule.a ??= {};
-            rule.a.n = value as string[];
+            attributes.n = value as string[];
             break;
           case "animation-play-state":
-            rule.a ??= {};
-            rule.a.p = value as AnimationPlayState[];
+            attributes.p = value as AnimationPlayState[];
             break;
           case "animation-timeline":
             return;

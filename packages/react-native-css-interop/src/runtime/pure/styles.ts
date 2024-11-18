@@ -75,7 +75,7 @@ export function buildStyles(
       return incomingProps?.[name] as StyleValueDescriptor;
     },
     getVariable: (name: string) => {
-      let value = resolveValue(next, next.variables?.[name], options);
+      let value = resolveValue(next.variables?.[name], options);
 
       // If the value is already defined, we don't need to look it up
       if (value !== undefined) {
@@ -83,17 +83,13 @@ export function buildStyles(
       }
 
       // Is there a universal variable?
-      value = resolveValue(
-        next,
-        next.styles.get(universalVariables(name)),
-        options,
-      );
+      value = resolveValue(next.styles.get(universalVariables(name)), options);
 
       // Check if the variable is inherited
       if (value === undefined) {
         for (const inherited of inheritedVariables) {
           if (name in inherited) {
-            value = resolveValue(next, inherited[name], options);
+            value = resolveValue(inherited[name], options);
             if (value !== undefined) {
               break;
             }
@@ -156,15 +152,17 @@ export function buildStyles(
    * If we had a transition style that was removed,
    * we need to transition back to the default value
    */
-  for (let transition of options.previousTransitions) {
-    const transitionFn = getTransitionSideEffect(next, previous, transition);
+  if (options.previousTransitions) {
+    for (let transition of options.previousTransitions) {
+      const transitionFn = getTransitionSideEffect(next, previous, transition);
 
-    if (transitionFn) {
-      if (typeof transition !== "string") {
-        transition = transition[transition.length - 1];
+      if (transitionFn) {
+        if (typeof transition !== "string") {
+          transition = transition[transition.length - 1];
+        }
+        next.styles.sideEffects ??= [];
+        next.styles.sideEffects.push(transitionFn(defaultValues[transition]));
       }
-      next.styles.sideEffects ??= [];
-      next.styles.sideEffects.push(transitionFn(defaultValues[transition]));
     }
   }
 
@@ -214,7 +212,7 @@ function applyStyles(
               value = {};
               delayedStyles.push(() => {
                 const placeholder = value;
-                value = resolveValue(next, originalValue, options);
+                value = resolveValue(originalValue, options);
                 if (transitionFn) {
                   next.styles.sideEffects ??= [];
                   next.styles.sideEffects.push(transitionFn(value));
@@ -223,7 +221,7 @@ function applyStyles(
                 }
               });
             } else {
-              value = resolveValue(next, value, options);
+              value = resolveValue(value, options);
             }
           }
 
@@ -235,7 +233,7 @@ function applyStyles(
             next.styles.baseStyles ??= {};
             setBaseValue(next.styles.baseStyles, propPath);
 
-            options.previousTransitions.delete(propPath);
+            options.previousTransitions?.delete(propPath);
           } else {
             props = setValue(props, propPath, value, next);
           }
@@ -254,7 +252,7 @@ function applyStyles(
 
                 next.styles.baseStyles ??= {};
                 next.styles.baseStyles[key] = defaultValues[key];
-                options.previousTransitions.delete(key);
+                options.previousTransitions?.delete(key);
               }
             }
           }

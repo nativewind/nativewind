@@ -105,3 +105,64 @@ test("updating animation", () => {
     marginTop: "25%",
   });
 });
+
+test("parsable shorthand animation", () => {
+  registerCSS(`
+    .animation-slide-in {
+      animation: slide-in 1s;
+    }
+
+    @keyframes slide-in {
+      from {
+        margin-left: 100%;
+      }
+
+      to {
+        margin-left: 0%;
+      }
+    }
+  `);
+
+  render(<View testID={testID} className="animation-slide-in" />);
+
+  expect(screen.getByTestId(testID)).toHaveAnimatedStyle({
+    marginLeft: "100%",
+  });
+
+  jest.advanceTimersByTime(1000);
+
+  expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({
+    marginLeft: "0%",
+  });
+});
+
+test("unparsable shorthand animation", () => {
+  registerCSS(`
+    .animation-slide-in {
+      --animation-name: slide-in;
+      animation: var(--animation-name) 1s;
+    }
+
+    @keyframes slide-in {
+      from {
+        margin-left: 100%;
+      }
+
+      to {
+        margin-left: 0%;
+      }
+    }
+  `);
+
+  render(<View testID={testID} className="animation-slide-in" />);
+
+  expect(screen.getByTestId(testID)).toHaveAnimatedStyle({
+    marginLeft: "100%",
+  });
+
+  jest.advanceTimersByTime(1000);
+
+  expect(getAnimatedStyle(screen.getByTestId(testID))).toEqual({
+    marginLeft: "0%",
+  });
+});

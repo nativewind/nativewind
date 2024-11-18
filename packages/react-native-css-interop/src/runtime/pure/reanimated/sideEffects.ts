@@ -1,8 +1,12 @@
+import { RuntimeFunction } from "test";
+
+import { VariableContextValue } from "../contexts";
 import type { Declarations } from "../declarations";
-import { animationFamily } from "../globals";
+import { animationFamily, rootVariables, universalVariables } from "../globals";
+import { ResolveOptions, resolveValue } from "../resolvers";
 import type { ConfigReducerState } from "../state/config";
 import type { StateWithStyles } from "../styles";
-import type { SideEffectTrigger } from "../types";
+import type { SideEffectTrigger, StyleValueDescriptor } from "../types";
 import { getValue } from "../utils/properties";
 import type {
   AnimationAttributes,
@@ -18,9 +22,12 @@ import type {
  */
 export function buildAnimationSideEffects(
   next: Declarations,
-  previous?: Declarations,
+  previous: Declarations | undefined,
+  inheritedVariables: VariableContextValue,
 ) {
   if (!next.animation) return next;
+
+  let variables: Record<string, StyleValueDescriptor>;
 
   const {
     n: names = defaultAnimation.n,
@@ -28,7 +35,25 @@ export function buildAnimationSideEffects(
     de: delays = defaultAnimation.du,
     e: baseEasingFuncs = defaultAnimation.e,
     i: iterationList = defaultAnimation.i,
-  } = Object.assign({}, ...next.animation) as AnimationAttributes;
+  } = next.animation.reduce((acc, current) => {
+    if (current.length === 1) {
+      return Object.assign(acc, current[0]);
+    }
+
+    if (next.variables) {
+      variables = Object.fromEntries(next.variables.flat(1));
+    }
+
+    const shorthandAttributes = getAnimationAttributes(
+      current[1],
+      next,
+      variables,
+      inheritedVariables,
+    );
+
+    // Make sure more specific attributes override the shorthand
+    return Object.assign(acc, shorthandAttributes, current[0]);
+  }, {} as Partial<AnimationAttributes>);
 
   if (!names.length) return next;
 
@@ -337,4 +362,55 @@ export function getTransitionSideEffect(
       );
     };
   };
+}
+
+function getAnimationAttributes(
+  func: RuntimeFunction,
+  next: Declarations,
+  variables: Record<string, StyleValueDescriptor>,
+  inheritedVariables: VariableContextValue,
+) {
+  const options: ResolveOptions = {
+    castToArray: true,
+    getVariable(name) {
+      let value = resolveValue(variables?.[name], options);
+
+      // If the value is already defined, we don't need to look it up
+      if (value !== undefined) {
+        return value;
+      }
+
+      // Is there a universal variable?
+      value = resolveValue(next.get(universalVariables(name)), options);
+
+      // Check if the variable is inherited
+      if (value === undefined) {
+        for (const inherited of inheritedVariables) {
+          if (name in inherited) {
+            value = resolveValue(inherited[name], options);
+            if (value !== undefined) {
+              break;
+            }
+          }
+        }
+
+        /**
+         * Create a rerender guard incase the variable changes
+         */
+        next.guards?.push({
+          type: "variable",
+          name: name,
+          value,
+        });
+      }
+
+      // This is a bit redundant as inheritedVariables probably is rootVariables,
+      // but this ensures a subscription is created for Fast Refresh
+      value ??= next.get(rootVariables(name));
+
+      return value;
+    },
+  };
+
+  return Object.fromEntries(resolveValue(func, options));
 }

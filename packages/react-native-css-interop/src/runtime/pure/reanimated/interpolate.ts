@@ -12,15 +12,9 @@ export function applyAnimation(
   const sharedValues = state.declarations?.sharedValues;
   if (!sharedValues) return styles;
 
-  const animationNames = state.declarations?.animation?.findLast((value) =>
-    Boolean(value.n),
-  )?.n;
-
-  if (!animationNames) return styles;
-
   const sharedValueIO: SharedValueInterpolation[] = [];
 
-  for (const name of animationNames) {
+  for (const name of sharedValues.keys()) {
     if (name === "none") {
       continue;
     }
@@ -44,7 +38,7 @@ export function applyAnimation(
 
       const values = [];
       for (const value of interpolation[2]) {
-        values.push(resolveValue(state, value, options));
+        values.push(resolveValue(value, options));
       }
 
       animationInterpolation.push([
