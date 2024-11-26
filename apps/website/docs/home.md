@@ -79,7 +79,7 @@ export function MyText({ bold, italic, lineThrough, ...props }) {
 
 ## Manually styling components via `cssInterop()` and `remapProps()`
 
-By default NativeWind maps `className`->`style`, but it can handle the mapping of complex components. If you'd like to manually wrap a component, you can use `cssInterop()` [docs](). If you run into any performance issues, we suggest trying out `remapProps()`. While less robust in its coverage, it should lead to improved performance.
+By default NativeWind maps `className`->`style`, but it can handle the mapping of complex components. If you'd like to manually wrap a component, you can use `cssInterop()` [docs](../api/css-interop). If you run into any performance issues, we suggest trying out `remapProps()`. While less robust in its coverage, it should lead to improved performance.
 
 ```tsx
 remapProps(FlatList, {
