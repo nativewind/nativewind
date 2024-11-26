@@ -47,6 +47,7 @@ const sidebars = {
         "guides/third-party-components",
         "guides/themes",
         "guides/editor-setup",
+        "guides/component-libraries"
       ],
     },
     {

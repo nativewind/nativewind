@@ -10,6 +10,12 @@ custom_edit_url: null
 
 ## What is NativeWind?
 
+Do you like using Tailwind CSS to style your apps? This helps you do that in React Native. NativeWind is not a component library, it's a styling library. If you're looking for component libraries that support NativeWind, see [Component Libraries](../guides/component-libraries).
+
+NativeWind makes sure you're using the best styling engine for any given platform (e.g. CSS StyleSheet on web and StyleSheet.create for native). It's primary goal is to provide a consistent styling experience across all platforms via robust coverage of Tailwind CSS. We believe that this is at the core of an exceptional developer experience. As we begin to wrap up this robust coverage, we have begun focus on our secondary goal, component performance.
+
+NativeWind processes your styles during your application's build step and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
+
 NativeWind allows you to use [Tailwind CSS](https://tailwindcss.com) to style your components in React Native. Styled components can be shared between all React Native platforms, using the best style engine for that platform; CSS StyleSheet on web and StyleSheet.create for native. It's goals are to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
 
 On native platforms, NativeWind performs two functions. First, at build time, it compiles your Tailwind CSS styles into `StyleSheet.create` objects and determines the conditional logic of styles (e.g. hover, focus, active, etc). Second, it has an efficient runtime system that applies the styles to your components. This means you can use the full power of Tailwind CSS, including media queries, container queries, and custom values, while still having the performance of a native style system.
@@ -18,45 +24,33 @@ On web, NativeWind is a small polyfill for adding `className` support to React N
 
 ## Key Features
 
-🌐 **Universal** Uses the best style system for each platform.
+🌐 **Universal** - Uses the best styling engine for each platform - CSS StyleSheet on web, StyleSheet.create for native
 
-🖥️ **DevUX** Plugins for simple setup and improving intellisense support
+🖥️ **Developer UX** - Simple setup with plugins for improved intellisense support and automatic TypeScript configuration
 
-✨ **Media & Container queries** Use modern mobile styling features like media and container queries [(docs)](../core-concepts/states#hover-focus-and-active)
+🎨 **CSS Variables** - Create themes, sub-themes and dynamic styles using CSS custom properties (variables) that work across platforms
 
-👪 **Custom values (CSS Variables)** Create themes, sub-themes and dynamic styles using custom values
+✨ **Robust Animations** - Full support for Tailwind's animation classes and custom keyframe animations via react-native-reanimated
+
+🔄 **Transitions** - Smooth transitions between style states, including dark mode changes and dynamic updates
+
+👪 **Tailwind Groups & Parent State** - Style children based on parent state using Tailwind's group syntax and modifiers [(docs)](../core-concepts/states#hover-focus-and-active#styling-based-on-parent-state)
+
+📱 **Media & Container Queries** - Responsive styles using modern mobile features like media and container queries [(docs)](../core-concepts/states#hover-focus-and-active)
 
 ✨ **Pseudo classes** hover / focus / active on compatible components [(docs)](../core-concepts/states#hover-focus-and-active)
 
-👪 **Parent state styles** automatically style children based upon parent pseudo classes [(docs)](../core-concepts/states#hover-focus-and-active#styling-based-on-parent-state)
+📏 **rem Support** - Use `rem` units consistently across platforms with automatic conversion
 
-🔥 **Lots of other features**
+🔍 **Dot Notation Support** - Access nested style properties using familiar dot notation
 
-- dark mode
-- arbitrary classes
-- platform selectors
-- plugins
-
-## How is this different StyleSheet.create?
-
-A full featured style system should have
-
-- Static styles
-- UI state styles (active, hover, focus, etc)
-- Responsive styles (media queries, dynamic units)
-- Container queries (styling based upon parent appearance)
-- Device state styles (orientation, color scheme)
-- Use the best rendering engine available
-
-React Native's StyleSheet system only provides static styles, with other features left for the user to implement. By using NativeWind you can focus on writing your system instead of building your own custom style system.
-
-On the web, it avoids injecting a StyleSheet at runtime by reusing the existing Tailwind CSS stylesheet, allowing you to use Server Side Rendering and much better initial page load performance.
+🎯 **Custom CSS** - Write custom CSS that gets compiled to native styles while preserving performance
 
 ## In action
 
 NativeWind handles both the Tailwind CSS compilation and the runtime styles. It works via a JSX transform, meaning there is no need for custom wrappers/boilerplate.
 
-As all React components are transformed with JSX, it works with 3rd party modules.
+As all React components are transformed with JSX, it works with 3rd party modules. This assumes that the 3rd party module in question allows you to pass through the `className` prop.
 
 ```tsx
 import { CustomText } from "third-party-text-component";
@@ -67,7 +61,7 @@ export function BoldText(props) {
 }
 ```
 
-Styling can by dynamic and you can perform conditional logic and built up complex style objects.
+Styling can by dynamic and you can perform conditional logic and build up complex style objects.
 
 ```tsx
 import { Text } from "react-native";
@@ -83,7 +77,9 @@ export function MyText({ bold, italic, lineThrough, ...props }) {
 }
 ```
 
-By default NativeWind maps `className`->`style`, but it can handle the mapping of complex components.
+## Manually styling components via `cssInterop()` and `remapProps()`
+
+By default NativeWind maps `className`->`style`, but it can handle the mapping of complex components. If you'd like to manually wrap a component, you can use `cssInterop()` [docs](). If you run into any performance issues, we suggest trying out `remapProps()`. While less robust in its coverage, it should lead to improved performance.
 
 ```tsx
 remapProps(FlatList, {
