@@ -2,7 +2,7 @@
 
 A Solito project is typically two separate applications that share a monorepo (typically an Expo and a Next.js application)
 
-You will need setup each project individually. We recommend using the [Babel Plugin](../guides/babel) for your native app and [Next.js via Babel](./nextjs) for your Next.js app.
+You will need to setup each project individually. We recommend using the [Babel Plugin](../guides/babel) for your native app and [Next.js via Babel](./nextjs) for your Next.js app.
 
 You can also spin up a [Solito](http://solito.dev) project with the setup already done:
 
