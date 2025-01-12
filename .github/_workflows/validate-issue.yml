@@ -1,0 +1,65 @@
+name: Validate Bug Report
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  validate-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for reproduction link
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const reproductionKeywords = [
+              'stackblitz.com',
+              'github.com'
+            ];
+
+            const issueBody = context.payload.issue.body.toLowerCase();
+            const hasReproduction = reproductionKeywords.some(keyword =>
+              issueBody.includes(keyword)
+            );
+
+            if (!hasReproduction) {
+              const issueNumber = context.payload.issue.number;
+              const commentBody = `
+                👋 Hi, thanks for opening this issue! However, it seems that you did not include a reproduction link.
+
+                Please update your issue with one of the following:
+                - **StackBlitz template**: [NativeWind Test on StackBlitz](https://stackblitz.com/edit/nativewind-test?view=editor)
+                - **GitHub repo link**: A repository demonstrating the issue.
+
+                Issues without reproductions will not be reviewed and are automatically closed. You can refer to our [contribution guide](https://github.com/nativewind/nativewind/blob/main/contributing.md#opening-an-issue) for more information.
+
+                If you have additional details, feel free to re-open the issue after providing a valid reproduction link.
+
+                If you have a usage question, please use the [Discord](https://discord.gg/nativewind) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions) instead.
+              `;
+
+              // Post the comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: commentBody
+              });
+
+              // Add a 'needs reproduction' label
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                labels: ['needs reproduction']
+              });
+
+              // Close the issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                state: 'closed'
+              });
+            }
