@@ -14,7 +14,7 @@ jobs:
         with:
           script: |
             const excludeLinks = [
-              'github.com/nativewind/',
+              'https://github.com/nativewind/',
               'https://stackblitz.com/edit/nativewind-test?view=editor'
             ];
 
@@ -23,36 +23,25 @@ jobs:
               'github.com'
             ];
 
-            const issueBody = context.payload.issue.body.toLowerCase();
+            const issueBody = context.payload.issue.body || '';
+            const issueBodyLower = issueBody.toLowerCase();
             
             // Check if the issue contains any of the excluded links only
             const hasOnlyExcludedLinks = excludeLinks.every(link => 
-              !issueBody.includes(link.toLowerCase()) || 
+              !issueBodyLower.includes(link.toLowerCase()) || 
               reproductionKeywords.every(keyword => 
-                issueBody.indexOf(keyword) === issueBody.indexOf(link.toLowerCase())
+                issueBodyLower.indexOf(keyword) === issueBodyLower.indexOf(link.toLowerCase())
               )
             );
 
             // Check if there's a valid reproduction link
             const hasReproduction = reproductionKeywords.some(keyword =>
-              issueBody.includes(keyword)
+              issueBodyLower.includes(keyword)
             );
 
             if (!hasReproduction || hasOnlyExcludedLinks) {
               const issueNumber = context.payload.issue.number;
-              const commentBody = `
-                👋 Hi, thanks for opening this issue! However, it seems that you did not include a reproduction link.
-
-                Please update your issue with one of the following:
-                - **StackBlitz template**: [NativeWind Test on StackBlitz](https://stackblitz.com/edit/nativewind-test?view=editor)
-                - **GitHub repo link**: A repository demonstrating the issue.
-
-                Issues without reproductions will not be reviewed and are automatically closed. You can refer to our [contribution guide](https://github.com/nativewind/nativewind/blob/main/contributing.md#opening-an-issue) for more information.
-
-                If you have additional details, feel free to re-open the issue after providing a valid reproduction link.
-
-                If you have a usage question, please use the [Discord](https://discord.gg/nativewind) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions) instead.
-              `;
+              const commentBody = `👋 Hi, thanks for opening this issue! However, it seems that you did not include a reproduction link.\n\nPlease update your issue with one of the following:\n- **StackBlitz template**: [NativeWind Test on StackBlitz](https://stackblitz.com/edit/nativewind-test?view=editor)\n- **GitHub repo link**: A repository demonstrating the issue.\n\nIssues without reproductions will not be reviewed and are automatically closed. You can refer to our [contribution guide](https://github.com/nativewind/nativewind/blob/main/contributing.md#opening-an-issue) for more information.\n\nIf you have additional details, feel free to re-open the issue after providing a valid reproduction link.\n\nIf you have a usage question, please use the [Discord](https://discord.gg/nativewind) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions) instead.`;
 
               // Post the comment
               await github.rest.issues.createComment({
