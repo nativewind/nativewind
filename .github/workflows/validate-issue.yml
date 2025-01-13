@@ -13,17 +13,32 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const excludeLinks = [
+              'github.com/nativewind/',
+              'https://stackblitz.com/edit/nativewind-test?view=editor'
+            ];
+
             const reproductionKeywords = [
               'stackblitz.com',
               'github.com'
             ];
 
             const issueBody = context.payload.issue.body.toLowerCase();
+            
+            // Check if the issue contains any of the excluded links only
+            const hasOnlyExcludedLinks = excludeLinks.every(link => 
+              !issueBody.includes(link.toLowerCase()) || 
+              reproductionKeywords.every(keyword => 
+                issueBody.indexOf(keyword) === issueBody.indexOf(link.toLowerCase())
+              )
+            );
+
+            // Check if there's a valid reproduction link
             const hasReproduction = reproductionKeywords.some(keyword =>
               issueBody.includes(keyword)
             );
 
-            if (!hasReproduction) {
+            if (!hasReproduction || hasOnlyExcludedLinks) {
               const issueNumber = context.payload.issue.number;
               const commentBody = `
                 👋 Hi, thanks for opening this issue! However, it seems that you did not include a reproduction link.
