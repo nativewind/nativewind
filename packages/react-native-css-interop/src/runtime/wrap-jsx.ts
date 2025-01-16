@@ -20,7 +20,7 @@ export default function wrapJSX(jsx: JSXFunction): JSXFunction {
 
     type = maybeHijackSafeAreaProvider(type);
 
-    // You can disable the css interop by setting `cssInterop` to false
+    // You can disable the css interop by setting `cssInterop` to false or pass the `style` prop as a function
     if (props && (props.cssInterop === false || props.style === "function")) {
       delete props.cssInterop;
     } else {
