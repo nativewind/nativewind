@@ -37,6 +37,6 @@ React Native's `<Text />` renders with a `fontSize: 14`, while the web's default
 
 ## Color Opacity
 
-For performance reasons, NativeWind renders with the `corePlugins`: `textOpacity`,`borderOpacity`, `divideOpacity` and `backgroundOpacity` disabled. Theses plugin allows colors to dynamically changed via CSS variables. Instead, the opacity is set as a static value in the `color` property.
+For performance reasons, NativeWind renders with the `corePlugins`: `textOpacity`,`borderOpacity`, `divideOpacity` and `backgroundOpacity` disabled. These plugins allow colors to be dynamically changed via CSS variables. Instead, the opacity is set as a static value in the `color` property.
 
 If you require this functionality, you can enable the disabled plugins in your `tailwind.config.js` file.
