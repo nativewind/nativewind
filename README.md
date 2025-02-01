@@ -33,7 +33,7 @@ Alternatively, you can create a new pre-configured project via our Quickstart op
 
 You can get started with any of the following options:
 
-- [Create Expo Stack](https://rn.new): `npx create-expo-stack@latest --nativewind`
+- [Create Expo Stack](https://createexpostack.com): `npx create-expo-stack@latest --nativewind`
 - ~~[Create Expo App](https://expo.new): `npx create-expo-app -e with-nativewind`~~ (being fixed to work with v4)
 
 ## Features
