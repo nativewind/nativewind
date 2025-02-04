@@ -112,7 +112,7 @@ This multi-platform library focuses on achieving native feel for each individual
 
 This open source library offers universal [shadcn/ui](https://ui.shadcn.com) via React Native. Use this as a foundation to develop your own high-quality component library.
 
-### [GluestackUI v2](https://gluestack.io)
+### [gluestack](https://gluestack.io)
 
 From the folks that brought you NativeBase, this library offers customizable cross-platform components designed to look & behave cleanly on every platform.
 
