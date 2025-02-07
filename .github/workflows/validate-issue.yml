@@ -23,21 +23,38 @@ jobs:
               'github.com'
             ];
 
+            // Helper function to get the base URL without query parameters or fragments
+            function getBaseUrl(url) {
+              try {
+                const parsedUrl = new URL(url);
+                return `${parsedUrl.origin}${parsedUrl.pathname}`;
+              } catch {
+                return url;
+              }
+            }
+
             const issueBody = context.payload.issue.body || '';
             const issueBodyLower = issueBody.toLowerCase();
+
+            // Extract base URLs for comparison
+            const issueLinks = issueBodyLower.match(/https?:\/\/[^\s)]+/g) || [];
+            const issueBaseLinks = issueLinks.map(getBaseUrl);
+
+            // Extract base URLs from excluded links
+            const excludedBaseLinks = excludeLinks.map(getBaseUrl.toLowerCase());
             
             // Check if the issue contains any of the excluded links only
-            const hasOnlyExcludedLinks = excludeLinks.every(link => 
-              !issueBodyLower.includes(link.toLowerCase()) || 
-              reproductionKeywords.every(keyword => 
-                issueBodyLower.indexOf(keyword) === issueBodyLower.indexOf(link.toLowerCase())
-              )
+            const hasOnlyExcludedLinks = issueBaseLinks.every(link =>
+              excludedBaseLinks.includes(link)
             );
 
             // Check if there's a valid reproduction link
             const hasReproduction = reproductionKeywords.some(keyword =>
-              issueBodyLower.includes(keyword)
+              issueBaseLinks.some(link => link.includes(keyword))
             );
+
+            console.log('hasReproduction: ', hasReproduction);
+            console.log('hasOnlyExcludedLinks: ', hasOnlyExcludedLinks);
 
             if (!hasReproduction || hasOnlyExcludedLinks) {
               const issueNumber = context.payload.issue.number;
