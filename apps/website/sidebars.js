@@ -30,9 +30,7 @@ const sidebars = {
       label: "Getting Started",
       collapsed: false,
       items: [
-        "getting-started/react-native",
-        "getting-started/expo-router",
-        "getting-started/nextjs",
+        "getting-started/installation",
         "getting-started/typescript",
         "getting-started/other-bundlers",
       ],
