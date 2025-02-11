@@ -51,7 +51,7 @@ import CodeBlock from "@theme/CodeBlock";
         .join("\n")}
     </CodeBlock>
   </TabItem>
-  {props.supportsExpo && (
+  {props.framework === 'expo' && (
     <TabItem value="expo" label="Expo">
       <CodeBlock language="bash">
         {[
