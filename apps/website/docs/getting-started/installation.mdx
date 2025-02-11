@@ -14,23 +14,23 @@ NativeWind works with both Expo and framework-less React Native projects but Exp
 
 :::
 
-:::tip
-
-If you'd like to skip manual setup and use NativeWind with Expo, you can use the following command to initialize a new Expo project with NativeWind and Tailwind CSS.
-
-```bash
-npx create-expo-stack@latest --nativewind
-```
-
-:::
-
 <Tabs groupId="framework">
   <TabItem value="Expo SDK 50+" label="Expo SDK 50+">
-    ## Installation
+    :::tip
+
+      If you'd like to skip manual setup and use NativeWind with Expo, you can use the following command to initialize a new Expo project with NativeWind and Tailwind CSS.
+
+      ```bash
+      npx create-expo-stack@latest --nativewind
+      ```
+
+    :::
+
+    ## Manual Installation
 
     ### 1. Install NativeWind
 
-    <Install supportsExpo />
+    <Install framework="expo" />
 
     ### 2. Setup Tailwind CSS
 
@@ -90,11 +90,12 @@ npx create-expo-stack@latest --nativewind
     Please follow the [TypeScript guide](./typescript).
   </TabItem>
   <TabItem value="Expo SDK 49" label="Expo SDK 49">
-    ## Installation
+
+    ## Manual Installation
 
     ### 1. Install NativeWind
 
-    <Install supportsExpo />
+    <Install framework="expo" />
 
     ### 2. Setup Tailwind CSS
 
@@ -159,13 +160,13 @@ npx create-expo-stack@latest --nativewind
     Please follow the [TypeScript guide](./typescript).
   </TabItem>
   <TabItem value="Framework-less" label="Framework-less">
-    ## Installation
+    ## Manual Installation
 
     Before installing NativeWind, you will need to [initialize your project with the React Native Community CLI](https://reactnative.dev/docs/getting-started-without-a-framework).
 
     ### 1. Install NativeWind
 
-    <Install />
+    <Install framework="framework-less" />
 
     Run `pod-install` to finish installation of `react-native-reanimated`
 
@@ -175,7 +176,36 @@ npx create-expo-stack@latest --nativewind
 
     ### 2. Setup Tailwind CSS
 
-    <Tailwind />
+    Run `npx tailwindcss init` to create a `tailwind.config.js` file
+
+    Add the paths to all of your component files in your tailwind.config.js file.
+
+    ```js title="tailwind.config.js"
+    /** @type {import('tailwindcss').Config} */
+    module.exports = {
+      // NOTE: Update this to include the paths to all of your component files.
+      content: ["./App.{js,jsx,ts,tsx}"],
+      presets: [require("nativewind/preset")],
+      theme: {
+        extend: {},
+      },
+      plugins: [],
+    }
+    ```
+
+    Create a CSS file and add the Tailwind directives
+
+    ```css title="global.css"
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+    ```
+
+    :::info
+
+    From here onwards, replace `./global.css` with the relative path to the CSS file you just created
+
+    :::
 
     ### 3. Add the Babel preset
 
@@ -201,7 +231,7 @@ npx create-expo-stack@latest --nativewind
 
     ### 5. Import your CSS file
 
-    ```js title="App.js"
+    ```js title="App.tsx"
     import "./global.css"
 
     export default App() {
@@ -209,26 +239,11 @@ npx create-expo-stack@latest --nativewind
     }
     ```
 
-    ### 6. Modify your `app.json` (Expo only)
-
-    Switch the bundler to use the [Metro bundler](https://docs.expo.dev/guides/customizing-metro/#web-support)
-
-    ```js
-    {
-      "expo": {
-        "web": {
-          "bundler": "metro"
-        }
-      }
-    }
-    ```
-
-    ### 7. TypeScript (optional)
-
-    Please follow the [TypeScript guide](./typescript).
+    ### 6. TypeScript
+    By default, the React Native Community CLI includes TypeScript support. Subsequently, you will need to follow the [TypeScript guide](./typescript) to finish setting up NativeWind in your project.
   </TabItem>
   <TabItem value="Next.js" label="Next.js">
-    ## Installation
+    ## Manual Installation
 
     NativeWind can be used in a Next.js project that is already configured to use Expo or framework-less React Native Web.
 

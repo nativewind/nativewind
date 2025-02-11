@@ -3,11 +3,11 @@ import NPM from "../_npm.mdx";
 You will need to install `nativewind` and it's peer dependencies `tailwindcss`, `react-native-reanimated` and `react-native-safe-area-context`
 
 <NPM
-  supportsExpo={props.supportsExpo}
+  framework={props.framework === 'expo'}
   deps={[
     "nativewind",
     "tailwindcss",
-    "react-native-reanimated",
+    props.framework === 'framework-less' ? 'react-native-reanimated' : 'react-native-reanimated@3.16.2',
     "react-native-safe-area-context",
   ]}
 />
