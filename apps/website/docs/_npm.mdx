@@ -51,4 +51,18 @@ import CodeBlock from "@theme/CodeBlock";
         .join("\n")}
     </CodeBlock>
   </TabItem>
+  {props.supportsExpo && (
+    <TabItem value="expo" label="Expo">
+      <CodeBlock language="bash">
+        {[
+          props.deps?.length ? `npx expo install ${props.deps.join(" ")}` : undefined,
+          props.devDeps?.length
+            ? `npx expo install -D ${props.devDeps.join(" ")}`
+            : undefined,
+        ]
+          .filter(Boolean)
+          .join("\n")}
+      </CodeBlock>
+    </TabItem>
+  )}
 </Tabs>
