@@ -124,7 +124,7 @@ Styles can be conditional based upon a component's or the app's state. The condi
 
 ### Child Styles
 
-For all styles are for the component, some are for it's children.
+For all styles are for the component, some are for its children.
 
 ```tsx
 <Text class="divide-x" />;
