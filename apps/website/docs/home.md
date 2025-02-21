@@ -12,11 +12,11 @@ custom_edit_url: null
 
 Do you like using Tailwind CSS to style your apps? This helps you do that in React Native. NativeWind is not a component library, it's a styling library. If you're looking for component libraries that support NativeWind, see [Component Libraries](../guides/component-libraries).
 
-NativeWind makes sure you're using the best styling engine for any given platform (e.g. CSS StyleSheet on web and StyleSheet.create for native). It's primary goal is to provide a consistent styling experience across all platforms via robust coverage of Tailwind CSS. We believe that this is at the core of an exceptional developer experience. As we begin to wrap up this robust coverage, we have begun focus on our secondary goal, component performance.
+NativeWind makes sure you're using the best styling engine for any given platform (e.g. CSS StyleSheet on web and StyleSheet.create for native). Its primary goal is to provide a consistent styling experience across all platforms via robust coverage of Tailwind CSS. We believe that this is at the core of an exceptional developer experience. As we begin to wrap up this robust coverage, we have begun focus on our secondary goal, component performance.
 
 NativeWind processes your styles during your application's build step and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
 
-NativeWind allows you to use [Tailwind CSS](https://tailwindcss.com) to style your components in React Native. Styled components can be shared between all React Native platforms, using the best style engine for that platform; CSS StyleSheet on web and StyleSheet.create for native. It's goals are to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
+NativeWind allows you to use [Tailwind CSS](https://tailwindcss.com) to style your components in React Native. Styled components can be shared between all React Native platforms, using the best style engine for that platform; CSS StyleSheet on web and StyleSheet.create for native. Its goals are to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
 
 On native platforms, NativeWind performs two functions. First, at build time, it compiles your Tailwind CSS styles into `StyleSheet.create` objects and determines the conditional logic of styles (e.g. hover, focus, active, etc). Second, it has an efficient runtime system that applies the styles to your components. This means you can use the full power of Tailwind CSS, including media queries, container queries, and custom values, while still having the performance of a native style system.
 
