@@ -33,6 +33,7 @@ const sidebars = {
         "getting-started/installation",
         "getting-started/typescript",
         "getting-started/other-bundlers",
+        "getting-started/using-with-monorepos",
       ],
     },
     {
@@ -45,7 +46,7 @@ const sidebars = {
         "guides/third-party-components",
         "guides/themes",
         "guides/editor-setup",
-        "guides/component-libraries"
+        "guides/component-libraries",
       ],
     },
     {
