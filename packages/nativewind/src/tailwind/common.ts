@@ -20,3 +20,7 @@ export const allowedColors = ({ colors }: any) => {
   }
   return _colors;
 };
+
+export const isWeb =
+  process.env.NATIVEWIND_OS === undefined ||
+  process.env.NATIVEWIND_OS === "web";

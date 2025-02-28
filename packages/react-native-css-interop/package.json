@@ -1,5 +1,5 @@
 {
-  "version": "0.0.36",
+  "version": "0.1.22",
   "name": "react-native-css-interop",
   "description": "",
   "main": "dist/index",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/marklawlor/nativewind.git"
+    "url": "git+https://github.com/marklawlor/nativewind.git"
   },
   "author": {
     "name": "Mark Lawlor",
@@ -33,7 +33,7 @@
     "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "lint": "eslint .",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm test",
     "build": "tsc -p tsconfig.build.json",
     "build:watch": "tsc -p tsconfig.build.json -w",
     "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
@@ -43,19 +43,21 @@
     "babel.js",
     "css-to-rn/",
     "dist/",
+    "src/",
     "doctor/",
     "jsx-dev-runtime/",
     "jsx-runtime/",
     "metro/",
-    "testing-library/",
+    "test/",
     "types.d.ts"
   ],
   "dependencies": {
     "@babel/helper-module-imports": "^7.22.15",
     "@babel/traverse": "^7.23.0",
     "@babel/types": "^7.23.0",
-    "babel-plugin-tester": "^11.0.4",
-    "lightningcss": "1.22.0"
+    "debug": "^4.3.7",
+    "lightningcss": "^1.27.0",
+    "semver": "^7.6.3"
   },
   "devDependencies": {
     "@babel/plugin-syntax-jsx": "^7.22.5",
@@ -63,10 +65,11 @@
     "@types/babel__helper-module-imports": "^7.18.1",
     "@types/jest": "^29.5.1",
     "@types/react": "^18.2.14",
+    "babel-plugin-tester": "^11.0.4",
     "metro-react-native-babel-preset": "^0.77.0",
     "react": "^18.2.0",
-    "react-native": "0.73.2",
-    "react-native-reanimated": "~3.6.2"
+    "react-native": "0.75.2",
+    "react-native-reanimated": "3.10.1"
   },
   "peerDependencies": {
     "react": ">=18",

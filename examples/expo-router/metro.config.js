@@ -24,4 +24,7 @@ module.exports = withNativeWind(config, {
   // This is optional
   projectRoot,
   inlineRem: false,
+  features: {
+    transformPercentagePolyfill: true,
+  },
 });

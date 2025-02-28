@@ -1,17 +1,16 @@
+/** @jsxImportSource nativewind */
 import { View } from "react-native";
-import { createMockComponent, renderTailwind } from "../test-utils";
-import { resetStyles } from "react-native-css-interop/testing-library";
+
 import { act, screen } from "@testing-library/react-native";
 import { colorScheme } from "react-native-css-interop";
 
-const testID = "react-native-css-interop";
-const A = createMockComponent(View);
+import { render } from "../test";
 
-beforeEach(() => resetStyles());
+const testID = "react-native-css-interop";
 
 test("Using css variables", async () => {
   // https://tailwindcss.com/docs/customizing-colors#using-css-variables
-  await renderTailwind(<A testID={testID} className="text-primary" />, {
+  await render(<View testID={testID} className="text-primary" />, {
     css: `
       @tailwind base;
       @tailwind components;

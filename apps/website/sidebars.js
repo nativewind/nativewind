@@ -15,6 +15,11 @@
 const sidebars = {
   docs: [
     {
+      type: "doc",
+      id: "home",
+      className: "home",
+    },
+    {
       type: "category",
       label: "Overview",
       collapsed: false,
@@ -25,11 +30,10 @@ const sidebars = {
       label: "Getting Started",
       collapsed: false,
       items: [
-        "getting-started/react-native",
-        "getting-started/expo-router",
-        "getting-started/nextjs",
+        "getting-started/installation",
         "getting-started/typescript",
         "getting-started/other-bundlers",
+        "getting-started/using-with-monorepos",
       ],
     },
     {
@@ -42,6 +46,7 @@ const sidebars = {
         "guides/third-party-components",
         "guides/themes",
         "guides/editor-setup",
+        "guides/component-libraries",
       ],
     },
     {
@@ -50,6 +55,7 @@ const sidebars = {
       collapsed: false,
       items: [
         "core-concepts/tailwindcss",
+        "core-concepts/quirks",
         "core-concepts/states",
         "core-concepts/responsive-design",
         "core-concepts/dark-mode",
@@ -64,7 +70,7 @@ const sidebars = {
         "core-concepts/units",
         "core-concepts/differences",
         "core-concepts/style-specificity",
-        // "tailwind/new-concepts/safe-area-insets",
+        "tailwind/new-concepts/safe-area-insets",
       ],
     },
     {

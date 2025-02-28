@@ -10,61 +10,29 @@ Safe Area Insets are the area of the screen that is not covered by the notch, ho
 
 On native, the safe area measurements are provided by [`react-native-safe-area-context`](https://github.com/th3rdwave/react-native-safe-area-context). You will need to wrap your app with the `SafeAreaProvider` and use the `useSafeAreaEnv` hook to get the safe area insets.
 
-The `useSafeAreaEnv()` object should be added to the style prop of a View or any other `cssInterop` enabled component
-
-The safe area class will only work on the component that has the `useSafeAreaEnv` styles, and any components within its render tree.
-
 ```tsx
 import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useSafeAreaEnv } from "nativewind";
 
 export function MyApp(props) {
   // Make sure you have the SafeAreaProvider at the root of your app
   return (
     <SafeAreaProvider>
-      <SafeAreaEnv {...props} />
+      <View className="p-safe" {...props} />
     </SafeAreaProvider>
   );
-}
-
-function SafeAreaEnv() {
-  // Add the safe area insets to the render tree
-  return <View {...props} style={[style, useSafeAreaEnv()]} />;
-}
-
-// Now you can use the safe area className
-export function MyComponent({ className, ...props }) {
-  return <View className={`p-safe ${className}`} {...props} />;
 }
 ```
 
 :::tip
 
-Expo Router adds the \<SafeAreaProvider /> to every route. You only need to add `useSafeAreaEnv()` to your root layout.
-
-```tsx
-import { View } from "react-native";
-import { Slot } from "expo-router";
-import { useSafeAreaEnv } from "nativewind";
-
-export default function MyLayout() {
-  return (
-    // Add the safe area insets to the render tree
-    <View {...props} style={[style, useSafeAreaEnv()]}>
-      <Slot />
-    </View>
-  );
-}
-```
+Expo Router adds the \<SafeAreaProvider /> to every route. This setup is not needed
 
 :::
 
 ## Usage (web)
 
 On web, your CSS StyleSheet will use the [CSS `env()` function](https://developer.mozilla.org/en-US/docs/Web/CSS/env) and no extra setup is needed.
-
-`useSafeAreaEnv()` returns `undefined` on web.
 
 The `h-screen-safe` and `min-h-screen-safe` utilities may not work as expected on Google Chrome. Add height: `-webkit-fill-available` on parent nodes:
 
@@ -94,130 +62,134 @@ The `h-screen-safe` and `min-h-screen-safe` utilities may not work as expected o
   supported={[
     [
       "m-safe",
-      <code>{`{ 
-  marginTop: env(safe-area-inset-top);
-  marginBottom: env(safe-area-inset-bottom);
-  marginLeft: env(safe-area-inset-left);
-  marginRight: env(safe-area-inset-right);
-}`}</code>,
+      <code>{`\
+margin-top: env(safe-area-inset-top);
+margin-bottom: env(safe-area-inset-bottom);
+margin-left: env(safe-area-inset-left);
+margin-right: env(safe-area-inset-right);
+`}</code>,
     ],
     [
       "p-safe",
-      <code>{`{ 
-  paddingTop: env(safe-area-inset-top);
-  paddingBottom: env(safe-area-inset-bottom);
-  paddingLeft: env(safe-area-inset-left);
-  paddingRight: env(safe-area-inset-right);
-}`}</code>,
+      <code>{`\
+padding-top: env(safe-area-inset-top);
+padding-bottom: env(safe-area-inset-bottom);
+padding-left: env(safe-area-inset-left);
+padding-right: env(safe-area-inset-right);
+`}</code>,
     ],
     [
       "mx-safe",
-      <code>{`{ 
-  marginLeft: env(safe-area-inset-left);
-  marginRight: env(safe-area-inset-right);
-}`}</code>,
+      <code>{`\
+margin-left: env(safe-area-inset-left);
+margin-right: env(safe-area-inset-right);
+`}</code>,
     ],
     [
       "px-safe",
-      <code>{`{ 
-  paddingLeft: env(safe-area-inset-left);
-  paddingRight: env(safe-area-inset-right);
-}`}</code>,
+      <code>{`\
+padding-left: env(safe-area-inset-left);
+padding-right: env(safe-area-inset-right);
+`}</code>,
     ],
     [
       "my-safe",
-      <code>{`{ 
-  marginTop: env(safe-area-inset-top);
-  marginBottom: env(safe-area-inset-bottom);
-}`}</code>,
+      <code>{`\
+margin-top: env(safe-area-inset-top);
+margin-bottom: env(safe-area-inset-bottom);
+`}</code>,
     ],
     [
       "py-safe",
-      <code>{`{ 
-  paddingTop: env(safe-area-inset-top);
-  paddingBottom: env(safe-area-inset-bottom);
-}`}</code>,
+      <code>{`\
+padding-top: env(safe-area-inset-top);
+padding-bottom: env(safe-area-inset-bottom);
+`}</code>,
     ],
     [
       "mt-safe",
-      <code>{`{ 
-  marginTop: env(safe-area-inset-top);
-}`}</code>,
+      <code>{`\
+margin-top: env(safe-area-inset-top);
+`}</code>,
     ],
     [
       "pt-safe",
-      <code>{`{ 
-  paddingTop: env(safe-area-inset-top);
-}`}</code>,
+      <code>{`\
+padding-top: env(safe-area-inset-top);
+`}</code>,
     ],
     [
       "mr-safe",
-      <code>{`{ 
-  marginRight: env(safe-area-inset-top);
-}`}</code>,
+      <code>{`\
+margin-right: env(safe-area-inset-top);
+`}</code>,
     ],
     [
       "pr-safe",
-      <code>{`{ 
-  paddingRight: env(safe-area-inset-top);
-}`}</code>,
+      <code>{`\
+padding-right: env(safe-area-inset-top);
+`}</code>,
     ],
     [
       "mb-safe",
-      <code>{`{ 
-  marginBottom: env(safe-area-inset-top);
-}`}</code>,
+      <code>{`\
+margin-bottom: env(safe-area-inset-top);
+`}</code>,
     ],
     [
       "pb-safe",
-      <code>{`{ 
-  paddingBottom: env(safe-area-inset-top);
-}`}</code>,
+      <code>{`\
+padding-bottom: env(safe-area-inset-top);
+`}</code>,
     ],
     [
       "ml-safe",
-      <code>{`{ 
-  marginLeft: env(safe-area-inset-top);
-}`}</code>,
+      <code>{`\
+margin-left: env(safe-area-inset-top);
+`}</code>,
     ],
     [
       "pl-safe",
-      <code>{`{ 
-  paddingLeft: env(safe-area-inset-top);
-}`}</code>,
+      <code>{`\
+padding-left: env(safe-area-inset-top);
+`}</code>,
     ],
     [
       "*-safe-or-[n]",
       <div>
-        <code>*</code> can be subsitued for any spacing utiltity.
+        <code>*</code> can be substituted for any spacing utility.
         <br />
-        <code>[n]</code> can be subsitued for any spacing value.
-        <code>{`
-// example using mt
-.mt-safe-or-4 = {
-  marginTop: max(env(safe-area-inset-top), 1rem);
-}`}</code>
+        <code>[n]</code> can be substituted for any spacing value.
+        <code>{`\
+// example using mt-safe-or-4
+margin-top: max(env(safe-area-inset-top), 1rem);
+
+// example using mt-safe-or-[2px]
+margin-top: max(env(safe-area-inset-top), 2px);
+`}</code>
       </div>,
     ],
   ]}
   none={[
     [
       "h-screen-safe",
-      <code>{`{
-  height: calc(100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom)))
-}`}</code>,
+      <code>{`\
+height: calc(100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom)))
+`}</code>,
     ],
     [
       "*-safe-offset-[n]",
       <div>
-        <code>*</code> can be subsitued for any spacing utiltity.
+        <code>*</code> can be substituted for any spacing utility.
         <br />
-        <code>[n]</code> can be subsitued for any spacing value.
-        <code>{`
-// example using mt
-.mt-safe-offset-4 = {
-  marginTop: calc(env(safe-area-inset-top) + 1rem);
-}`}</code>
+        <code>[n]</code> can be substituted for any spacing value.
+        <code>{`\
+// example using mt-safe-offset-4
+margin-top: calc(env(safe-area-inset-top) + 1rem);
+
+// example using mt-safe-offset-[2px]
+margin-top: calc(env(safe-area-inset-top) + 2px);
+`}</code>
       </div>,
     ],
   ]}

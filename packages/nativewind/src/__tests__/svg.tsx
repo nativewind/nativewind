@@ -1,16 +1,25 @@
-import { resetStyles } from "react-native-css-interop/testing-library";
-import { testCases } from "../test-utils";
-
-afterEach(() => resetStyles());
+import { renderCurrentTest } from "../test";
 
 describe("SVG - Fill", () => {
-  testCases(["fill-black", { props: { fill: "rgba(0, 0, 0, 1)" } }]);
+  test("fill-black", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { fill: "#000000" },
+    });
+  });
 });
 
 describe("SVG - Stroke", () => {
-  testCases(["stroke-black", { props: { stroke: "rgba(0, 0, 0, 1)" } }]);
+  test("stroke-black", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { stroke: "#000000" },
+    });
+  });
 });
 
 describe("SVG - Stroke Width", () => {
-  testCases(["stroke-1", { props: { strokeWidth: 1 } }]);
+  test("stroke-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { strokeWidth: 1 },
+    });
+  });
 });

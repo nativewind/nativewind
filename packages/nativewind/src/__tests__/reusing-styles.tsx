@@ -1,15 +1,14 @@
+/** @jsxImportSource nativewind */
 import { View } from "react-native";
-import { createMockComponent, renderTailwind } from "../test-utils";
+
 import { screen } from "@testing-library/react-native";
-import { resetStyles } from "react-native-css-interop/testing-library";
+
+import { render } from "../test";
 
 const testID = "react-native-css-interop";
-const A = createMockComponent(View);
-
-beforeEach(() => resetStyles());
 
 test("@apply", async () => {
-  await renderTailwind(<A testID={testID} className="btn-primary" />, {
+  await render(<View testID={testID} className="btn-primary" />, {
     css: `
 @tailwind base;
 @tailwind components;
@@ -26,15 +25,15 @@ test("@apply", async () => {
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    backgroundColor: "rgba(59, 130, 246, 1)",
+    backgroundColor: "#3b82f6",
     borderRadius: 7,
-    color: "rgba(255, 255, 255, 1)",
+    color: "#ffffff",
     fontWeight: "600",
     paddingBottom: 7,
     paddingLeft: 14,
     paddingRight: 14,
     paddingTop: 7,
-    shadowColor: "rgba(0, 0, 0, 0.3490196168422699)",
+    shadowColor: "#00000059",
     shadowOpacity: 1,
     shadowOffset: {
       width: 0,

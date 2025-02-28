@@ -1,16 +1,16 @@
 import plugin from "tailwindcss/plugin";
 
-const isNative = Boolean(process.env.NATIVEWIND_NATIVE);
+import { isWeb } from "./common";
 
 export const verify = plugin(function ({ addBase }) {
-  if (isNative) {
-    addBase({ "@cssInterop set nativewind": "" });
-  } else {
+  if (isWeb) {
     addBase({
       ":root": {
         "--css-interop": "true",
         "--css-interop-nativewind": "true",
       },
     });
+  } else {
+    addBase({ "@cssInterop set nativewind": "true" });
   }
 });

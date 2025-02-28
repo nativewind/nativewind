@@ -1,19 +1,20 @@
 // cSpell:ignore borderless
-import { Config } from "tailwindcss";
 import { AtRule } from "postcss";
-import plugin from "tailwindcss/plugin";
-import { PluginUtils } from "tailwindcss/types/config";
+import { Config } from "tailwindcss";
 import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
 import toColorValue from "tailwindcss/lib/util/toColorValue";
+import plugin from "tailwindcss/plugin";
+import { PluginUtils } from "tailwindcss/types/config";
 
 import { hairlineWidth, platformSelect } from "../theme";
-import { darkModeAtRule } from "./dark-mode";
 import { color } from "./color";
-import { verify } from "./verify";
-import { translateX, translateY } from "./translate";
-import { shadows } from "./shadows";
 import { allowedColors } from "./common";
+import { darkModeAtRule } from "./dark-mode";
+import { safeArea } from "./safe-area";
+import { shadows } from "./shadows";
 import { nativeSwitch } from "./switch";
+import { translateX, translateY } from "./translate";
+import { verify } from "./verify";
 
 const kebabCase = (str: string) => {
   return str.replace(
@@ -149,6 +150,15 @@ const nativePlugins = plugin(function ({
       }),
     },
     { values: theme("lineClamp") },
+  );
+
+  matchUtilities(
+    {
+      elevation: (value) => ({
+        "-rn-elevation": value,
+      }),
+    },
+    { values: theme("elevation") },
   );
 
   addUtilities({
@@ -330,6 +340,7 @@ const preset: Config = {
     },
   },
   plugins: [
+    safeArea,
     color,
     darkModeAtRule,
     shadows,

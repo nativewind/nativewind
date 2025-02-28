@@ -1,3 +1,7 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+
 # Troubleshooting
 
 :::tip
@@ -9,36 +13,13 @@ While troubleshooting, always start your application without the cache!
 
 :::
 
-Before troubleshooting NativeWind, it's crucial to ensure that Tailwind CSS itself is functioning correctly. NativeWind uses the Tailwind CLI to compile your styles, so any issues with Tailwind CLI should be resolved first. You can inspect the Tailwind CSS output at the following location: `node_modules/.cache/nativewind/<input-css-filename>.<platform>.css`, or by simply running `npx tailwindcss --input <input.css>`.
-
-For instance, if you've observed that a custom class `text-brand` isn't behaving as expected. You can proceed as follows:
-
-1. First, ensure that your `tailwind.config.js` has the necessary configurations for the color.
-2. Navigate to `node_modules/.cache/nativewind/<input-css-filename>.<platform>.css` and search for the CSS class `.text-brand {}`
-
-If you cannot locate the `.text-brand` CSS rule, it hints at an issue with your `tailwind.config.js`. To further validate this, run the command
-
-```bash
-npx tailwindcss --input <input.css>
-```
-
-If this output also lacks `.text-brand`, it confirms the misconfiguration.
-
-To troubleshoot Tailwind CSS, refer to their [Troubleshooting Guide](https://tailwindcss.com/docs/content-configuration#troubleshooting).
-
-**Only once you see the expected CSS being generated should you start this troubleshooting guide.**
+Before troubleshooting NativeWind, it's crucial to ensure that Tailwind CSS itself is functioning correctly. NativeWind uses the Tailwind CLI to compile your styles, so any issues with Tailwind CLI should be resolved first. Using the command `npx tailwindcss --input <input.css> --output output.css`, Tailwind CLI will generate an `output.css` file. If you are troubleshooting a class that is not working, ensure that the css rule is present in the `output.css` file.
 
 ## Verifying NativeWind Installation
 
-NativeWind provides a utility function, `verifyInstallation()`, designed to help confirm that the package has been correctly installed.
+NativeWind provides a utility function `verifyInstallation()` designed to help confirm that the package has been correctly installed.
 
-Import the `verifyInstallation` function from the NativeWind package and run within the scope of a React component. **It's crucial to ensure that you do not invoke this function on the global scope.**
-
-:::tip
-
-`verifyInstallation()` will `warn` on success and `error` on failure. If you do not see any output check the function is being executed correctly.
-
-:::
+Import the `verifyInstallation` function from the NativeWind package and run within the scope of a React component. **Do not invoke this function on the global scope**, it should be run within a component.
 
 ```tsx
 import React from 'react';
@@ -55,6 +36,36 @@ function App() {
 
 export default App;
 ```
+
+## Enabling debug mode
+
+NativeWind supports the `DEBUG` environment variable and will output various debug information while your server is running.
+
+<Tabs groupId="Troubleshooting">
+  <TabItem value="osx" label="Mac / Linux">
+    <CodeBlock language="bash">{`DEBUG=nativewind <start-command>`}</CodeBlock>
+  </TabItem>
+  <TabItem value="windows" label="Windows">
+    <CodeBlock language="bash">{`set "DEBUG=nativewind" <start-command>`}</CodeBlock>
+  </TabItem>
+</Tabs>
+
+:::warning
+
+@react-native-community/cli may create multiple terminal sessions. You will need to ensure all sessions have `DEBUG=nativewind` set.
+
+:::
+
+By itself, this information may or may not be useful to you, but it is extremely useful when reporting to the developers on GitHub. You can record the terminal output by redirecting the output to a file.
+
+<Tabs groupId="Troubleshooting">
+  <TabItem value="osx" label="Mac / Linux">
+    <CodeBlock language="bash">{`DEBUG=nativewind script output.log <start-command>`}</CodeBlock>
+  </TabItem>
+  <TabItem value="windows" label="Windows">
+    If you know how to record the terminal command in a one-liner script, please open a PR to add it here.
+  </TabItem>
+</Tabs>
 
 ## Common Issues
 
