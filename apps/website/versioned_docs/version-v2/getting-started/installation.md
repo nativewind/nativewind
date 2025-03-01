@@ -18,7 +18,7 @@ NativeWind works with both Expo and framework-less React Native projects but Exp
   <TabItem value="Expo SDK 50+" label="Expo SDK 50+">
     :::tip
 
-      If you'd like to quickly setup a blank Expo project], you can use the following command.
+      If you'd like to quickly setup a blank Expo project, you can use the following command:
 
       ```bash
       npx create-expo-stack@latest --blank
