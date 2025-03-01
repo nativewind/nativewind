@@ -55,7 +55,7 @@ import { CustomText } from "third-party-text-component";
 
 export function BoldText(props) {
   // You just need to write `className="<your styles>"`
-  return <CustomText className="text-bold" {...props} />;
+  return <CustomText className="font-bold" {...props} />;
 }
 ```
 
