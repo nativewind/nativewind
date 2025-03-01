@@ -45,21 +45,21 @@ You can get started with any of the following options:
 - **jsxImportSourceTransform** only wraps native components, making it lighter and such that the **className** prop is accessible inside your component
 - Respects all tailwind.config.js settings, including **themes, custom values,** and **plugins**
 - Support for
-  - custom CSS properties, aka **CSS Variables**
-  - **dark mode, arbitrary classes,** and **media queries**
-  - **animations** and **transitions**
-  - **container queries**
+  - Custom CSS properties, aka **CSS Variables**
+  - **Dark mode, arbitrary classes,** and **media queries**
+  - **Animations** and **transitions**
+  - **Container queries**
     - `container-type` and style-based container queries are not supported
-  - pseudo classes - **hover / focus / active** on compatible components
+  - Pseudo classes - **hover / focus / active** on compatible components
   - `rem` units
-  - theme functions and nested functions
+  - Theme functions and nested functions
   - React 18 Suspense API
   - Custom CSS
 - Styling based on **parent state modifiers** - automatically style children based upon parent pseudo classes
-  - support for the `group` and `group/<name>` syntax
+  - Support for the `group` and `group/<name>` syntax
 - **Children styles** - create simple layouts based upon parent class
 - Fast and consistent style application via hot reload
-  - includes changes made to `tailwind.config.js`
+  - Includes changes made to `tailwind.config.js`
 
 [More details here](https://www.nativewind.dev/blog/announcement-nativewind-v4#breaking-changes-from-v2)
 
