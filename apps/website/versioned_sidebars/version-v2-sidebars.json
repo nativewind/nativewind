@@ -17,16 +17,11 @@
     },
     {
       "type": "category",
-      "label": "Quick Starts",
+      "label": "Getting Started",
       "collapsed": false,
       "items": [
-        "getting-started/typescript",
-        "quick-starts/expo",
-        "quick-starts/react-native-cli",
-        "quick-starts/create-react-native-app",
-        "quick-starts/nextjs",
-        "quick-starts/solito",
-        "quick-starts/ignite"
+        "getting-started/installation",
+        "getting-started/typescript"
       ]
     },
     {

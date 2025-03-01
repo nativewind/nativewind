@@ -1,0 +1,15 @@
+Run `npx tailwindcss init` to create a `tailwind.config.js` file
+
+Add the paths to all of your component files in your tailwind.config.js file.
+
+```js title="tailwind.config.js"
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  // NOTE: Update this to include the paths to all of your component files.
+  content: ["./App.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
