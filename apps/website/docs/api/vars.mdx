@@ -9,10 +9,11 @@ These page is still under construction.
 ## Overview
 
 `vars` is a function that takes a dictionary of CSS variables and returns a style object that can be used in React Native components.
+It can be used to define new color variables inside that styled view which can be used with tailwind css. The dynamic variable can then be consumed with syntax `text-[--variable-name]`.
 
 ```tsx
 <View style={vars({ '--brand-color': 'red'})}>
-  { // style: { color: 'red' } }
   <Text className="text-[--brand-color]" />
+  { // style: { color: 'red' } will be applied to text }
 </View>
 ```
