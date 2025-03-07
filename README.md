@@ -19,13 +19,13 @@
 
 Do you like using [Tailwind CSS](https://tailwindcss.com) to style your apps? This helps you do that in [React Native](https://reactnative.dev). NativeWind is **not** a component library, it's a styling library. If you're looking for component libraries that support NativeWind, [see below](https://github.com/nativewind/nativewind/tree/%40danstepanov/docs-v4.1?tab=readme-ov-file#what-if-im-looking-for-a-component-library-that-uses-nativewind).
 
-NativeWind makes sure you're using the best style engine for any given platform (e.g. CSS StyleSheet or StyleSheet.create). It's goals are to to provide a consistent styling experience across all platforms, improving developer UX, component performance, and code maintainability.
+NativeWind makes sure you're using the best style engine for any given platform (e.g. CSS StyleSheet or StyleSheet.create). Its goals are to to provide a consistent styling experience across all platforms, improving developer UX, component performance, and code maintainability.
 
 NativeWind processes your styles during your application's build step and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
 
 ## Installation
 
-If you have an existing project, [use these guides](https://www.nativewind.dev/getting-started/react-native) to configure NativeWind for your respective stack.
+If you have an existing project, [use these guides](https://www.nativewind.dev/getting-started/installation) to configure NativeWind for your respective stack.
 
 Alternatively, you can create a new pre-configured project via our Quickstart options, below.
 
@@ -45,21 +45,21 @@ You can get started with any of the following options:
 - **jsxImportSourceTransform** only wraps native components, making it lighter and such that the **className** prop is accessible inside your component
 - Respects all tailwind.config.js settings, including **themes, custom values,** and **plugins**
 - Support for
-  - custom CSS properties, aka **CSS Variables**
-  - **dark mode, arbitrary classes,** and **media queries**
-  - **animations** and **transitions**
-  - **container queries**
+  - Custom CSS properties, aka **CSS Variables**
+  - **Dark mode, arbitrary classes,** and **media queries**
+  - **Animations** and **transitions**
+  - **Container queries**
     - `container-type` and style-based container queries are not supported
-  - pseudo classes - **hover / focus / active** on compatible components
+  - Pseudo classes - **hover / focus / active** on compatible components
   - `rem` units
-  - theme functions and nested functions
+  - Theme functions and nested functions
   - React 18 Suspense API
   - Custom CSS
 - Styling based on **parent state modifiers** - automatically style children based upon parent pseudo classes
-  - support for the `group` and `group/<name>` syntax
+  - Support for the `group` and `group/<name>` syntax
 - **Children styles** - create simple layouts based upon parent class
 - Fast and consistent style application via hot reload
-  - includes changes made to `tailwind.config.js`
+  - Includes changes made to `tailwind.config.js`
 
 [More details here](https://www.nativewind.dev/blog/announcement-nativewind-v4#breaking-changes-from-v2)
 
@@ -84,7 +84,7 @@ It's worth noting that we do not have Github branches that directly correlate to
 # FAQ
 
 ## Is it safe to use v4?
-It's reasonably safe to use the `canary` version save for a known issue with styles being inconsistently applied. This issue is resolved in the `next` version; however, using this dist tag may break your app as it is considered experimental. To see which versions correlate to these dist tags, please refer to [our npm distrbution tags](https://github.com/nativewind/nativewind?tab=readme-ov-file#npm-distribution-tags).
+It's reasonably safe to use the `canary` version save for a known issue with styles being inconsistently applied. This issue is resolved in the `next` version; however, using this dist tag may break your app as it is considered experimental. To see which versions correlate to these dist tags, please refer to [our npm distribution tags](https://github.com/nativewind/nativewind?tab=readme-ov-file#npm-distribution-tags).
 
 ## Is NativeWind moving to Expo?
 
@@ -92,7 +92,7 @@ No. Expo is always exploring ways to handle styles better but NativeWind, as a p
 
 ## Can we disable the change that was done recently to auto-add nativewind types using a setting or something? I already have the settings using `compilerOptions.types`, so I would like to disable the file generation.
 
-Not at the moment. We've found this will cause a long term problem where people "forget" what their type config was doing. They then update their types and break the NativeWind ones. To combat this, we've copied the behavior from other major frameworks which is to handle their types seperately from user specified ones.
+Not at the moment. We've found this will cause a long term problem where people "forget" what their type config was doing. They then update their types and break the NativeWind ones. To combat this, we've copied the behavior from other major frameworks which is to handle their types separately from user specified ones.
 
 In the future, we may add an option like `dangerouslyDisableTypeScriptGeneration` or something verbose to prevent people from using it. We are tired of solving TypeScript issues, particularly ones such as "my types were working and now they aren't."
 

@@ -1,5 +1,5 @@
 import StartCoding from "../\_start-coding-components.md"
-import Dependencies from "../\_dependencies.mdx"
+import NPM from "../\_npm.mdx";
 import Tailwind from "../\_tailwind.mdx"
 
 # Babel (compile only)
@@ -10,7 +10,7 @@ NativeWind provides two methods to style components, the `className` prop (which
 
 ### 1. Install the dependencies
 
-<Dependencies />
+<NPM />
 
 ### 2. Setup Tailwindcss
 

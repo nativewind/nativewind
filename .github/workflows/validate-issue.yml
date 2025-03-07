@@ -41,7 +41,7 @@ jobs:
             const issueBaseLinks = issueLinks.map(getBaseUrl);
 
             // Extract base URLs from excluded links
-            const excludedBaseLinks = excludeLinks.map(getBaseUrl.toLowerCase());
+            const excludedBaseLinks = excludeLinks.map(link => getBaseUrl(link).toLowerCase());
             
             // Check if the issue contains any of the excluded links only
             const hasOnlyExcludedLinks = issueBaseLinks.every(link =>

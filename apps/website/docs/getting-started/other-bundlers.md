@@ -10,7 +10,7 @@ NativeWind provides installation instructions for the two most common React Nati
 
 **Is TailwindCSS setup?**
 
-You can test Tailwind CSS by rendering `<div class="w-10 h-10 bg-red-500" />`. You should see see a red square if setup correctly. Please follow the [Tailwind CSS installation instructions for setup and troubleshooting.](https://tailwindcss.com/docs/installation)
+You can test Tailwind CSS by rendering `<div class="w-10 h-10 bg-red-500" />`. You should see see a red square if setup correctly. Please follow the [Tailwind CSS installation instructions for setup and troubleshooting.](https://v3.tailwindcss.com/docs/installation)
 
 **Is React Native Web setup?**
 

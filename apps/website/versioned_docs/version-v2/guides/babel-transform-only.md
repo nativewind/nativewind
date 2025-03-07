@@ -1,5 +1,5 @@
 import StartCoding from "../\_start-coding.md"
-import Dependencies from "../\_dependencies.mdx"
+import NPM from "../\_npm.mdx";
 import Tailwind from "../\_tailwind.mdx"
 
 # Babel (transform only)
@@ -10,7 +10,7 @@ Some frameworks (eg Next.js) provide an optimized pipeline for their CSS output 
 
 ### 1. Install the dependencies
 
-<Dependencies />
+<NPM />
 
 ### 2. Setup Tailwindcss
 

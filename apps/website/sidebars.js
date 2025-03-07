@@ -30,11 +30,10 @@ const sidebars = {
       label: "Getting Started",
       collapsed: false,
       items: [
-        "getting-started/react-native",
-        "getting-started/expo-router",
-        "getting-started/nextjs",
+        "getting-started/installation",
         "getting-started/typescript",
         "getting-started/other-bundlers",
+        "getting-started/using-with-monorepos",
       ],
     },
     {
@@ -47,7 +46,7 @@ const sidebars = {
         "guides/third-party-components",
         "guides/themes",
         "guides/editor-setup",
-        "guides/component-libraries"
+        "guides/component-libraries",
       ],
     },
     {

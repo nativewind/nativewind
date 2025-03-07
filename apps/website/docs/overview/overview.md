@@ -2,7 +2,7 @@
 
 ## What is NativeWind?
 
-NativeWind allows you to use [Tailwind CSS](https://tailwindcss.com) to style your components in React Native. Styled components can be shared between all React Native platforms, using the best style engine for that platform; CSS StyleSheet on web and StyleSheet.create for native. It's goals are to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
+NativeWind allows you to use [Tailwind CSS](https://tailwindcss.com) to style your components in React Native. Styled components can be shared between all React Native platforms, using the best style engine for that platform; CSS StyleSheet on web and StyleSheet.create for native. Its goals are to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
 
 On native platforms, NativeWind performs two functions. First, at build time, it compiles your Tailwind CSS styles into `StyleSheet.create` objects and determines the conditional logic of styles (e.g. hover, focus, active, etc). Second, it has an efficient runtime system that applies the styles to your components. This means you can use the full power of Tailwind CSS, including media queries, container queries, and custom values, while still having the performance of a native style system.
 
@@ -55,7 +55,7 @@ import { CustomText } from "third-party-text-component";
 
 export function BoldText(props) {
   // You just need to write `className="<your styles>"`
-  return <CustomText className="text-bold" {...props} />;
+  return <CustomText className="font-bold" {...props} />;
 }
 ```
 
@@ -105,7 +105,7 @@ import { cssInterop } from "nativewind";
 import { Svg, Circle } from "react-native-svg";
 
 /**
- * Circle uses `height`/`width` props on native and className on web
+ * Svg uses `height`/`width` props on native and className on web
  */
 const StyledSVG = cssInterop(Svg, {
   className: {
@@ -132,14 +132,14 @@ const StyledCircle = cssInterop(Circle, {
 
 export function BoldText(props) {
   return (
-    <Svg className="w-1/2 h-1/2" viewBox="0 0 100 100">
+    <StyledSVG className="w-1/2 h-1/2" viewBox="0 0 100 100">
       <StyledCircle
         className="fill-green-500 stroke-blue-500 stroke-2"
         cx="50"
         cy="50"
         r="45"
       />
-    </Svg>
+    </StyledSVG>
   );
 }
 ```
