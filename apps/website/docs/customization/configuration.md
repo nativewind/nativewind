@@ -53,3 +53,19 @@ The [environment used by browserslist & autoprefixer](https://github.com/browser
 Default: `{ port: <next-available> }`
 
 The options passed to `ws` for the development hot reloading server.
+
+### `customDeclarationPath`
+
+Type: `string | undefined`
+
+The path where the generated TypeScript declaration file `nativewind-env.d.ts` should be saved. This allows developers to specify a custom location for the declaration file
+
+**Example:**
+
+```javascript
+import { withNativeWind } from 'nativewind';
+
+const metroConfig = withNativeWind(config, {
+  input: 'src/styles.css',
+  customDeclarationPath: 'src/types/nativewind-env.d.ts',
+});
