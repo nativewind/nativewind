@@ -28,6 +28,9 @@
     "sass": "1.69.5",
     "tailwindcss": "3.4.4"
   },
+  "devDependencies": {
+    "@types/lodash.debounce": "4.0.8"
+  },
   "browserslist": {
     "production": [
       ">0.5%",
