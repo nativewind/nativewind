@@ -50,6 +50,12 @@ NativeWind works with both Expo and framework-less React Native projects but Exp
     };
     ```
 
+    :::info
+    
+    The babel preset overrides `SafeAreaProvider` from `react-native-safe-area-context`, make sure to use it like `<SafeAreaProvider>` (exact name) and not `<AliasedSafeAreaProvider>`
+    
+    :::
+
     ### 4. Modify your metro.config.js
 
     ```js title="metro.config.js"
