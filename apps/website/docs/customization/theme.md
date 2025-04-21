@@ -6,7 +6,7 @@ Fully dynamic React Native applications often make use of helper functions such 
 
 ## platformSelect
 
-`platformSelect` is the equivalent to (`Platform.select()`)[https://reactnative.dev/docs/platform#select].
+`platformSelect` is the equivalent to [`Platform.select()`](https://reactnative.dev/docs/platform#select).
 
 ```js
 // tailwind.config.js
@@ -30,7 +30,7 @@ module.exports = {
 
 ### platformColor()
 
-Equivalent of (`PlatformColor`)[https://reactnative.dev/docs/platformcolor]. Typically used with `platformSelect`.
+Equivalent of [`PlatformColor`](https://reactnative.dev/docs/platformcolor). Typically used with `platformSelect`.
 
 ```ts title=tailwind.config.js
 const { platformColor } = require("nativewind/theme");
@@ -51,7 +51,7 @@ module.exports = {
 
 ### hairlineWidth()
 
-Equivalent of (`StyleSheet.hairlineWidth`)[https://reactnative.dev/docs/stylesheet#hairlinewidth]
+Equivalent of [`StyleSheet.hairlineWidth`](https://reactnative.dev/docs/stylesheet#hairlinewidth)
 
 ```ts title=tailwind.config.js
 const { hairlineWidth } = require("nativewind/theme");
@@ -69,7 +69,7 @@ module.exports = {
 
 ### pixelRatio()
 
-Equivalent of (`PixelRatio.get()`)[https://reactnative.dev/docs/pixelratio#get]. If a number is provided it returns `PixelRatio.get() * <value>`, otherwise it returns the PixelRatio value.
+Equivalent of [`PixelRatio.get()`](https://reactnative.dev/docs/pixelratio#get). If a number is provided it returns `PixelRatio.get() * <value>`, otherwise it returns the PixelRatio value.
 
 ```ts title=tailwind.config.js
 const { pixelRatio } = require("nativewind/theme");
@@ -87,7 +87,7 @@ module.exports = {
 
 ### pixelRatioSelect()
 
-A helper function to use (`PixelRatio.get()`)[https://reactnative.dev/docs/pixelratio#get] in a conditional statement, similar to `Platform.select`.
+A helper function to use [`PixelRatio.get()`](https://reactnative.dev/docs/pixelratio#get) in a conditional statement, similar to `Platform.select`.
 
 ```ts title=tailwind.config.js
 const { pixelRatio, hairlineWidth } = require("nativewind/theme");
@@ -106,7 +106,7 @@ module.exports = {
 
 ### fontScale()
 
-Equivalent of (`PixelRatio.getFontScale()`)[https://reactnative.dev/docs/pixelratio#getFontScale]. If a number is provided it returns `PixelRatio.getFontScale() * <value>`, otherwise it returns the `PixelRatio.getFontScale()` value.
+Equivalent of [`PixelRatio.getFontScale()`](https://reactnative.dev/docs/pixelratio#getFontScale). If a number is provided it returns `PixelRatio.getFontScale() * <value>`, otherwise it returns the `PixelRatio.getFontScale()` value.
 
 ```ts title=tailwind.config.js
 const { fontScale } = require("nativewind/theme");
@@ -124,7 +124,7 @@ module.exports = {
 
 ### fontScaleSelect()
 
-A helper function to use (`PixelRatio.getFontScale()`)[https://reactnative.dev/docs/pixelratio#getFontScale] in a conditional statement, similar to `Platform.select`.
+A helper function to use [`PixelRatio.getFontScale()`](https://reactnative.dev/docs/pixelratio#getFontScale) in a conditional statement, similar to `Platform.select`.
 
 ```ts title=tailwind.config.js
 const { fontScaleSelect, hairlineWidth } = require("nativewind/theme");
