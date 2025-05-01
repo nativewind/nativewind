@@ -1,0 +1,7 @@
+<svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<path d="M17.5 54.5C46.5 44 66.8763 53.6331 74.5 53.0333C82.1237 52.4335 86.7205 48.0515 87 41.5333C87.2484 35.7396 82.2987 31.0909 76.5 31.0333C71.2246 30.981 67.0472 34.3626 66 39.5333" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+	<path d="M14 66C22.7738 59.8129 42.5 58.5325 52 63.5335C61.5 68.5346 58.7332 78.407 52.5 80C47.6251 81.2458 42.4238 77.5472 42 72.5335" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+	<path d="M22 43.5C43 38.5 45.0529 39.1187 55.2152 34.7219C65.3775 30.3251 62.5031 19.1172 55.2152 18.0713C50.4176 17.3827 45.9385 21.3139 45.8011 26.1587" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+	<style>@media (prefers-color-scheme: dark) {svg {filter: invert(1);}}</style>
+</svg>
+	
