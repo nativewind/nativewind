@@ -1,8 +1,8 @@
 <div align="center">
 <p align="center">
   <a href="https://nativewind.dev" target="_blank">
-    <img src="https://nativewind.dev/img/logo.svg" alt="Tailwind CSS" width="70" height="70">
-    <h1 align="center" style="color:red;">NativeWind</h1>
+    <img src="./assets/logo.svg" alt="Tailwind CSS" width="70" height="70">
+    <h1 align="center" style="color:red;">Nativewind</h1>
   </a>
 </p>
 
@@ -31,10 +31,7 @@ Alternatively, you can create a new pre-configured project via our Quickstart op
 
 ## Quickstart
 
-You can get started with any of the following options:
-
 - [Create Expo Stack](https://rn.new): `npx create-expo-stack@latest --nativewind`
-- ~~[Create Expo App](https://expo.new): `npx create-expo-app -e with-nativewind`~~ (being fixed to work with v4)
 
 ## Features
 
