@@ -17,21 +17,21 @@
 
 # About
 
-Do you like using [Tailwind CSS](https://tailwindcss.com) to style your apps? This helps you do that in [React Native](https://reactnative.dev). NativeWind is **not** a component library, it's a styling library. If you're looking for component libraries that support NativeWind, [see below](https://github.com/nativewind/nativewind/tree/%40danstepanov/docs-v4.1?tab=readme-ov-file#what-if-im-looking-for-a-component-library-that-uses-nativewind).
+Do you like using [Tailwind CSS](https://tailwindcss.com) to style your apps? This helps you do that in [React Native](https://reactnative.dev). Nativewind is **not** a component library, it's a styling library. If you're looking for component libraries that support Nativewind, [see below](https://github.com/nativewind/nativewind/tree/%40danstepanov/docs-v4.1?tab=readme-ov-file#what-if-im-looking-for-a-component-library-that-uses-nativewind).
 
-NativeWind makes sure you're using the best style engine for any given platform (e.g. CSS StyleSheet or StyleSheet.create). Its goals are to to provide a consistent styling experience across all platforms, improving developer UX, component performance, and code maintainability.
+Nativewind makes sure you're using the best style engine for any given platform (e.g. CSS StyleSheet or StyleSheet.create). Its goals are to to provide a consistent styling experience across all platforms, improving developer UX, component performance, and code maintainability.
 
-NativeWind processes your styles during your application's build step and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
+Nativewind processes your styles during your application's build step and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
 
 ## Installation
 
-If you have an existing project, [use these guides](https://www.nativewind.dev/getting-started/installation) to configure NativeWind for your respective stack.
+If you have an existing project, [use these guides](https://www.nativewind.dev/getting-started/installation) to configure Nativewind for your respective stack.
 
-Alternatively, you can create a new pre-configured project via our Quickstart options, below.
+Alternatively, you can create a new pre-configured project via our Quickstart below.
 
 ## Quickstart
 
-- [Create Expo Stack](https://rn.new): `npx create-expo-stack@latest --nativewind`
+- [Create Expo Stack](https://rn.new): `npx rn-new@latest --nativewind`
 
 ## Features
 
@@ -62,14 +62,16 @@ Alternatively, you can create a new pre-configured project via our Quickstart op
 
 ## npm distribution tags
 It's worth noting that we do not have Github branches that directly correlate to npm distribution tags. Instead, we deploy to specific npm tags either via automated Github actions (push to `main` -> publish to `next`) or manually (snapshots versions).
-- **Release:** `latest` (currently v2.0.11)
+- **Release:** `latest` (currently v4.1.21)
   - You should use this version
 - **Canary:** `canary` (currently v4.0.36)
   - You can use this version
   - Potentially less stable than latest but likely more robust
-- **Experimental:** `next` tag (currently v4.1)
+  - This version is currently out of date and will soon be updated to either v4.2 or v5.0
+- **Experimental:** `next` tag (currently v4.1.9)
   - You probably shouldn't use this version
   - Undergoing testing to move to a release version
+  - This version is currently out of date and needs to be updated to v5.0, work in progress
 - **Bleeding Edge:** snapshot releases prefixed with `0.0.0-`
   - You should not use this version
   - Used internally for moving towards a `next` version
@@ -83,13 +85,13 @@ It's worth noting that we do not have Github branches that directly correlate to
 ## Is it safe to use v4?
 It's reasonably safe to use the `canary` version save for a known issue with styles being inconsistently applied. This issue is resolved in the `next` version; however, using this dist tag may break your app as it is considered experimental. To see which versions correlate to these dist tags, please refer to [our npm distribution tags](https://github.com/nativewind/nativewind?tab=readme-ov-file#npm-distribution-tags).
 
-## Is NativeWind moving to Expo?
+## Is Nativewind moving to Expo?
 
-No. Expo is always exploring ways to handle styles better but NativeWind, as a project, will not be moving into the Expo organization.
+No. Expo is always exploring ways to handle styles better but Nativewind, as a project, will not be moving into the Expo organization.
 
 ## Can we disable the change that was done recently to auto-add nativewind types using a setting or something? I already have the settings using `compilerOptions.types`, so I would like to disable the file generation.
 
-Not at the moment. We've found this will cause a long term problem where people "forget" what their type config was doing. They then update their types and break the NativeWind ones. To combat this, we've copied the behavior from other major frameworks which is to handle their types separately from user specified ones.
+Not at the moment. We've found this will cause a long term problem where people "forget" what their type config was doing. They then update their types and break the Nativewind ones. To combat this, we've copied the behavior from other major frameworks which is to handle their types separately from user specified ones.
 
 In the future, we may add an option like `dangerouslyDisableTypeScriptGeneration` or something verbose to prevent people from using it. We are tired of solving TypeScript issues, particularly ones such as "my types were working and now they aren't."
 
@@ -97,11 +99,11 @@ In the future, we may add an option like `dangerouslyDisableTypeScriptGeneration
 
 Similar to Valve, we don't like the number 3. Nah, we had a V3 but it was a bad idea and needed to be reworked so we dropped it and moved on to v4.
 
-## What if I'm looking for a component library that uses NativeWind?
+## What if I'm looking for a component library that uses Nativewind?
 
-There are a number of different component libraries available that use NativeWind to achieve different results. You should pick the one that best suits your needs.
+There are a number of different component libraries available that use Nativewind to achieve different results. You should pick the one that best suits your needs.
 
-### [NativeWindUI](https://nativewindui.com)
+### [NativewindUI](https://nativewindui.com)
 
 This multi-platform library focuses on achieving native feel for each individual platform using the familiar interface of Tailwind CSS.
 
