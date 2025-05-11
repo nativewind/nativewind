@@ -25,7 +25,7 @@ Nativewind processes your styles during your application's build step and uses a
 
 ## Installation
 
-If you have an existing project, [use these guides](https://www.nativewind.dev/getting-started/installation) to configure Nativewind for your respective stack.
+If you have an existing project, [use these guides](https://www.nativewind.dev/docs/getting-started/installation) to configure Nativewind for your respective stack.
 
 Alternatively, you can create a new pre-configured project via our Quickstart below.
 
