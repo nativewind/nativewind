@@ -16,8 +16,8 @@ Please see our contribution guide: https://github.com/nativewind/nativewind/blob
 ⚠️ **Important**: Issues without a valid reproduction link will not be reviewed and will be automatically closed. Provide one of the following:
 - **StackBlitz template**: https://stackblitz.com/edit/nativewind-test?view=editor
 - **Create Expo Stack template**: 
-  - `npx create-expo-stack@latest --nativewind`
-  - `npx create-expo-stack@latest --nativewind --expo-router`
+  - `npx rn-new@latest --nativewind`
+  - `npx rn-new@latest --nativewind --expo-router`
 
 If you have a usage question, please use the [Discord](https://discord.gg/nativewind) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions) instead.
 

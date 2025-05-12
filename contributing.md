@@ -40,8 +40,8 @@ When opening an issue, it's crucial to provide a reproduction of the problem to 
 
 - **StackBlitz template**: [NativeWind Test on StackBlitz](https://stackblitz.com/edit/nativewind-test?view=editor)
 - **Create Expo Stack template**:
-  - `npx create-expo-stack@latest --nativewind`
-  - `npx create-expo-stack@latest --nativewind --expo-router`
+  - `npx rn-new@latest --nativewind`
+  - `npx rn-new@latest --nativewind --expo-router`
 
 #### Steps to Follow
 
