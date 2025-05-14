@@ -85,9 +85,7 @@ npm run build
 ```
 
 3c. Run the test suite
-We recommend installing the [Jest VSCode extension](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest) to run the tests. Once installed, you should have Testing icon in your left-hand tool bar:
-
-![alt text](image.png)
+We recommend installing the [Jest VSCode extension](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest) to run the tests. Once installed, you should have Testing icon in your left-hand tool bar (it looks like a laboratory beaker).
 
 Navigating to this tab will allow you to use a convenient GUI to run all the tests. Alternatively, you can run the tests using the following command:
 ```shell
