@@ -13,7 +13,6 @@ interface ValidationResult {
 
 async function validateUrl(url: string): Promise<boolean> {
   try {
-    const parsedUrl = new URL(url);
     const response = await fetch(url, { 
       method: 'GET',
       headers: {
