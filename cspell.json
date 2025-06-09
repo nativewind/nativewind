@@ -3,7 +3,6 @@
   "language": "en",
   "ignorePaths": [
     "node_modules/*",
-    "website/node_modules/*",
     "dist/*",
     "types.d.ts",
     "coverage/*",
@@ -11,10 +10,7 @@
     "**.snap",
     "**LICENSE",
     "**/package.json",
-    "**/renovate.json",
-    "website/build/*",
-    "website/static/*",
-    "website/src/css/*"
+    "**/renovate.json"
   ],
   "dictionaries": ["tailwind", "project", "react-native"],
   "dictionaryDefinitions": [
