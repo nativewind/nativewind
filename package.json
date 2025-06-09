@@ -2,7 +2,6 @@
   "name": "nativewind-monorepo",
   "workspaces": [
     "packages/*",
-    "apps/*",
     "examples/*"
   ],
   "scripts": {

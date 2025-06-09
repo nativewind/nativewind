@@ -106,8 +106,6 @@ The Nativewind source code can be found in the `packages/` directory. The `packa
 
 More information on how `react-native-css-interop` works is coming soon.
 
-Additionally, there is an `examples/` directory which includes an example app set up with Expo Router and there is an Expo Snack in the `apps/snack/` directory. These both likely need to be updated from v2 to v4.
-
 ### Make your changes
 
 Once you've made your changes and tested that it works locally, run the tests using `npm run test` in the root directory. You should also add a test to cover your own contribution, if relevant.
