@@ -1,6 +1,4 @@
 import fs from 'fs';
-import path from 'path';
-import { URL } from 'url';
 
 interface ValidationResult {
   file: string;
