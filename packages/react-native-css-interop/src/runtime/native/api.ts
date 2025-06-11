@@ -1,20 +1,27 @@
 import { createElement, forwardRef, useContext, useState } from "react";
+
+import {
+  assignToTarget,
+  inlineSpecificity,
+  PLACEHOLDER_SYMBOL,
+  StyleRuleSetSymbol,
+  StyleRuleSymbol,
+} from "../../shared";
 import type {
   CssInterop,
   JSXFunction,
-  ReactComponent,
   RuntimeValueDescriptor,
 } from "../../types";
 import { getNormalizeConfig } from "../config";
-import { colorScheme, variableContext } from "./globals";
-import { Effect, cleanupEffect } from "../observable";
-import { globalStyles } from "./stylesheet";
+import { cleanupEffect, Effect } from "../observable";
+import { colorScheme } from "./appearance-observables";
 import { interop } from "./native-interop";
-import { opaqueStyles } from "./style-store";
-import { getComponentType } from "./utils";
+import { getVariable, opaqueStyles, VariableContext } from "./styles";
+import { getComponentType } from "./unwrap-components";
 
 export { StyleSheet } from "./stylesheet";
-export { colorScheme, rem } from "./globals";
+export { colorScheme } from "./appearance-observables";
+export { rem } from "./unit-observables";
 
 export const interopComponents = new Map<
   object | string,
@@ -30,7 +37,7 @@ export const interopComponents = new Map<
 export const cssInterop: CssInterop = (baseComponent, mapping): any => {
   const configs = getNormalizeConfig(mapping);
 
-  let component: ReactComponent;
+  let component: any;
   const type = getComponentType(baseComponent);
 
   /**
@@ -42,7 +49,7 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
       return interop(baseComponent, configs, props, undefined);
     };
   } else {
-    component = forwardRef<unknown, Record<string, any>>((props, ref) => {
+    component = forwardRef((props, ref) => {
       // This function will change className->style, add the extra props and do the "magic"
       return interop(baseComponent, configs, props, ref);
       // `interop` will return createElement(baseComponent, propsWithStylesAppliedAndEventHandlersAdded);
@@ -63,38 +70,24 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
     ref: any,
   ) {
     for (const config of configs) {
-      let rawStyles = [];
-
       const source = props?.[config.source];
 
       // If the source is not a string or is empty, skip this config
       if (typeof source !== "string" || !source) continue;
 
+      const placeholder = {
+        [PLACEHOLDER_SYMBOL]: true,
+      };
+      opaqueStyles.set(placeholder, {
+        [StyleRuleSetSymbol]: "RemappedClassName",
+        classNames: source.split(/\s+/),
+      });
+
       delete props[config.source];
 
-      for (const className of source.split(/\s+/)) {
-        const signal = globalStyles.get(className);
-
-        if (signal !== undefined) {
-          const style = {};
-          const styleRuleSet = signal.get();
-          opaqueStyles.set(style, styleRuleSet);
-          rawStyles.push(style);
-        }
-      }
-
-      if (rawStyles.length !== 0) {
-        const existingStyle = props[config.target];
-
-        if (Array.isArray(existingStyle)) {
-          rawStyles.push(...existingStyle);
-        } else if (existingStyle) {
-          rawStyles.push(existingStyle);
-        }
-
-        props[config.target] =
-          rawStyles.length === 1 ? rawStyles[0] : rawStyles;
-      }
+      assignToTarget(props, placeholder, config, {
+        objectMergeStyle: "toArray",
+      });
     }
 
     props.ref = ref;
@@ -107,9 +100,11 @@ export const remapProps: CssInterop = (component: any, mapping): any => {
 
 export function useColorScheme() {
   const [effect, setEffect] = useState<Effect>(() => ({
-    rerun: () => setEffect((s) => ({ ...s })),
+    run: () => setEffect((s) => ({ ...s })),
     dependencies: new Set(),
   }));
+
+  cleanupEffect(effect);
 
   return {
     colorScheme: colorScheme.get(effect),
@@ -120,13 +115,14 @@ export function useColorScheme() {
 
 export function vars(variables: Record<string, RuntimeValueDescriptor>) {
   const style: Record<string, any> = {};
+
   opaqueStyles.set(style, {
-    $$type: "StyleRuleSet",
+    [StyleRuleSetSymbol]: true,
     variables: true,
-    normal: [
+    n: [
       {
-        $$type: "StyleRule",
-        specificity: { inline: 1 },
+        [StyleRuleSymbol]: true,
+        s: inlineSpecificity,
         variables: Object.entries(variables).map(([name, value]) => {
           return [name.startsWith("--") ? name : `--${name}`, value];
         }),
@@ -137,14 +133,14 @@ export function vars(variables: Record<string, RuntimeValueDescriptor>) {
 }
 
 export const useUnstableNativeVariable = (name: string) => {
-  const context = useContext(variableContext);
+  const context = useContext(VariableContext);
 
   const [effect, setState] = useState<Effect>(() => ({
-    rerun: () => setState((s) => ({ ...s })),
+    run: () => setState((s) => ({ ...s })),
     dependencies: new Set(),
   }));
 
-  let value = context[name];
+  let value: any = getVariable(name, context, effect);
   if (typeof value === "object" && "get" in value) {
     cleanupEffect(effect);
     value = value.get(effect);
@@ -153,18 +149,11 @@ export const useUnstableNativeVariable = (name: string) => {
   return value;
 };
 
+/**
+ * @deprecated Please use <SafeAreaProvider /> directly
+ */
 export const useSafeAreaEnv = () => {
-  try {
-    const insets =
-      require("react-native-safe-area-context").useSafeAreaInsets() as import("react-native-safe-area-context").EdgeInsets;
-
-    return vars({
-      "--___css-interop___safe-area-inset-bottom": insets.bottom,
-      "--___css-interop___safe-area-inset-left": insets.left,
-      "--___css-interop___safe-area-inset-right": insets.right,
-      "--___css-interop___safe-area-inset-top": insets.top,
-    });
-  } catch {
-    console.error("react-native-safe-area-context is not installed");
-  }
+  console.warn(
+    "useSafeAreaEnv() is deprecated. Please use <SafeAreaProvider /> directly",
+  );
 };

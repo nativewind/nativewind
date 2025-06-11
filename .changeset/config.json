@@ -5,6 +5,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "changelog": false,
   "ignore": []
 }

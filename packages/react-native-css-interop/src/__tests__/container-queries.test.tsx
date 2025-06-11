@@ -1,16 +1,17 @@
+/** @jsxImportSource test */
 import { View } from "react-native";
-import { fireEvent, render, screen } from "@testing-library/react-native";
 
 import {
-  createMockComponent,
+  fireEvent,
   registerCSS,
-  resetStyles,
-} from "../testing-library";
+  render,
+  screen,
+  setupAllComponents,
+} from "test";
 
-const Parent = createMockComponent(View);
-const Child = createMockComponent(View);
-
-beforeEach(() => resetStyles());
+const parentID = "parent";
+const childID = "child";
+setupAllComponents();
 
 test("container query width", () => {
   registerCSS(`
@@ -31,20 +32,20 @@ test("container query width", () => {
     `);
 
   render(
-    <Parent testID="parent" className="container">
-      <Child testID="child" className="child" />
-    </Parent>,
+    <View testID={parentID} className="container">
+      <View testID={childID} className="child" />
+    </View>,
   );
 
-  const parent = screen.getByTestId("parent");
-  const child = screen.getByTestId("child");
+  const parent = screen.getByTestId(parentID);
+  const child = screen.getByTestId(childID);
 
   expect(parent).toHaveStyle({
     width: 200,
   });
 
   expect(child).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 
   fireEvent(parent, "layout", {
@@ -57,13 +58,13 @@ test("container query width", () => {
   });
 
   expect(child).toHaveStyle({
-    color: "rgba(255, 0, 0, 1)",
+    color: "#ff0000",
   });
 
   screen.rerender(
-    <Parent testID="parent" className="container" style={{ width: 500 }}>
-      <Child testID="child" className="child" />
-    </Parent>,
+    <View testID={parentID} className="container" style={{ width: 500 }}>
+      <View testID={childID} className="child" />
+    </View>,
   );
 
   fireEvent(parent, "layout", {
@@ -80,6 +81,6 @@ test("container query width", () => {
   });
 
   expect(child).toHaveStyle({
-    color: "rgba(0, 0, 255, 1)",
+    color: "#0000ff",
   });
 });

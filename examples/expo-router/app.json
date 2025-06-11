@@ -18,7 +18,8 @@
     "ios": {
       "supportsTablet": true,
       "userInterfaceStyle": "automatic",
-      "requireFullScreen": true
+      "requireFullScreen": true,
+      "bundleIdentifier": "com.mwlawlor.nativewind-expo-router"
     },
     "android": {
       "userInterfaceStyle": "automatic",

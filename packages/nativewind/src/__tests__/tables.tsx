@@ -1,39 +1,103 @@
-import { resetStyles } from "react-native-css-interop/testing-library";
-import { invalidProperty, testCases } from "../test-utils";
-
-afterEach(() => resetStyles());
+import { renderCurrentTest } from "../test";
 
 describe("Tables - Border Collapse", () => {
-  testCases(
-    ["border-collapse", invalidProperty("border-collapse")],
-    ["border-separate", invalidProperty("border-collapse")],
-  );
+  test("border-collapse", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-collapse"] },
+    });
+  });
+  test("border-separate", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-collapse"] },
+    });
+  });
 });
 
 describe("Tables - Border Spacing", () => {
-  testCases(
-    ["border-spacing-0", invalidProperty("border-spacing")],
-    ["border-spacing-x-0", invalidProperty("border-spacing")],
-    ["border-spacing-y-0", invalidProperty("border-spacing")],
-    ["border-spacing-px", invalidProperty("border-spacing")],
-    ["border-spacing-x-px", invalidProperty("border-spacing")],
-    ["border-spacing-y-px", invalidProperty("border-spacing")],
-    ["border-spacing-1", invalidProperty("border-spacing")],
-    ["border-spacing-x-1", invalidProperty("border-spacing")],
-    ["border-spacing-y-1", invalidProperty("border-spacing")],
-  );
+  test("border-spacing-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-x-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-y-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-px", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-x-px", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-y-px", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-x-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
+  test("border-spacing-y-1", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["border-spacing"] },
+    });
+  });
 });
 
 describe("Tables - Table Layout", () => {
-  testCases(
-    ["table-auto", invalidProperty("table-layout")],
-    ["table-fixed", invalidProperty("table-layout")],
-  );
+  test("table-auto", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["table-layout"] },
+    });
+  });
+  test("table-fixed", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["table-layout"] },
+    });
+  });
 });
 
 describe("Tables - Caption Side", () => {
-  testCases(
-    ["caption-top", invalidProperty("caption-side")],
-    ["caption-bottom", invalidProperty("caption-side")],
-  );
+  test("caption-top", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["caption-side"] },
+    });
+  });
+  test("caption-bottom", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { properties: ["caption-side"] },
+    });
+  });
 });

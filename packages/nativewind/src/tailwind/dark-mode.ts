@@ -1,9 +1,7 @@
 import { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 
-const isWeb =
-  process.env.NATIVEWIND_NATIVE === undefined ||
-  process.env.NATIVEWIND_NATIVE === "web";
+import { isWeb } from "./common";
 
 export const darkModeAtRule = plugin(function ({ config, addBase }) {
   const darkMode = config<Config["darkMode"]>("darkMode");

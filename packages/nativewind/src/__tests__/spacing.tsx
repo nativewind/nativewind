@@ -1,37 +1,106 @@
-import { resetStyles } from "react-native-css-interop/testing-library";
-import { style, testCases } from "../test-utils";
-
-afterEach(() => resetStyles());
+import { renderCurrentTest } from "../test";
 
 describe("Spacing - Padding", () => {
-  testCases(
-    ["p-0", style({ padding: 0 })],
-    ["px-0", style({ paddingLeft: 0, paddingRight: 0 })],
-    ["py-0", style({ paddingTop: 0, paddingBottom: 0 })],
-    ["pt-0", style({ paddingTop: 0 })],
-    ["pr-0", style({ paddingRight: 0 })],
-    ["pb-0", style({ paddingBottom: 0 })],
-    ["pl-0", style({ paddingLeft: 0 })],
-    ["ps-0", style({ paddingStart: 0 })],
-    ["pe-0", style({ paddingEnd: 0 })],
-  );
+  test("p-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { padding: 0 } },
+    });
+  });
+  test("px-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { paddingLeft: 0, paddingRight: 0 } },
+    });
+  });
+  test("py-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { paddingTop: 0, paddingBottom: 0 } },
+    });
+  });
+  test("pt-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { paddingTop: 0 } },
+    });
+  });
+  test("pr-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { paddingRight: 0 } },
+    });
+  });
+  test("pb-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { paddingBottom: 0 } },
+    });
+  });
+  test("pl-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { paddingLeft: 0 } },
+    });
+  });
+  test("ps-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { paddingStart: 0 } },
+    });
+  });
+  test("pe-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { paddingEnd: 0 } },
+    });
+  });
 });
 
 describe("Spacing - Margin", () => {
-  testCases(
-    ["m-0", style({ margin: 0 })],
-    ["mx-0", style({ marginLeft: 0, marginRight: 0 })],
-    ["my-0", style({ marginTop: 0, marginBottom: 0 })],
-    ["mt-0", style({ marginTop: 0 })],
-    ["mr-0", style({ marginRight: 0 })],
-    ["mb-0", style({ marginBottom: 0 })],
-    ["ml-0", style({ marginLeft: 0 })],
-    ["ms-0", style({ marginStart: 0 })],
-    ["me-0", style({ marginEnd: 0 })],
-    ["m-auto", style({ margin: "auto" })],
-  );
+  test("m-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { margin: 0 } },
+    });
+  });
+  test("mx-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { marginLeft: 0, marginRight: 0 } },
+    });
+  });
+  test("my-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { marginTop: 0, marginBottom: 0 } },
+    });
+  });
+  test("mt-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { marginTop: 0 } },
+    });
+  });
+  test("mr-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { marginRight: 0 } },
+    });
+  });
+  test("mb-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { marginBottom: 0 } },
+    });
+  });
+  test("ml-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { marginLeft: 0 } },
+    });
+  });
+  test("ms-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { marginStart: 0 } },
+    });
+  });
+  test("me-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { marginEnd: 0 } },
+    });
+  });
+  test("m-auto", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { margin: "auto" } },
+    });
+  });
 });
 
 describe.skip("Spacing - Space Between", () => {
-  testCases();
+  // TODO
 });

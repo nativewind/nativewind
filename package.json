@@ -2,40 +2,43 @@
   "name": "nativewind-monorepo",
   "workspaces": [
     "packages/*",
-    "apps/*",
     "examples/*"
   ],
   "scripts": {
     "test": "turbo test --continue",
-    "snapshot": "npx changeset version --snapshot && npx changeset publish --tag snapshot && git restore .",
+    "snapshot": "npm run build && npx changeset version --snapshot && npx changeset publish --tag snapshot && git restore .",
     "build": "turbo run build --filter='./packages/*'",
     "build:watch": "turbo run build:watch --filter='./packages/*'",
     "dev": "npm_config_loglevel=silent turbo dev",
     "example": "npm start --workspace=examples/expo-router --",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i",
-    "publish-packages": "turbo run build lint test && changeset version && changeset publish",
-    "website": "vercel dev"
+    "publish-packages": "turbo run build lint test && changeset version && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
+    "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
+    "@testing-library/react-native": "^12.0.1",
     "@tsconfig/react-native": "^3.0.2",
-    "@types/node": "18.16.19",
+    "@types/connect": "^3.4.38",
+    "@types/debug": "^4.1.12",
+    "@types/jest": "^29.5.1",
+    "@types/node": "^22.5.5",
     "@vercel/node": "^2.15.8",
-    "@welldone-software/why-did-you-render": "^7.0.1",
     "eslint": "8.44.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-unicorn": "47.0.0",
+    "expect": "^29.7.0",
     "jest": "^29.3.1",
     "jest-expo": "^50.0.1",
-    "prettier": "3.0.0",
+    "prettier": "^3.3.1",
+    "tailwindcss": "3.4.4",
     "turbo": "^1.10.14",
-    "typescript": "^5.3.0",
+    "typescript": "^5.4.5",
     "vercel": "^31.2.2"
   },
-  "dependencies": {
-    "uuid": "^3.4.0"
-  },
   "overrides": {
-    "react-refresh": "0.14.0"
+    "@expo/metro-runtime": "3.2.3",
+    "react-native": "0.75.2",
+    "react-native-reanimated": "3.10.1"
   }
 }

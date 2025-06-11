@@ -1,22 +1,17 @@
+/** @jsxImportSource nativewind */
 import { View } from "react-native";
-import { createMockComponent, renderTailwind } from "../test-utils";
-import { fireEvent, screen } from "@testing-library/react-native";
-import { resetStyles } from "react-native-css-interop/testing-library";
 
-const Grandparent = createMockComponent(View);
-const Parent = createMockComponent(View);
-const Child = createMockComponent(View);
+import { fireEvent, render, screen } from "../test";
+
 const grandparentID = "grandparentID";
 const parentID = "parent";
 const childID = "child";
 
-beforeEach(() => resetStyles());
-
 test("Styling based on parent state (group-{modifier})", async () => {
-  await renderTailwind(
-    <Parent testID={parentID} className="group">
-      <Child testID={childID} className="group-hover:text-white" />
-    </Parent>,
+  await render(
+    <View testID={parentID} className="group">
+      <View testID={childID} className="group-hover:text-white" />
+    </View>,
   );
 
   const parent = screen.getByTestId(parentID);
@@ -27,17 +22,17 @@ test("Styling based on parent state (group-{modifier})", async () => {
 
   fireEvent(parent, "hoverIn");
 
-  expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(child).toHaveStyle({ color: "#ffffff" });
 });
 
 test("Differentiating nested groups", async () => {
-  await renderTailwind(
-    <Grandparent testID={grandparentID} className="group/grandparent">
-      <Parent testID={parentID} className="group/parent">
-        <Child className="group-hover/grandparent:text-white" />
-        <Child testID={childID} className="group-hover/parent:text-white" />
-      </Parent>
-    </Grandparent>,
+  await render(
+    <View testID={grandparentID} className="group/grandparent">
+      <View testID={parentID} className="group/parent">
+        <View className="group-hover/grandparent:text-white" />
+        <View testID={childID} className="group-hover/parent:text-white" />
+      </View>
+    </View>,
   );
 
   const grandparent = screen.getByTestId(grandparentID);
@@ -54,14 +49,14 @@ test("Differentiating nested groups", async () => {
 
   fireEvent(parent, "hoverIn");
 
-  expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(child).toHaveStyle({ color: "#ffffff" });
 });
 
 test("arbitrary groups - single className", async () => {
-  const { rerender } = await renderTailwind(
-    <Parent testID={parentID} className="group">
-      <Child testID={childID} className="group-[.test]:text-white" />
-    </Parent>,
+  const { rerender } = await render(
+    <View testID={parentID} className="group">
+      <View testID={childID} className="group-[.test]:text-white" />
+    </View>,
   );
 
   const parent = screen.getByTestId(parentID);
@@ -71,19 +66,19 @@ test("arbitrary groups - single className", async () => {
   expect(child).toHaveStyle(undefined);
 
   await rerender(
-    <Parent testID={parentID} className="group test">
-      <Child testID={childID} className="group-[.test]:text-white" />
-    </Parent>,
+    <View testID={parentID} className="group test">
+      <View testID={childID} className="group-[.test]:text-white" />
+    </View>,
   );
 
-  expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(child).toHaveStyle({ color: "#ffffff" });
 });
 
 test("arbitrary groups - multiple className", async () => {
-  const { rerender } = await renderTailwind(
-    <Parent testID={parentID} className="group">
-      <Child testID={childID} className="group-[.test.test2]:text-white" />
-    </Parent>,
+  const { rerender } = await render(
+    <View testID={parentID} className="group">
+      <View testID={childID} className="group-[.test.test2]:text-white" />
+    </View>,
   );
 
   const parent = screen.getByTestId(parentID);
@@ -93,31 +88,31 @@ test("arbitrary groups - multiple className", async () => {
   expect(child).toHaveStyle(undefined);
 
   await rerender(
-    <Parent testID={parentID} className="group test">
-      <Child testID={childID} className="group-[.test.test2]:text-white" />
-    </Parent>,
+    <View testID={parentID} className="group test">
+      <View testID={childID} className="group-[.test.test2]:text-white" />
+    </View>,
   );
 
   expect(parent).toHaveStyle(undefined);
   expect(child).toHaveStyle(undefined);
 
   await rerender(
-    <Parent testID={parentID} className="group test test2">
-      <Child testID={childID} className="group-[.test.test2]:text-white" />
-    </Parent>,
+    <View testID={parentID} className="group test test2">
+      <View testID={childID} className="group-[.test.test2]:text-white" />
+    </View>,
   );
 
-  expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(child).toHaveStyle({ color: "#ffffff" });
 });
 
 test("arbitrary groups - props", async () => {
-  const { rerender } = await renderTailwind(
-    <Parent testID={parentID} className="group" accessibilityLabel="test">
-      <Child
+  const { rerender } = await render(
+    <View testID={parentID} className="group" accessibilityLabel="test">
+      <View
         testID={childID}
         className="group-[[accessibilityLabel=works]]:text-white"
       />
-    </Parent>,
+    </View>,
   );
 
   const parent = screen.getByTestId(parentID);
@@ -127,13 +122,13 @@ test("arbitrary groups - props", async () => {
   expect(child).toHaveStyle(undefined);
 
   await rerender(
-    <Parent testID={parentID} className="group" accessibilityLabel="works">
-      <Child
+    <View testID={parentID} className="group" accessibilityLabel="works">
+      <View
         testID={childID}
         className="group-[[accessibilityLabel=works]]:text-white"
       />
-    </Parent>,
+    </View>,
   );
 
-  expect(child).toHaveStyle({ color: "rgba(255, 255, 255, 1)" });
+  expect(child).toHaveStyle({ color: "#ffffff" });
 });

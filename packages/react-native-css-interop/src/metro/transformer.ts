@@ -1,58 +1,64 @@
+import path from "path";
+
 import worker, {
   JsTransformerConfig,
   JsTransformOptions,
   TransformResponse,
 } from "metro-transform-worker";
 
-import { cssToReactNativeRuntime } from "../css-to-rn";
-import { CssToReactNativeRuntimeOptions } from "../types";
-
-interface CssInteropJsTransformerConfig extends JsTransformerConfig {
-  transformerPath?: string;
-  cssToReactNativeRuntime?: CssToReactNativeRuntimeOptions;
+interface TransformerConfig extends JsTransformerConfig {
+  cssInterop_transformerPath?: string;
+  cssInterop_outputDirectory: string;
 }
 
-export function transform(
-  config: CssInteropJsTransformerConfig,
+export async function transform(
+  config: TransformerConfig,
   projectRoot: string,
   filename: string,
-  data: Buffer | string,
+  data: Buffer,
   options: JsTransformOptions,
 ): Promise<TransformResponse> {
-  const transformer = config.transformerPath
-    ? require(config.transformerPath).transform
+  const transform = config.cssInterop_transformerPath
+    ? require(config.cssInterop_transformerPath).transform
     : worker.transform;
 
-  // If the file is not CSS, then use the default behavior.
-  const isCss = options.type !== "asset" && matchCss(filename);
-
-  if (!isCss || options.platform === "web") {
-    return transformer(config, projectRoot, filename, data, options);
+  /**
+   * Skip transforming anything that isn't ours, or is a .css file
+   */
+  if (
+    path.dirname(filename) !== config.cssInterop_outputDirectory ||
+    filename.endsWith(".css")
+  ) {
+    return transform(config, projectRoot, filename, data, options);
   }
 
-  const runtimeData = JSON.stringify(
-    cssToReactNativeRuntime(data, config.cssToReactNativeRuntime),
+  /**
+   * The style object can be quite large and running it though a transform can be quite costly
+   * Since the style file only uses a single import, we can transform a fake file to get the
+   * dependencies and function mapping
+   */
+  const fakeFile = `import { injectData } from "react-native-css-interop/dist/runtime/native/styles";injectData({});`;
+  const result = await transform(
+    config,
+    projectRoot,
+    filename,
+    Buffer.from(fakeFile),
+    options,
   );
 
-  const isCSSModule = matchCssModule(filename);
+  const output = result.output[0] as any;
+  const code = output.data.code.replace("({})", data.toString("utf-8"));
 
-  data = isCSSModule
-    ? `module.exports = require("react-native-css-interop").StyleSheet.create(${runtimeData});`
-    : `require("react-native-css-interop").StyleSheet.registerCompiled(${runtimeData});`;
-
-  if (options.platform !== "web" && options.dev && options.hot) {
-    data = `${data}\nrequire("react-native-css-interop/dist/metro/poll-update-client")`;
-  }
-
-  data = Buffer.from(data);
-
-  return worker.transform(config, projectRoot, filename, data, options);
-}
-
-function matchCss(filePath: string): boolean {
-  return /\.css$/.test(filePath);
-}
-
-function matchCssModule(filePath: string): boolean {
-  return /\.module(\.(native|ios|android|web))?\.css$/.test(filePath);
+  return {
+    ...result,
+    output: [
+      {
+        ...output,
+        data: {
+          ...output.data,
+          code,
+        },
+      },
+    ],
+  };
 }

@@ -1,18 +1,22 @@
-import { style, testCases } from "../test-utils";
+import { renderCurrentTest } from "../test";
 
-describe.skip("Custom - Elevation", () => {
-  testCases(
-    [
-      "elevation",
-      style({
-        elevation: 3,
-      }),
-    ],
-    [
-      "elevation-sm",
-      style({
-        elevation: 1,
-      }),
-    ],
-  );
+describe("Custom - Elevation", () => {
+  test("elevation", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: {
+          elevation: 3,
+        },
+      },
+    });
+  });
+  test("elevation-sm", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: {
+          elevation: 1,
+        },
+      },
+    });
+  });
 });

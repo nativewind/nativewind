@@ -7,7 +7,15 @@
     ],
     "outDir": "dist",
     "noEmit": false,
-    "sourceMap": true
+    "sourceMap": true,
+    "paths": {
+      "test": [
+        "./src/test"
+      ],
+      "test/jsx-runtime": [
+        "./src/test"
+      ]
+    }
   },
   "include": [
     "src/**/*",

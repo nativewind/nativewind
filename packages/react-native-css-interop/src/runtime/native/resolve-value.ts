@@ -1,11 +1,24 @@
 import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
-import type { AnimatableValue } from "react-native-reanimated";
+
 import type { EasingFunction, Time } from "lightningcss";
-import type { RuntimeValueDescriptor, RuntimeValueFrame } from "../../types";
-import { rem, systemColorScheme, universalVariables, vh, vw } from "./globals";
+import type { AnimatableValue } from "react-native-reanimated";
+
+import {
+  isDescriptorArray,
+  isDescriptorFunction,
+  transformKeys,
+} from "../../shared";
+import type {
+  InteropComponentConfig,
+  RuntimeValueDescriptor,
+  RuntimeValueFrame,
+} from "../../types";
 import { Effect, observable } from "../observable";
-import { transformKeys } from "../../shared";
-import { PropState } from "./native-interop";
+import { systemColorScheme } from "./appearance-observables";
+import { textShadow } from "./resolvers/text-shadow";
+import { getUniversalVariable, getVariable } from "./styles";
+import { ReducerState, ReducerTracking, Refs, ShorthandResult } from "./types";
+import { rem, vh, vw } from "./unit-observables";
 
 /**
  * Get the final value of a value descriptor
@@ -17,211 +30,337 @@ import { PropState } from "./native-interop";
  * @returns
  */
 export function resolveValue(
-  state: PropState,
-  descriptor: RuntimeValueDescriptor | string | number | boolean,
-  style?: Record<string, any>,
-): any {
-  switch (typeof descriptor) {
-    case "undefined":
-      return;
-    case "boolean":
-    case "number":
-    case "function":
-      return descriptor;
-    case "string":
-      return descriptor.endsWith("px") // Inline vars() might set a value with a px suffix
-        ? parseInt(descriptor.slice(0, -2), 10)
-        : descriptor;
-  }
+  state: ReducerState,
+  refs: Refs,
+  tracking: ReducerTracking,
+  descriptor: RuntimeValueDescriptor,
+  style: Record<string, any> | undefined,
+  castToArray = false,
+): RuntimeValueDescriptor | ShorthandResult {
+  try {
+    switch (typeof descriptor) {
+      case "undefined":
+        return;
+      case "boolean":
+      case "number":
+      case "function":
+        return descriptor;
+      case "string":
+        return descriptor.endsWith("px") // Inline vars() might set a value with a px suffix
+          ? parseInt(descriptor.slice(0, -2), 10)
+          : descriptor;
+    }
 
-  if (Array.isArray(descriptor)) {
-    return descriptor.map((v) => resolveValue(state, v, style));
-  }
+    if (isDescriptorArray(descriptor)) {
+      descriptor = descriptor.flatMap((d) => {
+        const value = resolveValue(state, refs, tracking, d, style);
+        return value === undefined ? [] : value;
+      }) as RuntimeValueDescriptor[];
 
-  switch (descriptor.name) {
-    case "var": {
-      let value = resolve(state, descriptor.arguments[0], style);
-      if (typeof value === "string") value = getVar(state, value, style);
-      if (value === undefined && descriptor.arguments[1]) {
-        value = resolveValue(state, descriptor.arguments[1], style);
-      }
-
-      return value;
-    }
-    case "calc": {
-      return calc(state, descriptor.arguments, style)?.value;
-    }
-    case "max": {
-      let mode;
-      let values: number[] = [];
-
-      for (const arg of descriptor.arguments) {
-        const result = calc(state, arg, style);
-        if (result) {
-          if (!mode) mode = result?.mode;
-          if (result.mode === mode) {
-            values.push(result.raw);
-          }
-        }
-      }
-
-      const max = Math.max(...values);
-      return mode === "percentage" ? `${max}%` : max;
-    }
-    case "min": {
-      let mode;
-      let values: number[] = [];
-
-      for (const arg of descriptor.arguments) {
-        const result = calc(state, arg, style);
-        if (result) {
-          if (!mode) mode = result?.mode;
-          if (result.mode === mode) {
-            values.push(result.raw);
-          }
-        }
-      }
-
-      const min = Math.min(...values);
-      return mode === "percentage" ? `${min}%` : min;
-    }
-    case "clamp": {
-      const min = calc(state, descriptor.arguments[0], style);
-      const val = calc(state, descriptor.arguments[1], style);
-      const max = calc(state, descriptor.arguments[2], style);
-
-      if (!min || !val || !max) return;
-      if (min.mode !== val.mode && max.mode !== val.mode) return;
-
-      const value = Math.max(min.raw, Math.min(val.raw, max.raw));
-      return val.mode === "percentage" ? `${value}%` : value;
-    }
-    case "vh": {
-      // 50vh = 50% of the viewport height
-      const value = resolve(state, descriptor.arguments[0], style);
-      const vhValue = vh.get(state.styleEffect) / 100;
-      if (typeof value === "number") return round(vhValue * value);
-    }
-    case "vw": {
-      const value = resolve(state, descriptor.arguments[0], style);
-      const vwValue = vw.get(state.styleEffect) / 100;
-      if (typeof value === "number") return round(vwValue * value);
-    }
-    case "em": {
-      const value = resolve(state, descriptor.arguments[0], style);
-      const fontSize = style?.fontSize ?? rem.get(state.styleEffect);
-      if (typeof value === "number") return round(fontSize * value);
-    }
-    case "rem": {
-      const value = resolve(state, descriptor.arguments[0], style);
-      const remValue = rem.get(state.styleEffect);
-      if (typeof value === "number") return round(remValue * value);
-    }
-    case "rnh": {
-      const value = resolve(state, descriptor.arguments[0], style);
-      const height = style?.height ?? getHeight(state);
-      if (typeof value === "number") return round(height * value);
-    }
-    case "rnw": {
-      const value = resolve(state, descriptor.arguments[0], style);
-      const width = style?.width ?? getWidth(state);
-      if (typeof value === "number") return round(width * value);
-    }
-    case "hwb":
-      const args = resolve(state, descriptor.arguments, style).flat(10);
-      return getColorArgs(args, { 3: "hwb" });
-    case "rgb":
-    case "rgba": {
-      const args = resolve(state, descriptor.arguments, style).flat(10);
-      return getColorArgs(args, { 3: "rgb", 4: "rgba" });
-    }
-    case "hsl":
-    case "hsla": {
-      const args = resolve(state, descriptor.arguments, style).flat(10);
-      return getColorArgs(args, { 3: "hsl", 4: "hsla" });
-    }
-    case "hairlineWidth": {
-      return StyleSheet.hairlineWidth;
-    }
-    case "platformColor": {
-      return PlatformColor(
-        ...(descriptor.arguments as any[]),
-      ) as unknown as string;
-    }
-    case "platformSelect": {
-      return resolve(
-        state,
-        Platform.select(descriptor.arguments[0] as any),
-        style,
-      );
-    }
-    case "getPixelSizeForLayoutSize": {
-      const v = resolve(state, descriptor.arguments[0], style);
-      if (typeof v === "number") return PixelRatio.getPixelSizeForLayoutSize(v);
-    }
-    case "fontScale": {
-      const value = resolve(state, descriptor.arguments[0], style);
-      if (typeof value === "number") return PixelRatio.getFontScale() * value;
-    }
-    case "pixelScale": {
-      const value = resolve(state, descriptor.arguments[0], style);
-      if (typeof value === "number") return PixelRatio.get() * value;
-    }
-    case "pixelScaleSelect": {
-      const specifics = descriptor.arguments[0] as any;
-      return resolve(
-        state,
-        specifics[PixelRatio.get()] ?? specifics["default"],
-        style,
-      );
-    }
-    case "fontScaleSelect": {
-      const specifics = descriptor.arguments[0] as any;
-      return resolve(
-        state,
-        specifics[PixelRatio.getFontScale()] ?? specifics["default"],
-        style,
-      );
-    }
-    case "roundToNearestPixel": {
-      const v = resolve(state, descriptor.arguments[0], style);
-      if (typeof v === "number") return PixelRatio.roundToNearestPixel(v);
-    }
-    default: {
-      if ("name" in descriptor && "arguments" in descriptor) {
-        const args = resolve(state, descriptor.arguments, style).join(",");
-        return `${descriptor.name}(${args})`;
+      if (castToArray && !Array.isArray(descriptor)) {
+        return [descriptor];
       } else {
         return descriptor;
       }
     }
+
+    const [, name, descriptorArgs = []] = descriptor;
+
+    const cast = (value: RuntimeValueDescriptor) => {
+      if (value === undefined) return;
+      return castToArray && !Array.isArray(value) ? [value] : value;
+    };
+
+    switch (name) {
+      case "@textShadow": {
+        return textShadow(
+          resolve,
+          state,
+          refs,
+          tracking,
+          descriptorArgs,
+          style,
+        );
+      }
+      case "var": {
+        let value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        if (typeof value === "string")
+          value = getVar(state, refs, tracking, value, style);
+        if (value === undefined && descriptorArgs[1]) {
+          value = resolveValue(state, refs, tracking, descriptorArgs[1], style);
+        }
+
+        return cast(value);
+      }
+      case "calc": {
+        return cast(calc(state, refs, tracking, descriptorArgs, style)?.value);
+      }
+      case "max": {
+        let mode;
+        let values: number[] = [];
+
+        for (const arg of descriptorArgs) {
+          const result = calc(state, refs, tracking, [arg], style);
+          if (result) {
+            if (!mode) mode = result?.mode;
+            if (result.mode === mode) {
+              values.push(result.raw);
+            }
+          }
+        }
+
+        const max = Math.max(...values);
+        return cast(mode === "percentage" ? `${max}%` : max);
+      }
+      case "min": {
+        let mode;
+        let values: number[] = [];
+
+        for (const arg of descriptorArgs) {
+          const result = calc(state, refs, tracking, [arg], style);
+          if (result) {
+            if (!mode) mode = result?.mode;
+            if (result.mode === mode) {
+              values.push(result.raw);
+            }
+          }
+        }
+
+        const min = Math.min(...values);
+        return cast(mode === "percentage" ? `${min}%` : min);
+      }
+      case "clamp": {
+        const min = calc(state, refs, tracking, descriptorArgs[0], style);
+        const val = calc(state, refs, tracking, descriptorArgs[1], style);
+        const max = calc(state, refs, tracking, descriptorArgs[2], style);
+
+        if (!min || !val || !max) return;
+        if (min.mode !== val.mode && max.mode !== val.mode) return;
+
+        const value = Math.max(min.raw, Math.min(val.raw, max.raw));
+        return cast(val.mode === "percentage" ? `${value}%` : value);
+      }
+      case "vh": {
+        // 50vh = 50% of the viewport height
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const vhValue = vh.get(tracking.effect) / 100;
+        if (typeof value === "number") {
+          return cast(round(vhValue * value));
+        }
+      }
+      case "vw": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const vwValue = vw.get(tracking.effect) / 100;
+        if (typeof value === "number") {
+          return cast(round(vwValue * value));
+        }
+      }
+      case "em": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const fontSize = style?.fontSize ?? rem.get(tracking.effect);
+        if (typeof value === "number") {
+          return cast(round(fontSize * value));
+        }
+      }
+      case "rem": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const remValue = rem.get(tracking.effect);
+        if (typeof value === "number") {
+          return cast(round(remValue * value));
+        }
+      }
+      case "rnh": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const height = style?.height ?? getHeight(state, refs, tracking);
+        if (typeof value === "number") {
+          return cast(round(height * value));
+        }
+      }
+      case "rnw": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        const width = style?.width ?? getWidth(state, refs, tracking);
+        if (typeof value === "number") {
+          return cast(round(width * value));
+        }
+      }
+      case "hwb":
+        const args = resolve(state, refs, tracking, descriptorArgs, style).flat(
+          10,
+        );
+        return cast(getColorArgs(args, { 3: "hwb" }));
+      case "rgb":
+      case "rgba": {
+        const args = resolve(state, refs, tracking, descriptorArgs, style).flat(
+          10,
+        );
+        return cast(getColorArgs(args, { 3: "rgb", 4: "rgba" }));
+      }
+      case "hsl":
+      case "hsla": {
+        const args = resolve(state, refs, tracking, descriptorArgs, style).flat(
+          10,
+        );
+        return cast(getColorArgs(args, { 3: "hsl", 4: "hsla" }));
+      }
+      case "hairlineWidth": {
+        return cast(StyleSheet.hairlineWidth);
+      }
+      case "platformColor": {
+        return cast(
+          PlatformColor(...(descriptorArgs as any[])) as unknown as string,
+        );
+      }
+      case "platformSelect": {
+        if (!isDescriptorArray(descriptorArgs)) return;
+        const value = resolve(
+          state,
+          refs,
+          tracking,
+          Platform.select(Object.fromEntries(descriptorArgs as any)),
+          style,
+        );
+        return cast(value);
+      }
+      case "getPixelSizeForLayoutSize": {
+        const v = resolve(state, refs, tracking, descriptorArgs[0], style);
+        if (typeof v === "number") {
+          return cast(PixelRatio.getPixelSizeForLayoutSize(v));
+        }
+      }
+      case "fontScale": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        if (typeof value === "number") {
+          return cast(PixelRatio.getFontScale() * value);
+        }
+      }
+      case "pixelScale": {
+        const value = resolve(state, refs, tracking, descriptorArgs[0], style);
+        if (typeof value === "number") {
+          return cast(PixelRatio.get() * value);
+        }
+      }
+      case "pixelScaleSelect": {
+        const specifics = Object.fromEntries(
+          descriptorArgs as [string, RuntimeValueDescriptor][],
+        );
+        const value = resolve(
+          state,
+          refs,
+          tracking,
+          specifics[PixelRatio.get()] ?? specifics["default"],
+          style,
+        );
+
+        return cast(value);
+      }
+      case "fontScaleSelect": {
+        const specifics = Object.fromEntries(
+          descriptorArgs as [string, RuntimeValueDescriptor][],
+        );
+        const value = resolve(
+          state,
+          refs,
+          tracking,
+          specifics[PixelRatio.getFontScale()] ?? specifics["default"],
+          style,
+        );
+        return cast(value);
+      }
+      case "roundToNearestPixel": {
+        const v = resolve(state, refs, tracking, descriptorArgs[0], style);
+        if (typeof v === "number") {
+          return PixelRatio.roundToNearestPixel(v);
+        }
+      }
+      case "translateX":
+      case "translateY":
+      case "scale":
+      case "scaleX":
+      case "scaleY":
+      case "rotate":
+      case "rotateX":
+      case "rotateY":
+      case "rotateZ":
+      case "skewX":
+      case "skewY":
+      case "perspective":
+      case "matrix":
+      case "transformOrigin": {
+        const value = {
+          [name]: resolve(state, refs, tracking, descriptorArgs[0], style),
+        } as RuntimeValueDescriptor;
+        return cast(value);
+      }
+      case "translate":
+      case "scale": {
+        return [
+          {
+            [`${name}X`]: resolve(
+              state,
+              refs,
+              tracking,
+              descriptorArgs[0],
+              style,
+            ),
+          },
+          {
+            [`${name}Y`]: resolve(
+              state,
+              refs,
+              tracking,
+              descriptorArgs[1],
+              style,
+            ),
+          },
+        ] as unknown as RuntimeValueDescriptor;
+      }
+      default: {
+        if ("name" in descriptor && "arguments" in descriptor) {
+          const args = resolve(
+            state,
+            refs,
+            tracking,
+            descriptorArgs,
+            style,
+          ).join(",");
+          return cast(`${descriptor.name}(${args})`);
+        } else {
+          return cast(descriptor);
+        }
+      }
+    }
+  } catch (error) {
+    if (process.env.NODE_ENV !== "development") {
+      console.error(error);
+    }
+    return undefined;
   }
 }
 
 function resolve(
-  state: PropState,
-  args: RuntimeValueDescriptor,
+  state: ReducerState,
+  refs: Refs,
+  tracking: ReducerTracking,
+  descriptor: RuntimeValueDescriptor | RuntimeValueDescriptor[],
   style?: Record<string, any>,
 ): any {
-  if (typeof args !== "object") {
-    return args;
+  if (typeof descriptor !== "object" || !Array.isArray(descriptor)) {
+    return descriptor;
   }
 
-  if (!Array.isArray(args)) {
-    return "arguments" in args ? resolveValue(state, args, style) : args;
-  }
-
-  let resolved = [];
-
-  for (let value of args) {
-    value = resolve(state, value, style);
-
-    if (value !== undefined) {
-      resolved.push(value);
+  if (isDescriptorArray(descriptor)) {
+    // Resolve the items, but skip anything that returns undefined
+    let resolved = [];
+    for (let value of descriptor) {
+      value = resolve(state, refs, tracking, value, style);
+      if (value !== undefined) {
+        resolved.push(value);
+      }
     }
+    return resolved;
   }
 
-  return resolved;
+  return resolveValue(state, refs, tracking, descriptor, style);
 }
 
 /**
@@ -229,123 +368,114 @@ function resolve(
  * - inline (via via a className or via the style prop)
  * - universal (e.g this CSS sets a universal variable `* { --primary: red; }` )
  * - inherited via the parent (either the parent set a variable, or its a :root variable)
- * @param propState
+ * @param state
  * @param name
  * @param style
  * @returns
  */
 function getVar(
-  propState: PropState,
+  state: ReducerState,
+  refs: Refs,
+  tracking: ReducerTracking,
   name: string,
   style?: Record<string, any>,
 ) {
   if (!name) return;
   let value: any = undefined;
   // Get the value from the inline style
-  value ??= propState.variables?.[name];
+  value ??= getVariable(name, state.variables);
   // Get the value from the universal variables
-  value ??= universalVariables[name]?.get(propState.styleEffect);
+  value ??= getUniversalVariable(name, tracking.effect);
 
   if (value === undefined) {
     // Get the value from the parent
-    value = propState.refs.variables[name];
+    value = getVariable(name, refs.variables, tracking.effect);
     // If the parent is :root, these are Observables instead of the raw values
     // So you need to access them with the styleEffect
     if (typeof value === "object" && "get" in value) {
-      value = value.get(propState.styleEffect);
+      value = value.get(tracking.effect);
+    } else if (value !== undefined) {
+      // This is a normal value that came from the context, so we need to track it
+      tracking.guards.push(
+        (refs) => getVariable(name, refs.variables, tracking.effect) !== value,
+      );
     }
-
-    // Track which variables we have accessed and their values.
-    // This will be used to determine if we should rerun the styleEffect, even if the declarationEffect didn't change
-    propState.variableTracking ??= new Map();
-    propState.variableTracking.set(name, value);
   }
 
   // The value may be another descriptor, so we need to resolve it
-  return resolveValue(propState, value, style);
+  return resolveValue(state, refs, tracking, value, style);
 }
 
 export function resolveAnimation(
-  state: PropState,
+  state: ReducerState,
+  refs: Refs,
   [initialFrame, ...frames]: RuntimeValueFrame[],
   property: string,
-  props: Record<string, any> = {},
-  normalizedProps: Record<string, any>,
   delay: number,
   totalDuration: number,
-  timingFunction: EasingFunction,
+  easingFuncs: EasingFunction | EasingFunction[],
 ): [AnimatableValue, AnimatableValue, ...AnimatableValue[]] {
   const { withDelay, withTiming, Easing } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
+  let progress = 0;
+
   const initialValue = resolveAnimationValue(
     state,
-    props,
-    normalizedProps,
+    refs,
     property,
     initialFrame.value,
   );
 
   return [
     initialValue,
-    ...frames.map((frame) => {
-      return withDelay(
-        delay,
-        withTiming(
-          resolveAnimationValue(
-            state,
-            props,
-            normalizedProps,
-            property,
-            frame.value,
-          ),
-          {
-            duration: totalDuration * frame.progress,
-            easing: getEasing(timingFunction, Easing),
-          },
-        ),
+    ...frames.map((frame, index) => {
+      const easingFunction = Array.isArray(easingFuncs)
+        ? easingFuncs[index]
+        : easingFuncs;
+
+      const framesProgress = frame.progress - progress;
+
+      let value = withTiming(
+        resolveAnimationValue(state, refs, property, frame.value),
+        {
+          duration: totalDuration * framesProgress,
+          easing: getEasing(easingFunction, Easing),
+        },
       );
+
+      // You can only have a delay between the initial and first frame
+      if (index === 1) {
+        value = withDelay(delay, value);
+      }
+
+      progress += framesProgress;
+
+      return value;
     }),
   ] as [AnimatableValue, AnimatableValue, ...AnimatableValue[]];
 }
 
 function resolveAnimationValue(
-  state: PropState,
-  props: Record<string, any> = {},
-  normalizedProps: Record<string, any>,
+  state: ReducerState,
+  refs: Refs,
   property: string,
   value: RuntimeValueDescriptor,
 ) {
   if (value === "!INHERIT!") {
-    value = normalizedProps[property] ?? props.style[property];
+    const { value: baseValue, defaultValue } = getBaseValue(state, [property]);
+    value = baseValue ?? defaultValue;
     if (value === undefined) {
-      const defaultValueFn = defaultValues[property];
+      const defaultValueFn =
+        defaultValues[property as keyof typeof defaultValues];
       return typeof defaultValueFn === "function"
-        ? defaultValueFn(state.styleEffect)
+        ? defaultValueFn(state.styleTracking.effect)
         : defaultValueFn;
     }
     return value;
   } else {
-    return resolve(state, value, props);
+    return resolve(state, refs, state.styleTracking, value, state.props);
   }
-}
-
-export function resolveTransitionValue(
-  state: PropState,
-  props: Record<string, any> = {},
-  normalizedProps: Record<string, any>,
-  property: string,
-) {
-  const defaultValueFn = defaultValues[property];
-  const defaultValue =
-    typeof defaultValueFn === "function"
-      ? defaultValueFn(state.styleEffect)
-      : defaultValueFn;
-
-  return {
-    defaultValue,
-    value: normalizedProps[property] ?? props[state.target]?.[property],
-  };
 }
 
 export const timeToMS = (time: Time) => {
@@ -358,7 +488,7 @@ function round(number: number) {
 
 export function getEasing(
   timingFunction: EasingFunction,
-  Easing: typeof import("react-native-reanimated")["Easing"],
+  Easing: (typeof import("react-native-reanimated"))["Easing"],
 ) {
   switch (timingFunction.type) {
     case "ease":
@@ -427,21 +557,26 @@ function getColorArgs(args: any[], config: Record<number, string>) {
   if (config[args.length]) return `${config[args.length]}(${args.join(", ")})`;
 }
 
-function getLayout(state: PropState, interaction = state.interaction) {
-  interaction.layout ??= observable([0, 0]);
-  return interaction.layout.get(state.styleEffect);
+function getLayout(state: ReducerState, refs: Refs, tracking: ReducerTracking) {
+  refs.sharedState.layout ??= observable([0, 0]);
+  return refs.sharedState.layout.get(tracking.effect);
 }
-export function getWidth(state: PropState) {
-  return getLayout(state)[0];
+export function getWidth(
+  state: ReducerState,
+  refs: Refs,
+  tracking: ReducerTracking,
+) {
+  return getLayout(state, refs, tracking)[0];
 }
-export function getHeight(state: PropState) {
-  return getLayout(state)[1];
+export function getHeight(
+  state: ReducerState,
+  refs: Refs,
+  tracking: ReducerTracking,
+) {
+  return getLayout(state, refs, tracking)[1];
 }
 
-export const defaultValues: Record<
-  string,
-  AnimatableValue | ((effect: Effect) => AnimatableValue)
-> = {
+export const defaultValues = {
   backgroundColor: "transparent",
   borderBottomColor: "transparent",
   borderBottomLeftRadius: 0,
@@ -457,7 +592,7 @@ export const defaultValues: Record<
   borderTopWidth: 0,
   borderWidth: 0,
   bottom: 0,
-  color: (effect) => {
+  color: (effect: Effect) => {
     return systemColorScheme.get(effect) === "dark" ? "white" : "black";
   },
   flex: 1,
@@ -495,6 +630,7 @@ export const defaultValues: Record<
   scaleY: 1,
   skewX: "0deg",
   skewY: "0deg",
+  textShadowRadius: 0,
   top: 0,
   translateX: 0,
   translateY: 0,
@@ -527,20 +663,23 @@ function applyCalcOperator(
 }
 
 export function calc(
-  state: PropState,
-  expression: RuntimeValueDescriptor,
+  state: ReducerState,
+  refs: Refs,
+  tracking: ReducerTracking,
+  descriptor: RuntimeValueDescriptor | RuntimeValueDescriptor[],
   style?: Record<string, any>,
 ) {
+  let mode;
   const values: number[] = [];
   const ops: string[] = [];
 
-  let mode;
+  descriptor = Array.isArray(descriptor)
+    ? isDescriptorFunction(descriptor)
+      ? [descriptor]
+      : descriptor
+    : [descriptor];
 
-  if (!Array.isArray(expression)) {
-    expression = [expression];
-  }
-
-  for (let token of expression) {
+  for (let token of descriptor) {
     switch (typeof token) {
       case "undefined":
         // Fail on an undefined value
@@ -552,7 +691,7 @@ export function calc(
         continue;
       case "object": {
         // All values should resolve to a numerical value
-        const value = resolveValue(state, token, style);
+        const value = resolveValue(state, refs, tracking, token, style);
         switch (typeof value) {
           case "number": {
             if (!mode) mode = "number";
@@ -613,4 +752,67 @@ export function calc(
     raw: value,
     value: mode === "percentage" ? `${value}%` : value,
   };
+}
+
+export function getBaseValue(state: ReducerState, paths: string[]) {
+  paths = [...state.config.target, ...paths];
+  let prop: string = "";
+
+  let target: unknown = state.props;
+  for (let index = 0; index < paths.length && target; index++) {
+    if (!isRecord(target)) {
+      target = undefined;
+      continue;
+    }
+
+    prop = paths[index];
+
+    if (target[prop] === undefined) {
+      if (
+        transformKeys.has(prop) &&
+        isRecord(target) &&
+        "transform" in target
+      ) {
+        target = target.transform.find((t: any) => t[prop] !== undefined);
+
+        if (isRecord(target) && prop in target) {
+          target = target[prop];
+        } else {
+          target = undefined;
+        }
+      } else {
+        target = undefined;
+      }
+    } else {
+      target = target[prop];
+    }
+  }
+
+  const defaultValueFn =
+    defaultValues[paths[paths.length - 1] as keyof typeof defaultValues];
+  const defaultValue =
+    typeof defaultValueFn === "function"
+      ? defaultValueFn(state.styleTracking.effect)
+      : defaultValueFn;
+
+  return {
+    value: target as any | undefined,
+    defaultValue,
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, any> {
+  return Boolean(typeof value === "object" && value);
+}
+
+export function getTarget(
+  target: Record<string, any> | undefined | null,
+  config: InteropComponentConfig,
+) {
+  for (let index = 0; index < config.target.length && target; index++) {
+    const prop = config.target[index];
+    target = target[prop];
+  }
+
+  return target || undefined;
 }

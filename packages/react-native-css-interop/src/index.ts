@@ -2,14 +2,17 @@ export { createElement } from "react";
 
 export { default as wrapJSX } from "./runtime/wrap-jsx";
 
+export * from "./doctor";
+
 export {
-  cssInterop,
-  remapProps,
-  createInteropElement,
   StyleSheet,
   colorScheme,
+  createInteropElement,
+  cssInterop,
+  rem,
+  remapProps,
   useColorScheme,
+  useSafeAreaEnv,
   useUnstableNativeVariable,
   vars,
-  rem,
 } from "./runtime";

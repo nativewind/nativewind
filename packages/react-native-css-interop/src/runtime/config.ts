@@ -1,33 +1,58 @@
-import {
-  EnableCssInteropOptions,
-  InteropComponentConfig,
-  NativeStyleToProp,
-} from "../types";
+import { EnableCssInteropOptions, InteropComponentConfig } from "../types";
 
 export function getNormalizeConfig(
   mapping: EnableCssInteropOptions<any>,
 ): InteropComponentConfig[] {
-  const config = new Map<string, InteropComponentConfig>();
+  const configs: InteropComponentConfig[] = [];
 
-  for (const [source, options] of Object.entries(mapping) as Array<
-    [string, EnableCssInteropOptions<any>[string]]
-  >) {
-    let target: string;
-    let nativeStyleToProp: NativeStyleToProp<any> | undefined;
+  for (const [source, options] of Object.entries(mapping)) {
+    let target: string[];
+    let inlineProp: string | undefined;
+    let propToRemove: string | undefined;
+    let nativeStyleToProp: InteropComponentConfig["nativeStyleToProp"];
 
     if (!options) continue;
 
-    if (typeof options === "boolean") {
-      target = source;
+    if (options === true) {
+      target = [source];
     } else if (typeof options === "string") {
-      target = options;
+      target = [options];
+    } else if (options.target === false) {
+      /*
+       * Even when target == false, you still need to process as normal. As nativeStyleToProp may move a style
+       * Once the styles are moved, you then need to remove the prop as there maybe left over styles
+       * e.g paddingTop: calc(10 + 2em). The user may also set a fontSize here to force a value of the `em`
+       */
+      target = [source];
+      propToRemove = source;
+      nativeStyleToProp = parseNativeStyleToProp(options.nativeStyleToProp);
     } else {
-      target = typeof options.target === "boolean" ? source : options.target;
-      nativeStyleToProp = options.nativeStyleToProp;
+      target = options.target === true ? [source] : options.target.split(".");
+      nativeStyleToProp = parseNativeStyleToProp(options.nativeStyleToProp);
     }
 
-    config.set(target, { target, source, nativeStyleToProp });
+    if (target.length === 1 && target[0] !== source) {
+      inlineProp = target[0];
+    }
+
+    configs.push({
+      nativeStyleToProp,
+      source,
+      target,
+      inlineProp,
+      propToRemove,
+    });
   }
 
-  return Array.from(config.values());
+  return configs;
+}
+
+function parseNativeStyleToProp(
+  nativeStyleToProp?: Record<string, string | true>,
+): InteropComponentConfig["nativeStyleToProp"] {
+  if (!nativeStyleToProp) return;
+
+  return Object.entries(nativeStyleToProp).map(([key, value]) => {
+    return [key, value === true ? [key] : value.split(".")];
+  });
 }

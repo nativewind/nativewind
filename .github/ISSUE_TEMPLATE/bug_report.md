@@ -10,21 +10,19 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Reproduction**
+Please see our contribution guide: https://github.com/nativewind/nativewind/blob/main/contributing.md#opening-an-issue
+
+⚠️ **Important**: Issues without a valid reproduction link will not be reviewed and will be automatically closed. Provide one of the following:
+- **StackBlitz template**: https://stackblitz.com/edit/nativewind-test?view=editor
+- **Create Expo Stack template**: 
+  - `npx rn-new@latest --nativewind`
+  - `npx rn-new@latest --nativewind --expo-router`
+
+If you have a usage question, please use the [Discord](https://discord.gg/nativewind) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions) instead.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Expo Snack**
-If applicable, add a link to an Expo snack demonstrating the issue. There are multiple example snacks available at nativewind.dev.
-
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
 **Additional context**
-Add any other context about the problem here.
+Add any other context about the problem here. If applicable, add screenshots to help explain your problem.

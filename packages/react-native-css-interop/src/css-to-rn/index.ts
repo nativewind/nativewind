@@ -1,36 +1,52 @@
+import { versions } from "node:process";
+
+import { debug as debugFn } from "debug";
 import {
-  KeyframesRule,
   Animation,
+  ContainerRule,
+  ContainerType,
   Declaration,
-  transform as lightningcss,
   DeclarationBlock,
+  EasingFunction,
+  KeyframesRule,
+  transform as lightningcss,
   MediaQuery,
   MediaRule,
-  SelectorList,
   Rule,
-  ContainerType,
-  ContainerRule,
+  SelectorList,
+  TokenOrValue,
 } from "lightningcss";
 
 import {
+  DEFAULT_CONTAINER_NAME,
+  isRuntimeDescriptor,
+  SpecificityIndex,
+  StyleRuleSetSymbol,
+  StyleRuleSymbol,
+  transformKeys,
+} from "../shared";
+import {
   AnimatableCSSProperty,
+  AnimationFrame,
+  CssToReactNativeRuntimeOptions,
   ExtractedAnimation,
   ExtractionWarning,
   ExtractRuleOptions,
-  CssToReactNativeRuntimeOptions,
-  StyleSheetRegisterCompiledOptions,
-  StyleRule,
-  Specificity,
   MoveTokenRecord,
-  StyleRuleSet,
-  StyleDeclaration,
-  RuntimeValueFrame,
   PathTokens,
+  RuntimeValueDescriptor,
+  Specificity,
+  SpecificityValue,
+  StyleDeclaration,
+  StyleRule,
+  StyleRuleSet,
+  StyleSheetRegisterCompiledOptions,
 } from "../types";
-import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
-import { DEFAULT_CONTAINER_NAME } from "../shared";
+import { defaultFeatureFlags } from "./feature-flags";
 import { normalizeSelectors, toRNProperty } from "./normalize-selectors";
-import { optimizeRules } from "./optimize-rules";
+import { parseDeclaration, ParseDeclarationOptions } from "./parseDeclaration";
+
+// import { isDeepEqual } from "../util/isDeepEqual";
 
 type CSSInteropAtRule = {
   type: "custom";
@@ -52,12 +68,23 @@ export type { CssToReactNativeRuntimeOptions };
 export function cssToReactNativeRuntime(
   code: Buffer | string,
   options: CssToReactNativeRuntimeOptions = {},
+  debug = debugFn("react-native-css-interop"),
 ): StyleSheetRegisterCompiledOptions {
+  const features = Object.assign({}, defaultFeatureFlags, options.features);
+
+  debug(`Features ${JSON.stringify(features)}`);
+
+  if (Number(versions.node.split(".")[0]) < 18) {
+    throw new Error("react-native-css-interop only supports NodeJS >18");
+  }
+
   // Parse the grouping options to create an array of regular expressions
   const grouping =
     options.grouping?.map((value) => {
       return typeof value === "string" ? new RegExp(value) : value;
     }) ?? [];
+
+  debug(`Grouping ${grouping}`);
 
   // These will by mutated by `extractRule`
   const extractOptions: ExtractRuleOptions = {
@@ -69,19 +96,51 @@ export function cssToReactNativeRuntime(
     flags: {},
     appearanceOrder: 1,
     ...options,
+    features,
     grouping,
+    varUsageCount: new Map(),
+  };
+
+  debug(`Start lightningcss`);
+
+  const onVarUsage = (token: TokenOrValue) => {
+    if (token.type === "function") {
+      token.value.arguments.forEach((token) => onVarUsage(token));
+    } else if (token.type === "var") {
+      const variable = token.value;
+      const varName = variable.name.ident;
+      extractOptions.varUsageCount.set(
+        varName,
+        (extractOptions.varUsageCount.get(varName) || 0) + 1,
+      );
+
+      if (variable.fallback) {
+        const fallbackValues = variable.fallback;
+        fallbackValues.forEach((varObj) => onVarUsage(varObj));
+      }
+    }
   };
 
   // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
   lightningcss({
     filename: "style.css", // This is ignored, but required
-    code: typeof code === "string" ? Buffer.from(code) : code,
+    code: typeof code === "string" ? new TextEncoder().encode(code) : code,
     visitor: {
-      Rule(rule) {
-        // Extract the style declarations and animations from the current rule
-        extractRule(rule, extractOptions);
-        // We have processed this rule, so now delete it from the AST
-        return [];
+      Declaration(decl) {
+        // Track variable usage, we remove any unused variables
+        if (decl.property !== "unparsed" && decl.property !== "custom") return;
+        decl.value.value.forEach((varObj) => onVarUsage(varObj));
+      },
+      StyleSheetExit(sheet) {
+        debug(`Found ${sheet.rules.length} rules to process`);
+
+        for (const rule of sheet.rules) {
+          // Extract the style declarations and animations from the current rule
+          extractRule(rule, extractOptions);
+          // We have processed this rule, so now delete it from the AST
+        }
+
+        debug(`Exiting lightningcss`);
       },
     },
     customAtRules: {
@@ -94,19 +153,28 @@ export function cssToReactNativeRuntime(
     },
   });
 
-  const rules: StyleSheetRegisterCompiledOptions["rules"] = [];
+  debug(`Found ${extractOptions.rules.size} valid rules`);
+
+  let rules: StyleSheetRegisterCompiledOptions["rules"] = {};
+  let ruleCount = 0;
   for (const [name, styles] of extractOptions.rules) {
     if (styles.length === 0) continue;
 
-    const styleRuleSet: StyleRuleSet = { $$type: "StyleRuleSet" };
+    // if (isDeepEqual(styles, options.cache?.rules.get(name))) {
+    //   continue;
+    // }
+
+    options.cache?.rules.set(name, styles);
+
+    const styleRuleSet: StyleRuleSet = { [StyleRuleSetSymbol]: true };
 
     for (const { warnings, ...style } of styles) {
-      if (style.specificity.I) {
-        styleRuleSet.important ??= [];
-        styleRuleSet.important.push(style);
+      if (style.s[SpecificityIndex.Important]) {
+        styleRuleSet.i ??= [];
+        styleRuleSet.i.push(style);
       } else {
-        styleRuleSet.normal ??= [];
-        styleRuleSet.normal.push(style);
+        styleRuleSet.n ??= [];
+        styleRuleSet.n.push(style);
       }
 
       if (warnings) {
@@ -118,21 +186,42 @@ export function cssToReactNativeRuntime(
       if (style.container) styleRuleSet.container = true;
       if (style.animations) styleRuleSet.animation = true;
       if (style.transition) styleRuleSet.animation = true;
+      if (style.pseudoClasses?.active) styleRuleSet.active = true;
+      if (style.pseudoClasses?.hover) styleRuleSet.hover = true;
+      if (style.pseudoClasses?.focus) styleRuleSet.focus = true;
     }
 
-    rules.push([name, styleRuleSet]);
+    rules[name] = styleRuleSet;
+    ruleCount++;
   }
 
-  // Convert the extracted style declarations and animations from maps to objects and return them
-  return {
-    $$compiled: true,
-    rules: optimizeRules(rules),
-    keyframes: Array.from(extractOptions.keyframes.entries()),
-    rootVariables: extractOptions.rootVariables,
-    universalVariables: extractOptions.universalVariables,
-    flags: extractOptions.flags,
-    rem: extractOptions.rem,
+  // debug(`Found ${ruleCount} new/changed rules`);
+  // debug(
+  //   `Note: Specificity order matters and a new style will change the specificity of the rules below it, causing a larger than expected number of changed rules`,
+  // );
+
+  const rem = extractOptions.inlineRem || extractOptions.rem;
+  const keyframes = Array.from(extractOptions.keyframes);
+  const rootVariables = extractOptions.rootVariables;
+  const universalVariables = extractOptions.universalVariables;
+  const flags = extractOptions.flags;
+
+  const result: StyleSheetRegisterCompiledOptions = {
+    $compiled: true,
+    flags,
+    rem,
   };
+
+  if (ruleCount) result.rules = rules;
+  if (keyframes.length) result.keyframes = keyframes;
+  if (rootVariables && Object.keys(rootVariables).length) {
+    result.rootVariables = rootVariables;
+  }
+  if (universalVariables && Object.keys(universalVariables).length) {
+    result.universalVariables = universalVariables;
+  }
+
+  return result;
 }
 
 /**
@@ -349,29 +438,26 @@ function setStyleForSelectorList(
     options,
   )) {
     const style: StyleRule = { ...extractedStyle };
-    if (!style.declarations) continue;
+    if (!style.d) continue;
 
     if (
-      selector.type === "rootVariables" ||
-      selector.type === "universalVariables"
+      selector.type === "rootVariables" || // :root
+      selector.type === "universalVariables" // *
     ) {
-      const fontSizeDeclaration = style.declarations.findLast((declaration) => {
-        if (Array.isArray(declaration)) {
-          return (
-            declaration[0] === "fontSize" && typeof declaration[2] === "number"
-          );
-        } else {
-          return "fontSize" in declaration;
-        }
-      });
+      const fontSizeValue = style.d.findLast(([value]) => {
+        return typeof value === "object" && "fontSize" in value;
+      })?.[0];
 
-      if (fontSizeDeclaration) {
-        const rem = Array.isArray(fontSizeDeclaration)
-          ? fontSizeDeclaration[2]
-          : (fontSizeDeclaration as Record<"fontSize", number>).fontSize;
-
-        if (typeof rem === "number") {
-          options.rem = rem;
+      if (
+        typeof options.inlineRem !== "number" &&
+        fontSizeValue &&
+        typeof fontSizeValue === "object" &&
+        "fontSize" in fontSizeValue &&
+        typeof fontSizeValue["fontSize"] === "number"
+      ) {
+        options.rem = fontSizeValue["fontSize"];
+        if (options.inlineRem === undefined) {
+          options.inlineRem = options.rem;
         }
       }
 
@@ -397,18 +483,22 @@ function setStyleForSelectorList(
         media,
       } = selector;
 
-      const specificity = {
-        ...extractedStyle.specificity,
-        ...selector.specificity,
-      };
+      const specificity: SpecificityValue[] = [];
+      for (let index = 0; index < 5; index++) {
+        const value =
+          (extractedStyle.s[index] ?? 0) + (selector.specificity[index] ?? 0);
+        if (value) {
+          specificity[index] = value;
+        }
+      }
 
       if (groupClassName) {
         // Add the conditions to the declarations object
         addDeclaration(declarations, groupClassName, {
-          $$type: "StyleRule",
-          specificity,
+          [StyleRuleSymbol]: true,
+          s: specificity,
           attrs,
-          declarations: [],
+          d: [],
           container: {
             names: [groupClassName],
           },
@@ -427,12 +517,15 @@ function setStyleForSelectorList(
         style.media.push(...media);
       }
 
-      addDeclaration(declarations, className, {
+      const rule: StyleRule = {
         ...style,
-        specificity,
-        pseudoClasses,
-        attrs,
-      });
+        s: specificity,
+      };
+
+      if (pseudoClasses) rule.pseudoClasses = pseudoClasses;
+      if (attrs) rule.attrs = attrs;
+
+      addDeclaration(declarations, className, rule);
     }
   }
 }
@@ -455,16 +548,21 @@ function extractKeyFrames(
   extractOptions: ExtractRuleOptions,
 ) {
   const animation: ExtractedAnimation = { frames: [] };
-  const frames: {
-    [index: string]: { values: RuntimeValueFrame[]; pathTokens: PathTokens };
-  } = {};
-
-  let rawFrames: Array<{ selector: number; values: StyleDeclaration[] }> = [];
+  let rawFrames: Array<{
+    selector: number;
+    values: StyleDeclaration[];
+    easingFunction?: EasingFunction;
+  }> = [];
 
   for (const frame of keyframes.keyframes) {
     if (!frame.declarations.declarations) continue;
 
-    const { declarations: props } = declarationsToStyle(
+    const specificity: Specificity = [];
+    specificity[SpecificityIndex.Important] = 2; // Animations have higher specificity than important
+    specificity[SpecificityIndex.ClassName] = 1;
+    specificity[SpecificityIndex.Order] = extractOptions.appearanceOrder;
+
+    const { d: declarations, animations } = declarationsToStyle(
       frame.declarations.declarations,
       {
         ...extractOptions,
@@ -476,47 +574,48 @@ function extractKeyFrames(
           }
         },
       },
-      {
-        I: 99, // Animations have higher specificity than important
-        S: 1,
-        O: extractOptions.appearanceOrder,
-      },
+      specificity,
       {},
     );
 
-    if (!props) continue;
+    if (!declarations) continue;
 
     /**
      * We an only animation style props
+     * Non-style props have pathTokens instead of a single string
      */
-    const values = props.filter((prop) => {
-      const target = prop.length === 2 ? prop[0] : prop[1][0];
-      return target === "style";
-    });
+    const values = declarations.filter(
+      (declaration) =>
+        declaration.length === 1 || typeof declaration[1] === "string",
+    );
 
     if (values.length === 0) continue;
+
+    const easingFunction = animations?.timingFunction?.[0];
 
     for (const selector of frame.selectors) {
       const keyframe =
         selector.type === "percentage"
           ? selector.value * 100
           : selector.type === "from"
-          ? 0
-          : selector.type === "to"
-          ? 100
-          : undefined;
+            ? 0
+            : selector.type === "to"
+              ? 100
+              : undefined;
 
       if (keyframe === undefined) continue;
 
       switch (selector.type) {
         case "percentage":
-          rawFrames.push({ selector: selector.value, values });
+          rawFrames.push({ selector: selector.value, values, easingFunction });
           break;
         case "from":
-          rawFrames.push({ selector: 0, values });
+          rawFrames.push({ selector: 0, values, easingFunction });
           break;
         case "to":
-          rawFrames.push({ selector: 1, values });
+          rawFrames.push({ selector: 1, values, easingFunction });
+          break;
+        case "timeline-range-percentage":
           break;
         default:
           selector satisfies never;
@@ -527,36 +626,81 @@ function extractKeyFrames(
   // Need to sort afterwards, as the order of the frames is not guaranteed
   rawFrames = rawFrames.sort((a, b) => a.selector - b.selector);
 
+  // Convert the rawFrames into frames
+  const frames: Record<string, AnimationFrame> = {};
+
+  const easingFunctions: EasingFunction[] = [];
+
   for (let i = 0; i < rawFrames.length; i++) {
     const rawFrame = rawFrames[i];
-    const animationProgress = rawFrame.selector;
-    const previousProgress = i === 0 ? 0 : rawFrames[i - 1].selector;
-    const progress = animationProgress - previousProgress;
+    const progress = rawFrame.selector;
+
+    if (rawFrame.easingFunction) {
+      easingFunctions[i] = rawFrame.easingFunction;
+    }
 
     for (const frameValue of rawFrame.values) {
-      // This will never happen, as this an a later optimization
-      if (frameValue.length === 2) continue;
+      const [value, propOrPathTokens] = frameValue;
 
-      const [key, pathTokens, value] = frameValue;
+      // We only accept animations on the `style` prop, which are either undefined or a string
+      if (Array.isArray(propOrPathTokens)) {
+        continue;
+      }
 
-      if (progress === 0) {
-        frames[key] = {
-          values: [{ value, progress }],
-          pathTokens,
-        };
-      } else {
-        // All props need a progress 0 frame
-        frames[key] ??= {
-          values: [{ value: "!INHERIT!", progress: 0 }],
-          pathTokens,
-        };
+      if (propOrPathTokens) {
+        const key = propOrPathTokens;
 
-        frames[key].values.push({ value, progress });
+        if (!isRuntimeDescriptor(value)) {
+          throw new Error("animation is an object?");
+        }
+
+        if (!frames[key]) {
+          frames[key] = [key, []];
+        }
+
+        frames[key][1].push({ value, progress });
+      } else if (value && typeof value === "object" && !Array.isArray(value)) {
+        for (const key in value) {
+          if (!frames[key]) {
+            frames[key] = [key, []];
+          }
+
+          frames[key][1].push({ value: value[key], progress });
+        }
       }
     }
   }
 
-  animation.frames = Object.entries(frames);
+  /**
+   * Ensure all animations have a 0%/100% frame.
+   *
+   * As per mdn:
+   * If a keyframe rule doesn't specify the start or end states of the animation (that is, 0%/from and 100%/to),
+   * browsers will use the element's existing styles for the start/end states.
+   * This can be used to animate an element from its initial state and back.
+   */
+  animation.frames = Object.values(frames).map((value) => {
+    const valueFrames = value[1];
+
+    if (valueFrames[0].progress !== 0) {
+      valueFrames.unshift({ value: "!INHERIT!", progress: 0 });
+    }
+
+    if (valueFrames[valueFrames.length - 1].progress !== 1) {
+      valueFrames.push({ value: "!INHERIT!", progress: 1 });
+    }
+
+    return value;
+  });
+
+  if (easingFunctions.length) {
+    // This is a holey array and may contain undefined values
+    animation.easingFunctions = Array.from<EasingFunction | undefined>(
+      easingFunctions,
+    ).map((value) => {
+      return value ?? { type: "!PLACEHOLDER!" };
+    });
+  }
 
   extractOptions.keyframes.set(keyframes.name.value, animation);
 }
@@ -572,16 +716,15 @@ function getExtractedStyles(
 ): StyleRule[] {
   const extractedStyles = [];
 
+  const specificity: Specificity = [];
+  specificity[SpecificityIndex.Order] = options.appearanceOrder;
+
   if (declarationBlock.declarations && declarationBlock.declarations.length) {
     extractedStyles.push(
       declarationsToStyle(
         declarationBlock.declarations,
         options,
-        {
-          I: 0,
-          S: 1,
-          O: options.appearanceOrder,
-        },
+        specificity,
         mapping,
       ),
     );
@@ -591,15 +734,12 @@ function getExtractedStyles(
     declarationBlock.importantDeclarations &&
     declarationBlock.importantDeclarations.length
   ) {
+    specificity[SpecificityIndex.Important] = 1;
     extractedStyles.push(
       declarationsToStyle(
         declarationBlock.importantDeclarations,
         options,
-        {
-          I: 1,
-          S: 1,
-          O: options.appearanceOrder,
-        },
+        specificity,
         mapping,
       ),
     );
@@ -611,14 +751,17 @@ function getExtractedStyles(
 function declarationsToStyle(
   declarations: Declaration[],
   options: GetExtractedStyleOptions,
-  specificity: Pick<Specificity, "I" | "S" | "O">,
+  specificity: Specificity,
   mapping: MoveTokenRecord,
 ): StyleRule {
-  const props: NonNullable<StyleRule["declarations"]> = [];
+  const styleDecls: StyleDeclaration[] = [];
+  let staticStyleDecl: Extract<StyleDeclaration, { length: 1 }>[0] | undefined =
+    undefined;
+
   const extractedStyle: StyleRule = {
-    $$type: "StyleRule",
-    specificity: { A: 0, B: 0, C: 0, ...specificity },
-    declarations: props,
+    [StyleRuleSymbol]: true,
+    s: [...specificity],
+    d: styleDecls,
   };
 
   /*
@@ -630,23 +773,60 @@ function declarationsToStyle(
    * The `append` option allows the same property to be added multiple times
    * E.g. `transform` accepts an array of transforms
    */
-  function addStyleProp(attribute: string, value: any, moveTokens?: string[]) {
+  function addStyleProp(
+    attribute: string,
+    value: RuntimeValueDescriptor,
+    moveTokens?: PathTokens,
+  ) {
     if (value === undefined) {
       return;
     }
 
     if (attribute.startsWith("--")) {
+      if (!options.varUsageCount.has(attribute)) {
+        return;
+      }
+
       return addVariable(attribute, value);
     }
 
     attribute = toRNProperty(attribute);
-    let pathTokens = mapping[attribute] ?? mapping["*"] ?? ["style", attribute];
 
-    if (moveTokens) {
-      pathTokens = [...pathTokens.slice(0, -1), ...moveTokens];
+    const attributeMapping: PathTokens | undefined =
+      mapping[attribute] ?? mapping["*"];
+
+    const shouldDelay = Array.isArray(value) && Boolean(value[3]);
+
+    const pathTokens =
+      !moveTokens && !attributeMapping
+        ? attribute
+        : [...(moveTokens || []), ...(attributeMapping || [])];
+
+    if (
+      typeof pathTokens === "string" &&
+      !transformKeys.has(pathTokens) &&
+      !shouldDelay &&
+      typeof value !== "object"
+    ) {
+      if (staticStyleDecl) {
+        Object.assign(staticStyleDecl, { [pathTokens]: value });
+      } else {
+        staticStyleDecl = { [pathTokens]: value };
+        styleDecls.push([staticStyleDecl]);
+      }
+    } else if (typeof pathTokens === "string") {
+      if (shouldDelay) {
+        styleDecls.push([value, pathTokens, 1]);
+      } else {
+        styleDecls.push([value, pathTokens]);
+      }
+    } else {
+      if (shouldDelay) {
+        styleDecls.push([value, pathTokens, 1]);
+      } else {
+        styleDecls.push([value, pathTokens]);
+      }
     }
-
-    props.push([attribute, pathTokens, value]);
   }
 
   function addTransformProp(property: string, value: any) {
@@ -655,7 +835,7 @@ function declarationsToStyle(
 
   function handleTransformShorthand(
     name: string,
-    options: Record<string, unknown>,
+    options: Record<string, RuntimeValueDescriptor>,
   ) {
     if (allEqual(...Object.values(options))) {
       return addStyleProp(name, Object.values(options)[0], ["transform", name]);
@@ -668,7 +848,7 @@ function declarationsToStyle(
 
   function handleStyleShorthand(
     name: string,
-    options: Record<string, unknown>,
+    options: Record<string, RuntimeValueDescriptor>,
   ) {
     if (allEqual(...Object.values(options))) {
       return addStyleProp(name, Object.values(options)[0]);
@@ -875,6 +1055,7 @@ function declarationsToStyle(
   }
 
   const parseDeclarationOptions: ParseDeclarationOptions = {
+    features: {},
     addStyleProp,
     addTransformProp,
     handleStyleShorthand,

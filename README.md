@@ -1,29 +1,37 @@
 <div align="center">
 <p align="center">
   <a href="https://nativewind.dev" target="_blank">
-    <img src="https://nativewind.dev/img/logo.svg" alt="Tailwind CSS" width="70" height="70">
-    <h1 align="center" style="color:red;">NativeWind</h1>
+    <img src="./assets/logo.svg" alt="Tailwind CSS" width="70" height="70">
+    <h1 align="center" style="color:red;">Nativewind</h1>
   </a>
 </p>
-<img alt="GitHub branch checks state" src="https://img.shields.io/github/checks-status/marklawlor/nativewind/next">
-<img alt="npm" src="https://img.shields.io/npm/v/nativewind">
-<img alt="npm" src="https://img.shields.io/npm/dt/nativewind">
-<img alt="GitHub" src="https://img.shields.io/github/license/marklawlor/nativewind">
+
+[![npm version](https://img.shields.io/npm/v/nativewind)](https://www.npmjs.com/package/nativewind)
+[![npm downloads](https://img.shields.io/npm/dw/nativewind)](https://www.npmjs.com/package/nativewind)
+[![Github](https://img.shields.io/github/license/marklawlor/nativewind)](https://github.com/nativewind/nativewind)
+[![Discord](https://img.shields.io/discord/968718419904057416?logo=discord&logoColor=ffffff&label=Discord&color=%235865F2)](https://discord.gg/ypNakAFQ65)
+[![Twitter](https://img.shields.io/twitter/follow/nativewindcss?link=https%3A%2F%2Fx.com%2Ftailwindcss)](https://x.com/nativewindcss)
+
 </div>
 <br />
 
-`NativeWind` uses [Tailwind CSS](https://tailwindcss.com) as high-level scripting language to create a **universal design system**. Styled components can be shared between all React Native platforms, using the best style engine for that platform (e.g. CSS StyleSheet or StyleSheet.create). It's goals are to to provide a consistent styling experience across all platforms, improving Developer UX, component performance and code maintainability.
+# About
 
-`NativeWind` processes your styles during your application build, and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
+Do you like using [Tailwind CSS](https://tailwindcss.com) to style your apps? This helps you do that in [React Native](https://reactnative.dev). Nativewind is **not** a component library, it's a styling library. If you're looking for component libraries that support Nativewind, [see below](https://github.com/nativewind/nativewind/tree/%40danstepanov/docs-v4.1?tab=readme-ov-file#what-if-im-looking-for-a-component-library-that-uses-nativewind).
 
-## In Action
+Nativewind makes sure you're using the best style engine for any given platform (e.g. CSS StyleSheet or StyleSheet.create). Its goals are to to provide a consistent styling experience across all platforms, improving developer UX, component performance, and code maintainability.
 
-<a href="https://snack.expo.dev?name=Hello World&dependencies=react,react-native,nativewind@latest&platform=web&supportedPlatforms=ios,android,web&code=import%20React%20from%20'react'%3B%0Aimport%20%7B%20withExpoSnack%20%7D%20from%20'nativewind'%3B%0A%0Aimport%20%7B%20Text%2C%20View%20%7D%20from%20'react-native'%3B%0Aimport%20%7B%20styled%20%7D%20from%20'nativewind'%3B%0A%0Aconst%20StyledView%20%3D%20styled(View)%0Aconst%20StyledText%20%3D%20styled(Text)%0A%0Aconst%20App%20%3D%20()%20%3D%3E%20%7B%0A%20%20return%20(%0A%20%20%20%20%3CStyledView%20className%3D%22flex-1%20items-center%20justify-center%22%3E%0A%20%20%20%20%20%20%3CStyledText%20className%3D%22text-slate-800%22%3E%0A%20%20%20%20%20%20%20%20Try%20editing%20me!%20%F0%9F%8E%89%0A%20%20%20%20%20%20%3C%2FStyledText%3E%0A%20%20%20%20%3C%2FStyledView%3E%0A%20%20)%3B%0A%7D%0A%0A%2F%2F%20This%20demo%20is%20using%20a%20external%20compiler%20that%20will%20only%20work%20in%20Expo%20Snacks.%0A%2F%2F%20You%20may%20see%20flashes%20of%20unstyled%20content%2C%20this%20will%20not%20occur%20under%20normal%20use!%0A%2F%2F%20Please%20see%20the%20documentation%20to%20setup%20your%20application%0Aexport%20default%20withExpoSnack(App)%3B%0A">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/3946701/178458845-c9ac0299-6809-4002-99a0-78030f27b06a.png">
-    <img src="https://user-images.githubusercontent.com/3946701/178458837-df03c080-eb13-4dcc-9080-186b061a8678.png">
-  </picture>
-</a>
+Nativewind processes your styles during your application's build step and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
+
+## Installation
+
+If you have an existing project, [use these guides](https://www.nativewind.dev/docs/getting-started/installation) to configure Nativewind for your respective stack.
+
+Alternatively, you can create a new pre-configured project via our Quickstart below.
+
+## Quickstart
+
+- [Create Expo Stack](https://rn.new): `npx rn-new@latest --nativewind`
 
 ## Features
 
@@ -31,13 +39,89 @@
 - Uses the Tailwind CSS compiler
 - Styles are computed at **build time**
 - Small runtime keeps your components fast
-- Babel plugin for **simple setup** and improving **intellisense support**
-- Respects all tailwind.config.js settings, including **themes, custom values, plugins**
-- **dark mode / arbitrary classes / media queries**
-- pseudo classes - **hover / focus / active** on compatible components
-- styling based on **parent state** - automatically style children based upon parent pseudo classes
-- **children styles** - create simple layouts based upon parent class
+- **jsxImportSourceTransform** only wraps native components, making it lighter and such that the **className** prop is accessible inside your component
+- Respects all tailwind.config.js settings, including **themes, custom values,** and **plugins**
+- Support for
+  - Custom CSS properties, aka **CSS Variables**
+  - **Dark mode, arbitrary classes,** and **media queries**
+  - **Animations** and **transitions**
+  - **Container queries**
+    - `container-type` and style-based container queries are not supported
+  - Pseudo classes - **hover / focus / active** on compatible components
+  - `rem` units
+  - Theme functions and nested functions
+  - React 18 Suspense API
+  - Custom CSS
+- Styling based on **parent state modifiers** - automatically style children based upon parent pseudo classes
+  - Support for the `group` and `group/<name>` syntax
+- **Children styles** - create simple layouts based upon parent class
+- Fast and consistent style application via hot reload
+  - Includes changes made to `tailwind.config.js`
+
+[More details here](https://v2.nativewind.dev/blog/announcement-nativewind-v4#breaking-changes-from-v2)
+
+## npm distribution tags
+It's worth noting that we do not have Github branches that directly correlate to npm distribution tags. Instead, we deploy to specific npm tags either via automated Github actions (push to `main` -> publish to `next`) or manually (snapshots versions).
+- **Release:** `latest` (currently v4.1.21)
+  - You should use this version
+- **Canary:** `canary` (currently v4.0.36)
+  - You can use this version
+  - Potentially less stable than latest but likely more robust
+  - This version is currently out of date and will soon be updated to either v4.2 or v5.0
+- **Experimental:** `next` tag (currently v4.1.9)
+  - You probably shouldn't use this version
+  - Undergoing testing to move to a release version
+  - This version is currently out of date and needs to be updated to v5.0, work in progress
+- **Bleeding Edge:** snapshot releases prefixed with `0.0.0-`
+  - You should not use this version
+  - Used internally for moving towards a `next` version
+
+## Contribution
+
+[See this guide](https://github.com/nativewind/nativewind/blob/main/contributing.md)
+
+# FAQ
+
+## When is v5 landing?
+[Soon.](https://github.com/nativewind/nativewind/discussions/1422)
+
+## Is it safe to use v4?
+Yes.
+
+## Is Nativewind moving to Expo?
+
+No.
+
+## Can we disable the change that was done recently to auto-add nativewind types using a setting or something? I already have the settings using `compilerOptions.types`, so I would like to disable the file generation.
+
+Not at the moment. We've found this will cause a long term problem where people "forget" what their type config was doing. They then update their types and break the Nativewind ones. To combat this, we've copied the behavior from other major frameworks which is to handle their types separately from user specified ones.
+
+In the future, we may add an option like `dangerouslyDisableTypeScriptGeneration` or something verbose to prevent people from using it. We are tired of solving TypeScript issues, particularly ones such as "my types were working and now they aren't."
+
+## What happened to v3?
+
+Similar to Valve, we don't like the number 3. Nah, we had a V3 but it was a bad idea and needed to be reworked so we dropped it and moved on to v4.
+
+## What if I'm looking for a component library that uses Nativewind?
+
+There are a number of different component libraries available that use Nativewind to achieve different results. You should pick the one that best suits your needs.
+
+### [NativewindUI](https://nativewindui.com)
+
+This multi-platform library focuses on achieving native feel for each individual platform using the familiar interface of Tailwind CSS.
+
+### [React Native Reusables](https://rnr-docs.vercel.app)
+
+This open source library offers universal [shadcn/ui](https://ui.shadcn.com) via React Native. Use this as a foundation to develop your own high-quality component library.
+
+### [gluestack](https://gluestack.io)
+
+From the folks that brought you NativeBase, this library offers customizable cross-platform components designed to look & behave cleanly on every platform.
+
+## What are the breaking changes from v2 to v4?
+
+All breaking changes are [outlined here](https://v2.nativewind.dev/blog/announcement-nativewind-v4#breaking-changes-from-v2).
 
 ## Documentation
 
-All documentation is on our website https://nativewind.dev
+Learn more on [our website](https://nativewind.dev).

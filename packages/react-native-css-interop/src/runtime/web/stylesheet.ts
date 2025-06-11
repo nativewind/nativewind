@@ -1,6 +1,6 @@
 import { StyleSheet as RNStyleSheet } from "react-native";
+
 import { CssInteropStyleSheet } from "../../types";
-import { INTERNAL_RESET, INTERNAL_FLAGS } from "../../shared";
 
 const documentStyle: CSSStyleDeclaration | undefined =
   globalThis.window?.getComputedStyle(
@@ -8,12 +8,8 @@ const documentStyle: CSSStyleDeclaration | undefined =
   );
 
 const commonStyleSheet: CssInteropStyleSheet = {
-  [INTERNAL_FLAGS]: {},
   getFlag(name) {
     return documentStyle?.getPropertyValue(`--css-interop-${name}`);
-  },
-  [INTERNAL_RESET](_options) {
-    return;
   },
   unstable_hook_onClassName() {},
   register(_options) {

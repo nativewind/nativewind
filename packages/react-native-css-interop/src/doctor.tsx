@@ -1,21 +1,17 @@
-let computedStyles: any = {
-  getPropertyValue() {
-    return null;
-  },
-};
-
-if (globalThis.window) {
-  computedStyles = globalThis.window.getComputedStyle(
-    globalThis.window.document.documentElement,
-  );
-}
+const computedStyles: Pick<CSSStyleDeclaration, "getPropertyValue"> =
+  globalThis.window
+    ? globalThis.window.getComputedStyle(
+        globalThis.window.document.documentElement,
+      )
+    : { getPropertyValue: () => "asdf" };
 
 export function verifyJSX() {
   // @ts-expect-error
   return <react-native-css-interop-jsx-pragma-check /> === true;
 }
 
-export function verifyFlag(name?: string, value: unknown = "true") {
+export function verifyFlag(name: string, value: unknown = "true") {
+  // This is skipped in SSR rendering
   return globalThis.window
     ? computedStyles.getPropertyValue(
         name ? `--css-interop-${name}` : "--css-interop",
@@ -23,6 +19,9 @@ export function verifyFlag(name?: string, value: unknown = "true") {
     : true;
 }
 
-export function verifyReceivedData() {
-  return verifyFlag();
+export function verifyData() {
+  // This is skipped in SSR rendering
+  return globalThis.window
+    ? computedStyles.getPropertyValue("--css-interop") !== ""
+    : true;
 }

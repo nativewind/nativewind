@@ -1,5 +1,6 @@
 import type { JSXFunction } from "../types";
 import { interopComponents } from "./api";
+import { maybeHijackSafeAreaProvider } from "./third-party-libs/react-native-safe-area-context";
 
 /**
  * Create a new JSX function that swaps the component type being rendered with
@@ -16,6 +17,8 @@ export default function wrapJSX(jsx: JSXFunction): JSXFunction {
     // We avoid this in the test environment as we want more fine-grained control
     // This call also need to be inside the JSX transform to avoid circular dependencies
     if (process.env.NODE_ENV !== "test") require("./components");
+
+    type = maybeHijackSafeAreaProvider(type);
 
     // You can disable the css interop by setting `cssInterop` to false
     if (props && props.cssInterop === false) {

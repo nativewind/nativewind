@@ -1,21 +1,22 @@
-import { StyleSheet, globalStyles } from "./runtime/native/stylesheet";
-import { INTERNAL_FLAGS } from "./shared";
+import { flags } from "./runtime/native/globals";
 
 export function verifyJSX() {
   // @ts-expect-error
   return <react-native-css-interop-jsx-pragma-check /> === true;
 }
 
-export function verifyFlag(name: string, value?: unknown) {
-  return value === undefined
-    ? Boolean(StyleSheet[INTERNAL_FLAGS][name])
-    : StyleSheet[INTERNAL_FLAGS][name] === value;
+export function verifyData() {
+  if (process.env.NODE_ENV !== "test") {
+    if (require("./interop-poison.pill") === false) {
+      throw new Error(
+        `Your 'metro.config.js' has overridden the 'config.resolver.resolveRequest' config setting in a non-composable manner. Your styles will not work until this issue is resolved. Note that 'require('metro-config').mergeConfig' is a shallow merge and does not compose existing resolveRequest functions together.`,
+      );
+    }
+  }
+
+  return flags.has("enabled");
 }
 
-export function verifyReceivedData() {
-  return StyleSheet[INTERNAL_FLAGS]["$$receivedData"] === "true";
-}
-
-export function verifyHasStyles() {
-  return globalStyles.size > 0;
+export function verifyFlag(name: string, value: unknown = "true") {
+  return flags.get(name) === value;
 }
