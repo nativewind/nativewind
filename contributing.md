@@ -1,30 +1,28 @@
-# Welcome to the NativeWind contributing guide
+# Welcome to the Nativewind contributing guide
 
-Thank you for your interest in contributing to NativeWind!
+Thank you for your interest in contributing to Nativewind!
 
 In this guide, you will get an overview of the contribution workflow from opening an issue to creating, reviewing, and merging a PR.
 
 ## New contributor guide
 
-Use this documentation and [this diagram](https://link.excalidraw.com/l/398AFcdY0wd/4cHnU8Ilxw7) to gain an understanding of how NativeWind works and how to contribute to the project. Please note, This diagram is a work in progress.
+Use this documentation and [this diagram](https://link.excalidraw.com/l/398AFcdY0wd/4cHnU8Ilxw7) to gain an understanding of how Nativewind works and how to contribute to the project. Please note, This diagram is a work in progress.
 
 ## What can I contribute to?
 
-Before delving deeper into the collaboration workflow, let's talk about what kind of contributions can be made. Make sure you've reviewed the above diagram to understand how various aspects of NativeWind function.
+Before delving deeper into the collaboration workflow, let's talk about what kind of contributions can be made. Make sure you've reviewed the above diagram to understand how various aspects of Nativewind function.
 
 There are three main things you can usually contribute to:
 
-- **Docs**: Anything that would improve the documentation for NativeWind (guides, installation instructions, API docs, core concepts, customizations, styling options, and/or even just typo corrections).
+- **Docs**: Anything that would improve the documentation for Nativewind (guides, installation instructions, API docs, core concepts, customizations, styling options, and/or even just typo corrections).
 
-- **Onboarding**: Helping to make installation of NativeWind easier by turning static changes into predefined plugins.
+- **Onboarding**: Helping to make installation of Nativewind easier by turning static changes into predefined plugins.
 
-- **Tests**: NativeWind has a pretty robust suite of tests. However, if you believe that we could benefit from an additional test or two that would meaningfully improve stability, please feel free to open a PR.
+- **Tests**: Nativewind has a pretty robust suite of tests. However, if you believe that we could benefit from an additional test or two that would meaningfully improve stability, please feel free to open a PR.
 
-- **Landing page**: We're interested in having a landing page that shows off what is possible with NativeWind as well as includes a showcase of folks using it in production.
+- **Bug fixes/reports**: If you think you've found a bug or some unexpected behavior in Nativewind or its dependencies, you're welcome to raise an issue and/or PR with a bug description and/or fix.
 
-- **Bug fixes/reports**: If you think you've found a bug or some unexpected behavior in NativeWind or its dependencies, you're welcome to raise an issue and/or PR with a bug description and/or fix.
-
-Ideas for improving architecture of NativeWind are always welcome, but we ask that you open a discussion with an overview of the proposed ideas first, in order to ensure a proper debate.
+Ideas for improving architecture of Nativewind are always welcome, but we ask that you open a discussion with an overview of the proposed ideas first, in order to ensure a proper debate.
 
 Be sure to follow the templates for new issues and pull requests, when applicable.
 
@@ -38,16 +36,16 @@ When opening an issue, it's crucial to provide a reproduction of the problem to 
 
 #### Reproduction Templates
 
-- **StackBlitz template**: [NativeWind Test on StackBlitz](https://stackblitz.com/edit/nativewind-test?view=editor)
+- **StackBlitz template**: [Nativewind Test on StackBlitz](https://stackblitz.com/edit/nativewind-test?view=editor)
 - **Create Expo Stack template**:
   - `npx rn-new@latest --nativewind`
   - `npx rn-new@latest --nativewind --expo-router`
 
 #### Steps to Follow
 
-1. **Test with Inline Styles**: Before reporting an issue, ensure that your flex layout behaves as expected using inline styles (passing `StyleSheet` styles to the `style` prop). This helps to confirm that the issue is specific to NativeWind.
+1. **Test with Inline Styles**: Before reporting an issue, ensure that your flex layout behaves as expected using inline styles (passing `StyleSheet` styles to the `style` prop). This helps to confirm that the issue is specific to Nativewind.
 
-2. **Provide a Reproduction**: If you can get your styles working with inline styles but not with NativeWind, use one of the provided templates to create a reproduction of the issue:
+2. **Provide a Reproduction**: If you can get your styles working with inline styles but not with Nativewind, use one of the provided templates to create a reproduction of the issue:
    - **StackBlitz**: This is the preferred method as it allows us to respond more quickly.
    - **Create Expo Stack**: Use the provided commands to set up a reproducible example.
 
@@ -85,9 +83,7 @@ npm run build
 ```
 
 3c. Run the test suite
-We recommend installing the [Jest VSCode extension](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest) to run the tests. Once installed, you should have Testing icon in your left-hand tool bar:
-
-![alt text](image.png)
+We recommend installing the [Jest VSCode extension](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest) to run the tests. Once installed, you should have Testing icon in your left-hand tool bar (it looks like a laboratory beaker).
 
 Navigating to this tab will allow you to use a convenient GUI to run all the tests. Alternatively, you can run the tests using the following command:
 ```shell
@@ -106,23 +102,15 @@ When you're ready to submit your changes, push your branch to your forked reposi
 
 ### Directory structure
 
-The NativeWind homepage/documentation and source-code can be found in the `apps/website` and `packages/` directories, respectively. The `packages/nativewind` is a wrapper around `packages/react-native-css-interop`.
+The Nativewind source code can be found in the `packages/` directory. The `packages/nativewind` is a wrapper around `packages/react-native-css-interop`. The documentation and homepage are maintained in a separate repository at https://github.com/nativewind/website.
 
 More information on how `react-native-css-interop` works is coming soon.
-
-To run the documentation website after installing all dependencies:
-
-```shell
-npm run website
-```
-
-Additionally, there is an `examples/` directory which includes an example app set up with Expo Router and there is an Expo Snack in the `apps/snack/` directory. These both likely need to be updated from v2 to v4.
 
 ### Make your changes
 
 Once you've made your changes and tested that it works locally, run the tests using `npm run test` in the root directory. You should also add a test to cover your own contribution, if relevant.
 
-If your changes alter and/or add to the behavior of the NativeWind, or fix a bug in it, then we encourage you to also create a **changeset**. A changeset is a quick summary that expresses the intention to bump the version of the package. This is used by our CI in order to automatically manage releases to NPM.
+If your changes alter and/or add to the behavior of the Nativewind, or fix a bug in it, then we encourage you to also create a **changeset**. A changeset is a quick summary that expresses the intention to bump the version of the package. This is used by our CI in order to automatically manage releases to NPM.
 
 To introduce a new changeset, run:
 

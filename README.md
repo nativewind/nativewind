@@ -58,7 +58,7 @@ Alternatively, you can create a new pre-configured project via our Quickstart be
 - Fast and consistent style application via hot reload
   - Includes changes made to `tailwind.config.js`
 
-[More details here](https://www.nativewind.dev/blog/announcement-nativewind-v4#breaking-changes-from-v2)
+[More details here](https://v2.nativewind.dev/blog/announcement-nativewind-v4#breaking-changes-from-v2)
 
 ## npm distribution tags
 It's worth noting that we do not have Github branches that directly correlate to npm distribution tags. Instead, we deploy to specific npm tags either via automated Github actions (push to `main` -> publish to `next`) or manually (snapshots versions).
@@ -82,12 +82,15 @@ It's worth noting that we do not have Github branches that directly correlate to
 
 # FAQ
 
+## When is v5 landing?
+[Soon.](https://github.com/nativewind/nativewind/discussions/1422)
+
 ## Is it safe to use v4?
-It's reasonably safe to use the `canary` version save for a known issue with styles being inconsistently applied. This issue is resolved in the `next` version; however, using this dist tag may break your app as it is considered experimental. To see which versions correlate to these dist tags, please refer to [our npm distribution tags](https://github.com/nativewind/nativewind?tab=readme-ov-file#npm-distribution-tags).
+Yes.
 
 ## Is Nativewind moving to Expo?
 
-No. Expo is always exploring ways to handle styles better but Nativewind, as a project, will not be moving into the Expo organization.
+No.
 
 ## Can we disable the change that was done recently to auto-add nativewind types using a setting or something? I already have the settings using `compilerOptions.types`, so I would like to disable the file generation.
 
@@ -117,7 +120,7 @@ From the folks that brought you NativeBase, this library offers customizable cro
 
 ## What are the breaking changes from v2 to v4?
 
-All breaking changes are [outlined here](https://www.nativewind.dev/blog/announcement-nativewind-v4#breaking-changes-from-v2).
+All breaking changes are [outlined here](https://v2.nativewind.dev/blog/announcement-nativewind-v4#breaking-changes-from-v2).
 
 ## Documentation
 

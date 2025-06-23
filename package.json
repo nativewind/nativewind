@@ -2,7 +2,6 @@
   "name": "nativewind-monorepo",
   "workspaces": [
     "packages/*",
-    "apps/*",
     "examples/*"
   ],
   "scripts": {
@@ -13,14 +12,15 @@
     "dev": "npm_config_loglevel=silent turbo dev",
     "example": "npm start --workspace=examples/expo-router --",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && rm package-lock.json && npm i",
-    "publish-packages": "turbo run build lint test && changeset version && changeset publish",
-    "website": "vercel dev"
+    "publish-packages": "turbo run build lint test && changeset version && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
     "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
     "@testing-library/react-native": "^12.0.1",
     "@tsconfig/react-native": "^3.0.2",
+    "@types/connect": "^3.4.38",
+    "@types/debug": "^4.1.12",
     "@types/jest": "^29.5.1",
     "@types/node": "^22.5.5",
     "@vercel/node": "^2.15.8",
