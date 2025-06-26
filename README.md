@@ -11,13 +11,6 @@
 [![Github](https://img.shields.io/github/license/marklawlor/nativewind)](https://github.com/nativewind/nativewind)
 [![Discord](https://img.shields.io/discord/968718419904057416?logo=discord&logoColor=ffffff&label=Discord&color=%235865F2)](https://discord.gg/ypNakAFQ65)
 [![Twitter](https://img.shields.io/twitter/follow/nativewindcss?link=https%3A%2F%2Fx.com%2Ftailwindcss)](https://x.com/nativewindcss)
-<br />
-<br />
-<a href="https://vercel.com/oss">
-  <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge.svg" />
-</a>
-</div>
-<br />
 
 # About
 
@@ -66,13 +59,13 @@ Alternatively, you can create a new pre-configured project via our Quickstart be
 
 ## npm distribution tags
 It's worth noting that we do not have Github branches that directly correlate to npm distribution tags. Instead, we deploy to specific npm tags either via automated Github actions (push to `main` -> publish to `next`) or manually (snapshots versions).
-- **Release:** `latest` (currently v4.1.21)
+- **Release:** `latest`
   - You should use this version
-- **Canary:** `canary` (currently v4.0.36)
+- **Canary:** `canary`
   - You can use this version
   - Potentially less stable than latest but likely more robust
   - This version is currently out of date and will soon be updated to either v4.2 or v5.0
-- **Experimental:** `next` tag (currently v4.1.9)
+- **Experimental:** `next` tag
   - You probably shouldn't use this version
   - Undergoing testing to move to a release version
   - This version is currently out of date and needs to be updated to v5.0, work in progress
@@ -114,7 +107,7 @@ There are a number of different component libraries available that use Nativewin
 
 This multi-platform library focuses on achieving native feel for each individual platform using the familiar interface of Tailwind CSS.
 
-### [React Native Reusables](https://rnr-docs.vercel.app)
+### [React Native Reusables](https://rnreusables.com)
 
 This open source library offers universal [shadcn/ui](https://ui.shadcn.com) via React Native. Use this as a foundation to develop your own high-quality component library.
 
@@ -124,8 +117,15 @@ From the folks that brought you NativeBase, this library offers customizable cro
 
 ## What are the breaking changes from v2 to v4?
 
-All breaking changes are [outlined here](https://v2.nativewind.dev/blog/announcement-nativewind-v4#breaking-changes-from-v2).
+All breaking changes are [outlined here](https://www.nativewind.dev/blog/announcement-nativewind-v4#breaking-changes-from-v2).
 
 ## Documentation
 
 Learn more on [our website](https://nativewind.dev).
+<br />
+<br />
+<a href="https://vercel.com/oss">
+  <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge.svg" />
+</a>
+</div>
+<br />
