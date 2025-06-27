@@ -4,7 +4,9 @@
   "description": "",
   "main": "dist/index",
   "types": "dist/index.d.ts",
-  "sideEffects": false,
+  "sideEffects": [
+    "dist/runtime/components.js"
+  ],
   "keywords": [
     "react-native",
     "react",
