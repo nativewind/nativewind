@@ -1,3 +1,2 @@
-module.exports = {
-  projects: ["<rootDir>/packages/*"],
-};
+/** @type {import('jest').Config} */
+module.exports = { preset: "jest-expo" };
