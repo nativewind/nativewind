@@ -10,7 +10,6 @@ import type {
   BoxShadow,
   ColorOrAuto,
   CssColor,
-  Declaration,
   DimensionPercentageFor_LengthValue,
   Display,
   EnvironmentVariable,
@@ -28,6 +27,7 @@ import type {
   LineStyle,
   MaxSize,
   NumberOrPercentage,
+  OutlineStyle,
   OverflowKeyword,
   PropertyId,
   Scale,
@@ -93,6 +93,13 @@ type AddTransitionProp = (
   >,
 ) => void;
 type AddWarning = (warning: ExtractionWarning) => undefined;
+
+type Declaration =
+  | import("lightningcss").Declaration
+  | {
+      property: "outline-offset";
+      value: Length;
+    };
 
 const validProperties = [
   "align-content",
@@ -211,6 +218,11 @@ const validProperties = [
   "min-width",
   "opacity",
   "overflow",
+  "outline",
+  "outline-color",
+  "outline-offset",
+  "outline-style",
+  "outline-width",
   "padding",
   "padding-block",
   "padding-block-end",
@@ -1186,6 +1198,38 @@ export function parseDeclaration(
         ),
       });
       return;
+    case "outline":
+      handleStyleShorthand("outline", {
+        "outline-width": parseBorderSideWidth(
+          declaration.value.width,
+          parseOptions,
+        ),
+        "outline-style": parseOutlineStyle(
+          declaration.value.style,
+          parseOptions,
+        ),
+      });
+      return;
+    case "outline-color":
+      return addStyleProp(
+        declaration.property,
+        parseColor(declaration.value, parseOptions),
+      );
+    case "outline-offset":
+      return addStyleProp(
+        declaration.property,
+        parseLength(declaration.value, parseOptions),
+      );
+    case "outline-style":
+      return addStyleProp(
+        declaration.property,
+        parseOutlineStyle(declaration.value, parseOptions),
+      );
+    case "outline-width":
+      return addStyleProp(
+        declaration.property,
+        parseBorderSideWidth(declaration.value, parseOptions),
+      );
     case "padding":
       handleStyleShorthand("padding", {
         "padding-top": parseSize(declaration.value.top, parseOptions),
@@ -2344,6 +2388,26 @@ function parseBorderSideWidth(
   }
 
   options.addValueWarning(borderSideWidth.type);
+  return undefined;
+}
+
+function parseOutlineStyle(
+  outlineStyle: OutlineStyle | LineStyle,
+  options: ParseDeclarationOptionsWithValueWarning,
+) {
+  const allowed = new Set(["solid", "dotted", "dashed"]);
+
+  if (typeof outlineStyle === "string") {
+    if (allowed.has(outlineStyle)) {
+      return outlineStyle;
+    } else {
+      options.addValueWarning(outlineStyle);
+      return undefined;
+    }
+  } else if (outlineStyle.type === "line-style") {
+    return parseBorderStyle(outlineStyle.value, options);
+  }
+
   return undefined;
 }
 
