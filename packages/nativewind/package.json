@@ -33,7 +33,7 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "test:debug": "npx --node-options=--inspect-brk -- jest --runInBand",
     "lint": "eslint .",
     "prepublishOnly": "npm run build && npm test",
     "postpublish": "./post-publish.sh",
@@ -61,12 +61,13 @@
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
-    "@testing-library/react-native": "^12.0.1",
-    "@types/jest": "^29.5.1",
+    "@testing-library/react-native": "^13.2.0",
+    "@types/jest": "^29.5.14",
     "@types/micromatch": "^4.0.4",
-    "jest": "^29.3.1",
-    "jest-expo": "^50.0.1",
+    "jest": "^29.7.0",
+    "jest-expo": "^52.0.6",
     "prettier": "^3.3.1",
+    "react-native-reanimated": "3.16.7",
     "tailwindcss": "3.4.4",
     "tw-colors": "^3.3.1"
   },
