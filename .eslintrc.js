@@ -61,5 +61,9 @@ module.exports = {
         "unicorn/filename-case": "off",
       },
     },
+    {
+      files: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      extends: ["plugin:testing-library/react"],
+    },
   ],
 };
