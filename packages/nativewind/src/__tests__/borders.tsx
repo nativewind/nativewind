@@ -322,20 +322,79 @@ describe.skip("Borders - Divide Style", () => {
   // TODO
 });
 
-describe.skip("Borders - Outline Width", () => {
-  // TODO
+describe("Borders - Outline Width", () => {
+  test("outline-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { outlineWidth: 0 } },
+    });
+  });
+  test("outline-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { outlineWidth: 2 } },
+    });
+  });
 });
 
-describe.skip("Borders - Outline Color", () => {
-  // TODO
+describe("Borders - Outline Color", () => {
+  test("outline-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { outlineColor: "#ffffff" } },
+    });
+  });
+  test("outline-current", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "outline-color": "currentcolor" } },
+    });
+  });
+  test("outline-inherit", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {},
+      invalid: { style: { "outline-color": "inherit" } },
+    });
+  });
 });
 
-describe.skip("Borders - Outline Style", () => {
-  // TODO
+describe("Borders - Outline Style", () => {
+  test("outline", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { outlineStyle: "solid" } },
+    });
+  });
+  test("outline-dashed", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { outlineStyle: "dashed" } },
+    });
+  });
+  test("outline-dotted", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { outlineStyle: "dotted" } },
+    });
+  });
+  test("outline-none", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: {
+          outlineOffset: 2,
+          outlineStyle: "solid",
+          outlineWidth: 2,
+        },
+      },
+    });
+  });
 });
 
-describe.skip("Borders - Outline Offset", () => {
-  // TODO
+describe("Borders - Outline Offset", () => {
+  test("outline-offset-0", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { outlineOffset: 0 } },
+    });
+  });
+  test("outline-offset-2", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { outlineOffset: 2 } },
+    });
+  });
 });
 
 describe.skip("Borders - Ring Width", () => {

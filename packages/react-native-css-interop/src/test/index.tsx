@@ -1,8 +1,8 @@
 import {
-  ComponentProps,
   ComponentRef,
   ForwardedRef,
   forwardRef,
+  PropsWithoutRef,
   ReactElement,
 } from "react";
 
@@ -101,7 +101,7 @@ export function createMockComponent<
   cssInterop(Component, mapping);
 
   const mock = jest.fn(
-    ({ ...props }: ComponentProps<C>, ref: ForwardedRef<ComponentRef<C>>) => {
+    ({ ...props }: PropsWithoutRef<C>, ref: ForwardedRef<ComponentRef<C>>) => {
       return createInteropElement(Component, { ...props, ref });
     },
   );
@@ -118,7 +118,7 @@ export function createRemappedComponent<
   remapProps(Component, mapping);
 
   const mock = jest.fn(
-    ({ ...props }: ComponentProps<C>, ref: ForwardedRef<ComponentRef<C>>) => {
+    ({ ...props }: PropsWithoutRef<C>, ref: ForwardedRef<ComponentRef<C>>) => {
       return createInteropElement(Component, { ...props, ref });
     },
   );
