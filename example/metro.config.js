@@ -1,6 +1,8 @@
 const path = require("path");
 const { getDefaultConfig } = require("@expo/metro-config");
-const { withReactNativeCSS } = require("react-native-css/metro");
+
+/* Use `const { withNativewind } = require("nativewind/metro");` in your project instead */
+const { withNativewind } = require("../dist/commonjs/metro");
 
 /**
  * Metro configuration
@@ -10,19 +12,16 @@ const { withReactNativeCSS } = require("react-native-css/metro");
  */
 const config = getDefaultConfig(__dirname);
 
+/** START - None of this code is necessary, its only to resolve Nativewind from the monorepo */
 config.resolver.unstable_enablePackageExports = true;
-
 config.resolver.extraNodeModules = {
   nativewind: path.resolve(__dirname, "../"),
 };
-
 config.resolver.nodeModulesPaths = [
   path.resolve(__dirname, "node_modules"),
   path.resolve(__dirname, "../node_modules"),
 ];
-
 config.watchFolders = [path.resolve(__dirname, "../")];
+/** END - None of this code is necessary, its only to resolve Nativewind from the monorepo */
 
-module.exports = withReactNativeCSS(config, {
-  globalClassNamePolyfill: true,
-});
+module.exports = withNativewind(config);
