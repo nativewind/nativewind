@@ -7,8 +7,6 @@ function kebabCase(str: string) {
   );
 }
 
-console.log("Asdf");
-
 const nativewind: PluginCreator = plugin.withOptions(
   () =>
     ({ matchVariant }) => {
