@@ -19,6 +19,10 @@
       "require": "./dist/commonjs/babel/index.js",
       "typescript": "./dist/typescript/commonjs/src/babel/index.d.ts"
     },
+    "./tailwind": {
+      "import": "./src/tailwindcss/theme.css",
+      "require": "./src/tailwindcss/theme.css"
+    },
     "./types": {
       "typescript": "./types.d.ts"
     }
@@ -62,6 +66,7 @@
   },
   "files": [
     "dist",
+    "src",
     "types.d.ts"
   ],
   "devDependencies": {
