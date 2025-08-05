@@ -1,0 +1,37 @@
+{
+  "name": "react-native-css-example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "build": "expo start --clear",
+    "debug": "DEBUG='react-native-css:*' expo start --clear",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "6.0.0-canary-20250713-8f814f8",
+    "@tailwindcss/postcss": "^4.1.11",
+    "eas-build-cache-provider": "^16.4.2",
+    "expo": "54.0.0-canary-20250713-8f814f8",
+    "expo-dev-client": "5.2.4",
+    "expo-status-bar": "~2.2.3",
+    "expo-system-ui": "5.0.11-canary-20250713-8f814f8",
+    "metro-runtime": "^0.83.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.80.1",
+    "react-native-reanimated": "4.0.1",
+    "react-native-web": "~0.20.0",
+    "react-native-worklets": "0.4.1",
+    "react-refresh": "^0.17.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "^19.1.9",
+    "react-native-builder-bob": "^0.40.13",
+    "react-native-monorepo-config": "^0.1.9"
+  },
+  "private": true
+}

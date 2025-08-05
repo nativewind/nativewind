@@ -3,33 +3,34 @@
   "name": "nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "type": "module",
+  "main": "./dist/commonjs/index.js",
+  "module": "./dist/module/index.js",
+  "types": "./dist/typescript/commonjs/src/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/module/index.js",
-      "require": "./dist/commonjs/index.js",
-      "typescript": "./dist/typescript/commonjs/src/index.d.ts"
+    "./babel": {
+      "import": "./dist/module/babel/index.js",
+      "require": "./dist/commonjs/babel/index.js",
+      "typescript": "./dist/typescript/commonjs/src/babel/index.d.ts"
     },
     "./metro": {
       "import": "./dist/module/metro/index.js",
       "require": "./dist/commonjs/metro/index.js",
       "typescript": "./dist/typescript/commonjs/src/metro/index.d.ts"
     },
-    "./babel": {
-      "import": "./dist/module/babel/index.js",
-      "require": "./dist/commonjs/babel/index.js",
-      "typescript": "./dist/typescript/commonjs/src/babel/index.d.ts"
-    },
-    "./tailwind": {
-      "import": "./src/tailwindcss/theme.css",
-      "require": "./src/tailwindcss/theme.css"
-    },
+    "./theme": "./theme.css",
     "./types": {
       "typescript": "./types.d.ts"
+    },
+    ".": {
+      "import": "./dist/module/index.js",
+      "require": "./dist/commonjs/index.js",
+      "typescript": "./dist/typescript/commonjs/src/index.d.ts"
     }
   },
-  "main": "./dist/commonjs/index.js",
-  "types": "./dist/typescript/commonjs/src/index.d.ts",
   "sideEffects": false,
+  "workspaces": [
+    "example"
+  ],
   "keywords": [
     "react-native",
     "react",
@@ -53,35 +54,55 @@
     "url": "https://github.com/marklawlor/nativewind/issues"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
+  },
+  "packageManager": "yarn@4.9.2",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "yarn",
+      "onFail": "warn"
+    }
   },
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
-    "lint": "eslint .",
-    "prepublishOnly": "npm run build && npm test",
     "build": "bob build",
-    "prepare": "bob build"
+    "example": "yarn workspace react-native-css-example",
+    "lint": "eslint .",
+    "prepare": "bob build",
+    "prepublishOnly": "npm run build && npm test",
+    "test": "jest",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "test:watch": "jest --watch"
   },
   "files": [
     "dist",
     "src",
-    "types.d.ts"
+    "types.d.ts",
+    "theme.css"
   ],
   "devDependencies": {
-    "@types/debug": "^4.1.12",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.2",
     "@react-native/typescript-config": "^0.80.1",
     "@tailwindcss/container-queries": "^0.1.1",
-    "react-native-css": "3.0.0-nightly.27bd5e2",
-    "@testing-library/react-native": "^12.0.1",
+    "@testing-library/react-native": "^13.2.0",
+    "@types/debug": "^4.1.12",
     "@types/jest": "^29.5.1",
-    "jest": "^29.3.1",
-    "jest-expo": "^50.0.1",
+    "expo": "54.0.0-canary-20250713-8f814f8",
+    "jest": "^29.7.0",
+    "jest-expo": "54.0.0-canary-20250713-8f814f8",
     "prettier": "^3.3.1",
-    "react-native": "^0.80.1",
-    "react-native-builder-bob": "^0.40.12",
+    "react": "19.1.0",
+    "react-native": "0.80.1",
+    "react-native-builder-bob": "^0.40.13",
+    "react-native-css": "3.0.0-nightly.27bd5e2",
+    "react-native-reanimated": "4.0.1",
+    "react-native-safe-area-context": "5.4.0",
+    "react-native-worklets": "0.4.1",
+    "react-refresh": "^0.17.0",
+    "react-test-renderer": "19.1.0",
     "tailwindcss": "^4.1.11",
     "tw-colors": "^3.3.1",
     "typescript": "^5.8.3"
@@ -90,7 +111,6 @@
     "react-native-css": "3.0.0-nightly.27bd5e2",
     "tailwindcss": ">4.1.11"
   },
-  "module": "./dist/module/index.js",
   "react-native-builder-bob": {
     "source": "src",
     "output": "dist",
