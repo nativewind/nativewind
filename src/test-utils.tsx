@@ -1,0 +1,150 @@
+import tailwind from "@tailwindcss/postcss";
+import {
+  screen,
+  render as tlRender,
+  type RenderOptions,
+} from "@testing-library/react-native";
+import postcss from "postcss";
+import { View } from "react-native-css/components";
+import { registerCSS } from "react-native-css/jest";
+
+export * from "./index";
+
+const testID = "nativewind";
+
+export type NativewindRenderOptions = RenderOptions & {
+  /** Replace the generated CSS*/
+  css?: string;
+  /** Appended after the generated CSS */
+  extraCss?: string;
+  /** Add `@source inline('<className>')` to the CSS. DEFAULT: Values are extracted from the component's className */
+  sourceInline?: string[];
+  /** Whether to include the theme in the generated CSS */
+  theme?: boolean;
+  /** Whether to include the preflight in the generated CSS */
+  preflight?: boolean;
+  /** Enable debug logging */
+  debug?: boolean;
+};
+
+const debugDefault = Boolean(
+  process.env.NATIVEWIND_TEST_AUTO_DEBUG &&
+    process.env.NODE_OPTIONS?.includes("--inspect"),
+);
+
+export async function render(
+  component: React.ReactElement<any>,
+  {
+    css,
+    sourceInline = Array.from(getClassNames(component)),
+    debug = debugDefault,
+    theme = true,
+    preflight = false,
+    extraCss,
+    ...options
+  }: NativewindRenderOptions = {},
+) {
+  if (!css) {
+    css = ``;
+
+    if (theme) {
+      css += `@import "tailwindcss/theme.css" layer(theme);\n`;
+    }
+
+    if (preflight) {
+      css += `@import "tailwindcss/preflight.css" layer(base);\n`;
+    }
+
+    css += `@import "tailwindcss/utilities.css" layer(utilities) source(none);\n`;
+  }
+
+  css += sourceInline
+    .map((source) => `@source inline("${source}");`)
+    .join("\n");
+
+  if (extraCss) {
+    css += `\n${extraCss}`;
+  }
+
+  if (debug) {
+    console.log(`Input CSS:\n---\n${css}\n---\n`);
+  }
+
+  // Process the TailwindCSS
+  let { css: output } = await postcss([
+    /* Tailwind seems to internally cache things, so we need a random value to cache bust */
+    tailwind({ base: Date.now().toString() }),
+  ]).process(css, {
+    from: __dirname,
+  });
+
+  if (debug) {
+    console.log(`Output CSS:\n---\n${output}\n---\n`);
+  }
+
+  registerCSS(output, { debug });
+
+  return tlRender(component, {
+    ...options,
+  });
+}
+
+render.debug = (
+  component: React.ReactElement<any>,
+  options: RenderOptions = {},
+) => {
+  return render(component, { ...options, debug: true });
+};
+
+function getClassNames(
+  component: React.ReactElement<any>,
+  classNames: Set<string> = new Set(),
+) {
+  if (component.props?.className) {
+    classNames.add(component.props.className);
+  }
+
+  if (component.props?.children) {
+    const children: React.ReactElement<any>[] = Array.isArray(
+      component.props.children,
+    )
+      ? component.props.children
+      : [component.props.children];
+
+    for (const child of children) {
+      getClassNames(child, classNames);
+    }
+  }
+
+  return classNames;
+}
+
+/**
+ * Helper method that uses the current test name to render the component
+ * Doesn't not support multiple components or changing the component type
+ */
+export async function renderCurrentTest({
+  sourceInline = [expect.getState().currentTestName?.split(/\s+/).at(-1) ?? ""],
+  ...options
+}: NativewindRenderOptions = {}) {
+  if (!sourceInline) {
+    throw new Error(
+      "unable to detect sourceInline, please manually set sourceInline in renderCurrentTest options",
+    );
+  }
+
+  await render(
+    <View testID={testID} className={sourceInline.join(" ")} />,
+    options,
+  );
+  const component = screen.getByTestId(testID, { hidden: true });
+
+  // Strip the testID and the children
+  const { testID: _testID, children, ...props } = component.props;
+
+  return { props };
+}
+
+renderCurrentTest.debug = (options: NativewindRenderOptions = {}) => {
+  return renderCurrentTest({ ...options, debug: true });
+};
