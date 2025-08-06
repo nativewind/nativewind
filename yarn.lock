@@ -2747,15 +2747,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tailwindcss/container-queries@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@tailwindcss/container-queries@npm:0.1.1"
-  peerDependencies:
-    tailwindcss: ">=3.2.0"
-  checksum: 10c0/336546ddcc60280723f2a92e311cac0acb8b05624c6519675d4b11ae13ed01dba5e622705a9be69cd66ca2c8019032551176546e6920d9634750165ac4c15d8e
-  languageName: node
-  linkType: hard
-
 "@tailwindcss/node@npm:4.1.11":
   version: 4.1.11
   resolution: "@tailwindcss/node@npm:4.1.11"
@@ -7690,18 +7681,19 @@ __metadata:
   dependencies:
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.4.2"
     "@react-native/typescript-config": "npm:^0.80.1"
-    "@tailwindcss/container-queries": "npm:^0.1.1"
+    "@tailwindcss/postcss": "npm:^4.1.11"
     "@testing-library/react-native": "npm:^13.2.0"
     "@types/debug": "npm:^4.1.12"
     "@types/jest": "npm:^29.5.1"
     expo: "npm:54.0.0-canary-20250713-8f814f8"
     jest: "npm:^29.7.0"
     jest-expo: "npm:54.0.0-canary-20250713-8f814f8"
+    postcss: "npm:^8.5.6"
     prettier: "npm:^3.3.1"
     react: "npm:19.1.0"
     react-native: "npm:0.80.1"
     react-native-builder-bob: "npm:^0.40.13"
-    react-native-css: "npm:3.0.0-nightly.27bd5e2"
+    react-native-css: "npm:3.0.0-nightly.75f8b74"
     react-native-reanimated: "npm:4.0.1"
     react-native-safe-area-context: "npm:5.4.0"
     react-native-worklets: "npm:0.4.1"
@@ -7711,7 +7703,7 @@ __metadata:
     tw-colors: "npm:^3.3.1"
     typescript: "npm:^5.8.3"
   peerDependencies:
-    react-native-css: 3.0.0-nightly.27bd5e2
+    react-native-css: 3.0.0-nightly.75f8b74
     tailwindcss: ">4.1.11"
   languageName: unknown
   linkType: soft
@@ -8196,7 +8188,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.41":
+"postcss@npm:^8.4.41, postcss@npm:^8.5.6":
   version: 8.5.6
   resolution: "postcss@npm:8.5.6"
   dependencies:
@@ -8494,9 +8486,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"react-native-css@npm:3.0.0-nightly.27bd5e2":
-  version: 3.0.0-nightly.27bd5e2
-  resolution: "react-native-css@npm:3.0.0-nightly.27bd5e2"
+"react-native-css@npm:3.0.0-nightly.75f8b74":
+  version: 3.0.0-nightly.75f8b74
+  resolution: "react-native-css@npm:3.0.0-nightly.75f8b74"
   dependencies:
     babel-plugin-react-compiler: "npm:^19.1.0-rc.2"
     colorjs.io: "npm:0.6.0-alpha.1"
@@ -8507,7 +8499,7 @@ __metadata:
     lightningcss: ">=1.27.0"
     react: 19.1.0
     react-native: 0.80.1
-  checksum: 10c0/72aac0f75d2634ffe4bfc5c62e08be40ef0198ea7cf81bd96d2e0637e466b96699ecc02cf062ec589aef7cec0e37794662d24ae8bce7b48dff54ab0855068aae
+  checksum: 10c0/f692464f0f3d685349de9c884825b88b11606b464173077728007c48b239febb79f6daf971de2cabfb768ed6b5294c4bf4ca6f3ae8a09125c8f449278552d7bd
   languageName: node
   linkType: hard
 
