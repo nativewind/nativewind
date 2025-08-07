@@ -17,13 +17,15 @@ export type NativewindRenderOptions = RenderOptions & {
   css?: string;
   /** Appended after the generated CSS */
   extraCss?: string;
-  /** Add `@source inline('<className>')` to the CSS. DEFAULT: Values are extracted from the component's className */
+  /** Add `@source inline('<className>')` to the CSS. @default Values are extracted from the component's className */
   sourceInline?: string[];
-  /** Whether to include the theme in the generated CSS */
+  /** Whether to include the theme in the generated CSS @default true */
   theme?: boolean;
-  /** Whether to include the preflight in the generated CSS */
+  /** Whether to include the preflight in the generated CSS @default false */
   preflight?: boolean;
-  /** Enable debug logging */
+  /** Whether to include the plugin in the generated CSS. @default true */
+  plugin?: boolean;
+  /** Enable debug logging. @default false - Set process.env.NATIVEWIND_TEST_AUTO_DEBUG and run tests with the node inspector   */
   debug?: boolean;
 };
 
@@ -40,6 +42,7 @@ export async function render(
     debug = debugDefault,
     theme = true,
     preflight = false,
+    plugin = true,
     extraCss,
     ...options
   }: NativewindRenderOptions = {},
@@ -53,6 +56,10 @@ export async function render(
 
     if (preflight) {
       css += `@import "tailwindcss/preflight.css" layer(base);\n`;
+    }
+
+    if (plugin) {
+      css += `@import "./theme.css";\n`;
     }
 
     css += `@import "tailwindcss/utilities.css" layer(utilities) source(none);\n`;
