@@ -22,6 +22,20 @@
   --leading-loose: 2em;
 }
 
+:root {
+  @media ios {
+    --font-sans: System;
+    --font-serif: Georgia;
+    --font-mono: Menlo;
+  }
+
+  @media android {
+    --font-sans: SystemAndroid;
+    --font-serif: sans-serif;
+    --font-mono: monospace;
+  }
+}
+
 @custom-variant ios (@media ios);
 @custom-variant android (@media android);
 @custom-variant native (@media native);

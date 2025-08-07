@@ -3,7 +3,7 @@ import { renderCurrentTest } from "../test-utils";
 describe("Typography - Font Family", () => {
   test("font-sans", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { fontFamily: "system font" } },
+      props: { style: { fontFamily: "System" } },
     });
   });
   test("font-serif", async () => {
@@ -13,7 +13,7 @@ describe("Typography - Font Family", () => {
   });
   test("font-mono", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { fontFamily: "Courier New" } },
+      props: { style: { fontFamily: "Menlo" } },
     });
   });
 });

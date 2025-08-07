@@ -1,6 +1,7 @@
-import { Switch, TextInput, View } from "react-native";
+import { fireEvent, screen } from "@testing-library/react-native";
+import { Switch, TextInput, View } from "react-native-css/components";
 
-import { fireEvent, render, screen } from "../test-utils";
+import { render } from "../test-utils";
 
 const testID = "component";
 
