@@ -35,7 +35,7 @@ describe("Typography - Font Smoothing", () => {
   test("antialiased", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: {
+      warnings: {
         properties: ["-webkit-font-smoothing", "-moz-osx-font-smoothing"],
       },
     });
@@ -43,7 +43,7 @@ describe("Typography - Font Smoothing", () => {
   test("subpixel-antialiased", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: {
+      warnings: {
         properties: ["-webkit-font-smoothing", "-moz-osx-font-smoothing"],
       },
     });
@@ -85,55 +85,55 @@ describe("Typography - Font Variant Numeric", () => {
   test("normal-nums", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["font-variant-numeric"] },
+      warnings: { properties: ["font-variant-numeric"] },
     });
   });
   test("ordinal", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["font-variant-numeric"] },
+      warnings: { properties: ["font-variant-numeric"] },
     });
   });
   test("slashed-zero", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["font-variant-numeric"] },
+      warnings: { properties: ["font-variant-numeric"] },
     });
   });
   test("lining-nums", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["font-variant-numeric"] },
+      warnings: { properties: ["font-variant-numeric"] },
     });
   });
   test("oldstyle-nums", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["font-variant-numeric"] },
+      warnings: { properties: ["font-variant-numeric"] },
     });
   });
   test("proportional-nums", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["font-variant-numeric"] },
+      warnings: { properties: ["font-variant-numeric"] },
     });
   });
   test("tabular-nums", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["font-variant-numeric"] },
+      warnings: { properties: ["font-variant-numeric"] },
     });
   });
   test("diagonal-fractions", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["font-variant-numeric"] },
+      warnings: { properties: ["font-variant-numeric"] },
     });
   });
   test("stacked-fractions", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["font-variant-numeric"] },
+      warnings: { properties: ["font-variant-numeric"] },
     });
   });
 });
@@ -141,12 +141,12 @@ describe("Typography - Font Variant Numeric", () => {
 describe("Typography - Letter Spacing", () => {
   test("tracking-tighter", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { letterSpacing: -0.5 } },
+      props: { style: { letterSpacing: -0.05 } },
     });
   });
   test("tracking-tight", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { letterSpacing: -0.25 } },
+      props: { style: { letterSpacing: -0.025 } },
     });
   });
   test("tracking-normal", async () => {
@@ -229,7 +229,7 @@ describe("Typography - List Style Image", () => {
   test("list-image-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["list-style-image"] },
+      warnings: { properties: ["list-style-image"] },
     });
   });
 });
@@ -238,13 +238,13 @@ describe("Typography - List Style Position", () => {
   test("list-inside", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["list-style-position"] },
+      warnings: { properties: ["list-style-position"] },
     });
   });
   test("list-outside", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["list-style-position"] },
+      warnings: { properties: ["list-style-position"] },
     });
   });
 });
@@ -253,19 +253,19 @@ describe("Typography - List Style Type", () => {
   test("list-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["list-style-type"] },
+      warnings: { properties: ["list-style-type"] },
     });
   });
   test("list-disc", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["list-style-type"] },
+      warnings: { properties: ["list-style-type"] },
     });
   });
   test("list-decimal", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["list-style-type"] },
+      warnings: { properties: ["list-style-type"] },
     });
   });
 });
@@ -322,13 +322,13 @@ describe("Typography - Text Color", () => {
   test("text-current", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { color: "currentcolor" } },
+      warnings: { values: { color: "currentcolor" } },
     });
   });
   test("text-inherit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { color: "inherit" } },
+      warnings: { values: { color: "inherit" } },
     });
   });
 });
@@ -352,7 +352,7 @@ describe("Typography - Text Decoration", () => {
   test("overline", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "text-decoration-line": "overline" } },
+      warnings: { values: { "text-decoration-line": "overline" } },
     });
   });
 });
@@ -381,13 +381,13 @@ describe("Typography - Text Decoration Color", () => {
   test("decoration-current", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "text-decoration-color": "currentcolor" } },
+      warnings: { values: { "text-decoration-color": "currentcolor" } },
     });
   });
   test("decoration-inherit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "text-decoration-color": "inherit" } },
+      warnings: { values: { "text-decoration-color": "inherit" } },
     });
   });
 });
@@ -416,7 +416,7 @@ describe("Typography - Text Decoration Style", () => {
   test("decoration-wavy", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "text-decoration-style": "wavy" } },
+      warnings: { values: { "text-decoration-style": "wavy" } },
     });
   });
 });
@@ -425,25 +425,25 @@ describe("Typography - Text Decoration Thickness", () => {
   test("decoration-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-decoration-thickness"] },
+      warnings: { properties: ["text-decoration-thickness"] },
     });
   });
   test("decoration-from-font", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-decoration-thickness"] },
+      warnings: { properties: ["text-decoration-thickness"] },
     });
   });
   test("decoration-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-decoration-thickness"] },
+      warnings: { properties: ["text-decoration-thickness"] },
     });
   });
   test("decoration-1", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-decoration-thickness"] },
+      warnings: { properties: ["text-decoration-thickness"] },
     });
   });
 });
@@ -452,13 +452,13 @@ describe("Typography - Text Underline Offset", () => {
   test("underline-offset-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-underline-offset"] },
+      warnings: { properties: ["text-underline-offset"] },
     });
   });
   test("underline-offset-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-underline-offset"] },
+      warnings: { properties: ["text-underline-offset"] },
     });
   });
 });
@@ -490,13 +490,13 @@ describe("Typography - Text Overflow", () => {
   test("text-ellipsis", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-overflow"] },
+      warnings: { properties: ["text-overflow"] },
     });
   });
   test("text-clip", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-overflow"] },
+      warnings: { properties: ["text-overflow"] },
     });
   });
 });
@@ -505,19 +505,19 @@ describe("Typography - Text Indent", () => {
   test("indent-px", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-indent"] },
+      warnings: { properties: ["text-indent"] },
     });
   });
   test("indent-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-indent"] },
+      warnings: { properties: ["text-indent"] },
     });
   });
   test("indent-1", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["text-indent"] },
+      warnings: { properties: ["text-indent"] },
     });
   });
 });
@@ -526,7 +526,7 @@ describe("Typography - Vertical Align", () => {
   test("align-baseline", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "vertical-align": "baseline" } },
+      warnings: { values: { "vertical-align": "baseline" } },
     });
   });
   test("align-top", async () => {
@@ -547,25 +547,25 @@ describe("Typography - Vertical Align", () => {
   test("align-text-top", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "vertical-align": "text-top" } },
+      warnings: { values: { "vertical-align": "text-top" } },
     });
   });
   test("align-text-bottom", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "vertical-align": "text-bottom" } },
+      warnings: { values: { "vertical-align": "text-bottom" } },
     });
   });
   test("align-sub", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "vertical-align": "sub" } },
+      warnings: { values: { "vertical-align": "sub" } },
     });
   });
   test("align-super", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "vertical-align": "super" } },
+      warnings: { values: { "vertical-align": "super" } },
     });
   });
 });
@@ -574,31 +574,31 @@ describe("Typography - Whitespace", () => {
   test("whitespace-normal", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["white-space"] },
+      warnings: { properties: ["white-space"] },
     });
   });
   test("whitespace-nowrap", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["white-space"] },
+      warnings: { properties: ["white-space"] },
     });
   });
   test("whitespace-pre", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["white-space"] },
+      warnings: { properties: ["white-space"] },
     });
   });
   test("whitespace-pre-line", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["white-space"] },
+      warnings: { properties: ["white-space"] },
     });
   });
   test("whitespace-pre-wrap", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["white-space"] },
+      warnings: { properties: ["white-space"] },
     });
   });
 });
@@ -607,7 +607,7 @@ describe("Typography - Word Break", () => {
   test("break-normal", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: {
+      warnings: {
         properties: ["overflow-wrap", "word-break"],
       },
     });
@@ -615,13 +615,13 @@ describe("Typography - Word Break", () => {
   test("break-words", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-wrap"] },
+      warnings: { properties: ["overflow-wrap"] },
     });
   });
   test("break-all", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["word-break"] },
+      warnings: { properties: ["word-break"] },
     });
   });
 });
@@ -630,19 +630,19 @@ describe("Typography - Hyphens", () => {
   test("hyphens-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["hyphens"] },
+      warnings: { properties: ["hyphens"] },
     });
   });
   test("hyphens-manual", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["hyphens"] },
+      warnings: { properties: ["hyphens"] },
     });
   });
   test("hyphens-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["hyphens"] },
+      warnings: { properties: ["hyphens"] },
     });
   });
 });
@@ -651,7 +651,7 @@ describe("Typography - Content", () => {
   test("content-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["content"] },
+      warnings: { properties: ["content"] },
     });
   });
 });

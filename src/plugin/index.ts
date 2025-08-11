@@ -11,7 +11,7 @@ const nativewind: PluginCreator = plugin.withOptions(
   () =>
     ({ matchVariant }) => {
       matchVariant(
-        "@move",
+        "@prop",
         (value = "", { modifier }) => {
           value = kebabCase(value.replace(/&/, "\\&").replaceAll(".", "\\."));
 

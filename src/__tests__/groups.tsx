@@ -1,6 +1,7 @@
+import { fireEvent, screen } from "@testing-library/react-native";
 import { View } from "react-native-css/components";
 
-import { fireEvent, render, screen } from "../test-utils";
+import { render } from "../test-utils";
 
 const grandparentID = "grandparentID";
 const parentID = "parent";
