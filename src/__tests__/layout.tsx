@@ -13,7 +13,7 @@ describe("Layout - Aspect Ratio", () => {
   });
   test("aspect-[4/3]", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { aspectRatio: "4 / 3" } },
+      props: { style: { aspectRatio: "4/3" } },
     });
   });
 });
@@ -21,7 +21,7 @@ describe("Layout - Aspect Ratio", () => {
 describe("Layout - Container", () => {
   test("container", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { maxWidth: 640, width: "100%" } },
+      props: { style: { maxWidth: 672, width: "100%" } },
     });
   });
 });
@@ -30,13 +30,13 @@ describe("Layout - Columns", () => {
   test("columns-1", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["columns"] },
+      warnings: { properties: ["columns"] },
     });
   });
   test("columns-2", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["columns"] },
+      warnings: { properties: ["columns"] },
     });
   });
 });
@@ -45,49 +45,49 @@ describe("Layout - Break After", () => {
   test("break-after-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-after"] },
+      warnings: { properties: ["break-after"] },
     });
   });
   test("break-after-avoid", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-after"] },
+      warnings: { properties: ["break-after"] },
     });
   });
   test("break-after-all", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-after"] },
+      warnings: { properties: ["break-after"] },
     });
   });
   test("break-after-avoid-page", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-after"] },
+      warnings: { properties: ["break-after"] },
     });
   });
   test("break-after-page", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-after"] },
+      warnings: { properties: ["break-after"] },
     });
   });
   test("break-after-left", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-after"] },
+      warnings: { properties: ["break-after"] },
     });
   });
   test("break-after-right", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-after"] },
+      warnings: { properties: ["break-after"] },
     });
   });
   test("break-after-column", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-after"] },
+      warnings: { properties: ["break-after"] },
     });
   });
 });
@@ -96,49 +96,49 @@ describe("Layout - Break Before", () => {
   test("break-before-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-before"] },
+      warnings: { properties: ["break-before"] },
     });
   });
   test("break-before-avoid", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-before"] },
+      warnings: { properties: ["break-before"] },
     });
   });
   test("break-before-all", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-before"] },
+      warnings: { properties: ["break-before"] },
     });
   });
   test("break-before-avoid-page", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-before"] },
+      warnings: { properties: ["break-before"] },
     });
   });
   test("break-before-page", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-before"] },
+      warnings: { properties: ["break-before"] },
     });
   });
   test("break-before-left", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-before"] },
+      warnings: { properties: ["break-before"] },
     });
   });
   test("break-before-right", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-before"] },
+      warnings: { properties: ["break-before"] },
     });
   });
   test("break-before-column", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-before"] },
+      warnings: { properties: ["break-before"] },
     });
   });
 });
@@ -147,25 +147,25 @@ describe("Layout - Break Inside", () => {
   test("break-inside-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-inside"] },
+      warnings: { properties: ["break-inside"] },
     });
   });
   test("break-inside-avoid", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-inside"] },
+      warnings: { properties: ["break-inside"] },
     });
   });
   test("break-inside-avoid-page", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-inside"] },
+      warnings: { properties: ["break-inside"] },
     });
   });
   test("break-inside-avoid-column", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["break-inside"] },
+      warnings: { properties: ["break-inside"] },
     });
   });
 });
@@ -174,13 +174,13 @@ describe("Layout - Box Decoration Break", () => {
   test("box-decoration-clone", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["box-decoration-break"] },
+      warnings: { properties: ["box-decoration-break"] },
     });
   });
   test("box-decoration-slice", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["box-decoration-break"] },
+      warnings: { properties: ["box-decoration-break"] },
     });
   });
 });
@@ -189,13 +189,13 @@ describe("Layout - Box Sizing", () => {
   test("box-border", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["box-sizing"] },
+      warnings: { properties: ["box-sizing"] },
     });
   });
   test("box-content", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["box-sizing"] },
+      warnings: { properties: ["box-sizing"] },
     });
   });
 });
@@ -214,115 +214,115 @@ describe("Layout - Display", () => {
   test("block", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "block" } },
+      warnings: { values: { display: "block" } },
     });
   });
   test("inline-block", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "inline-block" } },
+      warnings: { values: { display: "inline-block" } },
     });
   });
   test("inline", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "inline" } },
+      warnings: { values: { display: "inline" } },
     });
   });
   test("inline-flex", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "inline-flex" } },
+      warnings: { values: { display: "inline-flex" } },
     });
   });
   test("table", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "table" } },
+      warnings: { values: { display: "table" } },
     });
   });
   test("inline-table", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "inline-table" } },
+      warnings: { values: { display: "inline-table" } },
     });
   });
   test("table-caption", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "table-caption" } },
+      warnings: { values: { display: "table-caption" } },
     });
   });
   test("table-cell", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "table-cell" } },
+      warnings: { values: { display: "table-cell" } },
     });
   });
   test("table-column", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "table-column" } },
+      warnings: { values: { display: "table-column" } },
     });
   });
   test("table-column-group", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "table-column-group" } },
+      warnings: { values: { display: "table-column-group" } },
     });
   });
   test("table-footer-group", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "table-footer-group" } },
+      warnings: { values: { display: "table-footer-group" } },
     });
   });
   test("table-header-group", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "table-header-group" } },
+      warnings: { values: { display: "table-header-group" } },
     });
   });
   test("table-row-group", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "table-row-group" } },
+      warnings: { values: { display: "table-row-group" } },
     });
   });
   test("table-row", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "table-row" } },
+      warnings: { values: { display: "table-row" } },
     });
   });
   test("flow-root", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "flow-root" } },
+      warnings: { values: { display: "flow-root" } },
     });
   });
   test("grid", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "grid" } },
+      warnings: { values: { display: "grid" } },
     });
   });
   test("inline-grid", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "inline-grid" } },
+      warnings: { values: { display: "inline-grid" } },
     });
   });
   test("contents", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "contents" } },
+      warnings: { values: { display: "contents" } },
     });
   });
   test("list-item", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { display: "list-item" } },
+      warnings: { values: { display: "list-item" } },
     });
   });
 });
@@ -331,19 +331,19 @@ describe("Layout - Floats", () => {
   test("float-right", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["float"] },
+      warnings: { properties: ["float"] },
     });
   });
   test("float-left", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["float"] },
+      warnings: { properties: ["float"] },
     });
   });
   test("float-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["float"] },
+      warnings: { properties: ["float"] },
     });
   });
 });
@@ -352,25 +352,25 @@ describe("Layout - Clear", () => {
   test("clear-right", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["clear"] },
+      warnings: { properties: ["clear"] },
     });
   });
   test("clear-left", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["clear"] },
+      warnings: { properties: ["clear"] },
     });
   });
   test("clear-both", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["clear"] },
+      warnings: { properties: ["clear"] },
     });
   });
   test("clear-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["clear"] },
+      warnings: { properties: ["clear"] },
     });
   });
 });
@@ -379,13 +379,13 @@ describe("Layout - Isolation", () => {
   test("isolate", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["isolation"] },
+      warnings: { properties: ["isolation"] },
     });
   });
   test("isolation-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["isolation"] },
+      warnings: { properties: ["isolation"] },
     });
   });
 });
@@ -394,31 +394,31 @@ describe("Layout - Object Fit", () => {
   test("object-contain", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-fit"] },
+      warnings: { properties: ["object-fit"] },
     });
   });
   test("object-cover", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-fit"] },
+      warnings: { properties: ["object-fit"] },
     });
   });
   test("object-fill", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-fit"] },
+      warnings: { properties: ["object-fit"] },
     });
   });
   test("object-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-fit"] },
+      warnings: { properties: ["object-fit"] },
     });
   });
   test("object-scale-down", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-fit"] },
+      warnings: { properties: ["object-fit"] },
     });
   });
 });
@@ -427,55 +427,55 @@ describe("Layout - Object Position", () => {
   test("object-bottom", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-position"] },
+      warnings: { properties: ["object-position"] },
     });
   });
   test("object-center", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-position"] },
+      warnings: { properties: ["object-position"] },
     });
   });
   test("object-left", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-position"] },
+      warnings: { properties: ["object-position"] },
     });
   });
   test("object-left-bottom", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-position"] },
+      warnings: { properties: ["object-position"] },
     });
   });
   test("object-left-top", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-position"] },
+      warnings: { properties: ["object-position"] },
     });
   });
   test("object-right", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-position"] },
+      warnings: { properties: ["object-position"] },
     });
   });
   test("object-right-bottom", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-position"] },
+      warnings: { properties: ["object-position"] },
     });
   });
   test("object-right-top", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-position"] },
+      warnings: { properties: ["object-position"] },
     });
   });
   test("object-top", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["object-position"] },
+      warnings: { properties: ["object-position"] },
     });
   });
 });
@@ -484,79 +484,79 @@ describe("Layout - Overflow", () => {
   test("overflow-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { overflow: "auto" } },
+      warnings: { values: { overflow: "auto" } },
     });
   });
   test("overflow-clip", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { overflow: "clip" } },
+      warnings: { values: { overflow: "clip" } },
     });
   });
   test("overflow-scroll", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { overflow: "scroll" } },
+      warnings: { values: { overflow: "scroll" } },
     });
   });
   test("overflow-x-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-x"] },
+      warnings: { properties: ["overflow-x"] },
     });
   });
   test("overflow-y-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-y"] },
+      warnings: { properties: ["overflow-y"] },
     });
   });
   test("overflow-x-hidden", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-x"] },
+      warnings: { properties: ["overflow-x"] },
     });
   });
   test("overflow-y-hidden", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-y"] },
+      warnings: { properties: ["overflow-y"] },
     });
   });
   test("overflow-x-clip", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-x"] },
+      warnings: { properties: ["overflow-x"] },
     });
   });
   test("overflow-y-clip", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-y"] },
+      warnings: { properties: ["overflow-y"] },
     });
   });
   test("overflow-x-visible", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-x"] },
+      warnings: { properties: ["overflow-x"] },
     });
   });
   test("overflow-y-visible", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-y"] },
+      warnings: { properties: ["overflow-y"] },
     });
   });
   test("overflow-x-scroll", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-x"] },
+      warnings: { properties: ["overflow-x"] },
     });
   });
   test("overflow-y-scroll", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overflow-y"] },
+      warnings: { properties: ["overflow-y"] },
     });
   });
   test("overflow-hidden", async () => {
@@ -575,55 +575,55 @@ describe("Layout - Overscroll Behavior", () => {
   test("overscroll-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overscroll-behavior"] },
+      warnings: { properties: ["overscroll-behavior"] },
     });
   });
   test("overscroll-contain", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overscroll-behavior"] },
+      warnings: { properties: ["overscroll-behavior"] },
     });
   });
   test("overscroll-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overscroll-behavior"] },
+      warnings: { properties: ["overscroll-behavior"] },
     });
   });
   test("overscroll-y-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overscroll-behavior-y"] },
+      warnings: { properties: ["overscroll-behavior-y"] },
     });
   });
   test("overscroll-y-contain", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overscroll-behavior-y"] },
+      warnings: { properties: ["overscroll-behavior-y"] },
     });
   });
   test("overscroll-y-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overscroll-behavior-y"] },
+      warnings: { properties: ["overscroll-behavior-y"] },
     });
   });
   test("overscroll-x-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overscroll-behavior-x"] },
+      warnings: { properties: ["overscroll-behavior-x"] },
     });
   });
   test("overscroll-x-contain", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overscroll-behavior-x"] },
+      warnings: { properties: ["overscroll-behavior-x"] },
     });
   });
   test("overscroll-x-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { properties: ["overscroll-behavior-x"] },
+      warnings: { properties: ["overscroll-behavior-x"] },
     });
   });
 });
@@ -642,19 +642,19 @@ describe("Layout - Position", () => {
   test("static", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { position: "static" } },
+      warnings: { values: { position: "static" } },
     });
   });
   test("fixed", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { position: "fixed" } },
+      warnings: { values: { position: "fixed" } },
     });
   });
   test("sticky", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { position: "sticky" } },
+      warnings: { values: { position: "sticky" } },
     });
   });
 });
@@ -783,45 +783,45 @@ describe("Layout - Top Right Bottom Left", () => {
   test("inset-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: {
-        style: { top: "auto", bottom: "auto", left: "auto", right: "auto" },
+      warnings: {
+        values: { top: "auto", bottom: "auto", left: "auto", right: "auto" },
       },
     });
   });
   test("inset-x-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { left: "auto", right: "auto" } },
+      warnings: { values: { left: "auto", right: "auto" } },
     });
   });
   test("inset-y-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { top: "auto", bottom: "auto" } },
+      warnings: { values: { top: "auto", bottom: "auto" } },
     });
   });
   test("top-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { top: "auto" } },
+      warnings: { values: { top: "auto" } },
     });
   });
   test("right-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { right: "auto" } },
+      warnings: { values: { right: "auto" } },
     });
   });
   test("bottom-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { bottom: "auto" } },
+      warnings: { values: { bottom: "auto" } },
     });
   });
   test("left-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { left: "auto" } },
+      warnings: { values: { left: "auto" } },
     });
   });
 });
@@ -830,11 +830,17 @@ describe("Layout - Visibility", () => {
   test("visible", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: { style: { opacity: 1 } },
+      warnings: {
+        properties: ["visibility"],
+      },
     });
   });
   test("invisible", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: { style: { opacity: 0 } },
+      warnings: {
+        properties: ["visibility"],
+      },
     });
   });
 });
@@ -843,7 +849,7 @@ describe("Layout - Z-Index", () => {
   test("z-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "z-index": "auto" } },
+      warnings: { values: { "z-index": "auto" } },
     });
   });
   test("z-0", async () => {

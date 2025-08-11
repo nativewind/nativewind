@@ -1,73 +1,21 @@
-import {
-  PixelRatio,
-  Platform,
-  PlatformColor,
-  StyleSheet,
-  View,
-} from "react-native";
+import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
 
 import { screen } from "@testing-library/react-native";
+import { View } from "react-native-css/components";
 
 import { render } from "../test-utils";
-import {
-  fontScaleSelect,
-  getPixelSizeForLayoutSize,
-  hairlineWidth,
-  pixelScaleSelect,
-  platformColor,
-  platformSelect,
-  roundToNearestPixel,
-} from "../theme";
 
 const testA = "a";
 const testB = "b";
 
 test("hairlineWidth()", async () => {
-  await render(<View testID={testA} className="border-custom" />, {
-    config: {
-      theme: {
-        extend: {
-          borderWidth: {
-            custom: hairlineWidth(),
-          },
-        },
-      },
-    },
-  });
+  await render(
+    <View testID={testA} className="border-[length:hairlineWidth()]" />,
+  );
 
   const component = screen.getByTestId(testA);
 
   expect(component).toHaveStyle({ borderWidth: StyleSheet.hairlineWidth });
-});
-
-test("platformSelect()", async () => {
-  await render(
-    <>
-      <View testID={testA} className="text-match" />
-      <View testID={testB} className="text-default" />
-    </>,
-    {
-      config: {
-        theme: {
-          extend: {
-            colors: {
-              match: platformSelect({
-                [Platform.OS]: "black",
-                default: "white",
-              }),
-              default: platformSelect({
-                [Platform.OS === "ios" ? "android" : "ios"]: "black",
-                default: "white",
-              }),
-            },
-          },
-        },
-      },
-    },
-  );
-
-  expect(screen.getByTestId(testA)).toHaveStyle({ color: "black" });
-  expect(screen.getByTestId(testB)).toHaveStyle({ color: "white" });
 });
 
 test("pixelScaleSelect()", async () => {

@@ -7693,7 +7693,7 @@ __metadata:
     react: "npm:19.1.0"
     react-native: "npm:0.80.1"
     react-native-builder-bob: "npm:^0.40.13"
-    react-native-css: "npm:3.0.0-nightly.df0f885"
+    react-native-css: "npm:3.0.0-nightly.fa5e95b"
     react-native-reanimated: "npm:4.0.1"
     react-native-safe-area-context: "npm:5.4.0"
     react-native-worklets: "npm:0.4.1"
@@ -7703,7 +7703,7 @@ __metadata:
     tw-colors: "npm:^3.3.1"
     typescript: "npm:^5.8.3"
   peerDependencies:
-    react-native-css: 3.0.0-nightly.df0f885
+    react-native-css: 3.0.0-nightly.fa5e95b
     tailwindcss: ">4.1.11"
   languageName: unknown
   linkType: soft
@@ -8486,9 +8486,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"react-native-css@npm:3.0.0-nightly.df0f885":
-  version: 3.0.0-nightly.df0f885
-  resolution: "react-native-css@npm:3.0.0-nightly.df0f885"
+"react-native-css@npm:3.0.0-nightly.fa5e95b":
+  version: 3.0.0-nightly.fa5e95b
+  resolution: "react-native-css@npm:3.0.0-nightly.fa5e95b"
   dependencies:
     babel-plugin-react-compiler: "npm:^19.1.0-rc.2"
     colorjs.io: "npm:0.6.0-alpha.1"
@@ -8499,7 +8499,7 @@ __metadata:
     lightningcss: ">=1.27.0"
     react: 19.1.0
     react-native: 0.80.1
-  checksum: 10c0/4a3961fc2cdb0e68432d41197911695fa7d44590e31dcc5e0816bc53ba5ad5d201adf458b1969f794e9b9a445156951a8fc799a7947296f4bbdd6f8c7b80213f
+  checksum: 10c0/2783633f261bebb389aa4102f2b65c76dfdaa3c6ef299663b66c30ad16280c990e4720ba42041aafef34d29642e29ba5b2aa4cd804e9300d748bc825ee774a55
   languageName: node
   linkType: hard
 

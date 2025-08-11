@@ -7,25 +7,18 @@ const testID = "react-native-css-interop";
 
 test("@apply", async () => {
   await render(<View testID={testID} className="btn-primary" />, {
-    css: `
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer components {
+    extraCss: `
   .btn-primary {
     @apply py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400;
-  }
-}
-    `,
+  }`,
   });
 
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#2b7fff",
     borderRadius: 7,
-    color: "#ffffff",
+    color: "#fff",
     fontWeight: "600",
     paddingBottom: 7,
     paddingLeft: 14,

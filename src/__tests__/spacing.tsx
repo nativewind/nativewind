@@ -8,12 +8,12 @@ describe("Spacing - Padding", () => {
   });
   test("px-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { paddingLeft: 0, paddingRight: 0 } },
+      props: { style: { paddingInline: 0 } },
     });
   });
   test("py-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { paddingTop: 0, paddingBottom: 0 } },
+      props: { style: { paddingBlock: 0 } },
     });
   });
   test("pt-0", async () => {
@@ -38,12 +38,12 @@ describe("Spacing - Padding", () => {
   });
   test("ps-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { paddingStart: 0 } },
+      props: { style: { paddingInlineStart: 0 } },
     });
   });
   test("pe-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { paddingEnd: 0 } },
+      props: { style: { paddingInlineEnd: 0 } },
     });
   });
 });
@@ -56,12 +56,12 @@ describe("Spacing - Margin", () => {
   });
   test("mx-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { marginLeft: 0, marginRight: 0 } },
+      props: { style: { marginInline: 0 } },
     });
   });
   test("my-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { marginTop: 0, marginBottom: 0 } },
+      props: { style: { marginBlock: 0 } },
     });
   });
   test("mt-0", async () => {
@@ -86,12 +86,12 @@ describe("Spacing - Margin", () => {
   });
   test("ms-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { marginStart: 0 } },
+      props: { style: { marginInlineStart: 0 } },
     });
   });
   test("me-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { marginEnd: 0 } },
+      props: { style: { marginInlineEnd: 0 } },
     });
   });
   test("m-auto", async () => {

@@ -121,15 +121,15 @@ describe("Border - Border Width", () => {
 describe("Border - Border Color", () => {
   test("border-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderColor: "#ffffff" } },
+      props: { style: { borderColor: "#fff" } },
     });
   });
   test("border-x-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          borderLeftColor: "#ffffff",
-          borderRightColor: "#ffffff",
+          borderLeftColor: "#fff",
+          borderRightColor: "#fff",
         },
       },
     });
@@ -138,37 +138,37 @@ describe("Border - Border Color", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          borderTopColor: "#ffffff",
-          borderBottomColor: "#ffffff",
+          borderTopColor: "#fff",
+          borderBottomColor: "#fff",
         },
       },
     });
   });
   test("border-t-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderTopColor: "#ffffff" } },
+      props: { style: { borderTopColor: "#fff" } },
     });
   });
   test("border-b-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderBottomColor: "#ffffff" } },
+      props: { style: { borderBottomColor: "#fff" } },
     });
   });
   test("border-l-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderLeftColor: "#ffffff" } },
+      props: { style: { borderLeftColor: "#fff" } },
     });
   });
   test("border-r-white", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderRightColor: "#ffffff" } },
+      props: { style: { borderRightColor: "#fff" } },
     });
   });
   test("border-current", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: {
-        style: {
+      warnings: {
+        values: {
           "border-top-color": "currentcolor",
           "border-bottom-color": "currentcolor",
           "border-left-color": "currentcolor",
@@ -180,15 +180,15 @@ describe("Border - Border Color", () => {
   test("border-inherit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-color": "inherit" } },
+      warnings: { values: { "border-color": "inherit" } },
     });
   });
 
   test("border-x-inherit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: {
-        style: {
+      warnings: {
+        values: {
           "border-left-color": "inherit",
           "border-right-color": "inherit",
         },
@@ -198,8 +198,8 @@ describe("Border - Border Color", () => {
   test("border-y-current", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: {
-        style: {
+      warnings: {
+        values: {
           "border-top-color": "currentcolor",
           "border-bottom-color": "currentcolor",
         },
@@ -209,8 +209,8 @@ describe("Border - Border Color", () => {
   test("border-y-inherit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: {
-        style: {
+      warnings: {
+        values: {
           "border-top-color": "inherit",
           "border-bottom-color": "inherit",
         },
@@ -220,56 +220,56 @@ describe("Border - Border Color", () => {
   test("border-t-current", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-top-color": "currentcolor" } },
+      warnings: { values: { "border-top-color": "currentcolor" } },
     });
   });
 
   test("border-t-inherit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-top-color": "inherit" } },
+      warnings: { values: { "border-top-color": "inherit" } },
     });
   });
 
   test("border-b-current", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-bottom-color": "currentcolor" } },
+      warnings: { values: { "border-bottom-color": "currentcolor" } },
     });
   });
 
   test("border-b-inherit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-bottom-color": "inherit" } },
+      warnings: { values: { "border-bottom-color": "inherit" } },
     });
   });
 
   test("border-l-current", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-left-color": "currentcolor" } },
+      warnings: { values: { "border-left-color": "currentcolor" } },
     });
   });
 
   test("border-l-inherit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-left-color": "inherit" } },
+      warnings: { values: { "border-left-color": "inherit" } },
     });
   });
 
   test("border-r-current", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-right-color": "currentcolor" } },
+      warnings: { values: { "border-right-color": "currentcolor" } },
     });
   });
 
   test("border-r-inherit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-right-color": "inherit" } },
+      warnings: { values: { "border-right-color": "inherit" } },
     });
   });
 });
@@ -293,19 +293,19 @@ describe("Borders - Border Style", () => {
   test("border-none", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-style": "none" } },
+      warnings: { values: { "border-style": "none" } },
     });
   });
   test("border-double", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-style": "double" } },
+      warnings: { values: { "border-style": "double" } },
     });
   });
   test("border-hidden", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "border-style": "hidden" } },
+      warnings: { values: { "border-style": "hidden" } },
     });
   });
 });

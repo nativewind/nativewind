@@ -58,11 +58,11 @@ export async function render(
       css += `@import "tailwindcss/preflight.css" layer(base);\n`;
     }
 
+    css += `@import "tailwindcss/utilities.css" layer(utilities) source(none);\n`;
+
     if (plugin) {
       css += `@import "./theme.css";\n`;
     }
-
-    css += `@import "tailwindcss/utilities.css" layer(utilities) source(none);\n`;
   }
 
   css += sourceInline
@@ -89,11 +89,15 @@ export async function render(
     console.log(`Output CSS:\n---\n${output}\n---\n`);
   }
 
-  registerCSS(output, { debug });
+  const compiled = registerCSS(output);
 
-  return tlRender(component, {
-    ...options,
-  });
+  return Object.assign(
+    {},
+    tlRender(component, {
+      ...options,
+    }),
+    compiled,
+  );
 }
 
 render.debug = (
@@ -140,7 +144,7 @@ export async function renderCurrentTest({
     );
   }
 
-  await render(
+  const { warnings: warningFn } = await render(
     <View testID={testID} className={sourceInline.join(" ")} />,
     options,
   );
@@ -149,7 +153,30 @@ export async function renderCurrentTest({
   // Strip the testID and the children
   const { testID: _testID, children, ...props } = component.props;
 
-  return { props };
+  const compilerWarnings = warningFn();
+
+  console.log({ compilerWarnings });
+
+  let warnings: Record<string, unknown> | undefined;
+
+  if (compilerWarnings.properties) {
+    warnings ??= {};
+    warnings.properties = compilerWarnings.properties;
+  }
+
+  const warningValues = compilerWarnings.values;
+
+  if (warningValues) {
+    warnings ??= {};
+    warnings.values = Object.fromEntries(
+      Object.entries(warningValues).map(([key, value]) => [
+        key,
+        value.length > 1 ? value : value[0],
+      ]),
+    );
+  }
+
+  return warnings ? { props, warnings } : { props };
 }
 
 renderCurrentTest.debug = (options: NativewindRenderOptions = {}) => {

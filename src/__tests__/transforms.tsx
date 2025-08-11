@@ -5,66 +5,7 @@ describe("Transforms - Scale", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 0 },
-            { scaleY: 0 },
-          ],
-        },
-      },
-    });
-  });
-  test("scale-x-0", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 0 },
-            { scaleY: 1 },
-          ],
-        },
-      },
-    });
-  });
-  test("scale-y-0", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 1 },
-            { scaleY: 0 },
-          ],
-        },
-      },
-    });
-  });
-  test("scale-50", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {
-        style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 0.5 },
-            { scaleY: 0.5 },
-          ],
+          transform: [{ scaleX: 0 }, { scaleY: 0 }],
         },
       },
     });
@@ -73,15 +14,34 @@ describe("Transforms - Scale", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 0.5 },
-            { scaleY: 1 },
-          ],
+          transform: [{ scaleX: 0.5 }],
+        },
+      },
+    });
+  });
+  test("scale-y-50", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: {
+          transform: [{ scaleY: 0.5 }],
+        },
+      },
+    });
+  });
+  test("scale-50", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: {
+          transform: [{ scaleX: 0.5 }, { scaleY: 0.5 }],
+        },
+      },
+    });
+  });
+  test("scale-x-50", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: {
+          transform: [{ scaleX: 0.5 }],
         },
       },
     });
@@ -91,15 +51,7 @@ describe("Transforms - Scale", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 1 },
-            { scaleY: 0.5 },
-          ],
+          transform: [{ scaleY: 0.5 }],
         },
       },
     });
@@ -111,15 +63,7 @@ describe("Transforms - Rotate", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
+          transform: [{ rotate: "0deg" }],
         },
       },
     });
@@ -128,15 +72,7 @@ describe("Transforms - Rotate", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "180deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
+          transform: [{ rotate: "180deg" }],
         },
       },
     });
@@ -454,55 +390,55 @@ describe("Transforms - Mixed", () => {
     test("origin-center", async () => {
       expect(await renderCurrentTest()).toStrictEqual({
         props: {},
-        invalid: { properties: ["transform-origin"] },
+        warnings: { properties: ["transform-origin"] },
       });
     });
     test("origin-top", async () => {
       expect(await renderCurrentTest()).toStrictEqual({
         props: {},
-        invalid: { properties: ["transform-origin"] },
+        warnings: { properties: ["transform-origin"] },
       });
     });
     test("origin-top-right", async () => {
       expect(await renderCurrentTest()).toStrictEqual({
         props: {},
-        invalid: { properties: ["transform-origin"] },
+        warnings: { properties: ["transform-origin"] },
       });
     });
     test("origin-right", async () => {
       expect(await renderCurrentTest()).toStrictEqual({
         props: {},
-        invalid: { properties: ["transform-origin"] },
+        warnings: { properties: ["transform-origin"] },
       });
     });
     test("origin-bottom-right", async () => {
       expect(await renderCurrentTest()).toStrictEqual({
         props: {},
-        invalid: { properties: ["transform-origin"] },
+        warnings: { properties: ["transform-origin"] },
       });
     });
     test("origin-bottom", async () => {
       expect(await renderCurrentTest()).toStrictEqual({
         props: {},
-        invalid: { properties: ["transform-origin"] },
+        warnings: { properties: ["transform-origin"] },
       });
     });
     test("origin-bottom-left", async () => {
       expect(await renderCurrentTest()).toStrictEqual({
         props: {},
-        invalid: { properties: ["transform-origin"] },
+        warnings: { properties: ["transform-origin"] },
       });
     });
     test("origin-left", async () => {
       expect(await renderCurrentTest()).toStrictEqual({
         props: {},
-        invalid: { properties: ["transform-origin"] },
+        warnings: { properties: ["transform-origin"] },
       });
     });
     test("origin-top-left", async () => {
       expect(await renderCurrentTest()).toStrictEqual({
         props: {},
-        invalid: { properties: ["transform-origin"] },
+        warnings: { properties: ["transform-origin"] },
       });
     });
   });

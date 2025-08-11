@@ -2,21 +2,23 @@ import { renderCurrentTest } from "../test-utils";
 
 describe("Accessibility - Screen Readers", () => {
   test("sr-only", async () => {
-    const { props } = await renderCurrentTest();
-    expect(props).toStrictEqual({
-      style: {
-        borderWidth: 0,
-        height: 1,
-        margin: -1,
-        overflow: "hidden",
-        padding: 0,
-        position: "absolute",
-        width: 1,
+    const result = await renderCurrentTest();
+    expect(result).toStrictEqual({
+      props: {
+        style: {
+          borderWidth: 0,
+          height: 1,
+          margin: -1,
+          overflow: "hidden",
+          padding: 0,
+          position: "absolute",
+          width: 1,
+        },
+      },
+      warnings: {
+        properties: ["clip", "white-space"],
       },
     });
-    // expect(invalid).toStrictEqual({
-    //   properties: ["clip", "white-space"],
-    // });
   });
 
   test("not-sr-only", async () => {
@@ -29,9 +31,9 @@ describe("Accessibility - Screen Readers", () => {
           padding: 0,
         },
       },
-      invalid: {
+      warnings: {
         properties: ["clip", "white-space"],
-        style: {
+        values: {
           position: "static",
           width: "auto",
           height: "auto",

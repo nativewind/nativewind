@@ -31,25 +31,25 @@ describe("Sizing - Width", () => {
   test("w-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { width: "auto" } },
+      warnings: { values: { width: "auto" } },
     });
   });
   test("w-min", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { width: "min-content" } },
+      warnings: { values: { width: "min-content" } },
     });
   });
   test("w-max", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { width: "max-content" } },
+      warnings: { values: { width: "max-content" } },
     });
   });
   test("w-fit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { width: "fit-content" } },
+      warnings: { values: { width: "fit-content" } },
     });
   });
   test("w-screen", async () => {
@@ -73,19 +73,19 @@ describe("Sizing - Min Width", () => {
   test("min-w-min", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "min-width": "min-content" } },
+      warnings: { values: { "min-width": "min-content" } },
     });
   });
   test("min-w-max", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "min-width": "max-content" } },
+      warnings: { values: { "min-width": "max-content" } },
     });
   });
   test("min-w-fit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "min-width": "fit-content" } },
+      warnings: { values: { "min-width": "fit-content" } },
     });
   });
 });
@@ -104,19 +104,19 @@ describe("Sizing - Max Width", () => {
   test("max-w-min", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "max-width": "min-content" } },
+      warnings: { values: { "max-width": "min-content" } },
     });
   });
   test("max-w-max", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "max-width": "max-content" } },
+      warnings: { values: { "max-width": "max-content" } },
     });
   });
   test("max-w-fit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "max-width": "fit-content" } },
+      warnings: { values: { "max-width": "fit-content" } },
     });
   });
 });
@@ -150,25 +150,25 @@ describe("Sizing - Height", () => {
   test("h-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { height: "auto" } },
+      warnings: { values: { height: "auto" } },
     });
   });
   test("h-min", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { height: "min-content" } },
+      warnings: { values: { height: "min-content" } },
     });
   });
   test("h-max", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { height: "max-content" } },
+      warnings: { values: { height: "max-content" } },
     });
   });
   test("h-fit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { height: "fit-content" } },
+      warnings: { values: { height: "fit-content" } },
     });
   });
   test("h-screen", async () => {
@@ -192,19 +192,19 @@ describe("Sizing - Min Height", () => {
   test("min-h-min", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "min-height": "min-content" } },
+      warnings: { values: { "min-height": "min-content" } },
     });
   });
   test("min-h-max", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "min-height": "max-content" } },
+      warnings: { values: { "min-height": "max-content" } },
     });
   });
   test("min-h-fit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "min-height": "fit-content" } },
+      warnings: { values: { "min-height": "fit-content" } },
     });
   });
 });
@@ -223,19 +223,19 @@ describe("Sizing - Max Height", () => {
   test("max-h-min", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "max-height": "min-content" } },
+      warnings: { values: { "max-height": "min-content" } },
     });
   });
   test("max-h-max", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "max-height": "max-content" } },
+      warnings: { values: { "max-height": "max-content" } },
     });
   });
   test("max-h-fit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      invalid: { style: { "max-height": "fit-content" } },
+      warnings: { values: { "max-height": "fit-content" } },
     });
   });
 });
