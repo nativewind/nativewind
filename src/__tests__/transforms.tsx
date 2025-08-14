@@ -205,7 +205,8 @@ describe("Transforms - Translate (%)", () => {
   test("translate-x-1/2", async () => {
     expect(
       await renderCurrentTest({
-        className: "w-2 translate-x-1/2",
+        // TODO: Check if this actually works
+        sourceInline: ["w-2 translate-x-1/2"],
       }),
     ).toStrictEqual({
       props: {
@@ -227,7 +228,7 @@ describe("Transforms - Translate (%)", () => {
   test("translate-y-1/2", async () => {
     expect(
       await renderCurrentTest({
-        className: "h-2 translate-y-1/2",
+        sourceInline: ["h-2 translate-y-1/2"],
       }),
     ).toStrictEqual({
       props: {
@@ -249,7 +250,7 @@ describe("Transforms - Translate (%)", () => {
   test("translate-x-full", async () => {
     expect(
       await renderCurrentTest({
-        className: "w-2 translate-x-full",
+        sourceInline: ["w-2 translate-x-full"],
       }),
     ).toStrictEqual({
       props: {
@@ -271,7 +272,7 @@ describe("Transforms - Translate (%)", () => {
   test("translate-y-full", async () => {
     expect(
       await renderCurrentTest({
-        className: "h-2 translate-y-full",
+        sourceInline: ["h-2 translate-y-full"],
       }),
     ).toStrictEqual({
       props: {
@@ -367,7 +368,7 @@ describe("Transforms - Mixed", () => {
   test("rotate-90 skew-y-1 translate-x-1", async () => {
     expect(
       await renderCurrentTest({
-        className: "rotate-90 skew-y-1 translate-x-1",
+        sourceInline: [ "rotate-90 skew-y-1 translate-x-1"],
       }),
     ).toStrictEqual({
       props: {
