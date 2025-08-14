@@ -2,6 +2,7 @@ import { PixelRatio, Platform, PlatformColor, StyleSheet } from "react-native";
 
 import { screen } from "@testing-library/react-native";
 import { View } from "react-native-css/components";
+import {pixelScaleSelect, fontScaleSelect, roundToNearestPixel, getPixelSizeForLayoutSize, platformColor, platformSelect} from 'react-native-css-interop/css-to-rn/functions'
 
 import { render } from "../test-utils";
 
