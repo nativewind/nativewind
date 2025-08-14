@@ -4,12 +4,12 @@
  * They are not officially supported by NativeWind
  */
 
-import { Text, View } from "react-native";
 
 import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
 import plugin from "tailwindcss/plugin";
 
 import { render, screen } from "../test-utils";
+import { Text, View } from "react-native-css/components";
 
 const testID = "nativewind";
 
@@ -117,7 +117,6 @@ test("text-shadow", async () => {
     },
     {
       theme: {
-        experimental: false,
         textShadowMultiplier: {
           DEFAULT: 1,
           sm: 4,
