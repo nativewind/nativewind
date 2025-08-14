@@ -1,7 +1,30 @@
 import { fireEvent, screen } from "@testing-library/react-native";
-import { Switch, TextInput, View } from "react-native-css/components";
+import { View } from "react-native-css/components";
 
 import { render } from "../test-utils";
+
+import { Switch as RNSwitch, TextInput as RNTextInput, type SwitchProps, type TextInputProps } from "react-native";
+
+import {
+  useCssElement,
+} from "react-native-css";
+import type { StyledConfiguration, StyledProps } from "react-native-css";
+
+const textInputMapping = {
+  className: "style",
+} satisfies StyledConfiguration<typeof RNTextInput>;
+
+function TextInput(props: StyledProps<TextInputProps, typeof textInputMapping>) {
+  return useCssElement(RNTextInput, props, textInputMapping);
+}
+
+const switchMapping = {
+  className: "style",
+} satisfies StyledConfiguration<typeof RNSwitch>;
+
+function Switch(props: StyledProps<SwitchProps, typeof switchMapping>) {
+  return useCssElement(RNSwitch, props, switchMapping);
+}
 
 const testID = "component";
 
