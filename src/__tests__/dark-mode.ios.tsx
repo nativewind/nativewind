@@ -1,8 +1,11 @@
-import { Button, Text, View } from "react-native";
+import { Button, Text } from "react-native";
+import { View } from "react-native-css/components";
 
 import { act, fireEvent, screen } from "@testing-library/react-native";
 
-import { colorScheme, render, useColorScheme } from "../test-utils";
+import { colorScheme } from "react-native-css-interop";
+
+import { render, useColorScheme } from "../test-utils";
 
 const testID = "react-native-css-interop";
 
@@ -149,7 +152,8 @@ test("useColorScheme().setColorScheme() with darkMode: class", async () => {
         <Button
           testID={testIds.SYSTEM_BUTTON}
           title="System"
-          onPress={() => setColorScheme("system")}
+          // FIFME: System appears to be missing from the types - is this still meant to exist?
+          onPress={() => setColorScheme("system" as any)}
         />
       </View>
     );
@@ -203,9 +207,11 @@ test("useColorScheme().toggleColorScheme() with darkMode: class", async () => {
     );
   }
   await render(<UseColorScheme />, {
+    extraCss: `
+      @source inline("dark:text-red-500");
+    `,
     config: {
       darkMode: "class",
-      safelist: ["dark:text-red-500"],
     },
   });
 
