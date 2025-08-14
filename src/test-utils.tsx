@@ -16,6 +16,7 @@ import {
 export * from "./index";
 
 export {
+  screen,
   native,
   INTERNAL_SET,
   type RenderOptions as InteropRenderOptions,
