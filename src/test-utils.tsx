@@ -13,6 +13,8 @@ import {
   type RenderOptions as InteropRenderOptions,
 } from "react-native-css-interop/test";
 
+type RenderResult = ReturnType<typeof tlRender> & ReturnType<typeof registerCSS>;
+
 export * from "./index";
 
 export {
@@ -60,7 +62,7 @@ export async function render(
     extraCss,
     ...options
   }: NativewindRenderOptions = {},
-) {
+): Promise<RenderResult> {
   if (!css) {
     css = ``;
 
