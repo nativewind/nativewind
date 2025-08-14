@@ -99,6 +99,7 @@
     "react-native": "0.80.1",
     "react-native-builder-bob": "^0.40.13",
     "react-native-css": "3.0.0-nightly.fa5e95b",
+    "react-native-css-interop": "^0.1.22",
     "react-native-reanimated": "4.0.1",
     "react-native-safe-area-context": "5.4.0",
     "react-native-worklets": "0.4.1",
