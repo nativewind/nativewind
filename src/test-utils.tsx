@@ -9,11 +9,21 @@ import { View } from "react-native-css/components";
 import { registerCSS } from "react-native-css/jest";
 import type { Config } from "tailwindcss";
 
+import {
+  type RenderOptions as InteropRenderOptions,
+} from "react-native-css-interop/test";
+
 export * from "./index";
+
+export {
+  native,
+  INTERNAL_SET,
+  type RenderOptions as InteropRenderOptions,
+} from "react-native-css-interop/test";
 
 const testID = "nativewind";
 
-export type NativewindRenderOptions = RenderOptions & {
+export type NativewindRenderOptions = RenderOptions & Pick<InteropRenderOptions, "cssOptions"> & {
   /** Replace the generated CSS*/
   css?: string;
   /** Appended after the generated CSS */

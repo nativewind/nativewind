@@ -1,8 +1,8 @@
-import { ViewProps } from "react-native";
+import type { ViewProps } from "react-native";
 
-import { Metrics, SafeAreaProvider } from "react-native-safe-area-context";
+import { type Metrics, SafeAreaProvider } from "react-native-safe-area-context";
 
-import { INTERNAL_SET, native, renderCurrentTest } from "../test-utils";
+import { renderCurrentTest } from "../test-utils";
 
 const { vh } = native;
 
