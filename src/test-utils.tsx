@@ -7,6 +7,7 @@ import {
 import postcss from "postcss";
 import { View } from "react-native-css/components";
 import { registerCSS } from "react-native-css/jest";
+import type { Config } from "tailwindcss";
 
 export * from "./index";
 
@@ -27,6 +28,8 @@ export type NativewindRenderOptions = RenderOptions & {
   plugin?: boolean;
   /** Enable debug logging. @default false - Set process.env.NATIVEWIND_TEST_AUTO_DEBUG and run tests with the node inspector   */
   debug?: boolean;
+  /** Optional tailwindcss config */
+  config?: Config;
 };
 
 const debugDefault = Boolean(
