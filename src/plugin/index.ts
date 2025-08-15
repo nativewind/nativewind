@@ -19,12 +19,8 @@ const nativewind: PluginCreator = plugin.withOptions(
             modifier = modifier.replace(/&/, "\\&").replaceAll(".", "\\.");
           }
 
-          if (modifier && !value) {
-            value = modifier;
-            modifier = null;
-          }
           /**
-           Adding @media all is a hack for Tailwind CSS which has undocumented behaviour
+           Adding @media all is a hack for Tailwind CSS which has undocumented behavior
            If we do this `@prop { ...values } @slot;` it doesn't work, even if we
            wrap it like `& { @prop { ...values } @slot; }`
 
@@ -34,7 +30,20 @@ const nativewind: PluginCreator = plugin.withOptions(
 
            This does lead to weird looking CSS, but it works inside the browser and React Native
            */
-          return `@prop { ${value}: ${modifier ?? value}} @media all`;
+
+          if (modifier && value) {
+            // @prop-[value]/<modifier>:text-red-500
+            // In this instance, we are moving value (the style prop) to the modifier (the target key)
+            return `@prop { ${value}: ${modifier}} @media all`;
+          } else if (modifier && !value) {
+            // @prop/<modifier>:text-red-500
+            // In this instance, we are moving the last style value to the modifier
+            return `@prop ${modifier}; @media all`;
+          } else if (!modifier && value) {
+            return `@prop { ${value}: ${value}} @media all`;
+          } else {
+            return "";
+          }
         },
         { values: { DEFAULT: undefined } },
       );
