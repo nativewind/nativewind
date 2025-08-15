@@ -20,6 +20,14 @@
   --leading-normal: 1.5em;
   --leading-relaxed: 1.625em;
   --leading-loose: 2em;
+
+  --elevation-xs: 1;
+  --elevation-sm: 3;
+  --elevation-md: 6;
+  --elevation-lg: 8;
+  --elevation-xl: 13;
+  --elevation-2xl: 24;
+  --elevation-none: 0;
 }
 
 :root {
@@ -50,11 +58,16 @@
   color: --value(--color-*);
 }
 
+@utility elevation-* {
+  -rn-elevation: --value(--elevation-*);
+}
+
 @custom-variant ios (@media ios);
 @custom-variant android (@media android);
 @custom-variant native (@media native);
-@custom-variant web (&);
 @custom-variant tv (@media (display-mode: tv));
+/* Native does not support the child combinator */
+@custom-variant web (@supports selector(div > div));
 
 @utility visible {
   opacity: 1;

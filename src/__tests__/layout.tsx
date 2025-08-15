@@ -784,20 +784,20 @@ describe("Layout - Top Right Bottom Left", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
       warnings: {
-        values: { top: "auto", bottom: "auto", left: "auto", right: "auto" },
+        values: { inset: ["auto", "auto", "auto", "auto"] },
       },
     });
   });
   test("inset-x-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      warnings: { values: { left: "auto", right: "auto" } },
+      warnings: { values: { "inset-inline": ["auto", "auto"] } },
     });
   });
   test("inset-y-auto", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      warnings: { values: { top: "auto", bottom: "auto" } },
+      warnings: { values: { "inset-block": ["auto", "auto"] } },
     });
   });
   test("top-auto", async () => {

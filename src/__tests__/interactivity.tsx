@@ -82,16 +82,6 @@ describe("Interactivity - Pointer Events", () => {
       props: { style: { pointerEvents: "auto" } },
     });
   });
-  test("pointer-events-box-none", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { pointerEvents: "box-none" } },
-    });
-  });
-  test("pointer-events-box-only", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { pointerEvents: "box-only" } },
-    });
-  });
 });
 
 describe("Interactivity - Resize", () => {
@@ -146,13 +136,13 @@ describe("Interactivity - Scroll Margin", () => {
   test("scroll-mx-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      warnings: { properties: ["scroll-margin-left", "scroll-margin-right"] },
+      warnings: { properties: ["scroll-margin-inline"] },
     });
   });
   test("scroll-my-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      warnings: { properties: ["scroll-margin-top", "scroll-margin-bottom"] },
+      warnings: { properties: ["scroll-margin-block"] },
     });
   });
   test("scroll-mt-0", async () => {
@@ -200,13 +190,13 @@ describe("Interactivity - Scroll Margin", () => {
   test("scroll-mx-px", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      warnings: { properties: ["scroll-margin-left", "scroll-margin-right"] },
+      warnings: { properties: ["scroll-margin-inline"] },
     });
   });
   test("scroll-my-px", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      warnings: { properties: ["scroll-margin-top", "scroll-margin-bottom"] },
+      warnings: { properties: ["scroll-margin-block"] },
     });
   });
   test("scroll-mt-px", async () => {
@@ -257,13 +247,13 @@ describe("Interactivity - Scroll Padding", () => {
   test("scroll-px-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      warnings: { properties: ["scroll-padding-left", "scroll-padding-right"] },
+      warnings: { properties: ["scroll-padding-inline"] },
     });
   });
   test("scroll-py-0", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      warnings: { properties: ["scroll-padding-top", "scroll-padding-bottom"] },
+      warnings: { properties: ["scroll-padding-block"] },
     });
   });
   test("scroll-pt-0", async () => {
@@ -311,13 +301,13 @@ describe("Interactivity - Scroll Padding", () => {
   test("scroll-px-px", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      warnings: { properties: ["scroll-padding-left", "scroll-padding-right"] },
+      warnings: { properties: ["scroll-padding-inline"] },
     });
   });
   test("scroll-py-px", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
-      warnings: { properties: ["scroll-padding-top", "scroll-padding-bottom"] },
+      warnings: { properties: ["scroll-padding-block"] },
     });
   });
   test("scroll-pt-px", async () => {

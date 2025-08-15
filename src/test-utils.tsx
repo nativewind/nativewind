@@ -5,6 +5,7 @@ import {
   type RenderOptions,
 } from "@testing-library/react-native";
 import postcss from "postcss";
+import type { compile } from "react-native-css/compiler";
 import { View } from "react-native-css/components";
 import { registerCSS } from "react-native-css/jest";
 
@@ -46,7 +47,7 @@ export async function render(
     extraCss,
     ...options
   }: NativewindRenderOptions = {},
-) {
+): Promise<ReturnType<typeof tlRender> & ReturnType<typeof compile>> {
   if (!css) {
     css = ``;
 
@@ -89,7 +90,7 @@ export async function render(
     console.log(`Output CSS:\n---\n${output}\n---\n`);
   }
 
-  const compiled = registerCSS(output);
+  const compiled = registerCSS(output, { debug });
 
   return Object.assign(
     {},

@@ -260,9 +260,12 @@ describe("Border - Border Color", () => {
   });
 
   test("border-r-current", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
+    expect(
+      await renderCurrentTest({
+        sourceInline: ["border-r-current", "text-red-500"],
+      }),
+    ).toStrictEqual({
       props: {},
-      warnings: { values: { "border-right-color": "currentcolor" } },
     });
   });
 

@@ -1,7 +1,7 @@
 import { renderCurrentTest } from "../test-utils";
 
 describe("Custom - Elevation", () => {
-  test("elevation", async () => {
+  test("elevation-sm", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
@@ -10,7 +10,7 @@ describe("Custom - Elevation", () => {
       },
     });
   });
-  test("elevation-sm", async () => {
+  test("elevation-xs", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
