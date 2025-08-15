@@ -1,8 +1,8 @@
+import { screen } from "@testing-library/react-native";
 import { View } from "react-native-css/components";
 import { getAnimatedStyle } from "react-native-reanimated";
-import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 
-import { render, screen } from "../test-utils";
+import { render } from "../test-utils";
 
 const testID = "test-id";
 
@@ -17,9 +17,7 @@ test("transition-colors", async () => {
       className="transition-colors ease-linear bg-red-500 border-black"
     />,
     {
-      config: {
-        safelist: ["bg-blue-500 border-slate-500"],
-      },
+      sourceInline: ["bg-blue-500", "border-slate-500"],
     },
   );
 
@@ -79,9 +77,7 @@ test("transition-opacity", async () => {
       className="transition-opacity ease-linear opacity-0"
     />,
     {
-      config: {
-        safelist: ["opacity-100"],
-      },
+      sourceInline: ["opacity-100"],
     },
   );
 
@@ -170,9 +166,7 @@ test("animate-pulse", async () => {
 
 test("changing animations", async () => {
   await render(<View testID={testID} className="animate-spin" />, {
-    config: {
-      safelist: ["animate-bounce"],
-    },
+    sourceInline: ["animate-bounce"],
   });
 
   let component = screen.getByTestId(testID);
