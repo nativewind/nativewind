@@ -1,5 +1,6 @@
+import { Appearance } from "react-native";
+
 import { act, screen } from "@testing-library/react-native";
-import { colorScheme } from "react-native-css-interop";
 import { View } from "react-native-css/components";
 
 import { render } from "../test-utils";
@@ -23,21 +24,13 @@ test("Using css variables", async () => {
         }
       }
     `,
-    config: {
-      darkMode: "class",
-      theme: {
-        colors: {
-          primary: "rgb(var(--color-primary) / <alpha-value>)",
-        },
-      },
-    },
   });
 
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle({ color: "rgba(255, 115, 179, 1)" });
 
-  act(() => colorScheme.set("dark"));
+  act(() => Appearance.setColorScheme("dark"));
 
   expect(component).toHaveStyle({ color: "rgba(155, 100, 255, 1)" });
 });

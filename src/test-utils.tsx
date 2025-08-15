@@ -156,8 +156,6 @@ export async function renderCurrentTest({
 
   const compilerWarnings = warningFn();
 
-  console.log({ compilerWarnings });
-
   let warnings: Record<string, unknown> | undefined;
 
   if (compilerWarnings.properties) {

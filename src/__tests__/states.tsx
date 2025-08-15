@@ -6,6 +6,7 @@ import { render } from "../test-utils";
 const testID = "component";
 
 test("hover", async () => {
+  // @ts-expect-error
   await render(<TextInput testID={testID} className="hover:text-white" />);
 
   const component = screen.getByTestId(testID);
@@ -20,6 +21,7 @@ test("hover", async () => {
 });
 
 test("focus", async () => {
+  // @ts-expect-error
   await render(<TextInput testID={testID} className="focus:text-white" />);
 
   const component = screen.getByTestId(testID);
@@ -34,6 +36,7 @@ test("focus", async () => {
 });
 
 test("active", async () => {
+  // @ts-expect-error
   await render(<TextInput testID={testID} className="active:text-white" />);
 
   const component = screen.getByTestId(testID);
@@ -49,6 +52,7 @@ test("active", async () => {
 
 test("mixed", async () => {
   await render(
+    // @ts-expect-error
     <TextInput testID={testID} className="active:hover:focus:text-white" />,
   );
 
@@ -66,6 +70,7 @@ test("mixed", async () => {
 });
 
 test("selection", async () => {
+  // @ts-expect-error
   await render(<TextInput testID={testID} className="selection:text-black" />);
 
   const component = screen.getByTestId(testID);
@@ -86,6 +91,7 @@ test("ltr:", async () => {
 
 test("placeholder", async () => {
   await render(
+    // @ts-expect-error
     <TextInput testID={testID} className="placeholder:text-black" />,
   );
 
@@ -98,6 +104,7 @@ test("placeholder", async () => {
 
 test("disabled", async () => {
   const { rerender } = await render(
+    // @ts-expect-error
     <Switch testID={testID} className="disabled:bg-black" />,
   );
 
@@ -112,6 +119,7 @@ test("disabled", async () => {
     }),
   );
 
+  // @ts-expect-error
   rerender(<Switch testID={testID} disabled className="disabled:bg-black" />);
 
   expect(component.props).toEqual(
@@ -130,6 +138,7 @@ test("disabled", async () => {
   );
 
   rerender(
+    // @ts-expect-error
     <Switch testID={testID} disabled={false} className="disabled:bg-black" />,
   );
 

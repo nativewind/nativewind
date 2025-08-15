@@ -1,23 +1,20 @@
-import { Button, Text, View } from "react-native";
+import { Appearance, Button, Text } from "react-native";
 
 import { act, fireEvent, screen } from "@testing-library/react-native";
+import { View } from "react-native-css/components";
 
-import { colorScheme, render, useColorScheme } from "../test-utils";
+import { render, useColorScheme } from "../test-utils";
 
 const testID = "react-native-css-interop";
 
 test("darkMode: media", async () => {
-  await render(<View testID={testID} className="dark:text-black" />, {
-    config: {
-      darkMode: "media",
-    },
-  });
+  await render(<View testID={testID} className="dark:text-black" />);
 
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle(undefined);
 
-  act(() => colorScheme.set("dark"));
+  act(() => Appearance.setColorScheme("dark"));
 
   expect(component).toHaveStyle({ color: "#000000" });
 });
@@ -49,40 +46,32 @@ test("darkMode: media variable switching", async () => {
   expect(component).toHaveStyle({ color: "rgb(255, 115, 179)" });
 
   // You cannot manually set the color scheme when using media queries, so we fake it
-  act(() => colorScheme.set("dark"));
+  act(() => Appearance.setColorScheme("dark"));
 
   expect(component).toHaveStyle({ color: "rgb(155, 100, 255)" });
 });
 
 test("darkMode: class", async () => {
-  await render(<View testID={testID} className="dark:text-black" />, {
-    config: {
-      darkMode: "class",
-    },
-  });
+  await render(<View testID={testID} className="dark:text-black" />);
 
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle(undefined);
 
-  act(() => colorScheme.set("dark"));
+  act(() => Appearance.setColorScheme("dark"));
 
   expect(component).toHaveStyle({ color: "#000000" });
 });
 
 test("darkMode: class - on custom prop", async () => {
-  await render(<View testID={testID} className="dark:fill-black" />, {
-    config: {
-      darkMode: "class",
-    },
-  });
+  await render(<View testID={testID} className="dark:fill-black" />);
 
   const component = screen.getByTestId(testID);
 
   expect(component).toHaveStyle(undefined);
   expect(component.props).not.toHaveProperty("fill");
 
-  act(() => colorScheme.set("dark"));
+  act(() => Appearance.setColorScheme("dark"));
 
   expect(component).toHaveStyle(undefined);
   expect(component.props.fill).toEqual("#000000");
@@ -107,9 +96,6 @@ test("darkMode: class variable switching", async () => {
             }
           }
           `,
-      config: {
-        darkMode: "class",
-      },
     },
   );
 
@@ -117,7 +103,7 @@ test("darkMode: class variable switching", async () => {
 
   expect(component).toHaveStyle({ color: "rgb(255, 115, 179)" });
 
-  act(() => colorScheme.set("dark"));
+  act(() => Appearance.setColorScheme("dark"));
 
   expect(component).toHaveStyle({ color: "rgb(155, 100, 255)" });
 });
@@ -131,34 +117,28 @@ test("useColorScheme().setColorScheme() with darkMode: class", async () => {
   };
 
   function UseColorScheme() {
-    const { colorScheme, setColorScheme } = useColorScheme();
-
     return (
       <View>
-        <Text testID={testIds.TEXT}>{colorScheme}</Text>
+        <Text testID={testIds.TEXT}>{Appearance.getColorScheme()}</Text>
         <Button
           testID={testIds.DARK_BUTTON}
           title="Dark"
-          onPress={() => setColorScheme("dark")}
+          onPress={() => Appearance.setColorScheme("dark")}
         />
         <Button
           testID={testIds.LIGHT_BUTTON}
           title="Light"
-          onPress={() => setColorScheme("light")}
+          onPress={() => Appearance.setColorScheme("light")}
         />
         <Button
           testID={testIds.SYSTEM_BUTTON}
           title="System"
-          onPress={() => setColorScheme("system")}
+          onPress={() => Appearance.setColorScheme(null)}
         />
       </View>
     );
   }
-  await render(<UseColorScheme />, {
-    config: {
-      darkMode: "class",
-    },
-  });
+  await render(<UseColorScheme />);
 
   const text = screen.getByTestId(testIds.TEXT);
 
@@ -203,10 +183,10 @@ test("useColorScheme().toggleColorScheme() with darkMode: class", async () => {
     );
   }
   await render(<UseColorScheme />, {
-    config: {
-      darkMode: "class",
-      safelist: ["dark:text-red-500"],
-    },
+    // config: {
+    //   darkMode: "class",
+    //   safelist: ["dark:text-red-500"],
+    // },
   });
 
   const text = screen.getByTestId(testIds.TEXT);
@@ -222,7 +202,7 @@ test("useColorScheme().toggleColorScheme() with darkMode: class", async () => {
 });
 
 test("combines with other modifiers", async () => {
-  act(() => colorScheme.set("dark"));
+  act(() => Appearance.setColorScheme("dark"));
 
   await render(
     <View
@@ -231,11 +211,6 @@ test("combines with other modifiers", async () => {
     >
       <Text>Press me</Text>
     </View>,
-    {
-      config: {
-        darkMode: "class",
-      },
-    },
   );
 
   const component = screen.getByTestId(testID);
@@ -244,7 +219,7 @@ test("combines with other modifiers", async () => {
   fireEvent(component, "pressIn");
   expect(component).toHaveStyle({ backgroundColor: "#3b82f6" });
 
-  act(() => colorScheme.set("light"));
+  act(() => Appearance.setColorScheme("light"));
 
   expect(component).toHaveStyle({ backgroundColor: "#ef4444" });
 });
