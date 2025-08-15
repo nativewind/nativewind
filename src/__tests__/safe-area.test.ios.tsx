@@ -1,10 +1,10 @@
-import { ViewProps } from "react-native";
+import type { ViewProps } from "react-native";
 
-import { Metrics, SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, type Metrics } from "react-native-safe-area-context";
 
-import { INTERNAL_SET, native, renderCurrentTest } from "../test-utils";
+import { renderCurrentTest } from "../test-utils";
 
-const { vh } = native;
+// const { vh } = native;
 
 const initialMetrics: Metrics = {
   insets: {
@@ -34,15 +34,13 @@ function Wrapper({ children }: ViewProps) {
 }
 
 test("works without the wrapper", async () => {
-  expect(await renderCurrentTest({ cssOptions })).toStrictEqual({
+  expect(await renderCurrentTest()).toStrictEqual({
     props: {},
   });
 });
 
 test("m-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         marginBottom: 10,
@@ -55,9 +53,7 @@ test("m-safe", async () => {
 });
 
 test("mx-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         marginLeft: 10,
@@ -67,9 +63,7 @@ test("mx-safe", async () => {
   });
 });
 test("my-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         marginBottom: 10,
@@ -79,9 +73,7 @@ test("my-safe", async () => {
   });
 });
 test("ms-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         marginStart: 10,
@@ -90,9 +82,7 @@ test("ms-safe", async () => {
   });
 });
 test("me-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         marginEnd: 10,
@@ -101,9 +91,7 @@ test("me-safe", async () => {
   });
 });
 test("mt-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         marginTop: 10,
@@ -112,9 +100,7 @@ test("mt-safe", async () => {
   });
 });
 test("mr-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         marginRight: 10,
@@ -123,9 +109,7 @@ test("mr-safe", async () => {
   });
 });
 test("mb-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         marginBottom: 10,
@@ -135,9 +119,7 @@ test("mb-safe", async () => {
 });
 
 test("ml-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         marginLeft: 10,
@@ -147,9 +129,7 @@ test("ml-safe", async () => {
 });
 
 test("p-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         paddingBottom: 10,
@@ -162,9 +142,7 @@ test("p-safe", async () => {
 });
 
 test("px-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         paddingLeft: 10,
@@ -174,9 +152,7 @@ test("px-safe", async () => {
   });
 });
 test("py-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         paddingBottom: 10,
@@ -186,9 +162,7 @@ test("py-safe", async () => {
   });
 });
 test("ps-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         paddingStart: 10,
@@ -197,9 +171,7 @@ test("ps-safe", async () => {
   });
 });
 test("pe-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         paddingEnd: 10,
@@ -208,9 +180,7 @@ test("pe-safe", async () => {
   });
 });
 test("pt-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         paddingTop: 10,
@@ -219,9 +189,7 @@ test("pt-safe", async () => {
   });
 });
 test("pr-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         paddingRight: 10,
@@ -230,9 +198,7 @@ test("pr-safe", async () => {
   });
 });
 test("pb-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         paddingBottom: 10,
@@ -241,9 +207,7 @@ test("pb-safe", async () => {
   });
 });
 test("pl-safe", async () => {
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         paddingLeft: 10,
@@ -253,12 +217,10 @@ test("pl-safe", async () => {
 });
 
 test("min-h-screen-safe", async () => {
-  vh[INTERNAL_SET](100);
+  // vh[INTERNAL_SET](100);
 
   // calc(100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom)));
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         minHeight: 80,
@@ -268,12 +230,10 @@ test("min-h-screen-safe", async () => {
 });
 
 test("max-h-screen-safe", async () => {
-  vh[INTERNAL_SET](100);
+  // vh[INTERNAL_SET](100);
 
   // calc(100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom)));
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         maxHeight: 80,
@@ -283,12 +243,10 @@ test("max-h-screen-safe", async () => {
 });
 
 test("h-screen-safe", async () => {
-  vh[INTERNAL_SET](100);
+  // vh[INTERNAL_SET](100);
 
   // calc(100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom)));
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         height: 80,
@@ -298,9 +256,7 @@ test("h-screen-safe", async () => {
 });
 
 test("inset-safe", async () =>
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         bottom: 10,
@@ -311,9 +267,7 @@ test("inset-safe", async () =>
     },
   }));
 test("inset-x-safe", async () =>
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         left: 10,
@@ -322,9 +276,7 @@ test("inset-x-safe", async () =>
     },
   }));
 test("inset-y-safe", async () =>
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         bottom: 10,
@@ -333,9 +285,7 @@ test("inset-y-safe", async () =>
     },
   }));
 test("start-safe", async () =>
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         insetInlineStart: 10,
@@ -343,9 +293,7 @@ test("start-safe", async () =>
     },
   }));
 test("end-safe", async () =>
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         insetInlineEnd: 10,
@@ -353,9 +301,7 @@ test("end-safe", async () =>
     },
   }));
 test("top-safe", async () =>
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         top: 10,
@@ -363,9 +309,7 @@ test("top-safe", async () =>
     },
   }));
 test("right-safe", async () =>
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         right: 10,
@@ -373,9 +317,7 @@ test("right-safe", async () =>
     },
   }));
 test("bottom-safe", async () =>
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         bottom: 10,
@@ -383,9 +325,7 @@ test("bottom-safe", async () =>
     },
   }));
 test("left-safe", async () =>
-  expect(
-    await renderCurrentTest({ wrapper: Wrapper, cssOptions }),
-  ).toStrictEqual({
+  expect(await renderCurrentTest({ wrapper: Wrapper })).toStrictEqual({
     props: {
       style: {
         left: 10,
@@ -398,7 +338,6 @@ test("pb-safe-offset-4", async () => {
   expect(
     await renderCurrentTest({
       wrapper: Wrapper,
-      cssOptions,
     }),
   ).toStrictEqual({
     props: {
@@ -414,7 +353,6 @@ test("pb-safe-or-20", async () => {
   expect(
     await renderCurrentTest({
       wrapper: Wrapper,
-      cssOptions,
     }),
   ).toStrictEqual({
     props: {
