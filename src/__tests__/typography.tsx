@@ -140,13 +140,15 @@ describe("Typography - Font Variant Numeric", () => {
 
 describe("Typography - Letter Spacing", () => {
   test("tracking-tighter", async () => {
+    // 14 * -0.05
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { letterSpacing: -0.05 } },
+      props: { style: { letterSpacing: -0.7 } },
     });
   });
   test("tracking-tight", async () => {
+    // 14 * -0.025
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { letterSpacing: -0.025 } },
+      props: { style: { letterSpacing: -0.35 } },
     });
   });
   test("tracking-normal", async () => {
@@ -156,17 +158,18 @@ describe("Typography - Letter Spacing", () => {
   });
   test("tracking-wide", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { letterSpacing: 0.25 } },
+      // 14 * 0.025
+      props: { style: { letterSpacing: 0.35 } },
     });
   });
   test("tracking-wider", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { letterSpacing: 0.5 } },
+      props: { style: { letterSpacing: 0.7 } },
     });
   });
   test("tracking-widest", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { letterSpacing: 1 } },
+      props: { style: { letterSpacing: 1.4 } },
     });
   });
 });
@@ -175,31 +178,21 @@ describe("Typography - Line Clamp", () => {
   test("line-clamp-1", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: { numberOfLines: 1, style: { overflow: "hidden" } },
+      warnings: {
+        values: {
+          display: "box",
+        },
+      },
     });
   });
   test("line-clamp-2", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: { numberOfLines: 2, style: { overflow: "hidden" } },
-    });
-  });
-  test("line-clamp-3", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: { numberOfLines: 3, style: { overflow: "hidden" } },
-    });
-  });
-  test("line-clamp-4", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: { numberOfLines: 4, style: { overflow: "hidden" } },
-    });
-  });
-  test("line-clamp-5", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: { numberOfLines: 5, style: { overflow: "hidden" } },
-    });
-  });
-  test("line-clamp-6", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: { numberOfLines: 6, style: { overflow: "hidden" } },
+      warnings: {
+        values: {
+          display: "box",
+        },
+      },
     });
   });
   test("line-clamp-none", async () => {

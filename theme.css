@@ -31,16 +31,6 @@
 }
 
 :root {
-  @media native {
-    /* React Native uses unit-less numbers to  */
-    --tracking-tighter: -0.05;
-    --tracking-tight: -0.025;
-    --tracking-normal: 0;
-    --tracking-wide: 0.025;
-    --tracking-wider: 0.05;
-    --tracking-widest: 0.1;
-  }
-
   @media ios {
     --font-sans: System;
     --font-serif: Georgia;

@@ -1,4 +1,4 @@
-import { renderCurrentTest } from "../test-utils";
+import { renderCurrentTest, renderSimple } from "../test-utils";
 
 describe("Backgrounds - Background Attachment", () => {
   test("bg-fixed", async () => {
@@ -50,9 +50,15 @@ describe("Backgrounds - Background Clip", () => {
 
 describe("Backgrounds - Background Color", () => {
   test("bg-current", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { values: { "background-color": "currentcolor" } },
+    expect(
+      await renderSimple({ className: "bg-current text-red-500" }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          color: "#fb2c36",
+          backgroundColor: "#fb2c36",
+        },
+      },
     });
   });
 
@@ -179,57 +185,128 @@ describe("Backgrounds - Background Size", () => {
 
 describe("Backgrounds - Background Image", () => {
   test("bg-none", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { properties: ["background-image"] },
+    expect(
+      await renderSimple({
+        className: "bg-none",
+      }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          experimental_backgroundImage: ["none"],
+        },
+      },
     });
   });
   test("bg-gradient-to-t", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { properties: ["background-image"] },
+    expect(
+      await renderSimple({
+        className: "bg-gradient-to-t from-red-500 to-blue-500",
+      }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          experimental_backgroundImage:
+            "linear-gradient(to top in oklab, #fb2c36, #2b7fff)",
+        },
+      },
     });
   });
   test("bg-gradient-to-tr", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { properties: ["background-image"] },
+    expect(
+      await renderSimple({
+        className: "bg-gradient-to-tr from-red-500 to-blue-500",
+      }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          experimental_backgroundImage:
+            "linear-gradient(to top right in oklab, #fb2c36, #2b7fff)",
+        },
+      },
     });
   });
   test("bg-gradient-to-r", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { properties: ["background-image"] },
+    expect(
+      await renderSimple({
+        className: "bg-gradient-to-r from-red-500 to-blue-500",
+      }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          experimental_backgroundImage:
+            "linear-gradient(to right in oklab, #fb2c36, #2b7fff)",
+        },
+      },
     });
   });
   test("bg-gradient-to-br", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { properties: ["background-image"] },
+    expect(
+      await renderSimple({
+        className: "bg-gradient-to-br from-red-500 to-blue-500",
+      }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          experimental_backgroundImage:
+            "linear-gradient(to bottom right in oklab, #fb2c36, #2b7fff)",
+        },
+      },
     });
   });
   test("bg-gradient-to-b", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { properties: ["background-image"] },
+    expect(
+      await renderSimple({
+        className: "bg-gradient-to-b from-red-500 to-blue-500",
+      }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          experimental_backgroundImage:
+            "linear-gradient(to bottom in oklab, #fb2c36, #2b7fff)",
+        },
+      },
     });
   });
   test("bg-gradient-to-bl", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { properties: ["background-image"] },
+    expect(
+      await renderSimple({
+        className: "bg-gradient-to-bl from-red-500 to-blue-500",
+      }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          experimental_backgroundImage:
+            "linear-gradient(to bottom left in oklab, #fb2c36, #2b7fff)",
+        },
+      },
     });
   });
   test("bg-gradient-to-l", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { properties: ["background-image"] },
+    expect(
+      await renderSimple({
+        className: "bg-gradient-to-l from-red-500 to-blue-500",
+      }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          experimental_backgroundImage:
+            "linear-gradient(to left in oklab, #fb2c36, #2b7fff)",
+        },
+      },
     });
   });
   test("bg-gradient-to-tl", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { properties: ["background-image"] },
+    expect(
+      await renderSimple({
+        className: "bg-gradient-to-tl from-red-500 to-blue-500",
+      }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          experimental_backgroundImage:
+            "linear-gradient(to top left in oklab, #fb2c36, #2b7fff)",
+        },
+      },
     });
   });
 });
