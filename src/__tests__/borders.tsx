@@ -1,4 +1,4 @@
-import { renderCurrentTest } from "../test-utils";
+import { renderCurrentTest, renderSimple } from "../test-utils";
 
 describe("Border - Border Radius", () => {
   test("rounded-sm", async () => {
@@ -128,8 +128,7 @@ describe("Border - Border Color", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          borderLeftColor: "#fff",
-          borderRightColor: "#fff",
+          borderInlineColor: "#fff",
         },
       },
     });
@@ -138,8 +137,7 @@ describe("Border - Border Color", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          borderTopColor: "#fff",
-          borderBottomColor: "#fff",
+          borderBlockColor: "#fff",
         },
       },
     });
@@ -165,14 +163,13 @@ describe("Border - Border Color", () => {
     });
   });
   test("border-current", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: {
-        values: {
-          "border-top-color": "currentcolor",
-          "border-bottom-color": "currentcolor",
-          "border-left-color": "currentcolor",
-          "border-right-color": "currentcolor",
+    expect(
+      await renderSimple({ className: "border-current text-red-500" }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          borderColor: "#fb2c36",
+          color: "#fb2c36",
         },
       },
     });
@@ -184,24 +181,39 @@ describe("Border - Border Color", () => {
     });
   });
 
+  test("border-x-current", async () => {
+    expect(
+      await renderSimple({ className: "border-x-current text-red-500" }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          borderLeftColor: "#fb2c36",
+          borderRightColor: "#fb2c36",
+          color: "#fb2c36",
+        },
+      },
+    });
+  });
+
   test("border-x-inherit", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {},
       warnings: {
         values: {
-          "border-left-color": "inherit",
-          "border-right-color": "inherit",
+          "border-inline-color": "inherit",
         },
       },
     });
   });
   test("border-y-current", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: {
-        values: {
-          "border-top-color": "currentcolor",
-          "border-bottom-color": "currentcolor",
+    expect(
+      await renderSimple({ className: "border-y-current text-red-500" }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          borderBottomColor: "#fb2c36",
+          borderTopColor: "#fb2c36",
+          color: "#fb2c36",
         },
       },
     });
@@ -211,16 +223,21 @@ describe("Border - Border Color", () => {
       props: {},
       warnings: {
         values: {
-          "border-top-color": "inherit",
-          "border-bottom-color": "inherit",
+          "border-block-color": "inherit",
         },
       },
     });
   });
   test("border-t-current", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { values: { "border-top-color": "currentcolor" } },
+    expect(
+      await renderSimple({ className: "border-t-current text-red-500" }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          borderTopColor: "#fb2c36",
+          color: "#fb2c36",
+        },
+      },
     });
   });
 
@@ -232,9 +249,15 @@ describe("Border - Border Color", () => {
   });
 
   test("border-b-current", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { values: { "border-bottom-color": "currentcolor" } },
+    expect(
+      await renderSimple({ className: "border-b-current text-red-500" }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          borderBottomColor: "#fb2c36",
+          color: "#fb2c36",
+        },
+      },
     });
   });
 
@@ -246,9 +269,15 @@ describe("Border - Border Color", () => {
   });
 
   test("border-l-current", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { values: { "border-left-color": "currentcolor" } },
+    expect(
+      await renderSimple({ className: "border-l-current text-red-500" }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          borderLeftColor: "#fb2c36",
+          color: "#fb2c36",
+        },
+      },
     });
   });
 
@@ -261,11 +290,16 @@ describe("Border - Border Color", () => {
 
   test("border-r-current", async () => {
     expect(
-      await renderCurrentTest({
-        sourceInline: ["border-r-current", "text-red-500"],
+      await renderSimple({
+        className: "border-r-current text-red-500",
       }),
     ).toStrictEqual({
-      props: {},
+      props: {
+        style: {
+          borderRightColor: "#fb2c36",
+          color: "#fb2c36",
+        },
+      },
     });
   });
 

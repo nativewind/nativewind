@@ -98,7 +98,7 @@
     "react": "19.1.0",
     "react-native": "0.80.1",
     "react-native-builder-bob": "^0.40.13",
-    "react-native-css": "3.0.0-nightly.d8cb1bc",
+    "react-native-css": "3.0.0-nightly.4af17f5",
     "react-native-reanimated": "4.0.1",
     "react-native-safe-area-context": "5.4.0",
     "react-native-worklets": "0.4.1",
@@ -109,7 +109,7 @@
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
-    "react-native-css": "3.0.0-nightly.d8cb1bc",
+    "react-native-css": "3.0.0-nightly.4af17f5",
     "tailwindcss": ">4.1.11"
   },
   "react-native-builder-bob": {

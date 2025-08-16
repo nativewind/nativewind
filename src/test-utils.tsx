@@ -18,6 +18,8 @@ export type NativewindRenderOptions = RenderOptions & {
   css?: string;
   /** Appended after the generated CSS */
   extraCss?: string;
+  /** Specify the className to use for the component @default sourceInline */
+  className?: string;
   /** Add `@source inline('<className>')` to the CSS. @default Values are extracted from the component's className */
   sourceInline?: string[];
   /** Whether to include the theme in the generated CSS @default true */
@@ -131,22 +133,12 @@ function getClassNames(
   return classNames;
 }
 
-/**
- * Helper method that uses the current test name to render the component
- * Doesn't not support multiple components or changing the component type
- */
-export async function renderCurrentTest({
-  sourceInline = [expect.getState().currentTestName?.split(/\s+/).at(-1) ?? ""],
+export async function renderSimple({
+  className,
   ...options
-}: NativewindRenderOptions = {}) {
-  if (!sourceInline) {
-    throw new Error(
-      "unable to detect sourceInline, please manually set sourceInline in renderCurrentTest options",
-    );
-  }
-
+}: NativewindRenderOptions & { className: string }) {
   const { warnings: warningFn } = await render(
-    <View testID={testID} className={sourceInline.join(" ")} />,
+    <View testID={testID} className={className} />,
     options,
   );
   const component = screen.getByTestId(testID, { hidden: true });
@@ -176,6 +168,34 @@ export async function renderCurrentTest({
   }
 
   return warnings ? { props, warnings } : { props };
+}
+
+renderSimple.debug = (
+  options: NativewindRenderOptions & { className: string },
+) => {
+  return renderSimple({ ...options, debug: true });
+};
+
+/**
+ * Helper method that uses the current test name to render the component
+ * Doesn't not support multiple components or changing the component type
+ */
+export async function renderCurrentTest({
+  sourceInline = [expect.getState().currentTestName?.split(/\s+/).at(-1) ?? ""],
+  className = sourceInline.join(" "),
+  ...options
+}: NativewindRenderOptions = {}) {
+  if (!sourceInline) {
+    throw new Error(
+      "unable to detect sourceInline, please manually set sourceInline in renderCurrentTest options",
+    );
+  }
+
+  return renderSimple({
+    ...options,
+    sourceInline,
+    className,
+  });
 }
 
 renderCurrentTest.debug = (options: NativewindRenderOptions = {}) => {
