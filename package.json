@@ -1,5 +1,5 @@
 {
-  "version": "5.0.0",
+  "version": "5.0.0-dougtest1",
   "name": "nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "type": "module",
@@ -56,15 +56,10 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "yarn@4.9.2",
   "devEngines": {
     "runtime": {
       "name": "node",
       "onFail": "error"
-    },
-    "packageManager": {
-      "name": "yarn",
-      "onFail": "warn"
     }
   },
   "scripts": {
@@ -134,5 +129,9 @@
   "eslintIgnore": [
     "node_modules/",
     "dist/"
-  ]
+  ],
+  "dependencies": {
+    "@changesets/cli": "^2.29.6",
+    "changeset": "^0.2.6"
+  }
 }
