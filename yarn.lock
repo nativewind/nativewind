@@ -4080,7 +4080,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-preset-expo@npm:~14.0.1, babel-preset-expo@npm:~14.0.2":
+"babel-preset-expo@npm:^14.0.2, babel-preset-expo@npm:~14.0.1, babel-preset-expo@npm:~14.0.2":
   version: 14.0.2
   resolution: "babel-preset-expo@npm:14.0.2"
   dependencies:
@@ -9082,6 +9082,7 @@ __metadata:
     "@expo/metro-runtime": "npm:^6.0.0"
     "@tailwindcss/postcss": "npm:^4.1.11"
     "@types/react": "npm:^19.1.9"
+    babel-preset-expo: "npm:^14.0.2"
     eas-build-cache-provider: "npm:^16.4.2"
     expo: "npm:~54.0.0-preview.1"
     expo-dev-client: "npm:^6.0.2"
