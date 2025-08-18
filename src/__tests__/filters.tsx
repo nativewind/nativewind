@@ -2,7 +2,13 @@ import { renderCurrentTest } from "../test-utils";
 
 describe("Filters - Blur", () => {
   test("blur-xs", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({});
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: {
+        style: {
+          filter: [{ blur: 4 }],
+        },
+      },
+    });
   });
 });
 

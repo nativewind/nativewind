@@ -15,12 +15,6 @@
   --text-8xl--line-height: 1em;
   --text-9xl--line-height: 1em;
 
-  --leading-tight: 1.25em;
-  --leading-snug: 1.375em;
-  --leading-normal: 1.5em;
-  --leading-relaxed: 1.625em;
-  --leading-loose: 2em;
-
   --elevation-xs: 1;
   --elevation-sm: 3;
   --elevation-md: 6;
@@ -46,6 +40,10 @@
 
 @utility color-* {
   color: --value(--color-*);
+}
+
+@utility ripple-* {
+  -rn-android-ripple: --value(--color-*);
 }
 
 @utility elevation-* {
