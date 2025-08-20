@@ -197,6 +197,9 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
     return Component;
   }
 
+  // React.forwardRef is deprecated in React 19 and later, and in React Native 0.81 and later,
+  // this code will always throw an error. https://react.dev/reference/react/forwardRef
+  /*
   if (
     !(
       typeof Component !== "function" ||
@@ -207,6 +210,7 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
       `Looks like you're passing an animation style to a function component \`${Component.name}\`. Please wrap your function component with \`React.forwardRef()\` or use a class component instead.`,
     );
   }
+  */
 
   const { default: Animated } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
