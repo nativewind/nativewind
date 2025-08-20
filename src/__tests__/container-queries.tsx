@@ -28,7 +28,7 @@ test("Unnamed containers", async () => {
     },
   });
 
-  expect(child).toHaveStyle({ color: "#ffffff" });
+  expect(child).toHaveStyle({ color: "#fff" });
 });
 
 test("Named containers", async () => {
@@ -53,5 +53,5 @@ test("Named containers", async () => {
     },
   });
 
-  expect(child).toHaveStyle({ color: "#ffffff" });
+  expect(child).toHaveStyle({ color: "#fff" });
 });

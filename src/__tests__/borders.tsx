@@ -28,7 +28,7 @@ describe("Border - Border Radius", () => {
 describe("Border - Border Width", () => {
   test("border-1", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { borderWidth: 1 } },
+      props: { style: { borderWidth: 1, borderStyle: "solid" } },
     });
   });
   test("border-x-1", async () => {

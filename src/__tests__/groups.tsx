@@ -22,7 +22,7 @@ test("Styling based on parent state (group-{modifier})", async () => {
 
   fireEvent(parent, "hoverIn");
 
-  expect(child).toHaveStyle({ color: "#ffffff" });
+  expect(child).toHaveStyle({ color: "#fff" });
 });
 
 test("Differentiating nested groups", async () => {
@@ -49,7 +49,7 @@ test("Differentiating nested groups", async () => {
 
   fireEvent(parent, "hoverIn");
 
-  expect(child).toHaveStyle({ color: "#ffffff" });
+  expect(child).toHaveStyle({ color: "#fff" });
 });
 
 test("arbitrary groups - single className", async () => {
@@ -71,7 +71,7 @@ test("arbitrary groups - single className", async () => {
     </View>,
   );
 
-  expect(child).toHaveStyle({ color: "#ffffff" });
+  expect(child).toHaveStyle({ color: "#fff" });
 });
 
 test("arbitrary groups - multiple className", async () => {

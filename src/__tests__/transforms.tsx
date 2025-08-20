@@ -5,7 +5,7 @@ describe("Transforms - Scale", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [{ scaleX: 0 }, { scaleY: 0 }],
+          transform: [{ scale: "0%" }],
         },
       },
     });
@@ -14,7 +14,7 @@ describe("Transforms - Scale", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [{ scaleX: 0.5 }],
+          transform: [{ scaleX: "50%" }, { scaleY: 1 }],
         },
       },
     });
@@ -23,7 +23,7 @@ describe("Transforms - Scale", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [{ scaleY: 0.5 }],
+          transform: [{ scaleX: 1 }, { scaleY: "50%" }],
         },
       },
     });
@@ -32,26 +32,7 @@ describe("Transforms - Scale", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [{ scaleX: 0.5 }, { scaleY: 0.5 }],
-        },
-      },
-    });
-  });
-  test("scale-x-50", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {
-        style: {
-          transform: [{ scaleX: 0.5 }],
-        },
-      },
-    });
-  });
-
-  test("scale-y-50", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {
-        style: {
-          transform: [{ scaleY: 0.5 }],
+          transform: [{ scale: "50%" }],
         },
       },
     });
@@ -63,7 +44,7 @@ describe("Transforms - Rotate", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [{ rotate: "0deg" }],
+          transform: [{ rotateZ: "0deg" }],
         },
       },
     });
@@ -72,7 +53,7 @@ describe("Transforms - Rotate", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [{ rotate: "180deg" }],
+          transform: [{ rotateZ: "180deg" }],
         },
       },
     });
@@ -81,15 +62,7 @@ describe("Transforms - Rotate", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "30deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
+          transform: [{ rotateZ: "30deg" }],
         },
       },
     });
@@ -101,15 +74,7 @@ describe("Transforms - Translate", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
+          transform: [{ translateX: 0 }, { translateY: 0 }],
         },
       },
     });
@@ -118,15 +83,7 @@ describe("Transforms - Translate", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         style: {
-          transform: [
-            { translateX: 0 },
-            { translateY: 0 },
-            { rotate: "0deg" },
-            { skewX: "0deg" },
-            { skewY: "0deg" },
-            { scaleX: 1 },
-            { scaleY: 1 },
-          ],
+          transform: [{ translateX: 0 }, { translateY: 0 }],
         },
       },
     });

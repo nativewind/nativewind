@@ -3,7 +3,7 @@ import { renderCurrentTest } from "../test-utils";
 describe("SVG - Fill", () => {
   test("fill-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { fill: "#000" },
+      props: { fill: "#000", style: {} },
     });
   });
 });
@@ -11,7 +11,7 @@ describe("SVG - Fill", () => {
 describe("SVG - Stroke", () => {
   test("stroke-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { stroke: "#000" },
+      props: { stroke: "#000", style: {} },
     });
   });
 });
@@ -19,7 +19,7 @@ describe("SVG - Stroke", () => {
 describe("SVG - Stroke Width", () => {
   test("stroke-1", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { strokeWidth: 1 },
+      props: { strokeWidth: 1, style: {} },
     });
   });
 });

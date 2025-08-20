@@ -6,7 +6,6 @@ import { render } from "../test-utils";
 const testID = "component";
 
 test("hover", async () => {
-  // @ts-expect-error
   await render(<TextInput testID={testID} className="hover:text-white" />);
 
   const component = screen.getByTestId(testID);
@@ -14,14 +13,13 @@ test("hover", async () => {
   expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "hoverIn");
-  expect(component).toHaveStyle({ color: "#ffffff" });
+  expect(component).toHaveStyle({ color: "#fff" });
 
   fireEvent(component, "hoverOut");
   expect(component).toHaveStyle(undefined);
 });
 
 test("focus", async () => {
-  // @ts-expect-error
   await render(<TextInput testID={testID} className="focus:text-white" />);
 
   const component = screen.getByTestId(testID);
@@ -29,14 +27,13 @@ test("focus", async () => {
   expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "focus");
-  expect(component).toHaveStyle({ color: "#ffffff" });
+  expect(component).toHaveStyle({ color: "#fff" });
 
   fireEvent(component, "blur");
   expect(component).toHaveStyle(undefined);
 });
 
 test("active", async () => {
-  // @ts-expect-error
   await render(<TextInput testID={testID} className="active:text-white" />);
 
   const component = screen.getByTestId(testID);
@@ -44,7 +41,7 @@ test("active", async () => {
   expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "pressIn");
-  expect(component).toHaveStyle({ color: "#ffffff" });
+  expect(component).toHaveStyle({ color: "#fff" });
 
   fireEvent(component, "pressOut");
   expect(component).toHaveStyle(undefined);
@@ -52,7 +49,6 @@ test("active", async () => {
 
 test("mixed", async () => {
   await render(
-    // @ts-expect-error
     <TextInput testID={testID} className="active:hover:focus:text-white" />,
   );
 
@@ -66,17 +62,18 @@ test("mixed", async () => {
   expect(component).toHaveStyle(undefined);
 
   fireEvent(component, "focus");
-  expect(component).toHaveStyle({ color: "#ffffff" });
+  expect(component).toHaveStyle({ color: "#fff" });
 });
 
 test("selection", async () => {
-  // @ts-expect-error
   await render(<TextInput testID={testID} className="selection:text-black" />);
 
   const component = screen.getByTestId(testID);
   expect(component.props).toEqual({
     testID,
-    selectionColor: "#000000",
+    selectionColor: "#000",
+    children: undefined,
+    style: {},
   });
 });
 
@@ -85,26 +82,26 @@ test("ltr:", async () => {
 
   const component = screen.getByTestId(testID);
   expect(component).toHaveStyle({
-    color: "#000000",
+    color: "#000",
   });
 });
 
 test("placeholder", async () => {
   await render(
-    // @ts-expect-error
     <TextInput testID={testID} className="placeholder:text-black" />,
   );
 
   const component = screen.getByTestId(testID);
   expect(component.props).toEqual({
     testID,
-    placeholderTextColor: "#000000",
+    placeholderTextColor: "#000",
+    children: undefined,
+    style: {},
   });
 });
 
 test("disabled", async () => {
   const { rerender } = await render(
-    // @ts-expect-error
     <Switch testID={testID} className="disabled:bg-black" />,
   );
 
@@ -119,7 +116,6 @@ test("disabled", async () => {
     }),
   );
 
-  // @ts-expect-error
   rerender(<Switch testID={testID} disabled className="disabled:bg-black" />);
 
   expect(component.props).toEqual(
@@ -131,14 +127,13 @@ test("disabled", async () => {
           width: 51,
         },
         {
-          backgroundColor: "#000000",
+          backgroundColor: "#000",
         },
       ],
     }),
   );
 
   rerender(
-    // @ts-expect-error
     <Switch testID={testID} disabled={false} className="disabled:bg-black" />,
   );
 

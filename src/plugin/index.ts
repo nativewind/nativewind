@@ -16,7 +16,7 @@ const nativewind: PluginCreator = plugin.withOptions(
           value = kebabCase(value.replace(/&/, "\\&").replaceAll(".", "\\."));
 
           if (modifier) {
-            modifier = modifier.replace(/&/, "\\&").replaceAll(".", "\\.");
+            modifier = modifier.replace(/&/, "\\*").replaceAll(".", "\\.");
           }
 
           /**

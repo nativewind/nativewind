@@ -3,12 +3,12 @@ import { renderCurrentTest } from "../test-utils";
 describe("@prop/<props>:", () => {
   test("@prop/test:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { test: "#000000" },
+      props: { test: "#000", style: {} },
     });
   });
   test("@prop/test.nested:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { test: { nested: "#000000" } },
+      props: { test: { nested: "#000" }, style: {} },
     });
   });
   test("@prop/&test:color-black", async () => {
