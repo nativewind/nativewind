@@ -1,4 +1,5 @@
 @plugin "./dist/module/plugin/index.js";
+@import "tailwindcss-safe-area";
 
 @theme {
   --text-xs--line-height: calc(1em / 0.75);
@@ -56,10 +57,3 @@
 @custom-variant tv (@media (display-mode: tv));
 /* Native does not support the child combinator */
 @custom-variant web (@supports selector(div > div));
-
-@utility visible {
-  opacity: 1;
-}
-@utility invisible {
-  opacity: 0;
-}
