@@ -8684,7 +8684,7 @@ __metadata:
     react: "npm:19.1.0"
     react-native: "npm:0.81.0"
     react-native-builder-bob: "npm:^0.40.13"
-    react-native-css: "npm:3.0.0-preview.0"
+    react-native-css: "npm:3.0.0-preview.1"
     react-native-reanimated: "npm:4.0.1"
     react-native-safe-area-context: "npm:5.4.0"
     react-native-worklets: "npm:0.4.1"
@@ -8694,7 +8694,7 @@ __metadata:
     tw-colors: "npm:^3.3.1"
     typescript: "npm:^5.9.2"
   peerDependencies:
-    react-native-css: 3.0.0-preview.0
+    react-native-css: 3.0.0-preview.1
     tailwindcss: ">4.1.11"
   languageName: unknown
   linkType: soft
@@ -9486,9 +9486,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"react-native-css@npm:3.0.0-preview.0":
-  version: 3.0.0-preview.0
-  resolution: "react-native-css@npm:3.0.0-preview.0"
+"react-native-css@npm:3.0.0-preview.1":
+  version: 3.0.0-preview.1
+  resolution: "react-native-css@npm:3.0.0-preview.1"
   dependencies:
     "@expo/metro-runtime": "npm:~6.1.1"
     babel-plugin-react-compiler: "npm:^19.1.0-rc.2"
@@ -9500,7 +9500,7 @@ __metadata:
     lightningcss: ">=1.27.0"
     react: 19.1.0
     react-native: 0.81.0
-  checksum: 10c0/f74e3a08ec22057ac925997d26f626e1256ba8d0fd7aae381ec14cf15e6e904b2a6dfb42070aeaed3c1b28b4b71bfcff5af104becafba1b09f36b263975cc7c9
+  checksum: 10c0/0b9710b1175d6d2d3a6625bfa2fdef879afde8c2a1dec6d0b897551a1a269beeb7ff39e62df7c92177b734c584ed48f17a9d44d984c7e858e3b5505be941228e
   languageName: node
   linkType: hard
 
