@@ -55,11 +55,5 @@ module.exports = {
         "@typescript-eslint/no-var-requires": "off",
       },
     },
-    {
-      files: ["examples/**/*.tsx"],
-      rules: {
-        "unicorn/filename-case": "off",
-      },
-    },
   ],
 };
