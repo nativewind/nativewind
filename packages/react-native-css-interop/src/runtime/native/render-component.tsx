@@ -86,8 +86,14 @@ export function renderComponent(
           // Primitive or null
           if (typeof style !== "object" || !style) return style;
           // Shared value
-          if ("_isReanimatedSharedValue" in style && "value" in style) {
-            return style.value;
+          if ("_isReanimatedSharedValue" in style) {
+            if ("get" in style && typeof style.get === "function") {
+              return style.get();
+            }
+
+            if ("value" in style) {
+              return style.value;
+            }
           }
           if (Array.isArray(style)) return style.map(flattenAnimatedProps);
           return Object.fromEntries(
