@@ -1,0 +1,18 @@
+name: Check for unstaged files
+description: Check if there are any unstaged files and fail if found
+
+runs:
+  using: composite
+  steps:
+    - name: Check for unstaged files
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "❌ Unstaged files detected:"
+          git status --porcelain
+          echo ""
+          echo "Please commit or stash these changes before proceeding."
+          exit 1
+        else
+          echo "✅ No unstaged files detected."
+        fi
+      shell: bash
