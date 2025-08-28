@@ -51,6 +51,10 @@
   -rn-elevation: --value(--elevation-*);
 }
 
+@utility corner-* {
+  corner-shape: --value("rounded", "squircle");
+}
+
 @custom-variant ios (@media ios);
 @custom-variant android (@media android);
 @custom-variant native (@media native);
