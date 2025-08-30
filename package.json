@@ -134,5 +134,8 @@
   "eslintIgnore": [
     "node_modules/",
     "dist/"
-  ]
+  ],
+  "dependencies": {
+    "tailwindcss-safe-area": "^1.1.0"
+  }
 }

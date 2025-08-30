@@ -8691,6 +8691,7 @@ __metadata:
     react-refresh: "npm:^0.17.0"
     react-test-renderer: "npm:19.1.0"
     tailwindcss: "npm:^4.1.11"
+    tailwindcss-safe-area: "npm:^1.1.0"
     tw-colors: "npm:^3.3.1"
     typescript: "npm:^5.9.2"
   peerDependencies:
@@ -10581,6 +10582,15 @@ __metadata:
   version: 3.2.4
   resolution: "symbol-tree@npm:3.2.4"
   checksum: 10c0/dfbe201ae09ac6053d163578778c53aa860a784147ecf95705de0cd23f42c851e1be7889241495e95c37cabb058edb1052f141387bef68f705afc8f9dd358509
+  languageName: node
+  linkType: hard
+
+"tailwindcss-safe-area@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "tailwindcss-safe-area@npm:1.1.0"
+  peerDependencies:
+    tailwindcss: ^4.0.0
+  checksum: 10c0/93e48186ebb06f7034f5a01160abad916fcce90f331017d7f350d7de5fd934d742fd7186819e48ff9987d4c2c8a6c4ba6da572af72a125312d8b3786c8415162
   languageName: node
   linkType: hard
 
