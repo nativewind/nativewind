@@ -44,7 +44,19 @@
 }
 
 @utility ripple-* {
-  -rn-android-ripple: --value(--color-*);
+  -rn-ripple-color: --value(--color-*);
+}
+
+@utility ripple-* {
+  -rn-ripple-style: --value("borderless");
+}
+
+@utility ripple-* {
+  -rn-ripple-radius: --value(integer);
+}
+
+@utility ripple-foreground {
+  -rn-ripple-foreground: "foreground";
 }
 
 @utility elevation-* {
