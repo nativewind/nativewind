@@ -5,6 +5,7 @@ describe("Custom - Ripple Color", () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: {
         android_ripple: { color: "#000" },
+        style: {},
       },
     }));
 });

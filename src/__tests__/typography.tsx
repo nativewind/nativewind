@@ -1,4 +1,4 @@
-import { renderCurrentTest } from "../test-utils";
+import { renderCurrentTest, renderSimple } from "../test-utils";
 
 describe("Typography - Font Family", () => {
   test("font-sans", async () => {
@@ -214,6 +214,11 @@ describe("Typography - Line Height", () => {
   test("leading-4", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: { style: { lineHeight: 14 } },
+      warnings: {
+        values: {
+          "line-height": "initial",
+        },
+      },
     });
   });
 });
@@ -372,9 +377,15 @@ describe("Typography - Text Decoration Color", () => {
     });
   });
   test("decoration-current", async () => {
-    expect(await renderCurrentTest()).toStrictEqual({
-      props: {},
-      warnings: { values: { "text-decoration-color": "currentcolor" } },
+    expect(
+      await renderSimple({ className: "decoration-current text-red-500" }),
+    ).toStrictEqual({
+      props: {
+        style: {
+          color: "#fb2c36",
+          textDecorationColor: "#fb2c36",
+        },
+      },
     });
   });
   test("decoration-inherit", async () => {
