@@ -1,7 +1,11 @@
 {
-  "extends": "@react-native/typescript-config",
   "compilerOptions": {
     "rootDir": ".",
+    "paths": {
+      "nativewind": [
+        "./src/index"
+      ],
+    },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
@@ -12,6 +16,7 @@
     ],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitUseStrict": false,
@@ -25,7 +30,7 @@
     "target": "ESNext",
     "verbatimModuleSyntax": true
   },
-  "include": [
-    "src"
-  ],
+  "exclude": [
+    "example"
+  ]
 }

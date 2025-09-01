@@ -8,7 +8,6 @@
     "src/**/*",
     "index.js",
     "postcss.config.mjs",
-    "react-native-css-env.d.ts",
-    "nativewind-env.d.ts"
+    "nativewind-env.d.ts",
   ]
 }
