@@ -37,6 +37,11 @@
   color: --value(--color-*);
 }
 
+@utility tint-* {
+  -rn-tint: --value(--color-*);
+  @prop -rn-tint tint;
+}
+
 @utility ripple-* {
   -rn-ripple-color: --value(--color-*);
 }
