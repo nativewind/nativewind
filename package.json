@@ -90,7 +90,7 @@
     "@testing-library/react-native": "^13.2.0",
     "@types/debug": "^4.1.12",
     "@types/jest": "^29.5.1",
-    "expo": "54.0.0-preview.6",
+    "expo": "54.0.0-preview.13",
     "jest": "^29.7.0",
     "jest-expo": "54.0.4",
     "postcss": "^8.5.6",
@@ -98,7 +98,7 @@
     "react": "19.1.0",
     "react-native": "0.81.0",
     "react-native-builder-bob": "^0.40.13",
-    "react-native-css": "3.0.0-preview.1",
+    "react-native-css": "3.0.0-preview.2",
     "react-native-reanimated": "4.0.1",
     "react-native-safe-area-context": "5.4.0",
     "react-native-worklets": "0.4.1",
@@ -109,6 +109,7 @@
     "typescript": "^5.9.2"
   },
   "peerDependencies": {
+    "lightningcss": ">=1.27.0",
     "react-native-css": "3.0.0-preview.1",
     "tailwindcss": ">4.1.11"
   },
