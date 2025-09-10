@@ -1,11 +1,6 @@
 {
   "compilerOptions": {
     "rootDir": ".",
-    "paths": {
-      "nativewind": [
-        "./src/index"
-      ],
-    },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
@@ -29,8 +24,5 @@
     "strict": true,
     "target": "ESNext",
     "verbatimModuleSyntax": true
-  },
-  "exclude": [
-    "example"
-  ]
+  }
 }

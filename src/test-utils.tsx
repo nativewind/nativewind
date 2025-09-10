@@ -1,3 +1,5 @@
+import type { PropsWithChildren, ReactElement } from "react";
+
 import tailwind from "@tailwindcss/postcss";
 import {
   screen,
@@ -9,9 +11,7 @@ import type { compile } from "react-native-css/compiler";
 import { View } from "react-native-css/components";
 import { registerCSS } from "react-native-css/jest";
 
-export * from "./index";
-
-const testID = "nativewind";
+const testID = "tailwind";
 
 export type NativewindRenderOptions = RenderOptions & {
   /** Replace the generated CSS*/
@@ -29,23 +29,19 @@ export type NativewindRenderOptions = RenderOptions & {
   /** Whether to include the plugin in the generated CSS. @default true */
   plugin?: boolean;
   /** Enable debug logging. @default false - Set process.env.NATIVEWIND_TEST_AUTO_DEBUG and run tests with the node inspector   */
-  debug?: boolean;
+  debug?: boolean | "verbose";
 };
 
-const debugDefault = Boolean(
-  process.env.NATIVEWIND_TEST_AUTO_DEBUG &&
-    process.env.NODE_OPTIONS?.includes("--inspect"),
-);
+const debugDefault = Boolean(process.env.NODE_OPTIONS?.includes("--inspect"));
 
 export async function render(
-  component: React.ReactElement<any>,
+  component: ReactElement<PropsWithChildren>,
   {
     css,
     sourceInline = Array.from(getClassNames(component)),
     debug = debugDefault,
     theme = true,
     preflight = false,
-    plugin = true,
     extraCss,
     ...options
   }: NativewindRenderOptions = {},
@@ -61,11 +57,7 @@ export async function render(
       css += `@import "tailwindcss/preflight.css" layer(base);\n`;
     }
 
-    css += `@import "tailwindcss/utilities.css" layer(utilities) source(none);\n`;
-
-    if (plugin) {
-      css += `@import "./theme.css";\n`;
-    }
+    css += `@import "tailwindcss/utilities.css" layer(utilities) source(none);\n@import "tailwindcss-safe-area";`;
   }
 
   css += sourceInline
@@ -76,12 +68,12 @@ export async function render(
     css += `\n${extraCss}`;
   }
 
-  if (debug) {
+  if (debug === "verbose") {
     console.log(`Input CSS:\n---\n${css}\n---\n`);
   }
 
   // Process the TailwindCSS
-  let { css: output } = await postcss([
+  const { css: output } = await postcss([
     /* Tailwind seems to internally cache things, so we need a random value to cache bust */
     tailwind({ base: Date.now().toString() }),
   ]).process(css, {
@@ -92,7 +84,7 @@ export async function render(
     console.log(`Output CSS:\n---\n${output}\n---\n`);
   }
 
-  const compiled = registerCSS(output, { debug });
+  const compiled = registerCSS(output, { debug: Boolean(debug) });
 
   return Object.assign(
     {},
@@ -104,26 +96,34 @@ export async function render(
 }
 
 render.debug = (
-  component: React.ReactElement<any>,
+  component: ReactElement<PropsWithChildren>,
   options: RenderOptions = {},
 ) => {
   return render(component, { ...options, debug: true });
 };
 
 function getClassNames(
-  component: React.ReactElement<any>,
-  classNames: Set<string> = new Set(),
+  component: ReactElement<PropsWithChildren>,
+  classNames = new Set<string>(),
 ) {
-  if (component.props?.className) {
+  if (
+    typeof component.props === "object" &&
+    "className" in component.props &&
+    typeof component.props.className === "string"
+  ) {
     classNames.add(component.props.className);
   }
 
-  if (component.props?.children) {
-    const children: React.ReactElement<any>[] = Array.isArray(
-      component.props.children,
-    )
+  if (component.props.children) {
+    const rawChildren = Array.isArray(component.props.children)
       ? component.props.children
       : [component.props.children];
+
+    const children = rawChildren.filter(
+      (child): child is ReactElement<PropsWithChildren> => {
+        return !!child && typeof child === "object" && "props" in child;
+      },
+    );
 
     for (const child of children) {
       getClassNames(child, classNames);
@@ -141,7 +141,9 @@ export async function renderSimple({
     <View testID={testID} className={className} />,
     options,
   );
-  const component = screen.getByTestId(testID, { hidden: true });
+  const component = screen.getByTestId(testID, {
+    hidden: true,
+  }) as { props: Record<string, unknown> } & typeof View;
 
   // Strip the testID and the children
   const { testID: _testID, children, ...props } = component.props;
@@ -185,12 +187,6 @@ export async function renderCurrentTest({
   className = sourceInline.join(" "),
   ...options
 }: NativewindRenderOptions = {}) {
-  if (!sourceInline) {
-    throw new Error(
-      "unable to detect sourceInline, please manually set sourceInline in renderCurrentTest options",
-    );
-  }
-
   return renderSimple({
     ...options,
     sourceInline,
