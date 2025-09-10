@@ -14,7 +14,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -75,3 +74,63 @@ jobs:
 
       - name: Check for unstaged files
         uses: ./.github/actions/check-unstaged-files
+
+  build-ios-dev:
+    runs-on: macos-15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build iOS app
+        id: build
+        uses: ./.github/actions/ios-dev-app
+
+  # maestro-ios:
+  #   runs-on: macos-latest
+  #   needs: build-ios-dev
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup Maestro
+  #       uses: ./.github/actions/maestro
+
+  #     - name: Download development build
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: ios-dev-build
+  #         path: ./
+
+  #     - name: Extract and install app
+  #       run: |
+  #         # Extract the app bundle
+  #         tar -xzf ios-dev-build.tar.gz
+  #         APP_PATH=$(find . -name "*.app" -type d | head -n 1)
+
+  #         if [ -z "$APP_PATH" ]; then
+  #           echo "No .app bundle found after extraction"
+  #           exit 1
+  #         fi
+
+  #         echo "Installing app from: $APP_PATH"
+  #         xcrun simctl install $DEVICE_ID "$APP_PATH"
+
+  #         # Get the app bundle ID for launching
+  #         APP_BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw "$APP_PATH/Info.plist")
+  #         echo "APP_BUNDLE_ID=$APP_BUNDLE_ID" >> $GITHUB_ENV
+
+  #     - name: Run Maestro tests
+  #       run: |
+  #         # Ensure the simulator is booted before running tests
+  #         if [ -z "$DEVICE_ID" ]; then
+  #           echo "No simulator found. Exiting."
+  #           exit 1
+  #         fi
+
+  #         # Launch the app first
+  #         xcrun simctl launch $DEVICE_ID $APP_BUNDLE_ID
+
+  #         maestro test --device-id "$DEVICE_ID" --test-dir src/__tests__/e2e --report-dir src/__tests__/e2e/reports

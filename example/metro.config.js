@@ -1,5 +1,5 @@
 const path = require("path");
-const { getDefaultConfig } = require("@expo/metro-config");
+const { getDefaultConfig } = require("expo/metro-config");
 
 /* Use `const { withNativewind } = require("nativewind/metro");` in your project instead */
 const { withNativewind } = require("nativewind/metro");
