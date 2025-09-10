@@ -2,7 +2,7 @@ const path = require("path");
 const { getDefaultConfig } = require("@expo/metro-config");
 
 /* Use `const { withNativewind } = require("nativewind/metro");` in your project instead */
-const { withNativewind } = require("../dist/commonjs/metro");
+const { withNativewind } = require("nativewind/metro");
 
 /**
  * Metro configuration
@@ -12,16 +12,12 @@ const { withNativewind } = require("../dist/commonjs/metro");
  */
 const config = getDefaultConfig(__dirname);
 
-/** START - None of this code is necessary, its only to resolve Nativewind from the monorepo */
-config.resolver.unstable_enablePackageExports = true;
-config.resolver.extraNodeModules = {
-  nativewind: path.resolve(__dirname, "../"),
-};
+/** START - None of this code is necessary, its only to resolve node_modules inside the monorepo */
 config.resolver.nodeModulesPaths = [
   path.resolve(__dirname, "node_modules"),
   path.resolve(__dirname, "../node_modules"),
 ];
 config.watchFolders = [path.resolve(__dirname, "../")];
-/** END - None of this code is necessary, its only to resolve Nativewind from the monorepo */
+/** END - None of this code is necessary, its only to resolve node_modules inside the monorepo */
 
 module.exports = withNativewind(config);

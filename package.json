@@ -18,9 +18,15 @@
       "typescript": "./dist/typescript/commonjs/src/babel.d.ts"
     },
     "./metro": {
-      "import": "./dist/module/metro.js",
-      "require": "./dist/commonjs/metro.js",
-      "typescript": "./dist/typescript/commonjs/src/metro.d.ts"
+      "source": "./src/metro.ts",
+      "import": {
+        "types": "./dist/typescript/module/src/metro.d.ts",
+        "default": "./dist/module/metro.js"
+      },
+      "require": {
+        "types": "./dist/typescript/commonjs/src/metro.d.ts",
+        "default": "./dist/commonjs/metro.js"
+      }
     },
     "./types": {
       "typescript": "./types.d.ts"
