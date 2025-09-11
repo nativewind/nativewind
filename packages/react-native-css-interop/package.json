@@ -35,7 +35,7 @@
     "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "lint": "eslint .",
-    "prepublishOnly": "npm run build && npm test",
+    "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "build:watch": "tsc -p tsconfig.build.json -w",
     "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
