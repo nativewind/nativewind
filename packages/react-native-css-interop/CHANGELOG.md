@@ -1,5 +1,11 @@
 # react-native-css-interop
 
+## 0.2.0
+
+### Minor Changes
+
+- fb4503d: Fixes for RN 0.81 and reanimated 4
+
 ## 0.1.22
 
 ### Patch Changes

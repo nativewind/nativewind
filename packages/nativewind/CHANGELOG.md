@@ -1,5 +1,16 @@
 # nativewind
 
+## 4.2.0
+
+### Minor Changes
+
+- fb4503d: Fixes for RN 0.81 and reanimated 4
+
+### Patch Changes
+
+- Updated dependencies [fb4503d]
+  - react-native-css-interop@0.2.0
+
 ## 4.1.23
 
 ### Patch Changes
