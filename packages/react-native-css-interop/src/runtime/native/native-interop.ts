@@ -302,7 +302,7 @@ export function interop(
   return renderComponent(
     component,
     sharedState,
-    { ...props, ...memoOutput.handlers, ref },
+    { ref, ...props, ...memoOutput.handlers },
     memoOutput.possiblyAnimatedProps,
     variables,
     containers,
