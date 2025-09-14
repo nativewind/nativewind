@@ -299,6 +299,10 @@ export function interop(
   sharedState.originalProps = originalProps;
   sharedState.initialRender = false;
 
+  // In React 19, ref semantics have changed and it's more like a regular prop now
+  // We should prevent it from being overridden as `undefined | null` here.
+  if (ref == null) ref = props.ref;
+
   return renderComponent(
     component,
     sharedState,
