@@ -46,7 +46,7 @@ export const cssInterop: CssInterop = (baseComponent, mapping): any => {
    */
   if (type === "function") {
     component = (props: Record<string, any>) => {
-      return interop(baseComponent, configs, props, undefined);
+      return interop(baseComponent, configs, props, props.ref);
     };
   } else {
     component = forwardRef((props, ref) => {
