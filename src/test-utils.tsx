@@ -143,7 +143,7 @@ export async function renderSimple({
   );
   const component = screen.getByTestId(testID, {
     hidden: true,
-  }) as { props: Record<string, unknown> } & typeof View;
+  });
 
   // Strip the testID and the children
   const { testID: _testID, children, ...props } = component.props;

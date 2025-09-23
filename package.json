@@ -80,7 +80,8 @@
     "prepublishOnly": "npm run build && npm test",
     "test": "jest",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "typecheck": "tsc --noEmit"
   },
   "files": [
     "dist",
