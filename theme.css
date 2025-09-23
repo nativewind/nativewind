@@ -1,4 +1,4 @@
-@plugin "./dist/module/plugin/index.js";
+@plugin "./dist/module/plugin.js";
 @import "tailwindcss-safe-area";
 
 @theme {
@@ -43,11 +43,8 @@
 }
 
 @utility ripple-* {
-  -rn-ripple-color: --value(--color-*);
-}
-
-@utility ripple-* {
   -rn-ripple-style: --value("borderless");
+  -rn-ripple-color: --value(--color-*);
 }
 
 @utility ripple-* {

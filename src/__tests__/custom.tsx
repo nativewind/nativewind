@@ -14,7 +14,7 @@ describe("Custom - Ripple Color", () => {
 describe("Custom - Ripple Borderless", () => {
   test("ripple-borderless", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { android_ripple: { borderless: true } },
+      props: { android_ripple: { borderless: true }, style: {} },
     });
   });
 });

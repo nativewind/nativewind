@@ -11,14 +11,14 @@ describe("@prop/<props>:", () => {
       props: { test: { nested: "#000" }, style: {} },
     });
   });
-  test("@prop/&test:color-black", async () => {
+  test("@prop/&.test:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { test: "#000000" } },
+      props: { style: { test: "#000" } },
     });
   });
-  test("@prop/&test.nested:color-black", async () => {
+  test("@prop/&.test.nested:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { test: { nested: "#000000" } } },
+      props: { style: { test: { nested: "#000" } } },
     });
   });
 });
@@ -27,22 +27,22 @@ describe("@prop/<props>:", () => {
 describe("@prop-[prop]:", () => {
   test("@prop-[test]:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { test: "#000000" },
+      props: { test: "#000", style: {} },
     });
   });
   test("@prop-[test.nested]:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { test: { nested: "#000000" } },
+      props: { test: { nested: "#000" }, style: {} },
     });
   });
-  test("@prop-[&test]:color-black", async () => {
+  test("@prop-[&.test]:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { test: "#000000" } },
+      props: { style: { test: "#000" } },
     });
   });
-  test("@prop-[&test.nested]:color-black", async () => {
+  test("@prop-[&.test.nested]:color-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
-      props: { style: { test: { nested: "#000000" } } },
+      props: { style: { test: { nested: "#000" } } },
     });
   });
 });
@@ -58,12 +58,12 @@ describe("@prop-[props]/<attributes>:", () => {
       props: { test: { nested: 14 }, style: { lineHeight: 21 } },
     });
   });
-  test("@prop-[&test]/fontSize:text-base", async () => {
+  test("@prop-[&.test]/fontSize:text-base", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: { style: { lineHeight: 21, test: 14 } },
     });
   });
-  test("@prop-[&test.nested]/fontSize:text-base", async () => {
+  test("@prop-[&.test.nested]/fontSize:text-base", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
       props: { style: { lineHeight: 21, test: { nested: 14 } } },
     });

@@ -42,6 +42,7 @@ export async function render(
     debug = debugDefault,
     theme = true,
     preflight = false,
+    plugin = true,
     extraCss,
     ...options
   }: NativewindRenderOptions = {},
@@ -57,18 +58,22 @@ export async function render(
       css += `@import "tailwindcss/preflight.css" layer(base);\n`;
     }
 
-    css += `@import "tailwindcss/utilities.css" layer(utilities) source(none);\n@import "tailwindcss-safe-area";`;
+    css += `@import "tailwindcss/utilities.css" layer(utilities) source(none);`;
+
+    if (plugin) {
+      css += `\n@import "./theme.css";`;
+    }
+
+    css += sourceInline
+      .map((source) => `\n@source inline("${source}");`)
+      .join("\n");
+
+    if (extraCss) {
+      css += `\n${extraCss}`;
+    }
   }
 
-  css += sourceInline
-    .map((source) => `@source inline("${source}");`)
-    .join("\n");
-
-  if (extraCss) {
-    css += `\n${extraCss}`;
-  }
-
-  if (debug === "verbose") {
+  if (debug) {
     console.log(`Input CSS:\n---\n${css}\n---\n`);
   }
 
@@ -115,18 +120,12 @@ function getClassNames(
   }
 
   if (component.props.children) {
-    const rawChildren = Array.isArray(component.props.children)
+    const children: ReactElement[] = Array.isArray(component.props.children)
       ? component.props.children
       : [component.props.children];
 
-    const children = rawChildren.filter(
-      (child): child is ReactElement<PropsWithChildren> => {
-        return !!child && typeof child === "object" && "props" in child;
-      },
-    );
-
     for (const child of children) {
-      getClassNames(child, classNames);
+      getClassNames(child as ReactElement<PropsWithChildren>, classNames);
     }
   }
 
@@ -139,11 +138,12 @@ export async function renderSimple({
 }: NativewindRenderOptions & { className: string }) {
   const { warnings: warningFn } = await render(
     <View testID={testID} className={className} />,
-    options,
+    {
+      sourceInline: className ? [className] : [],
+      ...options,
+    },
   );
-  const component = screen.getByTestId(testID, {
-    hidden: true,
-  });
+  const component = screen.getByTestId(testID, { hidden: true });
 
   // Strip the testID and the children
   const { testID: _testID, children, ...props } = component.props;
@@ -183,13 +183,11 @@ renderSimple.debug = (
  * Doesn't not support multiple components or changing the component type
  */
 export async function renderCurrentTest({
-  sourceInline = [expect.getState().currentTestName?.split(/\s+/).at(-1) ?? ""],
-  className = sourceInline.join(" "),
+  className = expect.getState().currentTestName?.split(/\s+/).at(-1) ?? "",
   ...options
 }: NativewindRenderOptions = {}) {
   return renderSimple({
     ...options,
-    sourceInline,
     className,
   });
 }
