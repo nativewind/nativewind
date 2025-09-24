@@ -1,4 +1,3 @@
-import debug from "debug";
 import type { MetroConfig } from "metro-config";
 import {
   withReactNativeCSS,
@@ -10,7 +9,6 @@ export function withNativewind<
 >(config: T, options?: WithReactNativeCSSOptions): T {
   return withReactNativeCSS(config, {
     globalClassNamePolyfill: true,
-    logger: debug("nativewind"),
     typescriptEnvPath: "nativewind-env.d.ts",
     ...options,
   });

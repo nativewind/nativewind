@@ -5,7 +5,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name: "example",
     slug: "example",
-    plugins: ["expo-dev-client"],
     userInterfaceStyle: "automatic",
     android: {
       package: "dev.nativewind",
