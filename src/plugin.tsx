@@ -11,7 +11,7 @@ const nativewind: PluginCreator = plugin.withOptions(
   () =>
     ({ matchVariant }) => {
       matchVariant(
-        "@prop",
+        "@map",
         (value = "", { modifier }) => {
           value = kebabCase(value.replace(/&/, "\\&"));
 
@@ -21,10 +21,10 @@ const nativewind: PluginCreator = plugin.withOptions(
 
           /**
            Adding @media all is a hack for Tailwind CSS which has undocumented behavior
-           If we do this `@prop { ...values } @slot;` it doesn't work, even if we
-           wrap it like `& { @prop { ...values } @slot; }`
+           If we do this `@nativeMapping { ...values } @slot;` it doesn't work, even if we
+           wrap it like `& { @nativeMapping { ...values } @slot; }`
 
-           Adding @slot duplicates the styles and it will try to add the styles into the @prop block
+           Adding @slot duplicates the styles and it will try to add the styles into the @nativeMapping block
 
            By adding the `@media all`, Tailwind will add brackets and insert the styles correctly
 
@@ -32,15 +32,15 @@ const nativewind: PluginCreator = plugin.withOptions(
            */
 
           if (modifier && value) {
-            // @prop-[value]/<modifier>:text-red-500
-            // In this instance, we are moving value (the style prop) to the modifier (the target key)
-            return `@prop { ${modifier}:${value} }; @media all`;
+            // @nativeMapping-[value]/<modifier>:text-red-500
+            // In this instance, we are moving value (the style nativeMapping) to the modifier (the target key)
+            return `@nativeMapping { ${modifier}:${value} }; @media all`;
           } else if (modifier && !value) {
-            // @prop/<modifier>:text-red-500
+            // @nativeMapping/<modifier>:text-red-500
             // In this instance, we are moving the last style value to the modifier
-            return `@prop ${modifier}; @media all`;
+            return `@nativeMapping ${modifier}; @media all`;
           } else if (!modifier && value) {
-            return `@prop ${value}; @media all`;
+            return `@nativeMapping ${value}; @media all`;
           } else {
             return "";
           }

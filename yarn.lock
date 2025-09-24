@@ -9793,7 +9793,7 @@ __metadata:
     react: "npm:19.1.0"
     react-native: "npm:0.81.4"
     react-native-builder-bob: "npm:^0.40.13"
-    react-native-css: "npm:0.0.0-nightly.81d3fdb"
+    react-native-css: "npm:0.0.0-nightly.04af4c6"
     react-native-reanimated: "npm:~4.1.0"
     react-native-safe-area-context: "npm:5.6.1"
     react-native-worklets: "npm:~0.5.0"
@@ -10882,9 +10882,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"react-native-css@npm:0.0.0-nightly.81d3fdb":
-  version: 0.0.0-nightly.81d3fdb
-  resolution: "react-native-css@npm:0.0.0-nightly.81d3fdb"
+"react-native-css@npm:0.0.0-nightly.04af4c6":
+  version: 0.0.0-nightly.04af4c6
+  resolution: "react-native-css@npm:0.0.0-nightly.04af4c6"
   dependencies:
     babel-plugin-react-compiler: "npm:^19.1.0-rc.2"
     colorjs.io: "npm:0.6.0-alpha.1"
@@ -10894,7 +10894,7 @@ __metadata:
     "@expo/metro-config": ">=54"
     react: ">=19"
     react-native: ">=0.81"
-  checksum: 10c0/f75ce4eb7c0c8cd96d313a944ace98dc4dee0bb7c2371948963815e316b3316387475a6c750ec31b54dae31e673506286c9d781e2c2576742145ba4379647d58
+  checksum: 10c0/bc77b66f27335b99e6aeb45417fa1221467067842053d116cc51d6c75dda9f8161ad75d106013187d3ed0a66ab364f11f07f8c9d2599c5b1fa4bc29990ac9a0d
   languageName: node
   linkType: hard
 
