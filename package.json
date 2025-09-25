@@ -136,7 +136,7 @@
   },
   "peerDependencies": {
     "lightningcss": ">=1.27.0",
-    "react-native-css": "3.0.0-preview.5",
+    "react-native-css": "^3.0.0",
     "tailwindcss": ">4.1.11"
   },
   "react-native-builder-bob": {
