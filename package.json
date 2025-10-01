@@ -135,7 +135,6 @@
     "typescript-eslint": "^8.40.0"
   },
   "peerDependencies": {
-    "lightningcss": ">=1.27.0",
     "react-native-css": "^3.0.0",
     "tailwindcss": ">4.1.11"
   },
