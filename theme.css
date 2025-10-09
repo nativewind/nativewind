@@ -1,0 +1,71 @@
+@plugin "./dist/module/plugin.js";
+@import "tailwindcss-safe-area";
+
+@theme {
+  --elevation-xs: 1;
+  --elevation-sm: 3;
+  --elevation-md: 6;
+  --elevation-lg: 8;
+  --elevation-xl: 13;
+  --elevation-2xl: 24;
+  --elevation-none: 0;
+}
+
+:root {
+  @media ios {
+    --font-sans: System;
+    --font-serif: Georgia;
+    --font-mono: Menlo;
+  }
+
+  @media android {
+    --font-sans: SystemAndroid;
+    --font-serif: sans-serif;
+    --font-mono: monospace;
+  }
+}
+
+/**
+ * We need to override the leading-* utility. It returns a value in rem units, but react-native-css only accepts
+ * unit-less values for line-height
+ */
+@utility leading-* {
+  line-height: calc(var(--spacing) / 1rem * --value(integer));
+}
+
+@utility color-* {
+  color: --value(--color-*);
+}
+
+@utility tint-* {
+  -rn-tint: --value(--color-*);
+  @prop -rn-tint tint;
+}
+
+@utility ripple-* {
+  -rn-ripple-style: --value("borderless");
+  -rn-ripple-color: --value(--color-*);
+}
+
+@utility ripple-* {
+  -rn-ripple-radius: --value(integer);
+}
+
+@utility ripple-foreground {
+  -rn-ripple-foreground: "foreground";
+}
+
+@utility elevation-* {
+  -rn-elevation: --value(--elevation-*);
+}
+
+@utility corner-* {
+  corner-shape: --value("rounded", "squircle");
+}
+
+@custom-variant ios (@media ios);
+@custom-variant android (@media android);
+@custom-variant native (@media native);
+@custom-variant tv (@media (display-mode: tv));
+/* Native does not support the child combinator */
+@custom-variant web (@supports selector(div > div));
