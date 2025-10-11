@@ -9718,7 +9718,7 @@ __metadata:
     react: "npm:19.1.0"
     react-native: "npm:0.81.4"
     react-native-builder-bob: "npm:^0.40.13"
-    react-native-css: "npm:3.0.0-preview.5"
+    react-native-css: "npm:^3.0.0"
     react-native-reanimated: "npm:~4.1.0"
     react-native-safe-area-context: "npm:5.6.1"
     react-native-worklets: "npm:~0.5.0"
@@ -9730,7 +9730,7 @@ __metadata:
     typescript: "npm:^5.9.2"
     typescript-eslint: "npm:^8.40.0"
   peerDependencies:
-    react-native-css: ^3.0.0
+    react-native-css: ^3.0.1
     tailwindcss: ">4.1.11"
   languageName: unknown
   linkType: soft
@@ -10819,6 +10819,23 @@ __metadata:
     react: ">=19"
     react-native: ">=0.81"
   checksum: 10c0/5ff4f212db8d1182372cb703eb6d9abb3c4a0f26efa8db2be4d2ac6d299c95fa2944ce6167c2da6b6f3bf7db8e62306c7f3079ed569964c1db75ef1c277e4051
+  languageName: node
+  linkType: hard
+
+"react-native-css@npm:^3.0.0":
+  version: 3.0.1
+  resolution: "react-native-css@npm:3.0.1"
+  dependencies:
+    babel-plugin-react-compiler: "npm:^19.1.0-rc.2"
+    colorjs.io: "npm:0.6.0-alpha.1"
+    comment-json: "npm:^4.2.5"
+    debug: "npm:^4.4.1"
+  peerDependencies:
+    "@expo/metro-config": ">=54"
+    lightningcss: ">=1.27.0"
+    react: ">=19"
+    react-native: ">=0.81"
+  checksum: 10c0/61fd8bb657d68d1a901852b46d0e3b8778a634ea9451ff03eb0575d47a8f733be954f83c77cae3ef97bee89e423c2db8d85e493f203e6527cd1ca8e1775e2453
   languageName: node
   linkType: hard
 

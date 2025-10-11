@@ -122,7 +122,7 @@
     "react": "19.1.0",
     "react-native": "0.81.4",
     "react-native-builder-bob": "^0.40.13",
-    "react-native-css": "3.0.0-preview.5",
+    "react-native-css": "^3.0.0",
     "react-native-reanimated": "~4.1.0",
     "react-native-safe-area-context": "5.6.1",
     "react-native-worklets": "~0.5.0",
@@ -135,7 +135,7 @@
     "typescript-eslint": "^8.40.0"
   },
   "peerDependencies": {
-    "react-native-css": "^3.0.0",
+    "react-native-css": "^3.0.1",
     "tailwindcss": ">4.1.11"
   },
   "react-native-builder-bob": {
