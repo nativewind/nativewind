@@ -9,12 +9,12 @@
     ".": {
       "import": "./dist/module/index.js",
       "require": "./dist/commonjs/index.js",
-      "typescript": "./dist/typescript/commonjs/src/index.d.ts"
+      "types": "./dist/typescript/commonjs/src/index.d.ts"
     },
     "./babel": {
       "import": "./dist/module/babel.js",
       "require": "./dist/commonjs/babel.js",
-      "typescript": "./dist/typescript/commonjs/src/babel.d.ts"
+      "types": "./dist/typescript/commonjs/src/babel.d.ts"
     },
     "./metro": {
       "source": "./src/metro.ts",
