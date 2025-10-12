@@ -31,7 +31,9 @@ Alternatively, you can create a new pre-configured project via our Quickstart be
 
 ## Quickstart
 
-- [Create Expo Stack](https://rn.new): `npx rn-new@latest --nativewind`
+We use [rn-new](https://rn.new) to quickly stand up an Expo project with Nativewind.
+- `npx rn-new@latest --nativewind` (Expo SDK 54 + Nativewind v4.1)
+- `npx rn-new@next --nativewind` (Expo SDK 54 + Nativewind v5)
 
 ## Features
 
@@ -84,7 +86,7 @@ There are a number of different component libraries available that use Nativewin
 
 This multi-platform library focuses on achieving native feel for each individual platform using the familiar interface of Tailwind CSS.
 
-### [React Native Reusables](https://rnreusables.com)
+### [React Native Reusables](https://reactnativereusables.com)
 
 This open source library offers universal [shadcn/ui](https://ui.shadcn.com) via React Native. Use this as a foundation to develop your own high-quality component library.
 

@@ -38,8 +38,10 @@ When opening an issue, it's crucial to provide a reproduction of the problem to 
 
 - **StackBlitz template**: [Nativewind Test on StackBlitz](https://stackblitz.com/edit/nativewind-test?view=editor)
 - **Create Expo Stack template**:
-  - `npx rn-new@latest --nativewind`
-  - `npx rn-new@latest --nativewind --expo-router`
+  - `npx rn-new@latest --nativewind` (Expo SDK 54 + Nativewind v4.1)
+  - `npx rn-new@latest --nativewind --expo-router` (Expo SDK 54 + Expo Router v6 + Nativewind v4.1)
+  - `npx rn-new@next --nativewind` (Expo SDK 54 + Nativewind v5)
+  - `npx rn-new@next --nativewind --expo-router` (Expo SDK 54 + Expo Router v6 + Nativewind v5)
 
 #### Steps to Follow
 
@@ -102,7 +104,7 @@ When you're ready to submit your changes, push your branch to your forked reposi
 
 ### Directory structure
 
-The Nativewind source code can be found in the `packages/` directory. The `packages/nativewind` is a wrapper around `packages/react-native-css-interop`. The documentation and homepage are maintained in a separate repository at https://github.com/nativewind/website.
+The Nativewind source code can be found in the `packages/` directory. The `packages/nativewind` is a wrapper around [react-native-css](https://github.com/nativewind/react-native-css). The documentation and homepage are maintained in a separate repository at https://github.com/nativewind/website.
 
 More information on how `react-native-css-interop` works is coming soon.
 
