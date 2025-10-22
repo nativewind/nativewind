@@ -8,7 +8,7 @@
 
 [![npm version](https://img.shields.io/npm/v/nativewind)](https://www.npmjs.com/package/nativewind)
 [![npm downloads](https://img.shields.io/npm/dw/nativewind)](https://www.npmjs.com/package/nativewind)
-[![Github](https://img.shields.io/github/license/marklawlor/nativewind)](https://github.com/nativewind/nativewind)
+[![Github](https://img.shields.io/github/license/nativewind/nativewind)](https://github.com/nativewind/nativewind)
 [![Discord](https://img.shields.io/discord/968718419904057416?logo=discord&logoColor=ffffff&label=Discord&color=%235865F2)](https://discord.gg/ypNakAFQ65)
 [![Twitter](https://img.shields.io/twitter/follow/nativewindcss?link=https%3A%2F%2Fx.com%2Ftailwindcss)](https://x.com/nativewindcss)
 

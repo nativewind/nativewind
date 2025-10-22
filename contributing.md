@@ -112,19 +112,30 @@ More information on how `react-native-css-interop` works is coming soon.
 
 Once you've made your changes and tested that it works locally, run the tests using `npm run test` in the root directory. You should also add a test to cover your own contribution, if relevant.
 
-If your changes alter and/or add to the behavior of the Nativewind, or fix a bug in it, then we encourage you to also create a **changeset**. A changeset is a quick summary that expresses the intention to bump the version of the package. This is used by our CI in order to automatically manage releases to NPM.
+### Publishing a Release (Maintainers Only)
 
-To introduce a new changeset, run:
+If you're a maintainer and need to publish a new version to npm, the project uses **release-it** for automated releases.
+
+To publish a new version:
 
 ```shell
-npx changeset
+npm run release
 ```
 
-This will prompt you for the kind of version bump your changes introduce (`patch`, `minor`, `major`), and for a quick summary of your changes. If the change is small enough, it is valid to just replicate the contents of your commit message. If it's more complex, the changeset summary (generated in the root `.changeset` directory) can be edited to include more information.
+This will:
+1. Run the build and test suite (via the `prepublishOnly` hook)
+2. Prompt you for the version bump type (`patch`, `minor`, `major`)
+3. Update the version in `package.json`
+4. Create a git commit and tag
+5. Push changes and tags to GitHub
+6. Publish the package to npm
 
-The generated changeset file should be included in your commit. That way, when the new version releases, you will be properly credited on GitHub's release page and in the project's changelog.
+Make sure you have:
+- Proper npm authentication (`npm login`)
+- Write access to the GitHub repository
+- Publish permissions for the npm package
 
 > [!NOTE]
-> If you're not sure what kind of version bump your changes introduce, you can reach out to one of the maintainers in the PR comments and we'll try to help you out!
+> Contributors do not need to worry about releases - maintainers will handle version bumps and publishing to npm. Just focus on making your changes and opening a great pull request!
 
 > **_TODO:_** Add template for pull requests and issues
