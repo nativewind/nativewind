@@ -13,11 +13,11 @@ A clear and concise description of what the bug is.
 **Reproduction**
 Please see our contribution guide: https://github.com/nativewind/nativewind/blob/main/contributing.md#opening-an-issue
 
-⚠️ **Important**: Issues without a valid reproduction link will not be reviewed and will be automatically closed. Provide one of the following:
-- **StackBlitz template**: https://stackblitz.com/edit/nativewind-test?view=editor
-- **Create Expo Stack template**: 
-  - `npx rn-new@latest --nativewind`
-  - `npx rn-new@latest --nativewind --expo-router`
+⚠️ **Important**: Issues without a valid reproduction link will not be reviewed and will be automatically closed. Use the rn-new template to create a reproduction:
+- `npx rn-new@latest --nativewind`
+- `npx rn-new@latest --nativewind --expo-router`
+- `npx rn-new@next --nativewind`
+- `npx rn-new@next --nativewind --expo-router`
 
 If you have a usage question, please use the [Discord](https://discord.gg/nativewind) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions) instead.
 
