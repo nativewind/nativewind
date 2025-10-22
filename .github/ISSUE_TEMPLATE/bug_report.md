@@ -19,7 +19,7 @@ Please see our contribution guide: https://github.com/nativewind/nativewind/blob
 - `npx rn-new@next --nativewind`
 - `npx rn-new@next --nativewind --expo-router`
 
-If you have a usage question, please use the [Discord](https://discord.gg/nativewind) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions) instead.
+If you have a usage question, please use the [Discord](https://discord.gg/ypNakAFQ65) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions) instead.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.

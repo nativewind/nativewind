@@ -56,7 +56,7 @@ jobs:
 
             if (!hasReproduction || hasOnlyExcludedLinks) {
               const issueNumber = context.payload.issue.number;
-              const commentBody = `👋 Hi, thanks for opening this issue! However, it seems that you did not include a reproduction link.\n\nPlease update your issue with one of the following:\n- **GitHub repo link**: A repository demonstrating the issue.\n\nIssues without reproductions will not be reviewed and are automatically closed. You can refer to our [contribution guide](https://github.com/nativewind/nativewind/blob/main/contributing.md#opening-an-issue) for more information.\n\nIf you have additional details, feel free to re-open the issue after providing a valid reproduction link.\n\nIf you have a usage question, please use the [Discord](https://discord.gg/nativewind) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions) instead.`;
+              const commentBody = `👋 Hi, thanks for opening this issue! However, it seems that you did not include a reproduction link.\n\nPlease update your issue with one of the following:\n- **GitHub repo link**: A repository demonstrating the issue.\n\nIssues without reproductions will not be reviewed and are automatically closed. You can refer to our [contribution guide](https://github.com/nativewind/nativewind/blob/main/contributing.md#opening-an-issue) for more information.\n\nIf you have additional details, feel free to re-open the issue after providing a valid reproduction link.\n\nIf you have a usage question, please use the [Discord](https://discord.gg/ypNakAFQ65) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions) instead.`;
 
               // Post the comment
               await github.rest.issues.createComment({
