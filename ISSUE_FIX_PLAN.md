@@ -32,8 +32,10 @@
 ### Issue #1664 - tailwind.config.js non funziona
 **Priorità:** 🟡 MEDIA
 **Problema:** Non è possibile estendere stili usando `tailwind.config.js` come in v4
-**Causa Probabile:** Tailwind CSS 4 ha cambiato il modo in cui funziona la configurazione
-**Soluzione:** Potrebbe richiedere documentazione o supporto per la nuova API di Tailwind CSS 4
+**Causa Probabile:** Tailwind CSS 4 ha cambiato il modo in cui funziona la configurazione - ora si usa `@theme` in CSS
+**Soluzione:** 
+- ✅ Documentato: Creata guida di migrazione (MIGRATION_GUIDE_V4_TO_V5.md)
+- ⚠️ Nota: Tailwind CSS 4 usa `@theme` invece di `tailwind.config.js` - questo è un cambiamento di Tailwind CSS 4, non un bug
 
 ### Issue #1676 - Stili diversi tra v4 e v5
 **Priorità:** 🟡 MEDIA
