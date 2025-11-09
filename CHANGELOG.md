@@ -25,6 +25,9 @@
   - Created `src/metro.ts` wrapper that normalizes file paths on Windows
   - Helps resolve `ERR_UNSUPPORTED_ESM_URL_SCHEME` error on Windows
   - Wraps react-native-css's `withReactNativeCSS` function
+- Fixed TypeScript exports to use standard `types` field instead of `typescript` (addresses PR #1612)
+  - Changed all exports from `typescript` to `types` for better TypeScript tooling support
+  - Follows standard package.json exports specification
 
 ### Compatibility Helpers
 

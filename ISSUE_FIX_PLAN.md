@@ -107,6 +107,15 @@
 - ⚠️ Potrebbe richiedere fix aggiuntivi in react-native-css per supporto completo ESM su Windows
 **Stato:** ✅ MIGLIORATO - Wrapper creato per normalizzare path su Windows
 
+### PR #1612 - Fix TypeScript exports (typescript → types)
+**Priorità:** 🟡 MEDIA
+**Problema:** Gli exports usano `typescript` invece di `types`, causando problemi con alcuni tool TypeScript
+**Causa:** Uso di campo non standard `typescript` invece di `types` negli exports
+**Soluzione:** 
+- ✅ Cambiato tutti gli exports da `typescript` a `types`
+- ✅ Segue lo standard package.json exports specification
+**Stato:** ✅ RISOLTO - Export aggiornati per usare campo standard `types`
+
 ### Issue #1639 - iOS error con bun isolated installs
 **Priorità:** 🟢 BASSA
 **Problema:** Errore su iOS quando si usa bun con isolated installs

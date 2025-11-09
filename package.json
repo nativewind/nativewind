@@ -10,31 +10,31 @@
     ".": {
       "import": "./dist/module/index.js",
       "require": "./dist/commonjs/index.js",
-      "typescript": "./dist/typescript/commonjs/src/index.d.ts"
+      "types": "./dist/typescript/commonjs/src/index.d.ts"
     },
     "./babel": {
       "import": "./dist/module/babel.js",
       "require": "./dist/commonjs/babel.js",
-      "typescript": "./dist/typescript/commonjs/src/babel.d.ts"
+      "types": "./dist/typescript/commonjs/src/babel.d.ts"
     },
     "./metro": {
       "import": "./dist/module/metro.js",
       "require": "./dist/commonjs/metro.js",
-      "typescript": "./dist/typescript/commonjs/src/metro.d.ts"
+      "types": "./dist/typescript/commonjs/src/metro.d.ts"
     },
     "./types": {
-      "typescript": "./types.d.ts"
+      "types": "./types.d.ts"
     },
     "./theme": "./theme.css",
     "./compat": {
       "import": "./dist/module/compat.js",
       "require": "./dist/commonjs/compat.js",
-      "typescript": "./dist/typescript/commonjs/src/compat.d.ts"
+      "types": "./dist/typescript/commonjs/src/compat.d.ts"
     },
     "./jsx-dev-runtime": {
       "import": "./dist/module/jsx-dev-runtime.js",
       "require": "./dist/commonjs/jsx-dev-runtime.js",
-      "typescript": "./dist/typescript/commonjs/src/jsx-dev-runtime.d.ts"
+      "types": "./dist/typescript/commonjs/src/jsx-dev-runtime.d.ts"
     }
   },
   "sideEffects": false,
