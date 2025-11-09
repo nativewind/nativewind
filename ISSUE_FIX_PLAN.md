@@ -71,6 +71,20 @@
 **Causa Probabile:** Conflitto tra react-native-css e react-native-skia
 **Soluzione:** Richiede fix in react-native-css o workaround
 
+### Issue #1659 - Custom line-height values not applied
+**Priorità:** 🟡 MEDIA
+**Problema:** `leading-*` classes non applicano line-height custom definiti via CSS variables
+**Causa Probabile:** Problema in `react-native-css` nel processare la proprietà `line-height`
+**Soluzione:** Richiede fix in `react-native-css` package
+**Nota:** fontSize e letterSpacing funzionano correttamente, solo lineHeight non viene applicato
+
+### Issue #1640 - @media (prefers-color-scheme: dark) non funziona con Expo 54
+**Priorità:** 🟡 MEDIA
+**Problema:** Media query `@media (prefers-color-scheme: dark)` non funziona su iOS, funziona su web
+**Causa Probabile:** Problema in `react-native-css` nel supportare media query su iOS
+**Soluzione:** Richiede fix in `react-native-css` package
+**Nota:** `useColorScheme` hook di React funziona correttamente, il problema è specifico alle media query CSS
+
 ### Issue #1669 - Memory leak in VariableContextProvider
 **Priorità:** 🔴 ALTA
 **Problema:** Memory leak quando si usa `VariableContextProvider` con CSS variables
@@ -93,7 +107,11 @@
 **Priorità:** 🟡 MEDIA
 **Problema:** Errore su Windows quando si usa `withNativeWind` in metro.config.js
 **Causa Probabile:** Problema con path resolution su Windows in ESM loader
-**Soluzione:** Richiede investigazione - il file metro.ts non è visibile nel src (probabilmente compilato)
+**Soluzione:** 
+- ✅ Creato `src/metro.ts` wrapper che normalizza i path su Windows
+- ✅ Wrappa `withReactNativeCSS` da react-native-css
+- ⚠️ Potrebbe richiedere fix aggiuntivi in react-native-css per supporto completo ESM su Windows
+**Stato:** ✅ MIGLIORATO - Wrapper creato per normalizzare path su Windows
 
 ### Issue #1639 - iOS error con bun isolated installs
 **Priorità:** 🟢 BASSA
