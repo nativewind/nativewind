@@ -1,6 +1,6 @@
 {
   "version": "5.0.0",
-  "name": "@g97iulio1609/nativewind",
+  "name": "nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "type": "module",
   "main": "./dist/commonjs/index.js",
@@ -48,10 +48,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/g97iulio1609/nativewind.git"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "url": "git+https://github.com/nativewind/nativewind.git"
   },
   "author": {
     "name": "Mark Lawlor",

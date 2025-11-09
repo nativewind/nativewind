@@ -16,6 +16,11 @@
 
 ### Fixes
 
+- Removed legacy Babel export from package.json (fixes #1)
+  - NativeWind v5 does not require Babel plugin (works via JSX transform and Metro only)
+  - Removed `"./babel"` export that pointed to non-existent files
+  - Follows KISS, SOLID, and DRY principles by removing dead code
+  - Resolves "Cannot find module 'nativewind/dist/commonjs/babel.js'" error with pnpm
 - Improved safe area utilities import order in `theme.css` (moved `tailwindcss-safe-area` import to end of file)
   - This may help with Issue #1673, though full fix may require react-native-css support for `env()` CSS functions
 - Fixed `setColorScheme('system')` compatibility with React Native 0.82+ (fixes #1665)
