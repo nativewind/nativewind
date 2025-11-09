@@ -1,5 +1,15 @@
 # nativewind
 
+## 5.0.1
+
+### Fixes
+
+- Removed legacy Babel export from package.json (fixes #1)
+  - NativeWind v5 does not require Babel plugin (works via JSX transform and Metro only)
+  - Removed `"./babel"` export that pointed to non-existent files
+  - Follows KISS, SOLID, and DRY principles by removing dead code
+  - Resolves "Cannot find module 'nativewind/dist/commonjs/babel.js'" error with pnpm
+
 ## 5.0.0
 
 ### Features
