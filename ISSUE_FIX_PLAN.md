@@ -91,12 +91,6 @@
 **Causa Probabile:** Problema in `react-native-css` (package esterno)
 **Soluzione:** Richiede fix in `react-native-css` package
 
-### Issue #1659 - Custom line-height values not applied
-**Priorità:** 🟡 MEDIA
-**Problema:** `leading-*` classes non applicano line-height custom
-**Causa Probabile:** Problema in react-native-css o nel plugin
-**Soluzione:** Richiede fix in react-native-css o nel plugin
-
 ### Issue #1640 - @media (prefers-color-scheme: dark) non funziona con Expo 54
 **Priorità:** 🟡 MEDIA
 **Problema:** Media query per dark mode non funziona su iOS
