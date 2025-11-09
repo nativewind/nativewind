@@ -16,7 +16,9 @@
 **Priorità:** 🔴 ALTA
 **Problema:** Quando si usa sia `className` che `style`, il `className` viene ignorato
 **Causa Probabile:** Problema in `react-native-css` (package esterno)
-**Soluzione:** Richiede fix in `react-native-css` package
+**Soluzione:** 
+- ✅ Aggiunto helper `mergeStyles` in `nativewind/compat` come workaround temporaneo
+- ⚠️ Fix completo richiede fix in `react-native-css` package
 **Nota:** Issue assegnato a marklawlor, 23 +1 reactions
 
 ### Issue #1673 - Safearea className non funziona
@@ -47,7 +49,10 @@
 **Priorità:** 🟡 MEDIA
 **Problema:** `styled` in v5 non funziona come `cssInterop` in v4 per componenti con `nativeStyleToProp`
 **Causa Probabile:** Differenze nell'API tra `cssInterop` (v4) e `styled` (v5)
-**Soluzione:** Potrebbe richiedere documentazione o fix in react-native-css per supportare `nativeStyleToProp`
+**Soluzione:** 
+- ✅ Aggiunto helper `cssInterop` in `nativewind/compat` per facilitare la migrazione
+- ✅ Documentato nella migration guide
+- ⚠️ Fix completo per `nativeStyleToProp` richiede fix in react-native-css
 
 ### Issue #1674 - Problema con react-native-skia
 **Priorità:** 🟢 BASSA

@@ -19,6 +19,13 @@
 - Improved safe area utilities import order in `theme.css` (moved `tailwindcss-safe-area` import to end of file)
   - This may help with Issue #1673, though full fix may require react-native-css support for `env()` CSS functions
 
+### Compatibility Helpers
+
+- Added compatibility helpers in `nativewind/compat` to ease migration from v4 to v5
+  - `cssInterop`: Compatibility wrapper for migrating from v4's `cssInterop` to v5's `styled`
+  - `mergeStyles`: Helper for Issue #1647 (className and style cannot be used together)
+  - Provides similar API to v4 while using v5's underlying `styled` function
+
 ### Documentation
 
 - Added migration guide from v4 to v5 (`MIGRATION_GUIDE_V4_TO_V5.md`)

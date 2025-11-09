@@ -46,7 +46,7 @@ cssInterop(Icon, {
 });
 ```
 
-**v5:**
+**v5 (Opzione 1 - styled diretto):**
 ```tsx
 import { styled } from 'nativewind';
 
@@ -61,7 +61,22 @@ styled(Icon, {
 });
 ```
 
-**Nota:** Se `nativeStyleToProp` non funziona, potrebbe essere un problema noto (Issue #1675) che richiede fix in react-native-css.
+**v5 (Opzione 2 - Helper di compatibilità):**
+```tsx
+import { cssInterop } from 'nativewind/compat';
+
+cssInterop(Icon, {
+  className: {
+    target: 'style',
+    nativeStyleToProp: {
+      height: 'size',
+      width: 'size',
+    },
+  },
+});
+```
+
+**Nota:** Se `nativeStyleToProp` non funziona, potrebbe essere un problema noto (Issue #1675) che richiede fix in react-native-css. L'helper `cssInterop` da `nativewind/compat` fornisce un'API simile a v4 per facilitare la migrazione.
 
 ### 3. className e style insieme
 
@@ -70,9 +85,13 @@ styled(Icon, {
 
 **Workaround temporaneo:**
 ```tsx
-// Usa solo className o solo style, non entrambi
+// Opzione 1: Usa solo className o solo style, non entrambi
 <View className="bg-blue-500" style={{ padding: 10 }} /> // ❌ Non funziona
 <View className="bg-blue-500 p-2" /> // ✅ Funziona
+
+// Opzione 2: Usa l'helper mergeStyles (con warning)
+import { mergeStyles } from 'nativewind/compat';
+<View {...mergeStyles("bg-blue-500", { padding: 10 })} /> // ⚠️ Usa solo className
 ```
 
 ### 4. Safe Area Utilities
