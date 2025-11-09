@@ -8,8 +8,14 @@ import {
 export function useColorScheme() {
   return {
     colorScheme: useRNColorScheme(),
-    setColorScheme(scheme: ColorSchemeName) {
-      Appearance.setColorScheme(scheme);
+    setColorScheme(scheme: ColorSchemeName | "system" | null) {
+      // React Native 0.82 changed 'system' to null/unspecified
+      // Handle both for backward compatibility
+      if (scheme === "system") {
+        Appearance.setColorScheme(null);
+      } else {
+        Appearance.setColorScheme(scheme);
+      }
     },
     toggleColorScheme() {
       Appearance.setColorScheme(

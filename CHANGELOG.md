@@ -18,6 +18,9 @@
 
 - Improved safe area utilities import order in `theme.css` (moved `tailwindcss-safe-area` import to end of file)
   - This may help with Issue #1673, though full fix may require react-native-css support for `env()` CSS functions
+- Fixed `setColorScheme('system')` compatibility with React Native 0.82+ (fixes #1665)
+  - React Native 0.82 changed 'system' to `null`/`unspecified`
+  - Added backward compatibility to handle both 'system' and `null` values
 
 ### Compatibility Helpers
 

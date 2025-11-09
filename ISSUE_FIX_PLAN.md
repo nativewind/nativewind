@@ -8,6 +8,11 @@
 - Aggiunto export in `package.json`
 - PR #1677 creata
 
+### Issue #1665 - setColorScheme 'system' cambiato a 'unspecified' in RN 0.82
+**Stato:** ✅ RISOLTO
+- Aggiornato `src/stylesheet.ts` per gestire `'system'` → `null` per compatibilità con RN 0.82+
+- Aggiunta backward compatibility per supportare entrambi i valori
+
 ---
 
 ## Issue da Risolvere 🔧
@@ -59,6 +64,36 @@
 **Problema:** Errore "Non-whitespace character found after end of conversion: \"%\"" quando si usa con react-native-skia
 **Causa Probabile:** Conflitto tra react-native-css e react-native-skia
 **Soluzione:** Richiede fix in react-native-css o workaround
+
+### Issue #1669 - Memory leak in VariableContextProvider
+**Priorità:** 🔴 ALTA
+**Problema:** Memory leak quando si usa `VariableContextProvider` con CSS variables
+**Causa Probabile:** Problema in `react-native-css` (package esterno)
+**Soluzione:** Richiede fix in `react-native-css` package
+
+### Issue #1659 - Custom line-height values not applied
+**Priorità:** 🟡 MEDIA
+**Problema:** `leading-*` classes non applicano line-height custom
+**Causa Probabile:** Problema in react-native-css o nel plugin
+**Soluzione:** Richiede fix in react-native-css o nel plugin
+
+### Issue #1640 - @media (prefers-color-scheme: dark) non funziona con Expo 54
+**Priorità:** 🟡 MEDIA
+**Problema:** Media query per dark mode non funziona su iOS
+**Causa Probabile:** react-native-css non supporta correttamente media query su iOS
+**Soluzione:** Richiede fix in react-native-css
+
+### Issue #1667 - ERR_UNSUPPORTED_ESM_URL_SCHEME su Windows
+**Priorità:** 🟡 MEDIA
+**Problema:** Errore su Windows quando si usa `withNativeWind` in metro.config.js
+**Causa Probabile:** Problema con path resolution su Windows in ESM loader
+**Soluzione:** Richiede investigazione - il file metro.ts non è visibile nel src (probabilmente compilato)
+
+### Issue #1639 - iOS error con bun isolated installs
+**Priorità:** 🟢 BASSA
+**Problema:** Errore su iOS quando si usa bun con isolated installs
+**Causa Probabile:** Problema di risoluzione dipendenze con bun
+**Soluzione:** Richiede investigazione approfondita
 
 ---
 
