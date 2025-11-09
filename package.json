@@ -25,7 +25,12 @@
     "./types": {
       "typescript": "./types.d.ts"
     },
-    "./theme": "./theme.css"
+    "./theme": "./theme.css",
+    "./jsx-dev-runtime": {
+      "import": "./dist/module/jsx-dev-runtime.js",
+      "require": "./dist/commonjs/jsx-dev-runtime.js",
+      "typescript": "./dist/typescript/commonjs/src/jsx-dev-runtime.d.ts"
+    }
   },
   "sideEffects": false,
   "workspaces": [

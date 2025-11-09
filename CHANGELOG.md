@@ -1,5 +1,24 @@
 # nativewind
 
+## 5.0.0
+
+### Features
+
+- Add support for Next.js 16 with jsx-dev-runtime export (fixes #1670)
+  - Added `jsx-dev-runtime` export for Next.js 16 compatibility
+  - Supports `jsxImportSource: "nativewind"` in tsconfig.json
+
+### Changes
+
+- Verified Tailwind CSS 4 support (peer dependency already set to `>4.1.11`)
+- Verified Expo 54 compatibility (already using Expo 54.0.0-preview.6)
+
+### Notes
+
+- Some fixes from v4 PRs (#1346, #1525, #1527) are not directly applicable to v5 as the architecture has changed
+  - v5 uses `react-native-css` as an external dependency
+  - Platform-specific fixes should be implemented in the `react-native-css` package
+
 ## 4.1.23
 
 ### Patch Changes
