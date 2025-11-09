@@ -7,11 +7,21 @@
 - Add support for Next.js 16 with jsx-dev-runtime export (fixes #1670)
   - Added `jsx-dev-runtime` export for Next.js 16 compatibility
   - Supports `jsxImportSource: "nativewind"` in tsconfig.json
+  - Compatible with React 19 (jsx is default export)
 
 ### Changes
 
 - Verified Tailwind CSS 4 support (peer dependency already set to `>4.1.11`)
 - Verified Expo 54 compatibility (already using Expo 54.0.0-preview.6)
+
+### Known Issues
+
+The following issues require fixes in the `react-native-css` package (external dependency):
+- Issue #1647: className and style props cannot be used together
+- Issue #1673: Safe area utilities (pt-safe, pb-safe, etc.) not working with className
+- Issue #1676: Some className produce different results compared to v4
+
+These issues are tracked and will be addressed in future updates to `react-native-css`.
 
 ### Notes
 
