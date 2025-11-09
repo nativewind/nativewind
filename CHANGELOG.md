@@ -21,6 +21,10 @@
 - Fixed `setColorScheme('system')` compatibility with React Native 0.82+ (fixes #1665)
   - React Native 0.82 changed 'system' to `null`/`unspecified`
   - Added backward compatibility to handle both 'system' and `null` values
+- Added Windows ESM compatibility for metro configuration (fixes #1667)
+  - Created `src/metro.ts` wrapper that normalizes file paths on Windows
+  - Helps resolve `ERR_UNSUPPORTED_ESM_URL_SCHEME` error on Windows
+  - Wraps react-native-css's `withReactNativeCSS` function
 
 ### Compatibility Helpers
 

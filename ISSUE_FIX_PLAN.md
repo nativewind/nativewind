@@ -13,6 +13,12 @@
 - Aggiornato `src/stylesheet.ts` per gestire `'system'` → `null` per compatibilità con RN 0.82+
 - Aggiunta backward compatibility per supportare entrambi i valori
 
+### Issue #1667 - ERR_UNSUPPORTED_ESM_URL_SCHEME su Windows
+**Stato:** ✅ MIGLIORATO
+- Creato `src/metro.ts` wrapper che normalizza i path su Windows
+- Wrappa `withReactNativeCSS` da react-native-css
+- Potrebbe richiedere fix aggiuntivi in react-native-css per supporto completo ESM su Windows
+
 ---
 
 ## Issue da Risolvere 🔧
