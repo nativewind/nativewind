@@ -19,6 +19,14 @@
 - Improved safe area utilities import order in `theme.css` (moved `tailwindcss-safe-area` import to end of file)
   - This may help with Issue #1673, though full fix may require react-native-css support for `env()` CSS functions
 
+### Documentation
+
+- Added migration guide from v4 to v5 (`MIGRATION_GUIDE_V4_TO_V5.md`)
+  - Documents Tailwind CSS 4 configuration changes (`@theme` vs `tailwind.config.js`)
+  - Documents `cssInterop` to `styled` migration
+  - Documents known issues and workarounds
+  - Clarifies that Issue #1664 is not a bug but a Tailwind CSS 4 change
+
 ### Known Issues
 
 The following issues require fixes in the `react-native-css` package (external dependency):
