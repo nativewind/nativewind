@@ -14,11 +14,17 @@
 - Verified Tailwind CSS 4 support (peer dependency already set to `>4.1.11`)
 - Verified Expo 54 compatibility (already using Expo 54.0.0-preview.6)
 
+### Fixes
+
+- Improved safe area utilities import order in `theme.css` (moved `tailwindcss-safe-area` import to end of file)
+  - This may help with Issue #1673, though full fix may require react-native-css support for `env()` CSS functions
+
 ### Known Issues
 
 The following issues require fixes in the `react-native-css` package (external dependency):
 - Issue #1647: className and style props cannot be used together
 - Issue #1673: Safe area utilities (pt-safe, pb-safe, etc.) not working with className
+  - Note: Import order improved, but may still require react-native-css support for `env()` CSS functions
 - Issue #1675: styled function doesn't work as cssInterop did in v4 (nativeStyleToProp support)
 - Issue #1676: Some className produce different results compared to v4
 - Issue #1674: Compatibility issue with react-native-skia (non-whitespace character error)

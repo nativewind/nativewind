@@ -23,9 +23,11 @@
 **Priorità:** 🟡 MEDIA
 **Problema:** `pt-safe`, `pb-safe`, etc. non funzionano con className
 **Causa Probabile:** 
-- `tailwindcss-safe-area` è già importato in `theme.css`
-- Potrebbe essere un problema di configurazione o di come react-native-css processa le utility
-**Soluzione:** Investigare se è un problema di configurazione o richiede fix in react-native-css
+- `tailwindcss-safe-area` usa `env(safe-area-inset-top)` che potrebbe non essere supportato da react-native-css
+- L'import è stato spostato alla fine di `theme.css` per migliorare l'ordine di processamento
+**Soluzione:** 
+- ✅ Modificato: Spostato import `tailwindcss-safe-area` alla fine di `theme.css`
+- ⚠️ Potrebbe ancora richiedere fix in react-native-css per supportare `env()` CSS functions
 
 ### Issue #1664 - tailwind.config.js non funziona
 **Priorità:** 🟡 MEDIA
