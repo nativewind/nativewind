@@ -19,9 +19,17 @@
 The following issues require fixes in the `react-native-css` package (external dependency):
 - Issue #1647: className and style props cannot be used together
 - Issue #1673: Safe area utilities (pt-safe, pb-safe, etc.) not working with className
+- Issue #1675: styled function doesn't work as cssInterop did in v4 (nativeStyleToProp support)
 - Issue #1676: Some className produce different results compared to v4
+- Issue #1674: Compatibility issue with react-native-skia (non-whitespace character error)
 
 These issues are tracked and will be addressed in future updates to `react-native-css`.
+
+### Migration Notes
+
+- `cssInterop` from v4 has been replaced with `styled` from `react-native-css` in v5
+- The API is similar but may require adjustments for `nativeStyleToProp` mappings
+- See Issue #1675 for details on migrating from `cssInterop` to `styled`
 
 ### Notes
 

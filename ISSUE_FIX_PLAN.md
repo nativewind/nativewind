@@ -39,6 +39,18 @@
 **Causa Probabile:** Cambiamenti nell'architettura v5 o in react-native-css
 **Soluzione:** Richiede investigazione approfondita
 
+### Issue #1675 - styled non funziona come in v4
+**Priorità:** 🟡 MEDIA
+**Problema:** `styled` in v5 non funziona come `cssInterop` in v4 per componenti con `nativeStyleToProp`
+**Causa Probabile:** Differenze nell'API tra `cssInterop` (v4) e `styled` (v5)
+**Soluzione:** Potrebbe richiedere documentazione o fix in react-native-css per supportare `nativeStyleToProp`
+
+### Issue #1674 - Problema con react-native-skia
+**Priorità:** 🟢 BASSA
+**Problema:** Errore "Non-whitespace character found after end of conversion: \"%\"" quando si usa con react-native-skia
+**Causa Probabile:** Conflitto tra react-native-css e react-native-skia
+**Soluzione:** Richiede fix in react-native-css o workaround
+
 ---
 
 ## Note Importanti
