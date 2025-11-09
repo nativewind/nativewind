@@ -1,5 +1,5 @@
 {
-  "version": "5.0.1",
+  "version": "5.0.2",
   "name": "@g97iulio1609/nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "type": "module",
@@ -11,6 +11,11 @@
       "import": "./dist/module/index.js",
       "require": "./dist/commonjs/index.js",
       "types": "./dist/typescript/commonjs/src/index.d.ts"
+    },
+    "./babel": {
+      "import": "./dist/module/babel.js",
+      "require": "./dist/commonjs/babel.js",
+      "types": "./dist/typescript/commonjs/src/babel.d.ts"
     },
     "./metro": {
       "import": "./dist/module/metro.js",

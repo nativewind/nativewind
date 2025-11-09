@@ -1,14 +1,24 @@
 # nativewind
 
+## 5.0.2
+
+### Fixes
+
+- Added Babel plugin stub for compatibility (fixes #1)
+  - Created `src/babel.ts` with no-op Babel plugin for backward compatibility
+  - Some tools (e.g., babel-preset-expo) may try to automatically resolve `nativewind/babel`
+  - The plugin is a no-op and does nothing - NativeWind v5 still works via JSX transform and Metro only
+  - Resolves "Cannot find module 'nativewind/dist/commonjs/babel.js'" error with pnpm and babel-preset-expo
+
 ## 5.0.1
 
 ### Fixes
 
-- Removed legacy Babel export from package.json (fixes #1)
+- Removed legacy Babel export from package.json (partial fix for #1)
   - NativeWind v5 does not require Babel plugin (works via JSX transform and Metro only)
   - Removed `"./babel"` export that pointed to non-existent files
   - Follows KISS, SOLID, and DRY principles by removing dead code
-  - Resolves "Cannot find module 'nativewind/dist/commonjs/babel.js'" error with pnpm
+  - Note: Some tools still try to resolve the plugin, requiring a stub (see 5.0.2)
 
 ## 5.0.0
 
