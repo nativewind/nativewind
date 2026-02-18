@@ -3,7 +3,7 @@
   "fixed": [],
   "linked": [],
   "access": "public",
-  "baseBranch": "main",
+  "baseBranch": "v4",
   "updateInternalDependencies": "patch",
   "ignore": []
 }
