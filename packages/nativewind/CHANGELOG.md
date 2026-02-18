@@ -1,5 +1,13 @@
 # nativewind
 
+## 4.2.2
+
+### Patch Changes
+
+- b1c1378: fix: preserve ref in react19
+- Updated dependencies [b1c1378]
+  - react-native-css-interop@0.2.2
+
 ## 4.2.0
 
 ### Minor Changes
