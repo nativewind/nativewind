@@ -53,6 +53,12 @@
     "--output": fakeOutput,
   };
 
+  if (process.env.NATIVEWIND_POSTCSS === "true") {
+    args["--postcss"] = true;
+  } else if (process.env.NATIVEWIND_POSTCSS) {
+    args["--postcss"] = process.env.NATIVEWIND_POSTCSS;
+  }
+
   if (process.env.NATIVEWIND_WATCH === "true") {
     args["--watch"] = true;
   }

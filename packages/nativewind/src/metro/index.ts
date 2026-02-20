@@ -17,6 +17,7 @@ interface WithNativeWindOptions extends WithCssInteropOptions {
   outputDir?: string;
   configPath?: string;
   cliCommand?: string;
+  postcss?: boolean | string;
   browserslist?: string | null;
   browserslistEnv?: string | null;
   typescriptEnvPath?: string;
@@ -31,6 +32,7 @@ export function withNativeWind(
     input,
     inlineRem = 14,
     configPath: tailwindConfigPath = "tailwind.config",
+    postcss = false,
     browserslist = "last 1 version",
     browserslistEnv = "native",
     typescriptEnvPath = "nativewind-env.d.ts",
@@ -39,6 +41,9 @@ export function withNativeWind(
   }: WithNativeWindOptions = {} as WithNativeWindOptions,
 ): MetroConfig {
   if (input) input = path.resolve(input);
+
+  const resolvedPostcss =
+    typeof postcss === "string" ? path.resolve(postcss) : postcss;
 
   debug(`input: ${input}`);
 
@@ -68,6 +73,7 @@ export function withNativeWind(
       return cli.getCSSForPlatform({
         platform,
         input,
+        postcss: resolvedPostcss,
         browserslist,
         browserslistEnv,
         onChange,

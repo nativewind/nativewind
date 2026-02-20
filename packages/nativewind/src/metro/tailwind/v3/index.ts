@@ -26,6 +26,12 @@ const getEnv = (options: TailwindCliOptions) => {
     NATIVEWIND_INPUT: options.input,
     NATIVEWIND_OS: options.platform,
     NATIVEWIND_WATCH: options.onChange ? "true" : "false",
+    NATIVEWIND_POSTCSS:
+      options.postcss === true
+        ? "true"
+        : typeof options.postcss === "string"
+          ? options.postcss
+          : undefined,
     BROWSERSLIST: options.browserslist ?? undefined,
     BROWSERSLIST_ENV: options.browserslistEnv ?? undefined,
   };
