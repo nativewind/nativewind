@@ -1,0 +1,87 @@
+name: Create IOS Development App
+description: Create IOS Development App
+
+runs:
+  using: composite
+  steps:
+    - name: Cache iOS development build
+      id: ios-dev-cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          example/ios/build/DerivedData
+        key: ios-dev-${{ runner.os }}-${{ hashFiles('example/ios/**', 'example/package.json', 'package.json') }}
+        restore-keys: |
+          ios-dev-${{ runner.os }}-
+
+    - name: Check for cached build
+      shell: bash
+      run: |
+        if [ "${{ steps.ios-dev-cache.outputs.cache-hit }}" == "true" ]; then
+          echo "✅ Cache hit! Using cached build."
+          
+          # Verify cached build exists
+          if [ -d "example/ios/build/DerivedData/Build/Products/Release-iphonesimulator" ]; then
+            echo "Cached build directory exists, exiting early."
+            exit 0
+          else
+            echo "⚠️ Cache hit but no build found, continuing with build..."
+          fi
+        fi
+
+    - name: Build package
+      shell: bash
+      run: yarn build
+
+    - name: Generate ios folder
+      shell: bash
+      run: yarn example expo prebuild --platform ios
+
+    - name: Install xcpretty
+      shell: bash
+      run: gem install xcpretty
+
+    - name: Build iOS development app
+      id: build
+      working-directory: example
+      shell: bash
+      run: |
+        set -o pipefail
+
+        # Build the native iOS app using xcodebuild
+        echo "🔨 Starting iOS build..."
+        cd ios
+        xcodebuild -workspace example.xcworkspace \
+          -scheme example \
+          -configuration Release \
+          -sdk iphonesimulator \
+          -derivedDataPath build/DerivedData \
+          CODE_SIGNING_ALLOWED=NO \
+          build | xcpretty
+
+        cd ..
+
+        echo "✅ Build completed"
+
+        # Find the built .app bundle
+        APP_PATH=$(find ios/build/DerivedData/Build/Products/Release-iphonesimulator -name "*.app" -type d | head -n 1)
+        if [ -z "$APP_PATH" ]; then
+          echo "❌ No .app bundle found after build"
+          echo "📁 Contents of Release-iphonesimulator directory:"
+          ls -la ios/build/DerivedData/Build/Products/Release-iphonesimulator/ || echo "Directory doesn't exist"
+          exit 1
+        fi
+
+        echo "✅ Built app at: $APP_PATH"
+        echo "app-path=$APP_PATH" >> $GITHUB_OUTPUT
+
+        # Create a tar for better caching (go back to example directory)
+        tar -czf ios-dev-build.tar.gz -C "$(dirname "$APP_PATH")" "$(basename "$APP_PATH")"
+
+    - name: Upload development build
+      if: steps.ios-dev-cache.outputs.cache-hit != 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-dev-build
+        path: example/ios-dev-build.tar.gz
+        retention-days: 1

@@ -36,18 +36,16 @@ When opening an issue, it's crucial to provide a reproduction of the problem to 
 
 #### Reproduction Templates
 
-- **StackBlitz template**: [Nativewind Test on StackBlitz](https://stackblitz.com/edit/nativewind-test?view=editor)
-- **Create Expo Stack template**:
-  - `npx rn-new@latest --nativewind`
-  - `npx rn-new@latest --nativewind --expo-router`
+- `npx rn-new@latest --nativewind` (Expo SDK 54 + Nativewind v4.1)
+- `npx rn-new@latest --nativewind --expo-router` (Expo SDK 54 + Expo Router v6 + Nativewind v4.1)
+- `npx rn-new@next --nativewind` (Expo SDK 54 + Nativewind v5)
+- `npx rn-new@next --nativewind --expo-router` (Expo SDK 54 + Expo Router v6 + Nativewind v5)
 
 #### Steps to Follow
 
 1. **Test with Inline Styles**: Before reporting an issue, ensure that your flex layout behaves as expected using inline styles (passing `StyleSheet` styles to the `style` prop). This helps to confirm that the issue is specific to Nativewind.
 
-2. **Provide a Reproduction**: If you can get your styles working with inline styles but not with Nativewind, use one of the provided templates to create a reproduction of the issue:
-   - **StackBlitz**: This is the preferred method as it allows us to respond more quickly.
-   - **Create Expo Stack**: Use the provided commands to set up a reproducible example.
+2. **Provide a Reproduction**: If you can get your styles working with inline styles but not with Nativewind, use the rn-new (provided above) to create a reproduction of the issue.
 
 3. **Submit the Issue**: Include the link to your reproduction in the issue description. If no reproduction is provided for an issue that can be reproduced, we are likely not to look into the issue.
 
@@ -102,7 +100,7 @@ When you're ready to submit your changes, push your branch to your forked reposi
 
 ### Directory structure
 
-The Nativewind source code can be found in the `packages/` directory. The `packages/nativewind` is a wrapper around `packages/react-native-css-interop`. The documentation and homepage are maintained in a separate repository at https://github.com/nativewind/website.
+The Nativewind source code can be found in the `packages/` directory. The `packages/nativewind` is a wrapper around [react-native-css](https://github.com/nativewind/react-native-css). The documentation and homepage are maintained in a separate repository at https://github.com/nativewind/website.
 
 More information on how `react-native-css-interop` works is coming soon.
 
@@ -110,19 +108,30 @@ More information on how `react-native-css-interop` works is coming soon.
 
 Once you've made your changes and tested that it works locally, run the tests using `npm run test` in the root directory. You should also add a test to cover your own contribution, if relevant.
 
-If your changes alter and/or add to the behavior of the Nativewind, or fix a bug in it, then we encourage you to also create a **changeset**. A changeset is a quick summary that expresses the intention to bump the version of the package. This is used by our CI in order to automatically manage releases to NPM.
+### Publishing a Release (Maintainers Only)
 
-To introduce a new changeset, run:
+If you're a maintainer and need to publish a new version to npm, the project uses **release-it** for automated releases.
+
+To publish a new version:
 
 ```shell
-npx changeset
+npm run release
 ```
 
-This will prompt you for the kind of version bump your changes introduce (`patch`, `minor`, `major`), and for a quick summary of your changes. If the change is small enough, it is valid to just replicate the contents of your commit message. If it's more complex, the changeset summary (generated in the root `.changeset` directory) can be edited to include more information.
+This will:
+1. Run the build and test suite (via the `prepublishOnly` hook)
+2. Prompt you for the version bump type (`patch`, `minor`, `major`)
+3. Update the version in `package.json`
+4. Create a git commit and tag
+5. Push changes and tags to GitHub
+6. Publish the package to npm
 
-The generated changeset file should be included in your commit. That way, when the new version releases, you will be properly credited on GitHub's release page and in the project's changelog.
+Make sure you have:
+- Proper npm authentication (`npm login`)
+- Write access to the GitHub repository
+- Publish permissions for the npm package
 
 > [!NOTE]
-> If you're not sure what kind of version bump your changes introduce, you can reach out to one of the maintainers in the PR comments and we'll try to help you out!
+> Contributors do not need to worry about releases - maintainers will handle version bumps and publishing to npm. Just focus on making your changes and opening a great pull request!
 
 > **_TODO:_** Add template for pull requests and issues

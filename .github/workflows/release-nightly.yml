@@ -1,0 +1,47 @@
+name: Nightly Release & Publish to NPM
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # every day at midnight UTC
+  workflow_dispatch: # allow manual trigger
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Setup NPM registry
+        run: |
+          npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Set nightly version
+        id: set-version
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          VERSION=0.0.0-nightly.$SHORT_SHA
+          npm version $VERSION --no-git-tag-version
+          echo "version=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if version already exists
+        id: check-version
+        run: |
+          if npm view nativewind@${{ steps.set-version.outputs.version }} > /dev/null 2>&1; then
+            echo "Version ${{ steps.set-version.outputs.version }} already exists. Skipping publish."
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish nightly
+        if: steps.check-version.outputs.exists == 'false'
+        run: npm publish --tag nightly
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

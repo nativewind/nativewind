@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true
+  },
+  "include": [
+    "src/**/*",
+    "index.js",
+    "postcss.config.mjs",
+    "nativewind-env.d.ts",
+  ]
+}
