@@ -28,7 +28,7 @@
       }
     },
     "./types": {
-      "typescript": "./types.d.ts"
+      "types": "./types.d.ts"
     },
     "./theme": "./theme.css"
   },
