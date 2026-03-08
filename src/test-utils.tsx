@@ -120,9 +120,11 @@ function getClassNames(
   }
 
   if (component.props.children) {
-    const children: ReactElement[] = Array.isArray(component.props.children)
-      ? component.props.children
-      : [component.props.children];
+    const children = (
+      Array.isArray(component.props.children)
+        ? component.props.children
+        : [component.props.children]
+    ) as ReactElement[];
 
     for (const child of children) {
       getClassNames(child as ReactElement<PropsWithChildren>, classNames);

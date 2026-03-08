@@ -7,19 +7,17 @@ function kebabCase(str: string) {
   );
 }
 
-const nativewind: PluginCreator = plugin.withOptions(
-  () =>
-    ({ matchVariant }) => {
-      matchVariant(
-        "@map",
-        (value = "", { modifier }) => {
-          value = kebabCase(value.replace(/&/, "\\&"));
+const nativewind: PluginCreator = plugin.withOptions(() => (api) => {
+  api.matchVariant(
+    "@map",
+    (value = "", { modifier }) => {
+      value = kebabCase(value.replace(/&/, "\\&"));
 
-          if (modifier) {
-            modifier = modifier.replace(/&/, "\\&");
-          }
+      if (modifier) {
+        modifier = modifier.replace(/&/, "\\&");
+      }
 
-          /**
+      /**
            Adding @media all is a hack for Tailwind CSS which has undocumented behavior
            If we do this `@nativeMapping { ...values } @slot;` it doesn't work, even if we
            wrap it like `& { @nativeMapping { ...values } @slot; }`
@@ -31,23 +29,22 @@ const nativewind: PluginCreator = plugin.withOptions(
            This does lead to weird looking CSS, but it works inside the browser and React Native
            */
 
-          if (modifier && value) {
-            // @nativeMapping-[value]/<modifier>:text-red-500
-            // In this instance, we are moving value (the style nativeMapping) to the modifier (the target key)
-            return `@nativeMapping { ${modifier}:${value} }; @media all`;
-          } else if (modifier && !value) {
-            // @nativeMapping/<modifier>:text-red-500
-            // In this instance, we are moving the last style value to the modifier
-            return `@nativeMapping ${modifier}; @media all`;
-          } else if (!modifier && value) {
-            return `@nativeMapping ${value}; @media all`;
-          } else {
-            return "";
-          }
-        },
-        { values: { DEFAULT: undefined } },
-      );
+      if (modifier && value) {
+        // @nativeMapping-[value]/<modifier>:text-red-500
+        // In this instance, we are moving value (the style nativeMapping) to the modifier (the target key)
+        return `@nativeMapping { ${modifier}:${value} }; @media all`;
+      } else if (modifier && !value) {
+        // @nativeMapping/<modifier>:text-red-500
+        // In this instance, we are moving the last style value to the modifier
+        return `@nativeMapping ${modifier}; @media all`;
+      } else if (!modifier && value) {
+        return `@nativeMapping ${value}; @media all`;
+      } else {
+        return "";
+      }
     },
-);
+    { values: { DEFAULT: undefined } },
+  );
+});
 
 export default nativewind;
