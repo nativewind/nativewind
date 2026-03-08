@@ -4,6 +4,14 @@ description: Create IOS Development App
 runs:
   using: composite
   steps:
+    - name: Cache CocoaPods
+      uses: actions/cache@v4
+      with:
+        path: example/ios/Pods
+        key: pods-${{ runner.os }}-${{ hashFiles('example/ios/Podfile.lock') }}
+        restore-keys: |
+          pods-${{ runner.os }}-
+
     - name: Cache iOS development build
       id: ios-dev-cache
       uses: actions/cache@v4
@@ -37,9 +45,10 @@ runs:
       shell: bash
       run: yarn example expo prebuild --platform ios
 
-    - name: Install xcpretty
+    - name: Install CocoaPods dependencies
       shell: bash
-      run: gem install xcpretty
+      working-directory: example/ios
+      run: pod install
 
     - name: Build iOS development app
       id: build
@@ -57,7 +66,11 @@ runs:
           -sdk iphonesimulator \
           -derivedDataPath build/DerivedData \
           CODE_SIGNING_ALLOWED=NO \
-          build | xcpretty
+          build 2>&1 | tee /tmp/xcodebuild.log | xcpretty || {
+          echo "❌ xcodebuild failed. Raw output:"
+          cat /tmp/xcodebuild.log | grep -A 5 "error:"
+          exit 1
+        }
 
         cd ..
 
