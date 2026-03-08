@@ -1,5 +1,11 @@
 # react-native-css-interop
 
+## 0.2.3
+
+### Patch Changes
+
+- af3cdd0: Remove cssInterop registration for deprecated SafeAreaView from react-native. The import triggered a deprecation warning for all users, even those not using SafeAreaView. The SafeAreaView from react-native-safe-area-context remains supported.
+
 ## 0.2.2
 
 ### Patch Changes
