@@ -1,6 +1,6 @@
-import { renderCurrentTest, renderSimple } from "../test-utils";
+import { renderCurrentTest } from "../test-utils";
 
-describe("Shadow utilities", () => {
+describe("Shadow", () => {
   test("shadow-sm", async () => {
     const result = await renderCurrentTest();
     expect(result.props.style.boxShadow).toStrictEqual([
@@ -42,7 +42,7 @@ describe("Shadow utilities", () => {
   });
 
   test("shadow-lg", async () => {
-    const result = await renderSimple({ className: "shadow-lg" });
+    const result = await renderCurrentTest();
     expect(result.props.style.boxShadow).toStrictEqual([
       {
         offsetX: 0,
