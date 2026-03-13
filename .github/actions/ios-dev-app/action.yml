@@ -18,7 +18,7 @@ runs:
       with:
         path: |
           example/ios/build/DerivedData
-        key: ios-dev-${{ runner.os }}-${{ hashFiles('example/ios/**', 'example/package.json', 'package.json') }}
+        key: ios-dev-${{ runner.os }}-${{ hashFiles('example/ios/Podfile.lock', 'example/package.json', 'package.json') }}
         restore-keys: |
           ios-dev-${{ runner.os }}-
 
