@@ -1,0 +1,51 @@
+name: Release & Publish to NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: "Release type"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - preview
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Initialize Git user
+        shell: bash
+        run: |
+          git config user.name "github-actions"
+          git config user.email "dan@danstepanov.com"
+
+      - name: Setup NPM registry
+        run: |
+          npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Run release
+        run: |
+          if [ "${{ inputs.release-type }}" = "preview" ]; then
+            yarn release --ci --preRelease=preview
+          else
+            yarn release --ci --increment=${{ inputs.release-type }}
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
