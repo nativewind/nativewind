@@ -4,4 +4,7 @@ export default {
   git: {
     commitArgs: ["--no-verify"],
   },
+  github: {
+    release: true,
+  },
 } satisfies Config;
