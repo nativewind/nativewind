@@ -1,5 +1,5 @@
 {
-  "version": "4.2.2",
+  "version": "4.2.3",
   "name": "nativewind",
   "description": "Use Tailwindcss in your cross-platform React Native applications",
   "main": "dist/index.js",
@@ -56,7 +56,7 @@
   "dependencies": {
     "comment-json": "^4.2.5",
     "debug": "^4.3.7",
-    "react-native-css-interop": "0.2.2"
+    "react-native-css-interop": "0.2.3"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",

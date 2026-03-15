@@ -1,5 +1,12 @@
 # nativewind
 
+## 4.2.3
+
+### Patch Changes
+
+- Updated dependencies [af3cdd0]
+  - react-native-css-interop@0.2.3
+
 ## 4.2.2
 
 ### Patch Changes
