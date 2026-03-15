@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marklawlor/nativewind.git"
+    "url": "git+https://github.com/nativewind/nativewind.git"
   },
   "author": {
     "name": "Mark Lawlor",
@@ -25,7 +25,7 @@
   },
   "homepage": "https://nativewind.dev",
   "bugs": {
-    "url": "https://github.com/marklawlor/nativewind/issues"
+    "url": "https://github.com/nativewind/nativewind/issues"
   },
   "engines": {
     "node": ">=16"
