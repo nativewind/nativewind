@@ -5,6 +5,13 @@
 This is **Nativewind v5** (main branch), targeting **Tailwind CSS v4**.
 The stable version (v4, targeting Tailwind v3) lives on the `v4` branch.
 
+## Documentation
+
+- **v5 docs (preview):** https://www.nativewind.dev/v5
+- **v4 docs (stable):** https://www.nativewind.dev/
+
+The docs site is maintained in a separate repository: https://github.com/nativewind/website
+
 ## Project Overview
 
 Nativewind v5 is a **thin wrapper** around [react-native-css](https://github.com/nativewind/react-native-css). It provides:

@@ -100,7 +100,7 @@ When you're ready to submit your changes, push your branch to your forked reposi
 
 ### Directory structure
 
-The Nativewind source code can be found in the `packages/` directory. The `packages/nativewind` is a wrapper around [react-native-css](https://github.com/nativewind/react-native-css). The documentation and homepage are maintained in a separate repository at https://github.com/nativewind/website.
+The Nativewind source code can be found in the `packages/` directory. The `packages/nativewind` is a wrapper around [react-native-css](https://github.com/nativewind/react-native-css). The documentation and homepage are maintained in a separate repository at https://github.com/nativewind/website. The v4 (stable) docs are at https://www.nativewind.dev/ and the v5 (preview) docs are at https://www.nativewind.dev/v5.
 
 More information on how `react-native-css-interop` works is coming soon.
 
