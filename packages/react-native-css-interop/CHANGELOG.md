@@ -1,5 +1,11 @@
 # react-native-css-interop
 
+## 0.2.4
+
+### Patch Changes
+
+- f69ec4c: Update repository and bugs URLs from marklawlor/nativewind to nativewind/nativewind
+
 ## 0.2.3
 
 ### Patch Changes
