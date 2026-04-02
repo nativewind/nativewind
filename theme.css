@@ -59,6 +59,16 @@
   -rn-elevation: --value(--elevation-*);
 }
 
+@utility border-continuous {
+  -rn-border-curve: continuous;
+  @prop -rn-border-curve border-curve;
+}
+
+@utility border-circular {
+  -rn-border-curve: circular;
+  @prop -rn-border-curve border-curve;
+}
+
 @utility corner-* {
   corner-shape: --value("rounded", "squircle");
 }
