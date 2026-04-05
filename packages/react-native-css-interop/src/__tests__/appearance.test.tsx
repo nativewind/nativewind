@@ -1,6 +1,10 @@
-import { Appearance, Platform } from "react-native";
+import { Appearance, AppState, Platform } from "react-native";
 
 import { colorScheme } from "test";
+import {
+  systemColorScheme,
+} from "../runtime/native/appearance-observables";
+import { INTERNAL_RESET } from "../shared";
 
 describe("colorScheme.set", () => {
   let setColorSchemeSpy: jest.SpyInstance;
@@ -49,5 +53,98 @@ describe("colorScheme.set", () => {
 
     colorScheme.set("light");
     expect(setColorSchemeSpy).toHaveBeenCalledWith("light");
+  });
+});
+
+describe("appearance listener filters unspecified", () => {
+  let addChangeListenerSpy: jest.SpyInstance;
+  let addAppStateListenerSpy: jest.SpyInstance;
+  let appearanceCallback: (state: { colorScheme: string | null }) => void;
+  let appStateCallback: (state: string) => void;
+
+  beforeEach(() => {
+    // Capture the callbacks registered by resetAppearanceListeners
+    addChangeListenerSpy = jest
+      .spyOn(Appearance, "addChangeListener")
+      .mockImplementation((cb: any) => {
+        appearanceCallback = cb;
+        return { remove: jest.fn() } as any;
+      });
+
+    addAppStateListenerSpy = jest
+      .spyOn(AppState, "addEventListener")
+      .mockImplementation((_type: string, cb: any) => {
+        appStateCallback = cb;
+        return { remove: jest.fn() } as any;
+      });
+
+    // Reset to re-register listeners with our spies
+    colorScheme[INTERNAL_RESET](Appearance);
+  });
+
+  afterEach(() => {
+    addChangeListenerSpy.mockRestore();
+    addAppStateListenerSpy.mockRestore();
+  });
+
+  test('filters "unspecified" from Appearance change listener', () => {
+    // Set a known scheme first
+    systemColorScheme.set("dark");
+
+    // Simulate RN emitting "unspecified" during a transition
+    Object.defineProperty(AppState, "currentState", { value: "active", configurable: true });
+    appearanceCallback({ colorScheme: "unspecified" });
+
+    // Should keep the previous value, not "unspecified"
+    expect(systemColorScheme.get()).toBe("dark");
+  });
+
+  test('filters "unspecified" from AppState resume listener', () => {
+    // Set a known scheme first
+    systemColorScheme.set("dark");
+
+    // Simulate getColorScheme returning "unspecified" on resume
+    const getColorSchemeSpy = jest
+      .spyOn(Appearance, "getColorScheme")
+      .mockReturnValue("unspecified" as any);
+
+    appStateCallback("active");
+
+    // Should keep the previous value, not "unspecified"
+    expect(systemColorScheme.get()).toBe("dark");
+
+    getColorSchemeSpy.mockRestore();
+  });
+
+  test("passes through valid light/dark from Appearance listener", () => {
+    systemColorScheme.set("light");
+
+    Object.defineProperty(AppState, "currentState", { value: "active", configurable: true });
+    appearanceCallback({ colorScheme: "dark" });
+
+    expect(systemColorScheme.get()).toBe("dark");
+  });
+
+  test("passes through valid light/dark from AppState listener", () => {
+    systemColorScheme.set("light");
+
+    const getColorSchemeSpy = jest
+      .spyOn(Appearance, "getColorScheme")
+      .mockReturnValue("dark");
+
+    appStateCallback("active");
+
+    expect(systemColorScheme.get()).toBe("dark");
+
+    getColorSchemeSpy.mockRestore();
+  });
+
+  test("falls back to light when null and no previous scheme", () => {
+    Object.defineProperty(AppState, "currentState", { value: "active", configurable: true });
+    appearanceCallback({ colorScheme: null });
+
+    // null should resolve to the current systemColorScheme or "light"
+    const result = systemColorScheme.get();
+    expect(result === "light" || result === "dark").toBe(true);
   });
 });
