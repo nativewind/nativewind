@@ -45,7 +45,8 @@ export const colorScheme = {
   },
   toggle() {
     let current = colorSchemeObservable.get();
-    if (current === undefined) current = appearance.getColorScheme() ?? "light";
+    if (current === undefined)
+      current = resolveColorScheme(appearance.getColorScheme());
     colorScheme.set(current === "light" ? "dark" : "light");
   },
   [INTERNAL_RESET]: (appearance: typeof Appearance) => {
@@ -90,7 +91,18 @@ export function cssVariableObservable(
 
 /**
  * Appearance
+ *
+ * On RN 0.82+, Appearance can emit "unspecified" during AppState transitions
+ * (e.g. background→foreground). This is not a valid color scheme for consumers,
+ * so we filter it out and keep the last known valid scheme. (nativewind#1722)
  */
+function resolveColorScheme(
+  scheme: string | null | undefined,
+): "light" | "dark" {
+  if (scheme === "light" || scheme === "dark") return scheme;
+  return systemColorScheme.get() ?? "light";
+}
+
 let appearance = Appearance;
 let appearanceListener: NativeEventSubscription | undefined;
 let appStateListener: NativeEventSubscription | undefined;
@@ -105,14 +117,13 @@ function resetAppearanceListeners(
 
   appearanceListener = appearance.addChangeListener((state) => {
     if (AppState.currentState === "active") {
-      systemColorScheme.set(state.colorScheme ?? "light");
+      systemColorScheme.set(resolveColorScheme(state.colorScheme));
     }
   });
 
   appStateListener = appState.addEventListener("change", (type) => {
     if (type === "active") {
-      const colorScheme = appearance.getColorScheme() ?? "light";
-      systemColorScheme.set(colorScheme);
+      systemColorScheme.set(resolveColorScheme(appearance.getColorScheme()));
     }
   });
 }
