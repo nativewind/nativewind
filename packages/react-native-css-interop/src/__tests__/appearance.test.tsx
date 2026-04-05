@@ -1,9 +1,8 @@
 import { Appearance, AppState, Platform } from "react-native";
 
 import { colorScheme } from "test";
-import {
-  systemColorScheme,
-} from "../runtime/native/appearance-observables";
+
+import { systemColorScheme } from "../runtime/native/appearance-observables";
 import { INTERNAL_RESET } from "../shared";
 
 describe("colorScheme.set", () => {
@@ -92,7 +91,10 @@ describe("appearance listener filters unspecified", () => {
     systemColorScheme.set("dark");
 
     // Simulate RN emitting "unspecified" during a transition
-    Object.defineProperty(AppState, "currentState", { value: "active", configurable: true });
+    Object.defineProperty(AppState, "currentState", {
+      value: "active",
+      configurable: true,
+    });
     appearanceCallback({ colorScheme: "unspecified" });
 
     // Should keep the previous value, not "unspecified"
@@ -119,7 +121,10 @@ describe("appearance listener filters unspecified", () => {
   test("passes through valid light/dark from Appearance listener", () => {
     systemColorScheme.set("light");
 
-    Object.defineProperty(AppState, "currentState", { value: "active", configurable: true });
+    Object.defineProperty(AppState, "currentState", {
+      value: "active",
+      configurable: true,
+    });
     appearanceCallback({ colorScheme: "dark" });
 
     expect(systemColorScheme.get()).toBe("dark");
@@ -139,12 +144,15 @@ describe("appearance listener filters unspecified", () => {
     getColorSchemeSpy.mockRestore();
   });
 
-  test("falls back to light when null and no previous scheme", () => {
-    Object.defineProperty(AppState, "currentState", { value: "active", configurable: true });
+  test("falls back to current scheme when null is received", () => {
+    systemColorScheme.set("light");
+
+    Object.defineProperty(AppState, "currentState", {
+      value: "active",
+      configurable: true,
+    });
     appearanceCallback({ colorScheme: null });
 
-    // null should resolve to the current systemColorScheme or "light"
-    const result = systemColorScheme.get();
-    expect(result === "light" || result === "dark").toBe(true);
+    expect(systemColorScheme.get()).toBe("light");
   });
 });

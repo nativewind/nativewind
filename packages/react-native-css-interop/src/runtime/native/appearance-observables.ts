@@ -45,7 +45,8 @@ export const colorScheme = {
   },
   toggle() {
     let current = colorSchemeObservable.get();
-    if (current === undefined) current = appearance.getColorScheme() ?? "light";
+    if (current === undefined)
+      current = resolveColorScheme(appearance.getColorScheme());
     colorScheme.set(current === "light" ? "dark" : "light");
   },
   [INTERNAL_RESET]: (appearance: typeof Appearance) => {
