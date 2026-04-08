@@ -86,9 +86,30 @@ const flattenPresets = (configs: Partial<Config>[] = []): Partial<Config>[] => {
   ]);
 };
 
+/**
+ * Resolve tailwindcss/loadConfig from the user's project context first.
+ * In pnpm monorepos, NativeWind may have its own nested copy of tailwindcss
+ * (potentially v4) which does not export `loadConfig`, causing
+ * ERR_PACKAGE_PATH_NOT_EXPORTED errors even when the project has v3 installed.
+ */
+function resolveLoadConfig(): (path: string) => Config {
+  try {
+    // Try to resolve from the project's perspective first
+    const resolved = require.resolve("tailwindcss/loadConfig", {
+      paths: [process.cwd()],
+    });
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require(resolved);
+  } catch {
+    // Fall back to NativeWind's own resolution
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require("tailwindcss/loadConfig");
+  }
+}
+
 export function tailwindConfigV3(path: string) {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const config: Config = require("tailwindcss/loadConfig")(path);
+  const loadConfig = resolveLoadConfig();
+  const config: Config = loadConfig(path);
 
   const hasPreset = flattenPresets(config.presets).some((preset) => {
     return preset.nativewind;
