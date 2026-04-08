@@ -30,6 +30,7 @@ export function withNativeWind(
   {
     input,
     inlineRem = 14,
+    projectRoot,
     configPath: tailwindConfigPath = "tailwind.config",
     browserslist = "last 1 version",
     browserslistEnv = "native",
@@ -42,7 +43,13 @@ export function withNativeWind(
 
   debug(`input: ${input}`);
 
-  const { important } = tailwindConfig(path.resolve(tailwindConfigPath));
+  // Resolve the Tailwind config path relative to projectRoot if provided,
+  // otherwise fall back to cwd. In monorepo setups, cwd is often the
+  // workspace root rather than the app directory where tailwind.config lives.
+  const resolvedConfigPath = projectRoot
+    ? path.resolve(projectRoot, tailwindConfigPath)
+    : path.resolve(tailwindConfigPath);
+  const { important } = tailwindConfig(resolvedConfigPath);
 
   debug(`important: ${important}`);
 
