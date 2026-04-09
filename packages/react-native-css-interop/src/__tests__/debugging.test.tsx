@@ -41,8 +41,8 @@ describe("debugging", () => {
     "className": "my-class"
   },
   "props": {
-    "testID": "debugClassName",
     "ref": null,
+    "testID": "debugClassName",
     "style": {
       "color": "#ef4444",
       "padding": 10
@@ -79,8 +79,8 @@ describe("debugging", () => {
     "className": "my-class"
   },
   "props": {
-    "testID": "debugClassName",
     "ref": null,
+    "testID": "debugClassName",
     "style": {
       "color": "#ef4444 (animated value)",
       "padding": 10
@@ -115,8 +115,8 @@ describe("debugging", () => {
     "className": "my-class"
   },
   "props": {
-    "testID": "debugClassName",
     "ref": null,
+    "testID": "debugClassName",
     "style": {
       "color": "hsl(0, 84.2%, 50%)"
     }
@@ -153,6 +153,7 @@ describe("debugging", () => {
     "className": "my-class"
   },
   "props": {
+    "ref": null,
     "testID": "debugClassName",
     "onPressIn": "[Function]",
     "onPressOut": "[Function]",
@@ -162,7 +163,6 @@ describe("debugging", () => {
     "onBlur": "[Function]",
     "onPress": "[Function]",
     "onLayout": "[Function]",
-    "ref": null,
     "style": {
       "color": "#ef4444"
     }

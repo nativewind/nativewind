@@ -3,6 +3,7 @@ import {
   Appearance,
   AppState,
   NativeEventSubscription,
+  Platform,
 } from "react-native";
 
 import { INTERNAL_RESET } from "../../shared";
@@ -22,7 +23,11 @@ const colorSchemeObservable = observable<"light" | "dark" | undefined>(
 export const colorScheme = {
   set(value: "light" | "dark" | "system") {
     if (value === "system") {
-      appearance.setColorScheme(null);
+      if ((Platform.constants?.reactNativeVersion?.minor ?? 0) >= 82) {
+        appearance.setColorScheme("unspecified" as any);
+      } else {
+        appearance.setColorScheme(null);
+      }
     } else {
       appearance.setColorScheme(value);
     }

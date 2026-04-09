@@ -1,6 +1,0 @@
-POST https://nativewind.dev/api/compile
-content-type: application/json
-
-{
-  "content": "text-red-500"
-}

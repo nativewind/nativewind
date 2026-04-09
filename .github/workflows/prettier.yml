@@ -13,11 +13,11 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Setup Node.js 16.x
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
@@ -27,7 +27,5 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Prettify code
-        uses: creyD/prettier_action@v4.3
-        with:
-          prettier_options: --write **/src/**/*.{ts,tsx}
+      - name: Check formatting
+        run: npx prettier --check '**/src/**/*.{ts,tsx}'

@@ -12,7 +12,7 @@ module.exports = {
   env: {
     node: true,
   },
-  ignorePatterns: ["dist/*", "types.d.ts", "coverage/*", "website/build/*"],
+  ignorePatterns: ["dist/*", "types.d.ts", "coverage/*"],
   rules: {
     "@typescript-eslint/no-unused-vars": [
       "error",
@@ -59,13 +59,6 @@ module.exports = {
       files: ["examples/**/*.tsx"],
       rules: {
         "unicorn/filename-case": "off",
-      },
-    },
-    {
-      files: ["packages/website/*.js"],
-      rules: {
-        "unicorn/prefer-module": "off",
-        "@typescript-eslint/no-var-requires": "off",
       },
     },
   ],

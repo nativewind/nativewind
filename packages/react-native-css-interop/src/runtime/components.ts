@@ -7,7 +7,6 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   Switch,
@@ -24,7 +23,6 @@ import { cssInterop, remapProps } from "./api";
 
 cssInterop(Image, { className: "style" });
 cssInterop(Pressable, { className: "style" });
-cssInterop(SafeAreaView, { className: "style" });
 cssInterop(Switch, { className: "style" });
 cssInterop(Text, { className: "style" });
 cssInterop(TouchableHighlight, { className: "style" });

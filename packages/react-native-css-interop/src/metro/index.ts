@@ -232,7 +232,7 @@ function getConfig(
                 ensureBundlerPatched(bundler);
               });
 
-            server.use(async (_, __, next) => {
+            server.use(async (_: unknown, __: unknown, next: () => void) => {
               // Wait until the bundler patching has completed
               await virtualModulesPossible;
               next();

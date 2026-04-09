@@ -9,7 +9,8 @@ module.exports = function () {
           importSource: "react-native-css-interop",
         },
       ],
-      "react-native-reanimated/plugin",
+      // Use this plugin in reanimated 4 and later
+      "react-native-worklets/plugin",
     ],
   };
 };
