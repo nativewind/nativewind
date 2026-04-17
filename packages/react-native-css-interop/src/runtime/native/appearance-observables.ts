@@ -32,10 +32,9 @@ export const colorScheme = {
       appearance.setColorScheme(value);
     }
 
-    // Appearance.addChangeListener is not fired in a test environment
-    if (process.env.NODE_ENV === "test") {
-      colorSchemeObservable.set(value === "system" ? "light" : value);
-    }
+    // Always update colorSchemeObservable so the manual override is preserved
+    // even when iOS (26+) resets the native appearance during OTA reload.
+    colorSchemeObservable.set(value === "system" ? undefined : value);
   },
   get(effect?: Effect) {
     return colorSchemeObservable.get(effect) ?? systemColorScheme.get(effect);
