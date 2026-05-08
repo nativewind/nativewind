@@ -5,7 +5,6 @@ import {
   Animation,
   ContainerRule,
   ContainerType,
-  Declaration,
   DeclarationBlock,
   EasingFunction,
   KeyframesRule,
@@ -29,6 +28,7 @@ import {
   AnimatableCSSProperty,
   AnimationFrame,
   CssToReactNativeRuntimeOptions,
+  Declaration,
   ExtractedAnimation,
   ExtractionWarning,
   ExtractRuleOptions,
@@ -232,7 +232,7 @@ export function cssToReactNativeRuntime(
  * @param {CssToReactNativeRuntimeOptions} parseOptions - Options for parsing the CSS code, such as grouping related rules together.
  */
 function extractRule(
-  rule: Rule | CSSInteropAtRule,
+  rule: Rule<Declaration> | CSSInteropAtRule,
   extractOptions: ExtractRuleOptions,
   partialStyle: Partial<StyleRule> = {},
 ) {
@@ -365,7 +365,7 @@ function extractCSSInteropFlag(
  * @returns undefined if no screen media queries are found in the mediaRule, else it returns the extracted styles.
  */
 function extractMedia(
-  mediaRule: MediaRule,
+  mediaRule: MediaRule<Declaration>,
   extractOptions: ExtractRuleOptions,
 ) {
   // Initialize an empty array to store screen media queries
@@ -404,7 +404,7 @@ function extractMedia(
  * @param parseOptions - The CssToReactNativeRuntimeOptions object to use when parsing styles.
  */
 function extractedContainer(
-  containerRule: ContainerRule,
+  containerRule: ContainerRule<Declaration>,
   extractOptions: ExtractRuleOptions,
 ) {
   // Iterate over all rules inside the containerRule and extract their styles using the updated ExtractRuleOptions
