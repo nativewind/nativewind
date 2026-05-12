@@ -1,4 +1,4 @@
-module.exports = Object.assign(
+const preset = Object.assign(
   () => {
     // Check if this file is being loaded by an editor with Tailwind CSS IntelliSense (e.g., VS Code).
     // If so, load the `native` part so that features implemented in `native` (like `p-safe`) can be auto-completed in the editor.
@@ -10,6 +10,8 @@ module.exports = Object.assign(
       : require("./native").default;
   },
   {
-    nativewind: true,
+    nativewind: true as const,
   },
 );
+
+export = preset;
