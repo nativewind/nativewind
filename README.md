@@ -1,10 +1,12 @@
+<a href="https://nativewind.dev">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./.docs/img/banner-dark.jpg" />
+    <source media="(prefers-color-scheme: light)" srcset="./.docs/img/banner-light.jpg" />
+    <img alt="Nativewind" src="./.docs/img/banner-light.jpg" />
+  </picture>
+</a>
+
 <div align="center">
-<p align="center">
-  <a href="https://nativewind.dev" target="_blank">
-    <img src="./assets/logo.svg" alt="Tailwind CSS" width="70" height="70">
-    <h1 align="center" style="color:red;">Nativewind</h1>
-  </a>
-</p>
 
 [![npm version](https://img.shields.io/npm/v/nativewind)](https://www.npmjs.com/package/nativewind)
 [![npm downloads](https://img.shields.io/npm/dw/nativewind)](https://www.npmjs.com/package/nativewind)
