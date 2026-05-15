@@ -9,6 +9,7 @@ export default {
   },
   plugins: {
     "@release-it/conventional-changelog": {
+      ignoreRecommendedBump: true,
       preset: {
         name: "conventionalcommits",
         types: [
