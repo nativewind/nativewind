@@ -1,5 +1,15 @@
 # nativewind
 
+## 4.2.4
+
+### Patch Changes
+
+- 3138724: Add Roninidevs Nativewind banner to the top of the README
+- f69ec4c: Update repository and bugs URLs from marklawlor/nativewind to nativewind/nativewind
+- Updated dependencies [3138724]
+- Updated dependencies [f69ec4c]
+  - react-native-css-interop@0.2.4
+
 ## 4.2.3
 
 ### Patch Changes
