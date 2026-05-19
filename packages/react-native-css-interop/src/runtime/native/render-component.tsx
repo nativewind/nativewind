@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentType, createElement } from "react";
 import { Pressable } from "react-native";
 
@@ -51,6 +49,20 @@ export function renderComponent(
         2,
       )}`,
     );
+  }
+
+  /**
+   * Early return if display: none - prevents Yoga layout assertion crash.
+   *
+   * On web, display: none removes the element from the render tree and
+   * accessibility tree. On native, Yoga crashes when display: none is
+   * applied during initial layout (React Native issue #52349).
+   *
+   * By returning null, we achieve web-equivalent semantics: the element
+   * is completely removed from the tree rather than rendered invisibly.
+   */
+  if (hasDisplayNone(possiblyAnimatedProps?.style)) {
+    return null;
   }
 
   // TODO: We can probably remove this in favor of using `new Pressability()`
@@ -194,12 +206,14 @@ export function renderComponent(
 
 function createAnimatedComponent(Component: ComponentType<any>): any {
   if (animatedCache.has(Component)) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return animatedCache.get(Component)!;
   } else if (Component.displayName?.startsWith("AnimatedComponent")) {
     return Component;
   }
 
+  // React.forwardRef is deprecated in React 19 and later, and in React Native 0.81 and later,
+  // this code will always throw an error. https://react.dev/reference/react/forwardRef
+  /*
   if (
     !(
       typeof Component !== "function" ||
@@ -210,6 +224,7 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
       `Looks like you're passing an animation style to a function component \`${Component.name}\`. Please wrap your function component with \`React.forwardRef()\` or use a class component instead.`,
     );
   }
+  */
 
   const { default: Animated } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
@@ -299,4 +314,22 @@ function getDebugReplacer() {
 
     return value;
   };
+}
+
+/**
+ * Check if a style (or array of styles) contains display: 'none'.
+ * Handles both plain objects and style arrays.
+ */
+function hasDisplayNone(style: unknown): boolean {
+  if (!style) return false;
+
+  if (Array.isArray(style)) {
+    return style.some(hasDisplayNone);
+  }
+
+  if (typeof style === "object" && style !== null && "display" in style) {
+    return (style as Record<string, unknown>).display === "none";
+  }
+
+  return false;
 }
