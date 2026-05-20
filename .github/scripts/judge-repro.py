@@ -18,6 +18,7 @@ import base64
 import json
 import os
 import pathlib
+import re
 import sys
 import urllib.request
 
@@ -28,6 +29,48 @@ def read_tail(path: str, limit: int = 8000) -> str:
         return data[-limit:]
     except Exception:
         return ""
+
+
+def read_head_and_tail(path: str, head: int = 6000, tail: int = 4000) -> str:
+    """Return head + tail of a file with a marker between them. RN red-boxes
+    and Hermes stack traces typically land near the start of the device log
+    (right after JS evaluation begins), while crashes that kill the app land
+    at the very end. Pure-tail sampling misses the startup ones entirely on
+    a 5–6 MB unified log."""
+    try:
+        data = pathlib.Path(path).read_text(errors="replace")
+        if len(data) <= head + tail:
+            return data
+        return data[:head] + "\n\n[… truncated middle …]\n\n" + data[-tail:]
+    except Exception:
+        return ""
+
+
+# Lines worth surfacing verbatim regardless of where they appear in the log.
+_INTERESTING = re.compile(
+    r"(TypeError|ReferenceError|SyntaxError|RangeError|"
+    r"RCTRedBox|RCTFatal|\[runtime not ready\]|"
+    r"Unhandled (?:JS )?Exception|Fatal (?:JS )?Exception|"
+    r"react\.log:javascript|com\.facebook\.react\.log|"
+    r"Hermes(?:Runtime|Inspector)?|jsi::JSError|"
+    r"NSException|SIGABRT|SIGSEGV|EXC_BAD_ACCESS|"
+    r"FATAL EXCEPTION|AndroidRuntime|"
+    r"^E \d|^F \d)",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+def extract_errors(path: str, max_lines: int = 80) -> str:
+    try:
+        data = pathlib.Path(path).read_text(errors="replace")
+    except Exception:
+        return ""
+    hits = [line for line in data.splitlines() if _INTERESTING.search(line)]
+    if not hits:
+        return ""
+    if len(hits) > max_lines:
+        hits = hits[: max_lines // 2] + ["…"] + hits[-max_lines // 2 :]
+    return "\n".join(hits)
 
 
 def main() -> int:
@@ -46,7 +89,8 @@ def main() -> int:
             "build_log_tail": read_tail(f"evidence/{plat}/xcodebuild.log", limit=12000),
             "snapshot": read_tail(f"evidence/{plat}/snapshot.txt"),
             "snapshot_interactive": read_tail(f"evidence/{plat}/snapshot-interactive.txt"),
-            "logs_tail": read_tail(f"evidence/{plat}/device.log", limit=12000),
+            "logs": read_head_and_tail(f"evidence/{plat}/device.log"),
+            "log_errors_grep": extract_errors(f"evidence/{plat}/device.log"),
             # The app's own stdout/stderr (RN red-box, Hermes stack trace,
             # native crash). Strongest signal for launch-time crashes.
             "app_console_tail": read_tail(f"evidence/{plat}/app.console.log", limit=12000),
@@ -65,7 +109,8 @@ def main() -> int:
         "time. A visible RN red-box (`RCTRedBox`, \"unsanitizedScriptURLString\", "
         "a JS stack trace, or any developer error overlay text) IS runtime "
         "evidence — quote the overlay text in `evidence`.\n"
-        "  3. `logs_tail` — unified system log for the app process.\n"
+        "  3. `log_errors_grep` (filtered error lines from the unified log) "
+        "and `logs` (head+tail of device.log).\n"
         "  4. `build_log_tail` / `repro_status` — a build failure that "
         "matches the reported symptom is itself a reproduction.\n\n"
         "The bug reproduces when the captured evidence contains the described "
