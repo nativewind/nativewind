@@ -48,15 +48,23 @@ def read_head_and_tail(path: str, head: int = 6000, tail: int = 4000) -> str:
 
 # Lines worth surfacing verbatim regardless of where they appear in the log.
 _INTERESTING = re.compile(
-    r"(TypeError|ReferenceError|SyntaxError|RangeError|"
-    r"RCTRedBox|RCTFatal|\[runtime not ready\]|"
+    r"(\bTypeError\b|\bReferenceError\b|\bSyntaxError\b|\bRangeError\b|"
+    r"RCTRedBox|RCTFatal|\[runtime not ready\]|Invariant Violation|"
     r"Unhandled (?:JS )?Exception|Fatal (?:JS )?Exception|"
     r"react\.log:javascript|com\.facebook\.react\.log|"
     r"Hermes(?:Runtime|Inspector)?|jsi::JSError|"
-    r"NSException|SIGABRT|SIGSEGV|EXC_BAD_ACCESS|"
-    r"FATAL EXCEPTION|AndroidRuntime|"
-    r"^E \d|^F \d)",
+    r"SIGABRT|SIGSEGV|EXC_BAD_ACCESS|"
+    r"FATAL EXCEPTION|AndroidRuntime)",
     re.IGNORECASE | re.MULTILINE,
+)
+
+# Lines that look like Info.plist NSException* / ATS exception entries dumped
+# by the unified log on app startup. They contain the word "Exception" but
+# are not actual exceptions — strip them so the grep output starts with the
+# real RN/Hermes error.
+_NOISE = re.compile(
+    r"\b(NSException(?:Allows|Domains|Minimum|Requires)\w*|"
+    r"NSAllowsArbitraryLoads|NSAllowsLocalNetworking)\b"
 )
 
 
@@ -65,12 +73,54 @@ def extract_errors(path: str, max_lines: int = 80) -> str:
         data = pathlib.Path(path).read_text(errors="replace")
     except Exception:
         return ""
-    hits = [line for line in data.splitlines() if _INTERESTING.search(line)]
+    hits = [
+        line for line in data.splitlines()
+        if _INTERESTING.search(line) and not _NOISE.search(line)
+    ]
     if not hits:
         return ""
     if len(hits) > max_lines:
         hits = hits[: max_lines // 2] + ["…"] + hits[-max_lines // 2 :]
     return "\n".join(hits)
+
+
+def summarize_evidence(packet: dict) -> dict:
+    """Build an at-a-glance, hard-to-miss summary of what was captured. The
+    full text channels are still included for the judge to quote from, but
+    this summary makes it impossible for the model to claim 'all channels
+    are empty' when they aren't."""
+    sizes = {k: len(v) for k, v in packet.items() if isinstance(v, str)}
+    snapshot = packet.get("snapshot", "") + packet.get("snapshot_interactive", "")
+    combined = "\n".join(
+        packet.get(k, "") for k in (
+            "snapshot", "snapshot_interactive", "app_console_tail",
+            "logs", "log_errors_grep",
+        )
+    )
+    flags = {
+        "has_snapshot": bool(packet.get("snapshot")),
+        "has_app_console": bool(packet.get("app_console_tail")),
+        "has_device_log": bool(packet.get("logs")),
+        "rn_redbox_observed": bool(
+            re.search(r"RCTRedBox|\[runtime not ready\]|unsanitizedScriptURLString", combined)
+        ),
+        "js_error_observed": bool(
+            re.search(
+                r"\b(TypeError|ReferenceError|SyntaxError|RangeError|Invariant Violation)\b",
+                combined,
+            )
+        ),
+        "hermes_stack_observed": bool(
+            re.search(r"jsi::JSError|hermes::\w+|at \w+\s*\(.*\.js:\d+", combined)
+        ),
+        "native_crash_observed": bool(
+            re.search(r"SIGABRT|SIGSEGV|EXC_BAD_ACCESS|FATAL EXCEPTION|AndroidRuntime", combined)
+        ),
+        "missing_bundle_overlay": bool(
+            re.search(r"No script URL provided|unsanitizedScriptURLString", combined)
+        ),
+    }
+    return {"sizes": sizes, "flags": flags}
 
 
 def main() -> int:
@@ -82,7 +132,7 @@ def main() -> int:
         status = os.environ.get(f"{plat.upper()}_STATUS", "skipped")
         if status == "skipped":
             continue
-        platforms.append({
+        packet = {
             "platform": plat,
             "build_status": status,
             "repro_status": read_tail(f"evidence/{plat}/status.txt", limit=512),
@@ -95,7 +145,15 @@ def main() -> int:
             # native crash). Strongest signal for launch-time crashes.
             "app_console_tail": read_tail(f"evidence/{plat}/app.console.log", limit=12000),
             "agent_device_errors": read_tail(f"evidence/{plat}/agent-device.log", limit=4000),
-        })
+        }
+        packet["evidence_summary"] = summarize_evidence(packet)
+        platforms.append(packet)
+        # Surface the summary in the action log so we can grep it from CI.
+        print(
+            f"[judge] {plat} flags="
+            + json.dumps(packet["evidence_summary"]["flags"]),
+            flush=True,
+        )
 
     prompt = (
         "You are a CI judge for the NativeWind project. A user filed a bug "
@@ -121,6 +179,13 @@ def main() -> int:
         "the RN red-box says \"No script URL provided\" or similar bundler "
         "plumbing failures (we never ran the user JS, so we cannot judge); "
         "or the captured channels are empty/missing.\n\n"
+        "Before judging, look at `evidence_summary.flags` for each platform. "
+        "You may not claim a channel is empty if its size in "
+        "`evidence_summary.sizes` is > 0; quote from the corresponding text "
+        "field instead. A `true` value for `js_error_observed`, "
+        "`rn_redbox_observed`, `hermes_stack_observed` or "
+        "`native_crash_observed` is strong evidence the bug reproduced — "
+        "check whether the surfaced error matches the reported one.\n\n"
         "Return STRICT JSON with this exact shape and nothing else:\n"
         '{\n'
         '  "verdict": "reproduced" | "cannot-reproduce" | "inconclusive",\n'
