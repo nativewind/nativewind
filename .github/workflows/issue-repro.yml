@@ -289,6 +289,12 @@ jobs:
           # ONLY_ACTIVE_ARCH=YES keeps us from also building the dead
           # x86_64 simulator slice on the arm64 runner; -destination tells
           # xcodebuild which arch "active" actually means.
+          # FORCE_BUNDLING=1 makes React Native's "Bundle React Native code
+          # and images" build phase actually emit main.jsbundle in Debug
+          # configuration. Without it, debug builds defer bundling to a
+          # running Metro packager and the app shows the "No script URL
+          # provided" red box on launch in CI — which means we never run
+          # the JS code the issue is about.
           set +e
           xcodebuild \
             -workspace "$WORKSPACE" \
@@ -299,6 +305,7 @@ jobs:
             -derivedDataPath build/DerivedData \
             ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO \
+            FORCE_BUNDLING=1 \
             build 2>&1 | tee /tmp/xcodebuild.log | xcpretty
           BUILD_STATUS=${PIPESTATUS[0]}
           set -e
