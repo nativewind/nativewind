@@ -312,9 +312,11 @@ jobs:
           fi
           APP_PATH=$(find build/DerivedData/Build/Products/Debug-iphonesimulator -maxdepth 2 -name "*.app" -type d | head -n 1)
           BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw "$APP_PATH/Info.plist")
+          EXEC_NAME=$(plutil -extract CFBundleExecutable raw "$APP_PATH/Info.plist")
           echo "built=true"                 >> "$GITHUB_OUTPUT"
           echo "app_path=$(pwd)/$APP_PATH" >> "$GITHUB_OUTPUT"
           echo "bundle_id=$BUNDLE_ID"      >> "$GITHUB_OUTPUT"
+          echo "exec_name=$EXEC_NAME"      >> "$GITHUB_OUTPUT"
 
       - name: Boot iOS simulator
         id: sim
@@ -339,48 +341,90 @@ jobs:
 
       - name: Stream device logs in background
         if: steps.build.outputs.built == 'true'
+        env:
+          UDID: ${{ steps.sim.outputs.udid }}
+          BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
+          EXEC_NAME: ${{ steps.build.outputs.exec_name }}
         run: |
-          xcrun simctl spawn ${{ steps.sim.outputs.udid }} log stream \
+          # The macOS unified log shows `processImagePath` as a filesystem
+          # path to the binary (e.g. ".../PadelPlayground.app/PadelPlayground")
+          # — the bundle id never appears in that path. Filter by the
+          # CFBundleExecutable name + subsystem (apps that use os_log) to
+          # actually capture the RN runtime + Hermes output.
+          xcrun simctl spawn "$UDID" log stream \
             --level=debug --style=compact \
-            --predicate 'processImagePath CONTAINS "${{ steps.build.outputs.bundle_id }}" OR senderImagePath CONTAINS "${{ steps.build.outputs.bundle_id }}"' \
+            --predicate "processImagePath CONTAINS \"/$EXEC_NAME.app/\" OR process == \"$EXEC_NAME\" OR subsystem CONTAINS \"$BUNDLE_ID\"" \
             > evidence/ios/device.log 2>&1 &
           echo $! > evidence/ios/logger.pid
 
-      - name: Launch app via agent-device and capture evidence
+      - name: Launch app via simctl and capture console
+        id: console
+        if: steps.build.outputs.built == 'true'
+        continue-on-error: true
+        env:
+          UDID: ${{ steps.sim.outputs.udid }}
+          BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
+        run: |
+          set -euo pipefail
+          # `simctl launch --console-pty` attaches the app's stdout/stderr
+          # to our terminal — for React Native that means the JS bridge
+          # error, Hermes stack trace, and red-box message all land in our
+          # log file. This is the most reliable signal for "app crashes at
+          # launch" reproductions (e.g. issue #1783).
+          xcrun simctl terminate "$UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
+          ( xcrun simctl launch --terminate-running-process --console-pty \
+              "$UDID" "$BUNDLE_ID" > evidence/ios/app.console.log 2>&1 & \
+            echo $! > evidence/ios/app.console.pid ) || true
+          # Give the JS bundle time to evaluate (or blow up).
+          sleep 25
+
+      - name: Capture UI evidence via agent-device
         id: capture
         if: steps.build.outputs.built == 'true'
         continue-on-error: true
         env:
           BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
         run: |
-          set -euo pipefail
-          # Open the app in a named session so the run can be replayed.
-          agent-device --session "$AGENT_DEVICE_SESSION" \
+          # Cheap signals first (screenshot, perf) before the snapshot,
+          # because `snapshot` spins up an XCUITest accessibility bridge
+          # under the hood — when the app has crashed that bridge often
+          # times out ("Daemon request timed out") and kills the session,
+          # making every subsequent agent-device call fail with
+          # SESSION_NOT_FOUND. Order matters.
+          set +e
+          agent-device --debug --session "$AGENT_DEVICE_SESSION" \
             open "$BUNDLE_ID" --platform ios \
-            --save-script evidence/ios/launch.ad
-
-          # Give the JS bundle a moment to initialize / crash.
-          sleep 10
-
-          # Accessibility snapshot of the current screen — this is what the
-          # LLM judge inspects. -i restricts to interactive elements.
-          agent-device --session "$AGENT_DEVICE_SESSION" snapshot \
-            > evidence/ios/snapshot.txt || true
-          agent-device --session "$AGENT_DEVICE_SESSION" snapshot -i \
-            > evidence/ios/snapshot-interactive.txt || true
-
-          # Visual + perf evidence.
+            --save-script evidence/ios/launch.ad \
+            2>> evidence/ios/agent-device.log
           agent-device --session "$AGENT_DEVICE_SESSION" \
-            screenshot evidence/ios/screen.png || true
+            screenshot evidence/ios/screen.png \
+            2>> evidence/ios/agent-device.log
           agent-device --session "$AGENT_DEVICE_SESSION" perf --json \
-            > evidence/ios/perf.json || true
+            > evidence/ios/perf.json \
+            2>> evidence/ios/agent-device.log
+          # Snapshots last — these are the ones that historically time out.
+          agent-device --session "$AGENT_DEVICE_SESSION" snapshot \
+            > evidence/ios/snapshot.txt \
+            2>> evidence/ios/agent-device.log
+          agent-device --session "$AGENT_DEVICE_SESSION" snapshot -i \
+            > evidence/ios/snapshot-interactive.txt \
+            2>> evidence/ios/agent-device.log
+          agent-device --session "$AGENT_DEVICE_SESSION" close \
+            2>> evidence/ios/agent-device.log
+          exit 0
 
-          agent-device --session "$AGENT_DEVICE_SESSION" close || true
-
-      - name: Stop log stream
+      - name: Stop log stream and console capture
         if: always()
         run: |
           if [ -f evidence/ios/logger.pid ]; then kill "$(cat evidence/ios/logger.pid)" || true; fi
+          if [ -f evidence/ios/app.console.pid ]; then kill "$(cat evidence/ios/app.console.pid)" || true; fi
+          # Copy agent-device's per-session diagnostic ndjson into the
+          # uploaded artifact so the judge / a human can inspect failures.
+          if [ -d "$HOME/.agent-device/logs/$AGENT_DEVICE_SESSION" ]; then
+            mkdir -p evidence/ios/agent-device-diag
+            cp -R "$HOME/.agent-device/logs/$AGENT_DEVICE_SESSION/." \
+                  evidence/ios/agent-device-diag/ || true
+          fi
 
       - name: Record build-only outcome
         if: steps.build.outputs.built != 'true'

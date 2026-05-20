@@ -47,6 +47,10 @@ def main() -> int:
             "snapshot": read_tail(f"evidence/{plat}/snapshot.txt"),
             "snapshot_interactive": read_tail(f"evidence/{plat}/snapshot-interactive.txt"),
             "logs_tail": read_tail(f"evidence/{plat}/device.log", limit=12000),
+            # The app's own stdout/stderr (RN red-box, Hermes stack trace,
+            # native crash). Strongest signal for launch-time crashes.
+            "app_console_tail": read_tail(f"evidence/{plat}/app.console.log", limit=12000),
+            "agent_device_errors": read_tail(f"evidence/{plat}/agent-device.log", limit=4000),
         })
 
     prompt = (
