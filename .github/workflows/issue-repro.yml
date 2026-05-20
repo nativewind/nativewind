@@ -271,7 +271,7 @@ jobs:
         working-directory: repro/ios
         run: |
           set -euo pipefail
-          WORKSPACE=$(ls -1 *.xcworkspace | head -n 1)
+          WORKSPACE=$(ls -1d *.xcworkspace | head -n 1)
           SCHEME=$(basename "$WORKSPACE" .xcworkspace)
           echo "Building workspace=$WORKSPACE scheme=$SCHEME"
           xcodebuild \
@@ -452,7 +452,9 @@ jobs:
           emulator-options: -no-window -no-snapshot-save -no-boot-anim -camera-back none -gpu swiftshader_indirect
           disable-animations: true
           script: |
-            set -euo pipefail
+            # NB: android-emulator-runner runs this under /bin/sh (dash),
+            # which doesn't support `pipefail`. Use plain `set -eu`.
+            set -eu
             adb wait-for-device
             adb install -r -g "$APK_PATH"
 
