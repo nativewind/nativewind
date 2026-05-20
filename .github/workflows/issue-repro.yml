@@ -214,7 +214,11 @@ jobs:
     name: Reproduce on iOS
     needs: validate
     if: needs.validate.outputs.sufficient == 'true' && contains(needs.validate.outputs.platforms, 'ios')
-    runs-on: macos-15
+    # macos-26 ships Xcode 26 / iOS 26 SDK. Reproductions on recent
+    # React Native / React Navigation versions adopt iOS 26 APIs
+    # (e.g. UIView.setNeedsUpdateProperties, UIView.LayoutRegion) that
+    # don't exist on the iOS 18.5 SDK shipped with macos-15.
+    runs-on: macos-26
     timeout-minutes: 45
     env:
       REPRO_OWNER: ${{ needs.validate.outputs.repro_owner }}
@@ -266,31 +270,55 @@ jobs:
         working-directory: repro/ios
         run: pod install
 
+      - name: Prepare evidence directory
+        run: mkdir -p evidence/ios
+
       - name: Build iOS simulator app
         id: build
+        # A build failure is itself reproduction evidence (e.g. the repro's
+        # native code targets a newer SDK or breaks under the installed
+        # toolchain). We capture the log either way and let the judge job
+        # decide; `built=false` short-circuits the downstream device steps.
+        continue-on-error: true
         working-directory: repro/ios
         run: |
           set -euo pipefail
           WORKSPACE=$(ls -1d *.xcworkspace | head -n 1)
           SCHEME=$(basename "$WORKSPACE" .xcworkspace)
           echo "Building workspace=$WORKSPACE scheme=$SCHEME"
+          # ONLY_ACTIVE_ARCH=YES keeps us from also building the dead
+          # x86_64 simulator slice on the arm64 runner; -destination tells
+          # xcodebuild which arch "active" actually means.
+          set +e
           xcodebuild \
             -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
             -configuration Debug \
             -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build/DerivedData \
+            ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO \
-            build 2>&1 | tee /tmp/xcodebuild.log | xcpretty || {
-              echo "::error::xcodebuild failed"; tail -200 /tmp/xcodebuild.log; exit 1;
-            }
+            build 2>&1 | tee /tmp/xcodebuild.log | xcpretty
+          BUILD_STATUS=${PIPESTATUS[0]}
+          set -e
+          # Stash the raw build log as evidence regardless of outcome.
+          cp /tmp/xcodebuild.log ../../evidence/ios/xcodebuild.log || true
+          if [ "$BUILD_STATUS" -ne 0 ]; then
+            echo "::warning::xcodebuild failed with status $BUILD_STATUS (continuing so the judge sees the log)"
+            echo "built=false" >> "$GITHUB_OUTPUT"
+            tail -200 /tmp/xcodebuild.log
+            exit 0
+          fi
           APP_PATH=$(find build/DerivedData/Build/Products/Debug-iphonesimulator -maxdepth 2 -name "*.app" -type d | head -n 1)
           BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw "$APP_PATH/Info.plist")
+          echo "built=true"                 >> "$GITHUB_OUTPUT"
           echo "app_path=$(pwd)/$APP_PATH" >> "$GITHUB_OUTPUT"
           echo "bundle_id=$BUNDLE_ID"      >> "$GITHUB_OUTPUT"
 
       - name: Boot iOS simulator
         id: sim
+        if: steps.build.outputs.built == 'true'
         run: |
           set -euo pipefail
           UDID=$(xcrun simctl list devices available --json | \
@@ -302,15 +330,15 @@ jobs:
           echo "udid=$UDID" >> "$GITHUB_OUTPUT"
 
       - name: Install agent-device
+        if: steps.build.outputs.built == 'true'
         run: npm install -g agent-device@latest
 
       - name: Install app on simulator
+        if: steps.build.outputs.built == 'true'
         run: xcrun simctl install ${{ steps.sim.outputs.udid }} "${{ steps.build.outputs.app_path }}"
 
-      - name: Prepare evidence directory
-        run: mkdir -p evidence/ios
-
       - name: Stream device logs in background
+        if: steps.build.outputs.built == 'true'
         run: |
           xcrun simctl spawn ${{ steps.sim.outputs.udid }} log stream \
             --level=debug --style=compact \
@@ -320,6 +348,7 @@ jobs:
 
       - name: Launch app via agent-device and capture evidence
         id: capture
+        if: steps.build.outputs.built == 'true'
         continue-on-error: true
         env:
           BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
@@ -352,6 +381,15 @@ jobs:
         if: always()
         run: |
           if [ -f evidence/ios/logger.pid ]; then kill "$(cat evidence/ios/logger.pid)" || true; fi
+
+      - name: Record build-only outcome
+        if: steps.build.outputs.built != 'true'
+        run: |
+          {
+            echo "status=build-failed"
+            echo "note=xcodebuild failed before the app could be launched on a simulator."
+            echo "see=xcodebuild.log"
+          } > evidence/ios/status.txt
 
       - name: Upload iOS evidence
         if: always()

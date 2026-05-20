@@ -42,6 +42,8 @@ def main() -> int:
         platforms.append({
             "platform": plat,
             "build_status": status,
+            "repro_status": read_tail(f"evidence/{plat}/status.txt", limit=512),
+            "build_log_tail": read_tail(f"evidence/{plat}/xcodebuild.log", limit=12000),
             "snapshot": read_tail(f"evidence/{plat}/snapshot.txt"),
             "snapshot_interactive": read_tail(f"evidence/{plat}/snapshot-interactive.txt"),
             "logs_tail": read_tail(f"evidence/{plat}/device.log", limit=12000),
@@ -53,8 +55,12 @@ def main() -> int:
         "Decide whether the reported bug *actually reproduces* in the "
         "captured evidence. The bug reproduces when the app crashes, throws "
         "the described error, or otherwise exhibits the described faulty "
-        "behavior. The bug does NOT reproduce when the app launches "
-        "normally and the described symptom is not observed.\n\n"
+        "behavior at runtime OR when the native build itself fails in a way "
+        "that matches the reported symptom (inspect `build_log_tail` and "
+        "`repro_status`). The bug does NOT reproduce when the app launches "
+        "normally and the described symptom is not observed. If the build "
+        "failed for reasons unrelated to the reported issue (e.g. toolchain "
+        "mismatch, missing SDK), classify the platform as `inconclusive`.\n\n"
         "Return STRICT JSON with this exact shape and nothing else:\n"
         '{\n'
         '  "verdict": "reproduced" | "cannot-reproduce" | "inconclusive",\n'
