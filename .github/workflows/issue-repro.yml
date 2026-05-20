@@ -281,6 +281,18 @@ jobs:
         # decide; `built=false` short-circuits the downstream device steps.
         continue-on-error: true
         working-directory: repro/ios
+        env:
+          # React Native's `react-native-xcode.sh` checks these as ENV vars
+          # (not Xcode build settings) via `with-environment.sh`, which
+          # also sources the repro repo's `.xcode.env` and would otherwise
+          # clobber values passed via `xcodebuild VAR=...`. Forcing them
+          # in the parent shell's environment is the only reliable way to
+          # make the bundle phase actually emit main.jsbundle in Debug.
+          FORCE_BUNDLING: "1"
+          SKIP_BUNDLING: ""
+          # Don't let the build script try to spawn Metro on CI.
+          RCT_NO_LAUNCH_PACKAGER: "1"
+          BUNDLE_CONFIG_PLATFORM: ios
         run: |
           set -euo pipefail
           WORKSPACE=$(ls -1d *.xcworkspace | head -n 1)
@@ -289,12 +301,16 @@ jobs:
           # ONLY_ACTIVE_ARCH=YES keeps us from also building the dead
           # x86_64 simulator slice on the arm64 runner; -destination tells
           # xcodebuild which arch "active" actually means.
-          # FORCE_BUNDLING=1 makes React Native's "Bundle React Native code
-          # and images" build phase actually emit main.jsbundle in Debug
-          # configuration. Without it, debug builds defer bundling to a
-          # running Metro packager and the app shows the "No script URL
-          # provided" red box on launch in CI — which means we never run
-          # the JS code the issue is about.
+          # FORCE_BUNDLING + SKIP_BUNDLING are propagated via the parent
+          # shell env (see the step's `env:` block) so RN's bundle script
+          # actually emits main.jsbundle into the .app for Debug builds.
+          # Otherwise the app launches with the "No script URL provided"
+          # red box and we never observe the user's JS.
+          # Belt-and-suspenders: if the local `.xcode.env` in the repro
+          # exports SKIP_BUNDLING=1 anyway, neutralize it now.
+          if [ -f .xcode.env ] && grep -q SKIP_BUNDLING .xcode.env; then
+            sed -i.bak '/SKIP_BUNDLING/d' .xcode.env || true
+          fi
           set +e
           xcodebuild \
             -workspace "$WORKSPACE" \
@@ -320,6 +336,30 @@ jobs:
           APP_PATH=$(find build/DerivedData/Build/Products/Debug-iphonesimulator -maxdepth 2 -name "*.app" -type d | head -n 1)
           BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw "$APP_PATH/Info.plist")
           EXEC_NAME=$(plutil -extract CFBundleExecutable raw "$APP_PATH/Info.plist")
+
+          # Belt-and-suspenders: if the Xcode bundle phase still no-op'd
+          # (e.g. with-environment.sh clobbered our FORCE_BUNDLING), run
+          # the bundler ourselves and inject main.jsbundle + assets.
+          if [ ! -f "$APP_PATH/main.jsbundle" ]; then
+            echo "::warning::main.jsbundle missing from .app; bundling out-of-band"
+            pushd ../.. > /dev/null
+            # Expo apps get `expo export:embed`; bare RN gets the RN CLI.
+            if [ -f repro/app.json ] || [ -f repro/app.config.js ] || [ -f repro/app.config.ts ]; then
+              (cd repro && npx --yes expo export:embed \
+                --platform ios \
+                --dev false \
+                --bundle-output "ios/$APP_PATH/main.jsbundle" \
+                --assets-dest "ios/$APP_PATH") || echo "::warning::expo export:embed failed"
+            else
+              (cd repro && npx --yes react-native bundle \
+                --platform ios \
+                --dev false \
+                --entry-file index.js \
+                --bundle-output "ios/$APP_PATH/main.jsbundle" \
+                --assets-dest "ios/$APP_PATH") || echo "::warning::react-native bundle failed"
+            fi
+            popd > /dev/null
+          fi
           echo "built=true"                 >> "$GITHUB_OUTPUT"
           echo "app_path=$(pwd)/$APP_PATH" >> "$GITHUB_OUTPUT"
           echo "bundle_id=$BUNDLE_ID"      >> "$GITHUB_OUTPUT"
