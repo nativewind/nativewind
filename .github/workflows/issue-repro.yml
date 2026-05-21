@@ -13,8 +13,8 @@ name: Issue Reproduction
 #      (accessibility snapshots, screenshots, device logs, perf samples) is
 #      captured as artifacts and an LLM judge compares the evidence to the
 #      issue body to decide whether the bug reproduces. The issue is then
-#      labeled `reproduced` or `cannot-reproduce` and a summary comment is
-#      posted.
+#      labeled `reproducible` or `not reproducible` and a summary comment
+#      with a link back to this workflow run is posted.
 #
 # Required secrets:
 #   - ANTHROPIC_API_KEY  Used by the LLM judge step.
@@ -780,9 +780,13 @@ jobs:
             const perPlatform = JSON.parse(process.env.PER_PLATFORM || '[]');
             const issue_number = parseInt(process.env.ISSUE_NUMBER, 10);
 
+            // Verdict → issue label. The 'reproducible' / 'not reproducible'
+            // labels are what humans filter triage queues by; 'needs
+            // investigation' is the safety net for runs the judge couldn't
+            // call either way (e.g. toolchain mismatch, missing bundle).
             const labelMap = {
-              'reproduced':       'reproduced',
-              'cannot-reproduce': 'cannot-reproduce',
+              'reproduced':       'reproducible',
+              'cannot-reproduce': 'not reproducible',
               'inconclusive':     'needs investigation',
             };
             const label = labelMap[verdict] || 'needs investigation';
@@ -795,20 +799,32 @@ jobs:
               : '';
 
             const heading = {
-              'reproduced':       '✅ Reproduced',
-              'cannot-reproduce': '❎ Could not reproduce',
+              'reproduced':       '✅ Reproducible',
+              'cannot-reproduce': '❎ Not reproducible',
               'inconclusive':     '❓ Inconclusive',
             }[verdict] || '❓ Inconclusive';
+
+            // Verdict-specific one-liner that always sits directly above
+            // the run link so the reporter can click straight through to
+            // the evidence regardless of how the model phrased `summary`.
+            const callout = {
+              'reproduced':
+                `Our automated reproduction pipeline **reproduced** this bug. See the [CI run](${runUrl}) for the captured evidence (accessibility snapshots, screenshots, device logs, app console, perf samples).`,
+              'cannot-reproduce':
+                `Our automated reproduction pipeline **could not reproduce** this bug against the linked repro repository. See the [CI run](${runUrl}) for the captured evidence (accessibility snapshots, screenshots, device logs, app console, perf samples). If you believe the bug still reproduces, please double-check the repro repo runs the failing scenario on a clean install.`,
+              'inconclusive':
+                `Our automated reproduction pipeline could not conclusively judge this bug. See the [CI run](${runUrl}) for the captured evidence. A maintainer will take a closer look.`,
+            }[verdict] || `See the [CI run](${runUrl}) for captured evidence.`;
 
             const body = [
               `## ${heading}`,
               ``,
+              callout,
+              ``,
               summary,
               platformTable,
               ``,
-              `Evidence (accessibility snapshots, screenshots, device logs, perf samples) is attached to the [workflow run](${runUrl}) as artifacts.`,
-              ``,
-              `<sub>Automated by \`.github/workflows/issue-repro.yml\` using [agent-device](https://github.com/callstackincubator/agent-device).</sub>`,
+              `<sub>Automated by \`.github/workflows/issue-repro.yml\` using [agent-device](https://github.com/callstackincubator/agent-device). Workflow run: ${runUrl}</sub>`,
             ].join('\n');
 
             await github.rest.issues.createComment({
