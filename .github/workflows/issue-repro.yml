@@ -58,9 +58,132 @@ jobs:
       issue_number: ${{ steps.parse.outputs.issue_number }}
       issue_title: ${{ steps.parse.outputs.issue_title }}
       issue_body_b64: ${{ steps.parse.outputs.issue_body_b64 }}
+      throttled: ${{ steps.throttle.outputs.throttled }}
     steps:
+      # -------------------------------------------------------------------
+      # Spam / rate-limit gate. Runs *before* the issue parser so we never
+      # spin up the expensive macos-26 + Android emulator jobs when a single
+      # user (or a burst of users) is flooding the tracker. The downstream
+      # reproduce-* jobs gate on `sufficient == 'true'`, which is only set
+      # by the parse step — if throttled, parse is skipped and that output
+      # stays empty, so the expensive jobs short-circuit naturally. We
+      # still label + comment once so the reporter knows what happened.
+      # -------------------------------------------------------------------
+      - name: Spam / rate-limit gate
+        id: throttle
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Tunable thresholds. Conservative defaults; bump in env if
+            // you want to be looser/stricter without editing the script.
+            const PER_AUTHOR_24H_LIMIT = parseInt(process.env.PER_AUTHOR_24H_LIMIT || '3', 10);
+            const REPO_1H_LIMIT        = parseInt(process.env.REPO_1H_LIMIT        || '10', 10);
+
+            // workflow_dispatch is an operator override — never throttle.
+            if (context.eventName === 'workflow_dispatch') {
+              core.info('Manual dispatch; skipping rate-limit gate.');
+              core.setOutput('throttled', 'false');
+              return;
+            }
+
+            const issue = context.payload.issue;
+            if (!issue) {
+              core.setFailed('No issue payload on context.');
+              return;
+            }
+
+            // Drop bot-authored issues unconditionally. Dependabot,
+            // Renovate, etc. don't file repro-able bug reports.
+            if (issue.user && issue.user.type === 'Bot') {
+              core.info(`Skipping bot author ${issue.user.login}.`);
+              core.setOutput('throttled', 'true');
+              core.setOutput('reason', `author ${issue.user.login} is a Bot`);
+              return;
+            }
+
+            // Reopened issues that were previously rate-limited: skip the
+            // comment-storm but still throttle.
+            const existingLabels = new Set((issue.labels || []).map(l =>
+              typeof l === 'string' ? l : l.name
+            ));
+            const alreadyLabeled = existingLabels.has('rate-limited');
+
+            const toIso = (d) => new Date(d).toISOString().replace(/\.\d+/, '');
+            const since24h = toIso(Date.now() - 24 * 60 * 60 * 1000);
+            const since1h  = toIso(Date.now() -      60 * 60 * 1000);
+            const slug = `${context.repo.owner}/${context.repo.repo}`;
+
+            // Per-author burst: how many issues did this user open in 24h?
+            const author = issue.user.login;
+            const authorQuery =
+              `repo:${slug} type:issue author:${author} created:>${since24h}`;
+            const { data: authorHits } =
+              await github.rest.search.issuesAndPullRequests({ q: authorQuery, per_page: 1 });
+
+            // Repo-wide burst: total issues opened in the last hour.
+            const repoQuery = `repo:${slug} type:issue created:>${since1h}`;
+            const { data: repoHits } =
+              await github.rest.search.issuesAndPullRequests({ q: repoQuery, per_page: 1 });
+
+            core.info(`author=${author} issues_24h=${authorHits.total_count}/${PER_AUTHOR_24H_LIMIT} repo_1h=${repoHits.total_count}/${REPO_1H_LIMIT}`);
+
+            let reason = null;
+            if (authorHits.total_count > PER_AUTHOR_24H_LIMIT) {
+              reason = `@${author} has opened ${authorHits.total_count} issues in the last 24h ` +
+                       `(per-author limit: ${PER_AUTHOR_24H_LIMIT}).`;
+            } else if (repoHits.total_count > REPO_1H_LIMIT) {
+              reason = `${repoHits.total_count} issues opened against ${slug} in the last hour ` +
+                       `(repo-wide limit: ${REPO_1H_LIMIT}).`;
+            }
+
+            if (!reason) {
+              core.setOutput('throttled', 'false');
+              return;
+            }
+
+            core.warning(`Rate-limited: ${reason}`);
+            core.setOutput('throttled', 'true');
+            core.setOutput('reason', reason);
+
+            await core.summary
+              .addHeading(`Rate-limited issue #${issue.number}`)
+              .addRaw(reason).addEOL()
+              .write();
+
+            // Label once, comment once — never close (operators may still
+            // want to reach the reporter manually).
+            if (!alreadyLabeled) {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ['rate-limited'],
+                });
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: [
+                    `⏸️ Automated reproduction is temporarily paused for this issue.`,
+                    ``,
+                    reason,
+                    ``,
+                    `A maintainer can resume reproduction manually by re-running the workflow:`,
+                    ``,
+                    `> Actions → *Issue Reproduction* → *Run workflow* → issue \#${issue.number}`,
+                    ``,
+                    `Or via the GitHub CLI: \`gh workflow run "Issue Reproduction" -f issue_number=${issue.number}\``,
+                  ].join('\n'),
+                });
+              } catch (e) {
+                core.warning(`Failed to label/comment on #${issue.number}: ${e.message}`);
+              }
+            }
+
       - name: Parse issue body
         id: parse
+        if: steps.throttle.outputs.throttled != 'true'
         uses: actions/github-script@v7
         with:
           script: |
