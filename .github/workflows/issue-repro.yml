@@ -31,15 +31,6 @@ on:
         description: "Existing issue number to validate + reproduce."
         required: true
         type: string
-  # TEMPORARY: lets us validate this workflow end-to-end from a PR before
-  # merging to the default branch (where `issues` / `workflow_dispatch` live).
-  # Hardcoded to dry-run against issue #1783. Remove this trigger block
-  # before merge.
-  pull_request:
-    paths:
-      - .github/workflows/issue-repro.yml
-      - .github/scripts/judge-repro.py
-
 permissions:
   issues: write
   contents: read
@@ -72,8 +63,6 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // TEMP: PR runs dry-test against a fixed issue number.
-            const PR_TEST_ISSUE = 1783;
             let issue;
             if (context.eventName === 'workflow_dispatch') {
               const num = parseInt(context.payload.inputs.issue_number, 10);
@@ -81,13 +70,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: num,
-              });
-              issue = data;
-            } else if (context.eventName === 'pull_request') {
-              const { data } = await github.rest.issues.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: PR_TEST_ISSUE,
               });
               issue = data;
             } else {
@@ -155,15 +137,6 @@ jobs:
             if (!sufficient) core.summary.addList(missing);
             await core.summary.write();
 
-            // On PR runs we don't want to actually comment on / close the
-            // real issue — just print the verdict and stop the run if info
-            // is insufficient.
-            const dryRun = context.eventName === 'pull_request';
-            if (dryRun) {
-              core.info(`[dry-run] sufficient=${sufficient} missing=${JSON.stringify(missing)}`);
-              if (!sufficient) core.setFailed('Insufficient info (dry-run).');
-              return;
-            }
 
             // --- on insufficient info: comment, label, close ----------------
             if (!sufficient) {
@@ -675,16 +648,8 @@ jobs:
           SUMMARY: ${{ steps.judge.outputs.summary }}
           PER_PLATFORM: ${{ steps.judge.outputs.per_platform }}
           ISSUE_NUMBER: ${{ needs.validate.outputs.issue_number }}
-          # TEMP: skip mutating the real issue on PR dry-runs.
-          DRY_RUN: ${{ github.event_name == 'pull_request' }}
         with:
           script: |
-            if (process.env.DRY_RUN === 'true') {
-              core.info(`[dry-run] verdict=${process.env.VERDICT}`);
-              core.info(`[dry-run] summary=${process.env.SUMMARY}`);
-              core.info(`[dry-run] per_platform=${process.env.PER_PLATFORM}`);
-              return;
-            }
             const verdict = process.env.VERDICT;
             const summary = process.env.SUMMARY;
             const perPlatform = JSON.parse(process.env.PER_PLATFORM || '[]');
