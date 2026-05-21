@@ -1,0 +1,841 @@
+name: Issue Reproduction
+
+# Runs whenever a bug is filed against NativeWind. Performs two checks:
+#
+#   1. Sufficient-info gate. Parses the issue body for a reproduction repo
+#      link, expected behavior and a description of the bug. If any are
+#      missing the issue is labeled `needs reproduction`, commented on, and
+#      closed.
+#
+#   2. Live reproduction. The repository referenced in the issue body is
+#      cloned, built for both iOS and Android, then launched on a simulator/
+#      emulator through Callstack's `agent-device` CLI. Evidence
+#      (accessibility snapshots, screenshots, device logs, perf samples) is
+#      captured as artifacts and an LLM judge compares the evidence to the
+#      issue body to decide whether the bug reproduces. The issue is then
+#      labeled `reproducible` or `not reproducible` and a summary comment
+#      with a link back to this workflow run is posted.
+#
+# Required secrets:
+#   - ANTHROPIC_API_KEY  Used by the LLM judge step.
+#   - GITHUB_TOKEN       Provided by Actions.
+
+on:
+  issues:
+    types: [opened, reopened]
+  # Manual trigger for re-running against any existing issue — useful for
+  # ad-hoc reproductions or re-judging an issue after pushing workflow
+  # changes.
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Existing issue number to validate + reproduce."
+        required: true
+        type: string
+permissions:
+  issues: write
+  contents: read
+
+concurrency:
+  # One run per issue. Reopening or re-dispatching cancels any in-flight run.
+  group: issue-repro-${{ github.event.issue.number || inputs.issue_number }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Sufficient-info gate
+  # ---------------------------------------------------------------------------
+  validate:
+    name: Validate issue info
+    runs-on: ubuntu-latest
+    outputs:
+      sufficient: ${{ steps.parse.outputs.sufficient }}
+      repro_url: ${{ steps.parse.outputs.repro_url }}
+      repro_owner: ${{ steps.parse.outputs.repro_owner }}
+      repro_repo: ${{ steps.parse.outputs.repro_repo }}
+      repro_ref: ${{ steps.parse.outputs.repro_ref }}
+      platforms: ${{ steps.parse.outputs.platforms }}
+      issue_number: ${{ steps.parse.outputs.issue_number }}
+      issue_title: ${{ steps.parse.outputs.issue_title }}
+      issue_body_b64: ${{ steps.parse.outputs.issue_body_b64 }}
+      throttled: ${{ steps.throttle.outputs.throttled }}
+    steps:
+      # -------------------------------------------------------------------
+      # Spam / rate-limit gate. Runs *before* the issue parser so we never
+      # spin up the expensive macos-26 + Android emulator jobs when a single
+      # user (or a burst of users) is flooding the tracker. The downstream
+      # reproduce-* jobs gate on `sufficient == 'true'`, which is only set
+      # by the parse step — if throttled, parse is skipped and that output
+      # stays empty, so the expensive jobs short-circuit naturally. We
+      # still label + comment once so the reporter knows what happened.
+      # -------------------------------------------------------------------
+      - name: Spam / rate-limit gate
+        id: throttle
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Tunable thresholds. Conservative defaults; bump in env if
+            // you want to be looser/stricter without editing the script.
+            const PER_AUTHOR_24H_LIMIT = parseInt(process.env.PER_AUTHOR_24H_LIMIT || '3', 10);
+            const REPO_1H_LIMIT        = parseInt(process.env.REPO_1H_LIMIT        || '10', 10);
+
+            // workflow_dispatch is an operator override — never throttle.
+            if (context.eventName === 'workflow_dispatch') {
+              core.info('Manual dispatch; skipping rate-limit gate.');
+              core.setOutput('throttled', 'false');
+              return;
+            }
+
+            const issue = context.payload.issue;
+            if (!issue) {
+              core.setFailed('No issue payload on context.');
+              return;
+            }
+
+            // Drop bot-authored issues unconditionally. Dependabot,
+            // Renovate, etc. don't file repro-able bug reports.
+            if (issue.user && issue.user.type === 'Bot') {
+              core.info(`Skipping bot author ${issue.user.login}.`);
+              core.setOutput('throttled', 'true');
+              core.setOutput('reason', `author ${issue.user.login} is a Bot`);
+              return;
+            }
+
+            // Reopened issues that were previously rate-limited: skip the
+            // comment-storm but still throttle.
+            const existingLabels = new Set((issue.labels || []).map(l =>
+              typeof l === 'string' ? l : l.name
+            ));
+            const alreadyLabeled = existingLabels.has('rate-limited');
+
+            const toIso = (d) => new Date(d).toISOString().replace(/\.\d+/, '');
+            const since24h = toIso(Date.now() - 24 * 60 * 60 * 1000);
+            const since1h  = toIso(Date.now() -      60 * 60 * 1000);
+            const slug = `${context.repo.owner}/${context.repo.repo}`;
+
+            // Per-author burst: how many issues did this user open in 24h?
+            const author = issue.user.login;
+            const authorQuery =
+              `repo:${slug} type:issue author:${author} created:>${since24h}`;
+            const { data: authorHits } =
+              await github.rest.search.issuesAndPullRequests({ q: authorQuery, per_page: 1 });
+
+            // Repo-wide burst: total issues opened in the last hour.
+            const repoQuery = `repo:${slug} type:issue created:>${since1h}`;
+            const { data: repoHits } =
+              await github.rest.search.issuesAndPullRequests({ q: repoQuery, per_page: 1 });
+
+            core.info(`author=${author} issues_24h=${authorHits.total_count}/${PER_AUTHOR_24H_LIMIT} repo_1h=${repoHits.total_count}/${REPO_1H_LIMIT}`);
+
+            let reason = null;
+            if (authorHits.total_count > PER_AUTHOR_24H_LIMIT) {
+              reason = `@${author} has opened ${authorHits.total_count} issues in the last 24h ` +
+                       `(per-author limit: ${PER_AUTHOR_24H_LIMIT}).`;
+            } else if (repoHits.total_count > REPO_1H_LIMIT) {
+              reason = `${repoHits.total_count} issues opened against ${slug} in the last hour ` +
+                       `(repo-wide limit: ${REPO_1H_LIMIT}).`;
+            }
+
+            if (!reason) {
+              core.setOutput('throttled', 'false');
+              return;
+            }
+
+            core.warning(`Rate-limited: ${reason}`);
+            core.setOutput('throttled', 'true');
+            core.setOutput('reason', reason);
+
+            await core.summary
+              .addHeading(`Rate-limited issue #${issue.number}`)
+              .addRaw(reason).addEOL()
+              .write();
+
+            // Label once, comment once — never close (operators may still
+            // want to reach the reporter manually).
+            if (!alreadyLabeled) {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ['rate-limited'],
+                });
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: [
+                    `⏸️ Automated reproduction is temporarily paused for this issue.`,
+                    ``,
+                    reason,
+                    ``,
+                    `A maintainer can resume reproduction manually by re-running the workflow:`,
+                    ``,
+                    `> Actions → *Issue Reproduction* → *Run workflow* → issue \#${issue.number}`,
+                    ``,
+                    `Or via the GitHub CLI: \`gh workflow run "Issue Reproduction" -f issue_number=${issue.number}\``,
+                  ].join('\n'),
+                });
+              } catch (e) {
+                core.warning(`Failed to label/comment on #${issue.number}: ${e.message}`);
+              }
+            }
+
+      - name: Parse issue body
+        id: parse
+        if: steps.throttle.outputs.throttled != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let issue;
+            if (context.eventName === 'workflow_dispatch') {
+              const num = parseInt(context.payload.inputs.issue_number, 10);
+              const { data } = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: num,
+              });
+              issue = data;
+            } else {
+              issue = context.payload.issue;
+            }
+
+            const body = issue.body || '';
+            const bodyLower = body.toLowerCase();
+
+            // --- find a reproduction repo link ------------------------------
+            // We only treat *external* github repo links as reproductions.
+            // Links back into nativewind/nativewind, gists, comments, or
+            // issue threads don't count.
+            const urlRe = /https?:\/\/github\.com\/([\w.-]+)\/([\w.-]+?)(?:\.git)?(?:\/(tree|commit)\/([\w./-]+))?(?:[?#)\s]|$)/gi;
+            const excludedOwners = new Set(['nativewind']);
+            let repro = null;
+            for (const m of body.matchAll(urlRe)) {
+              const [, owner, repo, , ref] = m;
+              if (excludedOwners.has(owner.toLowerCase())) continue;
+              if (repo.toLowerCase() === 'issues' || repo.toLowerCase() === 'pull') continue;
+              repro = {
+                url: `https://github.com/${owner}/${repo}`,
+                owner,
+                repo: repo.replace(/\.git$/, ''),
+                ref: ref || '',
+              };
+              break;
+            }
+
+            // --- required narrative bits ------------------------------------
+            const hasDescribe = /describe the bug[\s\S]{20,}/i.test(body);
+            const hasExpected = /expected behavior[\s\S]{10,}/i.test(body);
+
+            const missing = [];
+            if (!repro) missing.push('a public GitHub reproduction repository link');
+            if (!hasDescribe) missing.push('a description of the bug ("Describe the bug" section with details)');
+            if (!hasExpected) missing.push('the expected behavior ("Expected behavior" section)');
+
+            const sufficient = missing.length === 0;
+
+            // --- platform inference -----------------------------------------
+            const platforms = [];
+            if (/\bios\b|iphone|ipad|simulator/i.test(body)) platforms.push('ios');
+            if (/\bandroid\b|emulator|gradle/i.test(body)) platforms.push('android');
+            // Default to both if unspecified.
+            if (platforms.length === 0) platforms.push('ios', 'android');
+
+            core.setOutput('sufficient', sufficient ? 'true' : 'false');
+            core.setOutput('issue_number', String(issue.number));
+            core.setOutput('issue_title', issue.title || '');
+            core.setOutput('issue_body_b64', Buffer.from(body, 'utf8').toString('base64'));
+            core.setOutput('platforms', platforms.join(','));
+            if (repro) {
+              core.setOutput('repro_url', repro.url);
+              core.setOutput('repro_owner', repro.owner);
+              core.setOutput('repro_repo', repro.repo);
+              core.setOutput('repro_ref', repro.ref);
+            }
+
+            core.summary
+              .addHeading(`Issue #${issue.number}: ${issue.title}`)
+              .addRaw(`Sufficient info: **${sufficient}**`).addEOL()
+              .addRaw(`Reproduction: ${repro ? repro.url : '(none found)'}`).addEOL()
+              .addRaw(`Platforms: ${platforms.join(', ')}`).addEOL();
+            if (!sufficient) core.summary.addList(missing);
+            await core.summary.write();
+
+
+            // --- on insufficient info: comment, label, close ----------------
+            if (!sufficient) {
+              const missingList = missing.map((m) => `- ${m}`).join('\n');
+              const commentBody = [
+                `👋 Thanks for opening this issue!`,
+                ``,
+                `Before our CI can attempt to reproduce this bug we need a bit more information. The following appear to be missing or incomplete:`,
+                ``,
+                missingList,
+                ``,
+                `Please update the issue and provide a public GitHub repository that reproduces the bug end-to-end. The easiest way to scaffold one is:`,
+                ``,
+                `- \`npx rn-new@latest --nativewind\``,
+                `- \`npx rn-new@latest --nativewind --expo-router\``,
+                `- \`npx rn-new@next --nativewind\``,
+                `- \`npx rn-new@next --nativewind --expo-router\``,
+                ``,
+                `Issues without enough information to reproduce are automatically closed. Once you've updated the issue with the missing details feel free to reopen it.`,
+                ``,
+                `For usage questions please use the [Discord](https://discord.gg/ypNakAFQ65) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions).`,
+              ].join('\n');
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: commentBody,
+              });
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['needs reproduction'],
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+              });
+            }
+
+  # ---------------------------------------------------------------------------
+  # 2a. iOS reproduction
+  # ---------------------------------------------------------------------------
+  reproduce-ios:
+    name: Reproduce on iOS
+    needs: validate
+    if: needs.validate.outputs.sufficient == 'true' && contains(needs.validate.outputs.platforms, 'ios')
+    # macos-26 ships Xcode 26 / iOS 26 SDK. Reproductions on recent
+    # React Native / React Navigation versions adopt iOS 26 APIs
+    # (e.g. UIView.setNeedsUpdateProperties, UIView.LayoutRegion) that
+    # don't exist on the iOS 18.5 SDK shipped with macos-15.
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      REPRO_OWNER: ${{ needs.validate.outputs.repro_owner }}
+      REPRO_REPO: ${{ needs.validate.outputs.repro_repo }}
+      REPRO_REF: ${{ needs.validate.outputs.repro_ref }}
+      ISSUE_NUMBER: ${{ needs.validate.outputs.issue_number }}
+      AGENT_DEVICE_SESSION: repro-ios-${{ needs.validate.outputs.issue_number }}
+    steps:
+      - name: Checkout reproduction repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPRO_OWNER }}/${{ env.REPRO_REPO }}
+          ref: ${{ env.REPRO_REF }}
+          path: repro
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install reproduction dependencies
+        working-directory: repro
+        run: |
+          set -euo pipefail
+          if   [ -f yarn.lock ];         then corepack enable && yarn install --frozen-lockfile || yarn install
+          elif [ -f pnpm-lock.yaml ];    then corepack enable && pnpm install --frozen-lockfile || pnpm install
+          elif [ -f package-lock.json ]; then npm ci || npm install
+          elif [ -f bun.lockb ];         then npm i -g bun && bun install
+          else                                npm install
+          fi
+
+      - name: Prebuild iOS
+        working-directory: repro
+        run: |
+          set -euo pipefail
+          if [ ! -d ios ]; then
+            npx --yes expo prebuild --platform ios --no-install
+          fi
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: repro/ios/Pods
+          key: pods-${{ runner.os }}-${{ env.REPRO_OWNER }}-${{ env.REPRO_REPO }}-${{ hashFiles('repro/ios/Podfile.lock') }}
+          restore-keys: |
+            pods-${{ runner.os }}-${{ env.REPRO_OWNER }}-${{ env.REPRO_REPO }}-
+
+      - name: Pod install
+        working-directory: repro/ios
+        run: pod install
+
+      - name: Prepare evidence directory
+        run: mkdir -p evidence/ios
+
+      - name: Build iOS simulator app
+        id: build
+        # A build failure is itself reproduction evidence (e.g. the repro's
+        # native code targets a newer SDK or breaks under the installed
+        # toolchain). We capture the log either way and let the judge job
+        # decide; `built=false` short-circuits the downstream device steps.
+        continue-on-error: true
+        working-directory: repro/ios
+        env:
+          # React Native's `react-native-xcode.sh` checks these as ENV vars
+          # (not Xcode build settings) via `with-environment.sh`, which
+          # also sources the repro repo's `.xcode.env` and would otherwise
+          # clobber values passed via `xcodebuild VAR=...`. Forcing them
+          # in the parent shell's environment is the only reliable way to
+          # make the bundle phase actually emit main.jsbundle in Debug.
+          FORCE_BUNDLING: "1"
+          SKIP_BUNDLING: ""
+          # Don't let the build script try to spawn Metro on CI.
+          RCT_NO_LAUNCH_PACKAGER: "1"
+          BUNDLE_CONFIG_PLATFORM: ios
+        run: |
+          set -euo pipefail
+          WORKSPACE=$(ls -1d *.xcworkspace | head -n 1)
+          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          echo "Building workspace=$WORKSPACE scheme=$SCHEME"
+          # ONLY_ACTIVE_ARCH=YES keeps us from also building the dead
+          # x86_64 simulator slice on the arm64 runner; -destination tells
+          # xcodebuild which arch "active" actually means.
+          # FORCE_BUNDLING + SKIP_BUNDLING are propagated via the parent
+          # shell env (see the step's `env:` block) so RN's bundle script
+          # actually emits main.jsbundle into the .app for Debug builds.
+          # Otherwise the app launches with the "No script URL provided"
+          # red box and we never observe the user's JS.
+          # Belt-and-suspenders: if the local `.xcode.env` in the repro
+          # exports SKIP_BUNDLING=1 anyway, neutralize it now.
+          if [ -f .xcode.env ] && grep -q SKIP_BUNDLING .xcode.env; then
+            sed -i.bak '/SKIP_BUNDLING/d' .xcode.env || true
+          fi
+          set +e
+          xcodebuild \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/DerivedData \
+            ONLY_ACTIVE_ARCH=YES \
+            CODE_SIGNING_ALLOWED=NO \
+            FORCE_BUNDLING=1 \
+            build 2>&1 | tee /tmp/xcodebuild.log | xcpretty
+          BUILD_STATUS=${PIPESTATUS[0]}
+          set -e
+          # Stash the raw build log as evidence regardless of outcome.
+          cp /tmp/xcodebuild.log ../../evidence/ios/xcodebuild.log || true
+          if [ "$BUILD_STATUS" -ne 0 ]; then
+            echo "::warning::xcodebuild failed with status $BUILD_STATUS (continuing so the judge sees the log)"
+            echo "built=false" >> "$GITHUB_OUTPUT"
+            tail -200 /tmp/xcodebuild.log
+            exit 0
+          fi
+          APP_PATH=$(find build/DerivedData/Build/Products/Debug-iphonesimulator -maxdepth 2 -name "*.app" -type d | head -n 1)
+          BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw "$APP_PATH/Info.plist")
+          EXEC_NAME=$(plutil -extract CFBundleExecutable raw "$APP_PATH/Info.plist")
+
+          # Belt-and-suspenders: if the Xcode bundle phase still no-op'd
+          # (e.g. with-environment.sh clobbered our FORCE_BUNDLING), run
+          # the bundler ourselves and inject main.jsbundle + assets.
+          if [ ! -f "$APP_PATH/main.jsbundle" ]; then
+            echo "::warning::main.jsbundle missing from .app; bundling out-of-band"
+            pushd ../.. > /dev/null
+            # Expo apps get `expo export:embed`; bare RN gets the RN CLI.
+            if [ -f repro/app.json ] || [ -f repro/app.config.js ] || [ -f repro/app.config.ts ]; then
+              (cd repro && npx --yes expo export:embed \
+                --platform ios \
+                --dev false \
+                --bundle-output "ios/$APP_PATH/main.jsbundle" \
+                --assets-dest "ios/$APP_PATH") || echo "::warning::expo export:embed failed"
+            else
+              (cd repro && npx --yes react-native bundle \
+                --platform ios \
+                --dev false \
+                --entry-file index.js \
+                --bundle-output "ios/$APP_PATH/main.jsbundle" \
+                --assets-dest "ios/$APP_PATH") || echo "::warning::react-native bundle failed"
+            fi
+            popd > /dev/null
+          fi
+          echo "built=true"                 >> "$GITHUB_OUTPUT"
+          echo "app_path=$(pwd)/$APP_PATH" >> "$GITHUB_OUTPUT"
+          echo "bundle_id=$BUNDLE_ID"      >> "$GITHUB_OUTPUT"
+          echo "exec_name=$EXEC_NAME"      >> "$GITHUB_OUTPUT"
+
+      - name: Boot iOS simulator
+        id: sim
+        if: steps.build.outputs.built == 'true'
+        run: |
+          set -euo pipefail
+          UDID=$(xcrun simctl list devices available --json | \
+            python3 -c "import sys,json; d=json.load(sys.stdin)['devices']; \
+            [print(dev['udid']) for v in d.values() for dev in v if 'iPhone' in dev['name']]" | head -n 1)
+          if [ -z "$UDID" ]; then echo "::error::No iPhone simulator available"; exit 1; fi
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+
+      - name: Install agent-device
+        if: steps.build.outputs.built == 'true'
+        run: npm install -g agent-device@latest
+
+      - name: Install app on simulator
+        if: steps.build.outputs.built == 'true'
+        run: xcrun simctl install ${{ steps.sim.outputs.udid }} "${{ steps.build.outputs.app_path }}"
+
+      - name: Stream device logs in background
+        if: steps.build.outputs.built == 'true'
+        env:
+          UDID: ${{ steps.sim.outputs.udid }}
+          BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
+          EXEC_NAME: ${{ steps.build.outputs.exec_name }}
+        run: |
+          # The macOS unified log shows `processImagePath` as a filesystem
+          # path to the binary (e.g. ".../PadelPlayground.app/PadelPlayground")
+          # — the bundle id never appears in that path. Filter by the
+          # CFBundleExecutable name + subsystem (apps that use os_log) to
+          # actually capture the RN runtime + Hermes output.
+          xcrun simctl spawn "$UDID" log stream \
+            --level=debug --style=compact \
+            --predicate "processImagePath CONTAINS \"/$EXEC_NAME.app/\" OR process == \"$EXEC_NAME\" OR subsystem CONTAINS \"$BUNDLE_ID\"" \
+            > evidence/ios/device.log 2>&1 &
+          echo $! > evidence/ios/logger.pid
+
+      - name: Launch app via simctl and capture console
+        id: console
+        if: steps.build.outputs.built == 'true'
+        continue-on-error: true
+        env:
+          UDID: ${{ steps.sim.outputs.udid }}
+          BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
+        run: |
+          set -euo pipefail
+          # `simctl launch --console-pty` attaches the app's stdout/stderr
+          # to our terminal — for React Native that means the JS bridge
+          # error, Hermes stack trace, and red-box message all land in our
+          # log file. This is the most reliable signal for "app crashes at
+          # launch" reproductions, which is the most common bug class
+          # reported against NativeWind.
+          xcrun simctl terminate "$UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
+          ( xcrun simctl launch --terminate-running-process --console-pty \
+              "$UDID" "$BUNDLE_ID" > evidence/ios/app.console.log 2>&1 & \
+            echo $! > evidence/ios/app.console.pid ) || true
+          # Give the JS bundle time to evaluate (or blow up).
+          sleep 25
+
+      - name: Capture UI evidence via agent-device
+        id: capture
+        if: steps.build.outputs.built == 'true'
+        continue-on-error: true
+        env:
+          BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
+        run: |
+          # Cheap signals first (screenshot, perf) before the snapshot,
+          # because `snapshot` spins up an XCUITest accessibility bridge
+          # under the hood — when the app has crashed that bridge often
+          # times out ("Daemon request timed out") and kills the session,
+          # making every subsequent agent-device call fail with
+          # SESSION_NOT_FOUND. Order matters.
+          set +e
+          agent-device --debug --session "$AGENT_DEVICE_SESSION" \
+            open "$BUNDLE_ID" --platform ios \
+            --save-script evidence/ios/launch.ad \
+            2>> evidence/ios/agent-device.log
+          agent-device --session "$AGENT_DEVICE_SESSION" \
+            screenshot evidence/ios/screen.png \
+            2>> evidence/ios/agent-device.log
+          agent-device --session "$AGENT_DEVICE_SESSION" perf --json \
+            > evidence/ios/perf.json \
+            2>> evidence/ios/agent-device.log
+          # Snapshots last — these are the ones that historically time out.
+          agent-device --session "$AGENT_DEVICE_SESSION" snapshot \
+            > evidence/ios/snapshot.txt \
+            2>> evidence/ios/agent-device.log
+          agent-device --session "$AGENT_DEVICE_SESSION" snapshot -i \
+            > evidence/ios/snapshot-interactive.txt \
+            2>> evidence/ios/agent-device.log
+          agent-device --session "$AGENT_DEVICE_SESSION" close \
+            2>> evidence/ios/agent-device.log
+          exit 0
+
+      - name: Stop log stream and console capture
+        if: always()
+        run: |
+          if [ -f evidence/ios/logger.pid ]; then kill "$(cat evidence/ios/logger.pid)" || true; fi
+          if [ -f evidence/ios/app.console.pid ]; then kill "$(cat evidence/ios/app.console.pid)" || true; fi
+          # Copy agent-device's per-session diagnostic ndjson into the
+          # uploaded artifact so the judge / a human can inspect failures.
+          if [ -d "$HOME/.agent-device/logs/$AGENT_DEVICE_SESSION" ]; then
+            mkdir -p evidence/ios/agent-device-diag
+            cp -R "$HOME/.agent-device/logs/$AGENT_DEVICE_SESSION/." \
+                  evidence/ios/agent-device-diag/ || true
+          fi
+
+      - name: Record build-only outcome
+        if: steps.build.outputs.built != 'true'
+        run: |
+          {
+            echo "status=build-failed"
+            echo "note=xcodebuild failed before the app could be launched on a simulator."
+            echo "see=xcodebuild.log"
+          } > evidence/ios/status.txt
+
+      - name: Upload iOS evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repro-evidence-ios-${{ env.ISSUE_NUMBER }}
+          path: evidence/ios
+          retention-days: 14
+
+  # ---------------------------------------------------------------------------
+  # 2b. Android reproduction
+  # ---------------------------------------------------------------------------
+  reproduce-android:
+    name: Reproduce on Android
+    needs: validate
+    if: needs.validate.outputs.sufficient == 'true' && contains(needs.validate.outputs.platforms, 'android')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      REPRO_OWNER: ${{ needs.validate.outputs.repro_owner }}
+      REPRO_REPO: ${{ needs.validate.outputs.repro_repo }}
+      REPRO_REF: ${{ needs.validate.outputs.repro_ref }}
+      ISSUE_NUMBER: ${{ needs.validate.outputs.issue_number }}
+      AGENT_DEVICE_SESSION: repro-android-${{ needs.validate.outputs.issue_number }}
+    steps:
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Checkout reproduction repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPRO_OWNER }}/${{ env.REPRO_REPO }}
+          ref: ${{ env.REPRO_REF }}
+          path: repro
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+
+      - name: Install reproduction dependencies
+        working-directory: repro
+        run: |
+          set -euo pipefail
+          if   [ -f yarn.lock ];         then corepack enable && yarn install --frozen-lockfile || yarn install
+          elif [ -f pnpm-lock.yaml ];    then corepack enable && pnpm install --frozen-lockfile || pnpm install
+          elif [ -f package-lock.json ]; then npm ci || npm install
+          elif [ -f bun.lockb ];         then npm i -g bun && bun install
+          else                                npm install
+          fi
+
+      - name: Prebuild Android
+        working-directory: repro
+        run: |
+          set -euo pipefail
+          if [ ! -d android ]; then
+            npx --yes expo prebuild --platform android --no-install
+          fi
+
+      - name: Build Android APK (debug)
+        id: build
+        working-directory: repro/android
+        run: |
+          set -euo pipefail
+          chmod +x ./gradlew
+          ./gradlew :app:assembleDebug --no-daemon
+          APK=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          PKG=$(${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -n 1)/aapt dump badging "$APK" | awk -F"'" '/package: name=/{print $2}')
+          echo "apk=$(pwd)/$APK" >> "$GITHUB_OUTPUT"
+          echo "package=$PKG"     >> "$GITHUB_OUTPUT"
+
+      - name: Install agent-device
+        run: npm install -g agent-device@latest
+
+      - name: Prepare evidence directory
+        run: mkdir -p evidence/android
+
+      - name: Run app on Android emulator + capture evidence
+        uses: reactivecircus/android-emulator-runner@v2
+        continue-on-error: true
+        env:
+          APK_PATH: ${{ steps.build.outputs.apk }}
+          APP_PACKAGE: ${{ steps.build.outputs.package }}
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_6
+          force-avd-creation: false
+          emulator-options: -no-window -no-snapshot-save -no-boot-anim -camera-back none -gpu swiftshader_indirect
+          disable-animations: true
+          script: |
+            # NB: android-emulator-runner runs this under /bin/sh (dash),
+            # which doesn't support `pipefail`. Use plain `set -eu`.
+            set -eu
+            adb wait-for-device
+            adb install -r -g "$APK_PATH"
+
+            # Stream logs in the background, scoped to the app's PID once
+            # it launches.
+            adb logcat -c
+            adb logcat > evidence/android/device.log 2>&1 &
+            echo $! > evidence/android/logger.pid
+
+            agent-device --session "$AGENT_DEVICE_SESSION" \
+              open "$APP_PACKAGE" --platform android \
+              --save-script evidence/android/launch.ad
+
+            sleep 10
+
+            agent-device --session "$AGENT_DEVICE_SESSION" snapshot \
+              > evidence/android/snapshot.txt || true
+            agent-device --session "$AGENT_DEVICE_SESSION" snapshot -i \
+              > evidence/android/snapshot-interactive.txt || true
+            agent-device --session "$AGENT_DEVICE_SESSION" \
+              screenshot evidence/android/screen.png || true
+            agent-device --session "$AGENT_DEVICE_SESSION" perf --json \
+              > evidence/android/perf.json || true
+            agent-device --session "$AGENT_DEVICE_SESSION" close || true
+
+            if [ -f evidence/android/logger.pid ]; then kill "$(cat evidence/android/logger.pid)" || true; fi
+
+      - name: Upload Android evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repro-evidence-android-${{ env.ISSUE_NUMBER }}
+          path: evidence/android
+          retention-days: 14
+
+  # ---------------------------------------------------------------------------
+  # 3. LLM judge + comment + label
+  # ---------------------------------------------------------------------------
+  report:
+    name: Judge + report
+    needs: [validate, reproduce-ios, reproduce-android]
+    # `always()` so we still post a result even when one platform was skipped
+    # (e.g. issue only mentioned iOS) or the build step failed.
+    if: always() && needs.validate.outputs.sufficient == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      # IMPORTANT: checkout MUST happen before download-artifact. actions/
+      # checkout@v4 defaults to clean=true, which `git clean -ffdx`s the
+      # workspace and would wipe out the evidence/ directory we just
+      # downloaded — leaving the judge script with empty files and
+      # producing false 'all channels empty' verdicts.
+      - name: Check out nativewind (for judge script)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/scripts
+          sparse-checkout-cone-mode: false
+
+      - name: Download iOS evidence
+        if: contains(needs.validate.outputs.platforms, 'ios')
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: repro-evidence-ios-${{ needs.validate.outputs.issue_number }}
+          path: evidence/ios
+
+      - name: Download Android evidence
+        if: contains(needs.validate.outputs.platforms, 'android')
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: repro-evidence-android-${{ needs.validate.outputs.issue_number }}
+          path: evidence/android
+
+      - name: Judge reproduction with Claude
+        id: judge
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ISSUE_TITLE: ${{ needs.validate.outputs.issue_title }}
+          ISSUE_BODY_B64: ${{ needs.validate.outputs.issue_body_b64 }}
+          IOS_STATUS: ${{ needs.reproduce-ios.result }}
+          ANDROID_STATUS: ${{ needs.reproduce-android.result }}
+        run: python3 .github/scripts/judge-repro.py
+
+      - name: Comment + label issue
+        uses: actions/github-script@v7
+        env:
+          VERDICT: ${{ steps.judge.outputs.verdict }}
+          SUMMARY: ${{ steps.judge.outputs.summary }}
+          PER_PLATFORM: ${{ steps.judge.outputs.per_platform }}
+          ISSUE_NUMBER: ${{ needs.validate.outputs.issue_number }}
+        with:
+          script: |
+            const verdict = process.env.VERDICT;
+            const summary = process.env.SUMMARY;
+            const perPlatform = JSON.parse(process.env.PER_PLATFORM || '[]');
+            const issue_number = parseInt(process.env.ISSUE_NUMBER, 10);
+
+            // Verdict → issue label. The 'reproducible' / 'not reproducible'
+            // labels are what humans filter triage queues by; 'needs
+            // investigation' is the safety net for runs the judge couldn't
+            // call either way (e.g. toolchain mismatch, missing bundle).
+            const labelMap = {
+              'reproduced':       'reproducible',
+              'cannot-reproduce': 'not reproducible',
+              'inconclusive':     'needs investigation',
+            };
+            const label = labelMap[verdict] || 'needs investigation';
+
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const platformTable = perPlatform.length
+              ? `\n| Platform | Verdict | Evidence |\n|---|---|---|\n` +
+                perPlatform.map(p => `| ${p.platform} | ${p.verdict} | ${(p.evidence || '').replace(/\n/g, ' ').slice(0, 240)} |`).join('\n')
+              : '';
+
+            const heading = {
+              'reproduced':       '✅ Reproducible',
+              'cannot-reproduce': '❎ Not reproducible',
+              'inconclusive':     '❓ Inconclusive',
+            }[verdict] || '❓ Inconclusive';
+
+            // Verdict-specific one-liner that always sits directly above
+            // the run link so the reporter can click straight through to
+            // the evidence regardless of how the model phrased `summary`.
+            const callout = {
+              'reproduced':
+                `Our automated reproduction pipeline **reproduced** this bug. See the [CI run](${runUrl}) for the captured evidence (accessibility snapshots, screenshots, device logs, app console, perf samples).`,
+              'cannot-reproduce':
+                `Our automated reproduction pipeline **could not reproduce** this bug against the linked repro repository. See the [CI run](${runUrl}) for the captured evidence (accessibility snapshots, screenshots, device logs, app console, perf samples). If you believe the bug still reproduces, please double-check the repro repo runs the failing scenario on a clean install.`,
+              'inconclusive':
+                `Our automated reproduction pipeline could not conclusively judge this bug. See the [CI run](${runUrl}) for the captured evidence. A maintainer will take a closer look.`,
+            }[verdict] || `See the [CI run](${runUrl}) for captured evidence.`;
+
+            const body = [
+              `## ${heading}`,
+              ``,
+              callout,
+              ``,
+              summary,
+              platformTable,
+              ``,
+              `<sub>Automated by \`.github/workflows/issue-repro.yml\` using [agent-device](https://github.com/callstackincubator/agent-device). Workflow run: ${runUrl}</sub>`,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              body,
+            });
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              labels: [label],
+            });
