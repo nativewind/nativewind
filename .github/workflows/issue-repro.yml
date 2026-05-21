@@ -23,8 +23,9 @@ name: Issue Reproduction
 on:
   issues:
     types: [opened, reopened]
-  # Manual trigger for re-running against an existing issue (handy for the
-  # initial dry-run against issue #1783).
+  # Manual trigger for re-running against any existing issue — useful for
+  # ad-hoc reproductions or re-judging an issue after pushing workflow
+  # changes.
   workflow_dispatch:
     inputs:
       issue_number:
@@ -390,7 +391,8 @@ jobs:
           # to our terminal — for React Native that means the JS bridge
           # error, Hermes stack trace, and red-box message all land in our
           # log file. This is the most reliable signal for "app crashes at
-          # launch" reproductions (e.g. issue #1783).
+          # launch" reproductions, which is the most common bug class
+          # reported against NativeWind.
           xcrun simctl terminate "$UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
           ( xcrun simctl launch --terminate-running-process --console-pty \
               "$UDID" "$BUNDLE_ID" > evidence/ios/app.console.log 2>&1 & \
