@@ -630,6 +630,18 @@ jobs:
     if: always() && needs.validate.outputs.sufficient == 'true'
     runs-on: ubuntu-latest
     steps:
+      # IMPORTANT: checkout MUST happen before download-artifact. actions/
+      # checkout@v4 defaults to clean=true, which `git clean -ffdx`s the
+      # workspace and would wipe out the evidence/ directory we just
+      # downloaded — leaving the judge script with empty files and
+      # producing false 'all channels empty' verdicts.
+      - name: Check out nativewind (for judge script)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/scripts
+          sparse-checkout-cone-mode: false
+
       - name: Download iOS evidence
         if: contains(needs.validate.outputs.platforms, 'ios')
         uses: actions/download-artifact@v4
@@ -645,13 +657,6 @@ jobs:
         with:
           name: repro-evidence-android-${{ needs.validate.outputs.issue_number }}
           path: evidence/android
-
-      - name: Check out nativewind (for judge script)
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            .github/scripts
-          sparse-checkout-cone-mode: false
 
       - name: Judge reproduction with Claude
         id: judge
