@@ -4,8 +4,12 @@ name: Issue Reproduction
 #
 #   1. Sufficient-info gate. Parses the issue body for a reproduction repo
 #      link, expected behavior and a description of the bug. If any are
-#      missing the issue is labeled `needs reproduction`, commented on, and
-#      closed.
+#      missing the issue is labeled `needs reproduction` and commented on.
+#      Issues missing the narrative sections ('Describe the bug' /
+#      'Expected behavior') are also auto-closed. Issues whose only gap
+#      is a missing repro link stay open AND we still run reproduction
+#      against a freshly-scaffolded `rn-new` starter (with the stack
+#      options inferred from the issue body).
 #
 #   2. Live reproduction. The repository referenced in the issue body is
 #      cloned, built for both iOS and Android, then launched on a simulator/
@@ -50,10 +54,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       sufficient: ${{ steps.parse.outputs.sufficient }}
+      has_repro: ${{ steps.parse.outputs.has_repro }}
       repro_url: ${{ steps.parse.outputs.repro_url }}
       repro_owner: ${{ steps.parse.outputs.repro_owner }}
       repro_repo: ${{ steps.parse.outputs.repro_repo }}
       repro_ref: ${{ steps.parse.outputs.repro_ref }}
+      scaffold_flavor: ${{ steps.parse.outputs.scaffold_flavor }}
       platforms: ${{ steps.parse.outputs.platforms }}
       issue_number: ${{ steps.parse.outputs.issue_number }}
       issue_title: ${{ steps.parse.outputs.issue_title }}
@@ -227,12 +233,34 @@ jobs:
             const hasDescribe = /describe the bug[\s\S]{20,}/i.test(body);
             const hasExpected = /expected behavior[\s\S]{10,}/i.test(body);
 
+            // Narrative is the hard gate: we genuinely can't reproduce a
+            // bug we can't understand. A missing repro link is *not* a
+            // gate — we'll fall back to scaffolding a fresh `rn-new`
+            // starter below.
+            const sufficient = hasDescribe && hasExpected;
+
             const missing = [];
             if (!repro) missing.push('a public GitHub reproduction repository link');
             if (!hasDescribe) missing.push('a description of the bug ("Describe the bug" section with details)');
             if (!hasExpected) missing.push('the expected behavior ("Expected behavior" section)');
 
-            const sufficient = missing.length === 0;
+            // --- scaffold flavor inference ---------------------------------
+            // When the reporter didn't link a repro repo we'll spin up a
+            // freshly-generated `rn-new` starter. Pick the channel/stack
+            // hinted at in the body so the starter is at least plausibly
+            // close to the reporter's setup.
+            const wantsNext = /\b(nativewind\s*v?5|next|5\.0\.0-preview|preview\.?\d)\b/i.test(body);
+            const wantsExpoRouter = /\bexpo[\s-]?router\b/i.test(body);
+            const wantsReactNavigation = /\breact[\s-]?navigation\b/i.test(body);
+            // expo-router takes precedence if both are mentioned (it implies
+            // a routing setup; react-navigation v8 issues like #1783 still
+            // get covered because rn-new will pick a sensible default).
+            const stack = wantsExpoRouter
+              ? 'expo-router'
+              : wantsReactNavigation
+                ? 'react-navigation'
+                : 'plain';
+            const scaffoldFlavor = `${wantsNext ? 'next' : 'latest'}-${stack}`;
 
             // --- platform inference -----------------------------------------
             const platforms = [];
@@ -242,6 +270,8 @@ jobs:
             if (platforms.length === 0) platforms.push('ios', 'android');
 
             core.setOutput('sufficient', sufficient ? 'true' : 'false');
+            core.setOutput('has_repro', repro ? 'true' : 'false');
+            core.setOutput('scaffold_flavor', scaffoldFlavor);
             core.setOutput('issue_number', String(issue.number));
             core.setOutput('issue_title', issue.title || '');
             core.setOutput('issue_body_b64', Buffer.from(body, 'utf8').toString('base64'));
@@ -256,19 +286,36 @@ jobs:
             core.summary
               .addHeading(`Issue #${issue.number}: ${issue.title}`)
               .addRaw(`Sufficient info: **${sufficient}**`).addEOL()
-              .addRaw(`Reproduction: ${repro ? repro.url : '(none found)'}`).addEOL()
+              .addRaw(`Reproduction: ${repro ? repro.url : `(none found — will scaffold \`${scaffoldFlavor}\`)`}`).addEOL()
               .addRaw(`Platforms: ${platforms.join(', ')}`).addEOL();
-            if (!sufficient) core.summary.addList(missing);
+            if (missing.length) core.summary.addList(missing);
             await core.summary.write();
 
 
-            // --- on insufficient info: comment, label, close ----------------
-            if (!sufficient) {
+            // --- branching on what's missing -------------------------------
+            // Three outcomes:
+            //   1. Narrative missing       → label + comment + close.
+            //                                Can't usefully act on the bug.
+            //   2. Only repro link missing → label + comment, stay open.
+            //                                Downstream reproduce-* jobs run
+            //                                anyway against a scaffolded
+            //                                starter (see `sufficient` above).
+            //   3. All three present       → silent pass to reproduce-*.
+            const onlyMissingRepro = !repro && hasDescribe && hasExpected;
+            const willClose = !sufficient;
+            const needsComment = !sufficient || onlyMissingRepro;
+
+            if (needsComment) {
               const missingList = missing.map((m) => `- ${m}`).join('\n');
+
+              const closingLine = willClose
+                ? `Issues without enough information to understand the bug are automatically closed. Once you've updated the issue with the missing details feel free to reopen it.`
+                : `Because the rest of the bug report is complete, our CI will still attempt a reproduction against a freshly-scaffolded \`${scaffoldFlavor}\` \`rn-new\` starter — see the workflow run linked in the follow-up comment. If the bug only shows up in a specific configuration, please attach a repro repo and the workflow will re-run on the next edit / reopen.`;
+
               const commentBody = [
                 `👋 Thanks for opening this issue!`,
                 ``,
-                `Before our CI can attempt to reproduce this bug we need a bit more information. The following appear to be missing or incomplete:`,
+                `Before our CI can confidently reproduce this bug we'd like a bit more information. The following appear to be missing or incomplete:`,
                 ``,
                 missingList,
                 ``,
@@ -279,7 +326,7 @@ jobs:
                 `- \`npx rn-new@next --nativewind\``,
                 `- \`npx rn-new@next --nativewind --expo-router\``,
                 ``,
-                `Issues without enough information to reproduce are automatically closed. Once you've updated the issue with the missing details feel free to reopen it.`,
+                closingLine,
                 ``,
                 `For usage questions please use the [Discord](https://discord.gg/ypNakAFQ65) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions).`,
               ].join('\n');
@@ -296,12 +343,14 @@ jobs:
                 issue_number: issue.number,
                 labels: ['needs reproduction'],
               });
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                state: 'closed',
-              });
+              if (willClose) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: 'closed',
+                });
+              }
             }
 
   # ---------------------------------------------------------------------------
@@ -318,23 +367,42 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 45
     env:
+      HAS_REPRO: ${{ needs.validate.outputs.has_repro }}
       REPRO_OWNER: ${{ needs.validate.outputs.repro_owner }}
       REPRO_REPO: ${{ needs.validate.outputs.repro_repo }}
       REPRO_REF: ${{ needs.validate.outputs.repro_ref }}
+      SCAFFOLD_FLAVOR: ${{ needs.validate.outputs.scaffold_flavor }}
       ISSUE_NUMBER: ${{ needs.validate.outputs.issue_number }}
       AGENT_DEVICE_SESSION: repro-ios-${{ needs.validate.outputs.issue_number }}
     steps:
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Checkout reproduction repository
+        if: env.HAS_REPRO == 'true'
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPRO_OWNER }}/${{ env.REPRO_REPO }}
           ref: ${{ env.REPRO_REF }}
           path: repro
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
+      - name: Scaffold rn-new starter (no repro link in issue)
+        if: env.HAS_REPRO != 'true'
+        run: |
+          set -euo pipefail
+          case "$SCAFFOLD_FLAVOR" in
+            next-expo-router)        FLAGS="--nativewind --expo-router";       CHANNEL=next ;;
+            next-react-navigation)   FLAGS="--nativewind --reactNavigation";   CHANNEL=next ;;
+            next-plain)              FLAGS="--nativewind";                     CHANNEL=next ;;
+            latest-expo-router)      FLAGS="--nativewind --expo-router";       CHANNEL=latest ;;
+            latest-react-navigation) FLAGS="--nativewind --reactNavigation";   CHANNEL=latest ;;
+            *)                       FLAGS="--nativewind";                     CHANNEL=latest ;;
+          esac
+          echo "Scaffolding rn-new@$CHANNEL repro $FLAGS --default --noInstall --noGit"
+          npx --yes "rn-new@$CHANNEL" repro $FLAGS --default --noInstall --noGit
+          test -d repro && test -f repro/package.json
 
       - name: Install reproduction dependencies
         working-directory: repro
@@ -598,9 +666,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
+      HAS_REPRO: ${{ needs.validate.outputs.has_repro }}
       REPRO_OWNER: ${{ needs.validate.outputs.repro_owner }}
       REPRO_REPO: ${{ needs.validate.outputs.repro_repo }}
       REPRO_REF: ${{ needs.validate.outputs.repro_ref }}
+      SCAFFOLD_FLAVOR: ${{ needs.validate.outputs.scaffold_flavor }}
       ISSUE_NUMBER: ${{ needs.validate.outputs.issue_number }}
       AGENT_DEVICE_SESSION: repro-android-${{ needs.validate.outputs.issue_number }}
     steps:
@@ -609,13 +679,6 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-
-      - name: Checkout reproduction repository
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.REPRO_OWNER }}/${{ env.REPRO_REPO }}
-          ref: ${{ env.REPRO_REF }}
-          path: repro
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -627,6 +690,30 @@ jobs:
         with:
           java-version: "17"
           distribution: temurin
+
+      - name: Checkout reproduction repository
+        if: env.HAS_REPRO == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPRO_OWNER }}/${{ env.REPRO_REPO }}
+          ref: ${{ env.REPRO_REF }}
+          path: repro
+
+      - name: Scaffold rn-new starter (no repro link in issue)
+        if: env.HAS_REPRO != 'true'
+        run: |
+          set -euo pipefail
+          case "$SCAFFOLD_FLAVOR" in
+            next-expo-router)        FLAGS="--nativewind --expo-router";       CHANNEL=next ;;
+            next-react-navigation)   FLAGS="--nativewind --reactNavigation";   CHANNEL=next ;;
+            next-plain)              FLAGS="--nativewind";                     CHANNEL=next ;;
+            latest-expo-router)      FLAGS="--nativewind --expo-router";       CHANNEL=latest ;;
+            latest-react-navigation) FLAGS="--nativewind --reactNavigation";   CHANNEL=latest ;;
+            *)                       FLAGS="--nativewind";                     CHANNEL=latest ;;
+          esac
+          echo "Scaffolding rn-new@$CHANNEL repro $FLAGS --default --noInstall --noGit"
+          npx --yes "rn-new@$CHANNEL" repro $FLAGS --default --noInstall --noGit
+          test -d repro && test -f repro/package.json
 
       - name: Install reproduction dependencies
         working-directory: repro
@@ -773,12 +860,16 @@ jobs:
           SUMMARY: ${{ steps.judge.outputs.summary }}
           PER_PLATFORM: ${{ steps.judge.outputs.per_platform }}
           ISSUE_NUMBER: ${{ needs.validate.outputs.issue_number }}
+          HAS_REPRO: ${{ needs.validate.outputs.has_repro }}
+          SCAFFOLD_FLAVOR: ${{ needs.validate.outputs.scaffold_flavor }}
         with:
           script: |
             const verdict = process.env.VERDICT;
             const summary = process.env.SUMMARY;
             const perPlatform = JSON.parse(process.env.PER_PLATFORM || '[]');
             const issue_number = parseInt(process.env.ISSUE_NUMBER, 10);
+            const scaffolded = process.env.HAS_REPRO !== 'true';
+            const scaffoldFlavor = process.env.SCAFFOLD_FLAVOR || 'latest-plain';
 
             // Verdict → issue label. The 'reproducible' / 'not reproducible'
             // labels are what humans filter triage queues by; 'needs
@@ -816,11 +907,19 @@ jobs:
                 `Our automated reproduction pipeline could not conclusively judge this bug. See the [CI run](${runUrl}) for the captured evidence. A maintainer will take a closer look.`,
             }[verdict] || `See the [CI run](${runUrl}) for captured evidence.`;
 
+            // When we ran against a scaffolded starter instead of a
+            // user-provided repro repo, the verdict is necessarily less
+            // authoritative — surface that prominently so reporters know
+            // a 'not reproducible' isn't a final answer for their setup.
+            const scaffoldedCaveat = scaffolded
+              ? `\n> ⚠️ This run was against a freshly-scaffolded \`${scaffoldFlavor}\` \`rn-new\` starter because the issue didn't link a repro repository. If your bug only manifests in a specific configuration (extra deps, custom babel/metro config, navigation flow, etc.), please attach a public repro repo and the workflow will re-run on the next edit / reopen.\n`
+              : '';
+
             const body = [
               `## ${heading}`,
               ``,
               callout,
-              ``,
+              scaffoldedCaveat,
               summary,
               platformTable,
               ``,
