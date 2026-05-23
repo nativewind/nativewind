@@ -500,7 +500,6 @@ jobs:
           fi
           APP_PATH=$(find build/DerivedData/Build/Products/Debug-iphonesimulator -maxdepth 2 -name "*.app" -type d | head -n 1)
           BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw "$APP_PATH/Info.plist")
-          EXEC_NAME=$(plutil -extract CFBundleExecutable raw "$APP_PATH/Info.plist")
 
           # Belt-and-suspenders: if the Xcode bundle phase still no-op'd
           # (e.g. with-environment.sh clobbered our FORCE_BUNDLING), run
@@ -528,109 +527,72 @@ jobs:
           echo "built=true"                 >> "$GITHUB_OUTPUT"
           echo "app_path=$(pwd)/$APP_PATH" >> "$GITHUB_OUTPUT"
           echo "bundle_id=$BUNDLE_ID"      >> "$GITHUB_OUTPUT"
-          echo "exec_name=$EXEC_NAME"      >> "$GITHUB_OUTPUT"
-
-      - name: Boot iOS simulator
-        id: sim
-        if: steps.build.outputs.built == 'true'
-        run: |
-          set -euo pipefail
-          UDID=$(xcrun simctl list devices available --json | \
-            python3 -c "import sys,json; d=json.load(sys.stdin)['devices']; \
-            [print(dev['udid']) for v in d.values() for dev in v if 'iPhone' in dev['name']]" | head -n 1)
-          if [ -z "$UDID" ]; then echo "::error::No iPhone simulator available"; exit 1; fi
-          xcrun simctl boot "$UDID" || true
-          xcrun simctl bootstatus "$UDID" -b
-          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
 
       - name: Install agent-device
         if: steps.build.outputs.built == 'true'
-        run: npm install -g agent-device@latest
+        run: npm install -g agent-device@0.15.2
+
+      - name: Boot iOS simulator
+        if: steps.build.outputs.built == 'true'
+        run: agent-device boot --platform ios 2>> evidence/ios/agent-device.log
 
       - name: Install app on simulator
         if: steps.build.outputs.built == 'true'
-        run: xcrun simctl install ${{ steps.sim.outputs.udid }} "${{ steps.build.outputs.app_path }}"
-
-      - name: Stream device logs in background
-        if: steps.build.outputs.built == 'true'
         env:
-          UDID: ${{ steps.sim.outputs.udid }}
+          APP_PATH: ${{ steps.build.outputs.app_path }}
           BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
-          EXEC_NAME: ${{ steps.build.outputs.exec_name }}
-        run: |
-          # The macOS unified log shows `processImagePath` as a filesystem
-          # path to the binary (e.g. ".../PadelPlayground.app/PadelPlayground")
-          # — the bundle id never appears in that path. Filter by the
-          # CFBundleExecutable name + subsystem (apps that use os_log) to
-          # actually capture the RN runtime + Hermes output.
-          xcrun simctl spawn "$UDID" log stream \
-            --level=debug --style=compact \
-            --predicate "processImagePath CONTAINS \"/$EXEC_NAME.app/\" OR process == \"$EXEC_NAME\" OR subsystem CONTAINS \"$BUNDLE_ID\"" \
-            > evidence/ios/device.log 2>&1 &
-          echo $! > evidence/ios/logger.pid
+        run: agent-device install "$BUNDLE_ID" "$APP_PATH" --platform ios 2>> evidence/ios/agent-device.log
 
-      - name: Launch app via simctl and capture console
+      - name: Launch app and start scoped logs
         id: console
         if: steps.build.outputs.built == 'true'
         continue-on-error: true
         env:
-          UDID: ${{ steps.sim.outputs.udid }}
           BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
         run: |
-          set -euo pipefail
-          # `simctl launch --console-pty` attaches the app's stdout/stderr
-          # to our terminal — for React Native that means the JS bridge
-          # error, Hermes stack trace, and red-box message all land in our
-          # log file. This is the most reliable signal for "app crashes at
-          # launch" reproductions, which is the most common bug class
-          # reported against NativeWind.
-          xcrun simctl terminate "$UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
-          ( xcrun simctl launch --terminate-running-process --console-pty \
-              "$UDID" "$BUNDLE_ID" > evidence/ios/app.console.log 2>&1 & \
-            echo $! > evidence/ios/app.console.pid ) || true
-          # Give the JS bundle time to evaluate (or blow up).
-          sleep 25
+          set +e
+          exec 2>> evidence/ios/agent-device.log
+          agent-device --debug \
+            open "$BUNDLE_ID" --platform ios \
+            --save-script evidence/ios/launch.ad
+          agent-device logs clear --restart
+          agent-device \
+            open "$BUNDLE_ID" --platform ios --relaunch \
+            --launch-console evidence/ios/app.console.log
+          agent-device wait 25000
+          exit 0
 
       - name: Capture UI evidence via agent-device
         id: capture
         if: steps.build.outputs.built == 'true'
         continue-on-error: true
-        env:
-          BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
         run: |
-          # Cheap signals first (screenshot, perf) before the snapshot,
-          # because `snapshot` spins up an XCUITest accessibility bridge
-          # under the hood — when the app has crashed that bridge often
-          # times out ("Daemon request timed out") and kills the session,
-          # making every subsequent agent-device call fail with
-          # SESSION_NOT_FOUND. Order matters.
+          # Cheap signals first. Snapshot can be slower or time out when the
+          # app has crashed, so keep screenshot, perf, console, and logs as
+          # robust evidence even when accessibility capture fails.
           set +e
-          agent-device --debug --session "$AGENT_DEVICE_SESSION" \
-            open "$BUNDLE_ID" --platform ios \
-            --save-script evidence/ios/launch.ad \
-            2>> evidence/ios/agent-device.log
-          agent-device --session "$AGENT_DEVICE_SESSION" \
-            screenshot evidence/ios/screen.png \
-            2>> evidence/ios/agent-device.log
-          agent-device --session "$AGENT_DEVICE_SESSION" perf --json \
-            > evidence/ios/perf.json \
-            2>> evidence/ios/agent-device.log
+          exec 2>> evidence/ios/agent-device.log
+          agent-device \
+            screenshot evidence/ios/screen.png
+          agent-device perf --json \
+            > evidence/ios/perf.json
           # Snapshots last — these are the ones that historically time out.
-          agent-device --session "$AGENT_DEVICE_SESSION" snapshot \
-            > evidence/ios/snapshot.txt \
-            2>> evidence/ios/agent-device.log
-          agent-device --session "$AGENT_DEVICE_SESSION" snapshot -i \
-            > evidence/ios/snapshot-interactive.txt \
-            2>> evidence/ios/agent-device.log
-          agent-device --session "$AGENT_DEVICE_SESSION" close \
-            2>> evidence/ios/agent-device.log
+          agent-device snapshot \
+            > evidence/ios/snapshot.txt
+          agent-device snapshot -i \
+            > evidence/ios/snapshot-interactive.txt
+          agent-device logs path \
+            > evidence/ios/logs-path.txt
+          LOG_PATH="$(head -n 1 evidence/ios/logs-path.txt || true)"
+          if [ -n "$LOG_PATH" ] && [ -f "$LOG_PATH" ]; then
+            cp "$LOG_PATH" evidence/ios/device.log
+          fi
+          agent-device close
           exit 0
 
-      - name: Stop log stream and console capture
+      - name: Export agent-device diagnostics
         if: always()
         run: |
-          if [ -f evidence/ios/logger.pid ]; then kill "$(cat evidence/ios/logger.pid)" || true; fi
-          if [ -f evidence/ios/app.console.pid ]; then kill "$(cat evidence/ios/app.console.pid)" || true; fi
           # Copy agent-device's per-session diagnostic ndjson into the
           # uploaded artifact so the judge / a human can inspect failures.
           if [ -d "$HOME/.agent-device/logs/$AGENT_DEVICE_SESSION" ]; then
@@ -747,7 +709,7 @@ jobs:
           echo "package=$PKG"     >> "$GITHUB_OUTPUT"
 
       - name: Install agent-device
-        run: npm install -g agent-device@latest
+        run: npm install -g agent-device@0.15.2
 
       - name: Prepare evidence directory
         run: mkdir -p evidence/android
@@ -767,34 +729,56 @@ jobs:
           disable-animations: true
           script: |
             # NB: android-emulator-runner runs this under /bin/sh (dash),
-            # which doesn't support `pipefail`. Use plain `set -eu`.
-            set -eu
-            adb wait-for-device
-            adb install -r -g "$APK_PATH"
+            # which doesn't support `pipefail`. Keep collecting evidence
+            # even when one capture channel fails.
+            set +e
+            agent-device \
+              install "$APP_PACKAGE" "$APK_PATH" --platform android \
+              2>> evidence/android/agent-device.log
 
-            # Stream logs in the background, scoped to the app's PID once
-            # it launches.
-            adb logcat -c
-            adb logcat > evidence/android/device.log 2>&1 &
-            echo $! > evidence/android/logger.pid
-
-            agent-device --session "$AGENT_DEVICE_SESSION" \
+            agent-device \
               open "$APP_PACKAGE" --platform android \
-              --save-script evidence/android/launch.ad
+              --save-script evidence/android/launch.ad \
+              2>> evidence/android/agent-device.log
+            agent-device logs clear --restart \
+              2>> evidence/android/agent-device.log
+            agent-device \
+              open "$APP_PACKAGE" --platform android --relaunch \
+              2>> evidence/android/agent-device.log
 
-            sleep 10
+            agent-device wait 25000 \
+              2>> evidence/android/agent-device.log
 
-            agent-device --session "$AGENT_DEVICE_SESSION" snapshot \
-              > evidence/android/snapshot.txt || true
-            agent-device --session "$AGENT_DEVICE_SESSION" snapshot -i \
-              > evidence/android/snapshot-interactive.txt || true
-            agent-device --session "$AGENT_DEVICE_SESSION" \
-              screenshot evidence/android/screen.png || true
-            agent-device --session "$AGENT_DEVICE_SESSION" perf --json \
-              > evidence/android/perf.json || true
-            agent-device --session "$AGENT_DEVICE_SESSION" close || true
+            agent-device \
+              screenshot evidence/android/screen.png \
+              2>> evidence/android/agent-device.log
+            agent-device perf --json \
+              > evidence/android/perf.json \
+              2>> evidence/android/agent-device.log
+            agent-device snapshot \
+              > evidence/android/snapshot.txt \
+              2>> evidence/android/agent-device.log
+            agent-device snapshot -i \
+              > evidence/android/snapshot-interactive.txt \
+              2>> evidence/android/agent-device.log
+            agent-device logs path \
+              > evidence/android/logs-path.txt \
+              2>> evidence/android/agent-device.log
+            LOG_PATH="$(head -n 1 evidence/android/logs-path.txt || true)"
+            if [ -n "$LOG_PATH" ] && [ -f "$LOG_PATH" ]; then
+              cp "$LOG_PATH" evidence/android/device.log
+            fi
+            agent-device close \
+              2>> evidence/android/agent-device.log
 
-            if [ -f evidence/android/logger.pid ]; then kill "$(cat evidence/android/logger.pid)" || true; fi
+      - name: Export Android agent-device diagnostics
+        if: always()
+        run: |
+          if [ -d "$HOME/.agent-device/logs/$AGENT_DEVICE_SESSION" ]; then
+            mkdir -p evidence/android/agent-device-diag
+            cp -R "$HOME/.agent-device/logs/$AGENT_DEVICE_SESSION/." \
+                  evidence/android/agent-device-diag/ || true
+          fi
 
       - name: Upload Android evidence
         if: always()
