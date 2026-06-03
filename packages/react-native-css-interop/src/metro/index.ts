@@ -1,6 +1,6 @@
+import assert from "assert";
 import fs from "fs";
 import fsPromise from "fs/promises";
-import assert from "assert";
 import path from "path";
 import type { EventEmitter } from "stream";
 
@@ -295,10 +295,7 @@ function getConfig(
   };
 }
 
-function emitHasteFileChange(
-  filePath: string,
-  debug: Debugger,
-) {
+function emitHasteFileChange(filePath: string, debug: Debugger) {
   assert(haste != null);
   // WARN: To prevent future incompatibilities with Metro from crashing, it's better
   // to just assume this call may fail
@@ -319,8 +316,8 @@ function emitHasteFileChange(
       // Post metro-file-map@0.83.6 / metro-file-map@0.84.3:
       // The internal change event structure has changed and expects a new shape now
       get rootDir() {
-        const rootDir = fileSystem?.lookup('');
-        assert(rootDir?.exists && typeof rootDir.realPath === 'string');
+        const rootDir = fileSystem?.lookup("");
+        assert(rootDir?.exists && typeof rootDir.realPath === "string");
         return rootDir.realPath;
       },
       changes: {
@@ -328,16 +325,11 @@ function emitHasteFileChange(
         removedDirectories: EMPTY_SET,
         addedFiles: EMPTY_SET,
         removedFiles: EMPTY_SET,
-        changedFiles: new Set([
-          [
-            filePath,
-            { isSymlink: false, modifiedTime }
-          ]
-        ]),
+        changedFiles: new Set([[filePath, { isSymlink: false, modifiedTime }]]),
       },
     });
   } catch (error) {
-    debug('virtualStyles.emit failed', error);
+    debug("virtualStyles.emit failed", error);
   }
 }
 
