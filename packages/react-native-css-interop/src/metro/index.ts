@@ -1,6 +1,8 @@
+import assert from "assert";
 import fs from "fs";
 import fsPromise from "fs/promises";
 import path from "path";
+import type { EventEmitter } from "stream";
 
 import connect from "connect";
 import { debug as debugFn, Debugger } from "debug";
@@ -73,7 +75,11 @@ export type GetCSSForPlatform = (
 
 export type GetCSSForPlatformOnChange = (platform: string) => void;
 
-let haste: any;
+const EMPTY_SET = new Set<any>();
+
+let haste: unknown | undefined;
+let fileSystem: FileSystem | undefined;
+
 let virtualModulesPossible: undefined | Promise<void> = undefined;
 const virtualModules = new Map<string, Promise<string | Buffer>>();
 const outputDirectory = path.resolve(__dirname, "../../.cache");
@@ -228,7 +234,8 @@ function getConfig(
               .getDependencyGraph()
               .then(async (graph: any) => {
                 haste = graph._haste;
-                ensureFileSystemPatched(graph._fileSystem);
+                fileSystem = graph._fileSystem;
+                ensureFileSystemPatched(fileSystem!);
                 ensureBundlerPatched(bundler);
               });
 
@@ -288,6 +295,44 @@ function getConfig(
   };
 }
 
+function emitHasteFileChange(filePath: string, debug: Debugger) {
+  assert(haste != null);
+  // WARN: To prevent future incompatibilities with Metro from crashing, it's better
+  // to just assume this call may fail
+  try {
+    const modifiedTime = Date.now();
+    (haste as EventEmitter).emit("change", {
+      eventsQueue: [
+        {
+          filePath,
+          metadata: {
+            modifiedTime: Date.now(),
+            size: 1, // Can be anything
+            type: "virtual", // Can be anything
+          },
+          type: "change",
+        },
+      ],
+      // Post metro-file-map@0.83.6 / metro-file-map@0.84.3:
+      // The internal change event structure has changed and expects a new shape now
+      get rootDir() {
+        const rootDir = fileSystem?.lookup("");
+        assert(rootDir?.exists && typeof rootDir.realPath === "string");
+        return rootDir.realPath;
+      },
+      changes: {
+        addedDirectories: EMPTY_SET,
+        removedDirectories: EMPTY_SET,
+        addedFiles: EMPTY_SET,
+        removedFiles: EMPTY_SET,
+        changedFiles: new Set([[filePath, { isSymlink: false, modifiedTime }]]),
+      },
+    });
+  } catch (error) {
+    debug("virtualStyles.emit failed", error);
+  }
+}
+
 async function startCSSProcessor(
   filePath: string,
   platform: string,
@@ -341,19 +386,7 @@ async function startCSSProcessor(
         );
 
         debug(`virtualStyles.emit ${platform}`);
-        haste.emit("change", {
-          eventsQueue: [
-            {
-              filePath,
-              metadata: {
-                modifiedTime: Date.now(),
-                size: 1, // Can be anything
-                type: "virtual", // Can be anything
-              },
-              type: "change",
-            },
-          ],
-        });
+        emitHasteFileChange(filePath, debug);
       }).then((css) => {
         debug(`virtualStyles.initial ${platform}`);
         return platform === "web"
