@@ -10,7 +10,6 @@ import type {
   BoxShadow,
   ColorOrAuto,
   CssColor,
-  Declaration,
   DimensionPercentageFor_LengthValue,
   Display,
   EnvironmentVariable,
@@ -47,9 +46,11 @@ import type {
 
 import { isDescriptorArray } from "../shared";
 import type {
+  Declaration,
   ExtractionWarning,
   RuntimeFunction,
   RuntimeValueDescriptor,
+  FontVariant,
 } from "../types";
 import { FeatureFlagStatus } from "./feature-flags";
 import { toRNProperty } from "./normalize-selectors";
@@ -174,6 +175,7 @@ const validProperties = [
   "font-family",
   "font-size",
   "font-style",
+  "font-variant",
   "font-variant-caps",
   "font-weight",
   "gap",
@@ -1277,6 +1279,11 @@ export function parseDeclaration(
       return addStyleProp(
         declaration.property,
         parseFontStyle(declaration.value, parseOptions),
+      );
+    case "font-variant":
+      return addStyleProp(
+        declaration.property,
+        parseFontVariantCaps(declaration.value, parseOptions),
       );
     case "font-variant-caps":
       return addStyleProp(
@@ -2428,7 +2435,7 @@ function parseFontStyle(
 }
 
 function parseFontVariantCaps(
-  fontVariantCaps: FontVariantCaps,
+  fontVariantCaps: FontVariantCaps | FontVariant,
   options: ParseDeclarationOptionsWithValueWarning,
 ) {
   const allowed = new Set([
