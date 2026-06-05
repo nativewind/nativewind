@@ -25,6 +25,8 @@ Nativewind makes sure you're using the best style engine for any given platform 
 
 Nativewind processes your styles during your application's build step and uses a minimal runtime to selectively apply reactive styles (eg changes to device orientation, light dark mode).
 
+> Built and maintained by the team at [Ronin Software](https://ronindevs.com/?utm_source=nativewind&utm_medium=readme). We help teams build, fix, and ship React Native apps.
+
 ## Installation
 
 If you have an existing project, [use these guides](https://www.nativewind.dev/docs/getting-started/installation) to configure Nativewind for your respective stack.
