@@ -1,5 +1,11 @@
 # react-native-css-interop
 
+## 0.2.5
+
+### Patch Changes
+
+- 64c9f04: Add metro-file-map forward compatibility
+
 ## 0.2.4
 
 ### Patch Changes
