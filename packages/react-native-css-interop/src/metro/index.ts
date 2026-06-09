@@ -301,7 +301,25 @@ function emitHasteFileChange(filePath: string, debug: Debugger) {
   // to just assume this call may fail
   try {
     const modifiedTime = Date.now();
+
+    // Post metro-file-map@0.83.6 / metro-file-map@0.84.3:
+    // The internal change event structure changed. Metro reconstructs each
+    // changed file's absolute path via `path.join(rootDir, canonicalPath)` and
+    // iterates the `modifiedFiles` key (see DependencyGraph._onHasteChange and
+    // DeltaCalculator._handleMultipleFileChanges). So the change set must:
+    //   1. use `modifiedFiles` (not `changedFiles`), otherwise Metro spreads
+    //      `undefined` -> "modifiedFiles is not iterable"; and
+    //   2. carry the path RELATIVE to rootDir, not the absolute filePath -
+    //      `path.join(rootDir, "/abs/path")` yields a bogus path, so the virtual
+    //      module is never matched in the graph and the CSS update is never sent
+    //      to the connected client (new classes silently never apply).
+    const rootDirEntry = fileSystem?.lookup("");
+    assert(rootDirEntry?.exists && typeof rootDirEntry.realPath === "string");
+    const rootDir = rootDirEntry.realPath;
+    const canonicalPath = path.relative(rootDir, filePath);
+
     (haste as EventEmitter).emit("change", {
+      // Kept for compatibility with pre-0.83 Metro, which consumed eventsQueue.
       eventsQueue: [
         {
           filePath,
@@ -313,19 +331,15 @@ function emitHasteFileChange(filePath: string, debug: Debugger) {
           type: "change",
         },
       ],
-      // Post metro-file-map@0.83.6 / metro-file-map@0.84.3:
-      // The internal change event structure has changed and expects a new shape now
-      get rootDir() {
-        const rootDir = fileSystem?.lookup("");
-        assert(rootDir?.exists && typeof rootDir.realPath === "string");
-        return rootDir.realPath;
-      },
+      rootDir,
       changes: {
         addedDirectories: EMPTY_SET,
         removedDirectories: EMPTY_SET,
         addedFiles: EMPTY_SET,
         removedFiles: EMPTY_SET,
-        changedFiles: new Set([[filePath, { isSymlink: false, modifiedTime }]]),
+        modifiedFiles: new Set([
+          [canonicalPath, { isSymlink: false, modifiedTime }],
+        ]),
       },
     });
   } catch (error) {
