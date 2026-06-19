@@ -3,13 +3,15 @@ name: Issue Reproduction
 # Runs whenever a bug is filed against NativeWind. Performs two checks:
 #
 #   1. Sufficient-info gate. Parses the issue body for a reproduction repo
-#      link, expected behavior and a description of the bug. If any are
-#      missing the issue is labeled `needs reproduction` and commented on.
-#      Issues missing the narrative sections ('Describe the bug' /
-#      'Expected behavior') are also auto-closed. Issues whose only gap
-#      is a missing repro link stay open AND we still run reproduction
-#      against a freshly-scaffolded `rn-new` starter (with the stack
-#      options inferred from the issue body).
+#      link, expected behavior and a description of the bug to decide
+#      whether (and how) to reproduce. Issues carrying the narrative
+#      sections ('Describe the bug' / 'Expected behavior') proceed to
+#      reproduction; a missing repro link is not a blocker — we fall back
+#      to a freshly-scaffolded `rn-new` starter (with the stack options
+#      inferred from the issue body). Labeling, commenting and closing of
+#      under-specified issues is handled separately by the issue validator,
+#      not here — the only comments this workflow still posts are the
+#      spam/rate-limit notice and the final reproduction result.
 #
 #   2. Live reproduction. The repository referenced in the issue body is
 #      cloned, built for both iOS and Android, then launched on a simulator/
@@ -290,68 +292,6 @@ jobs:
               .addRaw(`Platforms: ${platforms.join(', ')}`).addEOL();
             if (missing.length) core.summary.addList(missing);
             await core.summary.write();
-
-
-            // --- branching on what's missing -------------------------------
-            // Three outcomes:
-            //   1. Narrative missing       → label + comment + close.
-            //                                Can't usefully act on the bug.
-            //   2. Only repro link missing → label + comment, stay open.
-            //                                Downstream reproduce-* jobs run
-            //                                anyway against a scaffolded
-            //                                starter (see `sufficient` above).
-            //   3. All three present       → silent pass to reproduce-*.
-            const onlyMissingRepro = !repro && hasDescribe && hasExpected;
-            const willClose = !sufficient;
-            const needsComment = !sufficient || onlyMissingRepro;
-
-            if (needsComment) {
-              const missingList = missing.map((m) => `- ${m}`).join('\n');
-
-              const closingLine = willClose
-                ? `Issues without enough information to understand the bug are automatically closed. Once you've updated the issue with the missing details feel free to reopen it.`
-                : `Because the rest of the bug report is complete, our CI will still attempt a reproduction against a freshly-scaffolded \`${scaffoldFlavor}\` \`rn-new\` starter — see the workflow run linked in the follow-up comment. If the bug only shows up in a specific configuration, please attach a repro repo and the workflow will re-run on the next edit / reopen.`;
-
-              const commentBody = [
-                `👋 Thanks for opening this issue!`,
-                ``,
-                `Before our CI can confidently reproduce this bug we'd like a bit more information. The following appear to be missing or incomplete:`,
-                ``,
-                missingList,
-                ``,
-                `Please update the issue and provide a public GitHub repository that reproduces the bug end-to-end. The easiest way to scaffold one is:`,
-                ``,
-                `- \`npx rn-new@latest --nativewind\``,
-                `- \`npx rn-new@latest --nativewind --expo-router\``,
-                `- \`npx rn-new@next --nativewind\``,
-                `- \`npx rn-new@next --nativewind --expo-router\``,
-                ``,
-                closingLine,
-                ``,
-                `For usage questions please use the [Discord](https://discord.gg/ypNakAFQ65) or [GitHub Discussions](https://github.com/nativewind/nativewind/discussions).`,
-              ].join('\n');
-
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: commentBody,
-              });
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                labels: ['needs reproduction'],
-              });
-              if (willClose) {
-                await github.rest.issues.update({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  state: 'closed',
-                });
-              }
-            }
 
   # ---------------------------------------------------------------------------
   # 2a. iOS reproduction
