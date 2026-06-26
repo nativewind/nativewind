@@ -136,7 +136,10 @@ def main() -> int:
             "platform": plat,
             "build_status": status,
             "repro_status": read_tail(f"evidence/{plat}/status.txt", limit=512),
-            "build_log_tail": read_tail(f"evidence/{plat}/xcodebuild.log", limit=12000),
+            "build_log_tail": (
+                read_tail(f"evidence/{plat}/xcodebuild.log", limit=12000)
+                or read_tail(f"evidence/{plat}/gradle.log", limit=12000)
+            ),
             "snapshot": read_tail(f"evidence/{plat}/snapshot.txt"),
             "snapshot_interactive": read_tail(f"evidence/{plat}/snapshot-interactive.txt"),
             "logs": read_head_and_tail(f"evidence/{plat}/device.log"),
@@ -145,6 +148,8 @@ def main() -> int:
             # native crash). Strongest signal for launch-time crashes.
             "app_console_tail": read_tail(f"evidence/{plat}/app.console.log", limit=12000),
             "agent_device_errors": read_tail(f"evidence/{plat}/agent-device.log", limit=4000),
+            "agent_device_version": read_tail(f"evidence/{plat}/agent-device-version.txt", limit=200),
+            "agent_device_commands": read_tail(f"evidence/{plat}/commands.jsonl", limit=4000),
         }
         packet["evidence_summary"] = summarize_evidence(packet)
         platforms.append(packet)

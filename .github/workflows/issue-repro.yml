@@ -320,6 +320,14 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Check out workflow scripts
+        uses: actions/checkout@v4
+        with:
+          path: nativewind-workflow
+          sparse-checkout: |
+            .github/scripts
+          sparse-checkout-cone-mode: false
+
       - name: Checkout reproduction repository
         if: env.HAS_REPRO == 'true'
         uses: actions/checkout@v4
@@ -330,30 +338,10 @@ jobs:
 
       - name: Scaffold rn-new starter (no repro link in issue)
         if: env.HAS_REPRO != 'true'
-        run: |
-          set -euo pipefail
-          case "$SCAFFOLD_FLAVOR" in
-            next-expo-router)        FLAGS="--nativewind --expo-router";       CHANNEL=next ;;
-            next-react-navigation)   FLAGS="--nativewind --reactNavigation";   CHANNEL=next ;;
-            next-plain)              FLAGS="--nativewind";                     CHANNEL=next ;;
-            latest-expo-router)      FLAGS="--nativewind --expo-router";       CHANNEL=latest ;;
-            latest-react-navigation) FLAGS="--nativewind --reactNavigation";   CHANNEL=latest ;;
-            *)                       FLAGS="--nativewind";                     CHANNEL=latest ;;
-          esac
-          echo "Scaffolding rn-new@$CHANNEL repro $FLAGS --default --noInstall --noGit"
-          npx --yes "rn-new@$CHANNEL" repro $FLAGS --default --noInstall --noGit
-          test -d repro && test -f repro/package.json
+        run: bash nativewind-workflow/.github/scripts/repro-common.sh scaffold
 
       - name: Install reproduction dependencies
-        working-directory: repro
-        run: |
-          set -euo pipefail
-          if   [ -f yarn.lock ];         then corepack enable && yarn install --frozen-lockfile || yarn install
-          elif [ -f pnpm-lock.yaml ];    then corepack enable && pnpm install --frozen-lockfile || pnpm install
-          elif [ -f package-lock.json ]; then npm ci || npm install
-          elif [ -f bun.lockb ];         then npm i -g bun && bun install
-          else                                npm install
-          fi
+        run: bash nativewind-workflow/.github/scripts/repro-common.sh install-deps repro
 
       - name: Prebuild iOS
         working-directory: repro
@@ -400,7 +388,8 @@ jobs:
           BUNDLE_CONFIG_PLATFORM: ios
         run: |
           set -euo pipefail
-          WORKSPACE=$(ls -1d *.xcworkspace | head -n 1)
+          WORKSPACE=$(find . -maxdepth 1 -name "*.xcworkspace" -type d -print -quit)
+          WORKSPACE=${WORKSPACE#./}
           SCHEME=$(basename "$WORKSPACE" .xcworkspace)
           echo "Building workspace=$WORKSPACE scheme=$SCHEME"
           # ONLY_ACTIVE_ARCH=YES keeps us from also building the dead
@@ -434,12 +423,44 @@ jobs:
           cp /tmp/xcodebuild.log ../../evidence/ios/xcodebuild.log || true
           if [ "$BUILD_STATUS" -ne 0 ]; then
             echo "::warning::xcodebuild failed with status $BUILD_STATUS (continuing so the judge sees the log)"
-            echo "built=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "built=false"
+              echo "build_outcome=xcodebuild-failed"
+            } >> "$GITHUB_OUTPUT"
             tail -200 /tmp/xcodebuild.log
             exit 0
           fi
           APP_PATH=$(find build/DerivedData/Build/Products/Debug-iphonesimulator -maxdepth 2 -name "*.app" -type d | head -n 1)
+          if [ -z "$APP_PATH" ] || [ ! -d "$APP_PATH" ]; then
+            echo "::warning::xcodebuild completed but no simulator .app was found"
+            {
+              echo "status=app-missing"
+              echo "note=xcodebuild completed, but no simulator .app was found."
+              echo "see=xcodebuild.log"
+            } > ../../evidence/ios/status.txt
+            {
+              echo "built=false"
+              echo "build_outcome=app-missing"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          set +e
           BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw "$APP_PATH/Info.plist")
+          BUNDLE_ID_STATUS=$?
+          set -e
+          if [ "$BUNDLE_ID_STATUS" -ne 0 ] || [ -z "$BUNDLE_ID" ]; then
+            echo "::warning::Could not determine iOS bundle identifier"
+            {
+              echo "status=bundle-id-missing"
+              echo "note=The app was built, but CFBundleIdentifier could not be read."
+              echo "see=xcodebuild.log"
+            } > ../../evidence/ios/status.txt
+            {
+              echo "built=false"
+              echo "build_outcome=bundle-id-missing"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           # Belt-and-suspenders: if the Xcode bundle phase still no-op'd
           # (e.g. with-environment.sh clobbered our FORCE_BUNDLING), run
@@ -464,71 +485,44 @@ jobs:
             fi
             popd > /dev/null
           fi
-          echo "built=true"                 >> "$GITHUB_OUTPUT"
-          echo "app_path=$(pwd)/$APP_PATH" >> "$GITHUB_OUTPUT"
-          echo "bundle_id=$BUNDLE_ID"      >> "$GITHUB_OUTPUT"
+          if [ ! -s "$APP_PATH/main.jsbundle" ]; then
+            echo "::warning::main.jsbundle is still missing after fallback bundling"
+            {
+              echo "status=bundle-missing"
+              echo "note=The app built, but no main.jsbundle was embedded, so user JS would not run."
+              echo "see=xcodebuild.log"
+            } > ../../evidence/ios/status.txt
+            {
+              echo "built=false"
+              echo "build_outcome=bundle-missing"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          {
+            echo "built=true"
+            echo "build_outcome=built"
+            echo "app_path=$(pwd)/$APP_PATH"
+            echo "bundle_id=$BUNDLE_ID"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Install agent-device
         if: steps.build.outputs.built == 'true'
-        run: npm install -g agent-device@0.15.2
+        run: npm install -g agent-device@0.18.0
 
       - name: Boot iOS simulator
         if: steps.build.outputs.built == 'true'
         run: agent-device boot --platform ios 2>> evidence/ios/agent-device.log
 
-      - name: Install app on simulator
-        if: steps.build.outputs.built == 'true'
-        env:
-          APP_PATH: ${{ steps.build.outputs.app_path }}
-          BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
-        run: agent-device install "$BUNDLE_ID" "$APP_PATH" --platform ios 2>> evidence/ios/agent-device.log
-
-      - name: Launch app and start scoped logs
-        id: console
-        if: steps.build.outputs.built == 'true'
-        continue-on-error: true
-        env:
-          BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
-        run: |
-          set +e
-          exec 2>> evidence/ios/agent-device.log
-          agent-device --debug \
-            open "$BUNDLE_ID" --platform ios \
-            --save-script evidence/ios/launch.ad
-          agent-device logs clear --restart
-          agent-device \
-            open "$BUNDLE_ID" --platform ios --relaunch \
-            --launch-console evidence/ios/app.console.log
-          agent-device wait 25000
-          exit 0
-
-      - name: Capture UI evidence via agent-device
+      - name: Install app and capture iOS evidence via agent-device
         id: capture
         if: steps.build.outputs.built == 'true'
         continue-on-error: true
+        env:
+          APP_PATH: ${{ steps.build.outputs.app_path }}
+          BUNDLE_ID: ${{ steps.build.outputs.bundle_id }}
         run: |
-          # Cheap signals first. Snapshot can be slower or time out when the
-          # app has crashed, so keep screenshot, perf, console, and logs as
-          # robust evidence even when accessibility capture fails.
-          set +e
-          exec 2>> evidence/ios/agent-device.log
-          agent-device \
-            screenshot evidence/ios/screen.png
-          agent-device perf --json \
-            > evidence/ios/perf.json
-          # Snapshots last — these are the ones that historically time out.
-          agent-device snapshot \
-            > evidence/ios/snapshot.txt
-          agent-device snapshot -i \
-            > evidence/ios/snapshot-interactive.txt
-          agent-device logs path \
-            > evidence/ios/logs-path.txt
-          LOG_PATH="$(head -n 1 evidence/ios/logs-path.txt || true)"
-          if [ -n "$LOG_PATH" ] && [ -f "$LOG_PATH" ]; then
-            cp "$LOG_PATH" evidence/ios/device.log
-          fi
-          agent-device close
-          exit 0
+          bash nativewind-workflow/.github/scripts/capture-agent-device.sh \
+            ios "$BUNDLE_ID" "$APP_PATH" evidence/ios
 
       - name: Export agent-device diagnostics
         if: always()
@@ -544,6 +538,9 @@ jobs:
       - name: Record build-only outcome
         if: steps.build.outputs.built != 'true'
         run: |
+          if [ -f evidence/ios/status.txt ]; then
+            exit 0
+          fi
           {
             echo "status=build-failed"
             echo "note=xcodebuild failed before the app could be launched on a simulator."
@@ -593,6 +590,14 @@ jobs:
           java-version: "17"
           distribution: temurin
 
+      - name: Check out workflow scripts
+        uses: actions/checkout@v4
+        with:
+          path: nativewind-workflow
+          sparse-checkout: |
+            .github/scripts
+          sparse-checkout-cone-mode: false
+
       - name: Checkout reproduction repository
         if: env.HAS_REPRO == 'true'
         uses: actions/checkout@v4
@@ -603,30 +608,10 @@ jobs:
 
       - name: Scaffold rn-new starter (no repro link in issue)
         if: env.HAS_REPRO != 'true'
-        run: |
-          set -euo pipefail
-          case "$SCAFFOLD_FLAVOR" in
-            next-expo-router)        FLAGS="--nativewind --expo-router";       CHANNEL=next ;;
-            next-react-navigation)   FLAGS="--nativewind --reactNavigation";   CHANNEL=next ;;
-            next-plain)              FLAGS="--nativewind";                     CHANNEL=next ;;
-            latest-expo-router)      FLAGS="--nativewind --expo-router";       CHANNEL=latest ;;
-            latest-react-navigation) FLAGS="--nativewind --reactNavigation";   CHANNEL=latest ;;
-            *)                       FLAGS="--nativewind";                     CHANNEL=latest ;;
-          esac
-          echo "Scaffolding rn-new@$CHANNEL repro $FLAGS --default --noInstall --noGit"
-          npx --yes "rn-new@$CHANNEL" repro $FLAGS --default --noInstall --noGit
-          test -d repro && test -f repro/package.json
+        run: bash nativewind-workflow/.github/scripts/repro-common.sh scaffold
 
       - name: Install reproduction dependencies
-        working-directory: repro
-        run: |
-          set -euo pipefail
-          if   [ -f yarn.lock ];         then corepack enable && yarn install --frozen-lockfile || yarn install
-          elif [ -f pnpm-lock.yaml ];    then corepack enable && pnpm install --frozen-lockfile || pnpm install
-          elif [ -f package-lock.json ]; then npm ci || npm install
-          elif [ -f bun.lockb ];         then npm i -g bun && bun install
-          else                                npm install
-          fi
+        run: bash nativewind-workflow/.github/scripts/repro-common.sh install-deps repro
 
       - name: Prebuild Android
         working-directory: repro
@@ -636,25 +621,78 @@ jobs:
             npx --yes expo prebuild --platform android --no-install
           fi
 
+      - name: Prepare evidence directory
+        run: mkdir -p evidence/android
+
       - name: Build Android APK (debug)
         id: build
+        continue-on-error: true
         working-directory: repro/android
         run: |
           set -euo pipefail
           chmod +x ./gradlew
-          ./gradlew :app:assembleDebug --no-daemon
+          set +e
+          ./gradlew :app:assembleDebug --no-daemon 2>&1 | tee ../../evidence/android/gradle.log
+          BUILD_STATUS=${PIPESTATUS[0]}
+          set -e
+          if [ "$BUILD_STATUS" -ne 0 ]; then
+            echo "::warning::Gradle failed with status $BUILD_STATUS (continuing so the judge sees the log)"
+            {
+              echo "status=build-failed"
+              echo "note=Gradle failed before the app could be launched on an emulator."
+              echo "see=gradle.log"
+            } > ../../evidence/android/status.txt
+            {
+              echo "built=false"
+              echo "build_outcome=gradle-failed"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           APK=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
-          PKG=$(${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -n 1)/aapt dump badging "$APK" | awk -F"'" '/package: name=/{print $2}')
-          echo "apk=$(pwd)/$APK" >> "$GITHUB_OUTPUT"
-          echo "package=$PKG"     >> "$GITHUB_OUTPUT"
+          if [ ! -s "$APK" ]; then
+            echo "::warning::Gradle completed but no debug APK was found"
+            {
+              echo "status=apk-missing"
+              echo "note=Gradle completed, but no debug APK was found."
+              echo "see=gradle.log"
+            } > ../../evidence/android/status.txt
+            {
+              echo "built=false"
+              echo "build_outcome=apk-missing"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          set +e
+          BUILD_TOOLS_DIR=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
+          PKG=$("$BUILD_TOOLS_DIR/aapt" dump badging "$APK" | awk -F"'" '/package: name=/{print $2}')
+          PKG_STATUS=$?
+          set -e
+          if [ "$PKG_STATUS" -ne 0 ] || [ -z "$PKG" ]; then
+            echo "::warning::Could not determine Android package name"
+            {
+              echo "status=package-missing"
+              echo "note=The APK was built, but the package name could not be determined."
+              echo "see=gradle.log"
+            } > ../../evidence/android/status.txt
+            {
+              echo "built=false"
+              echo "build_outcome=package-missing"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          {
+            echo "built=true"
+            echo "build_outcome=built"
+            echo "apk=$(pwd)/$APK"
+            echo "package=$PKG"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Install agent-device
-        run: npm install -g agent-device@0.15.2
-
-      - name: Prepare evidence directory
-        run: mkdir -p evidence/android
+        if: steps.build.outputs.built == 'true'
+        run: npm install -g agent-device@0.18.0
 
       - name: Run app on Android emulator + capture evidence
+        if: steps.build.outputs.built == 'true'
         uses: reactivecircus/android-emulator-runner@v2
         continue-on-error: true
         env:
@@ -669,47 +707,9 @@ jobs:
           disable-animations: true
           script: |
             # NB: android-emulator-runner runs this under /bin/sh (dash),
-            # which doesn't support `pipefail`. Keep collecting evidence
-            # even when one capture channel fails.
-            set +e
-            agent-device \
-              install "$APP_PACKAGE" "$APK_PATH" --platform android \
-              2>> evidence/android/agent-device.log
-
-            agent-device \
-              open "$APP_PACKAGE" --platform android \
-              --save-script evidence/android/launch.ad \
-              2>> evidence/android/agent-device.log
-            agent-device logs clear --restart \
-              2>> evidence/android/agent-device.log
-            agent-device \
-              open "$APP_PACKAGE" --platform android --relaunch \
-              2>> evidence/android/agent-device.log
-
-            agent-device wait 25000 \
-              2>> evidence/android/agent-device.log
-
-            agent-device \
-              screenshot evidence/android/screen.png \
-              2>> evidence/android/agent-device.log
-            agent-device perf --json \
-              > evidence/android/perf.json \
-              2>> evidence/android/agent-device.log
-            agent-device snapshot \
-              > evidence/android/snapshot.txt \
-              2>> evidence/android/agent-device.log
-            agent-device snapshot -i \
-              > evidence/android/snapshot-interactive.txt \
-              2>> evidence/android/agent-device.log
-            agent-device logs path \
-              > evidence/android/logs-path.txt \
-              2>> evidence/android/agent-device.log
-            LOG_PATH="$(head -n 1 evidence/android/logs-path.txt || true)"
-            if [ -n "$LOG_PATH" ] && [ -f "$LOG_PATH" ]; then
-              cp "$LOG_PATH" evidence/android/device.log
-            fi
-            agent-device close \
-              2>> evidence/android/agent-device.log
+            # so the shared capture helper owns command status handling.
+            bash nativewind-workflow/.github/scripts/capture-agent-device.sh \
+              android "$APP_PACKAGE" "$APK_PATH" evidence/android
 
       - name: Export Android agent-device diagnostics
         if: always()
