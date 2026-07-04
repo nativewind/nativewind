@@ -234,32 +234,61 @@ function printUpgradeWarning(
 }
 
 function stringify(object: any) {
+  // The props graph can contain objects with throwing getters (e.g. React Navigation's
+  // default context value throws "Couldn't find a navigation context" on access) and
+  // heavily shared subtrees (React elements). The previous implementation invoked every
+  // getter via Object.entries — turning this dev-only warning into a render crash — and
+  // deleted nodes from `seen` after visiting, so shared (non-circular) subtrees were
+  // re-walked exponentially, hanging the JS thread. Bounded and exception-safe instead.
   const seen = new WeakSet();
-  return JSON.stringify(
-    object,
-    function replace(_, value) {
-      if (!(value !== null && typeof value === "object")) {
-        return value;
+  const MAX_DEPTH = 3;
+  const MAX_ENTRIES = 20;
+
+  const walk = (value: any, depth: number): any => {
+    if (value === null || typeof value !== "object") {
+      return typeof value === "function" ? "[Function]" : value;
+    }
+
+    if (seen.has(value)) {
+      return "[Circular]";
+    }
+
+    if (depth >= MAX_DEPTH) {
+      return Array.isArray(value) ? "[Array]" : "[Object]";
+    }
+
+    seen.add(value);
+
+    const newValue: any = Array.isArray(value) ? [] : {};
+
+    let entries: [string, any][];
+    try {
+      entries = Object.entries(value);
+    } catch {
+      return "[Unserializable]";
+    }
+
+    let count = 0;
+    for (const entry of entries) {
+      if (++count > MAX_ENTRIES) {
+        newValue["…"] = "[Truncated]";
+        break;
       }
-
-      if (seen.has(value)) {
-        return "[Circular]";
+      try {
+        newValue[entry[0]] = walk(entry[1], depth + 1);
+      } catch {
+        newValue[entry[0]] = "[Unserializable]";
       }
+    }
 
-      seen.add(value);
+    return newValue;
+  };
 
-      const newValue: any = Array.isArray(value) ? [] : {};
-
-      for (const entry of Object.entries(value)) {
-        newValue[entry[0]] = replace(entry[0], entry[1]);
-      }
-
-      seen.delete(value);
-
-      return newValue;
-    },
-    2,
-  );
+  try {
+    return JSON.stringify(walk(object, 0), null, 2);
+  } catch {
+    return "[Unserializable props]";
+  }
 }
 
 // const ForwardRefSymbol = Symbol.for("react.forward_ref");
