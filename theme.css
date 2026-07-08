@@ -42,6 +42,10 @@
   @prop -rn-tint tint;
 }
 
+@utility caret-* {
+  caret-color: --value(--color-*);
+}
+
 @utility ripple-* {
   -rn-ripple-style: --value("borderless");
   -rn-ripple-color: --value(--color-*);
