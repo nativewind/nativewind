@@ -42,6 +42,16 @@
   @prop -rn-tint tint;
 }
 
+@utility thumb-* {
+  -rn-thumb-color: --value(--color-*);
+  @prop -rn-thumb-color thumbColor;
+}
+
+@utility track-* {
+  -rn-track-color: --value(--color-*);
+  @prop -rn-track-color trackColor;
+}
+
 @utility ripple-* {
   -rn-ripple-style: --value("borderless");
   -rn-ripple-color: --value(--color-*);
