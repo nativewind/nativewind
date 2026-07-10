@@ -31,7 +31,9 @@
 
 @utility tint-* {
   -rn-tint: --value(--color-*);
-  @prop -rn-tint tint;
+  @nativeMapping {
+    -rn-tint: tint;
+  }
 }
 
 @utility ripple-* {
