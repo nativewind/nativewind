@@ -408,7 +408,11 @@ function getDeclarations(
     }
   }
 
-  if (config.inlineProp && refs.props?.[config.inlineProp]) {
+  if (
+    config.inlineProp &&
+    refs.props?.[config.inlineProp] &&
+    typeof refs.props[config.inlineProp] !== "function"
+  ) {
     collectInlineRules(
       state,
       refs,
