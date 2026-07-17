@@ -274,6 +274,58 @@ describe("Border - Border Color", () => {
   });
 });
 
+describe("Border - Logical Border Color", () => {
+  test("border-s-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderLeftColor: "#ffffff" } },
+    });
+  });
+
+  test("border-e-white", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { style: { borderRightColor: "#ffffff" } },
+    });
+  });
+
+  // https://github.com/nativewind/nativewind/issues/1737
+  // Colors defined with var() take the unparsed path, which previously
+  // missed the border-inline-* to border-left/right-* mappings
+  const variableColorOptions = {
+    css: `
+      @tailwind base;
+      @tailwind components;
+      @tailwind utilities;
+
+      @layer base {
+        :root {
+          --color-primary: 255 115 179;
+        }
+      }
+    `,
+    config: {
+      theme: {
+        extend: {
+          colors: {
+            primary: "rgb(var(--color-primary) / <alpha-value>)",
+          },
+        },
+      },
+    },
+  };
+
+  test("border-s-primary", async () => {
+    expect(await renderCurrentTest(variableColorOptions)).toStrictEqual({
+      props: { style: { borderLeftColor: "rgba(255, 115, 179, 1)" } },
+    });
+  });
+
+  test("border-e-primary", async () => {
+    expect(await renderCurrentTest(variableColorOptions)).toStrictEqual({
+      props: { style: { borderRightColor: "rgba(255, 115, 179, 1)" } },
+    });
+  });
+});
+
 describe("Borders - Border Style", () => {
   test("border-solid", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
