@@ -55,6 +55,12 @@ import { FeatureFlagStatus } from "./feature-flags";
 import { toRNProperty } from "./normalize-selectors";
 
 const unparsedPropertyMapping: Record<string, string> = {
+  // Matches the physical-side mapping the parsed path uses for these
+  // properties, so literal and var() based values stay consistent
+  "border-inline-end-color": "border-right-color",
+  "border-inline-end-width": "border-right-width",
+  "border-inline-start-color": "border-left-color",
+  "border-inline-start-width": "border-left-width",
   "margin-inline-start": "margin-start",
   "margin-inline-end": "margin-end",
   "padding-inline-start": "padding-start",
