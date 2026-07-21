@@ -42,3 +42,30 @@ test("will merge static styles", () => {
     },
   });
 });
+
+test("box-shadow does not fall through into aspect-ratio", () => {
+  const compiled = cssToReactNativeRuntime(`
+    .test {
+      box-shadow: 0 0 4px red;
+      aspect-ratio: 16 / 9;
+    }
+  `);
+
+  const [[declarations]] = (compiled.rules.test as any).n[0].d;
+
+  expect(declarations).toStrictEqual({
+    shadowColor: "#ff0000",
+    shadowRadius: 0,
+    aspectRatio: "16 / 9",
+  });
+});
+
+test("box-shadow alone does not crash", () => {
+  expect(() =>
+    cssToReactNativeRuntime(`
+      .test {
+        box-shadow: 0 0 4px red;
+      }
+    `),
+  ).not.toThrow();
+});
