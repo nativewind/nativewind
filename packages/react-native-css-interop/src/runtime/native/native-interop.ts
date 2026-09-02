@@ -51,7 +51,13 @@ import {
   getStyle,
   VariableContext,
 } from "./styles";
-import { ReducerAction, ReducerState, Refs, SharedState } from "./types";
+import {
+  ReducerAction,
+  ReducerState,
+  Refs,
+  RenderingGuard,
+  SharedState,
+} from "./types";
 
 export function interop(
   component: ReactComponent<any>,
@@ -348,6 +354,25 @@ function initReducer({
   );
 }
 
+/**
+ * Creates the declaration guard outside of `getDeclarations`, so the closure only
+ * captures the three values it actually compares.
+ *
+ * Declaring the guard inline inside `getDeclarations` makes it capture that
+ * function's environment, which also holds `previousState`. Each render then links
+ * its state to the previous one through `declarationTracking.guards`, so every past
+ * render (and the element tree held by its `props`) stays reachable.
+ */
+function makeDeclarationGuard(
+  config: ReducerState["config"],
+  className: ReducerState["className"],
+  inline: ReducerState["inline"],
+): RenderingGuard {
+  return (refs) =>
+    !Object.is(refs.props?.[config.source], className) ||
+    !Object.is(getTarget(refs.props, config), inline);
+}
+
 function getDeclarations(
   previousState: ReducerState,
   refs: Refs,
@@ -386,9 +411,7 @@ function getDeclarations(
   }
 
   state.declarationTracking.guards.push(
-    (refs) =>
-      !Object.is(refs.props?.[config.source], state.className) ||
-      !Object.is(getTarget(refs.props, config), state.inline),
+    makeDeclarationGuard(config, state.className, state.inline),
   );
 
   const normalRules: ProcessedStyleRules[] = [];
