@@ -17,7 +17,7 @@
       "types": "./dist/typescript/commonjs/src/babel.d.ts"
     },
     "./metro": {
-      "source": "./src/metro.ts",
+      "source": "./src/metro.tsx",
       "import": {
         "types": "./dist/typescript/module/src/metro.d.ts",
         "default": "./dist/module/metro.js"
