@@ -6,9 +6,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
@@ -23,6 +21,11 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
-    "verbatimModuleSyntax": true
-  }
+    "verbatimModuleSyntax": true,
+    "types": ["node", "jest", "react"],
+    "paths": {
+      "nativewind": ["./src/index.tsx"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
 }

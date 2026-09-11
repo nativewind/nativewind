@@ -25,14 +25,6 @@
   }
 }
 
-/**
- * We need to override the leading-* utility. It returns a value in rem units, but react-native-css only accepts
- * unit-less values for line-height
- */
-@utility leading-* {
-  line-height: calc(var(--spacing) / 1rem * --value(integer));
-}
-
 @utility color-* {
   color: --value(--color-*);
 }
@@ -45,14 +37,11 @@
 @utility ripple-* {
   -rn-ripple-style: --value("borderless");
   -rn-ripple-color: --value(--color-*);
-}
-
-@utility ripple-* {
   -rn-ripple-radius: --value(integer);
 }
 
 @utility ripple-foreground {
-  -rn-ripple-foreground: "foreground";
+  -rn-ripple-layer: "foreground";
 }
 
 @utility elevation-* {
@@ -60,7 +49,11 @@
 }
 
 @utility corner-* {
-  corner-shape: --value("rounded", "squircle");
+  corner-shape: --value("squircle");
+}
+
+@utility corner-rounded {
+  corner-shape: round;
 }
 
 @custom-variant ios (@media ios);
