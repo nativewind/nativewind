@@ -1,0 +1,632 @@
+{
+  "source": "https://tailwindcss.com/docs/upgrade-guide",
+  "sourceSection": "Changes from v3: removed deprecated utilities and renamed utilities",
+  "note": "Documentation provides migration intent. CSS was separately compiled with the pinned Nativewind and Tailwind stacks. Native presets can override upstream defaults.",
+  "rows": [
+    {
+      "v4Class": "shadow-sm",
+      "v5Replacement": "shadow-xs",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "--tw-shadow-color",
+          "value": "rgba(0, 0, 0, 0.35)"
+        },
+        {
+          "property": "-rn-shadow-color",
+          "value": "var(--tw-shadow-color)"
+        },
+        {
+          "property": "-rn-shadow-offset-width",
+          "value": "0px"
+        },
+        {
+          "property": "-rn-shadow-offset-height",
+          "value": "1px"
+        },
+        {
+          "property": "-rn-shadow-radius",
+          "value": "1px"
+        },
+        {
+          "property": "-rn-shadow-opacity",
+          "value": "1px"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "--tw-shadow",
+          "value": "0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1))"
+        },
+        {
+          "property": "box-shadow",
+          "value": "var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "--tw-shadow",
+          "value": "0 1px 2px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.05))"
+        },
+        {
+          "property": "box-shadow",
+          "value": "var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "shadow",
+      "v5Replacement": "shadow-sm",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "--tw-shadow-color",
+          "value": "rgba(0, 0, 0, 0.35)"
+        },
+        {
+          "property": "-rn-shadow-color",
+          "value": "var(--tw-shadow-color)"
+        },
+        {
+          "property": "-rn-shadow-offset-width",
+          "value": "0px"
+        },
+        {
+          "property": "-rn-shadow-offset-height",
+          "value": "1px"
+        },
+        {
+          "property": "-rn-shadow-radius",
+          "value": "4px"
+        },
+        {
+          "property": "-rn-shadow-opacity",
+          "value": "1px"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "--tw-shadow",
+          "value": "0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1))"
+        },
+        {
+          "property": "box-shadow",
+          "value": "var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "--tw-shadow",
+          "value": "0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1))"
+        },
+        {
+          "property": "box-shadow",
+          "value": "var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "drop-shadow-sm",
+      "v5Replacement": "drop-shadow-xs",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "--tw-drop-shadow",
+          "value": "drop-shadow(0 1px 1px rgb(0 0 0 / 0.05))"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "--tw-drop-shadow-size",
+          "value": "drop-shadow(0 1px 2px var(--tw-drop-shadow-color, rgb(0 0 0 / 0.15)))"
+        },
+        {
+          "property": "--tw-drop-shadow",
+          "value": "drop-shadow(var(--drop-shadow-sm))"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "--tw-drop-shadow-size",
+          "value": "drop-shadow(0 1px 1px var(--tw-drop-shadow-color, rgb(0 0 0 / 0.05)))"
+        },
+        {
+          "property": "--tw-drop-shadow",
+          "value": "drop-shadow(var(--drop-shadow-xs))"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "drop-shadow",
+      "v5Replacement": "drop-shadow-sm",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "--tw-drop-shadow",
+          "value": "drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06))"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "--tw-drop-shadow-size",
+          "value": "drop-shadow(0 1px 2px var(--tw-drop-shadow-color, rgb(0 0 0 / 0.1))) drop-shadow(0 1px 1px var(--tw-drop-shadow-color, rgb(0 0 0 / 0.06)))"
+        },
+        {
+          "property": "--tw-drop-shadow",
+          "value": "drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow( 0 1px 1px rgb(0 0 0 / 0.06))"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "--tw-drop-shadow-size",
+          "value": "drop-shadow(0 1px 2px var(--tw-drop-shadow-color, rgb(0 0 0 / 0.15)))"
+        },
+        {
+          "property": "--tw-drop-shadow",
+          "value": "drop-shadow(var(--drop-shadow-sm))"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "blur-sm",
+      "v5Replacement": "blur-xs",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "--tw-blur",
+          "value": "blur(4px)"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "--tw-blur",
+          "value": "blur(var(--blur-sm))"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "--tw-blur",
+          "value": "blur(var(--blur-xs))"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "blur",
+      "v5Replacement": "blur-sm",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "--tw-blur",
+          "value": "blur(8px)"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "--tw-blur",
+          "value": "blur(8px)"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "--tw-blur",
+          "value": "blur(var(--blur-sm))"
+        },
+        {
+          "property": "filter",
+          "value": "var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "backdrop-blur-sm",
+      "v5Replacement": "backdrop-blur-xs",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "--tw-backdrop-blur",
+          "value": "blur(4px)"
+        },
+        {
+          "property": "backdrop-filter",
+          "value": "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "--tw-backdrop-blur",
+          "value": "blur(var(--blur-sm))"
+        },
+        {
+          "property": "-webkit-backdrop-filter",
+          "value": "var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,)"
+        },
+        {
+          "property": "backdrop-filter",
+          "value": "var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,)"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "--tw-backdrop-blur",
+          "value": "blur(var(--blur-xs))"
+        },
+        {
+          "property": "-webkit-backdrop-filter",
+          "value": "var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,)"
+        },
+        {
+          "property": "backdrop-filter",
+          "value": "var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "backdrop-blur",
+      "v5Replacement": "backdrop-blur-sm",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "--tw-backdrop-blur",
+          "value": "blur(8px)"
+        },
+        {
+          "property": "backdrop-filter",
+          "value": "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "--tw-backdrop-blur",
+          "value": "blur(8px)"
+        },
+        {
+          "property": "-webkit-backdrop-filter",
+          "value": "var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,)"
+        },
+        {
+          "property": "backdrop-filter",
+          "value": "var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,)"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "--tw-backdrop-blur",
+          "value": "blur(var(--blur-sm))"
+        },
+        {
+          "property": "-webkit-backdrop-filter",
+          "value": "var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,)"
+        },
+        {
+          "property": "backdrop-filter",
+          "value": "var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "rounded-sm",
+      "v5Replacement": "rounded-xs",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "border-radius",
+          "value": "0.125rem"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "border-radius",
+          "value": "var(--radius-sm)"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "border-radius",
+          "value": "var(--radius-xs)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "rounded",
+      "v5Replacement": "rounded-sm",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "border-radius",
+          "value": "0.25rem"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "border-radius",
+          "value": "0.25rem"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "border-radius",
+          "value": "var(--radius-sm)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "outline-none",
+      "v5Replacement": "outline-hidden",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "outline",
+          "value": "2px solid transparent"
+        },
+        {
+          "property": "outline-offset",
+          "value": "2px"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "--tw-outline-style",
+          "value": "none"
+        },
+        {
+          "property": "outline-style",
+          "value": "none"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "--tw-outline-style",
+          "value": "none"
+        },
+        {
+          "property": "outline-style",
+          "value": "none"
+        },
+        {
+          "property": "outline",
+          "value": "2px solid transparent"
+        },
+        {
+          "property": "outline-offset",
+          "value": "2px"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "ring",
+      "v5Replacement": "ring-3",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "--tw-ring-offset-shadow",
+          "value": "var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color)"
+        },
+        {
+          "property": "--tw-ring-shadow",
+          "value": "var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color)"
+        },
+        {
+          "property": "box-shadow",
+          "value": "var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "--tw-ring-shadow",
+          "value": "var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor)"
+        },
+        {
+          "property": "box-shadow",
+          "value": "var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "--tw-ring-shadow",
+          "value": "var(--tw-ring-inset,) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor)"
+        },
+        {
+          "property": "box-shadow",
+          "value": "var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "flex-shrink-0",
+      "v5Replacement": "shrink-0",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "flex-shrink",
+          "value": "0"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "flex-shrink",
+          "value": "0"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "flex-shrink",
+          "value": "0"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "flex-grow",
+      "v5Replacement": "grow",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "flex-grow",
+          "value": "1"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "flex-grow",
+          "value": "1"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "flex-grow",
+          "value": "1"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "overflow-ellipsis",
+      "v5Replacement": "text-ellipsis",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "text-overflow",
+          "value": "ellipsis"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "text-overflow",
+          "value": "ellipsis"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "text-overflow",
+          "value": "ellipsis"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "decoration-slice",
+      "v5Replacement": "box-decoration-slice",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "box-decoration-break",
+          "value": "slice"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "-webkit-box-decoration-break",
+          "value": "slice"
+        },
+        {
+          "property": "box-decoration-break",
+          "value": "slice"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "-webkit-box-decoration-break",
+          "value": "slice"
+        },
+        {
+          "property": "box-decoration-break",
+          "value": "slice"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    },
+    {
+      "v4Class": "decoration-clone",
+      "v5Replacement": "box-decoration-clone",
+      "upstreamClassification": "Documented Tailwind v3 to v4 migration",
+      "v4Css": [
+        {
+          "property": "box-decoration-break",
+          "value": "clone"
+        }
+      ],
+      "v5SameNameCss": [
+        {
+          "property": "-webkit-box-decoration-break",
+          "value": "clone"
+        },
+        {
+          "property": "box-decoration-break",
+          "value": "clone"
+        }
+      ],
+      "v5ReplacementCss": [
+        {
+          "property": "-webkit-box-decoration-break",
+          "value": "clone"
+        },
+        {
+          "property": "box-decoration-break",
+          "value": "clone"
+        }
+      ],
+      "nativeClassification": "Requires renderer contract; upstream migration does not prove native equivalence"
+    }
+  ],
+  "skillTarget": {
+    "nativewind": "5.0.0-rc.0",
+    "react-native-css": "3.1.0-rc.0",
+    "status": "Candidate mappings for review; native equivalence is not established by compiled CSS."
+  }
+}

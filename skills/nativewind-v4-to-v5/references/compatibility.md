@@ -56,7 +56,7 @@ Browser cursor checks verify computed properties because screenshots do not capt
 
 Android animation cancellation remains tracked in [Reanimated issue 10507](https://github.com/software-mansion/react-native-reanimated/issues/10507). Changing a running rotation to animationName none or removing its animation styles can retain the final transform. Isolated none checks can pass, so a passing isolated example does not resolve the defect. The exact Android animate-none reset case is explicitly excluded from passing support claims; iPhone and browser cancellation and every other required motion case remain independently verified. No local Reanimated patch is included. Physical Android verification was waived; the Android Release emulator and physical iPhone remain required.
 
-See [release notes](expo57-rc.md) for the exact installation commands and audit status. The public v4 to v5 migration skill follows RC delivery and must be verified against the released packages.
+See [release notes](installation.md) for the exact installation commands and audit status. The public v4 to v5 migration skill follows RC delivery and must be verified against the released packages.
 
 The remaining browser documentation is tested as explicit examples. Rendering hints such as will-change, font smoothing and OpenType feature selection are checked as computed declarations. Those checks do not promise performance improvements, specific font glyphs or rasterization. Print fragmentation and automatic hyphenation also remain limited to computed declarations; printer pagination and language dictionary behavior are outside this RC claim.
 
