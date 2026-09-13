@@ -4,13 +4,17 @@ description: Create IOS Development App
 runs:
   using: composite
   steps:
+    - name: Verify Xcode
+      shell: bash
+      run: xcodebuild -version
+
     - name: Cache CocoaPods
       uses: actions/cache@v4
       with:
         path: example/ios/Pods
-        key: pods-${{ runner.os }}-${{ hashFiles('example/ios/Podfile.lock') }}
+        key: pods-${{ runner.os }}-${{ runner.arch }}-xcode26.6-${{ hashFiles('example/ios/Podfile.lock', 'yarn.lock') }}
         restore-keys: |
-          pods-${{ runner.os }}-
+          pods-${{ runner.os }}-${{ runner.arch }}-xcode26.6-
 
     - name: Cache iOS development build
       id: ios-dev-cache
@@ -18,9 +22,9 @@ runs:
       with:
         path: |
           example/ios/build/DerivedData
-        key: ios-dev-${{ runner.os }}-${{ hashFiles('example/ios/Podfile.lock', 'example/package.json', 'package.json') }}
+        key: ios-dev-${{ runner.os }}-${{ runner.arch }}-xcode26.6-${{ hashFiles('example/ios/Podfile.lock', 'example/package.json', 'package.json', 'yarn.lock') }}
         restore-keys: |
-          ios-dev-${{ runner.os }}-
+          ios-dev-${{ runner.os }}-${{ runner.arch }}-xcode26.6-
 
     - name: Check for cached build
       shell: bash
@@ -64,11 +68,13 @@ runs:
           -scheme example \
           -configuration Release \
           -sdk iphonesimulator \
+          -destination 'generic/platform=iOS Simulator' \
           -derivedDataPath build/DerivedData \
+          -resultBundlePath "$RUNNER_TEMP/ios-build.xcresult" \
           CODE_SIGNING_ALLOWED=NO \
-          build 2>&1 | tee /tmp/xcodebuild.log | xcpretty || {
+          build 2>&1 | tee "$RUNNER_TEMP/ios-build.log" | xcpretty || {
           echo "❌ xcodebuild failed. Raw output:"
-          cat /tmp/xcodebuild.log | grep -A 5 "error:"
+          grep -A 5 "error:" "$RUNNER_TEMP/ios-build.log" || true
           exit 1
         }
 
@@ -90,6 +96,17 @@ runs:
 
         # Create a tar for better caching (go back to example directory)
         tar -czf ios-dev-build.tar.gz -C "$(dirname "$APP_PATH")" "$(basename "$APP_PATH")"
+
+    - name: Upload iOS build diagnostics
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-build-diagnostics
+        path: |
+          ${{ runner.temp }}/ios-build.log
+          ${{ runner.temp }}/ios-build.xcresult
+        if-no-files-found: ignore
+        retention-days: 7
 
     - name: Upload development build
       if: steps.ios-dev-cache.outputs.cache-hit != 'true'
