@@ -1,3 +1,7 @@
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 import type { PropsWithChildren, ReactElement } from "react";
 
 import tailwind from "@tailwindcss/postcss";
@@ -22,12 +26,16 @@ export type NativewindRenderOptions = RenderOptions & {
   className?: string;
   /** Add `@source inline('<className>')` to the CSS. @default Values are extracted from the component's className */
   sourceInline?: string[];
+  /** Scan this TSX content from an actual file instead of using inline sources. */
+  sourceFile?: string;
   /** Whether to include the theme in the generated CSS @default true */
   theme?: boolean;
   /** Whether to include the preflight in the generated CSS @default false */
   preflight?: boolean;
   /** Whether to include the plugin in the generated CSS. @default true */
   plugin?: boolean;
+  /** Exercise the production CSS optimizer. Defaults to Tailwind's environment setting. */
+  optimize?: boolean;
   /** Enable debug logging. @default false - Set process.env.NATIVEWIND_TEST_AUTO_DEBUG and run tests with the node inspector   */
   debug?: boolean | "verbose";
 };
@@ -39,14 +47,17 @@ export async function render(
   {
     css,
     sourceInline = Array.from(getClassNames(component)),
+    sourceFile,
     debug = debugDefault,
     theme = true,
     preflight = false,
     plugin = true,
+    optimize,
     extraCss,
     ...options
   }: NativewindRenderOptions = {},
 ): Promise<ReturnType<typeof tlRender> & ReturnType<typeof compile>> {
+  let sourceDirectory: string | undefined;
   if (!css) {
     css = ``;
 
@@ -64,9 +75,16 @@ export async function render(
       css += `\n@import "./theme.css";`;
     }
 
-    css += sourceInline
-      .map((source) => `\n@source inline("${source}");`)
-      .join("\n");
+    if (sourceFile !== undefined) {
+      sourceDirectory = mkdtempSync(join(tmpdir(), "nativewind-source-"));
+      const sourcePath = join(sourceDirectory, "fixture.tsx");
+      writeFileSync(sourcePath, sourceFile);
+      css += `\n@source ${JSON.stringify(sourcePath)};`;
+    } else {
+      css += sourceInline
+        .map((source) => `\n@source inline("${source}");`)
+        .join("\n");
+    }
 
     if (extraCss) {
       css += `\n${extraCss}`;
@@ -78,12 +96,17 @@ export async function render(
   }
 
   // Process the TailwindCSS
-  const { css: output } = await postcss([
-    /* Tailwind seems to internally cache things, so we need a random value to cache bust */
-    tailwind({ base: Date.now().toString() }),
-  ]).process(css, {
-    from: __dirname,
-  });
+  let output: string;
+  try {
+    ({ css: output } = await postcss([
+      /* Tailwind seems to internally cache things, so we need a random value to cache bust */
+      tailwind({ base: Date.now().toString(), optimize }),
+    ]).process(css, {
+      from: __dirname,
+    }));
+  } finally {
+    if (sourceDirectory) rmSync(sourceDirectory, { recursive: true });
+  }
 
   if (debug) {
     console.log(`Output CSS:\n---\n${output}\n---\n`);
