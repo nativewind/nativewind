@@ -5703,13 +5703,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"colorjs.io@npm:0.6.0-alpha.1":
-  version: 0.6.0-alpha.1
-  resolution: "colorjs.io@npm:0.6.0-alpha.1"
-  checksum: 10c0/0bc58a65927d77fceade43fcdcaa512befadaa5fb38a4afb3ab632b38eea5d42d656c2bb32c3c604010eeb6e210f3801b0dc480d6b3ae26de6da8c3c55e09f11
-  languageName: node
-  linkType: hard
-
 "colorjs.io@npm:0.7.0":
   version: 0.7.0
   resolution: "colorjs.io@npm:0.7.0"
@@ -10481,7 +10474,7 @@ __metadata:
     react: "npm:19.2.3"
     react-native: "npm:0.86.3"
     react-native-builder-bob: "npm:^0.40.13"
-    react-native-css: "file:../compatibility/artifacts/releases/expo57-development/packages/react-native-css-candidate34-independent.tgz"
+    react-native-css: "https://github.com/nativewind/react-native-css.git#commit=5d45e60bd2659ae220bb8e6fb48273ad9c19fc1e"
     react-native-reanimated: "npm:4.5.1"
     react-native-safe-area-context: "npm:~5.7.0"
     react-native-worklets: "npm:0.10.1"
@@ -11508,7 +11501,7 @@ __metadata:
     react-dom: "npm:19.2.3"
     react-native: "npm:0.86.3"
     react-native-builder-bob: "npm:^0.40.13"
-    react-native-css: "npm:^3.0.6"
+    react-native-css: "https://github.com/nativewind/react-native-css.git#commit=5d45e60bd2659ae220bb8e6fb48273ad9c19fc1e"
     react-native-monorepo-config: "npm:^0.1.9"
     react-native-reanimated: "npm:4.5.1"
     react-native-web: "npm:~0.21.0"
@@ -11517,9 +11510,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"react-native-css@file:../compatibility/artifacts/releases/expo57-development/packages/react-native-css-candidate34-independent.tgz::locator=nativewind%40workspace%3A.":
+"react-native-css@https://github.com/nativewind/react-native-css.git#commit=5d45e60bd2659ae220bb8e6fb48273ad9c19fc1e":
   version: 3.0.7
-  resolution: "react-native-css@file:../compatibility/artifacts/releases/expo57-development/packages/react-native-css-candidate34-independent.tgz#../compatibility/artifacts/releases/expo57-development/packages/react-native-css-candidate34-independent.tgz::hash=b030c6&locator=nativewind%40workspace%3A."
+  resolution: "react-native-css@https://github.com/nativewind/react-native-css.git#commit=5d45e60bd2659ae220bb8e6fb48273ad9c19fc1e"
   dependencies:
     "@types/debug": "npm:^4.1.12"
     babel-plugin-react-compiler: "npm:^19.1.0-rc.2"
@@ -11531,25 +11524,7 @@ __metadata:
     lightningcss: ">=1.27.0"
     react: ">=19"
     react-native: ">=0.81"
-  checksum: 10c0/57852802cc99692089beacb861522da11b2d45df4bb8aedac34297d54f94b26eda3a7695aea15385de245cb02a8dad7000a825567a677dd31c1bdc6845a9d882
-  languageName: node
-  linkType: hard
-
-"react-native-css@npm:^3.0.6":
-  version: 3.0.6
-  resolution: "react-native-css@npm:3.0.6"
-  dependencies:
-    "@types/debug": "npm:^4.1.12"
-    babel-plugin-react-compiler: "npm:^19.1.0-rc.2"
-    colorjs.io: "npm:0.6.0-alpha.1"
-    comment-json: "npm:^4.2.5"
-    debug: "npm:^4.4.1"
-  peerDependencies:
-    "@expo/metro-config": ">=54"
-    lightningcss: ">=1.27.0"
-    react: ">=19"
-    react-native: ">=0.81"
-  checksum: 10c0/51a35fad98f598d97e868c7d3b6d7a97937b9cd0db8568bb510120e83d2ca48ff28493eb532b4a3cb18b2173168312aee9370e262c42cec58bd408941ca6ad6e
+  checksum: 10c0/b4fca88c70e96c011ffa450ba4210ddfb22b5d71b703fdbe11043233104f830f63fe5ca8d179891c4971f643f697dab60c3db2b4fe2a05f1ae43346444aad919
   languageName: node
   linkType: hard
 
