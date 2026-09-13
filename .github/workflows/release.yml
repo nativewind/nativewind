@@ -13,12 +13,25 @@ on:
           - minor
           - major
           - preview
+          - rc
+      rc-version:
+        description: "Reviewed RC version (required for rc)"
+        type: string
+      rc-publish:
+        description: "Publish the verified RC; leave unchecked for a preflight"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+
 jobs:
   release:
+    if: inputs.release-type != 'rc'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -49,3 +62,41 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  release-rc:
+    if: inputs.release-type == 'rc'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: https://registry.npmjs.org
+      - name: Test publication guards
+        run: python3 -m unittest discover -s .github/scripts -p 'test_release_rc.py'
+      - name: Verify npm authentication
+        run: npm whoami --registry=https://registry.npmjs.org
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Verify and publish reviewed RC
+        run: python3 .github/scripts/release_rc.py
+        env:
+          RC_VERSION: ${{ inputs.rc-version }}
+          RC_PUBLISH: ${{ inputs.rc-publish }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Retain publication receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc-publication-receipt
+          path: |
+            ${{ runner.temp }}/rc-publication/*.json
+            ${{ runner.temp }}/rc-publication/consumer/package*.json
+            ${{ runner.temp }}/rc-publication/consumer/registry.test.cjs
+            ${{ runner.temp }}/rc-publication/consumer/tsconfig.json
+            ${{ runner.temp }}/rc-publication/consumer/nativewind-env.d.ts
