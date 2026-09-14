@@ -1,8 +1,8 @@
 # Nativewind v5 RC compatibility notes
 
-Compatibility notes for the Expo 57 RC. The audit is complete and react-native-css 3.1.0-rc.0 is published. Nativewind 5.0.0-rc.0 publication remains pending.
+Compatibility notes for the Expo 57 RC. The audit is complete and react-native-css 3.1.0-rc.0 is published. Nativewind 5.0.0-rc.0 is also published.
 
-The target is Expo 57.0.22 with React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. The intended package pair is Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0. Installation instructions become active only after that exact pair is published.
+The target is Expo 57.0.22 with React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. The published package pair is Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0. Use those exact versions together.
 
 ## Corrections to the preview documentation
 
@@ -56,7 +56,7 @@ Browser cursor checks verify computed properties because screenshots do not capt
 
 Android animation cancellation remains tracked in [Reanimated issue 10507](https://github.com/software-mansion/react-native-reanimated/issues/10507). Changing a running rotation to animationName none or removing its animation styles can retain the final transform. Isolated none checks can pass, so a passing isolated example does not resolve the defect. The exact Android animate-none reset case is explicitly excluded from passing support claims; iPhone and browser cancellation and every other required motion case remain independently verified. No local Reanimated patch is included. Physical Android verification was waived; the Android Release emulator and physical iPhone remain required.
 
-See [release notes](expo57-rc.md) for the exact installation commands and audit status. The public v4 to v5 migration skill follows RC delivery and must be verified against the released packages.
+See [release notes](expo57-rc.md) for the exact installation commands and audit status. The [v4 migration skill](../skills/nativewind-v4-to-v5/SKILL.md) and [preview migration skill](../skills/nativewind-preview-to-rc/SKILL.md) include scoped evaluation results and remaining application verification requirements.
 
 The remaining browser documentation is tested as explicit examples. Rendering hints such as will-change, font smoothing and OpenType feature selection are checked as computed declarations. Those checks do not promise performance improvements, specific font glyphs or rasterization. Print fragmentation and automatic hyphenation also remain limited to computed declarations; printer pagination and language dictionary behavior are outside this RC claim.
 
