@@ -55,6 +55,14 @@ export default tseslint.config(
       ],
     },
   },
+  // Standalone skill scripts run in Node without the library TypeScript project.
+  {
+    files: ["skills/*/scripts/**/*.mjs"],
+    extends: [tseslint.configs.disableTypeChecked],
+    languageOptions: {
+      globals: { process: "readonly" },
+    },
+  },
   // Test file specific rules
   // These rules are causing false positives with @react-native/testing-library
   {
