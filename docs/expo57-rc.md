@@ -1,10 +1,10 @@
 # Nativewind v5 Expo 57 release candidate
 
-Nativewind 5.0.0-rc.0 is prepared and awaiting publication. [react-native-css 3.1.0-rc.0](https://github.com/nativewind/react-native-css/releases/tag/3.1.0-rc.0) is available on npm. The installation instructions below apply once the Nativewind RC is published.
+Nativewind 5.0.0-rc.0 is published. [react-native-css 3.1.0-rc.0](https://github.com/nativewind/react-native-css/releases/tag/3.1.0-rc.0) is available on npm. The installation instructions below target that exact pair. V4.2.7 remains the stable Nativewind release.
 
-Proposed pair: Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0. Nativewind's peer dependency selects that exact engine candidate. The target is Expo 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1, and Worklets 0.10.1.
+Package pair: Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0. Nativewind's peer dependency selects that exact engine candidate. The target is Expo 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1, and Worklets 0.10.1.
 
-## Installation after publication
+## Installation
 
 In an Expo 57 project:
 
@@ -32,9 +32,13 @@ module.exports = withNativewind(getDefaultConfig(__dirname));
 Use global.css and import it once in the root layout:
 
 ```css
-@import "tailwindcss";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
 @import "nativewind/theme";
 ```
+
+Keep utilities unlayered so React Native Web default styles do not override them. Expo 57 discovers postcss.config.js and postcss.config.mjs, but not postcss.config.cjs.
 
 Keep babel-preset-expo in Babel configuration. Enable userInterfaceStyle automatic in app.json for system appearance changes. TypeScript setup generates the Nativewind environment declaration and ensures it belongs to the TypeScript project.
 
@@ -44,7 +48,7 @@ Upgrade Tailwind 3 configuration to Tailwind 4 CSS configuration. Replace the v4
 
 For default dark variants, use system appearance media queries. Read useColorScheme from react-native. Set Appearance.setColorScheme('dark') or 'light' for a native override and 'unspecified' to restore the system preference on this Expo target. Legacy @cssInterop and @react-native configuration directives report migration errors. Use compiler inlineVariables.exclude for variables that must remain available at runtime. Prefer VariableContextProvider over the deprecated vars helper. Express cross platform length variables with units, such as '80.5px'.
 
-Keep a copy of your previous package.json, lockfile, and configuration before migration. To revert, restore those files, reinstall the previous dependencies, and rebuild native apps if their native dependencies changed.
+Keep a copy of your source, package.json, lockfile, and configuration before migration. To revert, restore those files, reinstall the previous dependencies, and rebuild native apps if their native dependencies changed.
 
 ## Changes and limitations
 
@@ -52,7 +56,7 @@ The candidate contains Expo alignment, production prop mapping fixes, layout and
 
 Android animation cancellation remains affected by [Reanimated issue 10507](https://github.com/software-mansion/react-native-reanimated/issues/10507). Changing a running rotation to animationName none or removing the animation styles can leave its final transform in place. Direct Reanimated controls reproduce the issue without either library. The behavior is intermittent: an isolated none check passed while the complete integrated audit reproduced the failure. The exact Android animate-none reset case is retained as an accepted upstream defect and is excluded from passing support claims. The iPhone case, browser cancellation checks and all other motion cases remain required. No experimental dependency patch is included. Physical Android testing is excluded; Android verification uses an emulator.
 
-The complete inventory review accounts for 6,129 entries with no unresolved dispositions. The final matrix requires 4,985 executions across compiler, runtime, tooling, rendering and interaction layers. All 4,985 required executions passed the final integrity checked release gate, with zero missing assertions. These counts describe the reviewed scope and do not claim that every CSS value works on every platform. The audit is complete. Nativewind source review and RC publication remain pending.
+The complete inventory review accounts for 6,129 entries with no unresolved dispositions. The final matrix requires 4,985 executions across compiler, runtime, tooling, rendering and interaction layers. All 4,985 required executions passed the final integrity checked release gate, with zero missing assertions. These counts describe the reviewed scope and do not claim that every CSS value works on every platform. The audit is complete. Nativewind source review and RC publication are complete.
 
 The [compatibility guide](rc-compatibility.md) records supported value domains, migrations, safe rejections and platform limits. Browser image fitting in the historical React Native Web and Expo Image adapters requires explicit resizeMode or contentFit/contentPosition props. The original WebKit backface scene and Firefox select-all interaction remain unverified. The generated select-none utility requires an explicit WebkitUserSelect:none style in the pinned WebKit engine. Native and other browser examples remain independently tested.
 
@@ -62,4 +66,4 @@ Report reproducible issues to [Nativewind](https://github.com/nativewind/nativew
 
 Stable promotion follows RC user feedback and verification of the v4 to v5 migration skill against representative applications. Stable npm tags will not change during this RC publication.
 
-The public migration skill draft is staged at `skills/nativewind-v4-to-v5/SKILL.md` in the Nativewind repository. It includes the pinned target and its supporting references. Structural validation passes. Independent migration evaluation and registry installation checks remain required before the skill is advertised as verified and before stable promotion.
+The [v4 migration skill](../skills/nativewind-v4-to-v5/SKILL.md) and [preview migration skill](../skills/nativewind-preview-to-rc/SKILL.md) are available. Install them with `npx skills add nativewind/nativewind`. Their references record the exact evaluated fixtures and remaining verification gaps. Browser and iOS simulator checks passed within that scope; Android migration interaction checks and full native navigation remain unverified. These migration checks are separate from the engine release audit above. Always verify the resulting application on its supported platforms.
