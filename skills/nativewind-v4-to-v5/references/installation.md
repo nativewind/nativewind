@@ -1,65 +1,68 @@
-# Nativewind v5 Expo 57 release candidate
+# RC0 installation contract
 
-Publication draft. These versions are prepared locally and are not available on npm yet. Do not announce the installation commands until registry verification and public tag promotion succeed.
+The published pair is Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0. The tested Expo target is 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. Keep Expo alignment separate from styling migration. Verify exact resolved native versions after installation.
 
-Proposed pair: Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0. Nativewind's peer dependency selects that exact engine candidate. The target is Expo 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1, and Worklets 0.10.1.
+Use the application's existing package manager. Update the related entries in `package.json` together before installing, preserving unrelated dependencies and dependency groups:
 
-## Installation after publication
-
-In an Expo 57 project:
-
-```sh
-npm install --save-exact nativewind@5.0.0-rc.0 react-native-css@3.1.0-rc.0 tailwindcss@4.1.12 @tailwindcss/postcss@4.1.12 lightningcss@1.30.1
-npx expo install react-native-reanimated react-native-worklets react-native-safe-area-context expo-system-ui
+```json
+{
+  "dependencies": {
+    "nativewind": "5.0.0-rc.0",
+    "react-native-css": "3.1.0-rc.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "4.1.12",
+    "@tailwindcss/postcss": "4.1.12",
+    "postcss": "8.5.6"
+  }
+}
 ```
 
-Keep the native dependency versions selected by the supported Expo SDK. Restart Metro after installing or upgrading the engine. Rebuild the native app when native dependencies change.
+This is a fragment to merge, not a replacement manifest. Move an existing Tailwind entry rather than duplicating it across dependency groups. Remove a direct v4 engine dependency only after checking all callers and workspace consumers. Then run the package manager's normal install, such as `npm install`, retaining the existing lockfile. Installing the RC first while the manifest still requires Tailwind 3 can produce `ERESOLVE`.
 
-Use postcss.config.js:
+If installation fails, inspect the actual peer conflict. Preserve the original manifest and lockfile; do not reflexively delete the lockfile or use `--force`/`--legacy-peer-deps`. In the evaluated npm 10.9.4 v4 lockfile, even a compatible atomic manifest update can leave npm trying to resolve the old Nativewind 4/Tailwind 3 peer graph. Removing only node_modules does not fix that case.
+
+For that confirmed stale styling graph, the tested lockfile preserving recovery is:
+
+1. Save the intended RC manifest to a temporary file outside the app; keep the original rollback copy separately.
+2. Run `npm uninstall nativewind react-native-css tailwindcss @tailwindcss/postcss postcss` to let npm remove the old styling graph from its lockfile. In a workspace, scope this operation to the app and preserve dependencies still needed by other consumers.
+3. Restore the saved intended RC manifest exactly, then run `npm install`.
+4. Verify exact installed versions and compare the new lockfile with the original, reporting unrelated dependency changes. Remove the temporary target copy after success.
+
+The temporary uninstall state is not a runnable migrated app. If any step fails, restore the captured manifest and lockfile, reinstall the original app, and report the conflict. Do not prune other workspaces or manually rewrite lockfile dependency graphs. This recovery was exercised in the single app npm fixture; other managers and workspace layouts require their normal equivalent, not a blind npm command.
+
+Pin the resolved lightningcss dependency to 1.30.1 with the package manager's supported overrides or resolutions, preserving unrelated entries. Keep Expo aligned `react-native-reanimated`, `react-native-worklets`, `react-native-safe-area-context` and `expo-system-ui`. Do not use peer dependency bypass flags as a migration fix.
+
+Merge the following into the project's existing configuration, preserving custom plugins and resolver settings.
+
+Use `postcss.config.js` for a CommonJS project, or `postcss.config.mjs` with an ESM export. Expo 57 does not discover `postcss.config.cjs`. An export can succeed with unprocessed CSS, so verify an actual styled element.
 
 ```js
 module.exports = { plugins: { '@tailwindcss/postcss': {} } };
 ```
 
-Use metro.config.cjs:
+Use the v5 Metro wrapper:
 
 ```js
 const { getDefaultConfig } = require('expo/metro-config');
 const { withNativewind } = require('nativewind/metro');
-module.exports = withNativewind(getDefaultConfig(__dirname));
+const config = getDefaultConfig(__dirname);
+module.exports = withNativewind(config);
 ```
 
-Use global.css and import it once in the root layout:
+Replace v4 Tailwind directives in the root CSS, preserving and migrating project theme values, plugins and additional sources:
 
 ```css
-@import "tailwindcss";
-@import "nativewind/theme";
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css';
+@import 'nativewind/theme';
 ```
 
-Keep babel-preset-expo in Babel configuration. Enable userInterfaceStyle automatic in app.json for system appearance changes. TypeScript setup generates the Nativewind environment declaration and ensures it belongs to the TypeScript project.
+Keep Tailwind utilities unlayered in React Native Web applications. A plain `@import 'tailwindcss';` places utilities in a layer that can lose to React Native Web defaults even though the production export succeeds. Preserve the split import order above.
 
-## Migration from v4
+Import the root CSS once from the app entry or Router root layout. Keep `babel-preset-expo`; remove only the v4 Nativewind Babel preset and Nativewind JSX import source setting. Set Expo `userInterfaceStyle` to `automatic` if the app follows system appearance. Ensure generated environment types belong to the TypeScript project. TypeScript 6 may also need `declare module '*.css';` for a side effect stylesheet import; this declaration does not replace Nativewind's className types.
 
-Upgrade Tailwind 3 configuration to Tailwind 4 CSS configuration. Replace the v4 Metro integration with withNativewind above. Remove the v4 Nativewind Babel preset and JSX import source setting; keep the Expo preset. Use react-native-css adapters for third party components and validate prop mappings against the new mapping contract. The old react-native-css-interop engine is not the v5 engine.
+Restart Metro after the engine or configuration changes. Rebuild native apps if native dependencies or app configuration changed. Check CSS discovery, a custom token, layout, interactions, themes and mappings in addition to type checks and production exports.
 
-For default dark variants, use system appearance media queries. Read useColorScheme from react-native. Set Appearance.setColorScheme('dark') or 'light' for a native override and 'unspecified' to restore the system preference on this Expo target. Legacy @cssInterop and @react-native configuration directives report migration errors. Use compiler inlineVariables.exclude for variables that must remain available at runtime. Prefer VariableContextProvider over the deprecated vars helper. Express cross platform length variables with units, such as '80.5px'.
-
-Keep a copy of your previous package.json, lockfile, and configuration before migration. To revert, restore those files, reinstall the previous dependencies, and rebuild native apps if their native dependencies changed.
-
-## Changes and limitations
-
-The candidate contains Expo alignment, production prop mapping fixes, layout and style regression fixes, Node ESM tooling entries, TypeScript declaration membership fixes, and compiler cache invalidation. Detailed evidence distinguishes compiler, runtime, integration, and device verification.
-
-Android animation cancellation remains affected by [Reanimated issue 10507](https://github.com/software-mansion/react-native-reanimated/issues/10507). Changing a running rotation to animationName none or removing the animation styles can leave its final transform in place. Direct Reanimated controls reproduce the issue without either library. The behavior is intermittent: an isolated none check passed while the complete integrated audit reproduced the failure. The exact Android animate-none reset case is retained as an accepted upstream defect and is excluded from passing support claims. The iPhone case, browser cancellation checks and all other motion cases remain required. No experimental dependency patch is included. Physical Android testing is excluded; Android verification uses an emulator.
-
-The complete inventory review accounts for 6,129 entries with no unresolved dispositions. The final matrix requires 4,985 executions across compiler, runtime, tooling, rendering and interaction layers. All 4,985 required executions passed the final integrity checked release gate, with zero missing assertions. These counts describe the reviewed scope and do not claim that every CSS value works on every platform. The audit is complete. Public source review and a subsequent publication instruction remain necessary before npm release.
-
-The [compatibility guide](compatibility.md) records supported value domains, migrations, safe rejections and platform limits. Browser image fitting in the historical React Native Web and Expo Image adapters requires explicit resizeMode or contentFit/contentPosition props. The original WebKit backface scene and Firefox select-all interaction remain unverified. The generated select-none utility requires an explicit WebkitUserSelect:none style in the pinned WebKit engine. Native and other browser examples remain independently tested.
-
-The pinned browsers ignore break-before:all and break-after:all. Firefox also ignores avoid-page and column for these properties. The audit records the unsupported declaration and its fallback against a supported control; it makes no pagination claim. Native animation samples begin after the mount callback, retaining earlier layout checkpoints separately. Initial samples within 100 milliseconds and intermediate and final trajectories remain required.
-
-Report reproducible issues to [Nativewind](https://github.com/nativewind/nativewind/issues) or [react-native-css](https://github.com/nativewind/react-native-css/issues). Include exact package versions, Expo SDK, platform and OS version, development or Release mode, configuration, expected and actual behavior, and a minimal reproduction. Include whether direct React Native or Reanimated reproduces the problem.
-
-Stable promotion remains blocked on the full audit, required migration evaluation, and the v4 to v5 migration skill. Stable npm tags will not change during this RC publication.
-
-The public migration skill draft is staged at `skills/nativewind-v4-to-v5/SKILL.md` in the Nativewind repository. It includes the pinned target and its supporting references. Structural validation passes. Independent migration evaluation and registry installation checks remain required before the skill is advertised as verified and before stable promotion.
+Read the [compatibility notes](compatibility.md) for contract limitations and the [published RC release](https://github.com/nativewind/nativewind/releases/tag/5.0.0-rc.0) for release details. Migration evaluation is separate from the library's release audit; neither guarantees parity for an arbitrary application.
