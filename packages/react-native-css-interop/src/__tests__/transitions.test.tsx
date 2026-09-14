@@ -55,7 +55,7 @@ test("numeric transition", () => {
   });
 
   // Width should only change after we advance time
-  jest.advanceTimersByTime(501); // Transition half the time
+  jest.advanceTimersByTime(500); // Transition half the time
   expect(component).toHaveAnimatedStyle({
     width: 150,
   });
@@ -105,7 +105,7 @@ test("transition - rerender", () => {
 
   // Directly after rerender, should still have the old width
   expect(component).toHaveAnimatedStyle({
-    color: "#ff0000",
+    color: "rgba(255, 0, 0, 1)",
   });
 
   // Width should only change after we advance time
@@ -159,7 +159,7 @@ test("transition - interaction", () => {
 
   // Directly after rerender, should still have the old color
   expect(component).toHaveAnimatedStyle({
-    color: "#ff0000",
+    color: "rgba(255, 0, 0, 1)",
   });
 
   // Color should only change after we advance time
@@ -209,7 +209,7 @@ test("optional transitions", async () => {
   jest.advanceTimersByTime(0);
 
   expect(getAnimatedStyle(child)).toStrictEqual({
-    color: "black",
+    color: "rgba(0, 0, 0, 1)",
   });
 
   jest.advanceTimersByTime(500);

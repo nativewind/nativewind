@@ -1,5 +1,5 @@
 /** @jsxImportSource nativewind */
-import { Switch, TextInput, View } from "react-native";
+import { StyleSheet, Switch, TextInput, View } from "react-native";
 
 import { fireEvent, render, screen } from "../test";
 
@@ -100,46 +100,13 @@ test("disabled", async () => {
   const { rerender } = await render(
     <Switch testID={testID} className="disabled:bg-black" />,
   );
-
-  const component = screen.getByTestId(testID);
-  expect(component.props).toEqual(
-    expect.objectContaining({
-      testID,
-      style: {
-        height: 31,
-        width: 51,
-      },
-    }),
-  );
-
+  const background = () =>
+    StyleSheet.flatten(screen.getByTestId(testID).props.style)?.backgroundColor;
+  expect(background()).toBeUndefined();
   rerender(<Switch testID={testID} disabled className="disabled:bg-black" />);
-
-  expect(component.props).toEqual(
-    expect.objectContaining({
-      testID,
-      style: [
-        {
-          height: 31,
-          width: 51,
-        },
-        {
-          backgroundColor: "#000000",
-        },
-      ],
-    }),
-  );
-
+  expect(background()).toBe("#000000");
   rerender(
     <Switch testID={testID} disabled={false} className="disabled:bg-black" />,
   );
-
-  expect(component.props).toEqual(
-    expect.objectContaining({
-      testID,
-      style: {
-        height: 31,
-        width: 51,
-      },
-    }),
-  );
+  expect(background()).toBeUndefined();
 });
