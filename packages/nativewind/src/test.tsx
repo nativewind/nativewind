@@ -93,7 +93,7 @@ export async function render(
     debugCompiled = process.env.NODE_OPTIONS?.includes("--inspect"),
     ...options
   }: RenderOptions = {},
-) {
+): Promise<ReturnType<typeof interopRender>> {
   // Compile the base CSS, e.g:
   // @tailwind base
   // @tailwind components

@@ -3,7 +3,6 @@ import path from "path";
 import worker, {
   JsTransformerConfig,
   JsTransformOptions,
-  TransformResponse,
 } from "metro-transform-worker";
 
 interface TransformerConfig extends JsTransformerConfig {
@@ -17,7 +16,7 @@ export async function transform(
   filename: string,
   data: Buffer,
   options: JsTransformOptions,
-): Promise<TransformResponse> {
+): ReturnType<typeof worker.transform> {
   const transform = config.cssInterop_transformerPath
     ? require(config.cssInterop_transformerPath).transform
     : worker.transform;
