@@ -363,7 +363,7 @@ try {
     add(
       "nativewindui-boundary",
       route === "v4-to-v5" ? "incompatible" : "needs-review",
-      "Confirm the NativewindUI component generation before proceeding. Nativewind 4 apps containing these templates must remain on Nativewind 4.2.6. In other routes, names alone cannot identify the template version; confirmed v4 templates block migration.",
+      "Confirm the NativewindUI component generation before proceeding. Nativewind 4 apps containing these templates must retain their supported Nativewind v4 setup; do not change the patch version as part of this migration. In other routes, names alone cannot identify the template version; confirmed v4 templates block migration.",
       [...new Set(ui)],
     );
   if (truncated || skipped.length)

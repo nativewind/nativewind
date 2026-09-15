@@ -251,7 +251,7 @@ jobs:
             // freshly-generated `rn-new` starter. Pick the channel/stack
             // hinted at in the body so the starter is at least plausibly
             // close to the reporter's setup.
-            const wantsNext = /\b(nativewind\s*v?5|next|5\.0\.0-preview|preview\.?\d)\b/i.test(body);
+            const wantsNext = /\b(nativewind[\s@]*v?5|next|5\.0\.0-(?:preview|rc)|preview\.?\d)\b/i.test(body);
             const wantsExpoRouter = /\bexpo[\s-]?router\b/i.test(body);
             const wantsReactNavigation = /\breact[\s-]?navigation\b/i.test(body);
             // expo-router takes precedence if both are mentioned (it implies

@@ -27,7 +27,7 @@ describe("Feature Name", () => {
 });
 ```
 
-For custom utilities that map to non-style props (like `elevation`, `tint`, `ripple`), the expected output includes those props directly:
+Check `theme.css` and existing tests to distinguish style properties from component props. Elevation remains in `style`; ripple utilities map to `android_ripple`. Do not move every custom utility directly onto component props:
 
 ```typescript
 test("elevation-sm", async () => {
@@ -49,4 +49,6 @@ test("elevation-sm", async () => {
 
 4. **Write the test**: Follow the exact convention above. Place it in the appropriate existing test file, or create a new one if it's a new category.
 
-5. **Run the test**: Execute `yarn test` to verify it passes.
+5. **Run the test**: Run the affected Jest file with `yarn test <test-path>` and the required repository checks. These tests exercise local source with mocked native hosts; they do not establish device rendering or interaction coverage.
+
+Use `sourceFile` or `sourceInline` when testing class discovery and `optimize` when the production compilation path matters. Check the option definitions in `src/test-utils.tsx` before adding an integration case.

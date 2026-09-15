@@ -1,19 +1,19 @@
 ---
 name: triage
-description: Triage a Nativewind or react-native-css GitHub issue. Reads the issue, determines version/repo, creates a reproduction, tests against latest published and local HEAD, then drafts a comment.
+description: Triage a Nativewind or react-native-css GitHub issue. Reads the issue, determines version/repo, creates a reproduction, tests against the applicable published release and local HEAD, then drafts a comment.
 argument-hint: <issue-number-or-url>
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, Agent, WebFetch
 ---
 
-You are triaging a GitHub issue for either **nativewind/nativewind** or **nativewind/react-native-css**. Your goal is to understand the issue, reproduce it, verify it against the latest releases and local HEAD, and draft a response.
+You are triaging a GitHub issue for either **nativewind/nativewind** or **nativewind/react-native-css**. Your goal is to understand the issue, reproduce it, verify it against the applicable published release and local HEAD, and draft a response.
 
 ## Project context
 
 Before diving in, read the relevant project docs for architecture and conventions:
 
-- **Nativewind v5**: Read `CLAUDE.md` and `DEVELOPMENT.md` in `/Users/dan/Developer/nativewind/nativewind/`
-- **react-native-css**: Read `CLAUDE.md` and `DEVELOPMENT.md` in `/Users/dan/Developer/nativewind/react-native-css/`
-- **Nativewind v4**: Read `CONTRIBUTING.md` and check test structure in `/Users/dan/Developer/nativewind/nativewind-v4/`
+- **Nativewind v5**: Read repository instructions, `DEVELOPMENT.md`, `docs/expo57-rc.md` and `docs/rc-compatibility.md` in the v5 checkout.
+- **react-native-css**: Locate its checkout and read its repository instructions and `DEVELOPMENT.md`.
+- **Nativewind v4**: Locate a checkout of the `v4` branch, read its contributing guide and inspect its test structure. Do not apply the v5 repository layout to v4.
 
 These docs describe the architecture, test conventions, commands, and common pitfalls for each project. Use them to inform your reproduction strategy and root cause analysis.
 
@@ -53,8 +53,8 @@ Read `DEVELOPMENT.md` in the react-native-css repo for the full architecture dia
 |---|---|
 | Branch | `main` |
 | npm package | `react-native-css` |
-| npm tag | `@latest` |
-| Local repo path | `/Users/dan/Developer/nativewind/react-native-css` |
+| RC consumer version | `3.1.0-rc.0` (paired with Nativewind 5.0.0-rc.0) |
+| Local repo path | `<react-native-css-checkout>` |
 
 ### If filed on `nativewind/nativewind`
 
@@ -63,16 +63,16 @@ Figure out whether this is a **v4** or **v5** issue. Clues:
 - Presence of `tailwind.config.js` = v4 (v5 uses Tailwind CSS v4's `@tailwindcss/postcss`)
 - Presence of `react-native-css-interop` = v4; `react-native-css` = v5
 - Mention of `@import "nativewind/theme"` = v5
-- If unclear, assume v5 (the active development branch) but note the ambiguity
+- If unclear, inspect the lockfile or ask for resolved versions before applying version specific configuration. A Tailwind config file alone does not establish the installed major version.
 
-| | Nativewind v4 (stable) | Nativewind v5 (preview) |
+| | Nativewind v4 (stable) | Nativewind v5 (release candidate) |
 |---|---|---|
 | Branch | `v4` | `main` |
 | Tailwind | v3 | v4 |
 | Runtime | `react-native-css-interop` | `react-native-css` |
-| npm tag | `@latest` | `@preview` |
+| Current version | `4.2.7` | `5.0.0-rc.0` with `react-native-css@3.1.0-rc.0` |
 | Repro template | `npx rn-new@latest --nativewind` | `npx rn-new@next --nativewind` |
-| Local repo path | `/Users/dan/Developer/nativewind/nativewind-v4` | `/Users/dan/Developer/nativewind/nativewind` |
+| Local repo path | `<nativewind-v4-checkout>` | `<nativewind-v5-checkout>` |
 
 ## Step 3: Assess reproducibility
 
@@ -133,31 +133,32 @@ describe("Issue #<number>", () => {
 });
 ```
 
-Run with: `cd /Users/dan/Developer/nativewind/react-native-css && yarn test src/__tests__/native/triage-<issue-number>.test.tsx`
+Run with: `cd <react-native-css-checkout> && yarn test src/__tests__/native/triage-<issue-number>.test.tsx`
 
 **For compiler issues** (CSS parses wrong, wrong JSON output):
 
 Read existing tests in `src/__tests__/compiler/` (e.g., `compiler.test.tsx`, `declarations.test.tsx`) to match the pattern. Compiler tests verify the JSON output structure from `compile()`.
 
-Run with: `cd /Users/dan/Developer/nativewind/react-native-css && yarn test compiler`
+Run with: `cd <react-native-css-checkout> && yarn test compiler`
 
 **For babel issues** (import rewriting broken):
 
 Read existing tests in `src/__tests__/babel/` which use `babel-plugin-tester`.
 
-Run with: `cd /Users/dan/Developer/nativewind/react-native-css && yarn test babel`
+Run with: `cd <react-native-css-checkout> && yarn test babel`
 
 **For runtime issues that need a full app:**
 ```bash
-cd /Users/dan/Developer/nativewind/react-native-css/example
-yarn example start:build  # Rebuilds library + starts Metro
+cd <react-native-css-checkout>
+# Inspect package.json and the example scripts before running the app.
+yarn example start
 ```
 
 ---
 
 ### Nativewind v5 issues
 
-**For CSS/styling issues** (in `/Users/dan/Developer/nativewind/nativewind`):
+**For CSS/styling issues** (in `<nativewind-v5-checkout>`):
 
 ```typescript
 // Create: src/__tests__/triage-<issue-number>.test.ts
@@ -188,10 +189,10 @@ Run with: `yarn test src/__tests__/triage-<issue-number>.test.ts`
 
 ### Nativewind v4 issues
 
-(in `/Users/dan/Developer/nativewind/nativewind-v4`):
+(in `<nativewind-v4-checkout>`):
 Check the v4 test conventions first:
 ```bash
-ls /Users/dan/Developer/nativewind/nativewind-v4/packages/nativewind/src/__tests__/
+ls <nativewind-v4-checkout>/packages/nativewind/src/__tests__/
 ```
 Then write a similar test following v4's patterns.
 
@@ -204,20 +205,22 @@ These are harder to reproduce with unit tests. Create a standalone project:
 **v5 / react-native-css**: `npx rn-new@next --nativewind` in a temp directory
 **v4**: `npx rn-new@latest --nativewind` in a temp directory
 
-Then replicate the reporter's setup and config.
+Inspect the generated package versions; generator tags do not guarantee a specific SDK. Then replicate the reporter's setup and config. Match the published RC pair and toolchain in `docs/expo57-rc.md` for an RC comparison.
 
 ## Step 5: Verify against versions
 
 Run the reproduction in two contexts:
 
-### 5a. Latest published version
+### 5a. Applicable published version
 
-For test-based reproductions, this is what `yarn test` already does (uses installed dependencies).
+Repository tests exercise local source with installed dependencies. They are not a separate test of the published Nativewind package. To test a published version, use an isolated consumer fixture with registry packages, record resolved versions and ensure workspace aliases or links do not redirect to local source.
 
-For app-based reproductions, ensure the project uses the latest published version:
-- react-native-css: `react-native-css@latest`
-- Nativewind v4: `nativewind@latest`
-- Nativewind v5: `nativewind@preview`
+First reproduce the reporter's exact versions, then compare with the applicable release:
+- Nativewind v4: `nativewind@4.2.7`, with its v4 engine and Tailwind 3 setup
+- Nativewind v5 RC: `nativewind@5.0.0-rc.0` and `react-native-css@3.1.0-rc.0` together
+- Standalone react-native-css: inspect its release contract; use 3.1.0-rc.0 when comparing the Nativewind RC engine
+
+Read current release records before substituting any newer version. Preserve the original baseline and do not mix preview or latest tags into the pinned RC comparison.
 
 Record the result: does the issue reproduce? What's the actual vs. expected behavior?
 
@@ -259,15 +262,7 @@ Format the comment as a markdown blockquote so Dan can review it before posting:
 
 ## Step 7: Clean up
 
-Remove any temporary test files you created:
-```bash
-# In whichever repo you created the test
-rm src/__tests__/triage-<issue-number>.test.ts
-rm src/__tests__/native/triage-<issue-number>.test.tsx
-rm src/__tests__/compiler/triage-<issue-number>.test.tsx
-```
-
-Do NOT leave triage test files in either repo.
+Remove only disposable files created for this investigation. Keep evidence and reproduction commands outside the user's app. Preserve useful regression tests when they belong in an authorized fix, and never delete preexisting or unrelated user work.
 
 ## Important notes
 
@@ -276,3 +271,5 @@ Do NOT leave triage test files in either repo.
 - If the issue is filed in the wrong repo (e.g., a react-native-css bug filed on nativewind), note that and suggest transferring it.
 - Be honest about what you can and cannot determine from the reproduction.
 - When the issue spans both repos, test in both and note which repo owns the fix.
+
+Record compiler, mocked host, bundle and actual device or simulator coverage separately. A passing bundle does not prove layout, input, themes, navigation or animations. State any unavailable platform or interaction checks explicitly.

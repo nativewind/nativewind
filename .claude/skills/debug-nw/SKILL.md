@@ -1,69 +1,54 @@
 ---
 name: debug-nw
-description: Debug a Nativewind v5 setup issue. Walks through common configuration problems with metro, babel, postcss, and dependencies.
+description: Debug a Nativewind v5 RC setup issue by checking actual dependencies, Metro, Babel, PostCSS, CSS and runtime behavior.
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
-You are helping debug a Nativewind v5 configuration issue. Walk through these checks systematically.
+Read `DEVELOPMENT.md`, `docs/expo57-rc.md` and the relevant sections of `docs/rc-compatibility.md`. Inspect the application's files and resolved dependencies before proposing changes. If the installed package is v4, use the v4 documentation; do not apply v5 configuration to it.
 
-## 1. Version check
+## 1. Check the version pair
 
-- Is `nativewind` at v5.x? (`package.json`)
-- Is `react-native-css` installed as a peer dependency? Must be `^3.0.1`
-- Is `tailwindcss` v4+? Must be `>4.1.11`
-- Is `@tailwindcss/postcss` installed?
+The current target is `nativewind@5.0.0-rc.0` with exactly `react-native-css@3.1.0-rc.0`. Check the manifest, lockfile and installed versions. Do not substitute `@latest`, `@preview` or the old `^3.0.1` engine range. The repository manifest can retain a preview version between releases; use the published release contract for consumer setup.
 
-## 2. PostCSS config
+The tested target is Expo 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. The tested CSS toolchain uses Tailwind CSS and `@tailwindcss/postcss` 4.1.12 with Lightning CSS 1.30.1. Engine peer minimums are not evidence of runtime verification on every older SDK. Treat an Expo upgrade as a separate step and preserve the app's package manager and unrelated configuration.
 
-Nativewind v5 uses Tailwind CSS v4's PostCSS plugin. Check for `postcss.config.mjs`:
+## 2. Check PostCSS and the CSS entry
 
-```javascript
-export default {
-  plugins: {
-    "@tailwindcss/postcss": {},
-  },
-};
+Expo 57 discovers `postcss.config.js` and `postcss.config.mjs`, but not `postcss.config.cjs`. Use `@tailwindcss/postcss`, not the Tailwind v3 PostCSS plugin:
+
+```js
+export default { plugins: { "@tailwindcss/postcss": {} } };
 ```
 
-**Common mistake**: Using Tailwind v3's `tailwindcss` PostCSS plugin instead of `@tailwindcss/postcss`.
-
-## 3. CSS entry file
-
-Check that the global CSS file imports the nativewind theme:
+Import the CSS once from `App.tsx` or the Router root layout. Keep utilities unlayered so React Native Web defaults do not override them:
 
 ```css
-@import "tailwindcss";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
 @import "nativewind/theme";
 ```
 
-**Common mistake**: Missing `@import "nativewind/theme"` — this provides RN-specific utilities.
+Check the existing package manager overrides or resolutions for Lightning CSS 1.30.1. Preserve custom theme values, plugins, source discovery and workspace paths.
 
-## 4. Metro config
+## 3. Check Metro and Babel
 
-Check `metro.config.js` for `withNativewind()`:
+Wrap the existing Metro configuration with `withNativewind` from `nativewind/metro`. Preserve custom resolvers and transformers. The deprecated `withNativeWind` alias still exists; its spelling alone does not explain a failure.
 
-```javascript
-const { withNativewind } = require("nativewind/metro");
-module.exports = withNativewind(config);
-```
+Keep `babel-preset-expo` and unrelated plugins. Remove the v4 Nativewind Babel preset and `jsxImportSource` settings when migrating from v4. The v5 Metro integration enables the engine's import rewriting; do not add the old v4 preset to fix it.
 
-**Common mistake**: Using `withNativeWind` (capital W) — deprecated.
+## 4. Check TypeScript and component contracts
 
-## 5. Babel config
+Ensure the generated `nativewind-env.d.ts` references `react-native-css/types` and belongs to the TypeScript project. A type error about `className` can indicate missing declarations or an unsupported component, not necessarily a Babel problem. If the TypeScript project checks CSS side effect imports, include `declare module "*.css";` in an application declaration file.
 
-Check that the babel plugin is configured. The react-native-css babel plugin should be active (this is handled by `withNativewind` in metro config, but verify).
+Read the actual exports in `src/index.tsx`. V5 does not export v4 `cssInterop`, `remapProps` or `verifyInstallation`. `styled` returns a component that callers must render; it does not globally register the original component. Use the RC mapping contract, including `nativeStyleMapping` and the supported `nativeStyleToProp` alias. Do not invent a `global` option or suppress unsupported props with casts.
 
-## 6. TypeScript
+For dynamic variables, check `VariableContextProvider`'s `value` prop and `inlineVariables.exclude` before assuming a compiler defect. For native themes, check `expo-system-ui`, `userInterfaceStyle: "automatic"` and React Native `Appearance`; on the tested target, `"unspecified"` restores the system preference.
 
-Check for `nativewind-env.d.ts` in project root — should be auto-generated. If missing, the `withNativewind` metro config may not be running.
+## 5. Verify the symptom
 
-## 7. Common symptoms
+Restart Metro after changing the engine. Rebuild when native dependencies or native configuration change. Compare the failing case with direct React Native styles or Reanimated controls where relevant. Consult the RC compatibility notes for rejected CSS values and the accepted Android animation cancellation limitation.
 
-- **"className is not a valid prop"**: Babel plugin not active — check metro config
-- **Styles not applying**: CSS file not imported, or PostCSS not processing
-- **Build errors with Tailwind**: Wrong Tailwind version (needs v4+)
-- **Runtime errors about react-native-css**: Missing peer dependency
+Record exact versions, platform, build mode and the observed result. A passing typecheck, bundle or mocked host test does not establish rendering or interaction correctness. Exercise the affected layout, input, themes, mappings, navigation or animations in the app's supported runtimes. Report unavailable platform checks as pending.
 
-## Approach
-
-Ask the user what symptom they're seeing, then check the relevant configs. Read their actual files to diagnose rather than guessing.
+For a migration, use the appropriate repository skill in `skills/nativewind-v4-to-v5` or `skills/nativewind-preview-to-rc`, including its preflight and completion gate. Preserve the supported v4 setup of NativewindUI v4 apps.
