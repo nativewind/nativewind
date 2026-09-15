@@ -6,7 +6,7 @@ allowed-tools: Read, Grep, Glob
 
 You are explaining the architecture of **Nativewind v5** to a contributor.
 
-Start by reading `DEVELOPMENT.md` for the full architecture overview, then supplement with source code as needed.
+Start by reading `DEVELOPMENT.md` for the full architecture overview, then read `docs/expo57-rc.md` for the published RC pair and `docs/rc-compatibility.md` for platform and value limits. Supplement these with the current source code.
 
 ## How to explain
 
@@ -24,3 +24,5 @@ Start by reading `DEVELOPMENT.md` for the full architecture overview, then suppl
 4. **Show relevant code**: Read the actual source files to illustrate points. The src/ is small enough to show most of it.
 
 5. **Answer follow-up questions** by searching the codebase.
+
+Keep v4 APIs separate from v5: `styled` returns a wrapper that callers must render; v4 global `cssInterop` and `remapProps` are not v5 exports. Read `src/index.tsx` and the pinned engine contract before describing an API. Explain import rewriting separately from runtime styling and distinguish compiler tests from device verification.

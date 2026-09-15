@@ -3,11 +3,12 @@
 ## Version Context
 
 This is **Nativewind v5** (main branch), targeting **Tailwind CSS v4**.
-The stable version (v4, targeting Tailwind v3) lives on the `v4` branch.
+The stable version (v4.2.7, targeting Tailwind v3) lives on the `v4` branch.
+The published v5 target is Nativewind 5.0.0-rc.0 with exactly react-native-css 3.1.0-rc.0. Read [the release setup](docs/expo57-rc.md) and [compatibility limits](docs/rc-compatibility.md) before advising consumers. A preview version in the source manifest does not identify the current published consumer target.
 
 ## Documentation
 
-- **v5 docs (preview):** https://www.nativewind.dev/v5
+- **v5 docs (release candidate):** https://www.nativewind.dev/v5
 - **v4 docs (stable):** https://www.nativewind.dev/
 
 The docs site is maintained in a separate repository: https://github.com/nativewind/website
@@ -40,7 +41,7 @@ theme.css provides RN-specific theme values
     ↓
 react-native-css compiler processes CSS → React Native styles
     ↓
-react-native-css babel plugin transforms JSX for className support
+react-native-css Babel plugin rewrites imports for className support
     ↓
 react-native-css runtime applies styles reactively
 ```
@@ -80,7 +81,7 @@ yarn test                # Run tests (Jest)
 yarn test:watch          # Watch mode
 yarn typecheck           # TypeScript validation
 yarn lint                # ESLint + Prettier
-yarn release             # Publish via release-it (maintainers only)
+# Maintainers: see contributing.md and .github/workflows/release.yml for publishing
 ```
 
 ### Example App
@@ -103,7 +104,7 @@ yarn example android     # Build and run on Android
     });
   });
   ```
-- **Options:** `renderCurrentTest` supports `css`, `extraCss`, `theme`, `preflight`, `plugin`, `debug`
+- **Options:** `renderCurrentTest` supports `css`, `extraCss`, `className`, `sourceInline`, `sourceFile`, `optimize`, `theme`, `preflight`, `plugin`, `debug`
 - **CSS compilation happens in tests** via `react-native-css/jest` — no separate build step needed
 
 ## Code Conventions
@@ -123,3 +124,9 @@ yarn example android     # Build and run on Android
 - **Tailwind v4 only** — uses `@tailwindcss/postcss` plugin system, not v3's `tailwind.config.js`
 - **`@map` variant** is the key integration point — it generates `@nativeMapping` directives that `react-native-css` understands
 - **`withNativewind` vs `withNativeWind`** — the capital-W version is deprecated
+
+## Agent guidance
+
+Contributor skills live in `.claude/skills/`: `architecture`, `debug-nw`, `add-test` and `triage`. Application migration skills live in `skills/nativewind-v4-to-v5` and `skills/nativewind-preview-to-rc`; both include read only inventory scripts and measured verification limits. Update affected guidance when changing setup or public contracts. Keep historical evaluation versions intact and distinguish them from the current stable release.
+
+The website repository generates `/llms.txt`, `/llms-full.txt`, their `/v5` equivalents and page Markdown endpoints from the documentation. Changes to shared MDX helpers must remain represented in those exports. Run its `pnpm test:llm` and `pnpm build` checks when changing that pipeline.

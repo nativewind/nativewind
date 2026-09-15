@@ -14,7 +14,7 @@ Run `node <skill-directory>/scripts/preflight.mjs /absolute/path/to/app` before 
 
 Record the package manager, manifests, lockfiles, entry points, installed versions, custom Metro/Babel/PostCSS configuration, theme controls and uncommitted edits. Capture a restorable snapshot of every file that may change, including application source, configuration, manifests and lockfiles. Establish available application checks and baseline screens before updating. An app on Tailwind 3 or Nativewind 4 needs the separate v4 workflow. A partially updated RC app needs dependency and configuration reconciliation rather than another wholesale migration.
 
-If Expo differs from the tested target, handle the SDK upgrade as a separate step within the authorized migration. Do not force unrelated native package upgrades merely to make installation succeed. NativewindUI stays on Nativewind 4.2.6; report this boundary rather than migrating its v4 templates.
+If Expo differs from the tested target, handle the SDK upgrade as a separate step within the authorized migration. Do not force unrelated native package upgrades merely to make installation succeed. NativewindUI v4 apps retain their supported Nativewind v4 setup without changing the patch version as part of this migration; report this boundary rather than migrating its v4 templates.
 
 ## Update the pair
 

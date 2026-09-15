@@ -68,7 +68,7 @@ We use [rn-new](https://rn.new) to quickly stand up an Expo project with Nativew
 
 ## When is v5 landing?
 
-[Nativewind v5 is in preview](https://nativewind.dev/v5)
+[Nativewind v5 is a release candidate](https://nativewind.dev/v5)
 
 ## Is it safe to use v4?
 
