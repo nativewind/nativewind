@@ -238,37 +238,29 @@ function printUpgradeWarning(
   warning: string,
   originalProps: Record<string, any> | null | undefined,
 ) {
+  let propsSummary = "undefined";
+  if (originalProps && typeof originalProps === "object") {
+    try {
+      const sanitized: Record<string, any> = {};
+      for (const [key, val] of Object.entries(originalProps)) {
+        if (key === "children") {
+          sanitized[key] = "[ReactElement / Children]";
+        } else if (typeof val === "function") {
+          sanitized[key] = val.name ? `[Function ${val.name}]` : "[Function]";
+        } else if (typeof val === "object" && val !== null) {
+          sanitized[key] = Array.isArray(val) ? `[Array(${val.length})]` : "[Object]";
+        } else {
+          sanitized[key] = val;
+        }
+      }
+      propsSummary = JSON.stringify(sanitized, null, 2);
+    } catch {
+      propsSummary = "[Unserializable Props]";
+    }
+  }
+
   console.log(
-    `CssInterop upgrade warning.\n\n${warning}.\n\nThis warning was caused by a component with the props:\n${stringify(originalProps)}\n\nIf adding or removing sibling components caused this warning you should add a unique "key" prop to your components. https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key\n`,
-  );
-}
-
-function stringify(object: any) {
-  const seen = new WeakSet();
-  return JSON.stringify(
-    object,
-    function replace(_, value) {
-      if (!(value !== null && typeof value === "object")) {
-        return value;
-      }
-
-      if (seen.has(value)) {
-        return "[Circular]";
-      }
-
-      seen.add(value);
-
-      const newValue: any = Array.isArray(value) ? [] : {};
-
-      for (const entry of Object.entries(value)) {
-        newValue[entry[0]] = replace(entry[0], entry[1]);
-      }
-
-      seen.delete(value);
-
-      return newValue;
-    },
-    2,
+    `CssInterop upgrade warning.\n\n${warning}.\n\nThis warning was caused by a component with the props:\n${propsSummary}\n\nIf adding or removing sibling components caused this warning you should add a unique "key" prop to your components. https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key\n`,
   );
 }
 
