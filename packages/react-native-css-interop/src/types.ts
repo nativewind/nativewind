@@ -12,7 +12,7 @@ import type {
   Animation,
   ContainerCondition,
   ContainerType,
-  Declaration,
+  Declaration as LightningcssDeclaration,
   EasingFunction,
   MediaQuery,
   SelectorComponent,
@@ -307,6 +307,22 @@ export type ExtractedContainer = {
   names?: string[] | false;
   type?: ContainerType;
 };
+
+export type FontVariant = 
+  | 'small-caps'
+  | 'oldstyle-nums'
+  | 'lining-nums'
+  | 'tabular-nums'
+  | 'proportional-nums';
+
+/**
+ * Handle fontVariant text style prop
+ */
+export type Declaration = LightningcssDeclaration | 
+  {
+    property: "font-variant";
+    value: FontVariant;
+  };
 
 export type ExtractedContainerQuery = {
   name?: string | null;
