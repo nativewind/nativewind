@@ -3,13 +3,18 @@ import { memo, useEffect } from "react";
 import { View, ViewProps } from "react-native";
 
 import {
+  act,
   cssInterop,
   registerCSS,
   render,
   screen,
   setupAllComponents,
   useUnstableNativeVariable,
+  VariableContext,
+  vars,
 } from "test";
+
+import { cssVariableObservable } from "../runtime/native/appearance-observables";
 
 const testID = "react-native-css-interop";
 setupAllComponents();
@@ -129,6 +134,128 @@ test("inherit variables - memo", () => {
 
   expect(a).toHaveStyle(undefined);
   expect(b).toHaveStyle({ width: 20 });
+});
+
+test("inheriting variables does not enumerate or read unused variables", () => {
+  registerCSS(`.width { width: var(--width); }`);
+  const unused = jest.fn(() => 20);
+  const ownKeys = jest.fn(Reflect.ownKeys);
+  const variables = new Proxy(
+    {
+      "--width": 10,
+      get "--unused"() {
+        return unused();
+      },
+    },
+    { ownKeys },
+  );
+
+  render(
+    <VariableContext.Provider value={variables}>
+      <View className="width">
+        <View testID={testID} className="width" />
+      </View>
+    </VariableContext.Provider>,
+  );
+
+  expect(screen.getByTestId(testID)).toHaveStyle({ width: 10 });
+  expect([ownKeys.mock.calls.length, unused.mock.calls.length]).toEqual([0, 0]);
+});
+
+test("inherited variables follow a replacement parent scope", () => {
+  registerCSS(`.width { width: var(--width); }`);
+  const child = <View testID={testID} className="width" />;
+
+  render(
+    <VariableContext.Provider value={{ "--width": 10 }}>
+      {child}
+    </VariableContext.Provider>,
+  );
+  expect(screen.getByTestId(testID)).toHaveStyle({ width: 10 });
+
+  screen.rerender(
+    <VariableContext.Provider value={{ "--width": 20 }}>
+      {child}
+    </VariableContext.Provider>,
+  );
+  expect(screen.getByTestId(testID)).toHaveStyle({ width: 20 });
+});
+
+test("inherited observable variables stay subscribed", () => {
+  registerCSS(`.width { width: var(--width); }`);
+  const width = cssVariableObservable({ light: 10 });
+
+  render(
+    <VariableContext.Provider value={{ "--width": width }}>
+      <View className="width">
+        <View testID={testID} className="width" />
+      </View>
+    </VariableContext.Provider>,
+  );
+  expect(screen.getByTestId(testID)).toHaveStyle({ width: 10 });
+
+  act(() => width.set({ light: 20 }));
+  expect(screen.getByTestId(testID)).toHaveStyle({ width: 20 });
+});
+
+test("local variables can be removed without changing siblings or their parent", () => {
+  registerCSS(`.width { width: var(--width); }`);
+  const parent = Object.freeze({ "--width": 10 });
+  const tree = (
+    style?: ReturnType<typeof vars>,
+    scope: Record<string, number> = parent,
+  ) => (
+    <VariableContext.Provider value={scope}>
+      <View>
+        <View testID="local" className="width" style={style}>
+          <View testID="descendant" className="width" />
+        </View>
+        <View testID="sibling" className="width" />
+      </View>
+    </VariableContext.Provider>
+  );
+
+  render(tree(vars({ width: 20 })));
+  expect(screen.getByTestId("local")).toHaveStyle({ width: 20 });
+  expect(screen.getByTestId("descendant")).toHaveStyle({ width: 20 });
+  expect(screen.getByTestId("sibling")).toHaveStyle({ width: 10 });
+
+  screen.rerender(tree());
+  expect(screen.getByTestId("local")).toHaveStyle({ width: 10 });
+  expect(screen.getByTestId("descendant")).toHaveStyle({ width: 10 });
+  expect(screen.getByTestId("sibling")).toHaveStyle({ width: 10 });
+
+  screen.rerender(tree(undefined, Object.freeze({ "--width": 30 })));
+  expect(screen.getByTestId("local")).toHaveStyle({ width: 30 });
+  expect(screen.getByTestId("descendant")).toHaveStyle({ width: 30 });
+  expect(screen.getByTestId("sibling")).toHaveStyle({ width: 30 });
+  expect(parent).toEqual({ "--width": 10 });
+});
+
+test("root variables remain reactive after removing a local override", () => {
+  registerCSS(`
+    :root { --width: 10px; }
+    .width { width: var(--width); }
+  `);
+  const tree = (style?: ReturnType<typeof vars>) => (
+    <View style={style}>
+      <View testID={testID} className="width" />
+    </View>
+  );
+
+  render(tree(vars({ width: 20 })));
+  expect(screen.getByTestId(testID)).toHaveStyle({ width: 20 });
+
+  screen.rerender(tree());
+  expect(screen.getByTestId(testID)).toHaveStyle({ width: 10 });
+
+  act(() =>
+    registerCSS(`
+      :root { --width: 30px; }
+      .width { width: var(--width); }
+    `),
+  );
+  expect(screen.getByTestId(testID)).toHaveStyle({ width: 30 });
 });
 
 test(":root variables", () => {
