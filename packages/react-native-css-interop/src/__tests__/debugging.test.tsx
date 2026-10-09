@@ -1,4 +1,5 @@
 /** @jsxImportSource test */
+import { createContext } from "react";
 import { View } from "react-native";
 
 import { registerCSS, render, screen, setupAllComponents } from "test";
@@ -189,5 +190,64 @@ describe("debugging", () => {
     "@__": "[Circular]"
   }
 }`);
+  });
+});
+
+describe("upgrade warning", () => {
+  const originalLog = console.log;
+
+  beforeEach(() => {
+    console.log = jest.fn();
+  });
+
+  afterEach(() => {
+    console.log = originalLog;
+  });
+
+  test("prints the props when a context value has getters that throw", () => {
+    registerCSS(`
+      .base { color: red; }
+      .selected { --my-var: 10px; width: var(--my-var); }
+    `);
+
+    // Like React Navigation's NavigationStateContext, whose default value
+    // throws "Couldn't find a navigation context" from its getters. React keeps
+    // that default on the context object, which the owner of any element reaches.
+    const Context = createContext({
+      get value(): number {
+        throw new Error("Couldn't find a navigation context");
+      },
+    });
+
+    const testID = "upgradeWarning";
+
+    function Card({ selected }: { selected: boolean }) {
+      return (
+        <View testID={testID} className={selected ? "base selected" : "base"}>
+          <View />
+        </View>
+      );
+    }
+
+    render(
+      <Context.Provider value={{ value: 1 }}>
+        <Card selected={false} />
+      </Context.Provider>,
+    );
+
+    // Setting a variable after the first render upgrades the component, and the
+    // warning prints its props
+    screen.rerender(
+      <Context.Provider value={{ value: 1 }}>
+        <Card selected />
+      </Context.Provider>,
+    );
+
+    expect(console.log).toHaveBeenCalledWith(
+      expect.stringContaining("CssInterop upgrade warning."),
+    );
+    expect(console.log).toHaveBeenCalledWith(
+      expect.stringMatching(/"children": "<[\w.]*View \/>"/),
+    );
   });
 });
