@@ -38,8 +38,10 @@ on:
         description: "Existing issue number to validate + reproduce."
         required: true
         type: string
+# Default to read-only. Only the jobs that call the issues API (validate,
+# report) get issues:write. The reproduce-* jobs run untrusted code from the
+# linked repro repo, so they must never hold a write-capable token.
 permissions:
-  issues: write
   contents: read
 
 concurrency:
@@ -54,6 +56,9 @@ jobs:
   validate:
     name: Validate issue info
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
     outputs:
       sufficient: ${{ steps.parse.outputs.sufficient }}
       has_repro: ${{ steps.parse.outputs.has_repro }}
@@ -306,6 +311,8 @@ jobs:
     # don't exist on the iOS 18.5 SDK shipped with macos-15.
     runs-on: macos-26
     timeout-minutes: 45
+    permissions:
+      contents: read
     env:
       HAS_REPRO: ${{ needs.validate.outputs.has_repro }}
       REPRO_OWNER: ${{ needs.validate.outputs.repro_owner }}
@@ -324,6 +331,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: nativewind-workflow
+          persist-credentials: false
           sparse-checkout: |
             .github/scripts
           sparse-checkout-cone-mode: false
@@ -335,6 +343,9 @@ jobs:
           repository: ${{ env.REPRO_OWNER }}/${{ env.REPRO_REPO }}
           ref: ${{ env.REPRO_REF }}
           path: repro
+          # Install scripts from the repro repo run in this job; don't leave
+          # the token in repro/.git/config for them to read.
+          persist-credentials: false
 
       - name: Scaffold rn-new starter (no repro link in issue)
         if: env.HAS_REPRO != 'true'
@@ -564,6 +575,8 @@ jobs:
     if: needs.validate.outputs.sufficient == 'true' && contains(needs.validate.outputs.platforms, 'android')
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: read
     env:
       HAS_REPRO: ${{ needs.validate.outputs.has_repro }}
       REPRO_OWNER: ${{ needs.validate.outputs.repro_owner }}
@@ -594,6 +607,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: nativewind-workflow
+          persist-credentials: false
           sparse-checkout: |
             .github/scripts
           sparse-checkout-cone-mode: false
@@ -605,6 +619,9 @@ jobs:
           repository: ${{ env.REPRO_OWNER }}/${{ env.REPRO_REPO }}
           ref: ${{ env.REPRO_REF }}
           path: repro
+          # Install scripts from the repro repo run in this job; don't leave
+          # the token in repro/.git/config for them to read.
+          persist-credentials: false
 
       - name: Scaffold rn-new starter (no repro link in issue)
         if: env.HAS_REPRO != 'true'
@@ -738,6 +755,9 @@ jobs:
     # (e.g. issue only mentioned iOS) or the build step failed.
     if: always() && needs.validate.outputs.sufficient == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
     steps:
       # IMPORTANT: checkout MUST happen before download-artifact. actions/
       # checkout@v4 defaults to clean=true, which `git clean -ffdx`s the
@@ -747,6 +767,7 @@ jobs:
       - name: Check out nativewind (for judge script)
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           sparse-checkout: |
             .github/scripts
           sparse-checkout-cone-mode: false
