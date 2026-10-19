@@ -39,8 +39,9 @@ export function observable<T>(
   return {
     name,
     get(effect) {
-      if (effect) {
-        // Subscribe the effect to the observable
+      if (effect && !effects.has(effect)) {
+        // Subscribe the effect to the observable once, so repeated reads
+        // do not add a new cleanup closure to effect.dependencies each time
         effects.add(effect);
         effect.dependencies.add(() => effects.delete(effect));
       }
