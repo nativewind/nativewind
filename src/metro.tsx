@@ -8,9 +8,9 @@ export function withNativewind<
   T extends MetroConfig | (() => Promise<MetroConfig>),
 >(config: T, options?: WithReactNativeCSSOptions): T {
   return withReactNativeCSS(config, {
-    globalClassNamePolyfill: true,
-    typescriptEnvPath: "nativewind-env.d.ts",
     ...options,
+    globalClassNamePolyfill: options?.globalClassNamePolyfill ?? true,
+    typescriptEnvPath: options?.typescriptEnvPath ?? "nativewind-env.d.ts",
   });
 }
 
