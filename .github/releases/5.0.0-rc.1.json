@@ -1,0 +1,34 @@
+{
+  "name": "nativewind",
+  "version": "5.0.0-rc.1",
+  "sourceCommit": "600b31a66a9f291a6e562b7827ad74ca94ea5bd0",
+  "archive": "nativewind-5.0.0-rc.1.tgz",
+  "sha256": "adff71f49138bf939db074efc2e9fd63e6cb40199d2c463c72b376133346ea34",
+  "integrity": "sha512-mqFulM0aJajUwWPO1CXdTMHpOnxQGgCABFSbQ1GuxaOs0nk8GqmiQ2N1N5Lm7GbDvgBwVl7uzjCM6EyPzlNWKw==",
+  "engine": {
+    "name": "react-native-css",
+    "version": "3.1.0-rc.1",
+    "integrity": "sha512-TT5NnkSK1TRlzbZWeJCyjYwEj7IWOZkGR+e42+PU5X6TQM/wW3CPplI44EbWyNz8QN0WeFzrkQTh3EvhO4cEWA=="
+  },
+  "consumerDependencies": {
+    "@babel/core": "7.29.7",
+    "@expo/metro-config": "57.0.12",
+    "expo": "57.0.22",
+    "lightningcss": "1.30.1",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-reanimated": "4.5.1",
+    "react-native-worklets": "0.10.1",
+    "typescript": "6.0.3",
+    "react-native-css": "3.1.0-rc.1",
+    "tailwindcss": "4.1.12",
+    "@tailwindcss/postcss": "4.1.12",
+    "postcss": "8.5.6",
+    "react-dom": "19.2.3",
+    "react-native-web": "0.21.2",
+    "@types/react": "19.2.18",
+    "react-native-safe-area-context": "5.7.0",
+    "@expo/metro-runtime": "57.0.15",
+    "babel-preset-expo": "57.0.11"
+  }
+}
