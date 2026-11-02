@@ -10474,7 +10474,7 @@ __metadata:
     react: "npm:19.2.3"
     react-native: "npm:0.86.3"
     react-native-builder-bob: "npm:^0.40.13"
-    react-native-css: "npm:3.1.0-rc.0"
+    react-native-css: "npm:3.1.0-rc.1"
     react-native-reanimated: "npm:4.5.1"
     react-native-safe-area-context: "npm:~5.7.0"
     react-native-worklets: "npm:0.10.1"
@@ -10486,7 +10486,7 @@ __metadata:
     typescript: "npm:~6.0.3"
     typescript-eslint: "npm:^8.40.0"
   peerDependencies:
-    react-native-css: 3.1.0-rc.0
+    react-native-css: 3.1.0-rc.1
     tailwindcss: ">4.1.11"
   languageName: unknown
   linkType: soft
@@ -11501,7 +11501,7 @@ __metadata:
     react-dom: "npm:19.2.3"
     react-native: "npm:0.86.3"
     react-native-builder-bob: "npm:^0.40.13"
-    react-native-css: "npm:3.1.0-rc.0"
+    react-native-css: "npm:3.1.0-rc.1"
     react-native-monorepo-config: "npm:^0.1.9"
     react-native-reanimated: "npm:4.5.1"
     react-native-web: "npm:~0.21.0"
@@ -11510,9 +11510,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"react-native-css@npm:3.1.0-rc.0":
-  version: 3.1.0-rc.0
-  resolution: "react-native-css@npm:3.1.0-rc.0"
+"react-native-css@npm:3.1.0-rc.1":
+  version: 3.1.0-rc.1
+  resolution: "react-native-css@npm:3.1.0-rc.1"
   dependencies:
     "@types/debug": "npm:^4.1.12"
     babel-plugin-react-compiler: "npm:^19.1.0-rc.2"
@@ -11524,7 +11524,7 @@ __metadata:
     lightningcss: ">=1.27.0"
     react: ">=19"
     react-native: ">=0.81"
-  checksum: 10c0/2170c000c5fc5e7a885a19f870f333337753ab586f19903a3dfd9eed4e60f97f03498fb4be06bdccd7858740936328460796fbff5d0dda3066b323a4ceb7a966
+  checksum: 10c0/e17bacc2b3e393456b36463f4003f3f3cfb2823b9a6a482259564cc691775b8e7253d042ad04b5d6c552039c0a16f6e2ccefba8154910ddec0919cc832f1a1d2
   languageName: node
   linkType: hard
 
