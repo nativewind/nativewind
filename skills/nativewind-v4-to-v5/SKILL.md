@@ -5,7 +5,7 @@ description: Migrate an existing Nativewind v4 application to the pinned Nativew
 
 # Migrate Nativewind v4 to v5
 
-Target Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0 on Expo 57.0.22. Read [the target contract](references/target.md) before changing dependencies and [the measured verification scope](references/verification.md) before describing this skill as tested. Verify exact package availability; do not substitute a preview, latest tag or newer RC. Controlled fixture success does not replace checks in the user's app.
+Target Nativewind 5.0.0-rc.1 and react-native-css 3.1.0-rc.1 on Expo 57.0.22. Read [the target contract](references/target.md) before changing dependencies and [the measured verification scope](references/verification.md) before describing this skill as tested. Verify exact package availability; do not substitute a preview, latest tag or newer RC. Controlled fixture success does not replace checks in the user's app.
 
 ## Inspect before changing
 

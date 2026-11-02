@@ -1,15 +1,21 @@
 # Nativewind v5 Expo 57 release candidate
 
-Nativewind 5.0.0-rc.0 is published. [react-native-css 3.1.0-rc.0](https://github.com/nativewind/react-native-css/releases/tag/3.1.0-rc.0) is available on npm. The installation instructions below target that exact pair. V4.2.7 remains the stable Nativewind release.
+Nativewind 5.0.0-rc.1 is published. [react-native-css 3.1.0-rc.1](https://github.com/nativewind/react-native-css/releases/tag/3.1.0-rc.1) is available on npm. The installation instructions below target that exact pair. V4.2.7 remains the stable Nativewind release.
 
-Package pair: Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0. Nativewind's peer dependency selects that exact engine candidate. The target is Expo 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1, and Worklets 0.10.1.
+Package pair: Nativewind 5.0.0-rc.1 and react-native-css 3.1.0-rc.1. Nativewind's peer dependency selects that exact engine candidate. The target is Expo 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1, and Worklets 0.10.1.
+
+Nativewind 5.0.0-rc.1 has the same Nativewind code as 5.0.0-rc.0 and moves the exact engine pin to react-native-css 3.1.0-rc.1. If you're on 5.0.0-rc.0, upgrade both packages together:
+
+```sh
+npm install --save-exact nativewind@5.0.0-rc.1 react-native-css@3.1.0-rc.1
+```
 
 ## Installation
 
 In an Expo 57 project:
 
 ```sh
-npm install --save-exact nativewind@5.0.0-rc.0 react-native-css@3.1.0-rc.0 tailwindcss@4.1.12 @tailwindcss/postcss@4.1.12 lightningcss@1.30.1
+npm install --save-exact nativewind@5.0.0-rc.1 react-native-css@3.1.0-rc.1 tailwindcss@4.1.12 @tailwindcss/postcss@4.1.12 lightningcss@1.30.1
 npx expo install react-native-reanimated react-native-worklets react-native-safe-area-context expo-system-ui
 ```
 

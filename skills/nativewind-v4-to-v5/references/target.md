@@ -1,6 +1,6 @@
 # Target and verification contract
 
-Pinned revision: Expo 57 RC0. The package pair is Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0. Nativewind requires this exact engine RC. The tested Expo target is 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. Consumer CSS tooling is Tailwind and @tailwindcss/postcss 4.1.12 with lightningcss 1.30.1. These are pinned contract values, not a claim about today's latest releases.
+Pinned revision: Expo 57 RC1. The package pair is Nativewind 5.0.0-rc.1 and react-native-css 3.1.0-rc.1. Nativewind requires this exact engine RC. The tested Expo target is 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. Consumer CSS tooling is Tailwind and @tailwindcss/postcss 4.1.12 with lightningcss 1.30.1. These are pinned contract values, not a claim about today's latest releases.
 
 The [RC installation guide](installation.md) and [compatibility notes](compatibility.md) are public companion documents in the same repository. They contain the setup, accepted defects, input domains and recovery guidance. End users do not need access to the private audit repository.
 

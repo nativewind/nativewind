@@ -1,14 +1,14 @@
-# RC0 installation contract
+# RC installation contract
 
-The published pair is Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0. The tested Expo target is 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. Keep Expo alignment separate from styling migration. Verify exact resolved native versions after installation.
+The published pair is Nativewind 5.0.0-rc.1 and react-native-css 3.1.0-rc.1. The tested Expo target is 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. Keep Expo alignment separate from styling migration. Verify exact resolved native versions after installation.
 
 Use the application's existing package manager. Update the related entries in `package.json` together before installing, preserving unrelated dependencies and dependency groups:
 
 ```json
 {
   "dependencies": {
-    "nativewind": "5.0.0-rc.0",
-    "react-native-css": "3.1.0-rc.0"
+    "nativewind": "5.0.0-rc.1",
+    "react-native-css": "3.1.0-rc.1"
   },
   "devDependencies": {
     "tailwindcss": "4.1.12",
@@ -65,4 +65,4 @@ Import the root CSS once from the app entry or Router root layout. Keep `babel-p
 
 Restart Metro after the engine or configuration changes. Rebuild native apps if native dependencies or app configuration changed. Check CSS discovery, a custom token, layout, interactions, themes and mappings in addition to type checks and production exports.
 
-Read the [compatibility notes](compatibility.md) for contract limitations and the [published RC release](https://github.com/nativewind/nativewind/releases/tag/5.0.0-rc.0) for release details. Migration evaluation is separate from the library's release audit; neither guarantees parity for an arbitrary application.
+Read the [compatibility notes](compatibility.md) for contract limitations and the [published RC release](https://github.com/nativewind/nativewind/releases/tag/5.0.0-rc.1) for release details. Migration evaluation is separate from the library's release audit; neither guarantees parity for an arbitrary application.
