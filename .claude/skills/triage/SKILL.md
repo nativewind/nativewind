@@ -53,7 +53,7 @@ Read `DEVELOPMENT.md` in the react-native-css repo for the full architecture dia
 |---|---|
 | Branch | `main` |
 | npm package | `react-native-css` |
-| RC consumer version | `3.1.0-rc.0` (paired with Nativewind 5.0.0-rc.0) |
+| RC consumer version | `3.1.0-rc.1` (paired with Nativewind 5.0.0-rc.1) |
 | Local repo path | `<react-native-css-checkout>` |
 
 ### If filed on `nativewind/nativewind`
@@ -70,7 +70,7 @@ Figure out whether this is a **v4** or **v5** issue. Clues:
 | Branch | `v4` | `main` |
 | Tailwind | v3 | v4 |
 | Runtime | `react-native-css-interop` | `react-native-css` |
-| Current version | `4.2.7` | `5.0.0-rc.0` with `react-native-css@3.1.0-rc.0` |
+| Current version | `4.2.7` | `5.0.0-rc.1` with `react-native-css@3.1.0-rc.1` |
 | Repro template | `npx rn-new@latest --nativewind` | `npx rn-new@next --nativewind` |
 | Local repo path | `<nativewind-v4-checkout>` | `<nativewind-v5-checkout>` |
 
@@ -217,8 +217,8 @@ Repository tests exercise local source with installed dependencies. They are not
 
 First reproduce the reporter's exact versions, then compare with the applicable release:
 - Nativewind v4: `nativewind@4.2.7`, with its v4 engine and Tailwind 3 setup
-- Nativewind v5 RC: `nativewind@5.0.0-rc.0` and `react-native-css@3.1.0-rc.0` together
-- Standalone react-native-css: inspect its release contract; use 3.1.0-rc.0 when comparing the Nativewind RC engine
+- Nativewind v5 RC: `nativewind@5.0.0-rc.1` and `react-native-css@3.1.0-rc.1` together
+- Standalone react-native-css: inspect its release contract; use 3.1.0-rc.1 when comparing the Nativewind RC engine
 
 Read current release records before substituting any newer version. Preserve the original baseline and do not mix preview or latest tags into the pinned RC comparison.
 

@@ -1,11 +1,11 @@
 ---
 name: nativewind-preview-to-rc
-description: Upgrade an existing Nativewind 5.0.0-preview.4 app using react-native-css 3.0.7 to Nativewind 5.0.0-rc.0, preserving Tailwind 4 setup and checking changed engine contracts. Use the v4 migration skill for Tailwind 3 applications.
+description: Upgrade an existing Nativewind 5.0.0-preview.4 app using react-native-css 3.0.7 to Nativewind 5.0.0-rc.1, preserving Tailwind 4 setup and checking changed engine contracts. Use the v4 migration skill for Tailwind 3 applications.
 ---
 
-# Upgrade the v5 preview to RC0
+# Upgrade the v5 preview to the RC
 
-Target the exact published pair `nativewind@5.0.0-rc.0` and `react-native-css@3.1.0-rc.0`. The tested Expo target is 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. Tailwind CSS and `@tailwindcss/postcss` are 4.1.12; lightningcss is 1.30.1. See [the changed contracts](references/contracts.md) before editing app code. Read [the measured verification scope](references/verification.md) before describing this skill as tested; do not equate structural validation with application verification.
+Target the exact published pair `nativewind@5.0.0-rc.1` and `react-native-css@3.1.0-rc.1`. The tested Expo target is 57.0.22, React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. Tailwind CSS and `@tailwindcss/postcss` are 4.1.12; lightningcss is 1.30.1. See [the changed contracts](references/contracts.md) before editing app code. Read [the measured verification scope](references/verification.md) before describing this skill as tested; do not equate structural validation with application verification.
 
 ## Inspect and preserve
 
@@ -21,7 +21,7 @@ If Expo differs from the tested target, handle the SDK upgrade as a separate ste
 Use the existing package manager and update both packages in one install with exact versions. For npm:
 
 ```sh
-npm install --save-exact nativewind@5.0.0-rc.0 react-native-css@3.1.0-rc.0
+npm install --save-exact nativewind@5.0.0-rc.1 react-native-css@3.1.0-rc.1
 ```
 
 Keep working Tailwind 4, PostCSS, root CSS imports and `withNativewind` configuration. Preserve custom plugins, resolver settings, source discovery and browser theme behavior. Verify the RC's exact engine peer dependency in the resolved lockfile. A `preview` or `latest` tag is not an exact pin. Do not fix a mismatch by ignoring peer dependencies.

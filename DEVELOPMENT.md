@@ -4,7 +4,7 @@
 
 This is **Nativewind v5** (main branch), targeting **Tailwind CSS v4**.
 The stable version (v4.2.7, targeting Tailwind v3) lives on the `v4` branch.
-The published v5 target is Nativewind 5.0.0-rc.0 with exactly react-native-css 3.1.0-rc.0. Read [the release setup](docs/expo57-rc.md) and [compatibility limits](docs/rc-compatibility.md) before advising consumers. A preview version in the source manifest does not identify the current published consumer target.
+The published v5 target is Nativewind 5.0.0-rc.1 with exactly react-native-css 3.1.0-rc.1. Read [the release setup](docs/expo57-rc.md) and [compatibility limits](docs/rc-compatibility.md) before advising consumers. A preview version in the source manifest does not identify the current published consumer target.
 
 ## Documentation
 

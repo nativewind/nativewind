@@ -8,8 +8,8 @@ const workflow = path.basename(
   path.dirname(path.dirname(fileURLToPath(import.meta.url))),
 );
 const target = {
-  nativewind: "5.0.0-rc.0",
-  "react-native-css": "3.1.0-rc.0",
+  nativewind: "5.0.0-rc.1",
+  "react-native-css": "3.1.0-rc.1",
   expo: "57.0.22",
   react: "19.2.3",
   "react-native": "0.86.3",

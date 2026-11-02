@@ -2,6 +2,8 @@
 
 Evaluated on 2026-09-14 using Nativewind 5.0.0-preview.4/react-native-css3.0.7 as the last preview pair and Nativewind 5.0.0-rc.0/react-native-css3.1.0-rc.0 as the exact destination. Both controlled npm apps use Expo 57.0.22 with its aligned native dependencies.
 
+This evaluation predates 5.0.0-rc.1. That release keeps the Nativewind code unchanged and moves the exact engine pin to react-native-css 3.1.0-rc.1. The fixtures were not rerun against it.
+
 A separate agent used this skill on a working preview and an interrupted manifest update containing Nativewind RC with the old engine. The interrupted input has no claimed working baseline. The regular preview's working baseline was established after explicit fixture repairs: included CSS declarations, discovered PostCSS filename and the correct split Tailwind imports. Those repairs are distinguished from the RC dependency migration.
 
 Both final apps pass TypeScript and production web/iOS/Android JavaScript exports. Independent Chromium checks pass custom token color/spacing, variable width, button and typing behavior, dark mode and restoration, with baseline parity for the regular preview. The RC native compiler/runtime suite passes 18 checks using Expo Jest host mocks. Wrong-width negative controls fail and restored values pass.

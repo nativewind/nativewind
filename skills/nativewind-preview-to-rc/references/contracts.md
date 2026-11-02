@@ -1,8 +1,8 @@
-# Preview 4 to RC0 contracts
+# Preview 4 to RC contracts
 
-The source pair is Nativewind 5.0.0-preview.4 with react-native-css 3.0.7. The destination pair is Nativewind 5.0.0-rc.0 with react-native-css 3.1.0-rc.0.
+The source pair is Nativewind 5.0.0-preview.4 with react-native-css 3.0.7. The destination pair is Nativewind 5.0.0-rc.1 with react-native-css 3.1.0-rc.1.
 
-The [published release notes](https://github.com/nativewind/nativewind/releases/tag/5.0.0-rc.0) and [compatibility guide](https://github.com/nativewind/nativewind/blob/main/docs/rc-compatibility.md) are authoritative for this pinned target.
+The [5.0.0-rc.0 release notes](https://github.com/nativewind/nativewind/releases/tag/5.0.0-rc.0), the [5.0.0-rc.1 release notes](https://github.com/nativewind/nativewind/releases/tag/5.0.0-rc.1) and [compatibility guide](https://github.com/nativewind/nativewind/blob/main/docs/rc-compatibility.md) are authoritative for this pinned target.
 
 Legacy `@cssInterop` and `@react-native` configuration was silently ignored by the previous engine and now produces errors. Determine the intended behavior before removing a directive. Theme selection on native uses React Native Appearance; runtime variables that must not be inlined use the Metro compiler option `inlineVariables.exclude`. Preserve actual values and customizations; record unsupported intent explicitly.
 

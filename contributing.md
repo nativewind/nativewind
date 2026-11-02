@@ -10,7 +10,7 @@ Include a minimal reproduction, exact resolved package versions, configuration, 
 
 You can start a v4 reproduction with `npx rn-new@latest --nativewind` or a v5 reproduction with `npx rn-new@next --nativewind`. Add `--expo-router` when the issue involves Router. Generator tags can change; inspect the generated manifest and lockfile rather than assuming a particular Expo SDK or package pair.
 
-For the v5 RC, follow [the published setup](docs/expo57-rc.md): Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0 on the tested Expo 57 toolchain. Consult [the compatibility notes](docs/rc-compatibility.md) before treating unsupported CSS values as regressions. Preserve the reporter's original baseline when comparing versions.
+For the v5 RC, follow [the published setup](docs/expo57-rc.md): Nativewind 5.0.0-rc.1 and react-native-css 3.1.0-rc.1 on the tested Expo 57 toolchain. Consult [the compatibility notes](docs/rc-compatibility.md) before treating unsupported CSS values as regressions. Preserve the reporter's original baseline when comparing versions.
 
 ## Develop a change
 

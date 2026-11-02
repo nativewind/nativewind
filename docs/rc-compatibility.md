@@ -1,8 +1,8 @@
 # Nativewind v5 RC compatibility notes
 
-Compatibility notes for the Expo 57 RC. The audit is complete and react-native-css 3.1.0-rc.0 is published. Nativewind 5.0.0-rc.0 is also published.
+Compatibility notes for the Expo 57 RC. The audit is complete. Nativewind 5.0.0-rc.1 and react-native-css 3.1.0-rc.1 are published. The audit ran against 5.0.0-rc.0 and 3.1.0-rc.0. Nativewind 5.0.0-rc.1 keeps the same Nativewind code and moves to the engine fixes in [react-native-css 3.1.0-rc.1](https://github.com/nativewind/react-native-css/releases/tag/3.1.0-rc.1).
 
-The target is Expo 57.0.22 with React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. The published package pair is Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0. Use those exact versions together.
+The target is Expo 57.0.22 with React Native 0.86.3, React 19.2.3, Reanimated 4.5.1 and Worklets 0.10.1. The published package pair is Nativewind 5.0.0-rc.1 and react-native-css 3.1.0-rc.1. Use those exact versions together.
 
 ## Corrections to the preview documentation
 

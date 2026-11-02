@@ -2,6 +2,8 @@
 
 Evaluated on 2026-09-14 against the published Nativewind 5.0.0-rc.0 and react-native-css 3.1.0-rc.0 pair. These results describe controlled fixtures, not a guarantee for arbitrary applications.
 
+This evaluation predates 5.0.0-rc.1. That release keeps the Nativewind code unchanged and moves the exact engine pin to react-native-css 3.1.0-rc.1. The fixtures were not rerun against it.
+
 Four npm applications started on Nativewind 4.2.6 and Tailwind 3.4.19 with Expo 57.0.22 already aligned: a minimal app, a Router app with custom theme/plugin, a workspace with a shared component, and an app with prop mappings, variables, placeholder color, SVG, image and animation declarations. Independent agents applied the skill. Browser and native runtime oracles were maintained separately from the migrating agents.
 
 All four final apps pass TypeScript, web production export and iOS/Android JavaScript bundle export. Chromium measurements compare original and migrated colors, spacing, variable dimensions, custom utility/workspace styles, button and typing behavior, and system dark/light changes. The independent RC native compiler/runtime suite passes 46 checks across these four apps using Expo Jest host mocks. Each fixture rejects an intentionally wrong width and passes the restored value.
