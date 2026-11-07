@@ -136,3 +136,40 @@ test(`ScrollView`, () => {
     },
   });
 });
+
+describe("Pressable with a style function", () => {
+  // React Native 0.86+ LogBox renders `<Pressable style={({ pressed }) => …}>`
+  test("without className", () => {
+    render(
+      <Pressable
+        testID={testID}
+        style={({ pressed }) => ({
+          backgroundColor: pressed ? "blue" : "red",
+          height: 48,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId(testID).props.style).toEqual({
+      backgroundColor: "red",
+      height: 48,
+    });
+  });
+
+  test("with className", () => {
+    registerCSS(`.p-4 { padding: 16px }`);
+
+    render(
+      <Pressable
+        testID={testID}
+        className="p-4"
+        style={() => ({ backgroundColor: "red" })}
+      />,
+    );
+
+    expect(screen.getByTestId(testID).props.style).toEqual([
+      { padding: 16 },
+      { backgroundColor: "red" },
+    ]);
+  });
+});
