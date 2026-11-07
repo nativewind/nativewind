@@ -299,11 +299,27 @@ export function interop(
   sharedState.originalProps = originalProps;
   sharedState.initialRender = false;
 
+  // A function-valued inline prop (Pressable's `style={({ pressed }) => …}`)
+  // cannot be resolved ahead of render. The className styles would replace it,
+  // so call it after them, with this render's function.
+  let possiblyAnimatedProps = memoOutput.possiblyAnimatedProps;
+  for (const config of configs) {
+    const inline = config.inlineProp ? props[config.inlineProp] : undefined;
+    const resolved = config.inlineProp
+      ? possiblyAnimatedProps[config.inlineProp]
+      : undefined;
+    if (typeof inline !== "function" || resolved === undefined) continue;
+    possiblyAnimatedProps = {
+      ...possiblyAnimatedProps,
+      [config.inlineProp!]: (...args: unknown[]) => [resolved, inline(...args)],
+    };
+  }
+
   return renderComponent(
     component,
     sharedState,
     { ref, ...props, ...memoOutput.handlers },
-    memoOutput.possiblyAnimatedProps,
+    possiblyAnimatedProps,
     variables,
     containers,
   );
@@ -408,7 +424,11 @@ function getDeclarations(
     }
   }
 
-  if (config.inlineProp && refs.props?.[config.inlineProp]) {
+  if (
+    config.inlineProp &&
+    refs.props?.[config.inlineProp] &&
+    typeof refs.props[config.inlineProp] !== "function"
+  ) {
     collectInlineRules(
       state,
       refs,
