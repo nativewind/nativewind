@@ -74,37 +74,14 @@ export function renderComponent(
           state.originalProps,
         );
       }
-    } else {
-      state.animated = UpgradeState.UPGRADED;
-      component = createAnimatedComponent(component);
-
-      const { useAnimatedStyle } =
-        require("react-native-reanimated") as typeof import("react-native-reanimated");
-
-      props.style = useAnimatedStyle(() => {
-        function flattenAnimatedProps(style: any): any {
-          // Primitive or null
-          if (typeof style !== "object" || !style) return style;
-          // Shared value
-          if ("_isReanimatedSharedValue" in style && "value" in style) {
-            return style.value;
-          }
-          if (Array.isArray(style)) return style.map(flattenAnimatedProps);
-          return Object.fromEntries(
-            Object.entries(style).map(([key, value]: any) => {
-              return [key, flattenAnimatedProps(value)];
-            }),
-          );
-        }
-
-        try {
-          return flattenAnimatedProps(possiblyAnimatedProps.style) || {};
-        } catch (error: any) {
-          console.log(`css-interop error: ${error.message}`);
-          return {};
-        }
-      }, [possiblyAnimatedProps.style]);
     }
+    state.animated = UpgradeState.UPGRADED;
+    props = {
+      component: createAnimatedComponent(component),
+      props,
+      style: possiblyAnimatedProps.style,
+    };
+    component = AnimatedInterop;
   } else {
     props = { ...props, ...possiblyAnimatedProps };
   }
@@ -190,6 +167,39 @@ export function renderComponent(
   // }
 }
 
+/** Keep Reanimated hooks in a component whose hook order never changes. */
+function AnimatedInterop({
+  component,
+  props,
+  style,
+}: {
+  component: ComponentType<any>;
+  props: Record<string, any>;
+  style: any;
+}) {
+  const { useAnimatedStyle } =
+    require("react-native-reanimated") as typeof import("react-native-reanimated");
+
+  const animatedStyle = useAnimatedStyle(() => {
+    function flattenAnimatedProps(value: any): any {
+      if (typeof value !== "object" || !value) return value;
+      if ("_isReanimatedSharedValue" in value && "value" in value) {
+        return value.value;
+      }
+      if (Array.isArray(value)) return value.map(flattenAnimatedProps);
+      return Object.fromEntries(
+        Object.entries(value).map(([key, entry]) => [
+          key,
+          flattenAnimatedProps(entry),
+        ]),
+      );
+    }
+    return flattenAnimatedProps(style) || {};
+  }, [style]);
+
+  return createElement(component, { ...props, style: animatedStyle });
+}
+
 function createAnimatedComponent(Component: ComponentType<any>): any {
   if (animatedCache.has(Component)) {
     return animatedCache.get(Component)!;
@@ -215,9 +225,8 @@ function createAnimatedComponent(Component: ComponentType<any>): any {
   const { default: Animated } =
     require("react-native-reanimated") as typeof import("react-native-reanimated");
 
-  const AnimatedComponent = Animated.createAnimatedComponent(
-    Component as React.ComponentClass,
-  );
+  const AnimatedComponent: ComponentType<any> =
+    Animated.createAnimatedComponent(Component as React.ComponentClass);
   AnimatedComponent.displayName = `Animated.${Component.displayName || Component.name || "Unknown"}`;
 
   animatedCache.set(Component, AnimatedComponent);
@@ -280,7 +289,16 @@ function stringify(object: any) {
 
 function getDebugReplacer() {
   const seen = new WeakSet<object>();
-  return (_: string, value: unknown) => {
+  return function (this: Record<string, unknown>, key: string, value: unknown) {
+    const original = this[key];
+    if (
+      typeof original === "object" &&
+      original !== null &&
+      "_isReanimatedSharedValue" in original &&
+      "value" in original
+    ) {
+      return `${original.value} (animated value)`;
+    }
     if (typeof value === "object" && value !== null) {
       if (seen.has(value)) {
         return "[Circular]";

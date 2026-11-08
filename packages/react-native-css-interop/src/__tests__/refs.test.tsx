@@ -12,7 +12,13 @@ import { createMockComponent, registerCSS, render } from "test";
 const testID = "react-native-css-interop";
 const mapping = { className: "style" } as const;
 
-const FunctionComponent = createMockComponent((_: ViewProps) => null, mapping);
+const FunctionComponent = createMockComponent(
+  (props: ViewProps & { ref?: React.Ref<unknown> }) => {
+    useImperativeHandle(props.ref, () => ({ getProps: () => props }));
+    return null;
+  },
+  mapping,
+);
 
 const ForwardRef = createMockComponent(
   forwardRef((props: ViewProps, ref: any) => {
@@ -48,19 +54,8 @@ test("FunctionComponent", () => {
   registerCSS(`.my-class { color: red; }`);
   const ref = createRef<any>();
 
-  const originalError = console.error;
-  const mockError = jest.fn();
-  console.error = mockError;
-
-  render(
-    <FunctionComponent ref={ref as any} testID={testID} className="my-class" />,
-  );
-
-  expect(mockError.mock.lastCall?.[0]).toMatch(
-    /Warning: Function components cannot be given refs\. Attempts to access this ref will fail\. Did you mean to use React\.forwardRef()?/,
-  );
-
-  console.error = originalError;
+  render(<FunctionComponent ref={ref} testID={testID} className="my-class" />);
+  expect(ref.current?.getProps().style).toEqual({ color: "#ff0000" });
 });
 
 test("ForwardRef", () => {

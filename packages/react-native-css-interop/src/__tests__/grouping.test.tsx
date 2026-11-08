@@ -98,7 +98,7 @@ test("group - active (animated)", async () => {
   jest.advanceTimersByTime(0);
 
   expect(getAnimatedStyle(child)).toStrictEqual({
-    color: "black",
+    color: "rgba(0, 0, 0, 1)",
   });
 
   jest.advanceTimersByTime(500);
@@ -125,9 +125,8 @@ test("invalid group", async () => {
   );
 
   const { rerender } = render(<View testID={childID} className="my-class" />);
-  const componentB = screen.findAllByTestId(childID);
 
-  expect(componentB).toHaveStyle(undefined);
+  expect(screen.getByTestId(childID)).toHaveStyle(undefined);
 
   rerender(
     <View testID={parentID} className="invalid">
@@ -135,7 +134,7 @@ test("invalid group", async () => {
     </View>,
   );
 
-  expect(componentB).toHaveStyle(undefined);
+  expect(screen.getByTestId(childID)).toHaveStyle(undefined);
 });
 
 test("group selector", async () => {
