@@ -264,3 +264,36 @@ test("transition - does not touch a shared value while rendering", () => {
 
   expect(duringRender).toHaveLength(0);
 });
+
+test("transition - a rerender with the same target does not restart it", () => {
+  registerCSS(`
+    .transition {
+      transition: width 1s linear;
+    }
+
+    .tall {
+      height: 10px;
+    }
+
+    .first {
+      width: 100px;
+    }
+
+    .second {
+      width: 200px;
+    }
+`);
+
+  const { rerender } = render(
+    <View testID={testID} className="transition first" />,
+  );
+  const component = screen.getByTestId(testID);
+
+  rerender(<View testID={testID} className="transition second" />);
+  jest.advanceTimersByTime(500);
+  expect(component).toHaveAnimatedStyle({ width: 150 });
+
+  rerender(<View testID={testID} className="transition second tall" />);
+  jest.advanceTimersByTime(500);
+  expect(component).toHaveAnimatedStyle({ width: 200 });
+});
