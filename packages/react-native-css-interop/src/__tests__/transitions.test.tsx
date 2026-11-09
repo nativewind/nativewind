@@ -232,3 +232,35 @@ test("optional transitions", async () => {
     color: "black",
   });
 });
+
+test("transition - does not touch a shared value while rendering", () => {
+  const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+  registerCSS(`
+    .transition {
+      transition: width 1s linear;
+    }
+
+    .first {
+      width: 100px;
+    }
+
+    .second {
+      width: 200px;
+    }
+`);
+
+  const { rerender } = render(
+    <View testID={testID} className="transition first" />,
+  );
+  rerender(<View testID={testID} className="transition second" />);
+  rerender(<View testID={testID} className="transition second" />);
+  rerender(<View testID={testID} className="transition first" />);
+
+  const duringRender = warn.mock.calls.filter(([message]) =>
+    String(message).includes("during component render"),
+  );
+  warn.mockRestore();
+
+  expect(duringRender).toHaveLength(0);
+});
