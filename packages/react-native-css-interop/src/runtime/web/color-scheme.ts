@@ -52,7 +52,7 @@ if (darkModeFlag) {
 }
 
 const systemColorScheme = observable<"light" | "dark">(
-  appearance.getColorScheme() ?? "light",
+  appearance.getColorScheme() === "dark" ? "dark" : "light",
 );
 
 const colorSchemeObservable = observable<"light" | "dark" | undefined>(
@@ -95,7 +95,8 @@ export const colorScheme = {
   get: colorSchemeObservable.get,
   toggle() {
     let current = colorSchemeObservable.get();
-    if (current === undefined) current = appearance.getColorScheme() ?? "light";
+    if (current === undefined)
+      current = appearance.getColorScheme() === "dark" ? "dark" : "light";
     colorScheme.set(current === "light" ? "dark" : "light");
   },
   [INTERNAL_RESET]: (appearance: typeof Appearance) => {
@@ -109,7 +110,9 @@ function resetAppearanceListeners($appearance: typeof Appearance) {
   appearanceListener?.remove();
   appearanceListener = appearance.addChangeListener((state) => {
     if (AppState.currentState === "active") {
-      systemColorScheme.set(state.colorScheme ?? "light");
+      if (state.colorScheme === "light" || state.colorScheme === "dark") {
+        systemColorScheme.set(state.colorScheme);
+      }
     }
   });
 }

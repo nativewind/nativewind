@@ -2,7 +2,6 @@
 import { View } from "react-native";
 
 import { getAnimatedStyle } from "react-native-reanimated";
-import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 
 import { render, screen } from "../test";
 
@@ -46,14 +45,14 @@ test("transition-colors", async () => {
     />,
   );
 
-  // Directly after rerender, should still have the old color
+  // Reanimated normalizes colors when the transition starts.
   expect(getAnimatedStyle(component)).toStrictEqual({
-    backgroundColor: "#ef4444",
-    borderColor: "#000000",
+    backgroundColor: "rgba(239, 68, 68, 1)",
+    borderColor: "rgba(0, 0, 0, 1)",
   });
 
   // Bg-Color should only change after we advance time
-  jest.advanceTimersByTime(76); // Transition half the time
+  jest.advanceTimersByTime(75); // Transition half the time
   expect(getAnimatedStyle(component)).toStrictEqual({
     backgroundColor: "rgba(178, 105, 184, 1)",
     borderColor: "rgba(73, 85, 101, 1)",
@@ -105,7 +104,7 @@ test("transition-opacity", async () => {
   expect(getAnimatedStyle(component)).toStrictEqual({ opacity: 0 });
 
   // Bg-Color should only change after we advance time
-  jest.advanceTimersByTime(76); // Transition half the time
+  jest.advanceTimersByTime(75); // Transition half the time
   expect(getAnimatedStyle(component)).toStrictEqual({ opacity: 0.5 });
 
   // At the end of the transition

@@ -14,7 +14,7 @@ import { Effect, observable, ObservableOptions } from "../observable";
  * Color scheme
  */
 export const systemColorScheme = observable<"light" | "dark">(
-  Appearance.getColorScheme() ?? "light",
+  Appearance.getColorScheme() === "dark" ? "dark" : "light",
 );
 const colorSchemeObservable = observable<"light" | "dark" | undefined>(
   undefined,
@@ -24,9 +24,11 @@ export const colorScheme = {
   set(value: "light" | "dark" | "system") {
     if (value === "system") {
       if ((Platform.constants?.reactNativeVersion?.minor ?? 0) >= 82) {
-        appearance.setColorScheme("unspecified" as any);
+        appearance.setColorScheme("unspecified");
       } else {
-        appearance.setColorScheme(null);
+        appearance.setColorScheme(
+          null as unknown as Parameters<typeof Appearance.setColorScheme>[0],
+        );
       }
     } else {
       appearance.setColorScheme(value);

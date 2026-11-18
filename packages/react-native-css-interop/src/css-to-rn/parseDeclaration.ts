@@ -1555,7 +1555,7 @@ export function parseDeclaration(
         parseTextAlign(declaration.value, parseOptions),
       );
     case "box-shadow": {
-      parseBoxShadow(declaration.value, parseOptions);
+      return parseBoxShadow(declaration.value, parseOptions);
     }
     case "aspect-ratio": {
       return addStyleProp(
