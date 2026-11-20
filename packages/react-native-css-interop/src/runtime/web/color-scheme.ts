@@ -41,13 +41,15 @@ if (darkModeFlag) {
     const flags = darkModeFlag.split(" ");
     darkMode = flags[0];
     darkModeValue = flags[1];
-    colorScheme.set(
-      globalThis.window.document.documentElement.classList.contains(
-        darkModeValue,
-      )
-        ? "dark"
-        : "system",
-    );
+    if (darkMode === "class") {
+      colorScheme.set(
+        globalThis.window.document.documentElement.classList.contains(
+          darkModeValue,
+        )
+          ? "dark"
+          : "system",
+      );
+    }
   }).observe(headNode, { attributes: false, childList: true, subtree: false });
 }
 
