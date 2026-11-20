@@ -38,6 +38,7 @@ export type ReducerState = {
   isWaitingLayout?: boolean;
   transition?: Required<ExtractedTransition>;
   sharedValues?: Map<string, SharedValue<any>>;
+  transitionTargets?: Map<string, unknown>;
   animationNames?: Set<string>;
   styleTracking: ReducerTracking;
   declarationTracking: ReducerTracking;
@@ -65,6 +66,7 @@ export type SharedState = {
   containers: number;
   pressable: number;
   canUpgradeWarn: boolean;
+  pendingTransitions?: Array<() => void>;
   layout?: Observable<[number, number]>;
   hover?: Observable<boolean>;
   active?: Observable<boolean>;

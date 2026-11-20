@@ -284,6 +284,14 @@ export function interop(
     };
   }, [inheritedContainers, memoOutput.containers]);
 
+  // Transitions are started after the commit: Reanimated warns about writing a shared value during render
+  useEffect(() => {
+    const pending = sharedState.pendingTransitions;
+    if (!pending) return;
+    sharedState.pendingTransitions = undefined;
+    for (const start of pending) start();
+  });
+
   // Cleanup the effects when the component is unmounted
   useEffect(() => {
     return () => {
@@ -513,7 +521,7 @@ function applyStyles(state: ReducerState, refs: Refs) {
   // Animations and Transitions screw with things.
   // Once an component has been upgraded to an animated component
   // we need to retain these values
-  retainSharedValues(state, seenAnimatedProps);
+  retainSharedValues(state, refs, seenAnimatedProps);
 
   // Moves styles to the correct props or removes the props if they shouldn't exist
   // { style: { fill: 'red' } -> { fill: 'red' }
@@ -763,28 +771,38 @@ function processTransition(
       const initialValue = value !== undefined ? value : defaultValue;
       sharedValue = makeMutable(initialValue);
       state.sharedValues.set(property, sharedValue);
+      state.transitionTargets ??= new Map();
+      state.transitionTargets.set(property, initialValue);
     } else {
+      state.transitionTargets ??= new Map();
       if (!sharedValue) {
         // First time seeing this value, but its not the initial render!
         // We need to create the sharedValue
         sharedValue = makeMutable(defaultValue);
         state.sharedValues.set(property, sharedValue);
+        state.transitionTargets.set(property, defaultValue);
       }
 
       // If the value is undefined or null, then it should be the default
       value ??= defaultValue;
 
-      if (value !== sharedValue.value) {
+      // Compared with the last target, not `sharedValue.value`: this runs during render
+      if (value !== state.transitionTargets.get(property)) {
+        state.transitionTargets.set(property, value);
         const duration = timeToMS(durations[index % durations.length]);
         const delay = timeToMS(delays[index % delays.length]);
         const easing = easingFunctions[index % easingFunctions.length];
-        sharedValue.value = withDelay(
-          delay,
-          withTiming(value, {
-            duration,
-            easing: getEasing(easing, Easing),
-          }),
-        );
+        const target = value;
+        const mutable = sharedValue;
+        (refs.sharedState.pendingTransitions ??= []).push(() => {
+          mutable.value = withDelay(
+            delay,
+            withTiming(target, {
+              duration,
+              easing: getEasing(easing, Easing),
+            }),
+          );
+        });
       }
     }
 
@@ -798,6 +816,7 @@ function processTransition(
 
 function retainSharedValues(
   state: ReducerState,
+  refs: Refs,
   seenAnimatedProps: Set<string>,
 ) {
   if (!state.sharedValues?.size) return;
@@ -813,7 +832,11 @@ function retainSharedValues(
     if (typeof value === "function") {
       value = value(state.styleTracking.effect);
     }
-    entry[1].value = value;
+    state.transitionTargets?.set(entry[0], value);
+    const mutable = entry[1];
+    (refs.sharedState.pendingTransitions ??= []).push(() => {
+      mutable.value = value;
+    });
     props.style ??= {};
     props.style?.[entry[0]] ??
       defaultValues[entry[0] as keyof typeof defaultValues];
