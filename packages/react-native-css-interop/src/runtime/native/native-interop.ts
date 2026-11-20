@@ -51,7 +51,13 @@ import {
   getStyle,
   VariableContext,
 } from "./styles";
-import { ReducerAction, ReducerState, Refs, SharedState } from "./types";
+import {
+  ReducerAction,
+  ReducerState,
+  Refs,
+  RenderingGuard,
+  SharedState,
+} from "./types";
 
 export function interop(
   component: ReactComponent<any>,
@@ -348,6 +354,30 @@ function initReducer({
   );
 }
 
+/**
+ * Creates the declaration guard outside of `getDeclarations`, so the closure only
+ * captures the three values it actually compares.
+ *
+ * Declared inline, the guard captures `getDeclarations`'s environment instead:
+ *
+ * - Hermes `-Og` (dev builds) keeps every local and parameter in that environment,
+ *   `previousState` included. Each render then links its state to the previous one
+ *   through `declarationTracking.guards`, so the whole render history — and the
+ *   element tree held by each state's `props` — stays reachable.
+ * - Hermes `-O` (release builds) narrows the environment to `config` and `state`.
+ *   The generational chain is gone, but the guard still pins that render's state
+ *   for as long as the tracking object lives.
+ */
+function makeDeclarationGuard(
+  config: ReducerState["config"],
+  className: ReducerState["className"],
+  inline: ReducerState["inline"],
+): RenderingGuard {
+  return (refs) =>
+    !Object.is(refs.props?.[config.source], className) ||
+    !Object.is(getTarget(refs.props, config), inline);
+}
+
 function getDeclarations(
   previousState: ReducerState,
   refs: Refs,
@@ -386,9 +416,7 @@ function getDeclarations(
   }
 
   state.declarationTracking.guards.push(
-    (refs) =>
-      !Object.is(refs.props?.[config.source], state.className) ||
-      !Object.is(getTarget(refs.props, config), state.inline),
+    makeDeclarationGuard(config, state.className, state.inline),
   );
 
   const normalRules: ProcessedStyleRules[] = [];
