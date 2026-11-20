@@ -408,7 +408,11 @@ function getDeclarations(
     }
   }
 
-  if (config.inlineProp && refs.props?.[config.inlineProp]) {
+  if (
+    config.inlineProp &&
+    refs.props?.[config.inlineProp] &&
+    typeof refs.props[config.inlineProp] !== "function"
+  ) {
     collectInlineRules(
       state,
       refs,
@@ -518,6 +522,26 @@ function applyStyles(state: ReducerState, refs: Refs) {
   // Moves styles to the correct props or removes the props if they shouldn't exist
   // { style: { fill: 'red' } -> { fill: 'red' }
   cleanup(state.props, state.config);
+
+  if (typeof state.props.__styleFn === "function") {
+    const fn = state.props.__styleFn;
+    delete state.props.__styleFn;
+    if (
+      state.props.style &&
+      Object.keys(state.props.style).length > 0
+    ) {
+      const baseStyle = state.props.style;
+      state.props.style = (args: any) => {
+        const result = fn(args);
+        if (Array.isArray(result)) {
+          return [baseStyle, ...result];
+        }
+        return [baseStyle, result];
+      };
+    } else {
+      state.props.style = fn;
+    }
+  }
 
   return state;
 }
@@ -965,10 +989,14 @@ function applyRules(
         }
       }
     } else {
-      // Make sure we clone this, as it may be a frozen style object
-      assignToTarget(props, { ...declaration }, state.config, {
-        objectMergeStyle: "assign",
-      });
+      if (typeof declaration === "function") {
+        props.__styleFn = declaration;
+      } else {
+        // Make sure we clone this, as it may be a frozen style object
+        assignToTarget(props, { ...declaration }, state.config, {
+          objectMergeStyle: "assign",
+        });
+      }
     }
   }
 }
