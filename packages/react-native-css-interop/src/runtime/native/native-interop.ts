@@ -264,6 +264,11 @@ export function interop(
   }, states);
 
   const variables = useMemo(() => {
+    // Reuse inherited scopes when there are no local overrides, while
+    // preserving the conversion of root Maps to plain objects.
+    if (!memoOutput.variables && !(inheritedVariables instanceof Map)) {
+      return inheritedVariables;
+    }
     return Object.assign(
       {},
       inheritedVariables instanceof Map
