@@ -245,31 +245,54 @@ function printUpgradeWarning(
 
 function stringify(object: any) {
   const seen = new WeakSet();
-  return JSON.stringify(
-    object,
-    function replace(_, value) {
-      if (!(value !== null && typeof value === "object")) {
-        return value;
-      }
+  try {
+    return JSON.stringify(
+      object,
+      function replace(_, value) {
+        if (!(value !== null && typeof value === "object")) {
+          return value;
+        }
 
-      if (seen.has(value)) {
-        return "[Circular]";
-      }
+        if (seen.has(value)) {
+          return "[Circular]";
+        }
 
-      seen.add(value);
+        // A React element holds its owner's fiber, which reaches the whole tree,
+        // including context default values whose getters throw by design (React
+        // Navigation's "Couldn't find a navigation context"). Name it instead.
+        if (typeof value.$$typeof === "symbol") {
+          return `<${getDisplayName(value.type)} />`;
+        }
 
-      const newValue: any = Array.isArray(value) ? [] : {};
+        seen.add(value);
 
-      for (const entry of Object.entries(value)) {
-        newValue[entry[0]] = replace(entry[0], entry[1]);
-      }
+        const newValue: any = Array.isArray(value) ? [] : {};
 
-      seen.delete(value);
+        for (const key of Object.keys(value)) {
+          let entry: unknown;
+          try {
+            entry = value[key];
+          } catch {
+            entry = "[Unreadable]";
+          }
+          newValue[key] = replace(key, entry);
+        }
 
-      return newValue;
-    },
-    2,
-  );
+        seen.delete(value);
+
+        return newValue;
+      },
+      2,
+    );
+  } catch {
+    return "[Unreadable]";
+  }
+}
+
+function getDisplayName(type: any): string {
+  const name =
+    typeof type === "string" ? type : type?.displayName || type?.name;
+  return typeof name === "string" && name ? name : "Component";
 }
 
 // const ForwardRefSymbol = Symbol.for("react.forward_ref");
