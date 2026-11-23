@@ -34,6 +34,23 @@
   -rn-native-mapping--rn-tint: tint;
 }
 
+/* A mapping declaration, unlike an @nativeMapping block, survives Tailwind's optimizer */
+@utility thumb-* {
+  -rn-thumb-color: --value(--color-*);
+  -rn-native-mapping--rn-thumb-color: thumbColor;
+}
+
+/* Switch's trackColor is { true: onColor, false: offColor } */
+@utility track-on-* {
+  -rn-track-on-color: --value(--color-*);
+  -rn-native-mapping--rn-track-on-color: trackColor.true;
+}
+
+@utility track-off-* {
+  -rn-track-off-color: --value(--color-*);
+  -rn-native-mapping--rn-track-off-color: trackColor.false;
+}
+
 @utility ripple-* {
   -rn-ripple-style: --value("borderless");
   -rn-ripple-color: --value(--color-*);
