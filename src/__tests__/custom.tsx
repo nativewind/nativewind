@@ -29,6 +29,7 @@ describe("Custom - Ripple Borderless", () => {
 
 describe("Custom utility production discovery", () => {
   test.each([
+    ["tint-black", { tint: "#000", style: {} }],
     ["ripple-foreground", { android_ripple: { foreground: true }, style: {} }],
     [
       "ripple-black ripple-foreground ripple-16",
