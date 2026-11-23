@@ -40,9 +40,15 @@
   -rn-native-mapping--rn-thumb-color: thumbColor;
 }
 
-@utility track-* {
-  -rn-track-color: --value(--color-*);
-  @prop -rn-track-color trackColor;
+/* Switch's trackColor is { true: onColor, false: offColor } */
+@utility track-on-* {
+  -rn-track-on-color: --value(--color-*);
+  -rn-native-mapping--rn-track-on-color: trackColor.true;
+}
+
+@utility track-off-* {
+  -rn-track-off-color: --value(--color-*);
+  -rn-native-mapping--rn-track-off-color: trackColor.false;
 }
 
 @utility ripple-* {
