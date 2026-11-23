@@ -1,5 +1,13 @@
 import { renderCurrentTest, renderSimple } from "../test-utils";
 
+describe("Custom - Tint Color", () => {
+  test("tint-black", async () => {
+    expect(await renderCurrentTest()).toStrictEqual({
+      props: { tint: "#000", style: {} },
+    });
+  });
+});
+
 describe("Custom - Ripple Color", () => {
   test("ripple-black", async () => {
     expect(await renderCurrentTest()).toStrictEqual({
@@ -21,6 +29,7 @@ describe("Custom - Ripple Borderless", () => {
 
 describe("Custom utility production discovery", () => {
   test.each([
+    ["tint-black", { tint: "#000", style: {} }],
     ["ripple-foreground", { android_ripple: { foreground: true }, style: {} }],
     [
       "ripple-black ripple-foreground ripple-16",
