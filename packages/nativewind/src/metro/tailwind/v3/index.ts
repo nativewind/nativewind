@@ -20,6 +20,8 @@ import { TailwindCliOptions } from "../types";
 
 const child_file = __dirname + "/child.js";
 
+const INITIAL_BUILD_TIMEOUT_MS = 60_000;
+
 const getEnv = (options: TailwindCliOptions) => {
   return {
     ...process.env,
@@ -45,8 +47,37 @@ export const tailwindCliV3 = function (debug: Debugger) {
           let initialMessage = true;
           let initialDoneIn = true;
 
+          /*
+           * The promise must settle even when the Tailwind build crashes
+           * before its first IPC message, otherwise Metro waits on the
+           * virtual CSS module forever with no error shown anywhere:
+           * - non-watch mode: the child exits without sending -> reject on
+           *   "exit"/"error"
+           * - watch mode: tailwind --watch logs the error and keeps running,
+           *   leaving the child alive but forever silent -> reject after a
+           *   timeout
+           * Keep the stderr tail so the rejection carries the real error.
+           */
+          let stderrTail = "";
+          const initialFailure = (why: string) =>
+            new Error(
+              `NativeWind: Tailwind child ${why} before producing CSS - the bundle would hang silently. Tailwind output below.\n--- tailwind stderr ---\n${
+                stderrTail.trim() || "(empty)"
+              }`,
+            );
+          const initialTimer = setTimeout(() => {
+            if (initialMessage) {
+              reject(
+                initialFailure(
+                  `produced nothing within ${INITIAL_BUILD_TIMEOUT_MS / 1000}s`,
+                ),
+              );
+            }
+          }, INITIAL_BUILD_TIMEOUT_MS);
+
           child.stderr?.on("data", (data) => {
             data = data.toString();
+            stderrTail = (stderrTail + data).slice(-4000);
             if (data.includes("Done in")) {
               if (initialDoneIn) {
                 initialDoneIn = false;
@@ -60,8 +91,23 @@ export const tailwindCliV3 = function (debug: Debugger) {
             data = data.toString();
           });
 
+          child.on("error", (error) => {
+            if (initialMessage) {
+              clearTimeout(initialTimer);
+              reject(error);
+            }
+          });
+
+          child.on("exit", (code, signal) => {
+            if (initialMessage) {
+              clearTimeout(initialTimer);
+              reject(initialFailure(`exited (code=${code}, signal=${signal})`));
+            }
+          });
+
           child.on("message", (message) => {
             if (initialMessage) {
+              clearTimeout(initialTimer);
               resolve(message.toString());
               initialMessage = false;
               debug("Finished initial development Tailwind CLI");
