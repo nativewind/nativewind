@@ -2,7 +2,6 @@ import { I18nManager, PixelRatio, Platform } from "react-native";
 
 import type {
   ContainerCondition,
-  Declaration,
   MediaFeatureComparison,
   MediaFeatureValue,
   MediaQuery,
@@ -12,6 +11,7 @@ import type {
 import { DEFAULT_CONTAINER_NAME } from "../../shared";
 import {
   AttributeCondition,
+  Declaration,
   ExtractedContainerQuery,
   PseudoClassesQuery,
   StyleRule,
